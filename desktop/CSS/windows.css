@@ -1,0 +1,227 @@
+
+/* ------------------ Windows skin ------------------------------- */
+
+.window_dragger a {
+  text-decoration:none;
+  font-weight:bold;
+
+  font-size:10px;
+}
+
+
+.window_dragger{
+
+   cursor:move;
+  z-index:1;
+  width:100%;
+  height:36px;
+  
+  position:absolute;
+  top:0px;
+  left:0px;
+
+}
+
+
+
+.window_resize_handle {
+position:absolute;
+cursor:se-resize;
+width:20px;
+height:16px;
+font-size:10px;
+z-index:1;
+}
+
+.window_container {
+
+  padding:0px;
+  position:absolute;
+}
+
+.window_fader
+{
+
+border:0px;
+width:100%;
+}
+
+.window_topslice
+{
+  position:relative;
+
+border:0px;
+width:100%;
+height:36px;
+
+}
+
+.window_middleslice
+{
+
+width:100%;
+position:relative;
+}
+
+.window_bottomslice
+{
+
+position:absolute;
+height:16px;
+border:0px;
+width:100%;
+}
+
+
+.window_handle_left {
+font-size:3px;
+position: absolute;
+left:0px;
+top:0px;
+width:15px;
+height:36px;
+background:url("./images/windows/window_0.gif");
+
+}
+
+.window_title {
+  line-height:30px;
+  font-size:14px;
+  font-weight:bold;
+  font-family:sans-serif;
+  overflow:hidden;
+}
+
+.window_handle_center {
+
+font-size:3px;
+background:url("./images/windows/window_1.gif");
+background-repeat:repeat-x;
+
+top:0px;
+height:36px;
+border:0px;
+
+margin-left: 15px;
+margin-right:74px;
+text-align:center;
+}
+
+.window_handle_right {
+background:url("./images/windows/window_2.gif");
+font-size:3px;
+position: absolute;
+right:0px;
+top:0px;
+width:74px;
+height:36px;
+border:0px;
+}
+
+
+
+
+.window_border_left {
+background:url("./images/windows/window_3.gif");
+background-repeat:repeat-y;
+position: absolute;
+left:0px;
+width:15px;
+
+border:0px;
+
+}
+
+.window_content {
+text-align:left;
+/*overflow:auto;*/
+position:relative;
+background:#D7D0BE;
+
+font-family:sans-serif;
+font-size:12px;
+border:0px;
+margin-left: 15px;
+margin-right:16px;
+padding:0px;
+}
+
+.window_border_right {
+background:url("./images/windows/window_4.gif");
+background-repeat:repeat-y;
+position: absolute;
+right:0px;
+top:0px;
+width:16px;
+
+border:0px;
+}
+
+
+.window_bottom_left {
+font-size:3px;
+position: absolute;
+left:0px;
+bottom:0px;
+width:15px;
+height:16px;
+background:url("./images/windows/window_5.gif");
+border:0px;
+}
+
+.window_bottom_center {
+font-size:3px;
+background:url("./images/windows/window_6.gif");
+background-repeat:repeat-x;
+margin-bottom:0px;
+height:16px;
+border:0px;
+margin-left: 15px;
+margin-right:16px;
+}
+
+.window_bottom_right {
+background:url("./images/windows/window_7.gif");  
+font-size:3px;
+position: absolute;
+right:0px;
+bottom:0px;
+width:16px;
+height:16px;
+border:0px;
+}
+
+.window_button_holder {
+  position:absolute;
+  right:19px;
+  text-align:right;
+  width:60px;
+  padding-top:8px;
+  font-size:6px
+}
+
+
+
+.window_iframe {
+border:0px;
+padding:0px;
+margin:0px;
+
+
+}
+
+.splashscreen {
+position: absolute;
+top: 100;
+left: 100;
+width: 400px;
+height: 300px;
+text-align: left; 
+background: #87cfff url("./images/windows/splash00.jpg");  
+padding:0px;
+color:black;
+z-index:10000;
+
+}
+
+

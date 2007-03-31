@@ -1,0 +1,8 @@
+.desktopTaskBar {
+    display: inline;
+    position: relative;
+    height: 30px;
+    width: 100%;
+    background: #000000;
+    z-index: 1001;
+}
