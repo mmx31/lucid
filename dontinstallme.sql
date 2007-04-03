@@ -43,10 +43,3 @@ CREATE TABLE `users` (
   `level` mediumtext character set ascii collate ascii_bin NOT NULL,
   PRIMARY KEY  (`ID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=31 ;
-
--- 
--- Dumping data for table `users`
--- 
-
-INSERT INTO `users` VALUES (`admin`, `email@admin.com`, `hashedpass`, 0, 1, `admin`);
-
