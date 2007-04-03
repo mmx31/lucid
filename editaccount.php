@@ -137,9 +137,9 @@ editaccount($user, $email, $newpass);
 <LABEL for="email">Confirm New Password: </LABEL>
 <INPUT type="password" name="confnewpass" id="confnewpass"><BR>
 <p>Enter the text in the image in this feild.</p>
-<img src="/backend/captchaimage.php?width=125&height=25&character=5" /><br>
+<img src="./backend/captchaimage.php?width=125&height=25&character=5" /><br>
 <input id="security_code" name="security_code" type="text" /><br />
-<INPUT type="submit" value="Submit"><INPUT type="button" value="Cancel" onClick="window.location='/index.php'">
+<INPUT type="submit" value="Submit"><INPUT type="button" value="Cancel" onClick="window.location='./index.php'">
 </FORM>
 </div>
 </center>

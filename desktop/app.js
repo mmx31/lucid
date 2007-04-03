@@ -31,7 +31,7 @@ function exec_app(id, libCodeProxy)
 ui_loadingIndicator(0);
 app_liborcode = libCodeProxy;
 app_createRequest();
-var url = "/backend/app.php?id="+id;
+var url = "../backend/app.php?id="+id;
 app_xmlHttp.open("GET", url, true);
 app_xmlHttp.onreadystatechange = app_StateChange;
 app_xmlHttp.send(null);

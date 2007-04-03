@@ -12,10 +12,10 @@ global $code;
 <link rel="stylesheet" href="./Steely.css" type="text/css">
 </head>
 <body>
-<table border= "0" width="100%" cellpadding= "0" cellspacing= "0" style="background-image: url('../images/header.gif'); position: absolute; top: 0px; left: 0px;">
+<table border= "0" width="100%" cellpadding= "0" cellspacing= "0" style="background-image: url('./images/header.gif'); position: absolute; top: 0px; left: 0px;">
 <tr>
 <td>
-<img src="../images/logo.gif">
+<img src="./images/logo.gif">
 </td>
 </tr>
 </table>

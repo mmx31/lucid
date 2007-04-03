@@ -15,7 +15,7 @@ drawtaskbar();
 function logout()
 {
 window.onbeforeunload = null;
-window.location = "/backend/logout.php?user="+conf_user;
+window.location = "../backend/logout.php?user="+conf_user;
 }
 
 function bodyOnBeforeUnload()

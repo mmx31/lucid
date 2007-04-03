@@ -1,77 +1,54 @@
 <?php
-//install script
-
-if($post['submitted'])
-{
-?>
-<html>
-<head>
-<title>Installing...</title>
-</head>
-<body>
-<h1>Psych Desktop Installation</h1>
-<h3>installing...</h3>
-<?php
-if($post['db_host'] && $post['db_name'] && $post['db_user'] && $post['db_pass'] && $post['db_prefix'] && $post['username'] && $post['password'])
-{
+require("./backend/config.php");
+if (isset($_POST['unsubmit'])) {
+echo("connecting to database server... ");
+mysql_connect($db_host, $db_username, $db_password) or die('Error connecting to MySQL server: ' . mysql_error());
+// Select database
+echo("selecting database... ");
+mysql_select_db($db_name) or die('Error selecting MySQL database: ' . mysql_error());
+echo("destroying psych desktop... ");
+mysql_query("DROP TABLE `users`;");
+mysql_query("DROP TABLE `apps`;");
+die("uninstalled Psych Desktop (My-SQL Only).");
 }
-else
-{
-echo "<b>Error: not all information entered!</b><br><a href='javascript: history.back()'>Go Back</a></body></html>";
-exit();
+if (isset($_POST['submit'])) {
+echo("Preparing... ");
+$filename = 'dontinstallme.sql';
+// Connect to MySQL server
+echo("connecting to database server... ");
+mysql_connect($db_host, $db_username, $db_password) or die('Error connecting to MySQL server: ' . mysql_error());
+// Select database
+echo("selecting database... ");
+mysql_select_db($db_name) or die('Error selecting MySQL database: ' . mysql_error());
+// Temporary variable, used to store current query
+$templine = '';
+// Read in entire file
+$lines = file($filename);
+// Loop through each line
+echo("doing main queries on database... ");
+foreach ($lines as $line_num => $line) {
+    // Only continue if it's not a comment
+    if (substr($line, 0, 2) != '--' && $line != '') {
+        // Add this line to the current segment
+        $templine .= $line;
+        // If it has a semicolon at the end, it's the end of the query
+        if (substr(trim($line), -1, 1) == ';') {
+            // Perform the query
+            mysql_query($templine) or print('Error performing query \'<b></b>\': ' . mysql_error() . '<br /><br />');
+            // Reset temp variable to empty
+            $templine = '';
+        }
+    }
 }
-echo "<br><b>Writing config...</b>";
-//insert config writing stuff here
-echo "done.";
-echo "<br><b>Configuring DB...</b>";
-//insert DB stuff here
-echo "done.";
-
-echo "<h4>Done. Please make sure you delete /install.php and /desktop.sql before using the desktop!</h4>";
-echo "<a href='./index.php'>Continue to homepage</a>";
-echo "<a href='./admin/index.php'>Go to administrator panel</a>";
-echo "</body>\n</html>";
-}
-else
-{
-?>
-<html>
-<head>
-<title>Psych Desktop Installation</title>
-</head>
-<body>
-<h1>Psych Desktop Installation</h1>
-<?php
-if(/*not able to write to file*/) { echo "<b>Error: cannot write to config file. Be sure to chmod it to 777"; $ready == 0; } else { $ready == 1; }
-?>
-<form action="./install.php">
-<input type="hidden" name="submitted" value="1">
-<input type="hidden" name="md5hash" value="<?php echo crypt("cryptme!"); ?>">
-DB Host: 
-<input type="text" name="db_host">
-<br>
-DB name: 
-<input type="text" name="db_name">
-<br>
-DB user: 
-<input type="text" name="db_user">
-<br>
-DB password: 
-<input type="text" name="db_pass">
-<br>
-DB table prefix: 
-<input type="text" name="db_prefix">
-<br>
-Admin's desired username: 
-<input type="text" name="username">
-<br>
-Admin's desired password: 
-<input type="text" name="password">
-<br>
-<?php if($ready == 1) { echo '<input type="submit">'; } ?>
-</form>
-</body>
-</html>
-<?php
+echo("installing admin username and password... ");
+$username = $_POST['username'];
+$password = crypt($_POST['password'], $conf_secretword);
+mysql_query("INSERT INTO `users` VALUES ('".$username."', 'email@admin.com', '".$password."', 0, 1, 'admin');") or print('Error performing query \'<b></b>\': ' . mysql_error() . '<br /><br />');
+die("done. <br> Please delete this file and dontinstallme.sql!");
 }
 ?>
+<form method="post" action="<?php echo $PHP_SELF;?>">
+Admin Username:<input type="text" size="12" maxlength="12" name="username">:<br />
+Admin Password:<input type="password" size="12" maxlength="36" name="password">:<br />
+<input type="submit" value="Install" name="submit">
+<input type="submit" value="Un-Install" name="unsubmit">

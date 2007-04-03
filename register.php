@@ -12,7 +12,7 @@ mysql_select_db($db_name) or die('<br>Could not select database');
 
 $query = "INSERT INTO `${db_prefix}users` (`username`, `email`, `password`, `logged`, `ID`, `level`) VALUES ('${username}', '${email}', '${password}', '0', NULL, 'user');";
 $result = mysql_query($query) or die('Query failed: ' . mysql_error());
-echo "<script type='text/javascript'> window.location = '../index.php?opmessage=Registration+Successfull'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?opmessage=Registration+Successfull'</script>";
 // Free resultset
 mysql_free_result($result);
 
@@ -35,13 +35,13 @@ if(($_SESSION['security_code'] == $_POST['security_code']) && (!empty($_SESSION[
 	  //ok
    } else {
       // Insert your code for showing an error message here
-echo "<script type='text/javascript'> window.location = '../index.php?page=register&opmessage=Error:+Security+Image+And+Submitted+Data+Are+Not+The+Same'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=register&opmessage=Error:+Security+Image+And+Submitted+Data+Are+Not+The+Same'</script>";
 exit();
    }
 }
 else
 {
-echo "<script type='text/javascript'> window.location = '../index.php?page=register&opmessage=Error:+No+Security+Code+Entered'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=register&opmessage=Error:+No+Security+Code+Entered'</script>";
 exit();
 }
 
@@ -56,19 +56,19 @@ if($_POST['user'])
   }
   else
   {
-echo "<script type='text/javascript'> window.location = '../index.php?page=register&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=register&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
   exit();
   }
  }
  else
  {
-echo "<script type='text/javascript'> window.location = '../index.php?page=register&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=register&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
  exit();
  }
 }
 else
 {
-echo "<script type='text/javascript'> window.location = '../index.php?page=register&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=register&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
 exit();
 }
 
@@ -79,7 +79,7 @@ if($_POST['email'])
 if (!eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", $_POST['email']))
 {
 
-echo "<script type='text/javascript'> window.location = '../index.php?page=register&opmessage=Error:+Invalid+Email+Address'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=register&opmessage=Error:+Invalid+Email+Address'</script>";
        exit(); 
 } else {
         
@@ -89,7 +89,7 @@ echo "<script type='text/javascript'> window.location = '../index.php?page=regis
 }
 else
 {
-echo "<script type='text/javascript'> window.location = '../index.php?page=register&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=register&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
 }
 
 
@@ -99,7 +99,7 @@ if($_POST['pass'] == $_POST['conf'])
 }
 else
 {
-echo "<script type='text/javascript'> window.location = '../index.php?page=register&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=register&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
 exit();
 }
 
@@ -120,7 +120,7 @@ foreach ($line as $col_value)
 {
 if($_POST["user"] == $col_value)
 {
-echo "<script type='text/javascript'> window.location = '../index.php?page=register&opmessage=Error:+Username+Allready+Exists'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=register&opmessage=Error:+Username+Allready+Exists'</script>";
 }
 }
 }
@@ -149,7 +149,7 @@ else
     <LABEL for="email">Email: </LABEL>
               <INPUT type="text" name="email" id="email"><BR>
 <p>Enter the text in the image in this feild. <a href="javascript: window.location.reload( false );">Can't Read it?</a></p>
-<img src="/backend/captchaimage.php?width=125&height=25&character=5" /><br>
+<img src="./backend/captchaimage.php?width=125&height=25&character=5" /><br>
 <input id="security_code" name="security_code" type="text" /><br />
 
 

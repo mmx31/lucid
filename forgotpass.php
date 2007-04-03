@@ -66,7 +66,7 @@ function sendpass($newpass, $email)
 //send the new password to $email and redirect to index with an OP message confirming the email was sent.
 $message= "In response to your forgotten password request, here's your new password.\n\n" . "New Password: '" . $newpass . "'\n\nLog in with this password, then change it once logged in. Thanks!\n\n--The Management";
 mail ($email, "Psych Desktop Password Change Script", $message, "From: Psych Desktop Account Service");
-echo "<script type='text/javascript'> window.location = '../index.php?opmessage=New+Password+Sent'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?opmessage=New+Password+Sent'</script>";
 }
 
 
@@ -80,7 +80,7 @@ if($_POST['email'])
 if (!eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", $_POST['email']))
 {
 
-echo "<script type='text/javascript'> window.location = '../index.php?page=forgotpass&opmessage=Error:+Invalid+Email+Address'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=forgotpass&opmessage=Error:+Invalid+Email+Address'</script>";
        exit(); 
 } else {
         
@@ -90,7 +90,7 @@ echo "<script type='text/javascript'> window.location = '../index.php?page=forgo
 }
 else
 {
-echo "<script type='text/javascript'> window.location = '../index.php?page=forgotpass&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=forgotpass&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
 }
 
 
@@ -101,13 +101,13 @@ if(($_SESSION['security_code'] == $_POST['security_code']) && (!empty($_SESSION[
 	  //ok
    } else {
       // Insert your code for showing an error message here
-echo "<script type='text/javascript'> window.location = '../index.php?page=forgotpass&opmessage=Error:+Security+Image+And+Submitted+Data+Are+Not+The+Same'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=forgotpass&opmessage=Error:+Security+Image+And+Submitted+Data+Are+Not+The+Same'</script>";
 exit();
    }
 }
 else
 {
-echo "<script type='text/javascript'> window.location = '../index.php?page=forgotpass&opmessage=Error:+No+Security+Code+Entered'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=forgotpass&opmessage=Error:+No+Security+Code+Entered'</script>";
 exit();
 }
 
@@ -117,7 +117,7 @@ if($_POST['user'])
   }
   else
   {
-echo "<script type='text/javascript'> window.location = '../index.php?page=forgotpass&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
+echo "<script type='text/javascript'> window.location = './index.php?page=forgotpass&opmessage=Error:+Not+Enough+Information+Submitted'</script>";
   exit();
   }
 
@@ -137,9 +137,9 @@ else
     <LABEL for="email">Email: </LABEL>
               <INPUT type="text" name="email" id="email"><BR>
 <p>Enter the text in the image in this feild.</p>
-<img src="/backend/captchaimage.php?width=125&height=25&character=5" /><br>
+<img src="./backend/captchaimage.php?width=125&height=25&character=5" /><br>
 <input id="security_code" name="security_code" type="text" /><br />
-<INPUT type="submit" value="Submit"><INPUT type="button" value="Cancel" onClick="window.location='/index.php'">
+<INPUT type="submit" value="Submit"><INPUT type="button" value="Cancel" onClick="window.location='./index.php'">
     </P>
  </FORM>
 </div>
