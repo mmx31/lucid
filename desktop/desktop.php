@@ -64,7 +64,7 @@ document.write("<i>"+conf_user+"</i><p> </p>")
 
 <center>
 <table cellpadding="0" cellspacing="0" width="90%" id="menu">
-<tr>
+<tr><script>app_getApplications();</script>
 <td onClick = "app_launch(1);" style="border-top: 1px solid white;">Calculator</td>
 </tr>
 <tr>

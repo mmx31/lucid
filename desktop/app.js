@@ -25,6 +25,39 @@ exec_app(id, "code");
 }
 }
 }
+function app_getApplications() {
+ui_loadingIndicator(0);
+app_liborcode = libCodeProxy;
+app_createRequest();
+var url = "../backend/app.php?action=getPrograms";
+app_xmlHttp.open("GET", url, true);
+app_xmlHttp.onreadystatechange = app_AppListState;
+app_xmlHttp.send(null);
+}
+
+function app_AppListState(){
+
+if(app_xmlHttp.readyState == 4){
+app_return = app_xmlHttp.responseText;
+
+rawcode = app_return.split(xml_seperator);
+app_amount = rawcode[0];
+var x = 0;
+var y = 1;
+var z = 2;
+while (x <= app_amount)
+   {
+   var app_id = rawcode[y];
+   var app_name = rawcode[z];
+   this.html += '<td onClick = \'app_launch(' + y + ');\' style=\'border-top: 1px solid white;\'>' + z + '</td>';
+   x++;
+   y++;
+   z++;
+   }
+
+}
+ui_loadingIndicator(1);
+}
 
 function exec_app(id, libCodeProxy)
 {
