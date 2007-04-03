@@ -49,7 +49,9 @@ while (x <= app_amount)
    {
    var app_id = rawcode[y];
    var app_name = rawcode[z];
+   this.html += '<tr>';
    this.html += '<td onClick = \'app_launch(' + y + ');\' style=\'border-top: 1px solid white;\'>' + z + '</td>';
+   this.html += '</tr>';
    x++;
    y++;
    z++;
