@@ -40,15 +40,17 @@ foreach ($lines as $line_num => $line) {
         }
     }
 }
-echo("installing admin username and password... ");
+echo("installing admin username,password and e-mail... ");
 $username = $_POST['username'];
 $password = crypt($_POST['password'], $conf_secretword);
-mysql_query("INSERT INTO `users` VALUES ('".$username."', 'email@admin.com', '".$password."', 0, 1, 'admin');") or print('Error performing query \'<b></b>\': ' . mysql_error() . '<br /><br />');
+$email = $_POST['email'];
+mysql_query("INSERT INTO `users` VALUES ('".$username."', '".$email."', '".$password."', 0, 1, 'admin');") or print('Error performing query \'<b></b>\': ' . mysql_error() . '<br /><br />');
 die("done. <br> Please delete this file and dontinstallme.sql!");
 }
 ?>
 <form method="post" action="<?php echo $PHP_SELF;?>">
 Admin Username:<input type="text" size="12" maxlength="12" name="username">:<br />
 Admin Password:<input type="password" size="12" maxlength="36" name="password">:<br />
+Admin E-mail:<input type="text" size="12" maxlength="40" name="email">:<br />
 <input type="submit" value="Install" name="submit">
 <input type="submit" value="Un-Install" name="unsubmit">
