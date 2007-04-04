@@ -9,6 +9,7 @@ mysql_select_db($db_name) or die('Error selecting MySQL database: ' . mysql_erro
 echo("destroying psych desktop... ");
 mysql_query("DROP TABLE `users`;");
 mysql_query("DROP TABLE `apps`;");
+mysql_query("DROP TABLE `installedapps`;");
 die("uninstalled Psych Desktop (My-SQL Only).");
 }
 if (isset($_POST['submit'])) {
