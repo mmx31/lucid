@@ -64,7 +64,7 @@ mysql_close($link);
 function sendpass($newpass, $email)
 {
 //send the new password to $email and redirect to index with an OP message confirming the email was sent.
-$message= "In response to your forgotten password request, here's your new password.\n\n" . "New Password: '" . $newpass . "'\n\nLog in with this password, then change it once logged in. Thanks!\n\n--The Management";
+$message= "In response to your forgotten password request, here's your new password.\r\n\r\n" . "New Password: '" . $newpass . "'\r\n\r\nLog in with this password, then change it once logged in. Thanks!\r\n\r\n--The Management";
 mail ($email, "Psych Desktop Password Change Script", $message, "From: Psych Desktop Account Service");
 echo "<script type='text/javascript'> window.location = './index.php?opmessage=New+Password+Sent'</script>";
 }
