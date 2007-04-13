@@ -10,6 +10,7 @@ echo("destroying psych desktop... ");
 mysql_query("DROP TABLE `users`;");
 mysql_query("DROP TABLE `apps`;");
 mysql_query("DROP TABLE `installedapps`;");
+mysql_query("DROP TABLE `registry`;");
 die("uninstalled Psych Desktop (My-SQL Only).");
 }
 if (isset($_POST['submit'])) {
