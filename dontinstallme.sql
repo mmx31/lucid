@@ -1,5 +1,6 @@
 -- NOTE: DON'T ACTUALLY RUN THIS! THIS IS JUST FOR REFERENCE!!!
-
+-- We should get this into a PHP installer, that way
+-- the user can specify a table prefix.
 -- --------------------------------------------------------
 
 -- 
@@ -7,7 +8,7 @@
 -- 
 
 CREATE TABLE `apps` (
-  `ID` bigint(255) NOT NULL auto_increment,
+  `ID` int(20) NOT NULL auto_increment,
   `name` mediumtext NOT NULL,
   `author` mediumtext NOT NULL,
   `email` mediumtext NOT NULL,
@@ -38,15 +39,26 @@ CREATE TABLE `users` (
   `email` mediumtext character set ascii collate ascii_bin NOT NULL,
   `password` mediumtext character set ascii collate ascii_bin NOT NULL,
   `logged` tinyint(1) NOT NULL default '0',
-  `ID` bigint(255) NOT NULL auto_increment,
+  `ID` int(11) NOT NULL auto_increment,
   `level` mediumtext character set ascii collate ascii_bin NOT NULL,
   PRIMARY KEY  (`ID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=31 ;
 
 -- FOR A PROGRAM INSTALLER (coming soon)
+-- Mabie this would be easier to do with the planned registry... --psych
 CREATE TABLE `installedapps` (
-  `ID` bigint(255) NOT NULL auto_increment,
-  `username` mediumtext character set ascii collate ascii_bin NOT NULL,
-  `appid` bigint(255) NOT NULL,
+  `ID` int(11) NOT NULL auto_increment,
+  `userid` int(11) NOT NULL auto_increment,
+  `appid` int(20) NOT NULL,
+  PRIMARY KEY  (`ID`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=31 ;
+
+-- Registry
+CREATE TABLE `registry` (
+  `ID` int(11) NOT NULL auto_increment,
+  `userid` int(11) NOT NULL auto_increment,
+  `appid` int(20) NOT NULL,
+  `varname` mediumtext character set ascii collate ascii_bin NOT NULL,
+  `value` mediumtext character set ascii collate ascii_bin NOT NULL,
   PRIMARY KEY  (`ID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=31 ;
