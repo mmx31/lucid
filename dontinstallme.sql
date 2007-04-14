@@ -48,7 +48,7 @@ CREATE TABLE `users` (
 -- Registry - I argee.  - Jaymacdonald
 CREATE TABLE `registry` (
   `ID` int(11) NOT NULL auto_increment,
-  `userid` int(11) NOT NULL auto_increment,
+  `userid` int(11) NOT NULL,
   `appid` int(20) NOT NULL,
   `varname` mediumtext character set ascii collate ascii_bin NOT NULL,
   `value` mediumtext character set ascii collate ascii_bin NOT NULL,
