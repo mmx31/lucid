@@ -1,4 +1,4 @@
-<?php
+<?phpsession_start();
 
 
 
@@ -85,8 +85,8 @@ mysql_select_db($db_name) or die('Could not select database');
 $query = "UPDATE `${db_prefix}users` SET `logged` = '1' WHERE username ='${user}'";
 mysql_query($query) or die('Query failed: ' . mysql_error());
 mysql_close($link);
-
-setcookie("userloggedin", $user, PHP_INT_MAX, "~");
+/** Normal Cookies Can Be Faked
+* setcookie("userloggedin", $user, PHP_INT_MAX, "~");*/$_SESSION["userloggedin"] = $user; // set a session cookie. very difficult (if impossible) to fake
 action();
 }
 
