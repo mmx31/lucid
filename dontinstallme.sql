@@ -44,16 +44,8 @@ CREATE TABLE `users` (
   PRIMARY KEY  (`ID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=31 ;
 
--- FOR A PROGRAM INSTALLER (coming soon)
--- Mabie this would be easier to do with the planned registry... --psych
-CREATE TABLE `installedapps` (
-  `ID` int(11) NOT NULL auto_increment,
-  `userid` int(11) NOT NULL auto_increment,
-  `appid` int(20) NOT NULL,
-  PRIMARY KEY  (`ID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=31 ;
 
--- Registry
+-- Registry - I argee.  - Jaymacdonald
 CREATE TABLE `registry` (
   `ID` int(11) NOT NULL auto_increment,
   `userid` int(11) NOT NULL auto_increment,
