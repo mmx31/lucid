@@ -125,7 +125,7 @@ if (isset($_POST['submit'])) {
     if($configerror == true)
     {
         echo "<span style='color: red;'>There was an error in writing to your configuration file. Please copy and paste this data into /backend/config.php:</span>";
-        $writebuffer = "<?php<br />//database type (mysql and ini) ini coming soon!<br />\$db_type=\"mysql\";<br />";
+        $writebuffer = "&lt;?php<br />//database type (mysql and ini) ini coming soon!<br />\$db_type=\"mysql\";<br />";
         $writebuffer = $writebuffer."//database name<br />\$db_name=\"${_POST['db_name']}\";<br />";
         $writebuffer = $writebuffer."//database host<br />\$db_host=\"${_POST['db_host']}\";<br />";
         $writebuffer = $writebuffer."//database username<br />\$db_username=\"${_POST['db_username']}\";<br />";
@@ -133,7 +133,7 @@ if (isset($_POST['submit'])) {
         $writebuffer = $writebuffer."//database prefix<br />\$db_prefix=\"${_POST['db_prefix']}\";<br />";
         $writebuffer = $writebuffer."//the secret word for encryption of passwords<br />//NOTE: DO NOT CHANGE AFTER INSTALL! THIS WILL BREAK THE USER LOGIN PROCESS!!!<br />";
         $writebuffer = $writebuffer."\$conf_secretword=\"$conf_secretword\";<br />?>";     
-        echo "<div align='left' style='width: 70%; height: 250px; overflow: scroll; border: 1px; border-style: dashed; border-color: #DDDDDD; font-family: mono;'>$writebuffer</div>";
+        echo "<div align='left' style='width: 70%; height: 250px; overflow: scroll; border: 1px; border-style: dashed; border-color: #DDDDDD; font-family: mono;'>".$writebuffer."</div>";
     }
     if($_POST['fresh'] == "yes") { die("Installation Completed.<br /><span style='color: red;'>Please delete this file and dontinstallme.sql before using the desktop</span></div></center></body></html>"); }
     if($_POST['fresh'] == "no") { die("Configuration Edit Completed.<br /><span style='color: red;'>Please delete this file and dontinstallme.sql before using the desktop</span></div></center></body></html>"); }

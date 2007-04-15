@@ -1,13 +1,17 @@
 <?php
-
-$db_type="mysql"; // only option is mysql
-$db_name="test";
+//database type (mysql and ini) ini coming soon!
+$db_type="mysql";
+//database name
+$db_name="desktop";
+//database host
 $db_host="127.0.0.1";
-$db_username="root";
-$db_password="YOURPASSHERE";
-$db_prefix="";//the secret word for encryption of passwords
-
-
-$conf_secretword="483e74f6eb0de99a7f49ff9172acefdf";//the secret word for encryption of passwords
+//database username
+$db_username="mysql";
+//database password
+$db_password="mysql";
+//database prefix
+$db_prefix="dsktp_";
+//the secret word for encryption of passwords
 //NOTE: DO NOT CHANGE AFTER INSTALL! THIS WILL BREAK THE USER LOGIN PROCESS!!!
+$conf_secretword="483e74f6eb0de99a7f49ff9172acefdf";
 ?>
