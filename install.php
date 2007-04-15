@@ -73,7 +73,7 @@ if (isset($_POST['submit'])) {
     //reload the config file
     require("./backend/config.php");
     echo "done.<br />";
-    $filename = 'dontinstallme.sql';
+    $filename = 'database.sql';
     if($_POST['fresh'] == 'yes')
     {
         // Connect to MySQL server

@@ -1,4 +1,4 @@
--- NOTE: DON'T ACTUALLY RUN THIS! THIS IS JUST FOR REFERENCE!!!
+-- NOTE: DON'T ACTUALLY RUN THIS! THE INSTALLER (install.php) will install for you!
 -- Changed the charset to utf8, it's more standard...
 -- Also fixed that nasty "there can be only one auto column and it must be defined as a key" bug.
 -- Now the user can specify a prefix! Woo Hoo!!!
