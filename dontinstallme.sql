@@ -51,3 +51,4 @@ CREATE TABLE `#__registry` (
   `varname` mediumtext NOT NULL,
   `value` mediumtext NOT NULL
 ) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1 ;
+REPLACE INTO `#__registry` VALUES (1,1,3,"Test","Yes... Test");
