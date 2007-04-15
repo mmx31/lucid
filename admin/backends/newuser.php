@@ -13,8 +13,10 @@ require("../backend/config.php");
     <LABEL for="email">Email: </LABEL>
               <INPUT type="text" name="email" id="email"><BR>
     <LABEL for="level">Level: </LABEL>
-              <INPUT type="text" name="level" id="level">
-<b>MUST BE 'user' OR 'admin' !!!</b><BR>
+            <SELECT name="level" id="level">
+                <option value="admin">Administrator</option>
+                <option value="user">User</option>
+            </SELECT>
     <INPUT type="submit" value="Submit">
     </P>
  </FORM>
