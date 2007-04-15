@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 
 
 if ($_POST['user'])
@@ -83,9 +83,15 @@ $link = mysql_connect($db_host, $db_username, $db_password)
 mysql_select_db($db_name) or die('Could not select database');
 
 $query = "UPDATE `${db_prefix}users` SET `logged` = '1' WHERE username ='${user}'";
-mysql_query($query) or die('Query failed: ' . mysql_error());
-mysql_close($link);
 
+$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+    while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+    {
+		$_SESSION['userid'] = $row['ID'];
+		$_SESSION['username'] = $row['username'];
+    }
+mysql_close($link);
+$_SESSION['userloggedin'] = TRUE;
 global $conf_user;
 $conf_user = $user;
 require("desktop.php");
