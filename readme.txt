@@ -1,5 +1,4 @@
 To install:
-	*Edit /backend/config.php (don't provide a DB prefix)
 	*Open install.php in a browser, and install.
 
 Customizing:
