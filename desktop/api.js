@@ -2,40 +2,38 @@
 |        Psych Desktop       |
 |         API Library        |
 |   (c) 2006 Psych Designs   |
+|  All functions here can be called |
+| 	via api.functionname();    |
 \***************************/
-
-function createvar(name)
+function api() {
+this.createvar = function(name)
 {
 eval("var "+name+";");
 }
 
 // Registry API Start
 
-function registry() {
-var value;
-var varname;
-var appid;
-var userid;
-var ID;
-}
-registry = new registry();
+this.registry = function() { }
+this.registry = new this.registry();
 
-function getRegistryValue(appid,varname)  {
+this.registry.getRegistryValue = function(appid,varname)  {
 ui_loadingIndicator(0);
 app_createRequest();
-registry.appid = appid;
-registry.varname = varname;
+api.registry.appid = appid;
+api.registry.varname = varname;
 var url = "../backend/api.php?registry=load&appid="+appid+"&varname="+varname;
 app_xmlHttp.open("GET", url, true);
-app_xmlHttp.onreadystatechange = processRegistryGet;
+app_xmlHttp.onreadystatechange = api.registry.processRegistryGet;
 app_xmlHttp.send(null);
 }
-function processRegistryGet() {
+this.registry.processRegistryGet = function() {
 if(app_xmlHttp.readyState == 4){
 value = app_xmlHttp.responseText;
-registry.value = value;
+api.registry.value = value;
 }
 }
+}
+api = new api();
 
 /*
  * To-Do: Fix requirment to run twice

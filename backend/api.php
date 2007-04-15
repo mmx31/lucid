@@ -1,5 +1,7 @@
 <?php
 session_start();
+		$userid = $_SESSION['userid']; // no longer a security risk
+echo "Debug <br> $userid <br> End";
 if (isset($_SESSION['userloggedin'])) { //check to see if the user is looged in!
 
 	if (isset($_GET['registry'])) { 

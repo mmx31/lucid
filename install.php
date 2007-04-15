@@ -135,8 +135,8 @@ if (isset($_POST['submit'])) {
         $writebuffer = $writebuffer."\$conf_secretword=\"$conf_secretword\";<br />?>";     
         echo "<div align='left' style='width: 70%; height: 250px; overflow: scroll; border: 1px; border-style: dashed; border-color: #DDDDDD; font-family: mono;'>".$writebuffer."</div>";
     }
-    if($_POST['fresh'] == "yes") { die("Installation Completed.<br /><span style='color: red;'>Please delete this file and dontinstallme.sql before using the desktop</span></div></center></body></html>"); }
-    if($_POST['fresh'] == "no") { die("Configuration Edit Completed.<br /><span style='color: red;'>Please delete this file and dontinstallme.sql before using the desktop</span></div></center></body></html>"); }
+    if($_POST['fresh'] == "yes") { die("Installation Completed.<br /><span style='color: red;'>Please delete this file and database.sql before using the desktop</span></div></center></body></html>"); }
+    if($_POST['fresh'] == "no") { die("Configuration Edit Completed.<br /><span style='color: red;'>Please delete this file and database.sql before using the desktop</span></div></center></body></html>"); }
 }
 
 ?>

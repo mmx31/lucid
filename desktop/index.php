@@ -1,7 +1,5 @@
 <?php
 session_start();
-
-
 if ($_POST['user'])
 {
 if($_POST['pass'])
@@ -45,7 +43,12 @@ foreach ($line as $col_value)
 
 if($col_value == $pass)
 {
-// Free resultset
+    while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+    {
+		$_SESSION['userid'] = $row['ID'];
+		$_SESSION['username'] = $row['username'];
+		$_SESSION['userloggedin'] = TRUE;
+    }
 mysql_free_result($result);
 
 // Closing connection
@@ -84,14 +87,9 @@ mysql_select_db($db_name) or die('Could not select database');
 
 $query = "UPDATE `${db_prefix}users` SET `logged` = '1' WHERE username ='${user}'";
 
-$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-    while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
-    {
-		$_SESSION['userid'] = $row['ID'];
-		$_SESSION['username'] = $row['username'];
-    }
+mysql_query($query) or die('Query failed: ' . mysql_error());
+
 mysql_close($link);
-$_SESSION['userloggedin'] = TRUE;
 global $conf_user;
 $conf_user = $user;
 require("desktop.php");
