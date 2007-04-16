@@ -1,5 +1,5 @@
 <?php
-session_start();
+if (session_id() == "") session_start(); // if no active session we start a new one
 if ($_POST['user'])
 {
     if(isset($_POST['pass']) || isset($_POST['passhash']))
@@ -33,7 +33,7 @@ function login_check($user, $pass)
     mysql_select_db($db_name) or die('Could not select database');
 
     // Performing SQL query
-    $query = "SELECT password FROM ${db_prefix}users WHERE username='${user}'";
+    $query = "SELECT password FROM ${db_prefix}users WHERE username='${user}' LIMIT 1";
     $result = mysql_query($query) or die('Query failed: ' . mysql_error());
 
     //do compare

@@ -1,10 +1,10 @@
-/****************************\
-|        Psych Desktop       |
-|         API Library        |
-|   (c) 2006 Psych Designs   |
-|  All functions here can be called |
-| 	via api.functionname();    |
-\***************************/
+/**********************************\
+|           Psych Desktop          |
+|            API Library           |
+|      (c) 2006 Psych Designs      |
+| All functions here can be called |
+| 	  via api.functionname();      |
+\**********************************/
 function api() {
 this.createvar = function(name)
 {
