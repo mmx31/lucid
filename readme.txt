@@ -13,7 +13,38 @@ Customizing:
 	You can delete register.php if you want it to be private 
 	(for something like a private installation). You will need to
 	add each account manually in the backend in this case.
+	You can include a php script by using:
 
+		<?php include("./desktop/page.php"); ?>
+
+	For the capatcha images to work properly, you need to add this PHP code.
+	If you use static pages, add this code to only the pages including the script. It must be as close to line 1 as possible.
+	If you're using a CMS, add this to your template, or the index.php of the CMS. This varies, so it's usually best to ask
+	someone how to go about doing this.
+	This is very important, otherwise the users will not be able to use these pages!
+
+	<?php session_start(); global $code; ?>
+
+	If you experience problems with your website/cms when adding this code (which is common for CMS users),
+	try adding this. Make sure you change the example URLs given to the actual URLs.
+	If you're not using register.php, remove that line, and the comma trailing after the line before.
+
+	<?php
+		$pages = array(
+				"http://www.website.com/index.php?page=register",
+				"http://www.website.com/index.php?page=forgotpass",
+				"http://www.website.com/index.php?page=register.php"
+		);
+		foreach($pages as $page) {
+			if($_SERVER['SERVER_SELF'] == $page)
+			{
+				session_start();
+				global $code;
+			}
+		}
+	?>
+	
+	If you still have problems, contact the psych desktop team either through IRC (preferred) at freenode #psychdesktop, or making a forum post.
 	To launch the desktop, put this in the head of your HTML document:
 
 		<SCRIPT LANGUAGE="JavaScript">
