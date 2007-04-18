@@ -1,6 +1,5 @@
 <?php
 session_start();
-if (isset($_SESSION['userloggedin'])) { //check to see if the user is looged in!
 
 	if (isset($_GET['registry'])) { 
 	if ($_GET['registry'] == ("load")) {
@@ -26,8 +25,4 @@ if (isset($_SESSION['userloggedin'])) { //check to see if the user is looged in!
 	echo("ERR"); 
 	}
 	}
-}
-else { //not logged in
-echo("Not Logged On"); // access denied error code?
-}
 ?>
