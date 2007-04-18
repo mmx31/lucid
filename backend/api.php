@@ -1,7 +1,5 @@
 <?php
 session_start();
-		$userid = $_SESSION['userid']; // no longer a security risk
-echo "Debug <br> $userid <br> End";
 if (isset($_SESSION['userloggedin'])) { //check to see if the user is looged in!
 
 	if (isset($_GET['registry'])) { 
@@ -30,6 +28,6 @@ if (isset($_SESSION['userloggedin'])) { //check to see if the user is looged in!
 	}
 }
 else { //not logged in
-echo("401_NOT_LOGGED_IN"); // access denied error code?
+echo("Not Logged On"); // access denied error code?
 }
 ?>
