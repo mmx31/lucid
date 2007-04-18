@@ -42,6 +42,7 @@ var url = "../backend/app.php?action=getPrograms";
 dojo.io.bind({
     url: url,
     load: app_AppListState,
+    error: ui_loadingIndicator(1),
     mimetype: "text/plain"
 });
 }
@@ -81,13 +82,13 @@ app_liborcode = libCodeProxy;
 var url = "../backend/app.php?id="+id;
 dojo.io.bind({
     url: url,
-    load: app_StateChange(data),
-    error: alert(error),
+    load: app_StateChange,
+    error: ui_loadingIndicator(1),
     mimetype: "text/plain"
 });
 }
 
-function app_StateChange(data){
+function app_StateChange(type, data, evt){
 app_return = data;
 rawcode = app_return.split(xml_seperator);
 app_lib = rawcode[5];
