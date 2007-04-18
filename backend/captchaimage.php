@@ -71,7 +71,7 @@ $width = isset($_GET['width']) ? $_GET['width'] : '120';
 $height = isset($_GET['height']) ? $_GET['height'] : '40';
 $characters = isset($_GET['characters']) ? $_GET['characters'] : '6';
 
-header('(anti-spam-(anti-spam-(anti-spam-content-type:))) image/jpeg');
+header('Content-type: image/jpeg');
 $captcha = new CaptchaSecurityImages($width,$height,$characters);
 
 ?>

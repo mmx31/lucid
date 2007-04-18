@@ -14,7 +14,7 @@ var app_xmlHttp;
 
 function app_launch(id)
 {
-if(id = -1)
+if(id == -1)
 {
 alert("Error: could not get app list from server");
 }
