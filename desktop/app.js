@@ -35,46 +35,6 @@ exec_app(id, "code");
 }
 }
 
-//this should probably be under menu.js, but whatever...
-function app_getApplications() {
-ui_loadingIndicator(0);
-var url = "../backend/app.php?action=getPrograms";
-dojo.io.bind({
-    url: url,
-    load: app_AppListState,
-    error: ui_loadingIndicator(1),
-    mimetype: "text/plain"
-});
-}
-
-function app_AppListState(type, data, evt){
-app_return = data;
-html = '<table cellpadding="0" cellspacing="0" width="90%">';
-rawcode = app_return.split(xml_seperator);
-app_amount = rawcode.length;
-app_amount--;
-app_amount = app_amount/2;
-var x = 0;
-var y = 0;
-var z = 1;
-while (x <= app_amount)
-   {
-   var app_id = rawcode[y];
-   var app_name = rawcode[z];
-   html += '<tr>';
-   html += '<td onClick = \'app_launch(' + app_id + ');\' style=\'border-top: 1px solid white;\'>' + app_name + '</td>';
-   html += '</tr>';
-   x++;
-   y++; y++;
-   z++; z++;
-   }
-html += '<tr><td onClick="logout();" style="border-top: 1px solid white; border-bottom: 1px solid white;">Logout</td></tr>';
-html += '</table>';
-
-document.getElementById("menu").innerHTML = html;
-ui_loadingIndicator(1);
-}
-
 function exec_app(id, libCodeProxy)
 {
 ui_loadingIndicator(0);
@@ -83,10 +43,12 @@ var url = "../backend/app.php?id="+id;
 dojo.io.bind({
     url: url,
     load: app_StateChange,
-    error: ui_loadingIndicator(1),
+    error: erroralert,
     mimetype: "text/plain"
 });
 }
+
+function erroralert(type, error) { alert("Error: "+error.message); ui_loadingIndicator(1); }
 
 function app_StateChange(type, data, evt){
 app_return = data;

@@ -4,19 +4,15 @@
 |   (c) 2006 Psych Designs   |
 \***************************/
 
-document.write('<div id="wallpaper" align="center" style="position: absolute; top: 0; left: 0; zindex: -100; height: 100%; width: 100%;"></div>');
-document.write('<div id="wallpaperoverlay" style="position: absolute; top: 0; left: 0; zindex: -50; height: 100%; width: 100%;"></div>');
-
-
 function setWallpaper(image)
 {
 if(image)
 {
-document.getElementById("wallpaper").innerHTML="<img width='100%' height='100%' src='"+image+"'>";
+setTimeout("document.getElementById(\"wallpaper\").innerHTML=\"<img width='100%' height='100%' src='"+image+"'>\";", 100);
 }
 else
 {
-document.getElementById("wallpaper").innerHTML=" ";
+document.getElementById("wallpaper").innerHTML="&nbsp";
 }
 }
 
