@@ -16,7 +16,7 @@ eval("var "+name+";");
 this.registry = function() { }
 this.registry = new this.registry();
 
-this.registry.getRegistryValue = function(appid,varname)  {
+this.registry.getValue = function(appid,varname)  {
 ui_loadingIndicator(0);
 app_createRequest();
 api.registry.appid = appid;
@@ -24,6 +24,16 @@ api.registry.varname = varname;
 var url = "../backend/api.php?registry=load&appid="+appid+"&varname="+varname;
 app_xmlHttp.open("GET", url, true);
 app_xmlHttp.onreadystatechange = api.registry.processRegistryGet;
+app_xmlHttp.send(null);
+}
+this.registry.saveValue = function(appid,varname,value)  {
+ui_loadingIndicator(0);
+app_createRequest();
+api.registry.appid = appid;
+api.registry.varname = varname;
+api.registry.value = value;
+var url = "../backend/api.php?registry=save&appid="+appid+"&varname="+varname+"&value="+value;
+app_xmlHttp.open("POST", url, true);
 app_xmlHttp.send(null);
 }
 this.registry.processRegistryGet = function() {
