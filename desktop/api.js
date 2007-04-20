@@ -44,7 +44,7 @@ api.registry.value = value;
 }
 }
 api = new api();
-
+api.registry.value = null; //wondering if that maybe will fix it...
 /*
  * To-Do: Fix requirment to run twice
  * And and save registry :)
