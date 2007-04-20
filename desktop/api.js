@@ -32,7 +32,6 @@ ui_loadingIndicator(0);
 var url = "../backend/api.php?registry=load&appid="+appid+"&varname="+varname;
 dojo.io.bind({
     url: url,
-	method: "get",
     load: api.registry.processRegistryGet,
     error: erroralert,
     mimetype: "text/plain"
