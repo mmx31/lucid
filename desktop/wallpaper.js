@@ -7,9 +7,9 @@
 function loadWallpaperPrefs()
 {
 api.registry.getValue(0, "bgimg");
-setTimeout("setWallpaper(api.registry.value);", 500);
+setTimeout("setWallpaper(api.registry.value);", 1000);
 
-setTimeout("api.registry.getValue(0, 'bgcolor');", 500);
+setTimeout("api.registry.getValue(0, 'bgcolor');", 1000);
 setTimeout("setWallpaperColor(api.registry.value);", 1000);
 }
 
