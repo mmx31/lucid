@@ -14,7 +14,7 @@ function setWallpaper(image)
 {
 if(image)
 {
-document.getElementById("wallpaper").innerHTML="<img width='100%' height='100%' src='"+image+"'>";
+setTimeout("document.getElementById(\"wallpaper\").innerHTML=\"<img width='100%' height='100%' src='"+image+"'>\";", 100);
 }
 else
 {

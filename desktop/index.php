@@ -46,7 +46,6 @@ function login_check($user, $pass)
     }
     foreach ($line as $col_value)
     {
-
     if($line["password"] == $pass)
     {
             $_SESSION['userid'] = $line['ID'];
@@ -68,6 +67,7 @@ function login_check($user, $pass)
     {
     login_go_back();
     }
+    break;
 }
 }
 else
