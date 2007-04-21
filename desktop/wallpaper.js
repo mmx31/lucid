@@ -6,18 +6,15 @@
 
 function loadWallpaperPrefs()
 {
-api.registry.getValue(0, "bgimg");
-setTimeout("setWallpaper(api.registry.value);", 1000);
-
-setTimeout("api.registry.getValue(0, 'bgcolor');", 1000);
-setTimeout("setWallpaperColor(api.registry.value);", 1000);
+api.registry.getValue(0, "bgimg", "setWallpaper");
+api.registry.getValue(0, "bgcolor", "setWallpaperColor");
 }
 
 function setWallpaper(image)
 {
 if(image)
 {
-setTimeout("document.getElementById(\"wallpaper\").innerHTML=\"<img width='100%' height='100%' src='"+image+"'>\";", 100);
+document.getElementById("wallpaper").innerHTML="<img width='100%' height='100%' src='"+image+"'>";
 }
 else
 {
