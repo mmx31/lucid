@@ -33,7 +33,7 @@ function login_check($user, $pass)
     mysql_select_db($db_name) or die('Could not select database');
 
     // Performing SQL query
-    $query = "SELECT password FROM ${db_prefix}users WHERE username='${user}' LIMIT 1";
+    $query = "SELECT * FROM ${db_prefix}users WHERE username='${user}' LIMIT 1";
     $result = mysql_query($query) or die('Query failed: ' . mysql_error());
 
     //do compare
@@ -47,18 +47,15 @@ function login_check($user, $pass)
     foreach ($line as $col_value)
     {
 
-    if($col_value == $pass)
+    if($line["password"] == $pass)
     {
-        while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
-        {
-            $_SESSION['userid'] = $row['ID'];
-            $_SESSION['username'] = $row['username'];
+            $_SESSION['userid'] = $line['ID'];
+            $_SESSION['username'] = $line['username'];
             $_SESSION['userloggedin'] = TRUE;
-        }
-    mysql_free_result($result);
+    //mysql_free_result($result);
 
     // Closing connection
-    mysql_close($link);
+    //mysql_close($link);
 
     //set autologin cookie
     if($_POST['remember'] == "yes")

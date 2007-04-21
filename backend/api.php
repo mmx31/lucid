@@ -1,11 +1,10 @@
 <?php
 session_start();
-
 if (isset($_GET['registry'])) { 
 	if ($_GET['registry'] == ("load")) {
 	// prototype registry value loading system - jaymacdonald
 		include("config.php");
-		$userid = 1; // share between all users ATM, not got sessions complete
+		$userid = $_SESSION['userid']; 
 		$appid = $_GET['appid'];
 		$varname = $_GET['varname'];
 		$query = "SELECT * FROM ${db_prefix}registry WHERE userid=\"${userid}\" AND appid=\"${appid}\" AND varname=\"${varname}\"";
@@ -18,7 +17,7 @@ if (isset($_GET['registry'])) {
 	elseif ($_GET['registry'] == ("save")) {
 	// prototype registry value saving system - jaymacdonald
 		include("config.php");
-		$userid = 1; // share between all users ATM, not got sessions complete
+		$userid = $_SESSION['userid'];
 		$appid = $_GET['appid'];
 		$varname = $_GET['varname'];
 		$value = $_GET['value'];
