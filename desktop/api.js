@@ -6,7 +6,6 @@
 | 	  via api.functionname();      |
 \**********************************/
 function api() {
-var api_xmlHttp;
 this.createvar = function(name)
 {
 eval("var "+name+";");
@@ -33,7 +32,7 @@ var url = "../backend/api.php?registry=load&appid="+appid+"&varname="+varname;
 dojo.io.bind({
     url: url,
     load: api.registry.processRegistryGet,
-    error: erroralert,
+    error: sys_toastererr,
     mimetype: "text/plain"
 });
 }
@@ -52,20 +51,23 @@ ui_loadingIndicator(0);
 var url = "../backend/api.php?registry=save&appid="+appid+"&varname="+varname+"&value="+value;
 dojo.io.bind({
     url: url,
-	method: "post",
-    error: erroralert,
+    error: sys_toastererr,
     mimetype: "text/plain"
 });
 ui_loadingIndicator(1);
 }
 this.registry.processRegistryGet = function(type, data, evt) {
-value = data;
-api.registry.value = value;
+api.registry.value = data;
 ui_loadingIndicator(1);
 }
 }
+
 api = new api();
-api.registry.value = null; //wondering if that maybe will fix it...
+
+function sys_toastererr(type, error)
+{
+    api.toaster("Error in AJAX call: "+error);
+}
 /*
  * To-Do: Fix requirment to run twice
  * And and save registry :)
