@@ -3,11 +3,7 @@ require("../backend/config.php");
 
 ?>
 
-<FORM action="index2.php?backend=dodeleteregistry" method="post">
-<a href='index2.php?backend=newregistry'>New Value</a>&nbsp&nbsp|&nbsp&nbsp
-<b>Delete Value:</b>  
-ID: <INPUT type="text" name="uid">
-<INPUT type="submit" value="delete">
+<FORM action="index2.php?backend=dodeleteregistry" method="post">Registry Viewer
 </FORM>
 <?php
 
