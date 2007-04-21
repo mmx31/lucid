@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (isset($_GET['registry'])) { 
-	if ($_GET['registry'] == ("load")) {
+	if ($_GET['registry'] == "load") {
 	// prototype registry value loading system - jaymacdonald
 		include("config.php");
 		$userid = $_SESSION['userid']; 
@@ -12,9 +12,9 @@ if (isset($_GET['registry'])) {
 		mysql_select_db($db_name) or die('Could not select database');
 		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		$row = mysql_fetch_array($result, MYSQL_ASSOC);
-			echo($row['value']);	//give the result :D
+			echo $row['value'];	//give the result :D
 	}
-	elseif ($_GET['registry'] == ("save")) {
+	elseif ($_GET['registry'] == "save") {
 	// prototype registry value saving system - jaymacdonald
 		include("config.php");
 		$userid = $_SESSION['userid'];
