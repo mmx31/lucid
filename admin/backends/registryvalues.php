@@ -3,7 +3,7 @@ require("../backend/config.php");
 
 ?>
 
-<FORM action="index2.php?backend=dodeleteregistry" method="post">Registry Viewer
+<FORM action="index2.php?backend=dodeleteregistry" method="post">Registry Viewer. AppID 0 is the system.
 </FORM>
 <?php
 
