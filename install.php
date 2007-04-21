@@ -163,7 +163,7 @@ if (isset($_POST['submit'])) {
                     echo "<span style='text-align: center; color: red;'>/backend/config.php is not writable. If you can't change it's permissions, you will need to copy and paste generated code into the file.</span>";
                     }
                 ?>
-                <form method="post" action="<?php echo $PHP_SELF;?>">
+                <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
                     <table style="border: 1px; border-style: dashed; border-color: #DDDDDD;" cellpadding="10">
                         <tr>
                             <td class="table">Database prefix:</td>
