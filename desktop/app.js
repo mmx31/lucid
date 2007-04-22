@@ -48,7 +48,7 @@ dojo.io.bind({
 });
 }
 
-function erroralert(type, error) { alert("Error: "+error.message); ui_loadingIndicator(1); }
+function erroralert(type, error) { api.toaster("Error: "+error.message); ui_loadingIndicator(1); }
 
 function app_StateChange(type, data, evt){
 app_return = data;

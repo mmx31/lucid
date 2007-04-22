@@ -6,11 +6,16 @@
 | 	  via api.functionname();      |
 \**********************************/
 function api() {
+this.apicount = 0;
 this.createvar = function(name)
 {
 eval("var "+name+";");
 }
-
+this.count = function()
+{
+    api.apicount++;
+    return api.apicount;
+}
 // Registry API Start
 
 this.registry = function() { }
@@ -30,7 +35,6 @@ app_xmlHttp.send(null);
 api.registry.callback = callback;
 ui_loadingIndicator(0);
 var url = "../backend/api.php?registry=load&appid="+appid+"&varname="+varname;
-api.toaster("Registry Read in Progress");
 eval("dojo.io.bind({url: url, load: function(type, data, http) { api.registry.processRegistryGet(type, data, http, \""+callback+"\"); }, error: sys_toastererr, mimetype: \"text/plain\" });");}
 this.registry.saveValue = function(appid,varname,value)  {
 /*
@@ -51,14 +55,12 @@ dojo.io.bind({
     mimetype: "text/plain"
 });
 ui_loadingIndicator(1);
-api.toaster("Registry Write OK");
 }
 this.registry.processRegistryGet = function(type, data, evt, callback) {
 api.registry.value = data;
 //var callback = api.registry.callback;
 if(callback) { eval(callback+"(\""+data+"\")"); }
 ui_loadingIndicator(1);
-api.toaster("Registry Read OK");
 }
 // end of registry api
 
