@@ -72,9 +72,17 @@ if($category == "System") { echo "<OPTION>Office</OPTION><OPTION>Internet</OPTIO
 </SELECT>
 </td></tr>
 <tr><td colspan="4"><b>Code:</b><br>
+<?php
+$code = str_replace("<", "&lt;", $code);
+$code = str_replace(">", "&gt;", $code);
+?>
 <textarea name="code" style="width: 100%; height: 500px;"><?php echo $code; ?></textarea>
 </td></tr>
 <tr><td colspan="4"><b>Library:</b><br>
+<?php
+$library = str_replace("<", "&lt;", $library);
+$library = str_replace(">", "&gt;", $library);
+?>
 <textarea name="library" style="width: 100%; height: 500px;"><?php echo $library; ?></textarea>
 </td></tr>
 <tr><td colspan="4"><input type="submit" value="save"> <input type="button" value="close" onclick="window.location='index2.php?backend=app'"></td></tr></table>
