@@ -192,7 +192,7 @@ if (isset($_POST['submit'])) {
                         </tr>
                         <tr>
                             <td class="table">Admin Username:</td>
-                            <td class="table"><input type="text" size="12" maxlength="12" name="username"></td>
+                            <td class="table"><input type="text" size="12" maxlength="20" name="username"></td>
                             <td width="150" class="table"><p class="info">Your username</p></td>
                         </tr>
                         <tr>
