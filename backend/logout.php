@@ -16,19 +16,8 @@ session_destroy();
 <div style="height: 30%; width: 100%;">&nbsp</div>
 <center>
 <div style="border: 1px solid black; background: #EEEEEE; width: 30%;"><center><h3>Logged Out</h3><br>
-<form>
 <input type=button value="Close Window" onClick="javascript:window.close();">
-</form>
-<p>Or wait 3 secconds...</p>
 </center></div>
 </center>
 <script type="text/javascript">
-var timeout=1; setTimeout(infoTimeout, 1000);function infoTimeout() { timeout--; if (timeout >0)
-  {
-   setTimeout(infoTimeout, 1000);
-  }
-  else
-  {
-   window.close();
-  }
-}</script></body></html>
+window.close();</script></body></html>

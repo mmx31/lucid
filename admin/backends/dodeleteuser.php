@@ -8,7 +8,7 @@ $link = mysql_connect($db_host, $db_username, $db_password)
    or die('Could not connect: ' . mysql_error());
 mysql_select_db($db_name) or die('Could not select database');
 
-$query = "SELECT ID FROM ${db_prefix}users WHERE username = '${uid}'";
+$query = "SELECT ID FROM ${db_prefix}users WHERE ID = '${uid}'";
 $result = mysql_query($query) or die('Query failed: ' . mysql_error());
 
  if($result)
@@ -25,7 +25,7 @@ delete_error("deleteself");
 }
 else
 {
-  $query = "DELETE FROM `${db_prefix}users` WHERE username = '${uid}'";
+  $query = "DELETE FROM `${db_prefix}users` WHERE ID = '${uid}'";
   mysql_query($query) or die('Query failed: ' . mysql_error());
   echo "<script type='text/javascript'> window.location='./index2.php?opmessage=User+Deleted&backend=users'</script>";
   exit();

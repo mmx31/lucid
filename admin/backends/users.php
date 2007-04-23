@@ -6,7 +6,7 @@ require("../backend/config.php");
 <FORM action="index2.php?backend=dodeleteuser" method="post">
 <a href='index2.php?backend=newuser'>New User</a>&nbsp&nbsp|&nbsp&nbsp
 <b>Delete User:</b>  
-Username: <INPUT type="text" name="uid">
+&nbsp;&nbsp;ID: <INPUT type="text" name="uid">
 <INPUT type="submit" value="delete">
 </FORM>
 <?php

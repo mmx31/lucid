@@ -1,8 +1,8 @@
 <?php
 header("Content-type: text/plain");
-if($_POST)
+if($_POST['user'] && $_POST['pass'] && $_POST['email'])
 {
-    require ("./backend/config.php");
+    require ("config.php");
     $link = mysql_connect($db_host, $db_username, $db_password)
        or die('Could not connect: ' . mysql_error());
     mysql_select_db($db_name) or die('<br>Could not select database');
@@ -20,27 +20,27 @@ if($_POST)
                 echo "1";
             }
         }
+        mysql_free_result($result);
+        mysql_close($link);        
     }
     else
     {
-        register_user($_POST['user'] , $_POST['pass'] , $_POST['email']);
+        mysql_free_result($result);
+        mysql_close($link);     
+        register_user($_POST['user'] , $_POST['pass'] , $_POST['email']);              
     }
 }
 
 function register_user($username , $password, $email)
 {
-require("./backend/config.php");
+require("config.php");
 $password = crypt($password, $conf_secretword);
-$link = mysql_connect($db_host, $db_username, $db_password)
+$link2 = mysql_connect($db_host, $db_username, $db_password)
    or die('Could not connect: ' . mysql_error());
 mysql_select_db($db_name) or die('<br>Could not select database');
 $query = "INSERT INTO `${db_prefix}users` (`username`, `email`, `password`, `logged`, `ID`, `level`) VALUES ('${username}', '${email}', '${password}', '0', NULL, 'user');";
-$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-echo "<script type='text/javascript'> window.location = './index.php?opmessage=Registration+Successfull'</script>";
-// Free resultset
-mysql_free_result($result);
-// Closing connection
-mysql_close($link);
+mysql_query($query) or die('Query failed: ' . mysql_error());
+mysql_close($link2);
 echo "0";
 }
 ?>
