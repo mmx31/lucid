@@ -50,3 +50,14 @@ CREATE TABLE `#__registry` (
   `varname` mediumtext NOT NULL,
   `value` mediumtext NOT NULL
 ) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1 ;
+
+-- filesystem
+DROP TABLE IF EXISTS `#__filesystem`;
+CREATE TABLE `#__filesystem` (
+  `ID` int(11) NOT NULL auto_increment PRIMARY KEY,
+  `userid` int(11) NOT NULL,
+  `file` mediumtext NOT NULL,
+  `directory` mediumtext NOT NULL,
+  `location` mediumtext NOT NULL,
+) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1 ;
+REPLACE INTO `#__filesystem` VALUES (1,1,"ReadMe.txt","docs/","readme.txt");

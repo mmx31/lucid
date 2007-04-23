@@ -67,18 +67,14 @@ ui_loadingIndicator(1);
 //start filesystem api
 this.fs = function() { }
 this.fs = new this.fs();
-this.fs.getFile = function(file,directory) {
+this.fs.getFile = function(file,directory,callback) {
 ui_loadingIndicator(0);
 var url = "../backend/api.php?fs=load&file="+file+"&directory="+directory;
-dojo.io.bind({
-    url: url,
-    error: sys_toastererr,
-    mimetype: "text/plain",
-	load: api.fs.getFileProcess
-});
+eval("dojo.io.bind({url: url, load: function(type, data, http) { api.fs.getFileProcess(type, data, http, \""+callback+"\"); }, error: sys_toastererr, mimetype: \"text/plain\" });");}
 }
-this.fs.getFileProcess = function(type, data, evt) {
+this.fs.getFileProcess = function(type, data, evt, callback) {
 api.fs.content = data;
+if(callback) { eval(callback+"(\""+data+"\")"); }
 ui_loadingIndicator(1);
 api.toaster("Security Note: FileSystem was accessed.");
 }

@@ -1,5 +1,22 @@
 <?php
 session_start();
+if (isset($_GET['fs'])) {
+ if ($_GET['registry'] == "load") {
+	// prototype file system loader - jaymacdonald
+	$userid = $_SESSION['userid'];
+	$file = $_GET['file'];
+	$directory = $_GET['directory'];
+	$query = "SELECT * FROM ${db_prefix}filesystem WHERE userid=\"${userid}\" AND file=\"${file}\" AND directory=\"${directory}\"";
+	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
+	mysql_select_db($db_name) or die('Could not select database');
+	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+	$row = mysql_fetch_array($result, MYSQL_ASSOC);
+	$reallocation = $row['location'];
+	$file = file_get_contents("files/$reallocation");
+	echo($file);
+	}
+	}
+	
 if (isset($_GET['registry'])) { 
 	if ($_GET['registry'] == "load") {
 	// prototype registry value loading system - jaymacdonald
