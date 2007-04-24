@@ -1,5 +1,6 @@
 //***********Login Form***********\\
-
+var psychdesktop_popupwindow;
+var psychdesktop_detect;
 var scriptTags = document.getElementsByTagName("script");
 for(var i=0;i<scriptTags.length;i++) {
   if(scriptTags[i].src && scriptTags[i].src.match(/login\.js$/)) {
@@ -28,7 +29,8 @@ psychdesktop_http.onreadystatechange = function(){
             else
             {
                 psychdesktop_continue();
-            }            
+            }
+            setInterval("psychdesktop_detectLogout();", 1000*5);
         }
         else
         {
@@ -42,6 +44,25 @@ psychdesktop_http.onreadystatechange = function(){
 };
 psychdesktop_http.open("GET", url, true);
 psychdesktop_http.send(null);
+
+function psychdesktop_detectLogout()
+{
+    if(psychdesktop_popupwindow)
+    {
+        if(psychdesktop_popupwindow.closed)
+        {
+            if(psychdesktop_detect == true)
+            {
+                readcook = psychdesktop_readCookie("psychdesktop_remember");
+                if(readcook == null)
+                {
+                    psychdesktop_home();
+                    psychdesktop_detect = false;
+                }
+            }
+        }
+    }
+}
 
 function psychdesktop_cannotconnect()
 {
@@ -176,6 +197,7 @@ function psychdesktop_login(auto)
                 {
                     psychdesktop_popUp();
                     psychdesktop_continue();
+                    psychdesktop_detect = true;
                 }
                 else
                 {
@@ -222,8 +244,8 @@ function psychdesktop_popUp() {
     }    
 	URL = psychdesktop_path+"/desktop/";
 	day = new Date();
-	id = day.getTime();
-	eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=1,width=1000000,height=1000000,left = 0,top = 0,fullscreen=1');");
+    id = day.getTime();
+	eval("psychdesktop_popupwindow = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=1,width=1000000,height=1000000,left = 0,top = 0,fullscreen=1');");
 }
 
 function psychdesktop_home()
