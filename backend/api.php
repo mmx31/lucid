@@ -1,8 +1,9 @@
 <?php
 session_start();
 if (isset($_GET['fs'])) {
- if ($_GET['registry'] == "load") {
+ if ($_GET['fs'] == "load") {
 	// prototype file system loader - jaymacdonald
+	include("config.php");
 	$userid = $_SESSION['userid'];
 	$file = $_GET['file'];
 	$directory = $_GET['directory'];
@@ -12,7 +13,7 @@ if (isset($_GET['fs'])) {
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 	$row = mysql_fetch_array($result, MYSQL_ASSOC);
 	$reallocation = $row['location'];
-	$file = file_get_contents("files/$reallocation");
+	$file = file_get_contents("../files/$reallocation");
 	echo($file);
 	}
 	}
