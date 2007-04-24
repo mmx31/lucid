@@ -49,13 +49,22 @@ if (isset($_POST['submit'])) {
     echo "<div style='width: 100%; height: 10%; text-align: center;'><br /><h1>Psych Desktop Installer</h1></div>\n";
     echo "<center><div style='width: 60%; border-width: 1px; border-color: black; border-style: solid; background: #FFFFFF; padding: 10px;'>";
     echo "Writing data to config file...";
-    if($_POST['fresh'] == "yes") { $conf_secretword = bin2hex( md5( "8be721aa096a969bb329abae890ad07c", TRUE ) ); }
+    $characters = 10;
+    $possible = '23456789bcdfghjkmnpqrstvwxyz'; 
+    $code = '';
+    $i = 0;
+    while ($i < $characters) { 
+    	$code .= substr($possible, mt_rand(0, trlen($possible)-1), 1);
+    	$i++;
+    }    
+    if($_POST['fresh'] == "yes") { $conf_secretword = bin2hex( md5($code, TRUE) ); }
     $writebuffer = "<?php\n//database type (mysql and ini) ini coming soon!\n\$db_type=\"mysql\";\n";
     $writebuffer = $writebuffer."//database name\n\$db_name=\"${_POST['db_name']}\";\n";
     $writebuffer = $writebuffer."//database host\n\$db_host=\"${_POST['db_host']}\";\n";
     $writebuffer = $writebuffer."//database username\n\$db_username=\"${_POST['db_username']}\";\n";
     $writebuffer = $writebuffer."//database password\n\$db_password=\"${_POST['db_password']}\";\n";
     $writebuffer = $writebuffer."//database prefix\n\$db_prefix=\"${_POST['db_prefix']}\";\n";
+    $writebuffer = $writebuffer."//Public registration enabled?(yes/no)\n\$conf_public=\"${_POST['public']}\";\n";
     $writebuffer = $writebuffer."//the secret word for encryption of passwords\n//NOTE: DO NOT CHANGE AFTER INSTALL! THIS WILL BREAK THE USER LOGIN PROCESS!!!\n";
     $writebuffer = $writebuffer."\$conf_secretword=\"$conf_secretword\";\n?>";
     if (is_writable("./backend/config.php")) {
@@ -131,6 +140,7 @@ if (isset($_POST['submit'])) {
         $writebuffer = $writebuffer."//database username<br />\$db_username=\"${_POST['db_username']}\";<br />";
         $writebuffer = $writebuffer."//database password<br />\$db_password=\"${_POST['db_password']}\";<br />";
         $writebuffer = $writebuffer."//database prefix<br />\$db_prefix=\"${_POST['db_prefix']}\";<br />";
+        $writebuffer = $writebuffer."//Public registration enabled?(yes/no)\n\$conf_public=\"${_POST['public']}\";\n";
         $writebuffer = $writebuffer."//the secret word for encryption of passwords<br />//NOTE: DO NOT CHANGE AFTER INSTALL! THIS WILL BREAK THE USER LOGIN PROCESS!!!<br />";
         $writebuffer = $writebuffer."\$conf_secretword=\"$conf_secretword\";<br />?>";     
         echo "<div align='left' style='width: 70%; height: 250px; overflow: scroll; border: 1px; border-style: dashed; border-color: #DDDDDD; font-family: mono;'>".$writebuffer."</div>";
@@ -205,6 +215,11 @@ if (isset($_POST['submit'])) {
                             <td class="table"><input type="text" size="12" maxlength="40" name="email"></td>
                             <td width="150" class="table"><p class="info">Your email address</p></td>
                         </tr>
+                          <tr>
+                              <td class="table">Allow user registration:</td>
+                              <td class="table">Yes:<input type="radio" name="public" value="yes" checked>&nbsp;&nbsp;No:<input type="radio" name="public" value="no"></td>
+                              <td width="150" class="table"><p class="info">If set to 'no', users will not be able to register, and new accounts have to be made from the administrator panel. Usefull for busnesses or organizations.</p></td>
+                        </tr>                         
                         <tr>
                             <td class="table">Fresh installation:</td>
                             <td class="table">Yes:<input type="radio" name="fresh" value="yes" checked>&nbsp;&nbsp;No:<input type="radio" name="fresh" value="no"></td>

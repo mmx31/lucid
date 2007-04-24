@@ -1,8 +1,9 @@
 <?php
 header("Content-type: text/plain");
+require ("config.php");
+if($conf_public == "no") { exit("User registration disabled"); }
 if($_POST['user'] && $_POST['pass'] && $_POST['email'])
 {
-    require ("config.php");
     $link = mysql_connect($db_host, $db_username, $db_password)
        or die('Could not connect: ' . mysql_error());
     mysql_select_db($db_name) or die('<br>Could not select database');
@@ -30,7 +31,10 @@ if($_POST['user'] && $_POST['pass'] && $_POST['email'])
         register_user($_POST['user'] , $_POST['pass'] , $_POST['email']);              
     }
 }
-
+else
+{
+echo $conf_public;
+}
 function register_user($username , $password, $email)
 {
 require("config.php");

@@ -9,6 +9,7 @@ $db_host="127.0.0.1";
 $db_username="mysql";
 //database password
 $db_password="mysql";
+//Public registration enabled?(yes/no)$conf_public="yes";
 //database prefix
 $db_prefix="dsktp_";
 //the secret word for encryption of passwords

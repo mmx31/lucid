@@ -7,9 +7,6 @@
 window.onbeforeunload = bodyOnBeforeUnload;
 document.onclick = leftclick;
 var clickcache = 0;
-
-setWallpaper('./wallpaper/default.gif');
-setWallpaperColor('white');
 drawtaskbar();
 
 function logout()
