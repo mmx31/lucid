@@ -175,6 +175,7 @@ function psychdesktop_login(auto)
                 if(psychdesktop_http.responseText == "0")
                 {
                     psychdesktop_popUp();
+                    psychdesktop_continue();
                 }
                 else
                 {
