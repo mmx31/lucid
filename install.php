@@ -140,7 +140,7 @@ if (isset($_POST['submit'])) {
         $writebuffer = $writebuffer."//database username<br />\$db_username=\"${_POST['db_username']}\";<br />";
         $writebuffer = $writebuffer."//database password<br />\$db_password=\"${_POST['db_password']}\";<br />";
         $writebuffer = $writebuffer."//database prefix<br />\$db_prefix=\"${_POST['db_prefix']}\";<br />";
-        $writebuffer = $writebuffer."//Public registration enabled?(yes/no)\n\$conf_public=\"${_POST['public']}\";\n";
+        $writebuffer = $writebuffer."//Public registration enabled?(yes/no)<br />\$conf_public=\"${_POST['public']}\";<br />";
         $writebuffer = $writebuffer."//the secret word for encryption of passwords<br />//NOTE: DO NOT CHANGE AFTER INSTALL! THIS WILL BREAK THE USER LOGIN PROCESS!!!<br />";
         $writebuffer = $writebuffer."\$conf_secretword=\"$conf_secretword\";<br />?>";     
         echo "<div align='left' style='width: 70%; height: 250px; overflow: scroll; border: 1px; border-style: dashed; border-color: #DDDDDD; font-family: mono;'>".$writebuffer."</div>";
