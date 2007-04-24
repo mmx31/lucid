@@ -16,6 +16,28 @@ if (isset($_GET['fs'])) {
 	$file = file_get_contents("../files/$reallocation");
 	echo($file);
 	}
+	if ($_GET['fs'] == "list") {
+	// prototype file system loader - jaymacdonald
+	include("config.php");
+	$userid = $_SESSION['userid'];
+	$file = $_GET['file'];
+	$directory = $_GET['directory'];
+	$query = "SELECT * FROM ${db_prefix}filesystem WHERE userid=\"${userid}\"";
+	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
+	mysql_select_db($db_name) or die('Could not select database');
+	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+	$tmp = 0;
+	while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	$directory = $row['directory'];
+	$file = $row['file'];
+	echo($directory);
+	echo($file);
+	    if($tmp+1 != mysql_numrows($result)) {
+		echo "[==separator==]";
+		}
+        $tmp++;
+	}
+	}
 	}
 	
 if (isset($_GET['registry'])) { 
