@@ -54,7 +54,7 @@ if (isset($_POST['submit'])) {
     $code = '';
     $i = 0;
     while ($i < $characters) { 
-    	$code .= substr($possible, mt_rand(0, trlen($possible)-1), 1);
+    	$code .= substr($possible, mt_rand(0, strlen($possible)-1), 1);
     	$i++;
     }    
     if($_POST['fresh'] == "yes") { $conf_secretword = bin2hex( md5($code, TRUE) ); }
