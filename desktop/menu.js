@@ -128,25 +128,25 @@ while (x <= app_amount)
 	y++; y++; y++;
 	z++; z++; z++;
 }
-html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;">Office<ul>';
+html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/applications-office.png" />&nbsp;Office<ul>';
 for(count=0;count<=office_id.length-1;count++)
 {
 	html += '<li onClick="javascript:app_launch('+office_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+office_name[count]+'</li>';
 }
 html += '</ul>';
-html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;">Internet<ul>';
+html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/applications-internet.png" />&nbsp;Internet<ul>';
 for(count=0;count<=internet_id.length-1;count++)
 {
 	html += '<li onClick="javascript:app_launch('+internet_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+internet_name[count]+'</li>';
 }
 html += '</ul>';
-html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;">System<ul>';
+html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/preferences-system.png" />&nbsp;System<ul>';
 for(count=0;count<=system_id.length-1;count++)
 {
 	html += '<li onClick="javascript:app_launch('+system_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+system_name[count]+'</li>';
 }
 html += '</ul>';
-html += '<li onClick="javascript:logout();" style="border-top: 1px solid white; border-bottom: 1px solid white;">Logout</li>';
+html += '<li onClick="javascript:logout();" style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/system-log-out.png" />&nbsp;Logout</li>';
 html += '</ul>';
 
 document.getElementById("menu").innerHTML = html;
