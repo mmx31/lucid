@@ -5,16 +5,23 @@ if (isset($_GET['fs'])) {
 	// prototype file system loader - jaymacdonald
 	include("config.php");
 	$userid = $_SESSION['userid'];
-	$file = $_GET['file'];
+	$file2 = $_GET['file'];
 	$directory = $_GET['directory'];
-	$query = "SELECT * FROM ${db_prefix}filesystem WHERE userid=\"${userid}\" AND file=\"${file}\" AND directory=\"${directory}\"";
+	$query = "SELECT * FROM ${db_prefix}filesystem WHERE userid=\"${userid}\" AND file=\"${file2}\" AND directory=\"${directory}\"";
 	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
 	mysql_select_db($db_name) or die('Could not select database');
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 	$row = mysql_fetch_array($result, MYSQL_ASSOC);
 	$reallocation = $row['location'];
 	$file = file_get_contents("../files/$reallocation");
-	echo($file);
+	$file = str_replace("<", "&lt;", $file);
+	$file = str_replace(">", "&gt;", $file);
+	//echo($file);
+	$output = '<?xml version=\'1.0\' encoding=\'utf-8\' ?>' . "\r\n" . '<getFileResponse>';
+	$output .=  "\r\n" . '<contents file="' .$file2. '"  directory="' . $directory . '">' . $file . '</contents>';
+	$output .=  "\r\n" . '</getFileResponse>';	
+	header('Content-type: text/xml');
+	echo($output);
 	}
 	if ($_GET['fs'] == "list") {
 	// prototype file system loader - jaymacdonald
@@ -27,16 +34,17 @@ if (isset($_GET['fs'])) {
 	mysql_select_db($db_name) or die('Could not select database');
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 	$tmp = 0;
+	$output = '<?xml version=\'1.0\' encoding=\'utf-8\' ?>' . "\r\n" . '<listFilesResponse>';
 	while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$directory = $row['directory'];
 	$file = $row['file'];
-	echo($directory);
-	echo($file);
-	    if($tmp+1 != mysql_numrows($result)) {
-		echo "[==separator==]";
-		}
-        $tmp++;
+	//echo($directory);
+	//echo($file);
+	$output .=  "\r\n" . '<file directory="' . $directory . '">' . $file . '</file>';
 	}
+	$output .=  "\r\n" . '</listFilesResponse>';
+	header('Content-type: text/xml');
+	echo $output;
 	}
 	}
 	

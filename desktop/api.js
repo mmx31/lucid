@@ -56,42 +56,39 @@ function api() {
     {
         ui_loadingIndicator(0);
         var url = "../backend/api.php?fs=load&file="+file+"&directory="+directory;
-        eval("dojo.io.bind({url: url, load: function(type, data, http) { api.fs.getFileProcess(type, data, http, \""+callback+"\"); }, error: sys_toastererr, mimetype: \"text/plain\" });");
+        eval("dojo.io.bind({url: url, load: function(type, data, http) { api.fs.getFileProcess(type, data, http, \""+callback+"\"); }, error: sys_toastererr, mimetype: \"text/xml\" });");
     }
 	this.fs.listFiles = function(callback)
     {
         ui_loadingIndicator(0);
         var url = "../backend/api.php?fs=list";
-        eval("dojo.io.bind({url: url, load: function(type, data, http) { api.fs.fileListProcess(type, data, http, \""+callback+"\"); }, error: sys_toastererr, mimetype: \"text/plain\" });");
+        eval("dojo.io.bind({url: url, load: function(type, data, http) { api.fs.fileListProcess(type, data, http, \""+callback+"\"); }, error: sys_toastererr, mimetype: \"text/xml\" });");
     }
+	this.fs.result = function() {
+	}
     this.fs.getFileProcess = function(type, data, evt, callback)
     {
-        api.fs.content = data;
-        if(callback) { eval(callback+"(\""+data+"\")"); }
+        var results = data.getElementsByTagName('contents');
+		var end = new Array();
+		api.fs.result.contents = results[0].firstChild.nodeValue;
+		api.fs.result.file = results[0].getAttribute("file");
+		api.fs.result.directory = results[0].getAttribute("directory");
+        if(callback) { eval(callback+"()"); }
         ui_loadingIndicator(1);
         api.toaster("Security Note: FileSystem was accessed.");
     }
 	this.fs.fileListProcess = function(type, data, evt, callback)
     {
-        /* to do: 
-		add some code to process the list instead of reling on the program to do it 
-		  - the files are seperated by the same seperator as the app list 
-		  */
-        if(callback) { eval(callback+"(\""+data+"\")"); }
+		var results = data.getElementsByTagName('file');
+		for(var i = 0; i<results.length; i++){
+		end[i].file = results[i].firstChild.nodeValue;
+		end[i].directory = results[i].getAttribute("directory");
+		}
+        if(callback) { eval(callback+"(\""+end+"\")"); }
         ui_loadingIndicator(1);
         api.toaster("Security Note: FileSystem was accessed.");
     }
-    this.fs.listFiles = function(directory)
-    {
-        ui_loadingIndicator(0);
-        var url = "../backend/api.php?fs=load&file="+file+"&directory="+directory;
-        dojo.io.bind({
-            url: url,
-            error: sys_toastererr,
-            mimetype: "text/xml",
-        });
     }
-}
 api = new api();
 
 function sys_toastererr(type, error)
