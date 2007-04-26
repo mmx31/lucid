@@ -36,21 +36,25 @@ dojo.io.bind({
 function erroralert(type, error) { api.toaster("Error: "+error.message); ui_loadingIndicator(1); }
 
 function app_StateChange(type, data, evt){
-app_return = data;
-rawcode = app_return.split(xml_seperator);
-app_lib = rawcode[5];
-app_code = rawcode[4];
-app_instance++;
-app_id = rawcode[0];
-app = function() {
-    this.id = app_id;
-    this.instance=app_instance;
-    this.code = app_code;
-    this.init = function()    {        eval(this.code);
+    app_return = data;
+    rawcode = app_return.split(xml_seperator);
+    app_lib = rawcode[5];
+    app_code = rawcode[4];
+    app_instance++;
+    app_id = rawcode[0];
+    app = function() {
+        this.id = app_id;
+        this.instance=app_instance;
+        this.code = app_code;
+        this.init = function()        {            eval(this.code);
+        }
+        eval(app_lib);
+        this.hitch = function(func)
+        {
+            eval("return dojo.lang.hitch(this, this."+func+");");
+        }
     }
-    eval(app_lib);
-}
-apps[app_id] = new app();
-apps[app_id].init();
-ui_loadingIndicator(1);
+    apps[app_id] = new app();
+    apps[app_id].init();
+    ui_loadingIndicator(1);
 }
