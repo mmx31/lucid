@@ -4,7 +4,24 @@
 |   (c) 2006 Psych Designs   |
 \****************************/ 
 
-//width and height is set by the div style, content is set by widget.setContent() and title is part of the widget creation process
+window.onresize = windows_desktopResize;
+setTimeout("windows_desktopResize();", 1500);
+function windows_desktopResize()
+{
+	if(document.body.clientWidth) { x=document.body.clientWidth }
+	if(window.innerWidth) { x=window.innerWidth }
+	if(document.body.clientHeight) { y=document.body.clientHeight }
+	if(window.innerHeight) { y=window.innerHeight }
+	document.getElementById("windowcontainer").style.width= x;
+	if(taskbarvisibility == "show")
+	{
+		document.getElementById("windowcontainer").style.height= y-35;
+	}
+	else
+	{
+		document.getElementById("windowcontainer").style.height= y;
+	}
+}
 
 function newWindow(wintitle, contents, winwidth, winheight)
 {

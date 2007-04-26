@@ -29,6 +29,7 @@ taskbarvisibility = "show";
 document.getElementById("taskbarhider").innerHTML='<img src="./icons/hidetask.gif">';
 }
 }
+windows_desktopResize();
 }
 
 function drawtaskbar()
