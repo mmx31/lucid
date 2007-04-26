@@ -65,11 +65,10 @@ function api() {
         eval("dojo.io.bind({url: url, load: function(type, data, http) { api.fs.fileListProcess(type, data, http, \""+callback+"\"); }, error: sys_toastererr, mimetype: \"text/xml\" });");
     }
 	this.fs.getFileResult = new Array();
-	this.fs.listFilesResult = new Array();
+	this.fs.listFilesResult = new Array(99,99);
     this.fs.getFileProcess = function(type, data, evt, callback)
     {
         var results = data.getElementsByTagName('contents');
-		var end = new Array();
 		api.fs.getFileResult["contents"] = results[0].firstChild.nodeValue;
 		api.fs.getFileResult["file"] = results[0].getAttribute("file");
 		api.fs.getFileResult["directory"] = results[0].getAttribute("directory");
@@ -80,14 +79,13 @@ function api() {
 	this.fs.fileListProcess = function(type, data, evt, callback)
     {
 		var results = data.getElementsByTagName('file');
-		var random = 0;
 		for(var i = 0; i<results.length; i++){
-		api.fs.listFilesResult["count"] = random;
+		api.fs.listFilesResult["count"] = i;
+		api.fs.listFilesResult[i] = {};
 		api.fs.listFilesResult[i]["file"] = results[i].firstChild.nodeValue;
 		api.fs.listFilesResult[i]["directory"] = results[i].getAttribute("directory");
-		random++;
 		}
-        if(callback) { eval(callback+"(\""+end+"\")"); }
+        if(callback) { eval(callback+"()"); }
         ui_loadingIndicator(1);
         api.toaster("Security Note: FileSystem was accessed.");
     }
