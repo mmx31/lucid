@@ -17,7 +17,14 @@ api.toaster("Error: could not get app list from server");
 }
 else
 {
+if(apps[id] == undefined)
+{
 exec_app(id);
+}
+else
+{
+apps[id].init();
+}
 }
 }
 
