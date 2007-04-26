@@ -3,42 +3,27 @@
 |  App function library  |
 | (c) 2006 Psych Designs |
 \************************/
-
-
-var app_launchTracker= new Array(255);
+var apps = new Array();
 var app_code;
 var app_lib;
-var app_liborcode;
 var xml_seperator = "[==separator==]";
 var app_xmlHttp;
-
+var app_instance;
 function app_launch(id)
 {
 if(id == -1)
 {
-alert("Error: could not get app list from server");
+api.toaster("Error: could not get app list from server");
 }
 else
 {
-if(!app_launchTracker[id])
-{
-exec_app(id, "both");
-app_launchTracker[id] = 1;
-}
-else
-{
-if(app_launchTracker[id] == 1)
-{
-exec_app(id, "code");
-}
-}
+exec_app(id);
 }
 }
 
-function exec_app(id, libCodeProxy)
+function exec_app(id)
 {
 ui_loadingIndicator(0);
-app_liborcode = libCodeProxy;
 var url = "../backend/app.php?id="+id;
 dojo.io.bind({
     url: url,
@@ -55,18 +40,17 @@ app_return = data;
 rawcode = app_return.split(xml_seperator);
 app_lib = rawcode[5];
 app_code = rawcode[4];
-if(app_liborcode == "lib")
-{
-eval(app_lib);
+app_instance++;
+app_id = rawcode[0];
+app = function() {
+    this.id = app_id;
+    this.instance=app_instance;
+    this.code = app_code;
+    this.init = function()    {        eval(this.code);
+    }
+    eval(app_lib);
 }
-else if(app_liborcode == "code")
-{
-eval(app_code);
-}
-else if(app_liborcode == "both")
-{
-eval(app_lib);
-eval(app_code);
-}
+apps[app_id] = new app();
+apps[app_id].init();
 ui_loadingIndicator(1);
 }
