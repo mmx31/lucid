@@ -53,12 +53,14 @@ function app_StateChange(type, data, evt){
         this.id = app_id;
         this.instance=app_instance;
         this.code = app_code;
-        this.init = function()        {            eval(this.code);
+        this.lib = app_lib;
+        this.init = function()        {            try {eval(this.code);}
+            catch(e){api.toaster(e);}
         }
-        eval(app_lib);
+        eval(this.lib);
         this.hitch = function(func)
         {
-            eval("return dojo.lang.hitch(this, this."+func+");");
+            return dojo.lang.hitch(this, func);
         }
     }
     apps[app_id] = new app();

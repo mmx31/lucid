@@ -6,8 +6,8 @@
 
 function loadWallpaperPrefs()
 {
-api.registry.getValue(0, "bgimg", "setWallpaper");
-api.registry.getValue(0, "bgcolor", "setWallpaperColor");
+api.registry.getValue(0, "bgimg", setWallpaper);
+api.registry.getValue(0, "bgcolor", setWallpaperColor);
 }
 
 function setWallpaper(image)
