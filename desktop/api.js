@@ -90,6 +90,17 @@ function api() {
         });
         ui_loadingIndicator(1);
     }
+	this.registry.removeValue = function(appid,varname)
+    {
+        ui_loadingIndicator(0);
+        var url = "../backend/api.php?registry=remove&appid="+appid+"&varname="+varname;
+        dojo.io.bind({
+            url: url,
+            error: sys_toastererr,
+            mimetype: "text/plain"
+        });
+        ui_loadingIndicator(1);
+    }
     this.registry.processRegistryGet = function(type, data, evt, callback)
     {
         api.registry.value = data;
@@ -105,7 +116,8 @@ function api() {
     {
         ui_loadingIndicator(0);
         var url = "../backend/api.php?fs=load&file="+file+"&directory="+directory;
-        dojo.io.bind({url: url,        load: function(type, data, http) { api.fs.getFileProcess(type, data, http, callback); },
+        dojo.io.bind({url: url,
+        load: function(type, data, http) { api.fs.getFileProcess(type, data, http, callback); },
         error: sys_toastererr, mimetype: "text/xml"
         });
     }
