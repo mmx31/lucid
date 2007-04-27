@@ -36,7 +36,7 @@ if (isset($_POST['unsubmit'])) {
     echo("destroying tables...");
     mysql_query("DROP TABLE `${db_prefix}users`;");
     mysql_query("DROP TABLE `${db_prefix}apps`;");
-    mysql_query("DROP TABLE `${db_prefix}installedapps`;");
+    mysql_query("DROP TABLE `${db_prefix}filesystem`;");
     mysql_query("DROP TABLE `${db_prefix}registry`;");
     echo "done.<br />";
     die("uninstalled Psych Desktop (mySQL Only).</div></center></body></html>");
