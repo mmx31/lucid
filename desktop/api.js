@@ -17,6 +17,7 @@ function api() {
     	this.height = "400px";
     	this.width = "500px";
     	this.title = "";
+		this.resizable = true;
     	this.empty = function()
     	{
     		this.window.innerHTML = "";
@@ -46,7 +47,7 @@ function api() {
     		document.getElementById("windowcontainer").appendChild(windiv);
     		this.window = dojo.widget.createWidget("FloatingPane", {
     			hasShadow: true,
-    			resizable: true,
+    			resizable: this.resizable,
     			displayCloseAction: true,
     			title: this.title,
     			displayMaximizeAction: true,
@@ -112,6 +113,18 @@ function api() {
     this.fs = function() { }
     this.fs = new this.fs();
 
+	
+    this.fs.saveFile = function(file,directory,contents)
+    {
+        ui_loadingIndicator(0);
+        var url = "../backend/api.php?fs=save&file="+file+"&directory="+directory+"&contents="+contents;
+        dojo.io.bind({
+		url: url,
+        error: sys_toastererr,
+		mimetype: "text/xml"
+        });
+    }
+	
     this.fs.getFile = function(file,directory,callback)
     {
         ui_loadingIndicator(0);

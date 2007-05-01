@@ -46,6 +46,18 @@ if (isset($_GET['fs'])) {
 	header('Content-type: text/xml');
 	echo $output;
 	}
+	if ($_GET['fs'] == "save") {
+	$uid = $_SESSION['userid'];
+	$file = $_GET['file'];
+	$directory = $_GET['directory'];
+	$contents = $_GET['contents'];
+	$location = "../files/$uid1$file";
+	file_put_contents($location,$contents);
+	require("config.php");
+    $link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
+    mysql_select_db($db_name) or die('Could not select database');
+	$query = "INSERT INTO `${db_prefix}filesystem` (userid, file, directory, location) VALUES('${uid}', '${file}', '${directory}', '${location}');";
+	}
 	}
 	
 if (isset($_GET['registry'])) { 
