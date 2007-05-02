@@ -2,15 +2,15 @@
 //database type (mysql and ini) ini coming soon!
 $db_type="mysql";
 //database name
-$db_name="test";
+$db_name="desktop";
 //database host
 $db_host="127.0.0.1";
 //database username
-$db_username="root";
+$db_username="mysql";
 //database password
-$db_password="92429242";
+$db_password="mysql";
 //database prefix
-$db_prefix="psych_";
+$db_prefix="dsktp_";
 //Public registration enabled?(yes/no)
 $conf_public="yes";
 //the secret word for encryption of passwords
