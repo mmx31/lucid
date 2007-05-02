@@ -179,51 +179,51 @@ function sys_toastererr(type, error)
     ui_loadingIndicator(1);
 }
 
-//Misc API
-    this.misc = function() { }
-    this.misc = new this.misc();
-this.misc.getUserName = function(callback) {
+//user API
+    this.user = function() { }
+    this.user = new this.user();
+this.user.getUserName = function(callback) {
         ui_loadingIndicator(0);
         var url = "../backend/api.php?action=getUserName";
         dojo.io.bind({
         url: url,
-        load: function(type, data, http) { api.misc.processGetUserName(type, data, http, callback); },
+        load: function(type, data, http) { api.user.processGetUserName(type, data, http, callback); },
         error: sys_toastererr, mimetype: "text/plain"
         });
 		}
-	this.misc.processGetUserName = function(type, data, evt, callback)
+	this.user.processGetUserName = function(type, data, evt, callback)
     {
-        api.misc.userName = data;
+        api.user.userName = data;
         if(callback) { callback(data); }
         ui_loadingIndicator(1);
     }
-	this.misc.getUserID = function(callback) {
+	this.user.getUserID = function(callback) {
         ui_loadingIndicator(0);
         var url = "../backend/api.php?action=getUserID";
         dojo.io.bind({
         url: url,
-        load: function(type, data, http) { api.misc.processGetUserID(type, data, http, callback); },
+        load: function(type, data, http) { api.user.processGetUserID(type, data, http, callback); },
         error: sys_toastererr, mimetype: "text/plain"
         });
 	}
-	this.misc.processGetUserID = function(type, data, evt, callback)
+	this.user.processGetUserID = function(type, data, evt, callback)
     {
-        api.misc.userID = data;
+        api.user.userID = data;
         if(callback) { callback(data); }
         ui_loadingIndicator(1);
     }
-	this.misc.getUserLevel = function(callback) {
+	this.user.getUserLevel = function(callback) {
         ui_loadingIndicator(0);
         var url = "../backend/api.php?action=getUserID";
         dojo.io.bind({
         url: url,
-        load: function(type, data, http) { api.misc.processGetUserLevel(type, data, http, callback); },
+        load: function(type, data, http) { api.user.processGetUserLevel(type, data, http, callback); },
         error: sys_toastererr, mimetype: "text/plain"
         });
 	}
-	this.misc.processGetUserLevel = function(type, data, evt, callback)
+	this.user.processGetUserLevel = function(type, data, evt, callback)
     {
-        api.misc.userLevel = data;
+        api.user.userLevel = data;
         if(callback) { callback(data); }
         ui_loadingIndicator(1);
     }
