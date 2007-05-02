@@ -1,5 +1,20 @@
 <?php
 session_start();
+if (isset($_GET['action'])) {
+// get password will NEVER be implamented
+ if ($_GET['action'] == "getUserName") {
+ $username = $_SESSION['username'];
+echo($username);
+}
+ if ($_GET['action'] == "getUserID") {
+ $userid = $_SESSION['userid'];
+ echo($userid);
+ }
+  if ($_GET['action'] == "getUserLevel") {
+  $userlevel = $_SESSION['userlevel'];
+  echo($userlevel);
+  }
+  }
 if (isset($_GET['fs'])) {
  if ($_GET['fs'] == "load") {
 	// alpha file system file loader - jaymacdonald

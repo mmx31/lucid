@@ -178,3 +178,52 @@ function sys_toastererr(type, error)
     api.toaster("Error in AJAX call: "+error.message);
     ui_loadingIndicator(1);
 }
+
+//Misc API
+    this.misc = function() { }
+    this.misc = new this.misc();
+this.misc.getUserName = function(callback) {
+        ui_loadingIndicator(0);
+        var url = "../backend/api.php?action=getUserName";
+        dojo.io.bind({
+        url: url,
+        load: function(type, data, http) { api.misc.processGetUserName(type, data, http, callback); },
+        error: sys_toastererr, mimetype: "text/plain"
+        });
+		}
+	this.misc.processGetUserName = function(type, data, evt, callback)
+    {
+        api.misc.userName = data;
+        if(callback) { callback(data); }
+        ui_loadingIndicator(1);
+    }
+	this.misc.getUserID = function(callback) {
+        ui_loadingIndicator(0);
+        var url = "../backend/api.php?action=getUserID";
+        dojo.io.bind({
+        url: url,
+        load: function(type, data, http) { api.misc.processGetUserID(type, data, http, callback); },
+        error: sys_toastererr, mimetype: "text/plain"
+        });
+	}
+	this.misc.processGetUserID = function(type, data, evt, callback)
+    {
+        api.misc.userID = data;
+        if(callback) { callback(data); }
+        ui_loadingIndicator(1);
+    }
+	this.misc.getUserLevel = function(callback) {
+        ui_loadingIndicator(0);
+        var url = "../backend/api.php?action=getUserID";
+        dojo.io.bind({
+        url: url,
+        load: function(type, data, http) { api.misc.processGetUserLevel(type, data, http, callback); },
+        error: sys_toastererr, mimetype: "text/plain"
+        });
+	}
+	this.misc.processGetUserLevel = function(type, data, evt, callback)
+    {
+        api.misc.userLevel = data;
+        if(callback) { callback(data); }
+        ui_loadingIndicator(1);
+    }
