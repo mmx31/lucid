@@ -63,7 +63,7 @@ exit();
 }
 
 //check user level here
-if($_POST['level'] == "user" || $_POST['level'] == "admin")
+if($_POST['level'] == "user" || $_POST['level'] == "admin" || $_POST['level'] == "dev")
 {
 //ok
 }
