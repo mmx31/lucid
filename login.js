@@ -1,49 +1,64 @@
 //***********Login Form***********\\
+var psychdesktop_path = '.';
+var psychdesktop_registration;
 var psychdesktop_popupwindow;
-var psychdesktop_detect;
-var scriptTags = document.getElementsByTagName("script");
-for(var i=0;i<scriptTags.length;i++) {
-  if(scriptTags[i].src && scriptTags[i].src.match(/login\.js$/)) {
-    var psychdesktop_path = scriptTags[i].src.replace(/login\.js$/,'');
+var psychdesktop_http;
+var psychdesktop_detect = false;
+var oldonload = window.onLoad;
+if (typeof window.onLoad != 'function') {
+  window.onLoad = psychdesktop_initloginform();
+} else {
+  window.onLoad = function() {
+    oldonload();
+    psychdesktop_initloginform();
   }
 }
 
-var psychdesktop_http;
-if (window.XMLHttpRequest) { // Mozilla, Safari, ...
-    psychdesktop_http = new XMLHttpRequest();
-    psychdesktop_http.overrideMimeType('text/plain');
-} else if (window.ActiveXObject) { // IE
-    psychdesktop_http = new ActiveXObject("Microsoft.XMLHTTP");
-}
-var psychdesktop_registration;
-url = psychdesktop_path+"/backend/register.php";
-psychdesktop_http.onreadystatechange = function(){
-    if (psychdesktop_http.readyState == 4) {
-        if(psychdesktop_http.status == 200){
-            psychdesktop_registration = psychdesktop_http.responseText;
-            var readcook = psychdesktop_readCookie("psychdesktop_remember");
-            if(readcook == null)
-            {
-                psychdesktop_home();
+function psychdesktop_initloginform()
+{
+    var psychdesktop_popupwindow;
+    var psychdesktop_detect;
+    var scriptTags = document.getElementsByTagName("script");
+    for(var i=0;i<scriptTags.length;i++) {
+      if(scriptTags[i].src && scriptTags[i].src.match(/login\.js$/)) {
+        psychdesktop_path = scriptTags[i].src.replace(/login\.js$/,'');
+      }
+    }
+    if (window.XMLHttpRequest) { // Mozilla, Safari, ...
+        psychdesktop_http = new XMLHttpRequest();
+        psychdesktop_http.overrideMimeType('text/plain');
+    } else if (window.ActiveXObject) { // IE
+        psychdesktop_http = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    url = psychdesktop_path+"/backend/register.php";
+    psychdesktop_http.onreadystatechange = function(){
+        if (psychdesktop_http.readyState == 4) {
+            if(psychdesktop_http.status == 200){
+                psychdesktop_registration = psychdesktop_http.responseText;
+                var readcook = psychdesktop_readCookie("psychdesktop_remember");
+                if(readcook == null)
+                {
+                    psychdesktop_home();
+                }
+                else
+                {
+                    psychdesktop_continue();
+                }
+                setInterval("psychdesktop_detectLogout();", 1000*5);
             }
             else
             {
-                psychdesktop_continue();
+                psychdesktop_cannotconnect();
             }
-            setInterval("psychdesktop_detectLogout();", 1000*5);
         }
         else
         {
             psychdesktop_cannotconnect();
-        }
-    }
-    else
-    {
-        psychdesktop_cannotconnect();
-    }        
-};
-psychdesktop_http.open("GET", url, true);
-psychdesktop_http.send(null);
+        }        
+    };
+    psychdesktop_http.open("GET", url, true);
+    psychdesktop_http.send(null);
+}
 
 function psychdesktop_detectLogout()
 {
@@ -231,18 +246,15 @@ function psychdesktop_register()
 function psychdestkop_error(msg)
 {
 	document.getElementById("psychdesktop_errorbox").innerHTML = msg;
-    if(document.getElementById("psychdesktop_loading"))
-    {
-        document.getElementById("psychdesktop_loading").style.display = "none";
-    }
+    document.getElementById("psychdesktop_loading").style.display = "none";
 }
 
 function psychdesktop_popUp() {
-    document.getElementById("psychdesktop_loading").style.display = "none";
+    document.getElementById("psychdesktop_loading").style.display = "none"; 
 	URL = psychdesktop_path+"/desktop/";
 	day = new Date();
     id = day.getTime();
-	eval("psychdesktop_popupwindow = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=1,width=1000000,height=1000000,left = 0,top = 0,fullscreen=1');");
+	psychdesktop_popupwindow = window.open(URL, id, "toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=1,width=1000000,height=1000000,left = 0,top = 0");
 }
 
 function psychdesktop_home()
