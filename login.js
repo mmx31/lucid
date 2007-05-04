@@ -1,5 +1,5 @@
 //***********Login Form***********\\
-var psychdesktop_path = '.';
+var psychdesktop_path = './';
 var psychdesktop_registration;
 var psychdesktop_popupwindow;
 var psychdesktop_http;
@@ -204,7 +204,7 @@ function psychdesktop_login(auto)
         password = cookie[1];
         remember = "false";
     }
-    url = psychdesktop_path+"/backend/login.php";
+    url = psychdesktop_path+"backend/login.php";
     psychdesktop_http.onreadystatechange = function(){
         if (psychdesktop_http.readyState == 4) {
             if(psychdesktop_http.status == 200){
@@ -251,7 +251,7 @@ function psychdestkop_error(msg)
 
 function psychdesktop_popUp() {
     document.getElementById("psychdesktop_loading").style.display = "none"; 
-	URL = psychdesktop_path+"/desktop/";
+	URL = psychdesktop_path+"desktop/";
 	day = new Date();
     id = day.getTime();
 	psychdesktop_popupwindow = window.open(URL, id, "toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=1,width=1000000,height=1000000,left = 0,top = 0");
