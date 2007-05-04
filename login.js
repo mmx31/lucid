@@ -238,10 +238,7 @@ function psychdestkop_error(msg)
 }
 
 function psychdesktop_popUp() {
-    if(document.getElementById("psychdesktop_loading"))
-    {
-        document.getElementById("psychdesktop_loading").style.display = "none";
-    }    
+    document.getElementById("psychdesktop_loading").style.display = "none";
 	URL = psychdesktop_path+"/desktop/";
 	day = new Date();
     id = day.getTime();
