@@ -227,3 +227,10 @@ this.user.getUserName = function(callback) {
         if(callback) { callback(data); }
         ui_loadingIndicator(1);
     }
+	//misc api
+	this.misc = function() { }
+    this.misc = new this.misc();    
+    this.misc.logout = function() {
+	logout();
+	}
+	
