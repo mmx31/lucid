@@ -3,7 +3,8 @@ var psychdesktop_path = './';
 var psychdesktop_registration;
 var psychdesktop_popupwindow;
 var psychdesktop_http;
-var psychdesktop_detect = false;
+var psychdesktop_detect;
+var psychdesktop_browser=navigator.appName; 
 var oldonload = window.onLoad;
 if (typeof window.onLoad != 'function') {
   window.onLoad = psychdesktop_initloginform();
@@ -31,32 +32,63 @@ function psychdesktop_initloginform()
         psychdesktop_http = new ActiveXObject("Microsoft.XMLHTTP");
     }
     url = psychdesktop_path+"/backend/register.php";
-	psychdesktop_http.open("GET", url, true);
-    psychdesktop_http.onreadystatechange = function(){
-        if (psychdesktop_http.readyState == 4) {
-            if(psychdesktop_http.status == 200){
-                psychdesktop_registration = psychdesktop_http.responseText;
-                var readcook = psychdesktop_readCookie("psychdesktop_remember");
-                if(readcook == null)
-                {
-                    psychdesktop_home();
+    if(psychdesktop_browser!="Microsoft Internet Explorer")
+    {
+        psychdesktop_http.onreadystatechange = function(){
+            if (psychdesktop_http.readyState == 4) {
+                if(psychdesktop_http.status == 200){
+                    psychdesktop_registration = psychdesktop_http.responseText;
+                    var readcook = psychdesktop_readCookie("psychdesktop_remember");
+                    if(readcook == null)
+                    {
+                        psychdesktop_home();
+                    }
+                    else
+                    {
+                        psychdesktop_continue();
+                    }
+                    setInterval("psychdesktop_detectLogout();", 1000*5);
                 }
                 else
                 {
-                    psychdesktop_continue();
+                    psychdesktop_cannotconnect();
                 }
-                setInterval("psychdesktop_detectLogout();", 1000*5);
             }
             else
             {
                 psychdesktop_cannotconnect();
+            }        
+        };
+    }
+	psychdesktop_http.open("GET", url, true);
+    if(psychdesktop_browser=="Microsoft Internet Explorer")
+    {
+        psychdesktop_http.onreadystatechange = function(){
+            if (psychdesktop_http.readyState == 4) {
+                if(psychdesktop_http.status == 200){
+                    psychdesktop_registration = psychdesktop_http.responseText;
+                    var readcook = psychdesktop_readCookie("psychdesktop_remember");
+                    if(readcook == null)
+                    {
+                        psychdesktop_home();
+                    }
+                    else
+                    {
+                        psychdesktop_continue();
+                    }
+                    setInterval("psychdesktop_detectLogout();", 1000*5);
+                }
+                else
+                {
+                    psychdesktop_cannotconnect();
+                }
             }
-        }
-        else
-        {
-            psychdesktop_cannotconnect();
-        }        
-    };
+            else
+            {
+                psychdesktop_cannotconnect();
+            }        
+        };
+    }    
     psychdesktop_http.send(null);
 }
 
@@ -81,7 +113,7 @@ function psychdesktop_detectLogout()
 
 function psychdesktop_cannotconnect()
 {
-    login = "<br /><br /><span style='font-size: 20px; color: red; align: center;'>Cannot connect to server.</span><br /><br />";
+    login = "<br /><br /><span style='font-size: 20px; color: red; align: center;'><center>Cannot connect to server.</center></span><br /><br />";
     try{ document.getElementById("psychdesktop_login").innerHTML = login; }
     catch(error) { alert("Error: "+error); }    
 }
@@ -101,28 +133,52 @@ function psychdesktop_resetpass()
     else
     {
         url = psychdesktop_path+"/backend/forgotpass.php";
+        if(psychdesktop_browser!="Microsoft Internet Explorer")
+        {
+            psychdesktop_http.onreadystatechange = function(){
+                if (psychdesktop_http.readyState == 4) {
+                    if(psychdesktop_http.status == 200){
+                        if(psychdesktop_http.responseText == "0")
+                        {
+                            psychdesktop_home();
+                            psychdestkop_error("Reset Successfull. Check your email for your new password.");
+                        }
+                        else if(psychdesktop_http.responseText == "1")
+                        {
+                            psychdestkop_error("No such user");
+                        }
+                        else
+                        {
+                            psychdestkop_error("Email address provided is different then the address on file");
+                        }
+                    }
+                }        
+            };
+        }
 		psychdesktop_http.open("POST", url, true);
+        if(psychdesktop_browser=="Microsoft Internet Explorer")
+        {
+            psychdesktop_http.onreadystatechange = function(){
+                if (psychdesktop_http.readyState == 4) {
+                    if(psychdesktop_http.status == 200){
+                        if(psychdesktop_http.responseText == "0")
+                        {
+                            psychdesktop_home();
+                            psychdestkop_error("Reset Successfull. Check your email for your new password.");
+                        }
+                        else if(psychdesktop_http.responseText == "1")
+                        {
+                            psychdestkop_error("No such user");
+                        }
+                        else
+                        {
+                            psychdestkop_error("Email address provided is different then the address on file");
+                        }
+                    }
+                }        
+            };
+        }        
         psychdesktop_http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        psychdesktop_http.onreadystatechange = function(){
-            if (psychdesktop_http.readyState == 4) {
-                if(psychdesktop_http.status == 200){
-                    if(psychdesktop_http.responseText == "0")
-                    {
-                        psychdesktop_home();
-                        psychdestkop_error("Reset Successfull. Check your email for your new password.");
-                    }
-                    else if(psychdesktop_http.responseText == "1")
-                    {
-                        psychdestkop_error("No such user");
-                    }
-                    else
-                    {
-                        psychdestkop_error("Email address provided is different then the address on file");
-                    }
-                }
-            }        
-        };
-        
         psychdesktop_http.send("noop=zzz&user="+username+"&email="+email);        
     }
 }
@@ -145,24 +201,44 @@ function psychdesktop_doregister()
             else
             {        
                 url = psychdesktop_path+"/backend/register.php";
-				psychdesktop_http.open("POST", url, true);
-                psychdesktop_http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                psychdesktop_http.onreadystatechange = function(){
-                    if (psychdesktop_http.readyState == 4) {
-                        if(psychdesktop_http.status == 200){
-                            if(psychdesktop_http.responseText == "0")
-                            {
-                                psychdesktop_home();
-                                psychdestkop_error("Registration Successfull. You may now log in.");
+                if(psychdesktop_browser!="Microsoft Internet Explorer")
+                {              
+                    psychdesktop_http.onreadystatechange = function(){
+                        if (psychdesktop_http.readyState == 4) {
+                            if(psychdesktop_http.status == 200){
+                                if(psychdesktop_http.responseText == "0")
+                                {
+                                    psychdesktop_home();
+                                    psychdestkop_error("Registration Successfull. You may now log in.");
+                                }
+                                else
+                                {
+                                    psychdestkop_error("Username allready taken");
+                                }                            
                             }
-                            else
-                            {
-                                psychdestkop_error("Username allready taken");
-                            }                            
-                        }
-                    }        
-                };
-                
+                        }        
+                    };
+                }           
+				psychdesktop_http.open("POST", url, true);
+                if(psychdesktop_browser=="Microsoft Internet Explorer")
+                {              
+                    psychdesktop_http.onreadystatechange = function(){
+                        if (psychdesktop_http.readyState == 4) {
+                            if(psychdesktop_http.status == 200){
+                                if(psychdesktop_http.responseText == "0")
+                                {
+                                    psychdesktop_home();
+                                    psychdestkop_error("Registration Successfull. You may now log in.");
+                                }
+                                else
+                                {
+                                    psychdestkop_error("Username allready taken");
+                                }                            
+                            }
+                        }        
+                    };
+                }                   
+                psychdesktop_http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 psychdesktop_http.send("noop=zzz&user="+username+"&pass="+password+"&email="+email);
             }
         }
@@ -206,25 +282,47 @@ function psychdesktop_login(auto)
         password = cookie[1];
         remember = "false";
     }
-    url = psychdesktop_path+"backend/login.php";
-	psychdesktop_http.open("POST", url, true);
-    psychdesktop_http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    url = psychdesktop_path+"/backend/login.php";
+    if(psychdesktop_browser!="Microsoft Internet Explorer")
+    {    
     psychdesktop_http.onreadystatechange = function(){
-        if (psychdesktop_http.readyState == 4) {
-            if(psychdesktop_http.status == 200){
-                if(psychdesktop_http.responseText == "0")
-                {
-                    psychdesktop_popUp();
-                    psychdesktop_continue();
-                    psychdesktop_detect = true;
+            if (psychdesktop_http.readyState == 4) {
+                if(psychdesktop_http.status == 200){
+                    if(psychdesktop_http.responseText == "0")
+                    {
+                        psychdesktop_popUp();
+                        psychdesktop_continue();
+                        psychdesktop_detect = true;
+                    }
+                    else
+                    {
+                        psychdestkop_error("Incorrect username or password");
+                    }
                 }
-                else
-                {
-                    psychdestkop_error("Incorrect username or password");
+            }        
+        };
+    }
+	psychdesktop_http.open("POST", url, true);
+    if(psychdesktop_browser=="Microsoft Internet Explorer")
+    {    
+    psychdesktop_http.onreadystatechange = function(){
+            if (psychdesktop_http.readyState == 4) {
+                if(psychdesktop_http.status == 200){
+                    if(psychdesktop_http.responseText == "0")
+                    {
+                        psychdesktop_popUp();
+                        psychdesktop_continue();
+                        psychdesktop_detect = true;
+                    }
+                    else
+                    {
+                        psychdestkop_error("Incorrect username or password");
+                    }
                 }
-            }
-        }        
-    };
+            }        
+        };
+    }    
+    psychdesktop_http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     psychdesktop_http.send("username="+username+"&password="+password+"&remember="+remember+"&encrypted="+encrypted);
 }
 
@@ -253,7 +351,7 @@ function psychdestkop_error(msg)
 
 function psychdesktop_popUp() {
     document.getElementById("psychdesktop_loading").style.display = "none"; 
-	URL = psychdesktop_path+"desktop/";
+	URL = psychdesktop_path+"/desktop/";
 	day = new Date();
     id = day.getTime();
 	psychdesktop_popupwindow = window.open(URL, id, "toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=1,width=1000000,height=1000000,left = 0,top = 0");
