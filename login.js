@@ -19,13 +19,11 @@ function psychdesktop_initloginform()
     var psychdesktop_popupwindow;
     var psychdesktop_detect;
     var scriptTags = document.getElementsByTagName("script");
-    /*for(var i=0;i<scriptTags.length;i++) {
+    for(var i=0;i<scriptTags.length;i++) {
       if(scriptTags[i].src && scriptTags[i].src.match(/login\.js$/)) {
         psychdesktop_path = scriptTags[i].src.replace(/login\.js$/,'');
       }
     }
-	Sorry this had to go. Until we find a alternative the correct path must be placed. - JayM
-	*/
     if (window.XMLHttpRequest) { // Mozilla, Safari, ...
         psychdesktop_http = new XMLHttpRequest();
         psychdesktop_http.overrideMimeType('text/plain');
