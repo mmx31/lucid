@@ -36,7 +36,7 @@ while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$file = str_replace(">", "&gt;", $file);
 	//echo($file);
 	$output = '<?xml version=\'1.0\' encoding=\'utf-8\' ?>' . "\r\n" . '<getFileResponse>';
-	$output .=  "\r\n" . '<contents owner="' .$row["userid"]. '" file="' .$file2. '"  directory="' . $directory . '">' . $file . '</contents>';
+	$output .=  "\r\n" . '<contents owner="' .$row["userid"]. '" file="' .$file2. '"  directory="' . $directory . '" sharing="' .$row['sharing']. '">' . $file . '</contents>';
 	$output .=  "\r\n" . '</getFileResponse>';	
 	header('Content-type: text/xml');
 	echo($output);
