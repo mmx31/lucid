@@ -16,7 +16,7 @@ if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
 	$name = $_FILES['uploadedfile']['name'];
 	$dir = $_POST['uploadedir'];
 	$location = $uid.'1'.$name;
-	$query = "INSERT INTO `${db_prefix}filesystem` (userid, file, directory, location) VALUES('${uid}', '${name}', '${dir}', '${location}');";
+	$query = "INSERT INTO `${db_prefix}filesystem` (userid, file, directory, location, sharing) VALUES('${uid}', '${name}', '${dir}', '${location}', 'none');";
 	mysql_select_db($db_name) or die('Could not select database');
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 	echo "The file ".  basename( $_FILES['uploadedfile']['name']). 

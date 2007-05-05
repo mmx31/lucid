@@ -62,6 +62,7 @@ CREATE TABLE `#__filesystem` (
   `userid` int(11) NOT NULL,
   `file` mediumtext NOT NULL,
   `directory` mediumtext NOT NULL,
-  `location` mediumtext NOT NULL
+  `location` mediumtext NOT NULL,
+  `sharing` varchar(100) default 'none'
 ) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1 ;
-REPLACE INTO `#__filesystem` VALUES (1,1,"ReadMe.txt","docs/","readme.txt");
+REPLACE INTO `#__filesystem` VALUES (1,1,"ReadMe.txt","docs/","readme.txt","all");

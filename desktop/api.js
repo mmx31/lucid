@@ -153,7 +153,9 @@ function api() {
 		api.fs.getFileResult["contents"] = results[0].firstChild.nodeValue;
 		api.fs.getFileResult["file"] = results[0].getAttribute("file");
 		api.fs.getFileResult["directory"] = results[0].getAttribute("directory");
-        if(callback) { callback() }
+        api.fs.getFileResult["owner"] = results[0].getAttribute("owner");
+		api.fs.getFileResult["sharing"] = results[0].getAttribute("sharing");
+		if(callback) { callback() }
         ui_loadingIndicator(1);
         api.toaster("Security Note: FileSystem was accessed.");
     }
@@ -165,22 +167,15 @@ function api() {
 		api.fs.listFilesResult[i] = {};
 		api.fs.listFilesResult[i]["file"] = results[i].firstChild.nodeValue;
 		api.fs.listFilesResult[i]["directory"] = results[i].getAttribute("directory");
+		api.fs.listFilesResult[i]["owner"] = results[i].getAttribute("owner");
+		api.fs.listFilesResult[i]["sharing"] = results[i].getAttribute("sharing");
 		}
         if(callback) { callback() }
         ui_loadingIndicator(1);
         api.toaster("Security Note: FileSystem was accessed.");
     }
-    }
-api = new api();
-
-function sys_toastererr(type, error)
-{
-    api.toaster("Error in AJAX call: "+error.message);
-    ui_loadingIndicator(1);
-}
-
-//user API
-    this.user = function() { }
+   
+	this.user = function() { }
     this.user = new this.user();
 this.user.getUserName = function(callback) {
         ui_loadingIndicator(0);
@@ -233,4 +228,14 @@ this.user.getUserName = function(callback) {
     this.misc.logout = function() {
 	logout();
 	}
+	}
+	api = new api();
+
+function sys_toastererr(type, error)
+{
+    api.toaster("Error in AJAX call: "+error.message);
+    ui_loadingIndicator(1);
+}
+
+    
 	
