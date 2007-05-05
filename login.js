@@ -19,11 +19,13 @@ function psychdesktop_initloginform()
     var psychdesktop_popupwindow;
     var psychdesktop_detect;
     var scriptTags = document.getElementsByTagName("script");
-    for(var i=0;i<scriptTags.length;i++) {
+    /*for(var i=0;i<scriptTags.length;i++) {
       if(scriptTags[i].src && scriptTags[i].src.match(/login\.js$/)) {
         psychdesktop_path = scriptTags[i].src.replace(/login\.js$/,'');
       }
     }
+	Sorry this had to go. Until we find a alternative the correct path must be placed. - JayM
+	*/
     if (window.XMLHttpRequest) { // Mozilla, Safari, ...
         psychdesktop_http = new XMLHttpRequest();
         psychdesktop_http.overrideMimeType('text/plain');
@@ -31,6 +33,7 @@ function psychdesktop_initloginform()
         psychdesktop_http = new ActiveXObject("Microsoft.XMLHTTP");
     }
     url = psychdesktop_path+"/backend/register.php";
+	psychdesktop_http.open("GET", url, true);
     psychdesktop_http.onreadystatechange = function(){
         if (psychdesktop_http.readyState == 4) {
             if(psychdesktop_http.status == 200){
@@ -56,7 +59,6 @@ function psychdesktop_initloginform()
             psychdesktop_cannotconnect();
         }        
     };
-    psychdesktop_http.open("GET", url, true);
     psychdesktop_http.send(null);
 }
 
@@ -101,6 +103,8 @@ function psychdesktop_resetpass()
     else
     {
         url = psychdesktop_path+"/backend/forgotpass.php";
+		psychdesktop_http.open("POST", url, true);
+        psychdesktop_http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         psychdesktop_http.onreadystatechange = function(){
             if (psychdesktop_http.readyState == 4) {
                 if(psychdesktop_http.status == 200){
@@ -120,8 +124,7 @@ function psychdesktop_resetpass()
                 }
             }        
         };
-        psychdesktop_http.open("POST", url, true);
-        psychdesktop_http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        
         psychdesktop_http.send("noop=zzz&user="+username+"&email="+email);        
     }
 }
@@ -144,6 +147,8 @@ function psychdesktop_doregister()
             else
             {        
                 url = psychdesktop_path+"/backend/register.php";
+				psychdesktop_http.open("POST", url, true);
+                psychdesktop_http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 psychdesktop_http.onreadystatechange = function(){
                     if (psychdesktop_http.readyState == 4) {
                         if(psychdesktop_http.status == 200){
@@ -159,8 +164,7 @@ function psychdesktop_doregister()
                         }
                     }        
                 };
-                psychdesktop_http.open("POST", url, true);
-                psychdesktop_http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                
                 psychdesktop_http.send("noop=zzz&user="+username+"&pass="+password+"&email="+email);
             }
         }
@@ -205,6 +209,8 @@ function psychdesktop_login(auto)
         remember = "false";
     }
     url = psychdesktop_path+"backend/login.php";
+	psychdesktop_http.open("POST", url, true);
+    psychdesktop_http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     psychdesktop_http.onreadystatechange = function(){
         if (psychdesktop_http.readyState == 4) {
             if(psychdesktop_http.status == 200){
@@ -221,8 +227,6 @@ function psychdesktop_login(auto)
             }
         }        
     };
-    psychdesktop_http.open("POST", url, true);
-    psychdesktop_http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     psychdesktop_http.send("username="+username+"&password="+password+"&remember="+remember+"&encrypted="+encrypted);
 }
 
