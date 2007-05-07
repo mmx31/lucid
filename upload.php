@@ -1,4 +1,6 @@
 <?php
+//In the future we should make the filename a random name, and then check if it exists. If it does,
+//generate a new name and go back to the begining
 session_start();
 	require("backend/config.php");
 if(!isset($_SESSION['userid'])) {
@@ -29,6 +31,6 @@ if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
 <form enctype="multipart/form-data" action="upload.php" method="POST">
 <input type="hidden" name="MAX_FILE_SIZE" value="100000" />
 Choose a file to upload: <input name="uploadedfile" type="file" /><br />
-Psych Desktop Location: <input name="uploadedir" type="text" value="/" /><br />
+Path to place the file in: <input name="uploadedir" type="text" value="/" /><br />
 <input type="submit" value="Upload File to Psych Desktop" />
 </form>

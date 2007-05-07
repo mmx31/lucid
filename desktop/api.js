@@ -5,6 +5,9 @@
 | All functions here can be called |
 | 	  via api.functionname();      |
 \**********************************/
+
+var windowcounter = 0;
+
 function api() {
     //Window API
     this.window = function() { }
