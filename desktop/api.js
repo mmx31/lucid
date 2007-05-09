@@ -55,8 +55,16 @@ function api() {
                 rawtable += field+"|||";
             }
             rawtable.substring(0, rawtable.length-3);
+            rawcols = "";
+            for(title in columns)
+            {
+                title.replace(/|||/," ")
+                rawcols += title+"|||";
+            }
+            rawcols.substring(0, rawcols.length-3);
+
             //umm not sure if it's rawtable.length-3 or rawtable.length-2... might result in a bug...
-            //Now take rawtable and save it to the database.
+            //Now take rawtable and rawcols, and save it to the database.
         }
     }
     //Window API
