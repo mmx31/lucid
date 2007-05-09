@@ -9,6 +9,55 @@
 var windowcounter = 0;
 
 function api() {
+    //Database API
+    //Note: alot of this can be based on the registry.
+    this.database = function() { }
+    this.database = new this.database();    
+    this.database = function()
+    {
+        this.parseTable = function(rawfields, cols)
+        {
+          var count=0;
+          rawfields=rawfields.split("|||");
+          for(field in rawfields)
+          {
+            table[count][table[count].length-1] = field;
+            //this next part will make it so something like table[0]['description'] will be valid
+            if(table[count].length)=cols.length)
+            {
+              count++;
+            }
+            for(col in cols)
+            {
+              rowcount=0;
+              for(row in table)
+              {
+                for(field in row)
+                {
+                  table[rowcount][col] = field
+                }
+                rowcount++;
+              }
+            }
+          }
+          return table;
+        }
+        this.getTable(appid, name, callback)
+        {
+            //grab the table, parse it using this.parseTable, and pass the array onto the function.
+        }
+        this.saveTable(appid, name, columns, table)
+        {
+            rawtable = "";
+            for(field in table)
+            {
+                rawtable += feild+"|||";
+            }
+            rawtable.substring(0, rawtable.length-3);
+            //umm not sure if it's rawtable.length-3 or rawtable.length-2... might result in a bug...
+            //Now take rawtable and save it to the database.
+        }
+    }
     //Window API
     this.window = function() { }
     this.window = new this.window();    
