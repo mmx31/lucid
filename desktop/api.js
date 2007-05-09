@@ -51,7 +51,7 @@ function api() {
             rawtable = "";
             for(field in table)
             {
-                field.replace("|||"," ")
+                field.replace(/|||/," ")
                 rawtable += field+"|||";
             }
             rawtable.substring(0, rawtable.length-3);
