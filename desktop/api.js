@@ -46,25 +46,38 @@ function api() {
         {
             //grab the table, parse it using this.parseTable, and pass the array onto the function.
         }
-        this.saveTable(appid, name, columns, table)
+        this.saveTable(appid, pub, name, columns, table)
         {
             rawtable = "";
             for(field in table)
             {
-                field.replace(/|||/," ")
+                field.replace(/|||/," ");
+                field.replace(/-|-/," ");
                 rawtable += field+"|||";
             }
             rawtable.substring(0, rawtable.length-3);
             rawcols = "";
             for(title in columns)
             {
-                title.replace(/|||/," ")
+                title.replace(/|||/," ");
+                field.replace(/-|-/," ");
                 rawcols += title+"|||";
             }
             rawcols.substring(0, rawcols.length-3);
 
             //umm not sure if it's rawtable.length-3 or rawtable.length-2... might result in a bug...
-            //Now take rawtable and rawcols, and save it to the database.
+            dojo.io.bind({
+                url: "../backend/api.php?action=saveDatabase",
+                method: "post",
+                content: {
+                    columns: rawcols,
+                    table: rawtable,
+                    public: pub,
+                    name: name,
+                    appid: appid
+                },
+                mimetype:'text/html'
+            });            
         }
     }
     //Window API
