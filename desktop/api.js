@@ -51,7 +51,8 @@ function api() {
             rawtable = "";
             for(field in table)
             {
-                rawtable += feild+"|||";
+                field.replace("|||"," ")
+                rawtable += field+"|||";
             }
             rawtable.substring(0, rawtable.length-3);
             //umm not sure if it's rawtable.length-3 or rawtable.length-2... might result in a bug...
