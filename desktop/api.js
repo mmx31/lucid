@@ -23,7 +23,7 @@ function api() {
           {
             table[count][table[count].length-1] = field;
             //this next part will make it so something like table[0]['description'] will be valid
-            if(table[count].length)=cols.length)
+            if(table[count].length =cols.length)
             {
               count++;
             }

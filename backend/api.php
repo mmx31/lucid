@@ -2,6 +2,14 @@
 session_start();
 if (isset($_GET['action'])) {
 // get password will NEVER be implamented
+ if ($_GET['action'] == "getStatus") {
+if(isset($_SESSION['userid'])) {
+echo("OK");
+}
+else {
+echo("FAIL");
+}
+}
  if ($_GET['action'] == "getUserName") {
  $username = $_SESSION['username'];
 echo($username);

@@ -25,6 +25,9 @@ function psychdesktop_initloginform()
         psychdesktop_path = scriptTags[i].src.replace(/login\.js$/,'');
       }
     }
+	if(psychdesktop_path == "") {
+	psychdesktop_path = "./";
+	}
     if (window.XMLHttpRequest) { // Mozilla, Safari, ...
         psychdesktop_http = new XMLHttpRequest();
         psychdesktop_http.overrideMimeType('text/plain');
