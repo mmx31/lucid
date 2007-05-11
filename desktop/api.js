@@ -9,6 +9,13 @@
 var windowcounter = 0;
 
 function api() {
+	this.ui = function() { }
+	this.ui = new this.ui();
+	this.ui = function() { }
+	this.ui.dialog = function()
+	{
+// coming soon
+	}
     //Database API
     //Note: alot of this can be based on the registry.
     this.database = function() { }
