@@ -1,39 +1,1 @@
-<?php
-if($_GET['page'] == "register" || $_GET['page'] == "forgotpass" || $_GET['page'] == "editaccount")
-{
-session_start();
-global $code;
-}
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title>Psych Desktop</title>
-<link rel="stylesheet" href="./Steely.css" type="text/css">
-</head>
-<body>
-<table border= "0" width="100%" cellpadding= "0" cellspacing= "0" style="background-image: url('./images/header.gif'); position: absolute; top: 0px; left: 0px;">
-<tr>
-<td>
-<img src="./images/logo.gif">
-</td>
-</tr>
-</table>
-<table height="70" width="100%" border="0"><tr><td></td></tr></table>
-<?php
-if($_GET['opmessage'])
-{
-echo "<center><span style='color: red;'>${_GET['opmessage']}</span></center>";
-}
-if($_GET['page'])
-{
-include("${_GET['page']}.php");
-}
-else
-{
-include("./front.php");
-}
-
-?>
-</body>
-</html>
+<?php/*    Psych Desktop    Copyright (C) 2006 Psychiccyberfreak    This program is free software; you can redistribute it and/or modify    it under the terms of the GNU General Public License as published by    the Free Software Foundation; either version 2 of the License, or    (at your option) any later version.    This program is distributed in the hope that it will be useful,    but WITHOUT ANY WARRANTY; without even the implied warranty of    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the    GNU General Public License for more details.    You should have received a copy of the GNU General Public License along    with this program; if not, write to the Free Software Foundation, Inc.,    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.	*/if($_GET['page'] == "register" || $_GET['page'] == "forgotpass" || $_GET['page'] == "editaccount"){session_start();global $code;}?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><title>Psych Desktop</title><link rel="stylesheet" href="./Steely.css" type="text/css"></head><body><table border= "0" width="100%" cellpadding= "0" cellspacing= "0" style="background-image: url('./images/header.gif'); position: absolute; top: 0px; left: 0px;"><tr><td><img src="./images/logo.gif"></td></tr></table><table height="70" width="100%" border="0"><tr><td></td></tr></table><?phpif($_GET['opmessage']){echo "<center><span style='color: red;'>${_GET['opmessage']}</span></center>";}if($_GET['page']){include("${_GET['page']}.php");}else{include("./front.php");}?></body></html>
