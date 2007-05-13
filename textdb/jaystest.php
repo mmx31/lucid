@@ -18,6 +18,7 @@ if (!file_exists(DB_DIR . "Test/mytable.txt")) {
 	else {
 	$fn = $_POST['fn'];
 	$sn = $_POST['sn'];
+	$db = new Database("Test");
 	$db->executeQuery("INSERT INTO mytable(firstname, secondname) VALUES ('$fn', '$sn')");
 	echo("inserted data to table mytable.");
 	}
