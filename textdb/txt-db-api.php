@@ -35,7 +35,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 // Directory where the API is located (Server Path, no URL)
 
-$API_HOME_DIR="C:\\xampplite\\htdocs\\jayrpg\\textdb\\";	
+$API_HOME_DIR="\\desktop\\";	
 //$API_HOME_DIR="c:\\programme\\apache\\htdocs\\php-api\\";	
 
 
@@ -46,7 +46,7 @@ $API_HOME_DIR="C:\\xampplite\\htdocs\\jayrpg\\textdb\\";
 // e.g. if you have a Database in Directory /home/website/test/TestDB
 // you must set this property to /home/website/test/ 		
 
-$DB_DIR="C:\\xampplite\\htdocs\\jayrpg\\userdata\\";			
+$DB_DIR="\\desktop\\";			
 //$DB_DIR="c:\\programme\\apache\\htdocs\\php-api-tests\\";			
 
 
