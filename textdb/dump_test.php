@@ -2,7 +2,7 @@
 
 header("Content-type: text/plain\n\n");
 
-include("dbf-include.php");
+include("./dbf-include.php");
 
 $dbf->query("CREATE DATABASE `dump_test`");
 echo "database created!\n";
@@ -69,8 +69,8 @@ $q3 = $dbf->query("show create table users_test");
 $createtb = $dbf->fetch_array($q3);
 	print_r($createtb);
 
-/*
+
 $dbf->query("drop DATABASE `dump_test`");
 echo "database dropped!\n";
-*/
+
 ?>
