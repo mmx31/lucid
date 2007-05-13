@@ -1,0 +1,8 @@
+$headinclude
+
+<form method="post" action="index.php?show=database_details&db=$_GET[db]&tbl=$_GET[tbl]&empty=true$SID">
+Do you really want to <b>empty</b> table "$_GET[tbl]"?<br>
+<input type="submit" name="confirm" value="OK"> <input type="submit" name="confirm" value="Cancel">
+</form>
+
+$footinclude

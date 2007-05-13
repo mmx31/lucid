@@ -1,0 +1,8 @@
+$headinclude
+
+<form method="post" action="index.php?show=database_details&db=$_GET[db]&tbl=$_GET[tbl]&delete=true$SID">
+Wollen Sie die Tabelle "$_GET[tbl]" wirklich <b>l&ouml;schen</b>?<br>
+<input type="submit" name="confirm" value="OK"> <input type="submit" name="confirm" value="Abbrechen">
+</form>
+
+$footinclude

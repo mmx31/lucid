@@ -1,0 +1,48 @@
+
+<link rel="stylesheet" href="php-txt-db-api.css" type="text/css">
+
+<title>Error Handling</title>
+<div align="center"> 
+  <h1 align="left"> Error Handling</h1>
+  <h2 align="left">Allgemein</h2>
+  <div align="left"> 
+    <p>Mit den beiden Einstellungen PRINT_ERRORS und PRINT_WARNINGS in const.php 
+      l&auml;sst sich Steuern ob <br>
+      Fehlermeldungen angezeigt werden oder nicht. Unabh&auml;nigig von diesen 
+      Einstellungen wird aber von<br>
+      der Text-Db-Api ein Error-Stack gef&uuml;hrt. Also ein Array mit allen Fehlermeldungen. 
+      Dazu setzt die<br>
+      Text-Db-Api einen eigenen PHP-Error Handler. Dieser f&auml;ngt dann alle 
+      Fehler auf, speichert sie im <br>
+      Fehler Stack und gibt sie abh&auml;ngig von der Konfiguration aus oder nicht. 
+      Der Error Handler wird in<br>
+      der executeQuery() Funktion gesetzt und am Ende dieser Funktion wieder entfernt. 
+      <br>
+      Ebenfalls wird bei jedem executeQuery() Aufruf der Fehler Stack zuerst gel&ouml;scht, 
+      daher hat man immer <br>
+      nur Fehler im Stack vom aktuellen executeQuery() Aufruf, und nicht noch 
+      von vorherigen.</p>
+    <p>Mit folgenden Funktionen lassen sich Fehler abfragen bzw. l&auml;sst sich 
+      der Stack manual leeren:</p>
+    <p><a href="functions/txtdbapi_clear_errors.html">txtdbapi_clear_errors</a><br>
+      <a href="functions/txtdbapi_error_occurred.html">txtdbapi_error_occurred</a><br>
+      <a href="functions/txtdbapi_get_errors.html">txtdbapi_get_errors</a><br>
+      <a href="functions/txtdbapi_get_last_error.html">txtdbapi_get_last_error</a><br>
+      <br>
+      <br>
+      Wichtig zu erw&auml;hnen ist ebenfalls, das der Txt-Db-Api Error Handler 
+      auch automatisch alle PHP Fehler<br>
+      welche in executeQuery() auftreten auff&auml;ngt und im Stack speichert. 
+      <br>
+      Hat man also PRINT_ERRORS und PRINT_WARNINGS auf 0 gesetzt, sollte man theoretisch 
+      keine <br>
+      Fehlermeldungen welche in executeQuery() entstehen zu sehen bekommen.</p>
+    </div>
+  <p align="left">&nbsp;</p>
+  <div align="left">
+    <div align="left">
+      <div align="left"></div>
+      
+    </div>
+  </div>
+</div>

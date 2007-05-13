@@ -1,0 +1,64 @@
+
+<link rel="stylesheet" href="../php-txt-db-api.css" type="text/css">
+
+<title>PHP: Text File Database Manual</title>
+<div align="center"> 
+  <h1 align="left"> Tutorial 1: Use the txt-db-api</h1>
+  <p align="left">The txt-db-api is simple to use. A php-site which 
+    uses the api does the following steps:</p>
+  <h2 align="left">1. Include the Txt-Db-Api</h2>
+  <div align="left">
+    <pre>&lt;?php</pre>
+    <pre>include ("../php-api/txt-db-api.php");</pre>
+    <pre>?&gt;</pre>
+    <p>It's important that you specify the correct path to the txt-db-api.php 
+      file. That's the only<br>
+      file you need to inlcude in order to work with the txt-db-api library.</p>
+    <h2>2. Create a Database Object</h2>
+    <p>If you have done the <a href="../installation/index.html">installation</a> 
+      correctly and the corresponding folder for the database were created<br>
+      (via FTP or with a CREATE DATABASE statement), you can now create a Database 
+      Object. <br>
+      You must specify the name (i.e. a subfolder of $DB_DIR) of the Database
+      in the constructor.<br>
+      Database names are case-sensitive.</p>
+    <p>$db = new <a href="../objects/Database/Database.html">Database</a>(&quot;myDatabase&quot;); 
+    </p>
+    <h2><br>
+      3. Execute SQL Statements</h2>
+    <p>Once you have a Database Object, you can now execute as many SQL-Statemens 
+      on it as you like.<br>
+      To execute a SQL-Statement use the executeQuery() function.</p>
+    <p>$rs=$db-&gt;<a href="../objects/Database/executeQuery.html">executeQuery</a>(&quot;SELECT 
+      name, prename, zip AS zipCode FROM people WHERE zip='1234' ORDER BY name; 
+      &quot;); </p>
+    <p>The &quot;;&quot; at the end of the SQL-String is optional. The executeQuery() 
+      method returns a different value dependant on the SQL-Statement type. It 
+      can be either a boolean, a int or a ResultSet. (the return types are documented 
+      <a href="../sql_limit.html">here)</a></p>
+    <p>&nbsp;</p>
+    <h2>4. Display the ResultSet (Only with SELECT Statements)</h2>
+    <p>SELECT statements return a result set object, which contains 
+      the data of the query.  There are different ways to query the
+      data stored in a result set object. 
+      <p>
+      Example #1: A while-loop method:</p>
+    <pre>while($rs-&gt;<a href="../objects/ResultSet/next.html">next</a>())<br>
+    { ... }
+</pre>
+    <p>The next() method above traverses the result set to the next row. Note that
+    before the next() method is called for the first time, the position of the
+    result set is not at the beginning, it is <b>one record </b>before the beginning.
+    Therefore, the first reference to next() will be at the first record!.</p>
+    <p>While in the while loop, you can now use any of the following 3 methods
+    to obtain current row values:<br>
+    <li><a href="../objects/ResultSet/getCurrentValues.html">getCurrentValues</a>
+    <li><a href="../objects/ResultSet/getCurrentValueByName.html">getCurrentValueByName</a>
+    <li><a href="../objects/ResultSet/getCurrentValueByNr.html">getCurrentValueByNr</a><p>
+    </p>
+    Example:
+    <pre>list($name,$prename,$zip)=$rs-><a href="../objects/ResultSet/getCurrentValues.html">getCurrentValues</a>();
+	echo &quot;$name $prename  has the zip code $zip&quot;;
+    </pre>
+   </div>
+  </div>

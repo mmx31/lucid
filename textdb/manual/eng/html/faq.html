@@ -1,0 +1,32 @@
+
+<link rel="stylesheet" href="php-txt-db-api.css" type="text/css">
+
+<title>FAQ</title>
+<div align="center"> 
+  <h1 align="left"> FAQ </h1>
+  <p align="left">&nbsp;</p>
+  <p align="left"><b><font size="3">How can I store a date ?</font></b></p>
+  <p align="left"><b>Suggested variant:<br>
+    </b>Save the date as timestamp in an int field. Before you display the data 
+    you just have to convert it into a date. <br>
+    When using this solution, sorting works automatically correctly.</p>
+  <p align="left"><b>Other variant:<br>
+    </b>.. save the date as string, for example in a format like yyyymmdd, for 
+    example 20030203. The sorting works also correctly <br>
+    when you use such a format (because the year comes before the month which 
+    comes before the day).<br>
+    You may want to convert the stored value before showing it also.<br>
+    Maybe a format like yyyy-mm-dd is even more simple to parse.</p>
+  <p align="left">If you don't want to make operations on the stored date (like 
+    plus 1 day), you could also just save the <br>
+    return value of date(&quot;D M j H:i:s Y&quot;) as string and display/overwrite 
+    it unconverted. This may be usefull for<br>
+    a guestbook or a forum, etc.</p>
+  <p align="left">&nbsp;</p>
+  <div align="left">
+    <div align="left">
+      <div align="left"></div>
+      
+    </div>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+<html>
+<head>
+<title>Das Database Objekt</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="../../php-txt-db-api.css" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Das Database Objekt</h1>
+<p>(seit Version 0.0.1)<br>
+  Database -- Diese Objekt stellt eine Datenbank (in einem Ordner) dar</p>
+<h2>Beschreibung:</h2>
+<p>Befor man irgendetwas auf einer Tabelle machen kann, ben&ouml;tigt man eine 
+  Instanz des <br>
+  Database Objektes.</p>
+<p>Von diesem Objekt aus kann man dann SQL aufrufe absetzten.<br>
+  Daf&uuml;r steht die Funktion <a href="executeQuery.html">executeQuery()</a> 
+  zur Verf&uuml;gung.</p>
+<p>&nbsp;</p>
+<h2>Beispiel:</h2>
+<pre>$db = new <a href="Database.html">Database</a>(&quot;DatenbankName&quot;);
+
+$resultSet = $db-&gt;<a href="executeQuery.html">executeQuery</a>(&quot;SELECT nr, name, vorname FROM personen WHERE nr=1&quot;);
+while($resultSet-&gt;next()) {
+	echo &quot;&lt;br&gt;&quot; . $resultSet-&gt;getCurrentValueByName(&quot;nr&quot;) . &quot;: &quot; . $resultSet-&gt;getCurrentValueByName(&quot;name&quot;) . &quot;&lt;br&gt;&quot;;
+}
+</pre>
+</body>
+</html>

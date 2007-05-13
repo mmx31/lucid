@@ -1,0 +1,28 @@
+$headinclude
+$gui_message2
+
+<table bgcolor="{tablebordercolor}" cellpadding=3>
+	<tr><td bgcolor="{tablec}">name</td><td colspan=5 align="center" bgcolor="{tablec}">options</td><td bgcolor="{tablec}">entries</td></tr>
+	$db_list_tbls
+</table>
+<hr>
+
+<ul>
+		<form method="post" action="index.php?show=sql_execute&db=$_GET[db]$SID">
+	<li>run SQL command on database "$_GET[db]"<br>
+		<input type="hidden" name="referto" value="database_details.php">
+		<textarea name="sql" rows=7 cols=40>$_POST[sql]</textarea><br>
+		<input type="checkbox" name="reprint" value="true">show SQL-Befehl again<br>
+		<input type="submit" value="execute">
+	</li>
+		</form>
+		<form method="post" action="index.php?show=table_create&db=$_GET[db]$SID">
+	<li>Create new table in database "$_GET[db]"<br>
+		Name <input size=30 name="new_table_name"><br>
+		Fields (amount) <input size=5 name="new_table_numf"><input type="submit" value="create">
+	</li>
+		</form>
+	<li><a href="index.php?show=database_delete&db=$_GET[db]$SID">Delete database "$_GET[db]"</a></li>
+</ul>
+
+$footinclude

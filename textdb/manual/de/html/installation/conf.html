@@ -1,0 +1,91 @@
+<html>
+<head>
+<title>Konfiguration</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="../php-txt-db-api.css" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Konfiguration</h1>
+<p>In der Datei const.php k&ouml;nnen einige Einstellungen vorgenommen werden. 
+  Dies ist jedoch nicht zwingend n&ouml;tig<br>
+  da man auch die Standardwerte verwenden kann. Man findet die Einstellungen in 
+  der Form von Variabeln<br>
+  in der Datei const.php nach dem Kommentar &quot;User Settings&quot;.</p>
+<table width="674" border="1">
+  <tr> 
+    <td width="175"><b>Einstellung</b></td>
+    <td width="107"><b>Standardwert</b></td>
+    <td width="367"><b>Beschreibung</b></td>
+  </tr>
+  <tr valign="top"> 
+    <td width="175">DEBUG</td>
+    <td width="107"> 
+      <div align="center">0</div>
+    </td>
+    <td width="367">Wenn man DEBUG auf 1 setzt, so gibt die API zus&auml;tzliche 
+      Debug Informationen aus. Wenn Ihr ein Problem habt oder einen Bug-Report 
+      machen wollt k&ouml;nnen diese Informationen z.T. hilfreich sein.<br>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="175">LIKE_CASE_SENSITIVE</td>
+    <td width="107"> 
+      <div align="center">0</div>
+    </td>
+    <td width="367">Wenn man diese Einstellung auf 1 setzt, so unterscheidet LIKE 
+      GROSS- und kleinschreibung. Wenn auf 0 gesetzt wird dazwischen nicht unterschieden.<br>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="175">ORDER_CASE_SENSITIVE</td>
+    <td width="107"> 
+      <div align="center">0</div>
+    </td>
+    <td width="367">Wenn auf 1 gesetzt, wird beim sortieren von Datens&auml;tzen 
+      mit ORDER BY die GROSS-kleinschreibung unterschieden. D.h. GROSSBUCHSTABEN 
+      kommen vor kleinbuchstaben (P -&gt; X -&gt; a -&gt; b).<br>
+      Wenn auf 0 gesetzt, wir GROSS-kleinschreibung beim sortieren NICHT unterschieden 
+      (a -&gt; b -&gt; P -&gt; X)<br>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="175">ASSUMED_RECORD_SIZE</td>
+    <td width="107"> 
+      <div align="center">30</div>
+    </td>
+    <td width="367">Setzt diesen Wert auf die Ungef&auml;hre Durschnittsgr&ouml;sse 
+      eines Datensatzes. Dieser Wert wird intern verwendet, und wenn er weise 
+      gew&auml;hlt wurde kann das positive auswirkungen auf die Performance haben. 
+      NICHT auf 0 setzten! Wenn du dir nicht sicher bist lass einfach den Standardwert!!<br>
+      <br>
+      Diese Einstellung ist <b>NICHT</b> als Begrenzung f&uuml;r die Datensatzgr&ouml;sse 
+      gedacht. Eine solche Begrenzung gibt es nicht! <br>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="175">PRINT_ERRORS</td>
+    <td width="107"> 
+      <div align="center">1</div>
+    </td>
+    <td width="367">Wenn auf 1 gesetzt werden Fehler angezeigt, andernfalls werden 
+      sie unterdr&uuml;ckt. Sofern man keine dynamischen SQL-Statements verwendet, 
+      weisen Fehler immer auf ein Fehler des Entwicklers hin, also besser auf 
+      1 lassen! Ausser man erzeugt seine SQL Statement dynamisch...<br>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="175">PRINT_WARNINGS</td>
+    <td width="107"> 
+      <div align="center">0</div>
+    </td>
+    <td width="367">Wenn auf 1 gesetzt werden Warnungen angezeigt, andernfalls 
+      werden sie unterdr&uuml;ckt.</td>
+  </tr>
+</table>
+<p>&nbsp; </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h2>&nbsp;</h2>
+</body>
+</html>

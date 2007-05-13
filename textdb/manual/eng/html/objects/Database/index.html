@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>The Database Object</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="../../php-txt-db-api.css" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>The Database Object</h1>
+<p>(since Version 0.0.1)<br>
+  Database -- This Object represents a Database (a Folder)</p>
+<h2>Description:</h2>
+<p>Before you can do something with a Table, you need an instance of a Database 
+  Object.</p>
+<p>With this instance you then can execute SQL Statements, use the function <a href="executeQuery.html">executeQuery()</a> 
+  to do this.</p>
+<h2>Example:</h2>
+<pre>$db = new <a href="Database.html">Database</a>(&quot;MyDatabase&quot;);
+
+$resultSet = $db-&gt;<a href="executeQuery.html">executeQuery</a>(&quot;SELECT nr, name, prename FROM person WHERE nr=1&quot;);
+while($resultSet-&gt;next()) {
+	echo &quot;&lt;br&gt;&quot; . $resultSet-&gt;getCurrentValueByName(&quot;nr&quot;) . &quot;: &quot; . $resultSet-&gt;getCurrentValueByName(&quot;name&quot;) . &quot;&lt;br&gt;&quot;;
+}
+</pre>
+</body>
+</html>

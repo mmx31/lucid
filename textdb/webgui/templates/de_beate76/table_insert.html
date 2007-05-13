@@ -1,0 +1,13 @@
+$headinclude
+$gui_message2
+
+<form method="post" action="index.php?show=table_details&amp;db=$_GET[db]&amp;tbl=$_GET[tbl]&amp;insert=true$SID">
+<input type="hidden" name="numf" value="$numf">
+<table bgcolor="{tablebordercolor}" cellpadding="3">
+	<tr><td bgcolor="{tablec}">Feld</td><td bgcolor="{tablec}">Typ</td><td align="center" bgcolor="{tablec}">Wert</td></tr>
+	$tbl_list_fields
+</table>
+<input type="submit" value="einfügen">
+</form>
+<hr />
+$footinclude

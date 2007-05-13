@@ -44,19 +44,27 @@ if (isset($_POST['unsubmit'])) {
     echo "<body style='background-color: #CCFFFF; font-size: 12px; font-family: sans-serif;'>\n";
     echo "<div style='width: 100%; height: 10%; text-align: center;'><br /><h1>Psych Desktop Installer</h1></div>\n";
     echo "<center><div style='width: 60%; border-width: 1px; border-color: black; border-style: solid; background: #FFFFFF; padding: 10px;'>";
+	echo "loading configuration file...";
+    //reload the config file
+    require("./backend/config.php");
+    echo "done.<br />";
     echo("connecting to database server...");
     mysql_connect($db_host, $db_username, $db_password) or die('<span style="color: red;">Error connecting to MySQL server: ' . mysql_error() . '</span></div></center></body></html>');
     echo "done.<br />";
     echo("selecting database...");
     mysql_select_db($db_name) or die('<span style="color: red;">Error selecting MySQL database: ' . mysql_error() . '</span></div></center></body></html>');
     echo "done.<br />";
-    echo("destroying tables...");
+    echo("removing tables...");
     mysql_query("DROP TABLE `${db_prefix}users`;");
     mysql_query("DROP TABLE `${db_prefix}apps`;");
     mysql_query("DROP TABLE `${db_prefix}filesystem`;");
     mysql_query("DROP TABLE `${db_prefix}registry`;");
     echo "done.<br />";
-    die("uninstalled Psych Desktop (mySQL Only).</div></center></body></html>");
+	echo "removing configuration file...";
+    //reload the config file
+    unlink("./backend/config.php");
+    echo "done.<br />";
+    die("uninstalled Psych Desktop (Database and Database Config Only).</div></center></body></html>");
 }
 
 
@@ -65,6 +73,9 @@ if (isset($_POST['submit'])) {
     echo "<body style='background-color: #CCFFFF; font-size: 12px; font-family: sans-serif;'>\n";
     echo "<div style='width: 100%; height: 10%; text-align: center;'><br /><h1>Psych Desktop Installer</h1></div>\n";
     echo "<center><div style='width: 60%; border-width: 1px; border-color: black; border-style: solid; background: #FFFFFF; padding: 10px;'>";
+	if($_POST['database'] != "mysql") {
+	die("Sorry but TextDB is not ready for use with Psych Desktop yet! <br> <a href=\"install.php\">back</a>");
+	}
     echo "Writing data to config file...";
     $characters = 10;
     $possible = '23456789bcdfghjkmnpqrstvwxyz'; 
@@ -183,25 +194,50 @@ if (isset($_POST['submit'])) {
         </style>
     </head>
     <body style="background-color: #CCFFFF; font-size: 12px; font-family: sans-serif;">
+	<script>
+	function toggleLayer( whichLayer )
+{
+  var elem, vis;
+  if( document.getElementById ) // this is the way the standards work
+    elem = document.getElementById( whichLayer );
+  else if( document.all ) // this is the way old msie versions work
+      elem = document.all[whichLayer];
+  else if( document.layers ) // this is the way nn4 works
+    elem = document.layers[whichLayer];
+  vis = elem.style;
+  // if the style.display value is blank we try to figure it out here
+  if(vis.display==''&&elem.offsetWidth!=undefined&&elem.offsetHeight!=undefined)
+    vis.display = (elem.offsetWidth!=0&&elem.offsetHeight!=0)?'block':'none';
+  vis.display = (vis.display==''||vis.display=='block')?'none':'block';
+}
+</script>
         <div style="width: 100%; height: 15%; text-align: center;"><br /><h1>Psych Desktop Installer</h1></div>
         <center>
             <div style="width: 40%; border-width: 1px; border-color: black; border-style: solid; background: #FFFFFF; padding: 10px;">
                 <?php
+$ourFileName = "./backend/config.php";
+$ourFileHandle = fopen($ourFileName, 'w');
+fclose($ourFileHandle);
                     if(!is_writable("./backend/config.php")) {
                     echo "<span style='text-align: center; color: red;'>/backend/config.php is not writable. If you can't change it's permissions, you will need to copy and paste generated code into the file.</span>";
                     }
                 ?>
                 <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
                     <table style="border: 1px; border-style: dashed; border-color: #DDDDDD;" cellpadding="10">
+					       <tr>
+                            <td class="table">Database Type:</td>
+                            <td class="table">MySQL<input type="radio" name="database" value="mysql" checked>&nbsp;&nbsp;TextDB:<input type="radio" name="database" value="textdb"></td>
+                            <td width="150" class="table"><p class="info">Choose to use MySQL or TextDB. We recommend MySQL for end-user environments.</p></td>
+                      </tr>  
                         <tr>
                             <td class="table">Database prefix:</td>
                             <td class="table"><input type="text" size="5" maxlength="6" <?php echo "value='$db_prefix'" ?> name="db_prefix"></td>
-                            <td width="150" class="table"><p class="info">This is the prefix that will be used for each table. Usefull if your host limits the number of databases you can have.</p></td>
+                            <td width="150" class="table"><p class="info">This is the prefix that will be used for each table. Usefull if your host limits the number of databases you can have. Leave this blank if your using TextDB.</p></td>
                         </tr>
                         <tr>
                             <td class="table">Database host:</td>
                             <td class="table"><input type="text" size="12" maxlength="20" <?php echo "value='$db_host'" ?> name="db_host"></td>
-                            <td width="150" class="table"><p class="info">The IP of the mySQL server to connect to. Usually on shared web hosting this is 'localhost'.</p></td>
+                            <td width="150" class="table"><p class="info">The IP of the mySQL server to connect to. Usually on shared web hosting this is 'localhost'. Leave this blank if your using TextDB.</p></td>
                         </tr>
                         <tr>
                             <td class="table">Database name:</td>
@@ -211,12 +247,12 @@ if (isset($_POST['submit'])) {
                         <tr>
                             <td class="table">Database username:</td>
                             <td class="table"><input type="text" size="12" maxlength="20" <?php echo "value='$db_username'" ?> name="db_username"></td>
-                            <td width="150" class="table"><p class="info">A mySQL user that has all privlages to the database specified above</p></td>
+                            <td width="150" class="table"><p class="info">A mySQL user that has all privlages to the database specified above. Leave this blank if your using TextDB.</p></td>
                         </tr>                        
                         <tr>
                             <td class="table">Database password:</td>
                             <td class="table"><input type="text" size="12" maxlength="20" <?php echo "value='$db_password'" ?> name="db_password"></td>
-                            <td width="150" class="table"><p class="info">The password for the user specified above</p></td>
+                            <td width="150" class="table"><p class="info">The password for the user specified above. Leave this blank if your using TextDB.</p></td>
                         </tr>
                         <tr>
                             <td class="table">Admin Username:</td>

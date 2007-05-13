@@ -1,0 +1,6 @@
+body, p, td, tr, table, input, textarea, select { font-size: 11px; }
+
+a:link { color:#0000ff; text-decoration:none; }
+a:visited { color:#0000ff; text-decoration:none; }
+a:active { color:#ff0000; text-decoration:none; }
+a:hover { color:#ff0000; text-decoration:underline; }

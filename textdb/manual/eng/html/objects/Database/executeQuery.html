@@ -1,0 +1,43 @@
+<html>
+<head>
+<title>executeQuery</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="../../php-txt-db-api.css" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>executeQuery</h1>
+<p>(since Version 0.0.1)<br>
+  executeQuery -- Executes a SQL-Statement, and returns (depending on the Type 
+  of SQL-Statement) a ResultSet Object or an int</p>
+<h2>Description:</h2>
+<pre>ResultSet/int<b> executeQuery</b> (string sqlQueryString)</pre>
+ 
+<p>Executes a SQL-Statement on the Database.<br>
+  Not all Keywords and Statements of the SQL Standard are supported (See the SQL 
+  Syntax Page of this Manual)<br>
+</p>
+<p> Dont forget to escape &quot; with a \ (See Escape Page of this Manual)</p>
+<h2>Parameter:</h2>
+<table width="579" border="1">
+  <tr> 
+    <td width="219" valign="top"> 
+      <pre>sqlQueryString</pre>
+    </td>
+    <td width="350">Sql Statement String (example:&quot;SELECT nr, name FROM person 
+      WHERE person.name=\&quot;HANS\&quot;;&quot;)</td>
+  </tr>
+</table>
+<h2>Return Value:</h2>
+<p>SELECT/LIST TABLES Satements:<br>
+  - A ResultSet Object, containing the Data returned by the Query<br>
+  - In case of an Error false is returned.</p>
+<p> UPDATE/INSERT/DELETE Statements:<br>
+  - The Number of Rows changed is returned as int<br>
+  - In case of an Error false is returned. (Attention: FALSE and 0 do not have 
+  the same meaning!)</p>
+<p> CREATE TABLE/DROP TABLE/CREATE DATABASE/DROP DATABASE Statements:<br>
+  - If ok: true<br>
+  - In case of an Error false is returned.</p>
+</body>
+</html>

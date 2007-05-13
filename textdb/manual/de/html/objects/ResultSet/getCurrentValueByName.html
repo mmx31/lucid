@@ -1,0 +1,35 @@
+<html>
+<head>
+<title>getCurrentValueByName</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="../../php-txt-db-api.css" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>getCurrentValueByName</h1>
+<p>(seit Version 0.0.1)<br>
+  getCurrentValueByName -- Gibt den Wert der Spalte colName der aktuellen Reihe 
+  zur&uuml;ck.</p>
+<h2>Beschreibung:</h2>
+<pre>string<b> </b>getCurrentValueByName (string colName)</pre>
+<p>Gibt den Wert der Spalte colName des aktuellen Datensatzes des ResultSet<br>
+  Objektes zur&uuml;ck. Der aktuelle Datensatz, bwz. die aktuelle Reihe kann zB. 
+  mit den<br>
+  Funktionen <a href="next.html">next()</a>, <a href="prev.html">prev()</a> oder 
+  <a href="setPos.html">setPos()</a> ver&auml;ndert werden.<br>
+</p>
+<h2>Parameter:</h2>
+<table width="579" border="1">
+  <tr> 
+    <td width="219" valign="top"> 
+      <pre>colName
+    </pre>
+    </td>
+    <td width="350">Name der Spalte in welcher der Wert zu lesen ist. </td>
+  </tr>
+</table>
+<h2>R&uuml;ckgabewert:</h2>
+<p>Wert der Spalte colName an der momentanen Position des ResultSet's als string.</p>
+<h2>&nbsp;</h2>
+</body>
+</html>

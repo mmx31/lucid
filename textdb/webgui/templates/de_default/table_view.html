@@ -1,0 +1,21 @@
+$headinclude
+$gui_message2
+
+<table bgcolor="{tablebordercolor}" cellpadding=3>
+	<tr>
+		<td bgcolor="{tablec}">
+			Zeige Ergebnis (insgesamt $total, $num_queries Queries)
+		</td>
+	</tr>
+	<tr>
+		<td bgcolor="{tableb}">
+			SQL-Befehl:<br>
+			$query
+		</td>
+	</tr>
+</table>
+<hr>
+	$tbl_view_rows
+<a href="index.php?show=table_insert&db=$_GET[db]&tbl=$_GET[tbl]$SID">Neue Zeile einfügen</a>
+
+$footinclude

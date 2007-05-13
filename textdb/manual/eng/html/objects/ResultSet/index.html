@@ -1,0 +1,27 @@
+<html>
+<head>
+<title>The Database Object</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="../../php-txt-db-api.css" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>The ResultSet Object</h1>
+<p>(since Version 0.0.1)<br>
+  ResultSet -- This Object represents the Retult of a SELECT Query</p>
+<h2>Description:</h2>
+<p>After you execute a SELECT Statement with a <a href="../Database/executeQuery.html">$myDatabaseInstace-&gt;executeQuery()</a> 
+  call, this<br>
+  function returns a ResultSet Object. You can navigate trough this Object and 
+  read all<br>
+  the Results of the Query.</p>
+<h2>Example:</h2>
+<pre>$db = new <a href="../Database/Database.html">Database</a>(&quot;MyDatabase&quot;);
+
+$resultSet = $db-&gt;<a href="../Database/executeQuery.html">executeQuery</a>(&quot;SELECT nr, name, prename FROM person WHERE nr=1&quot;);
+while($resultSet-&gt;next()) {
+	echo &quot;&lt;br&gt;&quot; . $resultSet-&gt;getCurrentValueByName(&quot;nr&quot;) . &quot;: &quot; . $resultSet-&gt;getCurrentValueByName(&quot;name&quot;) . &quot;&lt;br&gt;&quot;;
+}
+</pre>
+</body>
+</html>

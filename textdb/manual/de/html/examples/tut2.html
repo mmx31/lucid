@@ -1,0 +1,79 @@
+
+<link rel="stylesheet" href="../php-txt-db-api.css" type="text/css">
+
+<title>PHP: Text File Database Manual</title><div align="center">
+  <h1 align="left"> Tutorial 2: Tabellen &quot;manuell&quot; erstellen</h1>
+  <div align="left"><b>ACHTUNG: Das Tabellen-Format hat in 0.1.3-Alpha-02 und 
+    0.1.5-Alpha-01 ge&auml;ndert!</b> </div>
+  <p align="left">Wenn man neue Tabellen nicht immer mit einem CREATE TABLE Aufruf 
+    erstellen m&ouml;chte, so<br>
+    kann man dies auch &quot;von Hand&quot; tun.</p>
+  <h2 align="left">1. Text Datei erstellen</h2>
+  <div align="left"> Als erstes ist eine Text Datei (Endung .txt) zu erstellen. 
+    <br>
+    Datei &gt; Neu &gt; Textdokument (oder so &auml;hnlich) 
+    <h2>2. Spalten definieren (1. Zeile)</h2>
+    <p>In der ersten Zeile der Text Datei sind die Namen der Spalten niederzuschreiben.<br>
+      Dabei wird jeder Spaltenname mit einem # beendet. </p>
+    Beispiel: <br>
+    <pre>Nr#Name#Vorname#Adresse#Alter</pre>
+    <h2>3. Datentypen definieren (2. Zeile)</h2>
+    <p>Im gleichen Format wie oben ist nun der Datentyp f&uuml;r jede Spalte zu 
+      definieren.<br>
+      Welche Datentypen momentan unterst&uuml;tz werden sieht man <a href="../sql_limit.html#createTable">hier.</a></p>
+    <p>Die 2. Zeile k&ouml;nnte etwa so aussehen:</p>
+    <pre>inc#str#str#str#int
+
+
+
+</pre>
+    <h2>4. Standardwerte definieren (3. Zeile)</h2>
+    <p>Im gleichen Format wie oben ist nun f&uuml;r jede Spalte ein Standartwert 
+      festzulegen. <br>
+      Dieser wird verwendet wenn man bei INSERT Statements nicht alle Spalten 
+      angibt.<br>
+    </p>
+    <p>Die 3. Zeile k&ouml;nnte etwa so aussehen:</p>
+    <pre>0#Standard Name#Standard Vorname#Keine Adresse#40</pre>
+    <p>&nbsp;</p>
+    <h2>5. (Freiwillig) Daten eingeben</h2>
+    <p>Im gleichen Format wie oben k&ouml;nnen nun bei Bedarf bereits einige Daten 
+      (zB f&uuml;r Testzwecke) eingegeben werden.<br>
+      Die fertige Tabellen-Datei k&ouml;nnte dann so aussehen:</p>
+    <pre>Nr#Name#Vorname#Adresse#Alter
+inc#str#str#str#int<br>0#Standard Name#Standard Vorname#Keine Adresse#40
+0#Hans#Wurst#Wurststrasse 9#40
+1#Maxx#Test#Teststrasse 1#22</pre>
+    <h2>6. Berechtigungen setzten</h2>
+    <p>Auf der neu erstellen Datei sind nun noch die Berechtigungen zu setzten. 
+      Dies ist mit den meisten FTP-Clients m&ouml;glich!<br>
+      Am besten macht man gleich ein chmod 777. <br>
+      Damit die Datenbank-Dateien nicht mit dem Browser direkt angesehen werden 
+      k&ouml;nnen, ist es empfehlenswert die .htaccess Datei entsprechend zu ver&auml;ndern, 
+      dass mit GET und POST kein Zugriff auf die Txt-Dateien m&ouml;glich ist.</p>
+    <p>&nbsp;</p>
+    <h2>7. Weiteres / Hinweise</h2>
+    <p>Falls man ein % oder # als Teil des Spaltennamens oder als Teil der Daten 
+      verwenden m&ouml;chte, ist anstelle von &quot;%&quot; &quot;%p&quot; zu 
+      schreiben, und anstelle von &quot;#&quot; ein &quot;%h&quot;. Dies ist n&ouml;tig, 
+      da # und % eine spezielle Bedeutung haben. Ansonsten braucht man sich darum 
+      aber NIE (auch bei CREATE TABLE Statements nicht) zu k&uuml;mmern (# und 
+      % werden automatisch umgewandelt), sondern nur dann, wenn man Werte direkt 
+      im Text-File eingibt. Und das #-Zeichen, das wie oben beschrieben die Spaltennamen 
+      und Datentypen voneinander trennt, ist nat&uuml;rlich nicht als %h zu schreiben. 
+    </p>
+    <p>Beispiele: </p>
+    <pre>nr#link 
+inc#str 
+## 
+1#http://www.abc.de/index.htm%hanker 
+2#http://www.abc.de/start.htm%habsatz2      </pre>
+    <pre>nr#person#rabatt 
+inc#str#str 
+##10%p 
+1#m&uuml;ller#5%p 
+2#maier#7,5%p 
+     </pre>
+    <p>&nbsp;</p>
+  </div>
+</div>

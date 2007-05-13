@@ -1,0 +1,151 @@
+
+<link rel="stylesheet" href="php-txt-db-api.css" type="text/css">
+
+<title>Escape Zeichen</title>
+<body>
+<div align="center"> 
+  <h1 align="left"> Escape Characters</h1>
+  <p align="left">The SQL-Parser requires that some characters need to be escaped.<br>
+    This means putting the backslash character (i.e. \ ) in front of other characters.<br>
+    This is necessary for double or single quote (i.e. &quot; or ') characters embedded in strings.</p>
+  <p align="left">If you want to insert the value foo&quot;bar into the column 
+    col1, you can't write the following statement:</p>
+  <div align="left"> 
+    <pre align="left">INSERT INTO personen (col1,col2) VALUES (&quot;foo&quot;bar&quot;,&quot;bla&quot;);</pre>
+  </div>
+  <p align="left">You have to escape the &quot; between foo and bar:</p>
+  <div align="left"> 
+    <pre align="left">INSERT INTO personen (col1,col2) VALUES (&quot;foo\&quot;bar&quot;,&quot;bla&quot;);</pre>
+    <p>The following charactes must be escaped: (only between ' ' or &quot; &quot;): 
+      <br>
+      ' (Single Quote), &quot; (Double Quote), \ (the Backslash itself)<br>
+    </p>
+  </div>
+  <p align="left">There are 3 different variants to write a SQL Statement in the 
+    PHP Code.  In each variant the escape character is used differently.<br>
+    The first variant is the most frequently used and if you have some luck, 
+    you never need to escape anything :)</p>
+  <p align="left">&nbsp;</p>
+  <h2 align="left">Variant 1: Form Fields</h2>
+  <div align="left"> 
+    <p>If you want to use values of HTML form fields directly in the SQL stataments, 
+      you don't need to change anything.<br>
+      The Content of Form Fields are automaticly correctly escaped .</p>
+    Example: 
+    <p>$db-&gt;executeQuery(&quot;INSERT INTO person VALUES('$formField1','$formField2') 
+      &quot;);</p>
+  </div>
+  <h2 align="left">Variant 2: SQL Statement is between &quot; &quot;</h2>
+  <p align="left">In a Double Quoted String (&quot; &quot;) the following characters 
+    must be escaped (PHP rule):</p>
+  <div align="left">
+    <table width="426" border="1">
+      <tr> 
+        <td>character</td>
+        <td>Escaped</td>
+      </tr>
+      <tr> 
+        <td> 
+          <div align="left"></div>
+          <p align="left"> &quot; (Double Quote)</p>
+        </td>
+        <td>\&quot;</td>
+      </tr>
+      <tr>
+        <td>\ (Backslash)</td>
+        <td>\\</td>
+      </tr>
+    </table>
+    <p>But these characters must also be escaped for the SQL-Parser, so you have 
+      to escape them twice, because PHP itself will remove one &quot;escaping&quot;:</p>
+  </div>
+  <div align="left">
+    <table width="732" border="1">
+      <tr> 
+        <td width="260">character</td>
+        <td width="230">escaped (for PHP)</td>
+        <td width="220"> escaped for the SQL Parser</td>
+      </tr>
+      <tr> 
+        <td width="260"> 
+          <div align="left"></div>
+          <p align="left"> &quot; (Double Quote)</p>
+        </td>
+        <td width="230">\&quot;</td>
+        <td width="220">\\\&quot;</td>
+      </tr>
+      <tr> 
+        <td width="260">\ (Backslash)</td>
+        <td width="230">\\</td>
+        <td width="220">\\\\</td>
+      </tr>
+      <tr>
+        <td width="260">' (Single Quote)</td>
+        <td width="230">' (no escape char needed between &quot; &quot;)</td>
+        <td width="220">\'</td>
+      </tr>
+    </table>
+    <p>Example:</p>
+    <p>$db-&gt;executeQuery(&quot;INSERT INTO person VALUES('<i>double: <b>\\\&quot;</b> 
+      </i>','<i>single:<b> \'</b> </i>'); &quot;);</p>
+  </div>
+  <h2 align="left">Variant 3: SQL Statement is between ' '</h2>
+  <p align="left">In a Single Quote String (' ') the following characters must 
+    be escaoed (PHP rule):</p>
+  <div align="left"> 
+    <table width="426" border="1">
+      <tr> 
+        <td>character</td>
+        <td>Escaped</td>
+      </tr>
+      <tr> 
+        <td> 
+          <div align="left"></div>
+          <p align="left"> ' (Double Quote)</p>
+        </td>
+        <td>\'</td>
+      </tr>
+      <tr> 
+        <td>\ (Backslash)</td>
+        <td>\\</td>
+      </tr>
+    </table>
+  </div>
+  <p align="left">&nbsp;</p>
+  <div align="left"> 
+    <p>But these characters must also be escaped for the SQL-Parser, so you have 
+      to escape them twice, because<br>
+      PHP itself will remove one &quot;escaping&quot;:</p>
+  </div>
+  <div align="left"> 
+    <table width="732" border="1">
+      <tr> 
+        <td width="260">character</td>
+        <td width="230">Escaped (for PHP)</td>
+        <td width="220">escaped for the SQL Parser</td>
+      </tr>
+      <tr> 
+        <td width="260"> 
+          <div align="left"></div>
+          <p align="left"> &quot; (Double Quote)</p>
+        </td>
+        <td width="230">&quot; (no escape char needed between ' ')</td>
+        <td width="220">\&quot;</td>
+      </tr>
+      <tr> 
+        <td width="260">\ (Backslash)</td>
+        <td width="230">\\</td>
+        <td width="220">\\\\</td>
+      </tr>
+      <tr> 
+        <td width="260">' (Singe Quote)</td>
+        <td width="230">\'</td>
+        <td width="220">\\\'</td>
+      </tr>
+    </table>
+  </div>
+  <p align="left">&nbsp;</p>
+  <p align="left">$db-&gt;executeQuery('INSERT INTO person VALUES(&quot;<i>double: 
+    <b>\&quot;</b> </i>&quot;,&quot; <i>single: <b>\\\'</b></i> &quot;); ');</p>
+  <p align="left">&nbsp;</p>
+  </div>

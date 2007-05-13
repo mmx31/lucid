@@ -1,0 +1,85 @@
+$headinclude
+
+<h1>Willkommen beim txtDB WebGUI $txtdb_WEBGUI_version</h1>
+<h2>Hilfe</h2>
+
+<h3>txtDB-WebGUI V 0.3</h3>
+
+Diese Skriptsammlung ist mein Versuch, eine Art phpMyAdmin für die Textdatenbank-API
+von C-Worker zu schreiben. Look & Feel sind recht ähnlich, allerdings hinkt das WebGUI
+*deutlich* bei der Funktionalität hinterher.
+
+Zur Zeit merke ich einfach, wie ich immer mehr Schwierigkeiten habe, meinen inneren
+Schweinehund zu überwinden und weiter an dem Projekt zu arbeiten. Bevor ich jetzt
+komplett das interesse verliere, veröffentliche ich lieber den bisherigen Entwicklungs-
+stand und überlasse es der motivierten Community, dieses Tool zur Perfektion zu bringen :)
+Ich muss weiterhin zu meiner Schande gestehen, dass ich nicht einmal eine rudimentäre
+Dokumentation zustande gebracht habe und ich jetzt einfach hoffe, dass die WebGUI sehr
+einfach und intuitiv zu bedienen ist. Wenigstens ist das Configfile kommentiert :/
+
+Vielen Dank an dieser Stelle an C-Worker, seine API ist wirklich grossartig. Auch die
+Leute, die ihm Feedback und Codesnippets zugesandt haben, haben dazu beigetragen.
+
+<h3>Installation</h3>
+
+Entpackt einfach das komplette Zip in einen Ordner in eurem HTDocs-Verzeichnis, so
+dass ihr über euren Webserver die Skripte aufrufen könnt.
+Danach editiert ihr noch die Datei "config.inc.php" und passt dort den $ api_path an.
+Benutzt dabei am einfachsten relative Pfadangaben und denkt an den Slash/Doppelbackslash
+am Ende!
+
+Der Rest der Konfigurationsdatei kann unangetastet bleiben, ihr könnt dort sonst nur
+noch Styleangaben ändern. Andere Templates gibt es noch nicht (englische Seiten waren
+angedacht), deshalb ist auch hier der Standardwert beizubehalten.
+
+<div style="background: gainsboro; margin: 10px 0px; padding: 4px 2px; border: 1px #f00 solid; width:90%;">
+<span style="color:#f00;font-weight:bold;">WICHTIG !!!</span><br />
+Das WebGUI verfügt über keinerlei Benutzerlogin, deshalb solltet ihr wenigstens eine 
+.htaccess Datei erzeugen, die sich um die Zugriffsrechte kümmert. Wenn ihr keinen
+Schutz einbaut, kann über die WebGUI jeder eure Datenbanken nicht nur einsehen, 
+sondern auch ändern und löschen!
+</div>
+
+<h3>Einschränkungen bei der Benutzung</h3>
+
+Grundsätzlich gilt: alles, was man per Button oder Link anstellen kann, funktioniert auch!
+Was fehlt, ist zum Beispiel in der Eigenschaften-Ansicht der Tabellen die Möglichkeit,
+einzelne Felder zu ändern oder zu löschen.
+Der Code sollte flexibel genug sein, um ein paar der Fähigkeiten der neueren txtDB-API
+Versionen zu nutzen. Davon muss man allerdings nicht unbedingt etwas im WebGUI sehen.
+Zum Beispiel wird LIMIT in den SELECTs unterstützt, aber die Seite, die das Ergebnis
+eines solchen Queries zeigt, bietet einem keinerlei Navigationshilfen, um "weiterzu-
+blättern", wie man das von phpMyAdmin gewöhnt ist.
+Wenn ihr bei eurer Arbeit mit dem WebGUI an eine solche Hürde stosst, versucht die SQL-
+Box. Sie kann auch mehrere Queries in einem Rutsch abarbeiten, sogar mehrere getrennte
+SELECTS können zusammen abgesetzt werden.
+Wundert euch im Code nicht darüber, dass ein- und dieselbe Aktion mehrfach Ansätze haben
+kann. Die ersten Versionen der API konnten zB keine Datenbanken und Tabellen auflisten,
+weshalb solche Funktionen auf Dateiebene realisiert wurden. Das funktioniert selbstver-
+ständlich auch mit neueren Versionen der API problemlos, aber ich wollte halt weg von
+den Workarounds und hin zu einer Lösung, die komplett auf die API vertraut.
+Basis für solche Codeverzweigungen ist die Funktion "min_version($minimaleVersion)",
+die ich allerdings nicht ausreichend getestet habe. Also hier nocheinmal deutlich:
+der Status des WebGUIs ist BETA! Es hat für meine Belange funktioniert, aber ich habe 
+nichts davon ausgiebig getestet oder testen lassen, ihr bekommt den Code "as is".
+
+
+<h3>laienhafter Disclaimer</h3>
+
+Diese Skripte können Daten verändern und löschen, deshalb ist jeder User selbst zur 
+Vorsicht ermahnt und die benutzung erfolgt ausdrücklich auf eigene Gefahr. Es stand nie
+in meiner Absicht, schädlichen Code zu schreiben, der zweck dieser Skriptsammlung besteht
+in der Administration einer Datenbank auf Textbasis. Ich hafte daher nicht für Schädern,
+die irgendwer irgendwie mit meinem Produkt irgendwem zugefügt hat.
+Ich übergebe mit diesem Release meine Skripte der Öffentlichkeit, jedem steht es frei
+nach Belieben Änderungen an den Quellen vorzunehmen. Ich bitte lediglich darum, weiterhin
+als Autor genannt zu werden.
+
+
+<h3>Links</h3>
+
+iq.gobo@gmx.net<br /><br />
+Meine Email. Mailt mir ruhig bei Fragen und Problemen. Ich kann allerdings keine *schnelle*
+Hilfe garantieren.<br />
+
+$footinclude

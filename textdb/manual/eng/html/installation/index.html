@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Installation</title>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+  <link rel="stylesheet" href="../php-txt-db-api.css" type="text/css">
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<h1>Installation</h1>
+Since Version 0.3.x the Text-DB-Api Zip also includes the WebGUI and a<br>
+Table Editor. To use the Text-DB-API its still sufficient to upload
+only the<br>
+8 main .php Files (resultset.php, database.php, etc...) and to
+configure the<br>
+txt-db-api.php File.<br>
+This form of installation is described below in the paragraph "Manual
+Installation".<br>
+<br>
+Since the 0.3.x Verions you can also install and configure the API and
+the included<br>
+GUI's with a Wizard (installer.php). The installer.php script must be
+downloaded separately<br>
+from the Sourceforge Page.<br>
+To install the API this way, you have to upload the Text-DB-API Zip and
+the installer.php<br>
+file into the SAME directory on the webserver. Then you only have to
+call the isntaller.php<br>
+script and the Wizard will guide you through the installation.<br>
+<br>
+<h1>Manual Installation</h1>
+<br>
+<h2>Upload the files:</h2>
+<p>All PHP Files ot the Txt-Db-Api must be uploaded in one directory.</p>
+<h2>Change the File txt-db-api.php</h2>
+<p>Before uploading all the .php files the file txt-db-api.php must be
+changed.<br>
+You have to set the two Vars $API_HOME_DIR and $DB_DIR to correct
+values.</p>
+<p><b>$API_HOME_DIR:</b><br>
+This variable must be set to the absolute or relative path where all
+the Txt-Db-Api Files are located.<br>
+For example: /home/c-worker.ch/public_html/php-api/</p>
+<p><b>$DB_DIR:</b><br>
+This variable must be set to the absolute or relative path where the
+database folders are. <br>
+For example if you have a database folder at
+/home/c-worker.ch/dbs/TestDB, set<br>
+$DB_DIR to /home/c-worker.ch/dbs/. Now you can have 1 or more folders
+in the<br>
+/home/c-worker.ch/dbs/ folder, each representing a singe database.</p>
+<p>The file txt-db-api.php doesn't change in new versions. Don't
+overwritte it when you<br>
+install a new version. Just keep the old file! If this file will
+change, i'll put a big notice<br>
+in the changelog!</p>
+<h2><a name="abs"></a>Absolute or relative Paths for API_HOME_DIR and
+DB_DIR</h2>
+<p>You can set the $API_HOME_DIR and $DB_DIR vars to either relative
+(relative to the file which<br>
+includes txt-db-api.php) or absolute (relative to the server root)
+paths. </p>
+<p>If you use absolute paths, you only need one txt-db-api.php file.<br>
+This file should be placed by the other files of the Text-Db-Api (where
+it is by default<br>
+when the zip file is extracted).</p>
+<p>If you use relative Paths, I REALLY RECOMMEND to let each project
+have its own<br>
+txt-db-api.php file. This file should be placed in the Folder of the
+corresponding project.<br>
+This is neccessary because differrent projects may have another
+relative Path to the<br>
+API and Database Directory. So each project will now include its own
+txt-db-api.php <br>
+File located in its folder.<br>
+In the API Folder you now, no longer need a txt-db-api.php file, sience
+each project has its own.</p>
+<p>If you want, you can also let each project have its own
+txt-db-api.php file when using<br>
+absolute paths. This might be usefull if you want to use different
+Database-Roots for<br>
+each Project.</p>
+<p>&nbsp;</p>
+</body>
+</html>

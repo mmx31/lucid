@@ -1,0 +1,32 @@
+<html>
+<head>
+<title>getCurrentValues</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="../../php-txt-db-api.css" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>getCurrentValues</h1>
+<p>(since Version 0.0.1)<br>
+  getCurrentValues -- Returns the Values of the current Row as array.</p>
+<h2>Description:</h2>
+<pre>array<b> </b>getCurrentValues ()</pre>
+<p>Returns the Values of the current Row as array. The values in the Array have 
+  the same order as in <br>
+  the SQL Query you supply.<br>
+  The current Row (position) can be changed with the functions <a href="next.html">next()</a>, 
+  <a href="prev.html">prev()</a> or <a href="setPos.html">setPos()</a>.</p>
+<p>The PHP function list() somes in very handy here:</p>
+<pre>$db=new Database("MyDatabase");
+
+$rs=$db-><a href="../Database/executeQuery.html">executeQuery</a>("SELECT nr, name, address, email FROM person");
+while($rs-><a href="next.html">next</a>()) {
+	<b>list</b>($idNr, $name, $address, $mail)=$rs->getCurrentValues();
+	echo "$idNr: $name from $address (Email: $mail)";
+}
+</pre>
+<h2>Return Value:</h2>
+<p>The Values of the current Row as array.</p>
+<h2>&nbsp;</h2>
+</body>
+</html>

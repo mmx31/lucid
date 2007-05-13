@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Installation</title>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+  <link rel="stylesheet" href="../php-txt-db-api.css" type="text/css">
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<h1>Installation</h1>
+<br>
+Seit den 0.3.x Versionen beinhaltet das Text-DB-Api Zip nicht mehr nur
+die 8<br>
+Hauptfiles und das Manual, neu sind auch das WebGUI und der Table
+Editor integriert. <br>
+Um die Text-DB-API zu verwenden reicht es nachwievor die 8 .php Files <br>
+auf den Webserver zu laden und die txt-db-api.php Datei anzupassen. <br>
+Diese Installation ist weiter unten unter "Manuelle Installation"
+beschrieben.<br>
+<br>
+Seit den 0.3.x Versionen hat man aber auch die M&ouml;glichkeit die API
+und die<br>
+dazugeh&ouml;renden GUI's mit einem Assistenten (installer.php) zu
+installieren und<br>
+konfigurieren zu lassen. Das Skript installer.php kann von der
+Sourceforge Seite SEPARAT<br>
+heruntergeladen werden. <br>
+F&uuml;r die Installation l&auml;dt man das Text-DB-API Zip und das
+installer.php<br>
+Skript auf den Webserver und zwar ins GLEICHE Verzeichniss. Nun muss
+man nur noch<br>
+das installer.php Skript aufrufen und der Assistent leitet einen durch
+die Installation<br>
+welche soweit selbsterkl&auml;rend ist.<br>
+<br>
+<br>
+<h1>Manuelle Installation</h1>
+<br>
+<h2>Upload der Dateien:</h2>
+<p>Alle Php-Dateien der Txt-Db-Api sind in ein (und das gleiche)
+Verzeichnis hochzuladen.</p>
+<h2>&Auml;ndern der Datei txt-db-api.php</h2>
+<p>Die Datei txt-db-api.php ist vor dem upload anzupassen. In dieser
+Datei sind<br>
+die beiden Variabeln $API_HOME_DIR und $DB_DIR auf den richtigen Wert
+zu <br>
+setzten:</p>
+<p><b>$API_HOME_DIR:</b><br>
+Diese Variable muss auf den absoluten oder relativen Pfad zu den
+Txt-Db-Api Dateien zeigen. <br>
+z.B. /home/c-worker.ch/public_html/php-api/<br>
+F&uuml;r mehr Infos zur Pfadangabe siehe <a href="#abs">unten</a>.</p>
+<p>&nbsp; </p>
+<p><b>$DB_DIR:</b><br>
+Diese Variable muss auf den absoulten oder relativen Pfad zeigen, unter
+welchem sich die Datenbank<br>
+Ordner befinden. Hat man zB einen Datenbank Ordner unter
+/home/c-worker.ch/dbs/TestDB<br>
+so muss man $DB_DIR auf /home/c-worker.ch/dbs/ setzten. Im Ordner
+/home/c-worker.ch/dbs/ <br>
+k&ouml;nnen nun beliebig viele Datenbank-Ordner erzeugt werden.</p>
+<p><b>Wichtig: </b>Die Datei txt-db-api.php &auml;ndert sich nicht in
+neuen Versionen. Ihr braucht also NICHT bei<br>
+jeder neuen Version die Datei txt-db-api.php zu &uuml;berschreiben und
+zu &auml;ndern. Behaltet einfach <br>
+die alte! Falls sie sich mal &auml;ndern sollte wir das im changelog
+und unter den news deutlich stehen!</p>
+<p>&nbsp;</p>
+<h2><a name="abs"></a>Absolute oder relative Pfade f&uuml;r
+API_HOME_DIR und DB_DIR</h2>
+<p>Grunds&auml;tzlich hat man zwei M&ouml;glichkeiten die Verzeichnisse
+in den $API_HOME_DIR und $DB_DIR Variabeln<br>
+anzugeben. Man kann entweder <b>relative</b> (relativ zum Verzeichniss
+der Datei welche "txt-db-api.php" include't)<br>
+oder <b>absolute Verzeichnisse</b> (relativ zum Server root)
+verwenden. </p>
+<p>Wenn man eine absolute Pfadangabe verwendet, so be&ouml;tigt man nur
+eine txt-db-api.php - Datei. <br>
+Diese sollte man bei den andern Dateien der Text-Db-Api platzieren. <br>
+Dies ist auch der Standard-Ort der Datei nach dem extrahieren des
+Zip-Files.</p>
+<p>Falls man eine relative Pfadangabe verwendet, ist es SEHR
+EMPEHLENSWERT f&uuml;r jedes Projekt eine<br>
+eigene txt-db-api.php - Datei zu verwenden. Diese plaziert man dann
+direkt im Ordner des jeweligen<br>
+Projektes. Dies ist deshalb n&ouml;tig, da unterschiedliche Projekte
+einen anderen Relativen Pfad zur<br>
+API und zum Datanbank-Verzeichniss haben k&ouml;nnen. Mann muss nun
+nat&uuml;rlich darauf achten, auch<br>
+das entsprechende txt-db-api.php file zu includen, also dasjenige
+welches nun im Projekt Ordner liegt.<br>
+So muss nun jedes Projekt sein eigenes txt-db-api.php file includen,
+welches im gleichen Pfad wie<br>
+das Projekt liegt.<br>
+Im Ordner der API (dort wo Database.php, etc.) ben&ouml;tigt man dann
+eigentlich keine txt-db-api.php Datei mehr.</p>
+<p>Nat&uuml;rlich kann man auch bei absoluten Pfaden f&uuml;r jedes
+Projekt ein eigenes txt-db-api.php File verwenden.<br>
+Dies k&ouml;nnte z.B. dann n&uuml;tzlich sein wenn die jeweiligen
+Projekte einen unterschiedlichen Datenbank-Root<br>
+Ordner haben.</p>
+<p>&nbsp;</p>
+<h2>&nbsp;</h2>
+</body>
+</html>

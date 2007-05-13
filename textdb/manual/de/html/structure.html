@@ -1,0 +1,84 @@
+
+<link rel="stylesheet" href="php-txt-db-api.css" type="text/css">
+
+<title>PHP: Text File Database Manual</title><div align="center">
+  <h1 align="left"> Struktur / Aufbau der Datenbanken</h1>
+  <p align="left">Grunds&auml;tzlich wird eine Datenbank durch ein Verzeichnis 
+    repr&auml;sentiert. <br>
+    Die Datenbank hat den gleichen Namen wie das Verzeichnis.<br>
+    Alle Datenbank-Verzeichnisse m&uuml;ssen sich im gleichen Verzeichnis befinden,<br>
+    und dieses wird durch die Einstellung $DB_DIR in der Datei txt-db-api.php<br>
+    festgelegt.</p>
+  <p align="left"><b>Kleines Beispiel:</b></p>
+  <p align="left">Wurde $DB_DIR auf den Wert &quot;/home/websites/myhome/Databases/&quot; 
+    gesetzt<br>
+    so k&ouml;nnen sich die Datenbanken bzw. Ordner nun unter /home/websites/myhome/Databases/<br>
+    befinden.</p>
+  <p align="left">M&ouml;chte man eine Datenbank mit dem Namen &quot;MeineDB&quot; 
+    haben so erstellt man den Ordner<br>
+    /home/websites/myhome/Databases/MeineDB. <br>
+    Damit die Datenbank-Dateien nicht mit dem Browser direkt angesehen werden 
+    k&ouml;nnen, ist es empfehlenswert die .htaccess Datei in diesem Ordner entsprechend 
+    zu ver&auml;ndern, dass mit GET und POST kein Zugriff auf die Txt-Dateien 
+    m&ouml;glich ist.</p>
+  <p align="left">Nat&uuml;rlich kann $DB_DIR zum lokalen testen auf einer Windows 
+    Maschine auf Laufwerke<br>
+    enthalten, zB &quot;C:\meineWebseiten\blabla\Datenbanken\&quot;.</p>
+  <p align="left">Wenn man nun SQL-Statements auf die Datenbank MeineDB absetzen 
+    m&ouml;chte so<br>
+    muss man zuerst ein Datebase Objekt erzeugen, und im Konstruktor den Namen<br>
+    der Datenbank (also den Namen des Verzeichnisses) angeben.<br>
+    F&uuml;r das Beispiel von oben s&auml;he das folgendermassen aus:</p>
+  <div align="left"> 
+    <pre align="left">$db=new Database(&quot;MeineDB&quot;);
+</pre>
+    <p><b>ACHTUNG:</b> bei den Datenbank-Namen (also dem Verzeichniss) wird die 
+      GROSS-klein-Schreibung<br>
+      BER&Uuml;CKSICHTIGT !! (case sensitive).</p>
+    <p>Nun kann man auf der Variable $db Sql Statements absetzten.<br>
+      Als ersten Schritt k&ouml;nnte man zB eine Tabelle &quot;Personen&quot; 
+      erzeugen: </p>
+    <pre>$db-&gt;executeQuery(&quot;CREATE TABLE personen (nr inc, vorname str, nachname str, alter int)&quot;);
+
+</pre>
+    <p>Tabellen k&ouml;nnen auch ohne SQL-Statement, <a href="examples/tut2.html">manuell</a> 
+      erstellt werden.</p>
+    <p>Tabellen werden als .txt Files im Ordner der Datenbank repr&auml;sentiert. 
+      Was aber weniger Wichtig ist, theoretisch l&auml;sst sich mehr oder weniger 
+      alles machen, ohne dass man die .txt Files je anfassen muss.</p>
+    <p>Wichtig ist nur: Alle Datenbanken sind eigentlich Verzeichnisse welche 
+      sich im Verzeichnis $DB_DIR<br>
+      befinden m&uuml;ssen !!</p>
+    <p><b>WICHTIG</b>: Dieses Verzeichnis muss auch von Hand (z.B. via FTP erzeugt 
+      werden)! NICHT vergessen die Berechtigungen<br>
+      des Verzeichnisses via FTP zu &auml;ndern (chmod()), ansonsten k&ouml;nnen 
+      keine Tabellen (also Dateien) im entsprechenden<br>
+      Ordner erzeugt werden und CREATE TABLE schl&auml;g fehl.</p>
+  </div>
+  <p align="left"><b>NOCH ein Beispiel:</b> </p>
+  <p align="left">Die Webseite (also die HTML Dateien) sind unter /home/website/myPage/</p>
+  <p align="left">Die API Files sind unter /home/website/myPage/txt-db-api/</p>
+  <p align="left">Der Ordner der die Datenbanken h&auml;lt ist /home/website/myPage/Datanbanken</p>
+  <p align="left">Es sind zwei Datenbanken installiert (TestDatenbank und ProdDatenbank), 
+    somit existieren<br>
+    folgende Verzeichnisse: </p>
+  <p align="left">/home/website/myPage/Datanbanken/TestDatenbank/<br>
+    und<br>
+    /home/website/myPage/Datanbanken/ProdDatenbank/</p>
+  <p align="left">Bei diesen wurde mit chmod die entsprechende Berechtigungen 
+    gesetzt (zB 777).</p>
+  <p align="left">&nbsp;</p>
+  <p align="left">Bei dem oben erw&auml;hnten Beispiel w&uuml;rden die Einstellungen 
+    in txt-db-api.php so aussehen:</p>
+  <div align="left"> 
+    <pre align="left">$API_HOME_DIR="/home/website/myPage/txt-db-api/"; 
+$DB_DIR="/home/website/myPage/Datanbanken/"; 
+</pre>
+    <p><br>
+      Ein PHP Script im Ordner /home/website/myPage/ w&uuml;rde dann so beginnen</p>
+    <pre>&lt;? php</pre>
+    <pre>include(&quot;txt-db-api/txt-db-api.php&quot;);
+.....
+     </pre>
+  </div>
+</div>

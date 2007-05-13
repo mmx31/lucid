@@ -1,0 +1,42 @@
+<html>
+<head>
+<title>executeQuery</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="../../php-txt-db-api.css" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>executeQuery</h1>
+<p>(seit Version 0.0.1)<br>
+  executeQuery -- F&uuml;hrt ein Sql Statement aus, und gibt je nach Typ ein ResultSet 
+  Objekt oder ein int zur&uuml;ck </p>
+<h2>Beschreibung:</h2>
+<pre>ResultSet/int<b> executeQuery</b> (string sqlQueryString)</pre>
+ 
+<p>F&uuml;hrt ein Sql Statement auf der Datanbank aus. <br>
+  Es sind nicht alle Statement Typen und Keywords aus dem SQL Standard enthalten.<br>
+</p>
+<p> Nicht vergessen eventuellen &quot; in dem Sql-String ein \ voranzusetzten</p>
+<h2>Parameter:</h2>
+<table width="579" border="1">
+  <tr> 
+    <td width="219" valign="top"> 
+      <pre>sqlQueryString</pre>
+    </td>
+    <td width="350">Sql Statement String (z.B. &quot;SELECT nr, name FROM personen 
+      WHERE personen.name=\&quot;HANS\&quot;;&quot;)</td>
+  </tr>
+</table>
+<h2>R&uuml;ckgabewert:</h2>
+<p>Bei SELECT/LIST TABLES Satements:<br>
+  - Ein ResultSet Objekt welches die Daten enth&auml;lt.<br>
+  - Im Fehlerfalle wird false zur&uuml;ckgegeben.</p>
+<p>Bei UPDATE/INSERT/DELETE Statements:<br>
+  - Die Anzahl der ver&auml;nderten Datens&auml;tze<br>
+  - Im Fehlerfalle wird false zur&uuml;ckgegeben (Achtung: FALSE und 0 haben nicht 
+  die gleiche Bedeutung!)</p>
+<p>Bei CREATE TABLE/DROP TABLE/CREATE DATABASE/DROP DATABASE Statements:<br>
+  - Wenn ok: true<br>
+  - Im Fehlerfalle wird false zur&uuml;ckgegeben</p>
+</body>
+</html>

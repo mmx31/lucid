@@ -1,0 +1,23 @@
+<html>
+<head>
+ <title>Text-Datatabase GUI</title>
+ <link rel=stylesheet type="text/css" href="styles.css">
+</head>
+<body bgcolor="{pagebgcolor}">
+
+<table width="100%" height="97%" bgcolor="{tablebordercolor}">
+<tr>
+	<td bgcolor="{navibgcolor}" valign="top" width=150><font face="{font}" color="{fontcolor}">
+		<a href="index.php?$SID"><b>HOME</b></a><br><br>
+		$list_dbs
+		<br><hr>
+		Templates:<br>
+		$list_templates
+		<br><br>
+		<a href="tbedit.php"><b>LAUNCH TABLE EDITOR</b></a><br><br>
+		<a href="?logout=1"><b>LOGOUT</b></a><br><br>
+		</font>
+	</td>
+	<td bgcolor="{mainbgcolor}" valign="top"><font face="{font}" color="{fontcolor}">
+		$gui_message
+

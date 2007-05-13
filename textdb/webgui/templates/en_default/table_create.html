@@ -1,0 +1,15 @@
+$headinclude
+$gui_message2
+
+<h2>Creation of table "$_POST[new_table_name]"</h2>
+
+<form method="post" action="index.php?show=table_details&db=$_GET[db]&tbl=$_POST[new_table_name]&create=true$SID">
+<input type="hidden" name="numf" value="$_POST[new_table_numf]">
+<table bgcolor="{tablebordercolor}" cellpadding=3>
+	<tr><td bgcolor="{tablec}">Fieldname</td><td bgcolor="{tablec}">Datatyp</td></tr>
+	$tbl_list_fields
+</table>
+<input type="submit" value="create">
+</form>
+
+$footinclude

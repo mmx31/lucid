@@ -1,0 +1,73 @@
+
+<link rel="stylesheet" href="../php-txt-db-api.css" type="text/css">
+
+<title>PHP: Text File Database Manual</title><div align="center">
+  <h1 align="left"> Tutorial 2: Create Tables manually</h1>
+  <p align="left"><b>Attention: The table format changed in version 0.1.3-Alpha-02 
+    and 0.1.5-Alpha-01!</b></p>
+  <p align="left">If you don't want to create new Tables with a CREATE TABLE call 
+    you can also create a table file on your own.</p>
+  <h2 align="left">1. Create a Text File</h2>
+  <div align="left"> Create a File with the Extension .txt
+    <h2>2. Define the columns (first line of the file)</h2>
+    <p>In the first line of the text files, you have to write all column name.<br>
+      Each column-name is finished with a #.</p>
+    Example: <br>
+    <pre>Nr#Name#Prename#Adress#Age</pre>
+    <h2>3. Define Data-type's (second line of the file)</h2>
+    <p>Using the same format as above, you have to define the data type of each 
+      column now.<br>
+      The supported datatypes are listed <a href="../sql_limit.html#createTable">here.</a></p>
+    <p>Example for the second line::</p>
+    <pre>inc#str#str#str#int</pre>
+    <h2>4. Define Default Values (third line of the file)</h2>
+    <p>Using the same format as above, you have to define the default value for 
+      each column now.<br>
+      The default values are used if you don't specify all columns when using 
+      an INSERT Statement.<br>
+    </p>
+    <p>Example for the third line::</p>
+    <pre>0#default name#default prename#no adress#40</pre>
+    <p>&nbsp;</p>
+    <h2>5. (Voluntary) Insert Data</h2>
+    <p>Using the same format again, you can now insert some data in your table.<br>
+      The finished table-text-file could look like this:</p>
+    <pre>Nr#Name#Prename#Adress#Age
+inc#str#str#str#int<br>0#default name#default prename#no adress#40
+0#Tom#Smith#Teststreet 9#40
+1#Max#Payne#Superstreet 1#22</pre>
+    <h2>6. Set permissions</h2>
+    <p>Once you have uploaded the Text-File on your webserver, you have to change 
+      the permissions for it.<br>
+      This can be done with most FTP client. You could use a chmod 777 for example.<br>
+      To make it impossible that the Text-File can be viewed from the brower directly, 
+      it's m recommendable to<br>
+      change the .htaccess File in the Folder where the Text-File is located.<br>
+      Deny GET and POST access for to this folder.</p>
+    <p>&nbsp;</p>
+    <h2>7. Hints</h2>
+    <p>If you want to use % or # as part of a column name or value, you have to 
+      write %p instead of % and %h instead of #.<br>
+      This is necessary because # and % have a special meaning in table files.<br>
+      <b>You ONLY have to bother about the # and % characters if you enter the 
+      data manually into the text file. </b><br>
+      CREATE TABLE and all other SQL Statements will handle this automatically 
+      for you. <br>
+    </p>
+    <p>Examples: </p>
+    <pre>nr#link 
+inc#str 
+## 
+1#http://www.abc.de/index.htm%hanchor 
+2#http://www.abc.de/start.htm%hanchor2</pre>
+    <pre>nr#person#discount
+inc#str#str 
+##10%p 
+1#m&uuml;ller#5%p 
+2#maier#7,5%p 
+     </pre>
+    <p>&nbsp; </p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+  </div>
+</div>
