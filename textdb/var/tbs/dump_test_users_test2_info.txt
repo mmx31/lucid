@@ -1,0 +1,3 @@
+id,int,,0,1,1,0:
+domain,char,100,0,0,0,0:
+name,char,100,1,0,0,3:ppo
