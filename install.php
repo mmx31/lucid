@@ -236,27 +236,27 @@ fclose($ourFileHandle);
                         </tr>
                         <tr>
                             <td class="table">Database host:</td>
-                            <td class="table"><input type="text" size="12" maxlength="20" <?php echo "value='$db_host'" ?> name="db_host"></td>
+                            <td class="table"><input type="text" size="12"  <?php echo "value='$db_host'" ?> name="db_host"></td>
                             <td width="150" class="table"><p class="info">The IP of the mySQL server to connect to. Usually on shared web hosting this is 'localhost'. Leave this blank if your using TextDB.</p></td>
                         </tr>
                         <tr>
                             <td class="table">Database name:</td>
-                            <td class="table"><input type="text" size="12" maxlength="20" <?php echo "value='$db_name'" ?> name="db_name"></td>
+                            <td class="table"><input type="text" size="12"  <?php echo "value='$db_name'" ?> name="db_name"></td>
                             <td width="150" class="table"><p class="info">The mySQL database to use</p></td>
                         </tr>
                         <tr>
                             <td class="table">Database username:</td>
-                            <td class="table"><input type="text" size="12" maxlength="20" <?php echo "value='$db_username'" ?> name="db_username"></td>
+                            <td class="table"><input type="text" size="12"  <?php echo "value='$db_username'" ?> name="db_username"></td>
                             <td width="150" class="table"><p class="info">A mySQL user that has all privlages to the database specified above. Leave this blank if your using TextDB.</p></td>
                         </tr>                        
                         <tr>
                             <td class="table">Database password:</td>
-                            <td class="table"><input type="text" size="12" maxlength="20" <?php echo "value='$db_password'" ?> name="db_password"></td>
+                            <td class="table"><input type="text" size="12"  <?php echo "value='$db_password'" ?> name="db_password"></td>
                             <td width="150" class="table"><p class="info">The password for the user specified above. Leave this blank if your using TextDB.</p></td>
                         </tr>
                         <tr>
                             <td class="table">Admin Username:</td>
-                            <td class="table"><input type="text" size="12" maxlength="20" name="username"></td>
+                            <td class="table"><input type="text" size="12"  name="username"></td>
                             <td width="150" class="table"><p class="info">Your username</p></td>
                         </tr>
                         <tr>
