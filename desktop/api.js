@@ -16,7 +16,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-	/**********************************\
+/**********************************\
 |           Psych Desktop          |
 |            API Library           |
 |      (c) 2006 Psych Designs      |
@@ -170,7 +170,6 @@ function api() {
 
     this.registry.getValue = function(appid,varname,callback)
     {
-        api.registry.callback = callback;
         ui_loadingIndicator(0);
         var url = "../backend/api.php?registry=load&appid="+appid+"&varname="+varname;
         dojo.io.bind({
