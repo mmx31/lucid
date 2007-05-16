@@ -19,6 +19,18 @@
 	*/
 session_start();
 if (isset($_GET['action'])) {
+    if ($_GET['action'] == "getDatabase")
+    {
+        
+    }
+    if ($_GET['action'] == "saveDatabase")
+    {
+        $columns = $_POST['columns'];
+        $table = $_POST['table'];
+        $name = $_POST['name'];
+        $appid = $_POST['appid'];
+        $public = $_POST['public'];
+    }
 // get password will NEVER be implamented
  if ($_GET['action'] == "getStatus") {
 if(isset($_SESSION['userid'])) {
