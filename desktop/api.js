@@ -154,8 +154,8 @@ function api() {
     			taskBarId: "appbar",
     			toggle: "explode",
     			toggleDuration: 300,
-    			constrainToContainer: true.
-                id: this.id;
+    			constrainToContainer: true,
+                id: this.id
     		}, windiv);		
     	}
     	this.destroy = function()
