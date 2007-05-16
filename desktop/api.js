@@ -154,7 +154,8 @@ function api() {
     			taskBarId: "appbar",
     			toggle: "explode",
     			toggleDuration: 300,
-    			constrainToContainer: true
+    			constrainToContainer: true.
+                id: this.id;
     		}, windiv);		
     	}
     	this.destroy = function()
@@ -162,6 +163,10 @@ function api() {
     		if(this.window) { this.window.destroy(); }
     		else { api.toaster("Warning in app: No window shown."); }
     	}
+        this.addChild = function(node)
+        {
+            this.window.addChild(node);
+        }
     }    
     // Registry API
 
