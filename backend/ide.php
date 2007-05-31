@@ -44,15 +44,17 @@ $query = "INSERT INTO ${db_prefix}apps (name, author, email, code, library, vers
 }
 else
 {
-$query = "UPDATE ${db_prefix}apps  SET name=\"${_POST['name']}\", author=\"${_POST['author']}\", email=\"${_POST['email']}\", code=\"${_POST['code']}\", library=\"${_POST['library']}\", version=\"${_POST['version']}\", maturity=\"${_POST['maturity']}\", category=\"${_POST['category']}\" WHERE ID=\"${_POST['appid']}\" LIMIT 1";
+$query = "UPDATE ${db_prefix}apps SET name=\"${_POST['name']}\", author=\"${_POST['author']}\", email=\"${_POST['email']}\", code=\"${_POST['code']}\", library=\"${_POST['library']}\", version=\"${_POST['version']}\", maturity=\"${_POST['maturity']}\", category=\"${_POST['category']}\" WHERE ID=\"${_POST['appid']}\" LIMIT 1";
 }
 
-mysql_query($query) or die('Query failed: ' . mysql_error());
+mysql_query($query) or die('Query 1 failed: ' . mysql_error());
 if($_POST['appid'] == -1)
 {
-    $query = ""; //get the ID of the app last saved
-    mysql_query($query) or die('Query failed: ' . mysql_error());
-    //load result and echo it    
+    $query = "SELECT * FROM ${db_prefix}apps WHERE code=\"${_POST['code']}\" HAVING library=\"${_POST['library']}\" ORDER BY ID DESC LIMIT 1"; //get the ID of the app last saved
+    mysql_query($query) or die('Query 2 failed: ' . mysql_error());
+    $result = mysql_query($query) or die('Query failed: ' . mysql_error());
+    $line = mysql_fetch_array($result, MYSQL_ASSOC);
+    echo $line['id'];    
 }
 else
 {
