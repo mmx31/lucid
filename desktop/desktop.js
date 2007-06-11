@@ -52,4 +52,4 @@ dojo.lang.extend(desktop, {
 			}
 		}
 	}
-}
+});

@@ -22,22 +22,27 @@
 |   (c) 2006 Psych Designs   |
 \****************************/ 
 
-window.onresize = windows_desktopResize;
-setTimeout("windows_desktopResize();", 1500);
-var windowcounter = 0;
-function windows_desktopResize()
-{
-	if(document.body.clientWidth) { x=document.body.clientWidth }
-	if(window.innerWidth) { x=window.innerWidth }
-	if(document.body.clientHeight) { y=document.body.clientHeight }
-	if(window.innerHeight) { y=window.innerHeight }
-	document.getElementById("windowcontainer").style.width= x;
-	if(taskbarvisibility == "show")
+window.onresize = desktop.windows.desktopResize;
+setTimeout("desktop.windows.desktopResize();", 1500);
+dojo.lang.extend(desktop, {
+	windows: function()
 	{
-		document.getElementById("windowcontainer").style.height= y-35;
+		this.windowcounter = 0;
+		this.desktopResize = function()
+		{
+			if(document.body.clientWidth) { x=document.body.clientWidth }
+			if(window.innerWidth) { x=window.innerWidth }
+			if(document.body.clientHeight) { y=document.body.clientHeight }
+			if(window.innerHeight) { y=window.innerHeight }
+			document.getElementById("windowcontainer").style.width= x;
+			if(taskbarvisibility == "show")
+			{
+				document.getElementById("windowcontainer").style.height= y-35;
+			}
+			else
+			{
+				document.getElementById("windowcontainer").style.height= y;
+			}
+		}
 	}
-	else
-	{
-		document.getElementById("windowcontainer").style.height= y;
-	}
-}
+});

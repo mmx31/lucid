@@ -22,3 +22,9 @@
 |   (c) 2006 Psych Designs   |
 \***************************/ 
 
+dojo.lang.extend(desktop, {
+	appbar: function()
+	{
+		
+	}
+});

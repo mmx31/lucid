@@ -33,7 +33,7 @@ var PsychDesktop = {
  PsychDesktop.require('shortcuts.js');
  PsychDesktop.require('taskbar.js');
  PsychDesktop.require('tasktray.js');
- PsychDesktop.require('themes.js');
+ PsychDesktop.require('theme.js');
  PsychDesktop.require('tooltip.js');
  PsychDesktop.require('wallpaper.js');
  PsychDesktop.require('widget.js');
