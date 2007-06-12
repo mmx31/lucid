@@ -50,7 +50,7 @@ desktop.app = new function()
 				        this.init = function(args)
 				        {
 				            try {eval(this.code);}
-				            catch(e){api.toaster(e);}
+				            catch(e){api.toaster(e); desktop.core.loadingIndicator(1);}
 				        }
 				        eval(this.lib);
 				        this.hitch = function(func)
@@ -70,18 +70,18 @@ desktop.app = new function()
 						}
 					}
 				}),
-			    error: function(type, error) { api.toaster("Error: "+error.message); ui_loadingIndicator(1); },
+			    error: function(type, error) { desktop.core.loadingIndicator(1); api.toaster("Error: "+error.message); },
 			    mimetype: "text/plain"
 			});
 		}
 		this.launch = function(id, args)
 		{
 			desktop.core.loadingIndicator(0);
-			if(id==-1) { api.toaster("Error: could not get app list from server"); }
+			if(id==-1) { api.toaster("Error: could not get app list from server");  desktop.core.loadingIndicator(1); }
 			else
 			{
 				if(this.apps[id] == undefined)
-				{this.fetchApp(id, dojo.lang.hitch(this, this.launch), args)}
+				{this.fetchApp(id, dojo.lang.hitch(this, this.launch), args);  desktop.core.loadingIndicator(1);}
 				else
 				{
 					this.instances[this.instances.length] = new this.apps[id];
