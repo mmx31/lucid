@@ -22,10 +22,7 @@
 |   (c) 2006 Psych Designs   |
 \****************************/ 
 
-window.onresize = desktop.windows.desktopResize;
-setTimeout("desktop.windows.desktopResize();", 1500);
-dojo.lang.extend(desktop, {
-	windows: function()
+desktop.windows = new function()
 	{
 		this.windowcounter = 0;
 		this.desktopResize = function()
@@ -45,4 +42,3 @@ dojo.lang.extend(desktop, {
 			}
 		}
 	}
-});

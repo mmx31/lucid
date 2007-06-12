@@ -175,7 +175,7 @@ function api() {
 
     this.registry.getValue = function(appid,varname,callback)
     {
-        ui_loadingIndicator(0);
+        desktop.core.loadingIndicator(0);
         var url = "../backend/api.php?registry=load&appid="+appid+"&varname="+varname;
         dojo.io.bind({
         url: url,
@@ -185,31 +185,31 @@ function api() {
     }
     this.registry.saveValue = function(appid,varname,value)
     {
-        ui_loadingIndicator(0);
+        desktop.core.loadingIndicator(0);
         var url = "../backend/api.php?registry=save&appid="+appid+"&varname="+varname+"&value="+value;
         dojo.io.bind({
             url: url,
             error: sys_toastererr,
             mimetype: "text/plain"
         });
-        ui_loadingIndicator(1);
+        desktop.core.loadingIndicator(1);
     }
 	this.registry.removeValue = function(appid,varname)
     {
-        ui_loadingIndicator(0);
+        desktop.core.loadingIndicator(0);
         var url = "../backend/api.php?registry=remove&appid="+appid+"&varname="+varname;
         dojo.io.bind({
             url: url,
             error: sys_toastererr,
             mimetype: "text/plain"
         });
-        ui_loadingIndicator(1);
+        desktop.core.loadingIndicator(1);
     }
     this.registry.processRegistryGet = function(type, data, evt, callback)
     {
         api.registry.value = data;
         if(callback) { callback(data); }
-        ui_loadingIndicator(1);
+        desktop.core.loadingIndicator(1);
     }
 
     //filesystem api
@@ -219,7 +219,7 @@ function api() {
 	
     this.fs.saveFile = function(file,directory,contents)
     {
-        ui_loadingIndicator(0);
+        desktop.core.loadingIndicator(0);
         var url = "../backend/api.php?fs=save&file="+file+"&directory="+directory+"&contents="+contents;
         dojo.io.bind({
 		url: url,
@@ -230,7 +230,7 @@ function api() {
 	
     this.fs.getFile = function(file,directory,callback)
     {
-        ui_loadingIndicator(0);
+        desktop.core.loadingIndicator(0);
         var url = "../backend/api.php?fs=load&file="+file+"&directory="+directory;
         dojo.io.bind({url: url,
         load: function(type, data, http) { api.fs.getFileProcess(type, data, http, callback); },
@@ -239,7 +239,7 @@ function api() {
     }
 	this.fs.listFiles = function(callback)
     {
-        ui_loadingIndicator(0);
+        desktop.core.loadingIndicator(0);
         var url = "../backend/api.php?fs=list";
         dojo.io.bind({
         url: url,
@@ -259,7 +259,7 @@ function api() {
         api.fs.getFileResult["owner"] = results[0].getAttribute("owner");
 		api.fs.getFileResult["sharing"] = results[0].getAttribute("sharing");
 		if(callback) { callback() }
-        ui_loadingIndicator(1);
+        desktop.core.loadingIndicator(1);
         api.toaster("Security Note: FileSystem was accessed.");
     }
 	this.fs.fileListProcess = function(type, data, evt, callback)
@@ -274,14 +274,14 @@ function api() {
 		api.fs.listFilesResult[i]["sharing"] = results[i].getAttribute("sharing");
 		}
         if(callback) { callback() }
-        ui_loadingIndicator(1);
+        desktop.core.loadingIndicator(1);
         api.toaster("Security Note: FileSystem was accessed.");
     }
    
 	this.user = function() { }
     this.user = new this.user();
 this.user.getUserName = function(callback) {
-        ui_loadingIndicator(0);
+        desktop.core.loadingIndicator(0);
         var url = "../backend/api.php?action=getUserName";
         dojo.io.bind({
         url: url,
@@ -293,10 +293,10 @@ this.user.getUserName = function(callback) {
     {
         api.user.userName = data;
         if(callback) { callback(data); }
-        ui_loadingIndicator(1);
+        desktop.core.loadingIndicator(1);
     }
 	this.user.getUserID = function(callback) {
-        ui_loadingIndicator(0);
+        desktop.core.loadingIndicator(0);
         var url = "../backend/api.php?action=getUserID";
         dojo.io.bind({
         url: url,
@@ -308,10 +308,10 @@ this.user.getUserName = function(callback) {
     {
         api.user.userID = data;
         if(callback) { callback(data); }
-        ui_loadingIndicator(1);
+        desktop.core.loadingIndicator(1);
     }
 	this.user.getUserLevel = function(callback) {
-        ui_loadingIndicator(0);
+        desktop.core.loadingIndicator(0);
         var url = "../backend/api.php?action=getUserID";
         dojo.io.bind({
         url: url,
@@ -323,13 +323,13 @@ this.user.getUserName = function(callback) {
     {
         api.user.userLevel = data;
         if(callback) { callback(data); }
-        ui_loadingIndicator(1);
+        desktop.core.loadingIndicator(1);
     }
 	//misc api
 	this.misc = function() { }
     this.misc = new this.misc();    
     this.misc.logout = function() {
-	logout();
+	desktop.core.logout();
 	}
 	}
 	api = new api();

@@ -15,14 +15,13 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	*/
+*/
 /****************************\
 |        Psych Desktop       |
 |       Taskbar Engine       |
 |   (c) 2006 Psych Designs   |
 \***************************/ 
-dojo.lang.extend(desktop, {
-	taskbar: function()
+desktop.taskbar = new function()
 	{
 		this.visibility = "show";
 		
@@ -52,7 +51,7 @@ dojo.lang.extend(desktop, {
 			windows_desktopResize();
 		}
 		
-		this.drawtaskbar = function()
+		this.draw = function()
 		{
 			appbarcontent = "&nbsp;";
 			//appbarcontent = '<div dojoType="TaskBar" id="appbar"></div>';
@@ -68,4 +67,3 @@ dojo.lang.extend(desktop, {
 			*/
 		}
 	}
-});

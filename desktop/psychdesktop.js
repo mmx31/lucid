@@ -16,7 +16,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-var desktop = function() {  }
+var desktop = new Object();
 var PsychDesktop = {
   require: function(libraryName) {
     // inserting via DOM fails in Safari 2.0, so brute force approach

@@ -22,6 +22,6 @@
 |   (c) 2006 Psych Designs   |
 \***************************/ 
 
-api.toaster = function(message){
+api.toaster = new function(message){
 dojo.event.topic.publish("psychdesktop", message);
 }

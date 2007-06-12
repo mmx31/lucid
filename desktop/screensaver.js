@@ -22,9 +22,7 @@
 |     Screensaver Engine     |
 |   (c) 2006 Psych Designs   |
 \***************************/
-dojo.lang.extend(desktop, {
-	screensaver: function()
-	{
-		
-	}
+desktop.screensaver = new function()
+{
+	
 }

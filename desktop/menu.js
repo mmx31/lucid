@@ -23,8 +23,7 @@
 \***************************/ 
 
 
-dojo.lang.extend(desktop, {
-	menu: function()
+desktop.menu = new function()
 	{
 		this.visibility = "closed";
 		
@@ -41,7 +40,7 @@ dojo.lang.extend(desktop, {
 		}
 		if (window.attachEvent) window.attachEvent("onload", sfHover);
 		
-		this.leftclick()
+		this.leftclick = function()
 		{
 			if(clickcache == '1')
 			{
@@ -96,17 +95,17 @@ dojo.lang.extend(desktop, {
 		
 		//this should probably be under menu.js, but whatever...
 		this.getApplications = function() {
-		ui_loadingIndicator(0);
+		desktop.core.loadingIndicator(0);
 		var url = "../backend/app.php?action=getPrograms";
 		dojo.io.bind({
 		    url: url,
-		    load: app_AppListState,
-		    error: ui_loadingIndicator(1),
+		    load: dojo.lang.hitch(this, this.AppListState),
+		    error: function(type, data, evt) { desktop.core.loadingIndicator(1) },
 		    mimetype: "text/plain"
 		});
 		}
 		
-		function app_AppListState(type, data, evt){
+		this.AppListState = function(type, data, evt){
 		app_return = data;
 		html = '<ul id="nav">';
 		rawcode = app_return.split(xml_seperator);
@@ -153,26 +152,25 @@ dojo.lang.extend(desktop, {
 		html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/applications-office.png" />&nbsp;Office<ul>';
 		for(count=0;count<=office_id.length-1;count++)
 		{
-			html += '<li onClick="javascript:app_launch('+office_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+office_name[count]+'</li>';
+			html += '<li onClick="javascript:desktop.app.launch('+office_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+office_name[count]+'</li>';
 		}
 		html += '</ul>';
 		html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/applications-internet.png" />&nbsp;Internet<ul>';
 		for(count=0;count<=internet_id.length-1;count++)
 		{
-			html += '<li onClick="javascript:app_launch('+internet_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+internet_name[count]+'</li>';
+			html += '<li onClick="javascript:desktop.app.launch('+internet_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+internet_name[count]+'</li>';
 		}
 		html += '</ul>';
 		html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/preferences-system.png" />&nbsp;System<ul>';
 		for(count=0;count<=system_id.length-1;count++)
 		{
-			html += '<li onClick="javascript:app_launch('+system_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+system_name[count]+'</li>';
+			html += '<li onClick="javascript:desktop.app.launch('+system_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+system_name[count]+'</li>';
 		}
 		html += '</ul>';
-		html += '<li onClick="javascript:logout();" style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/system-log-out.png" />&nbsp;Logout</li>';
+		html += '<li onClick="javascript:desktop.core.logout();" style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/system-log-out.png" />&nbsp;Logout</li>';
 		html += '</ul>';
 		
 		document.getElementById("menu").innerHTML = html;
-		ui_loadingIndicator(1);
+		desktop.core.loadingIndicator(1);
 		}
 	}
-});

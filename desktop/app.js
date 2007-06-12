@@ -21,8 +21,7 @@
 |  App function library  |
 | (c) 2006 Psych Designs |
 \************************/
-dojo.lang.extend(desktop, {
-	app: function()
+desktop.app = new function()
 	{
 		this.apps = new Array();
 		this.instances = new Array();
@@ -63,14 +62,14 @@ dojo.lang.extend(desktop, {
 			    mimetype: "text/plain"
 			});
 		}
-		this.launchApp = function(id)
+		this.launch = function(id)
 		{
 			ui_loadingIndicator(0);
 			if(id=-1) { api.toaster("Error: could not get app list from server"); }
 			else
 			{
 				if(apps[id] == undefined)
-				{this.fetchApp(id, dojo.lang.hitch(this, this.launchApp))}
+				{this.fetchApp(id, dojo.lang.hitch(this, this.launch))}
 				else
 				{
 					this.instances[this.instances.length] = new apps[id];
@@ -81,4 +80,3 @@ dojo.lang.extend(desktop, {
 			}
 		}
 	}
-});

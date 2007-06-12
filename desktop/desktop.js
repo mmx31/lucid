@@ -26,9 +26,7 @@ window.onbeforeunload = function()
 {
   return "To exit Psych Desktop properly, you should log out.";
 }
-drawtaskbar();
-dojo.lang.extend(desktop, {
-	core: function()
+desktop.core = new function()
 	{
 		this.clickcache = 0;
 		this.logout = function()
@@ -52,4 +50,3 @@ dojo.lang.extend(desktop, {
 			}
 		}
 	}
-});

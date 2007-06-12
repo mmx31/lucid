@@ -22,13 +22,12 @@
 |   (c) 2006 Psych Designs   |
 \***************************/
 
-dojo.lang.extend(desktop, {
-	wallpaper: function()
+desktop.wallpaper = new function()
 	{
 		this.loadPrefs = function()
 		{
-			api.registry.getValue(0, "bgimg", setWallpaper);
-			api.registry.getValue(0, "bgcolor", setWallpaperColor);
+			api.registry.getValue(0, "bgimg", dojo.lang.hitch(this, this.set));
+			api.registry.getValue(0, "bgcolor", dojo.lang.hitch(this, this.setColor));
 		}
 		
 		this.set = function(image)
@@ -52,4 +51,3 @@ dojo.lang.extend(desktop, {
 			    document.bgColor = color;
 		}
 	}
-});

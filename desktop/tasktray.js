@@ -21,8 +21,7 @@
 |      Task Tray Library     |
 |   (c) 2006 Psych Designs   |
 \***************************/ 
-dojo.lang.extend(desktop, {
-	tray: function()
+desktop.tray = new function()
 	{
 		draw = function()
 		{
@@ -30,4 +29,3 @@ dojo.lang.extend(desktop, {
 			document.write('<table id="tasktray"><tr></tr></table>');
 		}
 	}
-});
