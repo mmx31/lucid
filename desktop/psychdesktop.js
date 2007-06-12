@@ -34,7 +34,6 @@ var PsychDesktop = {
  PsychDesktop.require('taskbar.js');
  PsychDesktop.require('tasktray.js');
  PsychDesktop.require('theme.js');
- PsychDesktop.require('tooltip.js');
  PsychDesktop.require('wallpaper.js');
  PsychDesktop.require('widget.js');
  PsychDesktop.require('windows.js');

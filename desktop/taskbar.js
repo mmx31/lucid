@@ -33,7 +33,7 @@ desktop.taskbar = new function()
 				dojo.lfx.html.fadeOut('taskbar', 300).play();
 				this.visibility = "hide";
 				document.getElementById("taskbarhider").innerHTML='<img src="./icons/showtask.gif">';
-				if(menuvisibility == "open")
+				if(this.visibility == "open")
 				{
 					//menubutton();
 				}
@@ -48,14 +48,14 @@ desktop.taskbar = new function()
 					document.getElementById("taskbarhider").innerHTML='<img src="./icons/hidetask.gif">';
 				}
 			}
-			windows_desktopResize();
+			desktop.windows.desktopResize();
 		}
 		
 		this.draw = function()
 		{
 			appbarcontent = "&nbsp;";
 			//appbarcontent = '<div dojoType="TaskBar" id="appbar"></div>';
-			setTimeout("document.getElementById(\"taskbar\").innerHTML='<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td width=\"30\"><img src=\"./icons/apps.gif\" onClick=\"menubutton();\" border=\"0\"></td><td width=\"1%\"><img src=\"./images/separator.gif\"></td><td>"+appbarcontent+"</td><td width=\"1%\"><img src=\"./images/separator.gif\"></td><td width=\"15%\"></td></tr><table>';", 100);
+			setTimeout("document.getElementById(\"taskbar\").innerHTML='<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td width=\"30\"><img src=\"./icons/apps.gif\" onmousedown =\"desktop.menu.button();\" border=\"0\"></td><td width=\"1%\"><img src=\"./images/separator.gif\"></td><td>"+appbarcontent+"</td><td width=\"1%\"><img src=\"./images/separator.gif\"></td><td width=\"15%\"></td></tr><table>';", 100);
 			
 			/*
 			bar=document.createElement("div");

@@ -32,7 +32,7 @@ desktop.windows = new function()
 			if(document.body.clientHeight) { y=document.body.clientHeight }
 			if(window.innerHeight) { y=window.innerHeight }
 			document.getElementById("windowcontainer").style.width= x;
-			if(taskbarvisibility == "show")
+			if(this.visibility == "show")
 			{
 				document.getElementById("windowcontainer").style.height= y-35;
 			}

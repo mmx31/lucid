@@ -26,7 +26,7 @@
 
 var windowcounter = 0;
 
-function api() {
+var api = new function() {
 	this.ui = function() { }
 	this.ui = new this.ui();
 	this.ui = function() { }
@@ -180,7 +180,8 @@ function api() {
         dojo.io.bind({
         url: url,
         load: function(type, data, http) { api.registry.processRegistryGet(type, data, http, callback); },
-        error: sys_toastererr, mimetype: "text/plain"
+        error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); },
+		mimetype: "text/plain"
         });
     }
     this.registry.saveValue = function(appid,varname,value)
@@ -189,7 +190,7 @@ function api() {
         var url = "../backend/api.php?registry=save&appid="+appid+"&varname="+varname+"&value="+value;
         dojo.io.bind({
             url: url,
-            error: sys_toastererr,
+            error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); },
             mimetype: "text/plain"
         });
         desktop.core.loadingIndicator(1);
@@ -200,7 +201,7 @@ function api() {
         var url = "../backend/api.php?registry=remove&appid="+appid+"&varname="+varname;
         dojo.io.bind({
             url: url,
-            error: sys_toastererr,
+            error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); },
             mimetype: "text/plain"
         });
         desktop.core.loadingIndicator(1);
@@ -223,7 +224,7 @@ function api() {
         var url = "../backend/api.php?fs=save&file="+file+"&directory="+directory+"&contents="+contents;
         dojo.io.bind({
 		url: url,
-        error: sys_toastererr,
+        error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); },
 		mimetype: "text/xml"
         });
     }
@@ -234,7 +235,7 @@ function api() {
         var url = "../backend/api.php?fs=load&file="+file+"&directory="+directory;
         dojo.io.bind({url: url,
         load: function(type, data, http) { api.fs.getFileProcess(type, data, http, callback); },
-        error: sys_toastererr, mimetype: "text/xml"
+        error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); }, mimetype: "text/xml"
         });
     }
 	this.fs.listFiles = function(callback)
@@ -244,7 +245,7 @@ function api() {
         dojo.io.bind({
         url: url,
         load: function(type, data, http) { api.fs.fileListProcess(type, data, http, callback); },
-        error: sys_toastererr,
+        error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); },
         mimetype: "text/xml"
         });
     }
@@ -286,7 +287,7 @@ this.user.getUserName = function(callback) {
         dojo.io.bind({
         url: url,
         load: function(type, data, http) { api.user.processGetUserName(type, data, http, callback); },
-        error: sys_toastererr, mimetype: "text/plain"
+        error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); }, mimetype: "text/plain"
         });
 		}
 	this.user.processGetUserName = function(type, data, evt, callback)
@@ -301,7 +302,7 @@ this.user.getUserName = function(callback) {
         dojo.io.bind({
         url: url,
         load: function(type, data, http) { api.user.processGetUserID(type, data, http, callback); },
-        error: sys_toastererr, mimetype: "text/plain"
+        error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); }, mimetype: "text/plain"
         });
 	}
 	this.user.processGetUserID = function(type, data, evt, callback)
@@ -316,7 +317,8 @@ this.user.getUserName = function(callback) {
         dojo.io.bind({
         url: url,
         load: function(type, data, http) { api.user.processGetUserLevel(type, data, http, callback); },
-        error: sys_toastererr, mimetype: "text/plain"
+        error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); },
+		mimetype: "text/plain"
         });
 	}
 	this.user.processGetUserLevel = function(type, data, evt, callback)
@@ -331,14 +333,9 @@ this.user.getUserName = function(callback) {
     this.misc.logout = function() {
 	desktop.core.logout();
 	}
+	this.toaster = function(message)
+	{
+		dojo.event.topic.publish("psychdesktop", message);
 	}
-	api = new api();
-
-function sys_toastererr(type, error)
-{
-    api.toaster("Error in AJAX call: "+error.message);
-    ui_loadingIndicator(1);
-}
-
-    
+	}
 	

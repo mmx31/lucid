@@ -22,11 +22,10 @@
 |   (c) 2006 Psych Designs   |
 \***************************/ 
 
-
 desktop.menu = new function()
 	{
 		this.visibility = "closed";
-		
+		this.clickcache = 0;
 		this.sfHover = function() {
 			var sfEls = document.getElementById("nav").getElementsByTagName("LI");
 			for (var i=0; i<sfEls.length; i++) {
@@ -38,17 +37,17 @@ desktop.menu = new function()
 				}
 			}
 		}
-		if (window.attachEvent) window.attachEvent("onload", sfHover);
-		
+		if (window.attachEvent) window.attachEvent("onload", dojo.lang.hitch(this, this.sfHover));
+
 		this.leftclick = function()
 		{
-			if(clickcache == '1')
+			if(this.clickcache == '1')
 			{
 				if(this.visibility=="open")
 				{
-					hidemenu();
+					this.hide();
 					this.visibility="closed";
-					clickcache = 0;
+					this.clickcache = 0;
 				}
 			}
 			else
@@ -58,13 +57,12 @@ desktop.menu = new function()
 				{
 					if(this.visibility=="open")
 					{
-						clickcache = 1;
+						this.clickcache = 1;
 					}
 					count--;
 				}
 			}
 		}
-		
 		
 		this.button = function()
 		{
@@ -108,7 +106,7 @@ desktop.menu = new function()
 		this.AppListState = function(type, data, evt){
 		app_return = data;
 		html = '<ul id="nav">';
-		rawcode = app_return.split(xml_seperator);
+		rawcode = app_return.split(desktop.app.xml_seperator);
 		app_amount = rawcode.length;
 		app_amount--;
 		app_amount = app_amount/3;

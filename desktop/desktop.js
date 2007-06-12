@@ -22,13 +22,12 @@
 |   (c) 2006 Psych Designs   |
 \****************************/
 
-window.onbeforeunload = function()
+window.onbeforeunload = new function()
 {
   return "To exit Psych Desktop properly, you should log out.";
 }
 desktop.core = new function()
 	{
-		this.clickcache = 0;
 		this.logout = function()
 		{
 			window.onbeforeunload = null;
