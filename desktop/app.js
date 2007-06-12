@@ -24,6 +24,7 @@
 desktop.app = new function()
 	{
 		this.apps = new Array();
+		this.args = new Array();
 		this.instances = new Array();
 		this.callback = new Array();
 		this.xml_seperator = "[==separator==]";
@@ -46,7 +47,7 @@ desktop.app = new function()
 				        this.instance = -1;
 				        this.code = app_code;
 				        this.lib = app_lib;
-				        this.init = function()
+				        this.init = function(args)
 				        {
 				            try {eval(this.code);}
 				            catch(e){api.toaster(e);}
@@ -59,13 +60,13 @@ desktop.app = new function()
 				    }
 					if(this.callback[app_id])
 					{
-						if(this.args[app_id])
+						if(this.args[app_id] != undefined)
 						{
-							this.callback[app_id](this.args[app_id]);
+							this.callback[app_id](app_id, this.args[app_id]);
 						}
 						else
 						{
-							this.callback[app_id]();
+							this.callback[app_id](app_id);
 						}
 					}
 				}),
