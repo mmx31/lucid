@@ -15,7 +15,7 @@
   position: absolute;
   bottom: 0px;
   right: 0px;
-  background:url(./images/hide.gif) #f5f5f5;
+  background:url(./images/icons/hide.gif) #f5f5f5;
   opacity:0.9;
 }
 #sysmenu {
@@ -37,4 +37,10 @@
   position:absolute;
   left: 0%;
   top: 0%;
+}
+
+.seperator {
+	background-image: url(./images/separator.gif);
+	height:35px;
+	width: 8px;
 }

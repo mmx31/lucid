@@ -55,7 +55,7 @@ desktop.taskbar = new function()
 		{
 			appbarcontent = "&nbsp;";
 			//appbarcontent = '<div dojoType="TaskBar" id="appbar"></div>';
-			setTimeout("document.getElementById(\"taskbar\").innerHTML='<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td width=\"30\"><img src=\"./icons/apps.gif\" onmousedown =\"desktop.menu.button();\" border=\"0\"></td><td width=\"1%\"><img src=\"./images/separator.gif\"></td><td>"+appbarcontent+"</td><td width=\"1%\"><img src=\"./images/separator.gif\"></td><td width=\"15%\"></td></tr><table>';", 100);
+			setTimeout("document.getElementById(\"taskbar\").innerHTML='<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td width=\"30\"><img src=\"./icons/apps.gif\" onmousedown =\"desktop.menu.button();\" border=\"0\"></td><td width=\"1%\"><div class=\"seperator\"></div></td><td>"+appbarcontent+"</td><td width=\"1%\"><div class=\"seperator\"></div></td><td width=\"15%\"></td></tr><table>';", 100);
 			
 			/*
 			bar=document.createElement("div");
