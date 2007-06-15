@@ -26,6 +26,7 @@ desktop.app = new function()
 		this.apps = new Array();
 		this.args = new Array();
 		this.instances = new Array();
+		this.instanceCount = 0;
 		this.callback = new Array();
 		this.xml_seperator = "[==separator==]";
 		this.fetchApp = function(appID, callback, args)
@@ -47,22 +48,7 @@ desktop.app = new function()
 				    app_lib = rawcode[5];
 				    app_code = rawcode[4];
 				    app_id = rawcode[0];
-				    this.apps[app_id] = function() {
-				        this.id = app_id;
-				        this.instance = -1;
-				        this.code = app_code;
-				        this.lib = app_lib;
-				        this.init = function(args)
-				        {
-				            try {eval(this.code);}
-				            catch(e){api.toaster(e); desktop.core.loadingIndicator(1);}
-				        }
-				        eval(this.lib);
-				        this.hitch = function(func)
-				        {
-				            return dojo.lang.hitch(this, func);
-				        }
-				    }
+				    eval("this.apps["+app_id+"] = function()\n{\n\tthis.id = "+app_id+";\n\tthis.instance = -1;\n\tthis.init = function(args)\n\t{ try {"+app_code+"}\n\tcatch(e){api.toaster(e); desktop.core.loadingIndicator(1);}}\n"+this.lib+"\n\tthis.hitch = function(func)\n{return dojo.lang.hitch(this, func);}\n}");
 					if(this.callback[app_id])
 					{
 						if(this.args[app_id] != undefined)
@@ -78,18 +64,15 @@ desktop.app = new function()
 		this.launch = function(id, args)
 		{
 			desktop.core.loadingIndicator(0);
-			if(id==-1) { api.toaster("Error: could not get app list from server");  desktop.core.loadingIndicator(1); }
+			if(this.apps[id] == undefined)
+			{this.fetchApp(id, dojo.lang.hitch(this, this.launch), args);  desktop.core.loadingIndicator(1);}
 			else
 			{
-				if(this.apps[id] == undefined)
-				{this.fetchApp(id, dojo.lang.hitch(this, this.launch), args);  desktop.core.loadingIndicator(1);}
-				else
-				{
-					this.instances[this.instances.length] = new this.apps[id];
-					this.instances[this.instances.length-1 ].instance = this.instances.length-1;
-					this.instances[this.instances.length-1 ].init(args);
-					desktop.core.loadingIndicator(1);
-				}
+				this.instanceCount++;
+				this.instances[this.instanceCount] = new this.apps[id];
+				this.instances[this.instanceCount].instance = this.instances.length-1;
+				this.instances[this.instanceCount].init(args);
+				desktop.core.loadingIndicator(1);
 			}
 		}
 	}
