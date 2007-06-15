@@ -48,7 +48,7 @@ desktop.app = new function()
 				    app_lib = rawcode[5];
 				    app_code = rawcode[4];
 				    app_id = rawcode[0];
-				    eval("this.apps["+app_id+"] = function()\n{\n\tthis.id = "+app_id+";\n\tthis.instance = -1;\n\tthis.init = function(args)\n\t{ try {"+app_code+"}\n\tcatch(e){api.toaster(e); desktop.core.loadingIndicator(1);}}\n"+this.lib+"\n\tthis.hitch = function(func)\n{return dojo.lang.hitch(this, func);}\n}");
+				    eval("this.apps["+app_id+"] = function()\n{\n\tthis.id = "+app_id+";\n\tthis.instance = -1;\n\tthis.init = function(args)\n\t{ try {"+app_code+"}\n\tcatch(e){api.toaster(e); desktop.core.loadingIndicator(1);}}\n"+app_lib+"\n\tthis.hitch = function(func)\n{return dojo.lang.hitch(this, func);}\n}");
 					if(this.callback[app_id])
 					{
 						if(this.args[app_id] != undefined)
