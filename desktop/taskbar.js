@@ -53,10 +53,11 @@ desktop.taskbar = new function()
 		
 		this.draw = function()
 		{
-			appbarcontent = "&nbsp;";
-			//appbarcontent = '<div dojoType="TaskBar" id="appbar"></div>';
-			setTimeout("document.getElementById(\"taskbar\").innerHTML='<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td width=\"30\"><img src=\"./icons/apps.gif\" onmousedown =\"desktop.menu.button();\" border=\"0\"></td><td width=\"1%\"><div class=\"seperator\"></div></td><td>"+appbarcontent+"</td><td width=\"1%\"><div class=\"seperator\"></div></td><td width=\"15%\"></td></tr><table>';", 100);
-			
+			//appbarcontent = "&nbsp;";
+			appbarcontent = '<div id="appbar" style="width: 75%; height: 100%; background-color: transparent; border:0px; top: 0px;"></div>';
+			dojo.byId("taskbar").innerHTML='<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td width="30"><img src="./icons/apps.gif" onmousedown ="desktop.menu.button();" border="0"></td><td width="1%"><div class="seperator"></div></td><td width="80%">'+appbarcontent+'</td><td width="1%"><div class="seperator"></div></td><td width="15%"></td></tr><table>';
+			//dojo.widget.createWidget("contentPane", {id: "appbar"}, dojo.byId("appbar"));
+
 			/*
 			bar=document.createElement("div");
 			bar.ID="appbar";
@@ -67,3 +68,35 @@ desktop.taskbar = new function()
 			*/
 		}
 	}
+	/*
+dojo.widget.defineWidget(
+	"desktop.widget.pdTaskBar",
+	dojo.widget.contentPane,
+	function(){
+		this._addChildStack = [];
+	},
+{
+	// summary:
+	//	Displays an icon for each associated floating pane, like Windows task bar
+
+	// TODO: this class extends floating pane merely to get the shadow;
+	//	it should extend HtmlWidget and then just call the shadow code directly
+
+	addChild: function(child) {
+		// summary: add taskbar item for specified FloatingPane
+		// TODO: this should not be called addChild(), as that has another meaning.
+		if(!this.containerNode){ 
+			this._addChildStack.push(child);
+		}else if(this._addChildStack.length > 0){
+			var oarr = this._addChildStack;
+			this._addChildStack = [];
+			dojo.lang.forEach(oarr, this.addChild, this);
+		}
+		var tbi = dojo.widget.createWidget("TaskBarItem",
+			{	windowId: child.widgetId, 
+				caption: child.title, 
+				iconSrc: child.iconSrc
+			});
+		dojo.widget.pdTaskBar.superclass.addChild.call(this,tbi);
+	}
+}); */
