@@ -116,6 +116,11 @@ var api = new function() {
     	this.height = "400px";
     	this.width = "500px";
     	this.title = "";
+	this.templatePath = "../themes/default/window.html";
+	this.templateCssPath = "../themes/default/window.css";
+	this.titleBarDisplay = true;
+	this.hasShadow = true;
+
 		this.resizable = true;
     	this.empty = function()
     	{
@@ -157,6 +162,8 @@ var api = new function() {
     			constrainToContainer: true,
 			templatePath: dojo.uri.dojoUri("../themes/default/window.html"),
 			templateCssPath: dojo.uri.dojoUri("../themes/default/window.css"),
+			titleBarDisplay: this.titleBarDisplay,
+			hasShadow: this.hasShadow,
                 id: this.id
     		}, windiv);		
     	}
