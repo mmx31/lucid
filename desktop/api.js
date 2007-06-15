@@ -155,6 +155,8 @@ var api = new function() {
     			toggle: "explode",
     			toggleDuration: 300,
     			constrainToContainer: true,
+			templatePath: dojo.uri.dojoUri("../themes/default/window.html"),
+			templateCssPath: dojo.uri.dojoUri("../themes/default/window.css"),
                 id: this.id
     		}, windiv);		
     	}
