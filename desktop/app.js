@@ -36,7 +36,12 @@ desktop.app = new function()
 			if(args) {this.args[appID] = args;}
 			dojo.io.bind({
 			    url: "../backend/app.php?id="+appID,
-			    load: dojo.lang.hitch(this, function(type, data, evt)
+			    load: dojo.lang.hitch(this, this.fetchAppCallback),
+			    error: function(type, error) { desktop.core.loadingIndicator(1); api.toaster("Error: "+error.message); },
+			    mimetype: "text/plain"
+			});
+		}
+		this.fetchAppCallback = function(type, data, evt)
 				{
 					rawcode = data.split(this.xml_seperator);
 				    app_lib = rawcode[5];
@@ -69,11 +74,7 @@ desktop.app = new function()
 							this.callback[app_id](app_id);
 						}
 					}
-				}),
-			    error: function(type, error) { desktop.core.loadingIndicator(1); api.toaster("Error: "+error.message); },
-			    mimetype: "text/plain"
-			});
-		}
+				}
 		this.launch = function(id, args)
 		{
 			desktop.core.loadingIndicator(0);
