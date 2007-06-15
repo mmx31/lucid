@@ -20,11 +20,30 @@
 |        Psych Desktop       |
 |       Taskbar Engine       |
 |   (c) 2006 Psych Designs   |
-\***************************/ 
+\***************************/
 desktop.taskbar = new function()
 	{
 		this.visibility = "show";
-		
+		this.setVisibility = function(value)
+		{
+			if(value == "hide")
+			{
+				//new Effect.Fade('taskbar');
+				this.visibility = "hide";
+				document.getElementById("taskbarhider").innerHTML='<img src="./icons/showtask.gif">';
+				dojo.html.setOpacity(dojo.byId("taskbar"), 0);
+			}
+			else
+			{
+				if(value == "show")
+				{
+					//new Effect.Appear('taskbar');
+					dojo.html.setOpacity(dojo.byId("taskbar"), 100);
+					this.visibility = "show";
+					document.getElementById("taskbarhider").innerHTML='<img src="./icons/hidetask.gif">';
+				}
+			}
+		}
 		this.hider = function()
 		{
 			if(this.visibility == "show")
@@ -49,6 +68,7 @@ desktop.taskbar = new function()
 				}
 			}
 			desktop.windows.desktopResize();
+			api.registry.saveValue(-1,"taskbarVisibility",this.visibility);
 		}
 		
 		this.draw = function()
