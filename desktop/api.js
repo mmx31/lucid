@@ -148,8 +148,8 @@ var api = new function() {
     	this.height = "400px";
     	this.width = "500px";
     	this.title = "";
-	this.templatePath = "../themes/default/window.html";
-	this.templateCssPath = "../themes/default/window.css";
+	this.templatePath = dojo.uri.dojoUri("../themes/default/window.html");
+	this.templateCssPath = dojo.uri.dojoUri("../themes/default/window.css");
 	this.titleBarDisplay = true;
 	this.hasShadow = true;
 
