@@ -97,7 +97,7 @@ var api = new function() {
                 content: {
                     columns: rawcols,
                     table: rawtable,
-                    public: pub,
+                    pub: pub,
                     name: name,
                     appid: appid
                 },

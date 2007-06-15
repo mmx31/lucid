@@ -29,7 +29,7 @@ if (isset($_GET['action'])) {
         $table = $_POST['table'];
         $name = $_POST['name'];
         $appid = $_POST['appid'];
-        $public = $_POST['public'];
+        $public = $_POST['pub'];
     }
 // get password will NEVER be implamented
  if ($_GET['action'] == "getStatus") {
