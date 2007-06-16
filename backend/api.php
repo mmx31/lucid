@@ -58,9 +58,8 @@ if (isset($_GET['fs'])) {
 	// alpha file system file loader - jaymacdonald
 	include("config.php");
 	$userid = $_SESSION['userid'];
-	$file2 = $_GET['file'];
-	$directory = $_GET['directory'];
-	$query = "SELECT * FROM ${db_prefix}filesystem WHERE file=\"${file2}\" AND directory=\"${directory}\"";
+	$path = $_GET['path'];
+	$query = "SELECT * FROM ${db_prefix}filesystem WHERE path=\"${path}\" AND directory=\"${directory}\"";
 	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
 	mysql_select_db($db_name) or die('Could not select database');
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
@@ -111,15 +110,14 @@ while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	}
 	if ($_GET['fs'] == "save") {
 	$uid = $_SESSION['userid'];
-	$file = $_GET['file'];
-	$directory = $_GET['directory'];
+	$path = $_GET['path'];
 	$contents = $_GET['contents'];
 	$location = "../files/$uid1$file";
 	file_put_contents($location,$contents);
 	require("config.php");
     $link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
     mysql_select_db($db_name) or die('Could not select database');
-	$query = "INSERT INTO `${db_prefix}filesystem` (userid, file, directory, location) VALUES('${uid}', '${file}', '${directory}', '${location}');";
+	$query = "INSERT INTO `${db_prefix}filesystem` (userid, file, directory, location) VALUES('${uid}', '${path}', '${location}');";
 	}
 	}
 	
