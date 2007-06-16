@@ -42,13 +42,15 @@ if (isset($_GET['crosstalk'])) {
 }
     if ($_GET['crosstalk'] == "sendEvent")
     {
+	include("config.php");
     $message = $_GET["message"];
     $sender = $_GET["sender"];
     $appID = $_GET["appID"];
-    $query = "INSERT INTO `${db_prefix}crosstalk` (message, sender, appID) VALUES('${message}', '${sender}', '${appID}');";
+    $query = "INSERT INTO `${db_prefix}crosstalk` (userid, message, sender, appID) VALUES('${userid}', '${message}', '${sender}', '${appID}');";
     $link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
     mysql_select_db($db_name) or die('Could not select database');
     $result = mysql_query($query) or die('Query failed: ' . mysql_error());
+    echo("OK.");
 }
 }
 if (isset($_GET['action'])) {
