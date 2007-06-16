@@ -24,7 +24,7 @@ if (isset($_GET['crosstalk'])) {
     {
     header('Content-type: text/xml');
 	include("config.php");
-        $appid = $_GET['appID'];
+        $appID = $_GET['appID'];
 	$query = "SELECT * FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND appID=\"${appID}\"";
 	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
 	mysql_select_db($db_name) or die('Could not select database');
@@ -48,7 +48,7 @@ if (isset($_GET['crosstalk'])) {
     $sender = $userid;
     $destination = $_GET["destination"];
     $appID = $_GET["appID"];
-    $query = "INSERT INTO `${db_prefix}crosstalk` (userid, message, sender, appID) VALUES('${destination}', '${message}', '${sender}', '${appID}');";
+    $query = "INSERT INTO `${db_prefix}crosstalk` (userid, message, sender, appID) VALUES('${sender}', '${message}', '${destination}', '${appID}');";
     $link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
     mysql_select_db($db_name) or die('Could not select database');
     $result = mysql_query($query) or die('Query failed: ' . mysql_error());
