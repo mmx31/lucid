@@ -194,6 +194,8 @@ var api = new function() {
     			constrainToContainer: true,
 			templatePath: dojo.uri.dojoUri("../themes/default/window.html"),
 			templateCssPath: dojo.uri.dojoUri("../themes/default/window.css"),
+			templateCssString: "",
+			templateString: "",
 			titleBarDisplay: this.titleBarDisplay,
 			hasShadow: this.hasShadow,
                 id: this.id
