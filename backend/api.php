@@ -24,7 +24,8 @@ if (isset($_GET['crosstalk'])) {
     {
     header('Content-type: text/xml');
 	include("config.php");
-	$query = "SELECT * FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\"";
+        $appid = $_GET['appID'];
+	$query = "SELECT * FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND appID=\"${appID}\"";
 	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
 	mysql_select_db($db_name) or die('Could not select database');
 	$output = "<?xml version='1.0' encoding='utf-8' ?>" . "\r\n" . "<crosstalkEvents>";

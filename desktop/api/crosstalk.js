@@ -1,9 +1,9 @@
 api.crosstalk = new function()
 {
-    this.checkForEvents = function(callback)
+    this.checkForEvents = function(appID, callback)
     {
         dojo.io.bind({
-			url: "../backend/api.php?crosstalk=checkForEvents",
+			url: "../backend/api.php?crosstalk=checkForEvents&appID="+appID,
         	load: function(type, data, http) { api.crosstalk.eventProcess(type, data, http, callback); },
         	error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); }, mimetype: "text/xml"
         });
