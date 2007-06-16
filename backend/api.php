@@ -29,7 +29,7 @@ if (isset($_GET['crosstalk'])) {
 	mysql_select_db($db_name) or die('Could not select database');
 	$output = "<?xml version='1.0' encoding='utf-8' ?>" . "\r\n" . "<crosstalkEvents>";
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-		while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$appid = $row["appid"];
 		$sender = $row["sender"];
 		$message = $row["message"];
