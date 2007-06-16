@@ -22,11 +22,12 @@ if (isset($_GET['crosstalk'])) {
  $userid = $_SESSION['userid'];
     if ($_GET['crosstalk'] == "checkForEvents")
     {
+    header('Content-type: text/xml');
 	include("config.php");
 	$query = "SELECT * FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\"";
 	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
 	mysql_select_db($db_name) or die('Could not select database');
-	$output = '<?xml version=\'1.0\' encoding=\'utf-8\' ?>' . "\r\n" . '<crosstalkEvents>';
+	$output = "<"."?xml version='1.0' encoding='utf-8' ?".">" . "\r\n" . "<crosstalkEvents>";
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$appid = $row["appid"];
@@ -36,8 +37,7 @@ if (isset($_GET['crosstalk'])) {
 		$query = "DELETE FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND appid=\"${appid}\" AND message=\"${message}\"";
 		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		}		
-	$output .=  "\r\n" . '</crosstalkEvents>';	
-	header('Content-type: text/xml');
+	$output .=  "\r\n" . "</crosstalkEvents>";	
 	echo($output);
 }
     if ($_GET['crosstalk'] == "sendEvent")
