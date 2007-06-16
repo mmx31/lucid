@@ -59,7 +59,7 @@ if (isset($_GET['fs'])) {
 	include("config.php");
 	$userid = $_SESSION['userid'];
 	$path = $_GET['path'];
-	$query = "SELECT * FROM ${db_prefix}filesystem WHERE path=\"${path}\" AND directory=\"${directory}\"";
+	$query = "SELECT * FROM ${db_prefix}filesystem WHERE path=\"${path}\"";
 	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
 	mysql_select_db($db_name) or die('Could not select database');
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
@@ -73,7 +73,7 @@ while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$file = str_replace(">", "&gt;", $file);
 	//echo($file);
 	$output = '<?xml version=\'1.0\' encoding=\'utf-8\' ?>' . "\r\n" . '<getFileResponse>';
-	$output .=  "\r\n" . '<contents owner="' .$row["userid"]. '" file="' .$file2. '"  directory="' . $directory . '" sharing="' .$row['sharing']. '">' . $file . '</contents>';
+	$output .=  "\r\n" . '<contents owner="' .$row["userid"]. '" path="' .$path. '" sharing="' .$row['sharing']. '">' . $file . '</contents>';
 	$output .=  "\r\n" . '</getFileResponse>';	
 	header('Content-type: text/xml');
 	echo($output);
@@ -86,8 +86,6 @@ while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	// alpha file system file lister - jaymacdonald
 	include("config.php");
 	$userid = $_SESSION['userid'];
-	$file = $_GET['file'];
-	$directory = $_GET['directory'];
 	$query = "SELECT * FROM ${db_prefix}filesystem";
 	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
 	mysql_select_db($db_name) or die('Could not select database');
@@ -97,11 +95,11 @@ while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	if($row['sharing'] == "all" || $row['userid'] == $userid) {
 	$directory = $row['directory'];
-	$file = $row['file'];
+	$path = $row['path'];
 	$owner = $row['userid'];
 	//echo($directory);
 	//echo($file);
-	$output .=  "\r\n" . '<file directory="' . $directory . '" owner="' . $owner . '" sharing="' . $row['sharing'] . '">' . $file . '</file>';
+	$output .=  "\r\n" . '<file owner="' . $owner . '" sharing="' . $row['sharing'] . '">' . $path . '</file>';
 	}
 	}
 	$output .=  "\r\n" . '</listFilesResponse>';
@@ -110,14 +108,15 @@ while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	}
 	if ($_GET['fs'] == "save") {
 	$uid = $_SESSION['userid'];
-	$path = $_GET['path'];
+	$file = $_GET['file'];
+	$directory = $_GET['directory'];
 	$contents = $_GET['contents'];
 	$location = "../files/$uid1$file";
 	file_put_contents($location,$contents);
 	require("config.php");
     $link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
     mysql_select_db($db_name) or die('Could not select database');
-	$query = "INSERT INTO `${db_prefix}filesystem` (userid, file, directory, location) VALUES('${uid}', '${path}', '${location}');";
+	$query = "INSERT INTO `${db_prefix}filesystem` (userid, file, directory, location) VALUES('${uid}', '${file}', '${directory}', '${location}');";
 	}
 	}
 	
