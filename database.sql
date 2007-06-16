@@ -82,3 +82,12 @@ CREATE TABLE `#__filesystem` (
   `sharing` varchar(100) default 'none'
 ) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1 ;
 REPLACE INTO `#__filesystem` VALUES (1,1,"docs/ReadMe.txt","readme.txt","all");
+--crosstalk
+DROP TABLE IF EXISTS `#__crosstalk`;
+CREATE TABLE `#__crosstalk` (
+  `ID` int(11) NOT NULL auto_increment PRIMARY KEY,
+  `userid` int(11) NOT NULL,
+  `message` mediumtext NOT NULL,
+  `sender` mediumtext NOT NULL,
+  `appID` int(11) NOT NULL
+) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1 ;

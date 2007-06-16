@@ -36,4 +36,5 @@ api.require("registry");
 api.require("ui");
 api.require("user");
 api.require("window");
+api.require("crosstalk");
 	
