@@ -37,9 +37,8 @@ api.fs = new function()
     {
         var results = data.getElementsByTagName('contents');
 		api.fs.getFileResult["contents"] = results[0].firstChild.nodeValue;
-		api.fs.getFileResult["file"] = results[0].getAttribute("file");
-		api.fs.getFileResult["directory"] = results[0].getAttribute("directory");
-        api.fs.getFileResult["owner"] = results[0].getAttribute("owner");
+		api.fs.getFileResult["path"] = results[0].getAttribute("path");
+        	api.fs.getFileResult["owner"] = results[0].getAttribute("owner");
 		api.fs.getFileResult["sharing"] = results[0].getAttribute("sharing");
 		if(callback) { callback() }
         desktop.core.loadingIndicator(1);
@@ -51,8 +50,7 @@ api.fs = new function()
 		for(var i = 0; i<results.length; i++){
 		api.fs.listFilesResult["count"] = i;
 		api.fs.listFilesResult[i] = {};
-		api.fs.listFilesResult[i]["file"] = results[i].firstChild.nodeValue;
-		api.fs.listFilesResult[i]["directory"] = results[i].getAttribute("directory");
+		api.fs.listFilesResult[i]["path"] = results[i].firstChild.nodeValue;
 		api.fs.listFilesResult[i]["owner"] = results[i].getAttribute("owner");
 		api.fs.listFilesResult[i]["sharing"] = results[i].getAttribute("sharing");
 		}
