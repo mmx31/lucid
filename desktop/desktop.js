@@ -78,7 +78,6 @@ desktop.core = new function()
 		}
 		this.logout = function()
 		{
-			this.loadingIndicator(0);
 			api.user.getUserName(function(data){
 				dojo.io.bind({
     				url: "../backend/logout.php?user="+data,
