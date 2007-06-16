@@ -261,10 +261,10 @@ var api = new function() {
     this.fs = new this.fs();
 
 	
-    this.fs.saveFile = function(file,directory,contents)
+    this.fs.saveFile = function(path,contents)
     {
         desktop.core.loadingIndicator(0);
-        var url = "../backend/api.php?fs=save&file="+file+"&directory="+directory+"&contents="+contents;
+        var url = "../backend/api.php?fs=save&path="+path;
         dojo.io.bind({
 		url: url,
         error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); },
@@ -272,10 +272,10 @@ var api = new function() {
         });
     }
 	
-    this.fs.getFile = function(file,directory,callback)
+    this.fs.getFile = function(path,callback)
     {
         desktop.core.loadingIndicator(0);
-        var url = "../backend/api.php?fs=load&file="+file+"&directory="+directory;
+        var url = "../backend/api.php?fs=load&path="+path;
         dojo.io.bind({url: url,
         load: function(type, data, http) { api.fs.getFileProcess(type, data, http, callback); },
         error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); }, mimetype: "text/xml"

@@ -22,8 +22,7 @@
 |(c)2006 Psych Designs|
 \*********************/
 desktop.rightclick = new function()
-{
-	/*
+{	/*
 	//var bgcontextmenu = document.getElementById("wallpaperoverlay");
 	document.oncontextmenu=new Function("contextMenu('background');");
 	
