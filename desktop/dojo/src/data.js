@@ -8,8 +8,8 @@
 		http://dojotoolkit.org/community/licensing.shtml
 */
 
+
+
 dojo.provide("dojo.data");
-
-// currently a stub for dojo.data
-
 dojo.data = {};
+
