@@ -8,10 +8,10 @@ api.crosstalk = new function()
         	error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); }, mimetype: "text/xml"
         });
     }
-    this.sendEvent = function(message, appID)
+    this.sendEvent = function(message, appID, destination)
     {
         dojo.io.bind({
-			url: "../backend/api.php?crosstalk=sendEvent&message="+message+"&sender=test&appID="+appID,
+			url: "../backend/api.php?crosstalk=sendEvent&message="+message+"&destination="+destination+"&appID="+appID,
         	error: function(type, error){ api.toaster("Error in AJAX call: "+error.message); },
 			mimetype: "text/xml"
         });

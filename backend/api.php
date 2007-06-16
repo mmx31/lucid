@@ -44,9 +44,10 @@ if (isset($_GET['crosstalk'])) {
     {
 	include("config.php");
     $message = $_GET["message"];
-    $sender = $_GET["sender"];
+    $sender = $userid;
+    $destination = $_GET["destination"];
     $appID = $_GET["appID"];
-    $query = "INSERT INTO `${db_prefix}crosstalk` (userid, message, sender, appID) VALUES('${userid}', '${message}', '${sender}', '${appID}');";
+    $query = "INSERT INTO `${db_prefix}crosstalk` (userid, message, sender, appID) VALUES('${destination}', '${message}', '${sender}', '${appID}');";
     $link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
     mysql_select_db($db_name) or die('Could not select database');
     $result = mysql_query($query) or die('Query failed: ' . mysql_error());
