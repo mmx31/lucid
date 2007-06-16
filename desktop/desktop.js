@@ -22,10 +22,6 @@
 |   (c) 2006 Psych Designs   |
 \****************************/
 
-window.onbeforeunload = new function()
-{
-  return "To exit Psych Desktop properly, you should log out.";
-}
 desktop.core = new function()
 	{
 		this.init = function()
@@ -64,6 +60,11 @@ desktop.core = new function()
 			api.user.getUserName(function(data){
 				dojo.byId("menu_name").innerHTML = "<i>"+data+"</i>";
 			});
+			window.onbeforeunload = function()
+			{
+			  desktop.core.logout();
+			  return "To exit Psych Desktop properly, you should log out.";
+			}
 		}
 		dojo.addOnLoad(this.init);
 		this.debug = function()
@@ -77,8 +78,24 @@ desktop.core = new function()
 		}
 		this.logout = function()
 		{
-			window.onbeforeunload = null;
-			window.location = "../backend/logout.php?user="+conf_user;
+			this.loadingIndicator(0);
+			api.user.getUserName(function(data){
+				dojo.io.bind({
+    				url: "../backend/logout.php?user="+data,
+    				load: function(type, data, evt){
+						if(data == "0")
+						{
+							window.onbeforeunload = null;
+							window.close();
+						}
+						else
+						{
+							api.toaster("Error communicating with server, could not log out");
+						}
+					},
+   					mimetype: "text/plain"
+				});
+			});
 		}
 		this.loadingIndicator = function(action)
 		{
