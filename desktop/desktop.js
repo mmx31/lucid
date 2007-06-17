@@ -136,11 +136,67 @@ desktop.core = new function()
 				}
 			}
 		}
+		this.consoleHistory = new Array();
+		this.consoleHistory[0] = " ";
+		this.consoleHist = 1;
+		this.consoleAliases = {
+			clear: function(params)
+			{
+				dojo.byId('consoleoutput').innerHTML = '';
+			},
+			logout: function(params)
+			{
+				desktop.core.logout();
+			},
+			exit: function(params)
+			{
+				this.toggleconsole();
+			}
+		}
+		this.consoleKey = function(e)
+		{
+			if(e.keyCode == "38") //up arrow
+			{
+				if(this.consoleHistory[this.consoleHist-1] != undefined && this.consoleHist != 1)
+				{
+					this.consoleHist--;
+					if(this.consoleHist != this.consoleHistory.length) dojo.byId('consoleinput').value = this.consoleHistory[this.consoleHist];
+					else this.consoleHist++;
+				}
+			}
+			if(e.keyCode == "40") //down arrow
+			{
+				if(this.consoleHist != this.consoleHistory.length)
+				{
+					if(this.consoleHist+1 >= this.consoleHistory.length)
+					{
+						this.consoleHist = this.consoleHistory.length;
+						if(this.consoleHistory[0] == " ") dojo.byId('consoleinput').value = "";
+						else dojo.byId('consoleinput').value = this.consoleHistory[0];
+					}
+					else
+					{
+						this.consoleHist++;
+						if(this.consoleHistory[this.consoleHist] == " ") dojo.byId('consoleinput').value = "";
+						else dojo.byId('consoleinput').value = this.consoleHistory[this.consoleHist];
+					}
+				}
+			}
+		}
 		this.consolesubmit = function()
 		{
+			if(dojo.byId('consoleinput').value == undefined) dojo.byId('consoleinput').value = " ";
+			this.consoleHistory[this.consoleHistory.length] = dojo.byId('consoleinput').value;
+			this.consoleHist = this.consoleHistory.length;
 			try{
 				dojo.byId('consoleoutput').innerHTML += '<b>~$ </b>'+dojo.byId('consoleinput').value+'<br />';
-				eval(dojo.byId('consoleinput').value);
+				if(this.consoleAliases[dojo.byId('consoleinput').value.split(" ")[0]] == undefined) eval(dojo.byId('consoleinput').value);
+				else
+				{
+					start = dojo.byId('consoleinput').value.indexOf(" ")+1;
+					params = dojo.byId('consoleinput').value.substring(start);
+					this.consoleAliases[dojo.byId('consoleinput').value.split(" ")[0]](params);
+				}
 				dojo.byId('consoleinput').value = '';
 				dojo.byId('console').scrollTop = dojo.byId('console').scrollHeight;
 			}
@@ -148,11 +204,15 @@ desktop.core = new function()
 				if(e==undefined)
 				{
 					e='An unknown error has occurred';
+					dojo.byId('consoleoutput').innerHTML += e+'<br />\n';
+					dojo.byId('consoleinput').value = '';
+					this.consoleHist = this.consoleHistory.length;
 				}
 				else
 				{
-					dojo.byId('consoleoutput').innerHTML += e+'<br />';
+					dojo.byId('consoleoutput').innerHTML += e+'<br />\n';
 					dojo.byId('consoleinput').value = '';
+					this.consoleHist = this.consoleHistory.length;
 				}
 				dojo.byId('console').scrollTop = dojo.byId('console').scrollHeight;
 			}
