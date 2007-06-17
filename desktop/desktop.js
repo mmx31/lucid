@@ -151,6 +151,15 @@ desktop.core = new function()
 			exit: function(params)
 			{
 				this.toggleconsole();
+			},
+			help: function()
+			{
+				api.console("--Psych Desktop Console--");
+				api.console("You can type any javascript you want to evaluate into this.");
+				api.console("Or, you can use these commands:");
+				api.console("&nbsp;&nbsp;clear- clear the screen");
+				api.console("&nbsp;&nbsp;logout- logs you out of the desktop");
+				api.console("&nbsp;&nbsp;exit- close the console");
 			}
 		}
 		this.consoleKey = function(e)
