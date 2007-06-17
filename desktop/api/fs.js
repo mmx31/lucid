@@ -64,6 +64,7 @@ api.fs = new function()
 		api.fs.listFilesResult[i] = new Object();
 		api.fs.listFilesResult[i].path = results[i].firstChild.nodeValue;
 		api.fs.listFilesResult[i].owner = results[i].getAttribute("owner");
+		api.fs.listFilesResult[i].isDir = results[i].getAttribute("isDir");
 		api.fs.listFilesResult[i].sharing = results[i].getAttribute("sharing");
 		}
         if(callback) { callback(api.fs.listFilesResult) }
