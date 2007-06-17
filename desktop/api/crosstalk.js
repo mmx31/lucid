@@ -22,7 +22,9 @@ api.crosstalk = new function()
     this.eventProcess = function(type, data, evt, callback)
     {
 		var results = data.getElementsByTagName('event');
+		delete api.crosstalk.eventArray;
 		for(var i = 0; i<results.length; i++){
+		api.crosstalk.eventArray["status"] = "OK";
 		api.crosstalk.eventArray["count"] = i;
 		api.crosstalk.eventArray[i] = new Object();
 		api.crosstalk.eventArray[i].message = results[i].firstChild.nodeValue;
