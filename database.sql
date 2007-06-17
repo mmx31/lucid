@@ -94,6 +94,7 @@ CREATE TABLE `#__filesystem` (
   `location` mediumtext NOT NULL,
   `sharing` varchar(100) default 'none'
 ) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1 ;
+REPLACE INTO `#__filesystem` VALUES (1,1,"docs","isDir","all");
 REPLACE INTO `#__filesystem` VALUES (1,1,"docs/ReadMe.txt","readme.txt","all");
 --crosstalk
 DROP TABLE IF EXISTS `#__crosstalk`;
