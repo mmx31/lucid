@@ -164,9 +164,15 @@ while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$directory = $row['directory'];
 	$path = $row['path'];
 	$owner = $row['userid'];
+	if($row['contents'] == "isDir") {
+	$isDir = "1";
+	}
+	else {
+	$isDir = "0";
+	}
 	//echo($directory);
 	//echo($file);
-	$output .=  "\r\n" . '<file owner="' . $owner . '" sharing="' . $row['sharing'] . '">' . $path . '</file>';
+	$output .=  "\r\n" . '<file isDir="' . $isDir .'" owner="' . $owner . '" sharing="' . $row['sharing'] . '">' . $path . '</file>';
 	}
 	}
 	$output .=  "\r\n" . '</listFilesResponse>';
