@@ -36,7 +36,7 @@ if (isset($_GET['crosstalk'])) {
 		$message = $row["message"];
 		$output .=  "\r\n" . '<event sender="'. $row["sender"] . '" appID="'. $row["appID"] .'">'. $row["message"] .'</event>';
 		$query = "DELETE FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND appID=\"${appid}\" AND message=\"${message}\"";
-		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+		mysql_query($query) or die('Query failed: ' . mysql_error());
 		}		
 	$output .=  "\r\n" . "</crosstalkEvents>";	
 	echo($output);
@@ -51,22 +51,35 @@ if (isset($_GET['crosstalk'])) {
     $query = "INSERT INTO `${db_prefix}crosstalk` (userid, message, sender, appID) VALUES('${sender}', '${message}', '${destination}', '${appID}');";
     $link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
     mysql_select_db($db_name) or die('Could not select database');
-    $result = mysql_query($query) or die('Query failed: ' . mysql_error());
+    mysql_query($query) or die('Query failed: ' . mysql_error());
     echo("OK.");
 }
 }
 if (isset($_GET['action'])) {
     if ($_GET['action'] == "getDatabase")
     {
-        
+		require("config.php");
+        $query = "SELECT * FROM `${db_prefix}database` WHERE appid='${_GET['appid']}' AND userid='${_SESSION['userid']}' AND tablename='${_GET['tablename']}' LIMIT 1";
+	    $link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
+	    mysql_select_db($db_name) or die('Could not select database');
+	    $result = mysql_query($query) or die('Query failed: ' . mysql_error());
+		while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			echo $row['columns'] . "-|-" . $row['values'];
+		}
     }
     if ($_GET['action'] == "saveDatabase")
     {
+		require("config.php");
         $columns = $_POST['columns'];
         $table = $_POST['table'];
         $name = $_POST['name'];
         $appid = $_POST['appid'];
         $public = $_POST['pub'];
+		$userid = $_SESSION['userid'];
+		$query = "REPLACE INTO `${db_prefix}database` (`userid`, `appid`, `public`, `tablename`, `columns`, `values`) VALUES('${userid}', '${appid}', '${public}', '${name}', '${columns}', '${table}')";
+	    $link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
+	    mysql_select_db($db_name) or die('Could not select database');
+	    mysql_query($query) or die('Query failed: ' . mysql_error());
     }
 // get password will NEVER be implamented
  if ($_GET['action'] == "getStatus") {
@@ -78,8 +91,7 @@ echo("FAIL");
 }
 }
  if ($_GET['action'] == "getUserName") {
- $username = $_SESSION['username'];
-echo($username);
+ echo $_SESSION['username'];
  }
  if ($_GET['action'] == "getUserNameFromID") {
  $userid = $_GET["userid"]; 
@@ -102,12 +114,10 @@ echo($username);
 		}
  }
  if ($_GET['action'] == "getUserID") {
- $userid = $_SESSION['userid'];
- echo($userid);
+ echo $_SESSION['userid'];
  }
   if ($_GET['action'] == "getUserLevel") {
-  $userlevel = $_SESSION['userlevel'];
-  echo($userlevel);
+  echo $_SESSION['userlevel'];
   }
   }
 if (isset($_GET['fs'])) {

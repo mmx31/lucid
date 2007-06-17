@@ -65,6 +65,7 @@ desktop.core = new function()
 			  desktop.core.logout();
 			  return "To exit Psych Desktop properly, you should log out.";
 			}
+			document.onkeydown = toggleconsole;
 		}
 		dojo.addOnLoad(this.init);
 		this.debug = function()
@@ -112,3 +113,27 @@ desktop.core = new function()
 			}
 		}
 	}
+function toggleconsole(e)
+{
+	if (document.all)
+    {
+    	var evnt = window.event;
+        x = evnt.keyCode;
+    }
+    else
+    {
+    	x = e.keyCode;
+    }
+	if(x == "192")
+	{
+		if(dojo.byId("console").style.display == "block")
+		{
+			dojo.byId("console").style.display = "none";
+		}
+		else
+		{
+			dojo.byId("console").style.display = "block";
+			setTimeout("dojo.byId('consoleinput').focus();", 400);
+		}
+	}
+}

@@ -39,6 +39,25 @@
   top: 0%;
 }
 
+#console {
+	width: 100%;
+	height: 30%;
+	position: absolute;
+	top: 0%;
+	left: 0px;
+	display: none;
+	border: 1px solid grey;
+	background-color: black;
+	color: white;
+}
+#consoleinput {
+	width: 90%;
+	height: 20px;
+	border: none;
+	background-color: black;
+	color: white;
+}
+
 .seperator {
 	background-image: url(./images/separator.gif);
 	height:35px;

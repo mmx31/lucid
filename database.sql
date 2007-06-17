@@ -68,6 +68,7 @@ CREATE TABLE `#__database` (
   `ID` int(11) NOT NULL auto_increment PRIMARY KEY,
   `userid` int(11) NOT NULL,
   `appid` int(20) NOT NULL,
+  `public` int(1) NOT NULL,
   `tablename` mediumtext NOT NULL,
   `columns` mediumtext NOT NULL,
   `values` mediumtext NOT NULL

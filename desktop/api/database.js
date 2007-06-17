@@ -27,9 +27,20 @@ api.database = new function()
       }
       return table;
     }
+	this.callbacks = new Object();
     this.getTable = function(appid, name, callback)
     {
-        //grab the table, parse it using this.parseTable, and pass the array onto the function.
+		this.callbacks[appid+name] = callback;
+		dojo.io.bind({
+            url: "../backend/api.php?action=getDatabase?appid="+appid+"&tablename="+name,
+            method: "GET",
+			load: dojo.lang.hitch(this, function(type, data, evt)
+			{
+				data = data.split("-|-");
+				callback(this.parseTable(data[1], data[0]));
+			}),
+            mimetype:'text/html'
+        });
     }
     this.saveTable = function(appid, pub, name, columns, table)
     {
@@ -40,15 +51,15 @@ api.database = new function()
             field.replace(/-|-/," ");
             rawtable += field+"|||";
         }
-        rawtable.substring(0, rawtable.length-3);
+        rawtable=rawtable.substring(0, rawtable.length-3);
         rawcols = "";
         for(title in columns)
         {
             title.replace(/|||/," ");
-            field.replace(/-|-/," ");
+            title.replace(/-|-/," ");
             rawcols += title+"|||";
         }
-        rawcols.substring(0, rawcols.length-3);
+        rawcols=rawcols.substring(0, rawcols.length-3);
 
         //umm not sure if it's rawtable.length-3 or rawtable.length-2... might result in a bug...
         dojo.io.bind({
