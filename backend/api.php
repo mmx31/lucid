@@ -31,7 +31,7 @@ if (isset($_GET['crosstalk'])) {
 	$output = "<?xml version='1.0' encoding='utf-8' ?>" . "\r\n" . "<crosstalkEvents>";
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
-		$appid = $row["appid"];
+		$appid = $row["appID"];
 		$sender = $row["sender"];
 		$message = $row["message"];
 		$output .=  "\r\n" . '<event sender="'. $row["sender"] . '" appID="'. $row["appID"] .'">'. $row["message"] .'</event>';
