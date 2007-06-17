@@ -65,7 +65,7 @@ desktop.core = new function()
 			  desktop.core.logout();
 			  return "To exit Psych Desktop properly, you should log out.";
 			}
-			document.onkeydown = toggleconsole;
+			document.onkeydown = desktop.core.toggleconsole;
 		}
 		dojo.addOnLoad(this.init);
 		this.debug = function()
@@ -112,28 +112,49 @@ desktop.core = new function()
 			document.getElementById("loadingIndicator").style.display = "none";
 			}
 		}
-	}
-function toggleconsole(e)
-{
-	if (document.all)
-    {
-    	var evnt = window.event;
-        x = evnt.keyCode;
-    }
-    else
-    {
-    	x = e.keyCode;
-    }
-	if(x == "192")
-	{
-		if(dojo.byId("console").style.display == "block")
+		this.toggleconsole = function(e)
 		{
-			dojo.byId("console").style.display = "none";
+			if (document.all)
+		    {
+		    	var evnt = window.event;
+		        x = evnt.keyCode;
+		    }
+		    else
+		    {
+		    	x = e.keyCode;
+		    }
+			if(x == "192")
+			{
+				if(dojo.byId("console").style.display == "block")
+				{
+					dojo.byId("console").style.display = "none";
+				}
+				else
+				{
+					dojo.byId("console").style.display = "block";
+					setTimeout("dojo.byId('consoleinput').focus();", 400);
+				}
+			}
 		}
-		else
+		this.consolesubmit = function()
 		{
-			dojo.byId("console").style.display = "block";
-			setTimeout("dojo.byId('consoleinput').focus();", 400);
+			try{
+				dojo.byId('consoleoutput').innerHTML += '<b>~$ </b>'+dojo.byId('consoleinput').value+'<br />';
+				eval(dojo.byId('consoleinput').value);
+				dojo.byId('consoleinput').value = '';
+				dojo.byId('console').scrollTop = dojo.byId('console').scrollHeight;
+			}
+			catch(e){
+				if(e==undefined)
+				{
+					e='An unknown error has occurred';
+				}
+				else
+				{
+					dojo.byId('consoleoutput').innerHTML += e+'<br />';
+					dojo.byId('consoleinput').value = '';
+				}
+				dojo.byId('console').scrollTop = dojo.byId('console').scrollHeight;
+			}
 		}
 	}
-}

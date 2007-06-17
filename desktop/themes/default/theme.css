@@ -49,6 +49,7 @@
 	border: 1px solid grey;
 	background-color: black;
 	color: white;
+	overflow: auto;
 }
 #consoleinput {
 	width: 90%;
