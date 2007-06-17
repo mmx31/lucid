@@ -152,14 +152,20 @@ desktop.core = new function()
 			{
 				this.toggleconsole();
 			},
+			reload: function(params)
+			{
+				window.onbeforeunload = null;
+				window.location = window.location;
+			},
 			help: function()
 			{
-				api.console("--Psych Desktop Console--");
-				api.console("You can type any javascript you want to evaluate into this.");
-				api.console("Or, you can use these commands:");
-				api.console("&nbsp;&nbsp;clear- clear the screen");
-				api.console("&nbsp;&nbsp;logout- logs you out of the desktop");
-				api.console("&nbsp;&nbsp;exit- close the console");
+				api.console("--Psych Desktop Console--<br />");
+				api.console("You can type any javascript you want to evaluate into this.<br />");
+				api.console("Or, you can use these commands:<br />");
+				api.console("&nbsp;&nbsp;reload- reload the desktop without logging out<br />");
+				api.console("&nbsp;&nbsp;clear- clear the screen<br />");
+				api.console("&nbsp;&nbsp;logout- logs you out of the desktop<br />");
+				api.console("&nbsp;&nbsp;exit- close the console<br />");
 			}
 		}
 		this.consoleKey = function(e)
