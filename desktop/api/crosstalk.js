@@ -2,10 +2,12 @@ api.crosstalk = new function()
 {
     this.checkForEvents = function(appID, callback)
     {
+		var url = "../backend/api.php?crosstalk=checkForEvents&appID="+appID;
         dojo.io.bind({
-			url: "../backend/api.php?crosstalk=checkForEvents&appID="+appID,
-        	load: function(type, data, http) { api.crosstalk.eventProcess(type, data, http, callback); },
-        	error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); }, mimetype: "text/xml"
+        url: url,
+        load: function(type, data, http) { api.crosstalk.eventProcess(type, data, http, callback); },
+        error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
+        mimetype: "text/xml"
         });
     }
     this.sendEvent = function(message, appID, destination)
