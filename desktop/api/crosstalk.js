@@ -23,10 +23,10 @@ api.crosstalk = new function()
 		var results = data.getElementsByTagName('event');
 		if(api.crosstalk.eventArray) {
 		delete api.crosstalk.eventArray;
-		this.eventArray = new Array(99,99);
+		api.crosstalk.eventArray = new Array(99,99);
 		}
 		else {
-		this.eventArray = new Array(99,99);
+		api.crosstalk.eventArray = new Array(99,99);
 		}
 		for(var i = 0; i<results.length; i++){
 		api.crosstalk.eventArray["status"] = "OK";
