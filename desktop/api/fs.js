@@ -31,30 +31,42 @@ api.fs = new function()
         mimetype: "text/xml"
         });
     }
-	this.getFileResult = new Array();
-	this.listFilesResult = new Array(99,99);
     this.getFileProcess = function(type, data, evt, callback)
     {
         var results = data.getElementsByTagName('contents');
-		api.fs.getFileResult["contents"] = results[0].firstChild.nodeValue;
-		api.fs.getFileResult["path"] = results[0].getAttribute("path");
-        	api.fs.getFileResult["owner"] = results[0].getAttribute("owner");
-		api.fs.getFileResult["sharing"] = results[0].getAttribute("sharing");
-		if(callback) { callback() }
+		if(api.fs.getFileResult) {
+		delete api.fs.getFileResult;
+		api.fs.getFileResult = new Object();
+		}
+		else {
+		api.fs.getFileResult = new Object();
+		}
+		api.fs.getFileResult.contents = results[0].firstChild.nodeValue;
+		api.fs.getFileResult.path = results[0].getAttribute("path");
+        	api.fs.getFileResult.owner = results[0].getAttribute("owner");
+		api.fs.getFileResult.sharing = results[0].getAttribute("sharing");
+		if(callback) { callback(api.fs.getFileResult) }
         desktop.core.loadingIndicator(1);
         api.toaster("Security Note: FileSystem was accessed.");
     }
 	this.fileListProcess = function(type, data, evt, callback)
     {
 		var results = data.getElementsByTagName('file');
+		if(api.fs.listFilesResult) {
+		delete api.fs.listFilesResult;
+		api.fs.listFilesResult = new Array(99,99);
+		}
+		else {
+		api.fs.listFilesResult = new Array(99,99);
+		}
 		for(var i = 0; i<results.length; i++){
 		api.fs.listFilesResult["count"] = i;
-		api.fs.listFilesResult[i] = {};
-		api.fs.listFilesResult[i]["path"] = results[i].firstChild.nodeValue;
-		api.fs.listFilesResult[i]["owner"] = results[i].getAttribute("owner");
-		api.fs.listFilesResult[i]["sharing"] = results[i].getAttribute("sharing");
+		api.fs.listFilesResult[i] = new Object();
+		api.fs.listFilesResult[i].path = results[i].firstChild.nodeValue;
+		api.fs.listFilesResult[i].owner = results[i].getAttribute("owner");
+		api.fs.listFilesResult[i].sharing = results[i].getAttribute("sharing");
 		}
-        if(callback) { callback() }
+        if(callback) { callback(api.fs.listFilesResult) }
         desktop.core.loadingIndicator(1);
         api.toaster("Security Note: FileSystem was accessed.");
     }
