@@ -35,7 +35,7 @@ if (isset($_GET['crosstalk'])) {
 		$sender = $row["sender"];
 		$message = $row["message"];
 		$output .=  "\r\n" . '<event sender="'. $row["sender"] . '" appID="'. $row["appID"] .'">'. $row["message"] .'</event>';
-		$query = "DELETE FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND appid=\"${appid}\" AND message=\"${message}\"";
+		$query = "DELETE FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND appID=\"${appid}\" AND message=\"${message}\"";
 		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		}		
 	$output .=  "\r\n" . "</crosstalkEvents>";	
