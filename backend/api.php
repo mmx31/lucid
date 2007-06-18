@@ -120,6 +120,33 @@ echo("FAIL");
   echo $_SESSION['userlevel'];
   }
   }
+if (isset($_GET['fs'])) {
+	if ($_GET['fs'] == "getFolder") {
+				$odir = $_REQUEST['path'];
+			    $dir = opendir("../files/".$_SESSION['userid']."/$odir");
+				if(!$dir){
+							die();
+				} else {
+					$output = '<?xml version=\'1.0\' encoding=\'utf-8\' ?>' . "\r\n" . '<getFolderResponse path="' . $_REQUEST['path'] . '">';
+					while(($file = readdir($dir)) !== false){
+						if($file == '..' || $file == '.'){
+							continue;
+						} else {
+							$t = strtolower($file);
+							if(is_dir("../files/".$_SESSION['userid']."/$odir" . $file)){
+								$type = 'folder';
+							} else {								$type = 'file';
+							}
+							$output .=  "\r\n" . '<file type="' . $type . '">' . $file . '</file>';
+						}
+					}
+					$output .=  "\r\n" . '</getFolderResponse>';
+					header('Content-type: text/xml');
+					echo $output;
+				}
+}
+
+}
 	
 if (isset($_GET['registry'])) { 
 	if ($_GET['registry'] == "load") {
