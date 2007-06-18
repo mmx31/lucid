@@ -168,8 +168,7 @@ desktop.core = new function()
 			},
 			ls: function()
 			{
-				api.console("Hold on...<br />");
-				api.fs.ls("/", this.processLs);
+				api.fs.ls("/", desktop.core.processLs);
 			}
 
 		}
@@ -178,11 +177,10 @@ desktop.core = new function()
 			var i = 0;
 			while(i < array.length) {
 				if(array[i].isDir == true) {
-					dojo.byId('consoleoutput').innerHTML = dojo.byId('consoleoutput').innerHTML += "<DIR> "+array[i].file+"<br />";
-					//api.console("<DIR> "+array[i].file+"<br />");
+					api.console("[DIR] "+array[i].file+"<br />");
 				}
 				else {
-					dojo.byId('consoleoutput').innerHTML = dojo.byId('consoleoutput').innerHTML += "<DIR> "+array[i].file+"<br />";
+					api.console(array[i].file+"<br />");
 				}
 			i++
 			}
