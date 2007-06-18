@@ -145,8 +145,17 @@ if (isset($_GET['fs'])) {
 					echo $output;
 				}
 }
-
+	if ($_GET['fs'] == "getFile") {
+				$odir = $_REQUEST['path'];
+			    	$dir = "../files/".$_SESSION['userid']."/$odir";
+				$file = file_get_contents($dir);
+				$output = '<?xml version=\'1.0\' encoding=\'utf-8\' ?>' . "\r\n" . '<getFileResponse path="' . $_REQUEST['path'] . '">';
+				$output .=  "\r\n" . '<file>' . $file . '</file>';
+				$output .= '</getFileResponse>';
+				header('Content-type: text/xml');
+				echo $output;
 }
+	}
 	
 if (isset($_GET['registry'])) { 
 	if ($_GET['registry'] == "load") {

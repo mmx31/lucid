@@ -78,6 +78,7 @@ this.path = "~/$";
 			api.console("Or, you can use these commands:<br />");
 			api.console("&nbsp;&nbsp;reload- reload the desktop without logging out<br />");
 			api.console("&nbsp;&nbsp;ls [dir]- list files in [dir]<br />");
+			api.console("&nbsp;&nbsp;cat [file]- read the file [file]<br />");
 			api.console("&nbsp;&nbsp;clear- clear the screen<br />");
 			api.console("&nbsp;&nbsp;logout- logs you out of the desktop<br />");
 		},
@@ -98,8 +99,21 @@ this.path = "~/$";
 				}
 			i = 0;
 			});
+		},
+		cat: function(params)
+		{
+if(params == "") {
+api.console("need a file!");
+}
+else {
+			if(params == "") params = "/";
+			api.fs.read(params, function(array)
+			{
+				api.console(array[0].contents);
+			}
+			);
 		}
-	}
+	} }
 	this.getPath = function()
 	{
 	dojo.byId('consolepath').value = this.path;

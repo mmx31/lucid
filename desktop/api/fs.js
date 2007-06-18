@@ -10,6 +10,16 @@ api.fs = new function()
         mimetype: "text/xml"
         });
     }
+   this.read = function(path, callback)
+    {
+	var url = "../backend/api.php?fs=getFile&path="+path;
+        dojo.io.bind({
+        url: url,
+        load: function(type, data, http) { api.fs.readProcess(type, data, http, callback); },
+        error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
+        mimetype: "text/xml"
+        });
+    }
     this.lsProcess = function(type, data, evt, callback)
     {
 		var results = data.getElementsByTagName('file');
@@ -32,10 +42,19 @@ api.fs = new function()
 		}
         if(callback) { callback(api.fs.lsArray); }
         desktop.core.loadingIndicator(1);
+	
+    }
+    this.readProcess = function(type, data, evt, callback)
+    {
+		var results = data.getElementsByTagName('file');
+		api.fs.fileArray = new Array(99,99);
+		api.fs.fileArray[0] = new Object();
+		api.fs.fileArray[0].contents = results[0].firstChild.nodeValue;
+        if(callback) { callback(api.fs.fileArray); }
+        desktop.core.loadingIndicator(1);
 	}
-
-
 }
+
 /*
 
 this.window = new api.window();
