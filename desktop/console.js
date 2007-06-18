@@ -24,7 +24,7 @@
 
 desktop.console = new function()
 {
-this.path = "~";
+this.path = "/";
 	this.toggle = function(e)
 	{
 		if (document.all)
@@ -64,7 +64,7 @@ this.path = "~";
 		},
 		echo: function(params)
 		{
-			api.console(params+"<br />");
+			api.console(params);
 		},
 		reload: function(params)
 		{
@@ -73,18 +73,18 @@ this.path = "~";
 		},
 		help: function(params)
 		{
-			api.console("--Psych Desktop Console--<br />");
-			api.console("You can type any javascript you want to evaluate this console.<br />");
-			api.console("Or, you can use these commands:<br />");
-			api.console("&nbsp;&nbsp;reload- reload the desktop without logging out<br />");
-			api.console("&nbsp;&nbsp;ls [dir]- list files in [dir]<br />");
-			api.console("&nbsp;&nbsp;cat [file]- read the file [file]<br />");
-			api.console("&nbsp;&nbsp;clear- clear the screen<br />");
-			api.console("&nbsp;&nbsp;logout- logs you out of the desktop<br />");
+			api.console("--Psych Desktop Console--");
+			api.console("You can type any javascript you want to evaluate this console.");
+			api.console("Or, you can use these commands:");
+			api.console("&nbsp;&nbsp;reload- reload the desktop without logging out");
+			api.console("&nbsp;&nbsp;ls [dir]- list files in [dir]");
+			api.console("&nbsp;&nbsp;cat [file]- read the file [file]");
+			api.console("&nbsp;&nbsp;clear- clear the screen");
+			api.console("&nbsp;&nbsp;logout- logs you out of the desktop");
 		},
 		ls: function(params)
 		{
-			if(params == "") params = "/";
+			if(params == "") params = desktop.console.path;
 			api.fs.ls(params, function(array)
 			{
 				var i = 0;
