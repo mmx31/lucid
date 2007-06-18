@@ -27,10 +27,8 @@ api.database = new function()
       }
       return table;
     }
-	this.callbacks = new Object();
     this.getTable = function(appid, name, callback)
     {
-		this.callbacks[appid+name] = callback;
 		dojo.io.bind({
             url: "../backend/api.php?action=getDatabase?appid="+appid+"&tablename="+name,
             method: "GET",

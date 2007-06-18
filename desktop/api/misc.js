@@ -1,7 +1,6 @@
 api.console = function(text)
 {
 		dojo.byId("consoleoutput").innerHTML += text+"\n";
-		dojo.byId("consoleinput").focus();
 }
 api.misc = new function()
 {    
