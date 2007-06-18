@@ -24,7 +24,7 @@
 
 desktop.console = new function()
 {
-this.path = "~$";
+this.path = "~/$";
 	this.toggle = function(e)
 	{
 		if (document.all)
@@ -38,6 +38,7 @@ this.path = "~$";
 	    }
 		if(x == "192")
 		{
+			dojo.byId("consolepath").innerHTML = desktop.console.path;
 			if(dojo.byId("console").style.display == "block")
 			{
 				dojo.byId("console").style.display = "none";
@@ -99,6 +100,10 @@ this.path = "~$";
 			});
 		}
 	}
+	this.getPath = function()
+	{
+	dojo.byId('consolepath').value = this.path;
+	}
 	this.key = function(e)
 	{
 		if(e.keyCode == "38") //up arrow
@@ -135,7 +140,7 @@ this.path = "~$";
 		this.history[this.history.length] = dojo.byId('consoleinput').value;
 		this.hist = this.history.length;
 		try{
-			dojo.byId('consoleoutput').innerHTML += '<b>'+this.path+'$ </b>'+dojo.byId('consoleinput').value+'<br />';
+			dojo.byId('consoleoutput').innerHTML += '<b>'+desktop.console.path+' </b>'+dojo.byId('consoleinput').value+'<br />';
 			if(this.aliases[dojo.byId('consoleinput').value.split(" ")[0]] == undefined) eval(dojo.byId('consoleinput').value);
 			else
 			{
