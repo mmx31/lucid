@@ -26,6 +26,7 @@ var PsychDesktop = {
  PsychDesktop.require('api.js');
  PsychDesktop.require('app.js');
  PsychDesktop.require('appbar.js');
+ PsychDesktop.require('console.js');
  PsychDesktop.require('icon.js');
  PsychDesktop.require('menu.js');
  PsychDesktop.require('rightclick.js');

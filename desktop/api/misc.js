@@ -1,6 +1,7 @@
 api.console = function(text)
 {
-		dojo.byId("consoleoutput").innerHTML += text+"\n";
+	dojo.byId("consoleoutput").innerHTML += text+"\n";
+	dojo.byId('console').scrollTop = dojo.byId('console').scrollHeight;
 }
 api.misc = new function()
 {    
