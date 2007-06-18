@@ -21,7 +21,6 @@ api.fs = new function()
 		api.fs.lsArray = new Array(99,99);
 		}
 		for(var i = 0; i<results.length; i++){
-		api.fs.lsArray["count"] = i;
 		api.fs.lsArray[i] = new Object();
 		if(results[i].getAttribute("type") == "folder") {
 		api.fs.lsArray[i].isDir = true;
