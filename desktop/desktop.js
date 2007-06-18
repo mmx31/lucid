@@ -157,7 +157,7 @@ desktop.core = new function()
 				window.onbeforeunload = null;
 				window.location = window.location;
 			},
-			help: function()
+			help: function(params)
 			{
 				api.console("--Psych Desktop Console--<br />");
 				api.console("You can type any javascript you want to evaluate this console.<br />");
@@ -165,6 +165,26 @@ desktop.core = new function()
 				api.console("&nbsp;&nbsp;reload- reload the desktop without logging out<br />");
 				api.console("&nbsp;&nbsp;clear- clear the screen<br />");
 				api.console("&nbsp;&nbsp;logout- logs you out of the desktop<br />");
+			},
+			ls: function()
+			{
+				api.console("Hold on...<br />");
+				api.fs.ls("/", this.processLs);
+			}
+
+		}
+		this.processLs = function(array)
+		{
+			var i = 0;
+			while(i < array.length) {
+				if(array[i].isDir == true) {
+					dojo.byId('consoleoutput').innerHTML = dojo.byId('consoleoutput').innerHTML += "<DIR> "+array[i].file+"<br />";
+					//api.console("<DIR> "+array[i].file+"<br />");
+				}
+				else {
+					dojo.byId('consoleoutput').innerHTML = dojo.byId('consoleoutput').innerHTML += "<DIR> "+array[i].file+"<br />";
+				}
+			i++
 			}
 		}
 		this.consoleKey = function(e)
