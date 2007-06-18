@@ -24,6 +24,7 @@
 
 desktop.console = new function()
 {
+this.path = "~$";
 	this.toggle = function(e)
 	{
 		if (document.all)
@@ -94,6 +95,7 @@ desktop.console = new function()
 					}
 				i++;
 				}
+			i = 0;
 			});
 		}
 	}
@@ -133,7 +135,7 @@ desktop.console = new function()
 		this.history[this.history.length] = dojo.byId('consoleinput').value;
 		this.hist = this.history.length;
 		try{
-			dojo.byId('consoleoutput').innerHTML += '<b>~$ </b>'+dojo.byId('consoleinput').value+'<br />';
+			dojo.byId('consoleoutput').innerHTML += '<b>'+this.path+'$ </b>'+dojo.byId('consoleinput').value+'<br />';
 			if(this.aliases[dojo.byId('consoleinput').value.split(" ")[0]] == undefined) eval(dojo.byId('consoleinput').value);
 			else
 			{
