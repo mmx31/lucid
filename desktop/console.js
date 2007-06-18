@@ -24,7 +24,7 @@
 
 desktop.console = new function()
 {
-this.path = "~/$";
+this.path = "~";
 	this.toggle = function(e)
 	{
 		if (document.all)
@@ -102,11 +102,10 @@ this.path = "~/$";
 		},
 		cat: function(params)
 		{
-if(params == "") {
-api.console("need a file!");
-}
-else {
-			if(params == "") params = "/";
+			if(params == "") {
+				api.console("need a file!");
+			}
+			else {
 			api.fs.read(params, function(array)
 			{
 				api.console(array[0].contents);
