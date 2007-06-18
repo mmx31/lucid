@@ -100,13 +100,21 @@ this.path = "/";
 			i = 0;
 			});
 		},
+		mkdir: function(params)
+		{
+		api.console("currently not implamented");
+		},
+		rm: function(params)
+		{
+		api.console("currently not implamented");
+		},
 		cat: function(params)
 		{
 			if(params == "") {
 				api.console("need a file!");
 			}
 			else {
-			api.fs.read(params, function(array)
+			api.fs.read(desktop.console.path + params, function(array)
 			{
 				api.console(array[0].contents);
 			}
