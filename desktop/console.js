@@ -90,10 +90,10 @@ this.path = "~";
 				var i = 0;
 				while(i < array.length) {
 					if(array[i].isDir == true) {
-						api.console("[DIR] "+array[i].file+"<br />");
+						api.console("[DIR] "+array[i].file);
 					}
 					else {
-						api.console(array[i].file+"<br />");
+						api.console(array[i].file);
 					}
 				i++;
 				}
@@ -153,7 +153,7 @@ this.path = "~";
 		this.history[this.history.length] = dojo.byId('consoleinput').value;
 		this.hist = this.history.length;
 		try{
-			dojo.byId('consoleoutput').innerHTML += '<b>'+desktop.console.path+' </b>'+dojo.byId('consoleinput').value+'<br />';
+			dojo.byId('consoleoutput').innerHTML += '<b>'+desktop.console.path+'$ </b>'+dojo.byId('consoleinput').value+'<br />';
 			if(this.aliases[dojo.byId('consoleinput').value.split(" ")[0]] == undefined) eval(dojo.byId('consoleinput').value);
 			else
 			{
