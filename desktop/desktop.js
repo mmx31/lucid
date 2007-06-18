@@ -148,9 +148,9 @@ desktop.core = new function()
 			{
 				desktop.core.logout();
 			},
-			exit: function(params)
+			echo: function(params)
 			{
-				this.toggleconsole();
+				api.console(params+"<br />");
 			},
 			reload: function(params)
 			{
@@ -160,12 +160,11 @@ desktop.core = new function()
 			help: function()
 			{
 				api.console("--Psych Desktop Console--<br />");
-				api.console("You can type any javascript you want to evaluate into this.<br />");
+				api.console("You can type any javascript you want to evaluate this console.<br />");
 				api.console("Or, you can use these commands:<br />");
 				api.console("&nbsp;&nbsp;reload- reload the desktop without logging out<br />");
 				api.console("&nbsp;&nbsp;clear- clear the screen<br />");
 				api.console("&nbsp;&nbsp;logout- logs you out of the desktop<br />");
-				api.console("&nbsp;&nbsp;exit- close the console<br />");
 			}
 		}
 		this.consoleKey = function(e)
@@ -216,19 +215,10 @@ desktop.core = new function()
 				dojo.byId('console').scrollTop = dojo.byId('console').scrollHeight;
 			}
 			catch(e){
-				if(e==undefined)
-				{
-					e='An unknown error has occurred';
-					dojo.byId('consoleoutput').innerHTML += e+'<br />\n';
-					dojo.byId('consoleinput').value = '';
-					this.consoleHist = this.consoleHistory.length;
-				}
-				else
-				{
-					dojo.byId('consoleoutput').innerHTML += e+'<br />\n';
-					dojo.byId('consoleinput').value = '';
-					this.consoleHist = this.consoleHistory.length;
-				}
+				if(!e) e='An unknown error has occurred';
+				dojo.byId('consoleoutput').innerHTML += e+'<br />\n';
+				dojo.byId('consoleinput').value = '';
+				this.consoleHist = this.consoleHistory.length;
 				dojo.byId('console').scrollTop = dojo.byId('console').scrollHeight;
 			}
 		}
