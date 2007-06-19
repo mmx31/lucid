@@ -20,6 +20,33 @@ api.fs = new function()
         mimetype: "text/xml"
         });
     }
+   this.mkdir = function(path)
+    {
+	var url = "../backend/api.php?fs=createDirectory&path="+path;
+        dojo.io.bind({
+        url: url,
+        error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
+        mimetype: "text/xml"
+        });
+    }
+   this.rm = function(path)
+    {
+	var url = "../backend/api.php?fs=removeFile&path="+path;
+        dojo.io.bind({
+        url: url,
+        error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
+        mimetype: "text/xml"
+        });
+    }
+   this.rmdir = function(path)
+    {
+	var url = "../backend/api.php?fs=removeDir&path="+path;
+        dojo.io.bind({
+        url: url,
+        error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
+        mimetype: "text/xml"
+        });
+    }
     this.lsProcess = function(type, data, evt, callback)
     {
 		var results = data.getElementsByTagName('file');

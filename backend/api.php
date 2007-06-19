@@ -121,6 +121,21 @@ echo("FAIL");
   }
   }
 if (isset($_GET['fs'])) {
+	if ($_GET['fs'] == "createDirectory") {
+				$odir = $_REQUEST['path'];
+			    $dir = "../files/".$_SESSION['userid']."/$odir";
+				mkdir($dir);
+}
+	if ($_GET['fs'] == "removeFile") {
+				$odir = $_REQUEST['path'];
+			    $dir = "../files/".$_SESSION['userid']."/$odir";
+				unlink($dir);
+}
+	if ($_GET['fs'] == "removeDir") {
+				$odir = $_REQUEST['path'];
+			    $dir = "../files/".$_SESSION['userid']."/$odir";
+				rmdir($dir);
+}
 	if ($_GET['fs'] == "getFolder") {
 				$odir = $_REQUEST['path'];
 			    $dir = opendir("../files/".$_SESSION['userid']."/$odir");

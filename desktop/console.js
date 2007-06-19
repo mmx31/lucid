@@ -79,6 +79,9 @@ this.path = "/";
 			api.console("&nbsp;&nbsp;reload- reload the desktop without logging out");
 			api.console("&nbsp;&nbsp;ls [dir]- list files in [dir]");
 			api.console("&nbsp;&nbsp;cat [file]- read the file [file]");
+			api.console("&nbsp;&nbsp;mkdir [dir]- creates the directory [dir]");
+			api.console("&nbsp;&nbsp;rm [file]- removes the file [file]");
+			api.console("&nbsp;&nbsp;rmdir [dir]- removes the dir [dir]");
 			api.console("&nbsp;&nbsp;clear- clear the screen");
 			api.console("&nbsp;&nbsp;logout- logs you out of the desktop");
 		},
@@ -102,11 +105,33 @@ this.path = "/";
 		},
 		mkdir: function(params)
 		{
-		api.console("currently not implamented");
+			if(params == "") {
+				api.console("need a dir name!");
+			}
+			else {
+			api.fs.mkdir(desktop.console.path+params);
+			api.console("directory created");
+			}
 		},
 		rm: function(params)
 		{
-		api.console("currently not implamented");
+			if(params == "") {
+				api.console("need a file!");
+			}
+			else {
+			api.fs.rm(desktop.console.path+params);
+			api.console("file removed");
+			}
+		},
+		rmdir: function(params)
+		{
+			if(params == "") {
+				api.console("need a directory!");
+			}
+			else {
+			api.fs.rmdir(desktop.console.path+params);
+			api.console("directory removed");
+			}
 		},
 		cat: function(params)
 		{
