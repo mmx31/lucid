@@ -29,12 +29,13 @@ api.require = function(api)
 {
 	document.write("<script type='text/javascript' src='./api/"+api+".js'></script>");
 }
+api.require("crosstalk");
 api.require("database");
 api.require("fs");
 api.require("misc");
 api.require("registry");
+api.require("soundmanager");
 api.require("ui");
 api.require("user");
 api.require("window");
-api.require("crosstalk");
 	
