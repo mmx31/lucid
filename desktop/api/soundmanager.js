@@ -19,11 +19,11 @@ api.sound = new function(smURL,smID)
     */
 	  var self = this;
   this.version = 'V2.0b.20070415';
-  this.url = "api/soundmanager2.swf";
-
+  this.url = "api/soundmanager/soundmanager2.swf";
+  this.idCounter = 0;
   this.debugMode = true;           // enable debugging output (div#soundmanager-debug, OR console if available + configured)
   this.useConsole = true;          // use firebug/safari console.log()-type debug console if available
-  this.consoleOnly = false;        // if console is being used, do not create/write to #soundmanager-debug
+  this.consoleOnly = true;        // if console is being used, do not create/write to #soundmanager-debug
   this.nullURL = 'api/soundmanager/null.mp3';  // path to "null" (empty) MP3 file, used to unload sounds
 
   this.defaultOptions = {
@@ -83,10 +83,12 @@ api.sound = new function(smURL,smID)
 
   this.createSound = function(oOptions) {
     if (!self._didInit) throw new Error('soundManager.createSound(): Not loaded yet - wait for soundManager.onload() before calling sound-related methods');
-    if (arguments.length==2) {
+    this.idCounter++;
+	if (typeof oOptions !=='object') {
       // function overloading in JS! :) ..assume simple createSound(id,url) use case
-      oOptions = {'id':arguments[0],'url':arguments[1]}
+      oOptions = {'id':this.idCounter,'url':arguments[0]}
     }
+	else oOptions.id = this.idCounter;
     var thisOptions = self._mergeObjects(oOptions);
     self._writeDebug('soundManager.createSound(): "<a href="#" onclick="soundManager.play(\''+thisOptions.id+'\');return false" title="play this sound">'+thisOptions.id+'</a>" ('+thisOptions.url+')',1);
     if (self._idCheck(thisOptions.id,true)) {
@@ -99,10 +101,11 @@ api.sound = new function(smURL,smID)
       self.o._createSound(thisOptions.id,thisOptions.onjustbeforefinishtime);
     } catch(e) {
       self._failSafely();
-      return true;
+      return this.idCounter;
     }
     if (thisOptions.autoLoad || thisOptions.autoPlay) self.sounds[thisOptions.id].load(thisOptions);
     if (thisOptions.autoPlay) self.sounds[thisOptions.id].playState = 1; // we can only assume this sound will be playing soon.
+    return this.idCounter;
   }
 
   this.destroySound = function(sID) {
