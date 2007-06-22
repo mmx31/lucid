@@ -15,5 +15,5 @@ $db_prefix="dsktp_";
 $conf_public="yes";
 //the secret word for encryption of passwords
 //NOTE: DO NOT CHANGE AFTER INSTALL! THIS WILL BREAK THE USER LOGIN PROCESS!!!
-$conf_secretword="41ae2e4baf870437694c67730099f3b2";
+$conf_secretword="2c714b6f9082e4097685d98de8f6b808";
 ?>

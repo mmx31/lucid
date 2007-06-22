@@ -24,7 +24,7 @@
 -- Table structure for table `apps`
 -- 
 
-CREATE TABLE `apps` (
+CREATE TABLE `#__apps` (
   `ID` int(20) NOT NULL auto_increment,
   `name` mediumtext NOT NULL,
   `author` mediumtext NOT NULL,
