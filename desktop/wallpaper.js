@@ -34,7 +34,7 @@ desktop.wallpaper = new function()
 		{
 			if(image)
 			{
-				setTimeout("document.getElementById(\"wallpaper\").innerHTML=\"<img width='100%' height='100%' src='"+image+"'>\";", 100);
+				document.getElementById("wallpaper").innerHTML="<img width='100%' height='100%' src='"+image+"'>";
 			}
 			else
 			{
@@ -49,5 +49,16 @@ desktop.wallpaper = new function()
 			if( document.body && document.body.style ) {
 			    document.body.style.backgroundColor = color; }
 			    document.bgColor = color;
+		}
+		this.init = function()
+		{
+			div = document.createElement("div");
+			div.id="wallpaper";
+			div.name="wallpaper";
+			document.body.appendChild(div);
+			div = document.createElement("div");
+			div.id="wallpaperoverlay";
+			document.body.appendChild(div);
+			this.loadPrefs();
 		}
 	}

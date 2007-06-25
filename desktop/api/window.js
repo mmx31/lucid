@@ -7,8 +7,8 @@ api.window = function()
 	this.height = "400px";
 	this.width = "500px";
 	this.title = "";
-	this.templatePath = dojo.uri.dojoUri("../themes/default/window.html");
-	this.templateCssPath = dojo.uri.dojoUri("../themes/default/window.css");
+	//this.templatePath = dojo.uri.dojoUri("../themes/default/window.html");
+	//this.templateCssPath = dojo.uri.dojoUri("../themes/default/window.css");
 	this.titleBarDisplay = true;
 	this.hasShadow = true;
 
@@ -52,7 +52,8 @@ api.window = function()
 			toggleDuration: 300,
 			constrainToContainer: true,
 		templatePath: dojo.uri.dojoUri("../themes/default/window.html"),
-		templateCssPath: dojo.uri.dojoUri("../themes/default/window.css"),
+		//templateCssPath: dojo.uri.dojoUri("../themes/default/window.css"),
+		templateCssPath: null,
 		templateCssString: "",
 		templateString: "",
 		titleBarDisplay: this.titleBarDisplay,

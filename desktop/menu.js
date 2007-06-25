@@ -171,4 +171,15 @@ desktop.menu = new function()
 		document.getElementById("menu").innerHTML = html;
 		desktop.core.loadingIndicator(1);
 		}
+		this.draw = function()
+		{
+			html  = "<table><tr><td class='menutop'></td></tr><tr><td class='menubody'>";
+			html += "<div id='menu_name'></div>";
+			html += "<div id='menu'></div>";
+			html += "</td></tr></table>";
+			div = document.createElement("div");
+			div.id="sysmenu";
+			div.innerHTML = html;
+			document.body.appendChild(div);
+		}
 	}

@@ -41,4 +41,11 @@ desktop.windows = new function()
 				document.getElementById("windowcontainer").style.height= y;
 			}
 		}
+		this.init = function()
+		{
+			div = document.createElement("div");
+			div.id="windowcontainer";
+			dojo.widget.createWidget("ContentPane", {id: "windowcontainer"}, div);
+			document.body.appendChild(div);
+		}
 	}

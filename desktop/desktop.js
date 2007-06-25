@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	*/
+*/
 /****************************\
 |        Psych Desktop       |
 |         Main script        |
@@ -35,27 +35,26 @@ desktop.core = new function()
 			dojo.require("dojo.widget.DomWidget");
 			dojo.require("dojo.widget.Toaster");
 			dojo.lang.extend(dojo.widget.TaskBarItem, {
-				templateCssPath: dojo.uri.Uri("./themes/default/taskbar.css"),
-				templateCssString: ""
+				//templateCssPath: dojo.uri.Uri("./themes/default/taskbar.css"),
+				templateCssString: "",
+				templateCssPath: null
 			});
 			dojo.lang.extend(dojo.widget.FloatingPane, {
-				templateCssPath: dojo.uri.Uri("./themes/default/window.css"),
-				templateCssString: ""
+				//templateCssPath: dojo.uri.Uri("./themes/default/window.css"),
+				templateCssString: "",
+				templateCssPath: null
 			});
+			desktop.core.uiInit();
+			desktop.wallpaper.init();
+			desktop.windows.init();
+			desktop.console.draw();
+			desktop.menu.draw();
 			desktop.taskbar.draw();
 			desktop.menu.getApplications();
-			desktop.wallpaper.loadPrefs();
 			desktop.windows.desktopResize();
 			window.onresize = desktop.windows.desktopResize;
 			document.body.onmouseup = dojo.lang.hitch(desktop.menu, desktop.menu.leftclick);
-			dojo.widget.createWidget("TaskBar", {id: "appbar", width: "100%", templateCssPath: dojo.uri.dojoUri("../themes/default/taskbar.css")}, dojo.byId("appbar"));
-			dojo.byId("appbar_container").style.border="0px";
-			dojo.byId("appbar_container").style.margin="2px";
-			dojo.byId("appbar_container").style.backgroundColor="transparent";
-			dojo.byId("appbar_container").style.padding="2px";
-			dojo.byId("appbar_container").style.width="100%";
-			dojo.byId("appbar_container").style.height="100%";
-			dojo.byId("appbar_container").style.overflow="hidden";
+			dojo.widget.createWidget("TaskBar", {id: "appbar", width: "100%"}, dojo.byId("appbar"));
 			api.registry.getValue(-1,"taskbarVisibility",desktop.taskbar.setVisibility);
 			api.user.getUserName(function(data){
 				dojo.byId("menu_name").innerHTML = "<i>"+data+"</i>";
@@ -63,9 +62,14 @@ desktop.core = new function()
 			window.onbeforeunload = function()
 			{
 			  desktop.core.logout();
-			  return "To exit Psych Desktop properly, you should log out.";
+			  //log out quickly
 			}
 			document.onkeydown = desktop.console.toggle;
+			window.onError = function(e)
+			{
+				api.console(e);
+				alert("Psych Desktop encountered an error.\nPlease report this to the developers with the console output.\n(press the '`' key)")
+			}
 		}
 		dojo.addOnLoad(this.init);
 		this.debug = function()
@@ -101,16 +105,21 @@ desktop.core = new function()
 		{
 			if(action == 0)
 			{
-			//Effect.Appear("loadingIndicator");
 			dojo.lfx.html.fadeIn('loadingIndicator', 300).play();
-			document.getElementById("loadingIndicator").style.display = "inline";
+			dojo.byId("loadingIndicator").style.display = "inline";
 			}
 			if(action == 1)
 			{
-			//Effect.Fade("loadingIndicator");
 			dojo.lfx.html.fadeOut('loadingIndicator', 300).play();
 			document.getElementById("loadingIndicator").style.display = "none";
 			}
+		}
+		this.uiInit = function()
+		{
+			div = document.createElement("div");
+			div.innerHTML = "<center><img style='vertical-align: middle;' src='../images/UI/loading.gif' /><span style='vertical-align: middle;'> <b>Loading...</b></span></center>";
+			div.id="loadingIndicator";
+			document.body.appendChild(div);
 		}
 
 	}

@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	*/
+*/
 /****************************\
 |        Psych Desktop       |
 |       Console  Engine      |
@@ -210,5 +210,17 @@ this.path = "/";
 			this.hist = this.history.length;
 			dojo.byId('console').scrollTop = dojo.byId('console').scrollHeight;
 		}
+	}
+	this.draw = function()
+	{
+		html  = "<div id='consoleoutput' onClick = \"dojo.byId('consoleinput').focus();\"></div>";
+		html += "<form onSubmit='desktop.console.submit(); return false;' onkeydown='desktop.console.key(event);'>";
+		html += "<b><span id='consolepath'>~</span>$&nbsp;</b><input type='text' id='consoleinput' />";
+		html += "</form>";
+		div = document.createElement("div");
+		div.id = "console";
+		div.setAttribute("onclick", "dojo.byId('consoleinput').focus();");
+		div.innerHTML = html;
+		document.body.appendChild(div);
 	}
 }

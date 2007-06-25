@@ -1,15 +1,19 @@
 <div id="${this.widgetId}" dojoAttachEvent="onMouseDown" class="dojoFloatingPane">
 	<div dojoAttachPoint="titleBar" class="dojoFloatingPaneTitleBar"  style="display:none">
-	  	<img dojoAttachPoint="titleBarIcon"  class="dojoFloatingPaneTitleBarIcon">
-		<div dojoAttachPoint="closeAction" dojoAttachEvent="onClick:closeWindow"
-   	  		class="dojoFloatingPaneCloseIcon"></div>
-		<div dojoAttachPoint="restoreAction" dojoAttachEvent="onClick:restoreWindow"
-   	  		class="dojoFloatingPaneRestoreIcon"></div>
-		<div dojoAttachPoint="maximizeAction" dojoAttachEvent="onClick:maximizeWindow"
-   	  		class="dojoFloatingPaneMaximizeIcon"></div>
-		<div dojoAttachPoint="minimizeAction" dojoAttachEvent="onClick:minimizeWindow"
-   	  		class="dojoFloatingPaneMinimizeIcon"></div>
-	  	<div dojoAttachPoint="titleBarText" class="dojoFloatingPaneTitleText">${this.title}</div>
+		<div dojoAttachPoint="titleBarLeft"  class="dojoFloatingPaneTitleBarLeft"></div>
+		<div dojoAttachPoint="titleBarRight"  class="dojoFloatingPaneTitleBarRight"></div>
+	  	<div class="dojoFloatingPaneTitleBarBody">
+			<img dojoAttachPoint="titleBarIcon"  class="dojoFloatingPaneTitleBarIcon">
+			<div class="dojoFloatingPaneTitleText" dojoAttachPoint="titleBarText">${this.title}</div>
+			<div dojoAttachPoint="closeAction" dojoAttachEvent="onClick:closeWindow"
+	   	  		class="dojoFloatingPaneCloseIcon"></div>
+			<div dojoAttachPoint="restoreAction" dojoAttachEvent="onClick:restoreWindow"
+	   	  		class="dojoFloatingPaneRestoreIcon"></div>
+			<div dojoAttachPoint="maximizeAction" dojoAttachEvent="onClick:maximizeWindow"
+	   	  		class="dojoFloatingPaneMaximizeIcon"></div>
+			<div dojoAttachPoint="minimizeAction" dojoAttachEvent="onClick:minimizeWindow"
+	   	  		class="dojoFloatingPaneMinimizeIcon"></div>
+		</div>
 	</div>
 
 	<div id="${this.widgetId}_container" dojoAttachPoint="containerNode" class="dojoFloatingPaneClient"></div>

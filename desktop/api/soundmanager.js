@@ -101,12 +101,41 @@ api.sound = new function(smURL,smID)
       self.o._createSound(thisOptions.id,thisOptions.onjustbeforefinishtime);
     } catch(e) {
       self._failSafely();
-      return this.idCounter;
+      return true;
     }
     if (thisOptions.autoLoad || thisOptions.autoPlay) self.sounds[thisOptions.id].load(thisOptions);
     if (thisOptions.autoPlay) self.sounds[thisOptions.id].playState = 1; // we can only assume this sound will be playing soon.
-    return this.idCounter;
+    //create wrapper object
+	id = this.idCounter;
+	return new function()
+	{
+		this._id=id;
+		this.play = function(options)
+		{ return api.sound.play(this._id, options); }
+		this.start=this.play;
+		this.stop = function()
+		{ return api.sound.stop(this._id); }
+		this.pause = function()
+		{ return api.sound.pause(this._id); }
+		this.pause = function()
+		{ return api.sound.resume(this._id); }
+		this.togglePause = function()
+		{ return api.sound.togglePause(this._id); }
+		this.destroy = function()
+		{ return api.sound.destroySound(this._id); }
+		this.load = function(options)
+		{ return api.sound.load(this._id, options); }
+		this.unload = function()
+		{ return api.sound.unload(this._id); }
+		this.setPosition = function(options)
+		{ return api.sound.setPosition(this._id, options); }
+		this.setPan = function(options)
+		{ return api.sound.setPan(this._id, options); }
+		this.setVolume = function(options)
+		{ return api.sound.setVolume(this._id, options); }
+	}
   }
+  this.create=this.createSound;
 
   this.destroySound = function(sID) {
     // explicitly destroy a sound before normal page unload, etc.
@@ -222,7 +251,7 @@ api.sound = new function(smURL,smID)
   this.onload = function() {
     // window.onload() equivalent for SM2, ready to create sounds etc.
     // this is a stub - you can override this in your own external script, eg. soundManager.onload = function() {}
-    soundManager._writeDebug('<em>Warning</em>: soundManager.onload() is undefined.',2);
+    api.sound._writeDebug('<em>Warning</em>: soundManager.onload() is undefined.',2);
   }
 
   this.onerror = function() {
@@ -312,7 +341,8 @@ api.sound = new function(smURL,smID)
   this._writeDebug = function(sText,sType) {
     if (!self.debugMode) return false;
     if (self._hasConsole && self.useConsole) {
-      console[self._debugLevels[sType]||'log'](sText); // firebug et al
+      /*console[self._debugLevels[sType]||'log'](sText); // firebug et al*/
+	 api.console(sText);
       if (self.useConsoleOnly) return true;
     }
     var sDID = 'soundmanager-debug';
