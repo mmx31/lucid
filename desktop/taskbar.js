@@ -74,7 +74,7 @@ desktop.taskbar = new function()
 			div.innerHTML = "<div id='clock'></div>";
 			document.body.appendChild(div);
 			appbarcontent = '<div id="appbar"></div>';
-			tasktray = '<table id="tasktray"><tr><td><div id="trayclock"></div></td></tr></table>';
+			tasktray = '<table id="tasktray"><tr id="tasklist"><td><div id="trayclock"></div></td></tr></table>';
 			html='<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td width="30"><img src="./icons/apps.gif" onmousedown ="desktop.menu.button();" border="0"></td><td width="1%"><div class="seperator"></div></td><td width="80%">'+appbarcontent+'</td><td width="1%"><div class="seperator"></div></td><td width="15%">'+tasktray+'</td></tr></table>';
 			//dojo.widget.createWidget("contentPane", {id: "appbar"}, dojo.byId("appbar"));
 			div= document.createElement("div");

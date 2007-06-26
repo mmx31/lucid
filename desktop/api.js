@@ -36,6 +36,7 @@ api.require("ide");
 api.require("misc");
 api.require("registry");
 api.require("soundmanager");
+api.require("tray");
 api.require("ui");
 api.require("user");
 api.require("window");
