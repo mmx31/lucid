@@ -22,28 +22,10 @@
 |(c)2006 Psych Designs|
 \*********************/
 desktop.rightclick = new function()
-{	/*
-	//var bgcontextmenu = document.getElementById("wallpaperoverlay");
-	document.oncontextmenu=new Function("contextMenu('background');");
-	
-	function contextMenu(mode, object)
+{
+	this.init = function()
 	{
-	var context = document.createElement('div');
-	context.style.width= "40px";
-	context.style.position= "absolute";
-	context.style.top = window.clientY
-	context.style.left = window.clientX
-	context.innerHTML="test"
-	document.appendChild(context);
-	
-	switch(mode)
-	{
-	case "background":
-	
-	break;
-	
+		this.menu = dojo.widget.createWidget("PopupMenu2", {targetNodeIds: ["windowcontainer", "taskbar", "taskbarhider"]});
+		this.menu.addChild(dojo.widget.createWidget("MenuItem2", {caption: "right click"}));
 	}
-	return false;
-	}
-	*/
 }

@@ -68,8 +68,14 @@ desktop.taskbar = new function()
 		
 		this.draw = function()
 		{
+			div = document.createElement("div");
+			div.id="sysclock";
+			div.style.display="none";
+			div.innerHTML = "<div id='clock'></div>";
+			document.body.appendChild(div);
 			appbarcontent = '<div id="appbar"></div>';
-			html='<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td width="30"><img src="./icons/apps.gif" onmousedown ="desktop.menu.button();" border="0"></td><td width="1%"><div class="seperator"></div></td><td width="80%">'+appbarcontent+'</td><td width="1%"><div class="seperator"></div></td><td width="15%"></td></tr><table>';
+			tasktray = '<table id="tasktray"><tr><td><div id="trayclock"></div></td></tr></table>';
+			html='<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td width="30"><img src="./icons/apps.gif" onmousedown ="desktop.menu.button();" border="0"></td><td width="1%"><div class="seperator"></div></td><td width="80%">'+appbarcontent+'</td><td width="1%"><div class="seperator"></div></td><td width="15%">'+tasktray+'</td></tr></table>';
 			//dojo.widget.createWidget("contentPane", {id: "appbar"}, dojo.byId("appbar"));
 			div= document.createElement("div");
 			div.innerHTML = html;
@@ -80,5 +86,37 @@ desktop.taskbar = new function()
 			div.innerHTML = "<img src='./icons/hidetask.gif'>";
 			document.body.appendChild(div);
 			div.setAttribute("onclick", "desktop.taskbar.hider();");
+			this.clock = dojo.widget.createWidget("clock", {id: "sysclock"}, dojo.byId("clock"));
+			dojo.byId("trayclock").setAttribute("onclick", "desktop.taskbar.toggleClock();", true);
+			this.clockinterval = setInterval(function(){
+				var clock_time = new Date();
+				var clock_hours = clock_time.getHours();
+				var clock_minutes = clock_time.getMinutes();
+				var clock_seconds = clock_time.getSeconds();
+				var clock_suffix = "AM";
+				if (clock_hours > 11){
+					clock_suffix = "PM";
+					clock_hours = clock_hours - 12;
+				}
+				if (clock_hours == 0){
+					clock_hours = 12;
+				}
+				if (clock_hours < 10){
+					clock_hours = "0" + clock_hours;
+				}if (clock_minutes < 10){
+					clock_minutes = "0" + clock_minutes;
+				}if (clock_seconds < 10){
+					clock_seconds = "0" + clock_seconds;
+				}
+				dojo.byId("trayclock").innerHTML = clock_hours + ":" + clock_minutes + ":" + clock_seconds + " " + clock_suffix;
+			}, 1000);
+		}
+		this.toggleClock = function()
+		{
+			if(dojo.byId("sysclock").style.display=="block")
+			{
+				dojo.byId("sysclock").style.display="none";
+			}
+			else dojo.byId("sysclock").style.display="block";
 		}
 	}

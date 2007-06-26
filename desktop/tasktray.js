@@ -23,9 +23,5 @@
 \***************************/ 
 desktop.tray = new function()
 	{
-		draw = function()
-		{
-			//draw out a simple table for icons.
-			document.write('<table id="tasktray"><tr></tr></table>');
-		}
+		
 	}

@@ -99,6 +99,11 @@ height: 100%;
 {
 	zindex: 11000;
 }
+#tasktray
+{
+	width: 15%;
+	height: 100%;
+}
 #windowcontainer
 {
 	position: absolute;
@@ -134,4 +139,16 @@ height: 100%;
 #console form
 {
 	margin: 0px;
+}
+#sysclock
+{
+	position: absolute;
+	right: 5px;
+	bottom: 35px;
+}
+#trayclock
+{
+	cursor: default;
+	font-size: 10pt;
+	width: 7em;
 }

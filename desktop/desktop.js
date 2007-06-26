@@ -52,6 +52,7 @@ desktop.core = new function()
 			desktop.taskbar.draw();
 			desktop.menu.getApplications();
 			desktop.windows.desktopResize();
+			desktop.rightclick.init();
 			window.onresize = desktop.windows.desktopResize;
 			document.body.onmouseup = dojo.lang.hitch(desktop.menu, desktop.menu.leftclick);
 			dojo.widget.createWidget("TaskBar", {id: "appbar", width: "100%"}, dojo.byId("appbar"));
