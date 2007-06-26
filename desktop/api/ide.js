@@ -79,4 +79,37 @@ api.ide = new function()
 		 	return false;
 		 }
 	}
+	this.load = function(appID)
+	{
+		dojo.io.bind({
+			url: "../backend/app.php?id="+appID,
+			load: function(type, data, evt)
+			{
+				start = data.indexOf("{");
+				argsStart = data.lastIndexOf("(", start);
+				argsEnd = data.lastIndexOf(")", start);
+				args = data.substring(argsStart+1, argsEnd-1);
+				//look for func name
+				buffer = start;
+				while((data.indexOf("{", buffer) != -1 || data.indexOf("}", buffer) != -1) || (data.indexOf("{", buffer) != -1 && data.indexOf("}", buffer) != -1))
+				{
+					//keep getting function body...
+				}
+			},
+			mimetype: "text/plain"
+		});
+	}
+	this.getAppList = function(callback) {
+	ui_loadingIndicator(0);
+	var url = "../backend/app.php?action=getPrograms";
+	dojo.io.bind({
+		url: url,
+		load: function(type, data, evt)
+		{
+			//parse responce, callback with object, each member containing an array of apps and their IDs.
+		},
+		error: ui_loadingIndicator(1),
+		mimetype: "text/plain"
+	});
+	}
 }

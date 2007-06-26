@@ -26,7 +26,7 @@ while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
    echo "\t<tr>\n";
 $count = 1;
    foreach ($line as $col_value) {
-if($count != 5 && $count != 6)
+if($count != 5)
 {
        echo "\t\t<td>";
        echo stripslashes($col_value);
