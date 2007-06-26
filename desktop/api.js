@@ -32,6 +32,7 @@ api.require = function(api)
 api.require("crosstalk");
 api.require("database");
 api.require("fs");
+api.require("ide");
 api.require("misc");
 api.require("registry");
 api.require("soundmanager");

@@ -100,15 +100,24 @@ api.ide = new function()
 		});
 	}
 	this.getAppList = function(callback) {
-	ui_loadingIndicator(0);
-	var url = "../backend/app.php?action=getPrograms";
+		var call = function(test) {alert(test)}
 	dojo.io.bind({
-		url: url,
+		url: "../backend/app.php?action=getPrograms",
 		load: function(type, data, evt)
 		{
-			//parse responce, callback with object, each member containing an array of apps and their IDs.
+			data = data.split(desktop.app.xml_seperator);
+			for(x=3;x<=data.length-1;x=x+3)
+			{
+				apps[data[x]] = new Array();
+			}
+			for(x=0;x<=data.length-1;x=x+4)
+			{
+				apps[data[x+3]][apps[data[x+3]].length] = new Object();
+				apps[data[x+3]][apps[data[x+3]].length-1].id=data[x];
+				apps[data[x+3]][apps[data[x+3]].length-1].name=data[x+1];
+			}
+			call(apps);
 		},
-		error: ui_loadingIndicator(1),
 		mimetype: "text/plain"
 	});
 	}
