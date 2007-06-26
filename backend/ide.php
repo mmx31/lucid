@@ -32,7 +32,6 @@ $_POST['name'] = mysql_real_escape_string ($_POST['name'], $link);
 $_POST['author'] = mysql_real_escape_string ($_POST['author'], $link);
 $_POST['email'] = mysql_real_escape_string ($_POST['email'], $link);
 $_POST['code'] = mysql_real_escape_string ($_POST['code'], $link);
-$_POST['library'] = mysql_real_escape_string ($_POST['library'], $link);
 $_POST['version'] = mysql_real_escape_string ($_POST['version'], $link);
 $_POST['maturity'] = mysql_real_escape_string ($_POST['maturity'], $link);
 $_POST['category'] = mysql_real_escape_string ($_POST['category'], $link);
@@ -40,11 +39,11 @@ $_POST['category'] = mysql_real_escape_string ($_POST['category'], $link);
 if($_POST['appid'] == -1)
 {
 //INSERT
-$query = "INSERT INTO ${db_prefix}apps (name, author, email, code, library, version, maturity, category) VALUES(\"${_POST['name']}\", \"${_POST['author']}\", \"${_POST['email']}\", \"${_POST['code']}\", \"${_POST['library']}\", \"${_POST['version']}\", \"${_POST['maturity']}\", \"${_POST['category']}\")";
+$query = "INSERT INTO ${db_prefix}apps (name, author, email, code, version, maturity, category) VALUES(\"${_POST['name']}\", \"${_POST['author']}\", \"${_POST['email']}\", \"${_POST['code']}\", \"${_POST['version']}\", \"${_POST['maturity']}\", \"${_POST['category']}\")";
 }
 else
 {
-$query = "UPDATE ${db_prefix}apps SET name=\"${_POST['name']}\", author=\"${_POST['author']}\", email=\"${_POST['email']}\", code=\"${_POST['code']}\", library=\"${_POST['library']}\", version=\"${_POST['version']}\", maturity=\"${_POST['maturity']}\", category=\"${_POST['category']}\" WHERE ID=\"${_POST['appid']}\" LIMIT 1";
+$query = "UPDATE ${db_prefix}apps SET name=\"${_POST['name']}\", author=\"${_POST['author']}\", email=\"${_POST['email']}\", code=\"${_POST['code']}\", version=\"${_POST['version']}\", maturity=\"${_POST['maturity']}\", category=\"${_POST['category']}\" WHERE ID=\"${_POST['appid']}\" LIMIT 1";
 }
 
 mysql_query($query) or die('Query 1 failed: ' . mysql_error());

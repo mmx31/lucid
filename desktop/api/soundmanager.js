@@ -80,7 +80,7 @@ api.sound = new function(smURL,smID)
       return true;
     }
   }
-
+  this.create = function(oOptions){ this.createSound(oOptions); } //shorthand
   this.createSound = function(oOptions) {
     if (!self._didInit) throw new Error('soundManager.createSound(): Not loaded yet - wait for soundManager.onload() before calling sound-related methods');
     this.idCounter++;

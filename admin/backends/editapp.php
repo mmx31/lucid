@@ -15,10 +15,9 @@ if($count == 2) { $name = stripslashes($col_value); }
 if($count == 3) { $author = stripslashes($col_value); }
 if($count == 4) { $email = stripslashes($col_value); }
 if($count == 5) { $code = stripslashes($col_value); }
-if($count == 6) { $library = stripslashes($col_value); }
-if($count == 7) { $version = stripslashes($col_value); }
-if($count == 8) { $maturity = stripslashes($col_value); }
-if($count == 9) { $category = stripslashes($col_value); }
+if($count == 6) { $version = stripslashes($col_value); }
+if($count == 7) { $maturity = stripslashes($col_value); }
+if($count == 8) { $category = stripslashes($col_value); }
 $count++;
    }
 }
@@ -31,7 +30,6 @@ else
 //new app
 $appid="-1";
 $name="New App";
-$library="//put your javascript library here. Don't forget to make it a class!!!";
 $code="//put your javascript code here";
 $maturity="Alpha";
 $category="Office";
@@ -77,13 +75,6 @@ $code = str_replace("<", "&lt;", $code);
 $code = str_replace(">", "&gt;", $code);
 ?>
 <textarea name="code" style="width: 100%; height: 500px;"><?php echo $code; ?></textarea>
-</td></tr>
-<tr><td colspan="4"><b>Library:</b><br>
-<?php
-$library = str_replace("<", "&lt;", $library);
-$library = str_replace(">", "&gt;", $library);
-?>
-<textarea name="library" style="width: 100%; height: 500px;"><?php echo $library; ?></textarea>
 </td></tr>
 <tr><td colspan="4"><input type="submit" value="save"> <input type="button" value="close" onclick="window.location='index2.php?backend=app'"></td></tr></table>
 </form>
