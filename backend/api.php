@@ -150,7 +150,8 @@ if (isset($_GET['fs'])) {
 							$t = strtolower($file);
 							if(is_dir("../files/".$_SESSION['userid']."/$odir" . $file)){
 								$type = 'folder';
-							} else {								$type = 'file';
+							} else {
+								$type = 'file';
 							}
 							$output .=  "\r\n" . '<file type="' . $type . '">' . $file . '</file>';
 						}
@@ -169,6 +170,12 @@ if (isset($_GET['fs'])) {
 				$output .= '</getFileResponse>';
 				header('Content-type: text/xml');
 				echo $output;
+}
+	if ($_GET['fs'] == "writeFile") {
+				$content = $_REQUEST['content'];
+				$odir = $_REQUEST['path'];
+			    	$dir = "../files/".$_SESSION['userid']."/$odir";
+				$file = file_put_contents($dir, $content);
 }
 	}
 	

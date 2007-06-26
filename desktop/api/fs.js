@@ -20,6 +20,15 @@ api.fs = new function()
         mimetype: "text/xml"
         });
     }
+   this.write = function(path, content)
+   {
+   	var url = "../backend/api.php?fs=writeFile&path="+path+"&content="+content;
+        dojo.io.bind({
+        url: url,
+        error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
+        mimetype: "text/xml"
+        });
+    }
    this.mkdir = function(path)
     {
 	var url = "../backend/api.php?fs=createDirectory&path="+path;
