@@ -20,8 +20,6 @@ api.sound = function(oOptions){
 	{ return api.soundmanager.togglePause(this._id); }
 	this.destroy = function()
 	{ return api.soundmanager.destroySound(this._id); }
-	this.load = function(options)
-	{ return api.soundmanager.load(this._id, options); }
 	this.unload = function()
 	{ return api.soundmanager.unload(this._id); }
 	this.setPosition = function(options)

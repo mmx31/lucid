@@ -1,4 +1,4 @@
-api.database = new function()
+api.db = new function()
 {
     this.parseTable = function(rawfields, cols)
     {
@@ -27,8 +27,11 @@ api.database = new function()
       }
       return table;
     }
-    this.getTable = function(appid, name, callback)
+    this.getTable = function(options)
     {
+		appid=options.appid;
+		name=options.name;
+		callback=options.callback;
 		dojo.io.bind({
             url: "../backend/api.php?action=getDatabase?appid="+appid+"&tablename="+name,
             method: "GET",
@@ -40,9 +43,15 @@ api.database = new function()
             mimetype:'text/html'
         });
     }
-    this.saveTable = function(appid, pub, name, columns, table)
+    this.saveTable = function(options)
     {
-        rawtable = "";
+		appid=options.appid;
+		pub=options.pub;
+		name=options.name;
+		columns=options.columns;
+		table=options.table;
+		
+		rawtable = "";
         for(field in table)
         {
             field.replace(/|||/," ");
