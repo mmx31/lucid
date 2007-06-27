@@ -3,8 +3,35 @@
  * http://www.schillmania.com/projects/soundmanager2/
  */
 document.write("<script type='text/javascript' src='./soundmanager/soundmanager2-jsmin.js'></script>")
-
-api.sound = new function(smURL,smID)
+api.sound = function(oOptions){
+  	api.soundmanager.idCounter++;
+	api.soundmanager.createSound(oOptions);
+	this._id=api.soundmanager.idCounter;
+	this.play = function(options)
+	{ return api.soundmanager.play(this._id, options); }
+	this.start=this.play;
+	this.stop = function()
+	{ return api.soundmanager.stop(this._id); }
+	this.pause = function()
+	{ return api.soundmanager.pause(this._id); }
+	this.pause = function()
+	{ return api.soundmanager.resume(this._id); }
+	this.togglePause = function()
+	{ return api.soundmanager.togglePause(this._id); }
+	this.destroy = function()
+	{ return api.soundmanager.destroySound(this._id); }
+	this.load = function(options)
+	{ return api.soundmanager.load(this._id, options); }
+	this.unload = function()
+	{ return api.soundmanager.unload(this._id); }
+	this.setPosition = function(options)
+	{ return api.soundmanager.setPosition(this._id, options); }
+	this.setPan = function(options)
+	{ return api.soundmanager.setPan(this._id, options); }
+	this.setVolume = function(options)
+	{ return api.soundmanager.setVolume(this._id, options); }
+  }
+api.soundmanager = new function(smURL,smID)
 {
 	/*
    SoundManager 2: Javascript Sound for the Web
@@ -80,7 +107,8 @@ api.sound = new function(smURL,smID)
       return true;
     }
   }
-  this.create = function(oOptions){ this.createSound(oOptions); } //shorthand
+
+  
   this.createSound = function(oOptions) {
     if (!self._didInit) throw new Error('soundManager.createSound(): Not loaded yet - wait for soundManager.onload() before calling sound-related methods');
     this.idCounter++;
@@ -101,41 +129,14 @@ api.sound = new function(smURL,smID)
       self.o._createSound(thisOptions.id,thisOptions.onjustbeforefinishtime);
     } catch(e) {
       self._failSafely();
-      return true;
+      return false;
     }
     if (thisOptions.autoLoad || thisOptions.autoPlay) self.sounds[thisOptions.id].load(thisOptions);
     if (thisOptions.autoPlay) self.sounds[thisOptions.id].playState = 1; // we can only assume this sound will be playing soon.
     //create wrapper object
 	id = this.idCounter;
-	return new function()
-	{
-		this._id=id;
-		this.play = function(options)
-		{ return api.sound.play(this._id, options); }
-		this.start=this.play;
-		this.stop = function()
-		{ return api.sound.stop(this._id); }
-		this.pause = function()
-		{ return api.sound.pause(this._id); }
-		this.pause = function()
-		{ return api.sound.resume(this._id); }
-		this.togglePause = function()
-		{ return api.sound.togglePause(this._id); }
-		this.destroy = function()
-		{ return api.sound.destroySound(this._id); }
-		this.load = function(options)
-		{ return api.sound.load(this._id, options); }
-		this.unload = function()
-		{ return api.sound.unload(this._id); }
-		this.setPosition = function(options)
-		{ return api.sound.setPosition(this._id, options); }
-		this.setPan = function(options)
-		{ return api.sound.setPan(this._id, options); }
-		this.setVolume = function(options)
-		{ return api.sound.setVolume(this._id, options); }
-	}
+	return true;
   }
-  this.create=this.createSound;
 
   this.destroySound = function(sID) {
     // explicitly destroy a sound before normal page unload, etc.
@@ -251,7 +252,7 @@ api.sound = new function(smURL,smID)
   this.onload = function() {
     // window.onload() equivalent for SM2, ready to create sounds etc.
     // this is a stub - you can override this in your own external script, eg. soundManager.onload = function() {}
-    api.sound._writeDebug('<em>Warning</em>: soundManager.onload() is undefined.',2);
+    api.soundmanager._writeDebug('<em>Warning</em>: soundManager.onload() is undefined.',2);
   }
 
   this.onerror = function() {
@@ -738,13 +739,13 @@ function SMSound(oSM,oOptions) {
 }
 
 if (window.addEventListener) {
-  window.addEventListener('load',api.sound.beginDelayedInit,false);
-  window.addEventListener('beforeunload',api.sound.destruct,false);
+  window.addEventListener('load',api.soundmanager.beginDelayedInit,false);
+  window.addEventListener('beforeunload',api.soundmanager.destruct,false);
 } else if (window.attachEvent) {
-  window.attachEvent('onload',api.sound.beginInit);
-  window.attachEvent('beforeunload',api.sound.destruct);
+  window.attachEvent('onload',api.soundmanager.beginInit);
+  window.attachEvent('beforeunload',api.soundmanager.destruct);
 } else {
   // no add/attachevent support - safe to assume no JS->Flash either.
-  api.sound.onerror();
-  api.sound.disable();
+  api.soundmanager.onerror();
+  api.soundmanager.disable();
 }

@@ -1,8 +1,8 @@
-var windowcounter = 0;
+api.windowcounter = 0;
 api.window = function()
 {
-	this.id = "win"+windowcounter;
-	windowcounter++;
+	this.id = "win"+api.windowcounter;
+	api.windowcounter++;
 	this.innerHTML = "";
 	this.height = "400px";
 	this.width = "500px";
