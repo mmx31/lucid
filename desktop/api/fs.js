@@ -1,3 +1,10 @@
+/** 
+* An API that interacts with the filesystem
+* TODO: document this. Also condense it so all the callbacks are not seperate functions.
+* 
+* @classDescription An API that interacts with the filesystem
+* @memberOf api
+*/
 api.fs = new function()
 { 
    this.ls = function(path, callback)
@@ -90,24 +97,3 @@ api.fs = new function()
         desktop.core.loadingIndicator(1);
 	}
 }
-
-/*
-
-this.window = new api.window();
-this.window.title = "FileExplorer";
-  var i = 0;
-  jayCount = array["count"];
-  while(i <= jayCount)
-  {
-if(array[i].isDir == true) {
-    this.window.write("<p> Directory: "+array[i]["file"]+"</p>");
-alert("directory");
-}
-else {
-    this.window.write("<p> File: "+array[i]["file"]+"</p>");
-alert("file");
-}
-    i++;
-  }
-this.window.show();
-*/

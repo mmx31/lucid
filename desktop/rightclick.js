@@ -16,13 +16,22 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-/*********************\
-|    Psych Desktop    |
-| Right Click Engine  |
-|(c)2006 Psych Designs|
-\*********************/
+/**
+* Contains all the context menu functions of the desktop
+* 
+* @classDescription	Contains all the context menu functions of the desktop
+* @memberOf desktop
+* @constructor	
+*/
 desktop.rightclick = new function()
 {
+	/** 
+	* Sets up the context menus for each desktop element
+	* 
+	* @alias desktop.rightclick.init
+	* @type {Function}
+	* @memberOf desktop.rightclick
+	*/
 	this.init = function()
 	{
 		this.menu = dojo.widget.createWidget("PopupMenu2", {targetNodeIds: ["windowcontainer", "taskbar", "taskbarhider"]});

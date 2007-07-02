@@ -16,14 +16,22 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-/****************************\
-|        Psych Desktop       |
-|         Main script        |
-|   (c) 2006 Psych Designs   |
-\****************************/
-
+/**
+* Contains all the core functions of the desktop
+*
+* @classDescription	Contains all the core functions of the desktop
+* @memberOf desktop
+* @constructor	
+*/
 desktop.core = new function()
-	{
+{
+		/** 
+		* Instalizes the desktop
+		* 
+		* @alias desktop.core.init
+		* @type {Function}
+		* @memberOf desktop.core
+		*/
 		this.init = function()
 		{
 		    dojo.require("dojo.lfx.*");
@@ -55,6 +63,16 @@ desktop.core = new function()
 			desktop.rightclick.init();
 			window.onresize = desktop.windows.desktopResize;
 			document.body.onmouseup = dojo.lang.hitch(desktop.menu, desktop.menu.leftclick);
+			div = document.createElement("div");
+			div.id="toaster";
+			document.body.appendChild(div);
+			dojo.widget.createWidget("toaster", {
+				id: "toaster",
+				separator: "<hr>",
+				positionDirection: "tr-down",
+				duration: 0,
+				messageTopic: "psychdesktop"
+			}, div);
 			dojo.widget.createWidget("TaskBar", {id: "appbar", width: "100%"}, dojo.byId("appbar"));
 			api.registry.getValue(-1,"taskbarVisibility",desktop.taskbar.setVisibility);
 			api.user.getUserName(function(data){
@@ -62,26 +80,25 @@ desktop.core = new function()
 			});
 			window.onbeforeunload = function()
 			{
+			  
 			  desktop.core.logout();
 			  //log out quickly
 			}
 			document.onkeydown = desktop.console.toggle;
-			window.onError = function(e)
+			window.onerror = function(e)
 			{
 				api.console(e);
 				alert("Psych Desktop encountered an error.\nPlease report this to the developers with the console output.\n(press the '`' key)")
 			}
 		}
 		dojo.addOnLoad(this.init);
-		this.debug = function()
-		{
-				win = new api.window;
-				win.write("<input type='text' id='eval' /><input type='button' onClick = 'eval(dojo.byId(\"eval\").value);' />");
-				win.height="57px";
-				win.width="208px";
-				win.title="debug";
-				win.show();
-		}
+		/** 
+		* Logs the user out
+		* 
+		* @alias desktop.core.logout
+		* @type {Function}
+		* @memberOf desktop.core
+		*/
 		this.logout = function()
 		{
 			api.user.getUserName(function(data){
@@ -102,6 +119,14 @@ desktop.core = new function()
 				});
 			});
 		}
+		/** 
+		* Shows or hides the loading indicator
+		* 
+		* @alias desktop.core.loadingIndicator
+		* @param {Integer} action	When set to 0 the loading indicator is displayed. When set to 1, the loading indicator will be hidden.
+		* @type {Function}
+		* @memberOf desktop.core
+		*/
 		this.loadingIndicator = function(action)
 		{
 			if(action == 0)
@@ -115,6 +140,13 @@ desktop.core = new function()
 			document.getElementById("loadingIndicator").style.display = "none";
 			}
 		}
+		/** 
+		* Draws the loading indicator
+		* 
+		* @alias desktop.core.uiInit
+		* @type {Function}
+		* @memberOf desktop.core
+		*/
 		this.uiInit = function()
 		{
 			div = document.createElement("div");

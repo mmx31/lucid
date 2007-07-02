@@ -16,14 +16,31 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-/****************************\
-|        Psych Desktop       |
-|       Taskbar Engine       |
-|   (c) 2006 Psych Designs   |
-\***************************/
+/**
+* Contains all the taskbar functions of the desktop
+* 
+* @classDescription	Contains all the taskbar functions of the desktop
+* @memberOf desktop
+* @constructor	
+*/
 desktop.taskbar = new function()
 	{
+		/**
+		 * The current working directory
+		 * 
+		 * @type {String}
+		 * @alias desktop.taskbar.visibility
+		 * @memberOf desktop.taskbar
+		 */
 		this.visibility = "show";
+		/** 
+		* sets the visibility of the taskbar
+		* 
+		* @alias desktop.taskbar.setVisibility
+		* @param {String} value	can be "hide" or "show"
+		* @type {Function}
+		* @memberOf desktop.taskbar
+		*/
 		this.setVisibility = function(value)
 		{
 			if(value == "hide")
@@ -44,6 +61,13 @@ desktop.taskbar = new function()
 				}
 			}
 		}
+		/** 
+		* toggles the visibility of the tasbar. Used for the taskbar hider
+		* 
+		* @alias desktop.taskbar.hider
+		* @type {Function}
+		* @memberOf desktop.taskbar
+		*/
 		this.hider = function()
 		{
 			if(this.visibility == "show")
@@ -65,7 +89,13 @@ desktop.taskbar = new function()
 			desktop.windows.desktopResize();
 			api.registry.saveValue(-1,"taskbarVisibility",this.visibility);
 		}
-		
+		/** 
+		* draws the taskbar
+		* 
+		* @alias desktop.taskbar.draw
+		* @type {Function}
+		* @memberOf desktop.taskbar
+		*/
 		this.draw = function()
 		{
 			div = document.createElement("div");
@@ -111,6 +141,13 @@ desktop.taskbar = new function()
 				dojo.byId("trayclock").innerHTML = clock_hours + ":" + clock_minutes + ":" + clock_seconds + " " + clock_suffix;
 			}, 1000);
 		}
+		/** 
+		* toggles the visibility of the analog clock
+		* 
+		* @alias desktop.taskbar.toggleClock
+		* @type {Function}
+		* @memberOf desktop.taskbar
+		*/
 		this.toggleClock = function()
 		{
 			if(dojo.byId("sysclock").style.display=="block")

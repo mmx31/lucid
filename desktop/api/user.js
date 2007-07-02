@@ -1,3 +1,10 @@
+/** 
+* An API that gets user info and such
+* TODO: condense this so that the callbacks are not seperate functions. Also document this.
+* 
+* @classDescription An API that gets user info and such
+* @memberOf api
+*/
 api.user = new function()
 {
 	this.getUserName = function(callback) {

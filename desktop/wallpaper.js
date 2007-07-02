@@ -16,20 +16,35 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-/****************************\
-|        Psych Desktop       |
-|      Wallpaper Engine      |
-|   (c) 2006 Psych Designs   |
-\***************************/
-
+/**
+* Contains all the wallpaper functions of the desktop
+* 
+* @classDescription	Contains all the wallpaper functions of the desktop
+* @memberOf desktop
+* @constructor	
+*/
 desktop.wallpaper = new function()
 	{
+		/** 
+		* Loads the wallpaper preferences
+		* 
+		* @alias desktop.wallpaper.loadPrefs
+		* @type {Function}
+		* @memberOf desktop.wallpaper
+		*/
 		this.loadPrefs = function()
 		{
 			api.registry.getValue(0, "bgimg", dojo.lang.hitch(this, this.set));
 			api.registry.getValue(0, "bgcolor", dojo.lang.hitch(this, this.setColor));
 		}
-		
+		/** 
+		* Sets the wallpaper image
+		* 
+		* @alias desktop.wallpaper.set
+		* @param {string} image	The image to use as the wallpaper
+		* @type {Function}
+		* @memberOf desktop.wallpaper
+		*/		
 		this.set = function(image)
 		{
 			if(image)
@@ -41,7 +56,14 @@ desktop.wallpaper = new function()
 				document.getElementById("wallpaper").innerHTML="&nbsp;";
 			}
 		}
-
+		/** 
+		* Sets the wallpaper background color
+		* 
+		* @alias desktop.wallpaper.setColor
+		* @param {string} color	The color to use. Can be a color name or a hex code, or RGB.
+		* @type {Function}
+		* @memberOf desktop.wallpaper
+		*/
 		this.setColor = function(color)
 		{
 			if( document.documentElement && document.documentElement.style ) {
@@ -50,6 +72,13 @@ desktop.wallpaper = new function()
 			    document.body.style.backgroundColor = color; }
 			    document.bgColor = color;
 		}
+		/** 
+		* Draws the wallpaper elements
+		* 
+		* @alias desktop.wallpaper.init
+		* @type {Function}
+		* @memberOf desktop.wallpaper
+		*/
 		this.init = function()
 		{
 			div = document.createElement("div");

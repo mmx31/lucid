@@ -2,7 +2,16 @@
  * thanks to Scott Schiller, who was the original author of the sound manager we modified for this API
  * http://www.schillmania.com/projects/soundmanager2/
  */
-document.write("<script type='text/javascript' src='./soundmanager/soundmanager2-jsmin.js'></script>")
+document.write("<script type='text/javascript' src='./soundmanager/soundmanager2-jsmin.js'></script>");
+
+/**
+* An API acting as a class of wrapper functions to make soundmanager 2 more like a Psych Desktop API
+* TODO: document stuff in this class
+* 
+* @classDescription	An API acting as a class of wrapper functions to make soundmanager 2 more like a Psych Desktop API
+* @memberOf api
+* @constructor	
+*/
 api.sound = function(oOptions){
   	api.soundmanager.idCounter++;
 	api.soundmanager.createSound(oOptions);
@@ -29,6 +38,13 @@ api.sound = function(oOptions){
 	this.setVolume = function(options)
 	{ return api.soundmanager.setVolume(this._id, options); }
   }
+/**
+* Scott Schiller's Sound Manager 2 with some modifications so that it will work in Psych Desktop
+* 
+* @classDescription	Scott Schiller's Sound Manager 2 with some modifications so that it will work in Psych Desktop
+* @memberOf api
+* @constructor	
+*/
 api.soundmanager = new function(smURL,smID)
 {
 	/*

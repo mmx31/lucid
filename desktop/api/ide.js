@@ -16,7 +16,13 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
+/** 
+* An API for making an IDE
+* TODO: plan this out better. After that write documentation for it.
+* 
+* @classDescription An API for making an IDE
+* @memberOf api
+*/
 api.ide = new function()
 {
 	this.compile = function(code)

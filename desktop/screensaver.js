@@ -17,12 +17,14 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-/****************************\
-|        Psych Desktop       |
-|     Screensaver Engine     |
-|   (c) 2006 Psych Designs   |
-\***************************/
+/**
+* Contains all the screensaver functions of the desktop
+* 
+* @classDescription	Contains all the screensaver functions of the desktop
+* @memberOf desktop
+* @constructor	
+*/
 desktop.screensaver = new function()
 {
-	
+	//we probably will do something similar to apps for this one...
 }

@@ -16,50 +16,89 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-/************************\
-|     Psych  Desktop     |
-|  App function library  |
-| (c) 2006 Psych Designs |
-\************************/
+/**
+* Contains all the app functions of the desktop
+* 
+* @classDescription	Contains all the app functions of the desktop
+* @memberOf desktop
+* @constructor	
+*/
 desktop.app = new function()
 	{
+		/**
+		 * Contains a cache of each app
+		 * 
+		 * @type {Array}
+		 * @alias desktop.app.apps
+		 * @memberOf desktop.app
+		 */
 		this.apps = new Array();
-		this.args = new Array();
+		/**
+		 * Contains each instance of all apps
+		 * 
+		 * @type {Array}
+		 * @alias desktop.app.instances
+		 * @memberOf desktop.app
+		 */
 		this.instances = new Array();
+		/**
+		 * A counter for making new instances of apps
+		 * 
+		 * @type {Integer}
+		 * @alias desktop.app.instanceCount
+		 * @memberOf desktop.app
+		 */
 		this.instanceCount = 0;
-		this.callback = new Array();
+		/**
+		 * The seperator used when retreiving an app
+		 * 
+		 * @type {String}
+		 * @alias desktop.app.xml_seperator
+		 * @memberOf desktop.app
+		 * @deprecated We use json to transfer the apps instead.
+		 */
 		this.xml_seperator = "[==separator==]";
+		/** 
+		* Fetches an app and stores it into the cache
+		* @param {String} appID	The appID to store into the cache
+		* @param {Function} callback	A callback to call once the app has been loaded into the cache
+		* @param {String} args	used internally when the callback is desktop.app.launch
+		* @memberOf desktop.app
+		* @alias desktop.app.fetchApp
+		*/
 		this.fetchApp = function(appID, callback, args)
 		{
 			//fetch an app, put it into the cache
 			desktop.core.loadingIndicator(0);
-			if(callback) {this.callback[appID] = callback;}
-			if(args) {this.args[appID] = args;}
 			dojo.io.bind({
 			    url: "../backend/app.php?id="+appID,
-			    load: dojo.lang.hitch(this, this.fetchAppCallback),
+			    load: dojo.lang.hitch(this, function(type, data, evt)
+				{
+					app = eval('('+data+')'); //TODO: get a json interpriter in place for more security
+					eval("this.apps["+app[0].ID+"] = function()\n{\n\tthis.id = "+app[0].ID+";\n\tthis.instance = -1;\n"+app[0].code+"\n\tthis.hitch = function(func)\n{return dojo.lang.hitch(this, func);}\n}");
+					if(callback)
+					{
+						if(args != undefined)
+						{
+							callback(app[0].ID, args);
+						}
+						else
+						{
+							callback(app[0].ID);
+						}
+					}
+				}),
 			    error: function(type, error) { desktop.core.loadingIndicator(1); api.toaster("Error: "+error.message); },
 			    mimetype: "text/plain"
 			});
 		}
-		this.fetchAppCallback = function(type, data, evt)
-				{
-					rawcode = data.split(this.xml_seperator);
-				    app_code = rawcode[4];
-				    app_id = rawcode[0];
-				    eval("this.apps["+app_id+"] = function()\n{\n\tthis.id = "+app_id+";\n\tthis.instance = -1;\n"+app_code+"\n\tthis.hitch = function(func)\n{return dojo.lang.hitch(this, func);}\n}");
-					if(this.callback[app_id])
-					{
-						if(this.args[app_id] != undefined)
-						{
-							this.callback[app_id](app_id, this.args[app_id]);
-						}
-						else
-						{
-							this.callback[app_id](app_id);
-						}
-					}
-				}
+		/** 
+		* Fetches an app and stores it into the cache
+		* @param {Integer} id	The id of the app to launch
+		* @param {Object} args	The args to pass to the 'init' function of the app
+		* @memberOf desktop.app
+		* @alias desktop.app.fetchApp
+		*/
 		this.launch = function(id, args)
 		{
 			desktop.core.loadingIndicator(0);

@@ -24,7 +24,17 @@
 | 	  via api.functionname();      |
 \**********************************/
 
+/**
+* Contains all the public APIs
+*
+* @classDescription	Contains all the public APIs
+* @constructor	
+*/
 var api = new Object();
+/** 
+* Includes an API at startup.
+* @param {String} api	The name of the API to load. The API has to be a JS file in the /api/ dir.
+*/
 api.require = function(api)
 {
 	document.write("<script type='text/javascript' src='./api/"+api+".js'></script>");

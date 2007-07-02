@@ -16,7 +16,14 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
+/**
+* Contains all the functions of the desktop
+*
+* @classDescription	Contains all the functions of the desktop
+* @constructor	
+*/
 var desktop = new Object();
+
 var PsychDesktop = {
   require: function(libraryName) {
     // inserting via DOM fails in Safari 2.0, so brute force approach
@@ -25,7 +32,6 @@ var PsychDesktop = {
   load: function() {
  PsychDesktop.require('api.js');
  PsychDesktop.require('app.js');
- PsychDesktop.require('appbar.js');
  PsychDesktop.require('console.js');
  PsychDesktop.require('icon.js');
  PsychDesktop.require('menu.js');

@@ -1,3 +1,10 @@
+/** 
+* An API that provides things like dialogs and such
+* TODO: document this
+* 
+* @classDescription An API that provides things like dialogs and such
+* @memberOf api
+*/
 api.ui = new function() {
 	this.dialog = function()
 	{

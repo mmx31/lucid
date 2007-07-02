@@ -39,7 +39,6 @@ if($_SESSION['userloggedin'] == true)
 <link id="window_theme" rel="stylesheet" href="./themes/default/window.css" type="text/css" media="screen" />
 </head>
 <body>
-<div dojoType="toaster" id="toaster" separator="<hr>" positionDirection="tr-down" duration="0" messageTopic="psychdesktop"></div>
 </body>
 </html>
 <?php

@@ -16,15 +16,29 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-/****************************\
-|        Psych Desktop       |
-|       Console  Engine      |
-|   (c) 2006 Psych Designs   |
-\****************************/
-
+/**
+* Contains all the console functions of the desktop
+* 
+* @classDescription	Contains all the console functions of the desktop
+* @memberOf desktop
+*/
 desktop.console = new function()
 {
-this.path = "/";
+	/**
+	 * The current working directory
+	 * 
+	 * @type {String}
+	 * @alias desktop.console.path
+	 * @memberOf desktop.console
+	 */
+	this.path = "/";
+	/** 
+	* Toggles the console
+	* 
+	* @alias desktop.console.toggle
+	* @param {Object} e	parameter that the document.onKey event provides.
+	* @memberOf desktop.console
+	*/
 	this.toggle = function(e)
 	{
 		if (document.all)
@@ -50,9 +64,28 @@ this.path = "/";
 			}
 		}
 	}
+	/**
+	 * Conains the history of console commands.
+	 * 
+	 * @type {Array}
+	 */
 	this.history = new Array();
 	this.history[0] = " ";
+	/**
+	 * Used when the user is going through their console history. It is the current history slot that the user has reached
+	 * 
+	 * @type {Integer}
+	 * @alias desktop.console.aliases
+	 * @memberOf desktop.console
+	 */
 	this.hist = 1;
+	/**
+	 * Contains console aliases that can be used from the console.
+	 * 
+	 * @alias desktop.console.aliases
+	 * @type {Object}
+	 * @memberOf desktop.console
+	 */
 	this.aliases = {
 		clear: function(params)
 		{
@@ -64,7 +97,7 @@ this.path = "/";
 		},
 		echo: function(params)
 		{
-			api.console(params);
+			api.console(eval('('+params+')'));
 		},
 		reload: function(params)
 		{
@@ -84,6 +117,12 @@ this.path = "/";
 			api.console("&nbsp;&nbsp;rmdir [dir]- removes the dir [dir]");
 			api.console("&nbsp;&nbsp;clear- clear the screen");
 			api.console("&nbsp;&nbsp;logout- logs you out of the desktop");
+		},
+		cd: function(params)
+		{
+			desktop.console.path=params;
+			dojo.byId("consolepath").innerHTML = params;
+			//TODO: check to see if the directory exists
 		},
 		ls: function(params)
 		{
@@ -146,10 +185,27 @@ this.path = "/";
 			);
 		}
 	} }
+	/** 
+	* Gets the current working directory
+	* 
+	* @alias desktop.console.getPath
+	* @type {Function}
+	* @memberOf desktop.console
+	* @return {String}	Returns the current working directory
+	*/
 	this.getPath = function()
 	{
-	dojo.byId('consolepath').value = this.path;
+		dojo.byId('consolepath').value = this.path;
+		return this.path;
 	}
+	/** 
+	* Activated on a keystroke. Used to grab console toggling key.
+	* 
+	* @alias desktop.console.key
+	* @type {Function}
+	* @memberOf desktop.console
+	* @param {Object} e	The object passed by the onKey* event
+	*/
 	this.key = function(e)
 	{
 		if(e.keyCode == "38") //up arrow
@@ -173,13 +229,20 @@ this.path = "/";
 				}
 				else
 				{
-					this.consoleHist++;
+					this.hist++;
 					if(this.history[this.consoleHist] == " ") dojo.byId('consoleinput').value = "";
 					else dojo.byId('consoleinput').value = this.history[this.hist];
 				}
 			}
 		}
 	}
+	/** 
+	* Activated when the console form is submitted. Executes the console command.
+	* 
+	* @alias desktop.console.submit
+	* @type {Function}
+	* @memberOf desktop.console
+	*/
 	this.submit = function()
 	{
 		if(dojo.byId('consoleinput').value == undefined) dojo.byId('consoleinput').value = " ";
@@ -211,6 +274,13 @@ this.path = "/";
 			dojo.byId('console').scrollTop = dojo.byId('console').scrollHeight;
 		}
 	}
+	/** 
+	* Draws the console
+	* 
+	* @alias desktop.console.draw
+	* @type {Function}
+	* @memberOf desktop.console
+	*/
 	this.draw = function()
 	{
 		html  = "<div id='consoleoutput' onClick = \"dojo.byId('consoleinput').focus();\"></div>";

@@ -16,18 +16,41 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-/****************************\
-|        Psych Desktop       |
-|         Menu Engine        |
-|   (c) 2006 Psych Designs   |
-\***************************/ 
+/**
+* Contains all the menu functions of the desktop
+* TODO: use dojo's popupmenu2 widget, the CSS based menus are too problematic...
+* 
+* @classDescription	Contains all the menu functions of the desktop
+* @memberOf desktop
+* @constructor
+*/
 
 desktop.menu = new function()
 	{
+		/**
+		 * Tracks wheather or not the desktop's menu is visible
+		 * 
+		 * @type {String}
+		 * @alias desktop.menu.visibility
+		 * @memberOf desktop.menu
+		 */
 		this.visibility = "closed";
+		/**
+		 * Tracks the number of clicks. Used when closing the menu.
+		 * 
+		 * @type {Integer}
+		 * @alias desktop.menu.clickcache
+		 * @memberOf desktop.menu
+		 */
 		this.clickcache = 0;
+		/** 
+		* A function that fixes IE display bugs in the menu
+		* 
+		* @memberOf desktop.menu
+		* @alias desktop.menu.sfHover
+		*/
 		this.sfHover = function() {
-			var sfEls = document.getElementById("nav").getElementsByTagName("LI");
+			var sfEls = document.getElementById("sysmenu").getElementsByTagName("LI");
 			for (var i=0; i<sfEls.length; i++) {
 				sfEls[i].onmouseover=function() {
 					this.className+=" sfhover";
@@ -38,7 +61,12 @@ desktop.menu = new function()
 			}
 		}
 		if (window.attachEvent) window.attachEvent("onload", dojo.lang.hitch(this, this.sfHover));
-
+		/** 
+		* Triggered on the document's left click event, used to close the menu.
+		*
+		* @memberOf desktop.menu
+		* @alias desktop.menu.leftclick
+		*/
 		this.leftclick = function()
 		{
 			if(this.clickcache == '1')
@@ -63,7 +91,12 @@ desktop.menu = new function()
 				}
 			}
 		}
-		
+		/** 
+		* Function that is triggered when the menu button is pressed.
+		* 
+		* @memberOf desktop.menu
+		* @alias desktop.menu.button
+		*/
 		this.button = function()
 		{
 			if(this.visibility == "closed")
@@ -81,7 +114,12 @@ desktop.menu = new function()
 				}
 			}
 		}
-		
+		/** 
+		* Hides the menu
+		*
+		* @memberOf desktop.app
+		* @alias desktop.menu.hide
+		*/
 		this.hide = function()
 		{
 		//new Effect.Fade('sysmenu',{duration: 0.6});
@@ -89,88 +127,98 @@ desktop.menu = new function()
 		setTimeout('document.getElementById("sysmenu").style.display = "none";', 350);
 		}
 		
-		//           AJAX Stuff         \\
 		
-		//this should probably be under menu.js, but whatever...
+		/** 
+		* Gets a list of applications from the server and generates a menu from it.
+		* TODO: convert this into JSON
+		*
+		* @memberOf desktop.menu
+		* @alias desktop.menu.getApplications
+		*/
 		this.getApplications = function() {
 		desktop.core.loadingIndicator(0);
 		var url = "../backend/app.php?action=getPrograms";
 		dojo.io.bind({
 		    url: url,
-		    load: dojo.lang.hitch(this, this.AppListState),
+		    load: dojo.lang.hitch(this, function(type, data, evt){
+				app_return = data;
+				html = '<ul id="nav">';
+				rawcode = app_return.split(desktop.app.xml_seperator);
+				app_amount = rawcode.length;
+				app_amount--;
+				app_amount = app_amount/3;
+				var x = 0;
+				var y = 0;
+				var z = 1;
+				office_id = new Array();
+				office_name = new Array();
+				office_count = 0;
+				system_id = new Array();
+				system_name = new Array();
+				system_count = 0;
+				internet_id = new Array();
+				internet_name = new Array();
+				internet_count = 0;
+				while (x <= app_amount)
+				{
+					var app_id = rawcode[y];
+					var app_name = rawcode[z];
+					var app_category = rawcode[z+1];
+					switch(app_category)
+					{
+						case "Office":
+							office_id[office_id.length] = app_id;
+							office_name[office_name.length] = app_name;
+						break;
+						case "System":
+							system_id[system_id.length] = app_id;
+							system_name[system_name.length] = app_name;			
+						break;
+						case "Internet":
+							internet_id[internet_id.length] = app_id;
+							internet_name[internet_name.length] = app_name;
+							internet_count++;			
+						break;
+					}
+					x++;
+					y++; y++; y++;
+					z++; z++; z++;
+				}
+				html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/applications-office.png" />&nbsp;Office<ul>';
+				for(count=0;count<=office_id.length-1;count++)
+				{
+					html += '<li onClick="javascript:desktop.app.launch('+office_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+office_name[count]+'</li>';
+				}
+				html += '</ul>';
+				html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/applications-internet.png" />&nbsp;Internet<ul>';
+				for(count=0;count<=internet_id.length-1;count++)
+				{
+					html += '<li onClick="javascript:desktop.app.launch('+internet_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+internet_name[count]+'</li>';
+				}
+				html += '</ul>';
+				html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/preferences-system.png" />&nbsp;System<ul>';
+				for(count=0;count<=system_id.length-1;count++)
+				{
+					html += '<li onClick="javascript:desktop.app.launch('+system_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+system_name[count]+'</li>';
+				}
+				html += '</ul>';
+				html += '<li onClick="javascript:desktop.core.logout();" style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/system-log-out.png" />&nbsp;Logout</li>';
+				html += '</ul>';
+				
+				document.getElementById("menu").innerHTML = html;
+				desktop.core.loadingIndicator(1);
+				}),
 		    error: function(type, data, evt) { desktop.core.loadingIndicator(1) },
 		    mimetype: "text/plain"
 		});
 		}
 		
-		this.AppListState = function(type, data, evt){
-		app_return = data;
-		html = '<ul id="nav">';
-		rawcode = app_return.split(desktop.app.xml_seperator);
-		app_amount = rawcode.length;
-		app_amount--;
-		app_amount = app_amount/3;
-		var x = 0;
-		var y = 0;
-		var z = 1;
-		office_id = new Array();
-		office_name = new Array();
-		office_count = 0;
-		system_id = new Array();
-		system_name = new Array();
-		system_count = 0;
-		internet_id = new Array();
-		internet_name = new Array();
-		internet_count = 0;
-		while (x <= app_amount)
-		{
-			var app_id = rawcode[y];
-			var app_name = rawcode[z];
-			var app_category = rawcode[z+1];
-			switch(app_category)
-			{
-				case "Office":
-					office_id[office_id.length] = app_id;
-					office_name[office_name.length] = app_name;
-				break;
-				case "System":
-					system_id[system_id.length] = app_id;
-					system_name[system_name.length] = app_name;			
-				break;
-				case "Internet":
-					internet_id[internet_id.length] = app_id;
-					internet_name[internet_name.length] = app_name;
-					internet_count++;			
-				break;
-			}
-			x++;
-			y++; y++; y++;
-			z++; z++; z++;
-		}
-		html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/applications-office.png" />&nbsp;Office<ul>';
-		for(count=0;count<=office_id.length-1;count++)
-		{
-			html += '<li onClick="javascript:desktop.app.launch('+office_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+office_name[count]+'</li>';
-		}
-		html += '</ul>';
-		html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/applications-internet.png" />&nbsp;Internet<ul>';
-		for(count=0;count<=internet_id.length-1;count++)
-		{
-			html += '<li onClick="javascript:desktop.app.launch('+internet_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+internet_name[count]+'</li>';
-		}
-		html += '</ul>';
-		html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/preferences-system.png" />&nbsp;System<ul>';
-		for(count=0;count<=system_id.length-1;count++)
-		{
-			html += '<li onClick="javascript:desktop.app.launch('+system_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+system_name[count]+'</li>';
-		}
-		html += '</ul>';
-		html += '<li onClick="javascript:desktop.core.logout();" style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./images/icons/system-log-out.png" />&nbsp;Logout</li>';
-		html += '</ul>';
-		
-		document.getElementById("menu").innerHTML = html;
-		desktop.core.loadingIndicator(1);
-		}
+		/** 
+		* Draws the menu
+		*
+		* @memberOf desktop.menu
+		* @alias desktop.menu.draw
+		*/
 		this.draw = function()
 		{
 			html  = "<table><tr><td class='menutop'></td></tr><tr><td class='menubody'>";
