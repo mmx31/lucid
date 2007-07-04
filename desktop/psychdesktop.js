@@ -41,6 +41,7 @@ var PsychDesktop = {
  PsychDesktop.require('taskbar.js');
  PsychDesktop.require('tasktray.js');
  PsychDesktop.require('theme.js');
+ //PsychDesktop.require('thread.js'); //threading only works in firefox 2 at the moment so this may come back in a later release...
  PsychDesktop.require('wallpaper.js');
  PsychDesktop.require('widget.js');
  PsychDesktop.require('windows.js');
