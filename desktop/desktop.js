@@ -84,7 +84,8 @@ desktop.core = new function()
 			  desktop.core.logout();
 			  //log out quickly
 			}
-			document.onkeydown = desktop.console.toggle;
+			//document.onkeydown = desktop.console.toggle;
+			dojo.event.connect(document, "onkeydown", desktop.console.toggle);
 			window.onerror = function(e)
 			{
 				api.console(e);

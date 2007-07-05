@@ -1,3 +1,10 @@
+try{
+	threadtest = new function()
+	{
+	  for (let i=0; i < 2; ++i) {
+	    yield i;
+	  }
+	}
 /* Thread.js
  * A library for threading using JavaScript 1.7 generators and trampolining.
  * Author: Neil Mix, neilmix [at] gmail [dot] com, http://www.neilmix.com/
@@ -175,4 +182,11 @@ desktop.thread.prototype = {
 			this.waitingThreads[i]._run(this._value, this._state == "throw");
 		}
 	}
+}
+setTimeout('api.console("threading support enabled.");', 500);
+}
+catch(e)
+{
+	//nope, no threading support. oh well...
+	setTimeout('api.console("threading support disabled due to browser limitations.");', 500);
 }

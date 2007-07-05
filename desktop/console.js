@@ -199,7 +199,7 @@ desktop.console = new function()
 		return this.path;
 	}
 	/** 
-	* Activated on a keystroke. Used to grab console toggling key.
+	* Activated on a keystroke. Used for console history.
 	* 
 	* @alias desktop.console.key
 	* @type {Function}

@@ -25,9 +25,14 @@
 var desktop = new Object();
 
 var PsychDesktop = {
-  require: function(libraryName) {
+  require: function(libraryName, version) {
     // inserting via DOM fails in Safari 2.0, so brute force approach
-    document.write('<script type="text/javascript" src="'+libraryName+'"></script>');
+	if(version == "1.7") document.write('<script type="application/javascript;version=1.7" src="'+libraryName+'"></script>');
+	else document.write('<script type="text/javascript" src="'+libraryName+'"></script>');
+  },
+  link: function(file, id)
+  {
+  	document.write('<link id="'+id+'" rel="stylesheet" href="'+file+'" type="text/css" media="screen" />');
   },
   load: function() {
  PsychDesktop.require('api.js');
@@ -37,16 +42,15 @@ var PsychDesktop = {
  PsychDesktop.require('menu.js');
  PsychDesktop.require('rightclick.js');
  PsychDesktop.require('screensaver.js');
- PsychDesktop.require('shortcuts.js');
  PsychDesktop.require('taskbar.js');
- PsychDesktop.require('tasktray.js');
- PsychDesktop.require('theme.js');
- //PsychDesktop.require('thread.js'); //threading only works in firefox 2 at the moment so this may come back in a later release...
+ PsychDesktop.require('thread.js', "1.7");
  PsychDesktop.require('wallpaper.js');
  PsychDesktop.require('widget.js');
  PsychDesktop.require('windows.js');
  PsychDesktop.require('desktop.js');
-  }
+ PsychDesktop.link("./themes/default/theme.css", "desktop_theme");
+ PsychDesktop.link("./themes/default/window.css", "window_theme");
+ PsychDesktop.link("desktop.css", "corestyle");
 }
-
+}
 PsychDesktop.load();

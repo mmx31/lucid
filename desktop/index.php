@@ -32,11 +32,8 @@ if($_SESSION['userloggedin'] == true)
 <html>
 <title>Psych Desktop</title>
 <head>
-<link rel="stylesheet" href="desktop.css" type="text/css" media="screen" />
 <script type="text/javascript" src="./dojo/dojo.js"></script>
 <script type="text/javascript" language="javascript" src="psychdesktop.js"></script>
-<link id="desktop_theme" rel="stylesheet" href="./themes/default/theme.css" type="text/css" media="screen" />
-<link id="window_theme" rel="stylesheet" href="./themes/default/window.css" type="text/css" media="screen" />
 </head>
 <body>
 </body>
@@ -45,7 +42,7 @@ if($_SESSION['userloggedin'] == true)
 }
 else
 {
-	echo "<script type='text/javascript'>window.close();</script>";
+	echo "<script type='text/javascript'>window.close(); window.history(-1);</script>";
 	echo "not logged in";
 }
 ?>

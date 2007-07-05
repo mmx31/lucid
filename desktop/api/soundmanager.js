@@ -2,7 +2,6 @@
  * thanks to Scott Schiller, who was the original author of the sound manager we modified for this API
  * http://www.schillmania.com/projects/soundmanager2/
  */
-document.write("<script type='text/javascript' src='./soundmanager/soundmanager2-jsmin.js'></script>");
 
 /**
 * An API acting as a class of wrapper functions to make soundmanager 2 more like a Psych Desktop API
@@ -332,6 +331,7 @@ api.soundmanager = new function(smURL,smID)
         // may fail under app/xhtml+xml - has yet to be tested
         throw new Error(appXHTML);
       }
+	  /*
       if (!document.getElementById(self.debugID) && ((!self._hasConsole||!self.useConsole)||(self.useConsole && self._hasConsole && !self.consoleOnly))) {
         var oDebug = document.createElement('div');
         oDebug.id = self.debugID;
@@ -346,7 +346,9 @@ api.soundmanager = new function(smURL,smID)
           }
         }
         oTarget.appendChild(oDebug);
+       
       }
+      */
       oTarget = null;
     }
     self._writeDebug('-- SoundManager 2 Version '+self.version.substr(1)+' --',1);
@@ -444,7 +446,7 @@ api.soundmanager = new function(smURL,smID)
       self.onerror.apply(window);
       return false;
     }
-    self._writeDebug('soundManager.initComplete(): calling soundManager.onload()',1);
+    //self._writeDebug('soundManager.initComplete(): calling soundManager.onload()',1);
     try {
       // call user-defined "onload", scoped to window
       self.onload.apply(window);
