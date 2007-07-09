@@ -17,7 +17,6 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-	require("quickbackend.php");
 session_start();
 if (isset($_GET['crosstalk'])) {
  $userid = $_SESSION['userid'];
@@ -56,62 +55,17 @@ if (isset($_GET['crosstalk'])) {
     echo("OK.");
 }
 }
-//Database -------------------------------------------
 if (isset($_GET['action'])) {
-    if ($_GET['action'] == "getDatabase")
+    if (($_GET['action'] == "getDatabase") || ($_GET['action'] == "saveDatabase"))
     {
-		$link = qback::mysqlLink();
-        $result = qback::query("SELECT * FROM `#__database` WHERE appid='${_GET['appid']}' AND userid='${_SESSION['userid']}' AND tablename='${_GET['tablename']}' LIMIT 1");
-		if($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
-			echo $row['data'];
-		}
-		qback::close($link, $result);
+		require("./api/database.php");
     }
-    if ($_GET['action'] == "saveDatabase")
-    {
-		$link = qback::mysqlLink();
-		qback::query("REPLACE INTO `#__database` (`userid`, `appid`, `public`, `tablename`, `data`) VALUES('${_GET['userid']}', '${_GET['appid']}', '${_GET['pub']}', '${_GET['name']}', '${_GET['data']}')");
-		qback::close($link);
-    }
-// get password will NEVER be implamented
- if ($_GET['action'] == "getStatus") {
-if(isset($_SESSION['userid'])) {
-echo("OK");
+
+ if (($_GET['action'] == "getStatus") || ($_GET['action'] == "getUserLevel") || ($_GET['action'] == "getUserName") || ($_GET['action'] == "getUserNameFromID") || ($_GET['action'] == "getUserIDFromName") || ($_GET['action'] == "getUserID"))
+ {
+ 	require("./api/misc.php");
+ }
 }
-else {
-echo("FAIL");
-}
-}
- if ($_GET['action'] == "getUserName") {
- echo $_SESSION['username'];
- }
- if ($_GET['action'] == "getUserNameFromID") {
- $userid = $_GET["userid"]; 
-	$query = "SELECT * FROM ${db_prefix}users WHERE ID=\"${userid}\"";
-	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
-	mysql_select_db($db_name) or die('Could not select database');
-	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
-		echo($_row["username"]);
-		}
- }
- if ($_GET['action'] == "getUserIDFromName") {
- $username = $_GET["username"]; 
-	$query = "SELECT * FROM ${db_prefix}users WHERE username=\"${username}\"";
-	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
-	mysql_select_db($db_name) or die('Could not select database');
-	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
-		echo($_row["ID"]);
-		}
- }
- if ($_GET['action'] == "getUserID") {
- echo $_SESSION['userid'];
- }
-  if ($_GET['action'] == "getUserLevel") {
-  echo $_SESSION['userlevel'];
-  }
-  }
 if (isset($_GET['fs'])) {
 	if ($_GET['fs'] == "createDirectory") {
 				$odir = $_REQUEST['path'];
