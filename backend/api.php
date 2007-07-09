@@ -17,6 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
+	require("quickbackend.php");
 session_start();
 if (isset($_GET['crosstalk'])) {
  $userid = $_SESSION['userid'];
@@ -28,7 +29,7 @@ if (isset($_GET['crosstalk'])) {
 	$query = "SELECT * FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND appID=\"${appID}\"";
 	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
 	mysql_select_db($db_name) or die('Could not select database');
-	$output = "<?xml version='1.0' encoding='utf-8' ?>" . "\r\n" . "<crosstalkEvents>";
+	$output = "<" . "?xml version='1.0' encoding='utf-8' ?" . ">\r\n" . "<crosstalkEvents>";
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$appid = $row["appID"];
@@ -55,31 +56,22 @@ if (isset($_GET['crosstalk'])) {
     echo("OK.");
 }
 }
+//Database -------------------------------------------
 if (isset($_GET['action'])) {
     if ($_GET['action'] == "getDatabase")
     {
-		require("config.php");
-        $query = "SELECT * FROM `${db_prefix}database` WHERE appid='${_GET['appid']}' AND userid='${_SESSION['userid']}' AND tablename='${_GET['tablename']}' LIMIT 1";
-	    $link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
-	    mysql_select_db($db_name) or die('Could not select database');
-	    $result = mysql_query($query) or die('Query failed: ' . mysql_error());
-		while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
-			echo $row['columns'] . "-|-" . $row['values'];
+		$link = qback::mysqlLink();
+        $result = qback::query("SELECT * FROM `#__database` WHERE appid='${_GET['appid']}' AND userid='${_SESSION['userid']}' AND tablename='${_GET['tablename']}' LIMIT 1");
+		if($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			echo $row['data'];
 		}
+		qback::close($link, $result);
     }
     if ($_GET['action'] == "saveDatabase")
     {
-		require("config.php");
-        $columns = $_POST['columns'];
-        $table = $_POST['table'];
-        $name = $_POST['name'];
-        $appid = $_POST['appid'];
-        $public = $_POST['pub'];
-		$userid = $_SESSION['userid'];
-		$query = "REPLACE INTO `${db_prefix}database` (`userid`, `appid`, `public`, `tablename`, `columns`, `values`) VALUES('${userid}', '${appid}', '${public}', '${name}', '${columns}', '${table}')";
-	    $link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
-	    mysql_select_db($db_name) or die('Could not select database');
-	    mysql_query($query) or die('Query failed: ' . mysql_error());
+		$link = qback::mysqlLink();
+		qback::query("REPLACE INTO `#__database` (`userid`, `appid`, `public`, `tablename`, `data`) VALUES('${_GET['userid']}', '${_GET['appid']}', '${_GET['pub']}', '${_GET['name']}', '${_GET['data']}')");
+		qback::close($link);
     }
 // get password will NEVER be implamented
  if ($_GET['action'] == "getStatus") {
@@ -142,7 +134,7 @@ if (isset($_GET['fs'])) {
 				if(!$dir){
 							die();
 				} else {
-					$output = '<?xml version=\'1.0\' encoding=\'utf-8\' ?>' . "\r\n" . '<getFolderResponse path="' . $_REQUEST['path'] . '">';
+					$output = "<" . "?xml version='1.0' encoding='utf-8' ?" . ">" . "\r\n" . "<getFolderResponse path=\"" . $_REQUEST['path'] . "\">";
 					while(($file = readdir($dir)) !== false){
 						if($file == '..' || $file == '.'){
 							continue;
@@ -165,7 +157,7 @@ if (isset($_GET['fs'])) {
 				$odir = $_REQUEST['path'];
 			    	$dir = "../files/".$_SESSION['userid']."/$odir";
 				$file = file_get_contents($dir);
-				$output = '<?xml version=\'1.0\' encoding=\'utf-8\' ?>' . "\r\n" . '<getFileResponse path="' . $_REQUEST['path'] . '">';
+				$output = "<" . "?xml version='1.0' encoding='utf-8' ?" .">\r\n" . "<getFileResponse path=\"" . $_REQUEST['path'] . "\">";
 				$output .=  "\r\n" . '<file>' . $file . '</file>';
 				$output .= '</getFileResponse>';
 				header('Content-type: text/xml');

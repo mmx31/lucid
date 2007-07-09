@@ -61,8 +61,8 @@ api.db = new function()
             method: "GET",
 			load: dojo.lang.hitch(this, function(type, data, evt)
 			{
-				data = data.split("-|-");
-				callback(this.parseTable(data[1], data[0]));
+				data = data.parseJSON();
+				callback(data);
 			}),
             mimetype:'text/html'
         });
@@ -76,39 +76,16 @@ api.db = new function()
 	* @memberOf api.db
 	*/
     this.saveTable = function(options)
-    {
-		appid=options.appid;
-		pub=options.pub;
-		name=options.name;
-		columns=options.columns;
-		table=options.table;
-		
-		rawtable = "";
-        for(field in table)
-        {
-            field.replace(/|||/," ");
-            field.replace(/-|-/," ");
-            rawtable += field+"|||";
-        }
-        rawtable=rawtable.substring(0, rawtable.length-3);
-        rawcols = "";
-        for(title in columns)
-        {
-            title.replace(/|||/," ");
-            title.replace(/-|-/," ");
-            rawcols += title+"|||";
-        }
-        rawcols=rawcols.substring(0, rawcols.length-3);
-
+    {		
         dojo.io.bind({
             url: "../backend/api.php?action=saveDatabase",
             method: "post",
             content: {
-                columns: rawcols,
-                table: rawtable,
-                pub: pub,
-                name: name,
-                appid: appid
+                data: options.table.toJSONString(),
+				userid: options.userid,
+                pub: options.pub,
+                name: options.name,
+                appid: options.appid
             },
             mimetype:'text/html'
         });            

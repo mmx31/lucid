@@ -43,6 +43,7 @@ api.require("misc"); // should be at the start, has console stuff, for startup n
 api.require("database");
 api.require("fs");
 api.require("ide");
+api.require("json");
 api.require("registry");
 api.require("soundmanager");
 api.require("tray");

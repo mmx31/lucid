@@ -71,8 +71,7 @@ CREATE TABLE `#__database` (
   `appid` int(20) NOT NULL,
   `public` int(1) NOT NULL,
   `tablename` mediumtext NOT NULL,
-  `columns` mediumtext NOT NULL,
-  `values` mediumtext NOT NULL
+  `data` mediumtext NOT NULL
 ) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1 ;
 
 
