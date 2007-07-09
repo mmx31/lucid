@@ -50,7 +50,14 @@ desktop.console = new function()
 	    {
 	    	x = e.keyCode;
 	    }
-		if(x == "192")
+		//alert(x);
+		//alert(window.navigator.appName);
+		if(window.navigator.appName == "Opera")
+		{
+			code="96";
+		}
+		else code="192";
+		if(x == code)
 		{
 			dojo.byId("consolepath").innerHTML = desktop.console.path;
 			if(dojo.byId("console").style.display == "block")

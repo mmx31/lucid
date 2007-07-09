@@ -1,11 +1,5 @@
 try{
-	threadtest = new function()
-	{
-	  for (let i=0; i < 2; ++i) {
-	    yield i;
-	  }
-	}
-/* Thread.js
+/* thread.js
  * A library for threading using JavaScript 1.7 generators and trampolining.
  * Author: Neil Mix, neilmix [at] gmail [dot] com, http://www.neilmix.com/
  *

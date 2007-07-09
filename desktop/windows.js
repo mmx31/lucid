@@ -56,6 +56,7 @@ desktop.windows = new function()
 			document.getElementById("windowcontainer").style.height= y;
 		}
 	}
+	
 	/** 
 	* Draws the elements needed for the window manager
 	* 

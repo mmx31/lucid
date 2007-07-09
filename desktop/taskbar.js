@@ -90,6 +90,32 @@ desktop.taskbar = new function()
 			api.registry.saveValue(-1,"taskbarVisibility",this.visibility);
 		}
 		/** 
+		* Adds a taskbar item to the taskbar
+		* TODO: add a context menu that can close the window, minimize it, etc.
+		* 
+		* @alias desktop.taskbar.addChild
+		* @type {Function}
+		* @param {object} Options	The properties of the item
+		* @memberOf desktop.taskbar
+		*/
+		this.addChild = function(options)
+		{
+			//options.label
+			//options.icon
+			//options.winid
+			div=document.createElement("div");
+			div.onClick = function()
+			{
+				//minimize and restore windows
+			}
+			div.id="task_"+options.winid;
+			//div.class="taskBarItem";
+			div.setAttribute("class", "taskBarItem");
+			if(options.icon) div.innerHTML = "<img src='"+options.icon+"' />"
+			div.innerHTML += options.label;
+			dojo.byId("appbar").appendChild(div)
+		}
+		/** 
 		* draws the taskbar
 		* 
 		* @alias desktop.taskbar.draw

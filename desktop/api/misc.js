@@ -9,11 +9,10 @@ api.console = function(text)
 {
 	dojo.byId("consoleoutput").innerHTML += text+"<br />\n";
 	dojo.byId('console').scrollTop = dojo.byId('console').scrollHeight;
-	if (window.console || console.firebug)
+	if (console.log)
 	{
-		console["log"](text);
+		console.log(text);
 	}
-	else console["log"](text);
 }
 /**
 * Changes the console's path.
