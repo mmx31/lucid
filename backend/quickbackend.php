@@ -8,7 +8,7 @@
  */
 $CONFIG_FILE = "configuration.php";
 /**
- * The Quck Backend class
+ * The Quick Backend class
  * @classDescription contains functions that make ajax backend creation easier
  */
 class qback
@@ -25,7 +25,7 @@ class qback
 		mysql_close($link);	
 	}
 	/** 
-	 * Hashes a string such as a password
+	 * Executes a mysql query. Replaces '#__' with the table prefix
  	 * @alias qback::query
 	 * @param {String} $query	The query to execute
 	 * @return {Mixed}	The mysql result
