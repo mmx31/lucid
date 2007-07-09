@@ -42,7 +42,9 @@ api.crosstalk = new function()
 		api.crosstalk.session[api.crosstalk.assignid].appid = desktop.app.instances[instance].id;
                 api.crosstalk.session[api.crosstalk.assignid].callback = callback;
                 api.crosstalk.session[api.crosstalk.assignid].instance = instance;
+		id = api.crosstalk.assignid;
 		api.crosstalk.assignid = api.crosstalk.assignid + 1;
+		return id;
 		}
 	/** 
 	* the crosstalk api checker, called every 20 or so seconds, internally. then will handle it from the registered crap...
@@ -50,7 +52,7 @@ api.crosstalk = new function()
 	* @alias api.crosstalk.internalCheck
 	* @memberOf api.crosstalk
 	*/
-	this.internalCheck = function()
+	this._internalCheck = function()
 		{
 		if (api.crosstalk.session.length == 0) {
 		api.console("Crosstalk API: No events to process...");
@@ -74,7 +76,7 @@ api.crosstalk = new function()
 	* @alias api.crosstalk.internalCheck2
 	* @memberOf api.crosstalk
 	*/
-	this.internalCheck2 = function(type, data, http, callback)
+	this._internalCheck2 = function(type, data, http, callback)
 		{	// JayM: I tried to optimize the thing as much as possible, add more optimization if needed. 
 		var results = data.getElementsByTagName('event');
 		var handled = false;
