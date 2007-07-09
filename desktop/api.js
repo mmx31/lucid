@@ -39,15 +39,14 @@ api.require = function(api)
 {
 	document.write("<script type='text/javascript' src='./api/"+api+".js'></script>");
 }
-api.require("crosstalk");
+api.require("misc"); // should be at the start, has console stuff, for startup notices in the apis
 api.require("database");
 api.require("fs");
 api.require("ide");
-api.require("misc");
 api.require("registry");
 api.require("soundmanager");
 api.require("tray");
 api.require("ui");
 api.require("user");
 api.require("window");
-	
+api.require("crosstalk");	
