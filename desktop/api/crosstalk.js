@@ -17,17 +17,16 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-/**
-* An API enabling communication of apps on a global level, regardless of user
+/** 
+* An API that allows an app to communicate with other applications on a system-wide level.
 * 
-* @classDescription	An API enabling communication of apps on a global level, regardless of user
+* @classDescription An API that allows an app to communicate with other applications on a system-wide level.
 * @memberOf api
-* @deprecated the crosstalk API has to be redone. Look at the wiki for some more info.
 */
 api.crosstalk = new function()
 {
-	this.session = new Array();
-	this.assignid = 0;
+	this.session = new Array();	// handler storage
+	this.assignid = 0;		// ids for storage
 	/** 
 	* register an event handler
 	* 
@@ -48,9 +47,7 @@ api.crosstalk = new function()
 	/** 
 	* the crosstalk api checker, called every 20 or so seconds, internally. then will handle it from the registered crap...
 	* 
-	* @alias api.crosstalk.registerHandler
-	* @param {Integer} instance	The current instance ID
-	* @param {Function} callback	A callback to pass the data to
+	* @alias api.crosstalk.internalCheck
 	* @memberOf api.crosstalk
 	*/
 	this.internalCheck = function()
@@ -59,9 +56,44 @@ api.crosstalk = new function()
 		api.console("Crosstalk API: No events to process...");
 			}
 		else {
-		// blahahahahaah
+		api.console("Crosstalk API: Checking for events...");
+		var url = "../backend/api.php?crosstalk=checkForEvents";
+        	dojo.io.bind({
+        	url: url,
+        	load: function(type, data, http) { api.crosstalk.internalCheck2(type, data, http); },
+        	error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
+        	mimetype: "text/xml"
+        	});
 		}
 		api.crosstalk.start();
+		}
+
+	/** 
+	* the crosstalk api checker, stage2, compare the results with the handled handlers ;)
+	* 
+	* @alias api.crosstalk.internalCheck2
+	* @memberOf api.crosstalk
+	*/
+	this.internalCheck2 = function(type, data, http, callback)
+		{	// JayM: I tried to optimize the thing as much as possible, add more optimization if needed. 
+		var results = data.getElementsByTagName('event');
+		var handled = false;
+		for(var i = 0; i<results.length; i++){
+
+		for(var x = 0; x<api.crosstalk.session.length; x++){
+
+		if(results[i].getAttribute("appid") == api.crosstalk.session[x].appid) {
+		api.crosstalk.session[x].callback(results[i].firstChild.nodeValue);
+		handled = true;
+		}
+
+		}
+		if(handled != true) {
+		api.console("Crosstalk API: Unhandled data, appid: "+results[i].getAttribute("appid")+" instance: "+results[i].getAttribute("instance")+" message: "+results[i].firstChild.nodeValue);
+		}
+
+		}
+
 		}
 	/** 
 	* the crosstalk timer starter
