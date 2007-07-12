@@ -92,5 +92,6 @@ CREATE TABLE `#__crosstalk` (
   `userid` int(11) NOT NULL,
   `message` mediumtext NOT NULL,
   `sender` mediumtext NOT NULL,
-  `appID` int(11) NOT NULL
+  `appID` int(11) NOT NULL,
+  `instance` int(11) NOT NULL
 ) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1 ;
