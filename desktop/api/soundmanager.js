@@ -61,7 +61,7 @@ api.soundmanager = new function(smURL,smID)
   this.version = 'V2.0b.20070415';
   this.url = "api/soundmanager/soundmanager2.swf";
   this.idCounter = 0;
-  this.debugMode = true;           // enable debugging output (div#soundmanager-debug, OR console if available + configured)
+  this.debugMode = desktop.config.debug;           // enable debugging output (div#soundmanager-debug, OR console if available + configured)
   this.useConsole = true;          // use firebug/safari console.log()-type debug console if available
   this.consoleOnly = true;        // if console is being used, do not create/write to #soundmanager-debug
   this.nullURL = 'api/soundmanager/null.mp3';  // path to "null" (empty) MP3 file, used to unload sounds
@@ -97,7 +97,7 @@ api.soundmanager = new function(smURL,smID)
   this.isIE = (navigator.userAgent.match(/MSIE/));
   this.isSafari = (navigator.userAgent.match(/safari/i));
   this.debugID = 'soundmanager-debug';
-  this._debugOpen = true;
+  this._debugOpen = false;
   this._didAppend = false;
   this._appendSuccess = false;
   this._didInit = false;
@@ -356,9 +356,9 @@ api.soundmanager = new function(smURL,smID)
   }
 
   this._writeDebug = function(sText,sType) {
-    if (!self.debugMode) return false;
+    /*if (!self.debugMode) return false;
     if (self._hasConsole && self.useConsole) {
-      /*console[self._debugLevels[sType]||'log'](sText); // firebug et al*/
+      console[self._debugLevels[sType]||'log'](sText); // firebug et al
 	 api.console(sText);
       if (self.useConsoleOnly) return true;
     }
@@ -373,7 +373,8 @@ api.soundmanager = new function(smURL,smID)
     } catch(e) {
       // oh well
     }
-    o = null;
+    o = null;*/
+	api.console(sText);
   }
   this._writeDebug._protected = true;
 
@@ -385,7 +386,7 @@ api.soundmanager = new function(smURL,smID)
   }
 
   this._toggleDebug = function() {
-    var o = document.getElementById(self.debugID);
+    /*var o = document.getElementById(self.debugID);
     var oT = document.getElementById(self.debugID+'-toggle');
     if (!o) return false;
     if (self._debugOpen) {
@@ -396,7 +397,7 @@ api.soundmanager = new function(smURL,smID)
       oT.innerHTML = '-';
       o.style.display = 'block';
     }
-    self._debugOpen = !self._debugOpen;
+    self._debugOpen = !self._debugOpen;*/
   }
 
   this._toggleDebug._protected = true;
@@ -754,14 +755,4 @@ function SMSound(oSM,oOptions) {
 
 }
 
-if (window.addEventListener) {
-  window.addEventListener('load',api.soundmanager.beginDelayedInit,false);
-  window.addEventListener('beforeunload',api.soundmanager.destruct,false);
-} else if (window.attachEvent) {
-  window.attachEvent('onload',api.soundmanager.beginInit);
-  window.attachEvent('beforeunload',api.soundmanager.destruct);
-} else {
-  // no add/attachevent support - safe to assume no JS->Flash either.
-  api.soundmanager.onerror();
-  api.soundmanager.disable();
-}
+dojo.subscribe("desktopload", null, api.soundmanager.beginInit);

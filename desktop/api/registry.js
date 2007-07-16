@@ -19,14 +19,13 @@ api.registry = new function()
     this.getValue = function(appid,varname,callback)
     {
         desktop.core.loadingIndicator(0);
-        var url = "../backend/api.php?registry=load&appid="+appid+"&varname="+varname;
-        dojo.io.bind({
-        url: url,
-        load: function(type, data, evt) {
+        dojo.xhrGet({
+        url: "../backend/api/registry.php?registry=load&appid="+appid+"&varname="+varname,
+        load: function(data, ioArgs) {
 			if(callback) { callback(data); }
      		desktop.core.loadingIndicator(1);
 		},
-        error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); },
+        error: function(error, ioArgs) { api.console("Error in AJAX call: "+error.message); },
 		mimetype: "text/plain"
         });
     }
@@ -43,10 +42,10 @@ api.registry = new function()
     this.saveValue = function(appid,varname,value)
     {
         desktop.core.loadingIndicator(0);
-        var url = "../backend/api.php?registry=save&appid="+appid+"&varname="+varname+"&value="+value;
-        dojo.io.bind({
-            url: url,
-            error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); },
+        dojo.xhrPost({
+            url: "../backend/api/registry.php?registry=save&appid="+appid+"&varname="+varname,
+            content: {value: value},
+			error: function(error, ioArgs) { api.console("Error in AJAX call: "+error.message); },
             mimetype: "text/plain"
         });
         desktop.core.loadingIndicator(1);
@@ -63,10 +62,9 @@ api.registry = new function()
 	this.removeValue = function(appid,varname)
     {
         desktop.core.loadingIndicator(0);
-        var url = "../backend/api.php?registry=remove&appid="+appid+"&varname="+varname;
-        dojo.io.bind({
-            url: url,
-            error: function(type, error) { api.toaster("Error in AJAX call: "+error.message); },
+        dojo.xhrGet({
+            url: "../backend/api/registry.php?registry=remove&appid="+appid+"&varname="+varname,
+            error: function(error, ioArgs) { api.toaster("Error in AJAX call: "+error.message); },
             mimetype: "text/plain"
         });
         desktop.core.loadingIndicator(1);

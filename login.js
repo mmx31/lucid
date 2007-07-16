@@ -91,7 +91,7 @@ psychdesktop_detect=false;
 }
 }
 function psychdesktop_cannotconnect(){
-login="<br /><br /><span style='font-size: 20px; color: red; align: center;'><center>Cannot connect to server.</center></span><br /><br />";
+login="<br /><br /><span style='font-size: 20px; color: red; text-align: center;'><center>Cannot connect to server.</center></span><br /><br />";
 try{
 document.getElementById("psychdesktop_login").innerHTML=login;
 }
@@ -273,7 +273,7 @@ login+="<tr><td style='font-size: 14px; font-weight: bold;'>Email:</td><td><inpu
 login+="<tr><td style='font-size: 14px; font-weight: bold;'>Password:</td><td><input type='password' id='psychdesktop_register_password' /></td></tr>\n";
 login+="<tr><td style='font-size: 14px; font-weight: bold;'>Confirm Password:</td><td><input type='password' id='psychdesktop_register_password2' /></td></tr>\n";
 login+="<tr><td colspan='2' style='text-align: center; color: red; font-size: 14px; font-weight: bold;' id='psychdesktop_errorbox'></td></tr>";
-login+="<tr><td colspan='2'><span style='float: right'><span id='psychdesktop_loading' style='display: none;'><img src='"+psychdesktop_path+"/images/UI/loading.gif' alt='' /></span><input type='button' value='Cancel' onClick='psychdesktop_home();' /><input type='button' value='Submit' onClick='psychdestkop_error(\"\"); psychdesktop_doregister();' /></span></td></tr>";
+login+="<tr><td colspan='2'><span style='float: right'><span id='psychdesktop_loading' style='display: none;'><img src='"+psychdesktop_path+"desktop/themes/default/images/icons/loading.gif' alt='' /></span><input type='button' value='Cancel' onClick='psychdesktop_home();' /><input type='button' value='Submit' onClick='psychdestkop_error(\"\"); psychdesktop_doregister();' /></span></td></tr>";
 login+="</table>";
 try{
 document.getElementById("psychdesktop_login").innerHTML=login;
@@ -298,7 +298,7 @@ function psychdesktop_home(){
 login="<table style='width: auto; height: auto; border: 0px;'><tr><td colspan='2' style='text-align: center; font-weight: bold;'>Sign in to desktop</td></tr>\n";
 login+="<tr><td style='font-size: 14px; font-weight: bold;'>Username:</td><td><input type='text' id='psychdesktop_username' /></td></tr>\n";
 login+="<tr><td style='font-size: 14px; font-weight: bold;'>Password:</td><td><input type='password' id='psychdesktop_password' /></td></tr>\n";
-login+="<tr><td colspan='2' style='font-size: 14px; font-weight: bold;'><span style='float: right'><span id='psychdesktop_loading' style='display: none;'><img src='"+psychdesktop_path+"/images/UI/loading.gif' alt='' /></span><input type='button' value='Login' onClick='psychdestkop_error(\"\"); psychdesktop_login(0);' /></span>";
+login+="<tr><td colspan='2' style='font-size: 14px; font-weight: bold;'><span style='float: right'><span id='psychdesktop_loading' style='display: none;'><img src='"+psychdesktop_path+"/desktop/themes/default/images/icons/loading.gif' alt='' /></span><input type='button' value='Login' onClick='psychdestkop_error(\"\"); psychdesktop_login(0);' /></span>";
 login+="<b>Remember me:</b><input type='checkbox' id='psychdesktop_remember' /></td></tr>";
 login+="<tr><td colspan='2' style='text-align: center; color: red; font-size: 14px; font-weight: bold;' id='psychdesktop_errorbox'></td></tr>";
 login+="<tr><td colspan='2' style='font-size: 14px; text-align: center;'><a href='javascript:psychdesktop_forgotpass();'>Forgot Password?</a></td></tr>";
@@ -317,7 +317,7 @@ function psychdesktop_forgotpass(){
 login="<table style='width: auto; height: auto; border: 0px;'><tr><td colspan='2' style='text-align: center; font-weight: bold;'>Reset your password</td></tr>\n";
 login+="<tr><td style='font-size: 14px; font-weight: bold;'>Username:</td><td><input type='text' id='psychdesktop_resetpass_username' /></td></tr>\n";
 login+="<tr><td style='font-size: 14px; font-weight: bold;'>Email:</td><td><input type='text' id='psychdesktop_resetpass_email' /></td></tr>\n";
-login+="<tr><td colspan='2'><span style='float: right'><span id='psychdesktop_loading' style='display: none;'><img src='"+psychdesktop_path+"/images/UI/loading.gif' alt='' /></span><input type='button' value='Cancel' onClick='psychdesktop_home();' /><input type='button' value='Submit' onClick='psychdestkop_error(\"\"); psychdesktop_resetpass();' /></span></td></tr>";
+login+="<tr><td colspan='2'><span style='float: right'><span id='psychdesktop_loading' style='display: none;'><img src='"+psychdesktop_path+"/desktop/themes/default/images/icons/loading.gif' alt='' /></span><input type='button' value='Cancel' onClick='psychdesktop_home();' /><input type='button' value='Submit' onClick='psychdestkop_error(\"\"); psychdesktop_resetpass();' /></span></td></tr>";
 login+="<tr><td colspan='2' style='text-align: center; color: red; font-size: 14px; font-weight: bold;' id='psychdesktop_errorbox'></td></tr>";
 login+="</table>";
 try{

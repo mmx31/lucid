@@ -60,9 +60,9 @@ api.crosstalk = new function()
 		else {
 		api.console("Crosstalk API: Checking for events...");
 		var url = "../backend/api.php?crosstalk=checkForEvents";
-        	dojo.io.bind({
+        	dojo.xhrGet({
         	url: url,
-        	load: function(type, data, http) { api.crosstalk.internalCheck2(type, data, http); },
+        	load: function(data, ioArgs) { api.crosstalk.internalCheck2(type, data, http); },
         	error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
         	mimetype: "text/xml"
         	});
@@ -105,7 +105,7 @@ api.crosstalk = new function()
 	*/
 	this.start = function()
 		{
-		api.crosstalk.timer = setTimeout("api.crosstalk.internalCheck();",20000);
+		api.crosstalk.timer = setTimeout("api.crosstalk._internalCheck();",20000);
 		}
 	/** 
 	* the crosstalk timer stopper

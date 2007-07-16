@@ -1,3 +1,5 @@
+api.consoleBuffer = new Array();
+api.misc = new Object();
 /**
 * Writes stuff to the Psych Desktop console, and to firebug/the browser's console
 * 
@@ -7,11 +9,25 @@
 */
 api.console = function(text)
 {
-	dojo.byId("consoleoutput").innerHTML += text+"<br />\n";
-	dojo.byId('console').scrollTop = dojo.byId('console').scrollHeight;
-	if (console.log)
+	if(desktop.isLoaded == true)
 	{
-		console.log(text);
+		dojo.byId("consoleoutput").innerHTML += text+"<br />\n";
+		dojo.byId('console').scrollTop = dojo.byId('console').scrollHeight;
+		if (console.log)
+		{
+			console.log(text);
+		}
+	}
+	else
+	{
+		api.consoleBuffer[api.consoleBuffer.length] = text;
+		if(!this._subscribe)
+		{
+			this._subscribe = dojo.subscribe("desktopload", this, function() {
+				for(message in api.consoleBuffer) api.console(message);
+				dojo.unsubscribe(this._subscribe);
+			});
+		}
 	}
 }
 /**
@@ -52,6 +68,7 @@ api.misc = new function()
 * @param {String} message	the text the popup should have
 * @memberOf api
 * @constructor	
+* @deprecated unfortunatly, dojo toaster widget does not work, so we're still figuring out what to do here.
 */
 api.toaster = function(message)
 {

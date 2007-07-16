@@ -3,9 +3,10 @@
 * TODO: tie this in more with the dojo.data stuff
 * 
 * @classDescription An API that allows storage in a table format.
+* @alias api.db
 * @memberOf api
 */
-api.db = new function()
+api.database = new function()
 {
 	/** 
 	* Parases the result from a table.
@@ -56,10 +57,10 @@ api.db = new function()
 		appid=options.appid;
 		name=options.name;
 		callback=options.callback;
-		dojo.io.bind({
+		dojo.xhrGet({
             url: "../backend/api.php?action=getDatabase?appid="+appid+"&tablename="+name,
             method: "GET",
-			load: dojo.lang.hitch(this, function(type, data, evt)
+			load: dojo.lang.hitch(this, function(data, ioArgs)
 			{
 				data = data.parseJSON();
 				callback(data);
@@ -77,7 +78,7 @@ api.db = new function()
 	*/
     this.saveTable = function(options)
     {		
-        dojo.io.bind({
+        dojo.xhrGet({
             url: "../backend/api.php?action=saveDatabase",
             method: "post",
             content: {
@@ -91,3 +92,4 @@ api.db = new function()
         });            
     }
 }
+api.db = api.database;

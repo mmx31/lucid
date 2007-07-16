@@ -1,140 +1,92 @@
-
-/********** Outer Window ***************/
-
-.dojoFloatingPane {
-	/* essential css */
-	position: absolute;
-	overflow: visible;		/* so drop shadow is displayed */
-	z-index: 10;
-
-	/* styling css */
-	border: 0px solid;
-	border-color: ThreeDHighlight ThreeDShadow ThreeDShadow ThreeDHighlight;
-	background-color: ThreeDFace;
-}
-
-
-/********** Title Bar ****************/
-
-.dojoFloatingPaneTitleBar {
-	/*margin: 2px 2px 2px 2px;*/
+.win {
+	border: 0px;
+	padding: 0px;
 	margin: 0px;
+	overflow: hidden;
+	top: 50px;
+	left: 50px;
+	/*right: auto;
+	bottom: auto;*/
+	position: absolute;
+	
+}
+.winbuttons {
+	top: 1px;
+	right: 4px;
+	padding: 2px;
 	z-index: 10;
+	width: 60px;
+	white-space: nowrap;
+	text-align: right;
+	position: absolute;
+}
+.winbuttonclose,
+.winbuttonminimize,
+.winbuttonmaximize {
+	z-index: 10;
+	display: inline;
+	width: 16px;
+	height: 16px;
+	float: right;
+}
+.winbuttonclose {
+	background-image: url(./images/icons/close.gif);
+}
+.winbuttonminimize {
+	background-image: url(./images/icons/minimize.gif);
+}
+.winbuttonmaximize {
+	background-image: url(./images/icons/maximize.gif);
+}
+.winhandle {
+	white-space: nowrap;
+	/*width: 100%;*/
+	position: absolute;
+	top: 0px;
+	left: 6px;
+	right: 6px;
+	margin: 0px;
+	padding-top: 2px;
+	z-index: 1;
+	background-image: url(./images/winmid.gif);
+}
+.wintitlebar {
 	height: 20px;
-	/*background-color: #EFEFEF;*/
 	cursor: default;
 	overflow: hidden;
-	/*border-color: ThreeDHighlight ThreeDShadow ThreeDShadow ThreeDHighlight;*/
 	vertical-align: middle;
+	/*margin: 2px 2px 2px 2px;*/
 }
-
-.dojoFloatingPaneTitleText {
-	float: left;
-	padding: 2px 4px 2px 2px;
-	white-space: nowrap;
-	color: CaptionText;
-	font: small-caption;
-	background-image: url(./images/winmid.gif);
-}
-
-.dojoTitleBarIcon {
-	float: left;
-	height: 16px;
-	width: 16px;
-	vertical-align: middle;
-	margin-right: 5px;
-	margin-left: 5px;
-	background-image: url(./images/winmid.gif);
-}
-
-.dojoFloatingPaneActions{
-	float: right;
+.winbody {
+	background-color: white;
+	overflow: hidden;
+	border-left: 1px solid gray;
+	border-right: 1px solid gray;
+	border-bottom: 1px solid gray;
 	position: absolute;
-	right: 2px;
-	top: 2px;
-	vertical-align: middle;
+	top: 20px;
+	left: 1px;
+	right: 1px;
+	bottom: 1px;
 }
-
-
-.dojoFloatingPaneActionItem {
-	vertical-align: middle;
-	margin-right: 1px;
-	height: 16px;
-	width: 22px;
-}
-
-
-.dojoFloatingPaneTitleBarIcon {
-	/* essential css */
-	float: left;
-
-	/* styling css */
-	margin-left: 2px;
-	margin-right: 4px;
-	height: 16px;
-}
-
-/* minimize/maximize icons are specified by CSS only */
-.dojoFloatingPaneMinimizeIcon,
-.dojoFloatingPaneMaximizeIcon,
-.dojoFloatingPaneRestoreIcon,
-.dojoFloatingPaneCloseIcon {
-	vertical-align: middle;
-	height: 16px;
-	width: 16px;
-	margin-top: 2px;
-	margin-bottom: 2px;
-	float: right;
-}
-.dojoFloatingPaneTitleBarLeft,
-.dojoFloatingPaneTitleBarRight {
+.winrightcorner,
+.winleftcorner {
 	width: 6px;
 	height: 20px;
 }
-.dojoFloatingPaneTitleBarLeft {
-	float: left;
-	background-image: url('./images/winleft.gif');
-}
-.dojoFloatingPaneTitleBarBody {
-	background-image: url('./images/winmid.gif');
-	height: 20px;
-}
-.dojoFloatingPaneTitleBarRight {
+.winrightcorner {
+	background-image: url(./images/winright.gif);
 	float: right;
-	background-image: url('./images/winright.gif');
 }
-.dojoFloatingPaneMinimizeIcon {
-	background-image: url(./images/icons/minimize.gif);
+.winleftcorner {
+	background-image: url(./images/winleft.gif);
+	float: left;
 }
-.dojoFloatingPaneMaximizeIcon {
-	background-image: url(./images/icons/maximize.gif);
+.winresize {
+	width: 5px;
+	height: 5px;
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+	cursor: se-resize;
 }
-.dojoFloatingPaneRestoreIcon {
-	background-image: url(./images/icons/maximize.gif);
-}
-.dojoFloatingPaneCloseIcon {
-	background-image: url(./images/icons/close.gif);
-}
-
-/* bar at bottom of window that holds resize handle */
-.dojoFloatingPaneResizebar {
-	z-index: 10;
-	height: 8px;
-	background-color: ThreeDFace;
-}
-
-/************* Client Area ***************/
-
-.dojoFloatingPaneClient {
-	position: relative;
-	z-index: 10;
-	border: 1px solid;
-	border-color: ThreeDShadow ThreeDHighlight ThreeDHighlight ThreeDShadow;
-	margin: 0px;
-	background-color: ThreeDFace;
-	padding: 0px;
-	font-family: Verdana, Helvetica, Garamond, sans-serif;
-	font-size: 12px;
-	overflow: auto;
-}
-

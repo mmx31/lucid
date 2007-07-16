@@ -21,7 +21,7 @@
     if ($_GET['crosstalk'] == "checkForEvents")
     {
     header('Content-type: text/xml');
-	include("config.php");
+	include("../config.php");
         $appID = $_GET['appID'];
 	$query = "SELECT * FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND appID=\"${appID}\"";
 	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
@@ -41,7 +41,7 @@
 }
     if ($_GET['crosstalk'] == "sendEvent")
     {
-	include("config.php");
+	include("../config.php");
     $message = $_GET["message"];
     $sender = $userid;
     $destination = $_GET["destination"];

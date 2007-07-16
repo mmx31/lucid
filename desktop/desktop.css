@@ -58,7 +58,7 @@ height: 100%;
 	position: absolute;
 	top: 0;
 	left: 0;
-	zindex: -50;
+	z-index: 1;
 	height: 100%;
 	width: 100%;
 }
@@ -66,7 +66,7 @@ height: 100%;
 	position: absolute;
 	top: 0;
 	left: 0;
-	zindex: -100;
+	z-index: 0;
 	height: 100%;
 	width: 100%;
 	text-align: center;
@@ -80,24 +80,24 @@ height: 100%;
 	color: #FFFFFF;
 	height: 25px;
 	width: 130px;
-	zindex: 1000;
+	z-index: 1000;
 }
 #sysmenu
 {
 	display: none;
 	width: 165px;
-  	z-index:200; 
+  	z-index:1200; 
   	position: absolute;
  	bottom: 35px;
  	left: 0%;
 }
 #taskbar
 {
-	zindex: 10000;
+	z-index: 1000;
 }
 #taskbarhider
 {
-	zindex: 11000;
+	z-index: 1500;
 }
 #tasktray
 {
@@ -109,15 +109,13 @@ height: 100%;
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	zindex: 0;
+	z-index: 2;
 	height: 100%;
 	width: 100%;
 }
 #sysmenu table
 {
 	border-spacing: 0px;
-	cellpadding: 0px;
-	cellspacing: 0px;
 	border: 0px;
 	padding: 0px;
 	margin: 0px;
@@ -126,7 +124,7 @@ height: 100%;
 {
 	overflow: auto;
 	cursor: default;
-	zindex: 1000;
+	z-index: 200;
 	width: 100%;
 	height: 30%;
 	position: absolute;

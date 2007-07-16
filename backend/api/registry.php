@@ -20,7 +20,6 @@ session_start();
 require("../config.php");
 	if ($_GET['registry'] == "load") {
 	// stable registry value loading system - jaymacdonald and psychiccyberfreak
-		include("config.php");
 		$userid = $_SESSION['userid']; 
 		$appid = $_GET['appid'];
 		$varname = $_GET['varname'];
@@ -33,11 +32,10 @@ require("../config.php");
 	}
 	elseif ($_GET['registry'] == "save") {
 	// stable registry value saving system - jaymacdonald and psychiccyberfreak
-		include("config.php");
 		$userid = $_SESSION['userid'];
 		$appid = $_GET['appid'];
 		$varname = $_GET['varname'];
-		$value = $_GET['value'];
+		$value = $_POST['value'];
 		$query = "SELECT * FROM ${db_prefix}registry WHERE appid=\"${appid}\" AND varname=\"${varname}\" HAVING userid=\"${userid}\" LIMIT 1";
 		$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
 		mysql_select_db($db_name) or die('Could not select database');
@@ -54,7 +52,6 @@ require("../config.php");
 	}
 	elseif ($_GET['registry'] == "remove") {
 		// alpha registry value remover - jaymacdonald
-		include("config.php");
 		$userid = $_SESSION['userid'];
 		$appid = $_GET['appid'];
 		$varname = $_GET['varname'];

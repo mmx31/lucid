@@ -16,9 +16,10 @@ Customizing:
 	
 		<script type="text/javascript" src="/path/to/login.js"></script>
 		
-	
+	If you don't need the default page provided, you may delete it along with the /images/ directory.
 	
 	That's it, enjoy your installation of psych desktop!
+
 
 Manual Installation:
 

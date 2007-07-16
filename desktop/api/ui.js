@@ -1,6 +1,7 @@
 /** 
 * An API that provides things like dialogs and such
 * TODO: document this
+* TODO: this should use the window api. Untill then it will not be loaded.
 * 
 * @classDescription An API that provides things like dialogs and such
 * @memberOf api

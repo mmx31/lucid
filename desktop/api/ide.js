@@ -61,7 +61,7 @@ api.ide = new function()
 		{
 	          var ide_headers = new Object();
 	          this.compile(app.lib, app.code);
-	          dojo.io.bind({
+	          dojo.xhrGet({
 	               url: "../backend/ide.php",
 	               method: "POST",
 	               content : {
@@ -74,7 +74,7 @@ api.ide = new function()
 	                    category: app.metadata.category,
 	                    code: app.code
 	               },
-	               load: function(type, data, evt){
+	               load: function(data, ioArgs){
 						app.callback(parseInt(data));
 				   },
 	               mimetype: "text/plain"
@@ -85,31 +85,24 @@ api.ide = new function()
 		 	return false;
 		 }
 	}
-	this.load = function(appID)
+	this.load = function(appID, callback)
 	{
-		dojo.io.bind({
+		dojo.xhrGet({
 			url: "../backend/app.php?id="+appID,
-			load: function(type, data, evt)
+			load: function(data, ioArgs)
 			{
-				start = data.indexOf("{");
-				argsStart = data.lastIndexOf("(", start);
-				argsEnd = data.lastIndexOf(")", start);
-				args = data.substring(argsStart+1, argsEnd-1);
-				//look for func name
-				buffer = start;
-				while((data.indexOf("{", buffer) != -1 || data.indexOf("}", buffer) != -1) || (data.indexOf("{", buffer) != -1 && data.indexOf("}", buffer) != -1))
-				{
-					//keep getting function body...
-				}
+				//TODO: get rid of "function() { " ... " }"
+				var app = eval("new function() {"+data+"}");
+				if(callback) callback(app)
 			},
 			mimetype: "text/plain"
 		});
 	}
 	this.getAppList = function(callback) {
 		var call = function(test) {alert(test)}
-	dojo.io.bind({
+	dojo.xhrGet({
 		url: "../backend/app.php?action=getPrograms",
-		load: function(type, data, evt)
+		load: function(data, ioArgs)
 		{
 			data = data.split(desktop.app.xml_seperator);
 			for(x=3;x<=data.length-1;x=x+3)

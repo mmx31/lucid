@@ -1,0 +1,95 @@
+/*
+    Psych Desktop
+    Copyright (C) 2006 Psychiccyberfreak
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+	*/
+/**********************************\
+|           Psych Desktop          |
+|            API Library           |
+|      (c) 2006 Psych Designs      |
+| All functions here can be called |
+| 	  via api.functionname();      |
+\**********************************/
+
+/**
+* Contains all the public APIs
+* TODO: document some things in here
+* @classDescription	Contains all the public APIs
+* @alias desktop.api
+* @constructor	
+*/
+var api = new function() {
+	this.libList = new Object();
+	this.consoleBuffer = new Array();
+	dojo.subscribe("desktopload", null, function() {
+		for(i=api.consoleBuffer.length-1;i>=0;i--)
+		{
+			api.console(api.consoleBuffer[i]);
+		}
+	});
+	this.console = function(text)
+	{
+		//to settle apps over untill the console is ready
+		this.consoleBuffer[this.consoleBuffer.length] = text;
+	}
+	/** 
+	* Includes an API at startup.
+	* @param {String} api	The name of the API to load. The API has to be a JS file in the /api/ dir.
+	*/
+	this.require = function(theapi)
+	{
+		//document.write("<script type='text/javascript' src='./api/"+api+".js'></script>");
+			dojo.io.script.get({
+				url: "./api/"+theapi+".js",
+				preventCache: true, //change to false in releases, this is to make debugging easier
+				id: "api_"+theapi
+			});
+			this.libList[theapi] = new Object();
+			this.libList[theapi].loaded = false;
+	}
+	this.init = function()
+	{
+		api.require("crosstalk");
+		api.require("database");
+		api.require("fs");
+		api.require("ide");
+		api.require("misc");
+		api.require("registry");
+		api.require("soundmanager");
+		api.require("tray");
+		//api.require("ui"); disabled untill it uses the window API
+		api.require("user");
+		api.require("window");
+		this.checkifloaded();
+	}
+	this.checkifloaded = function()
+	{
+		for(mod in this.libList)
+		{
+			if((typeof this[mod]) != "undefined")
+			{
+				this.libList[mod].loaded = true;
+			}
+			else
+			{
+				this.libList[mod].loaded = false;
+				setTimeout(function() {api.checkifloaded();}, 50);
+				return;
+			}
+			desktop.api = api;
+		}
+	}
+}
