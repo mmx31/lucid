@@ -323,7 +323,7 @@ api.window = function()
 		
 		if(desktop.config.fx == true)
 		{
-			api.console("unmaximizing... (in style!)");
+			api.console("maximizing... (in style!)");
 			//win.style.height= "auto";
 			//win.style.width= "auto";
 			dojo.animateProperty({
@@ -331,17 +331,15 @@ api.window = function()
 				properties: {
 					top: {end: 0},
 					left: {end: 0},
-					right: {end: 0},
-					bottom: {end: 0},
-					width: {end: dojo.byId(this._id).parentNode.width},
-					height: {end: dojo.byId(this._id).parentNode.height}
+					width: {end: dojo.byId(this._id).parentNode.style.width.replace(/px/g, "")},
+					height: {end: dojo.byId(this._id).parentNode.style.height.replace(/px/g, "")}
 				},
 				duration: 150
 			}).play();
 		}
 		else
 		{
-			api.console("unmaximizing...");
+			api.console("maximizing...");
 			win.style.top = "0px";
 			win.style.left = "0px";
 			win.style.width = "100%";

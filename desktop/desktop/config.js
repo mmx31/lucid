@@ -25,7 +25,7 @@
 desktop.config = {
 	init: function() {
 		desktop.config.load();
-		setInterval(desktop.config.load, 1000*60);
+		setInterval(desktop.config.save, 1000*60);
 	},
 	load: function() {
 		//TODO: give this it's own mySQL table
