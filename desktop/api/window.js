@@ -47,7 +47,7 @@ api.window = function()
 	 */
 	this.maximized = false;
 	/**
-	 * The window's height in px, em, or %.
+	 * The window's height in px, or %.
 	 * 
 	 * @type {String}
 	 * @alias api.window.height
@@ -55,7 +55,7 @@ api.window = function()
 	 */
 	this.height = "400px";
 	/**
-	 * The windows width in px, em, or %.
+	 * The windows width in px, or %.
 	 * 
 	 * @type {String}
 	 * @alias api.window.width
@@ -132,6 +132,8 @@ api.window = function()
 			windiv.id=this._id;
 			windiv.style.width=this.width;
 			windiv.style.height=this.height;
+			windiv.style.top="50px";
+			windiv.style.left="50px";
 			windiv.style.zIndex=api.windowcounter+100;
 			windiv.setAttribute("class", "win");
 			
@@ -199,6 +201,45 @@ api.window = function()
 				handle: this._id+"handle",
 				mover: dojo.dnd.parentConstrainedMover("border", true)
 			});
+			if(this.resizable == true)
+			{
+				this._resize = new dojo.dnd.Moveable(this._id+"resize", {});
+				//TODO: figure out a way that we can get it so it will resize during the drag
+				dojo.subscribe("dndMoveStop",dojo.hitch(this, function(elem){
+					if(elem.id ==  this._id+"resize")
+					{
+						var dragger = dojo.byId(this._id+"resize");
+						var win = dojo.byId(this._id);
+						var y = dragger.style.top.replace(/px/g, "");
+						var x = dragger.style.left.replace(/px/g, "");
+						y = parseInt(y)+5;
+						x = parseInt(x)+5;
+						var width = win.style.width.replace(/px/g, "");
+						var height = win.style.height.replace(/px/g, "");
+						var t = width.indexOf("%");
+						var s = height.indexOf("%");
+						width = parseInt(width);
+						height = parseInt(height);
+						if(t != -1){
+							width = width.replace(/%/g, "");
+							width = (parseInt(win.parentNode.style.width.replace(/px/g, ""))/100)*width;
+						}
+						if(s != -1){
+							height = height.replace(/%/g, "");
+							height = (parseInt(win.parentNode.style.height.replace(/px/g, ""))/100)*height;
+						}
+						var top = win.style.top.replace(/px/g, "");
+						var left = win.style.left.replace(/px/g, "");
+						top = parseInt(top);
+						left = parseInt(left);
+						var winx = left+width;
+						var winy = top+height;
+						console.log(width+"+("+(x-winx)+")");
+						win.style.width = (winx+(x-winx))+"px";
+						win.style.height = (winy+(y-winy))+"px";
+					}
+				}));
+			}
 			dojo.connect(closebutton, "onmouseup", dojo.hitch(this, this.destroy));
 			dojo.connect(minimizebutton, "onmouseup", dojo.hitch(this, this.minimize));
 			dojo.connect(maximizebutton, "onmouseup", dojo.hitch(this, function() {
@@ -222,7 +263,6 @@ api.window = function()
 					}
 					else
 					{
-						//TODO: check if this window is intersecting another before bringing it to the front
 						var ns = document.getElementById("windowcontainer").getElementsByTagName("div");
 						var box;
 						var myBox = new Object
@@ -283,10 +323,36 @@ api.window = function()
 			var pos = dojo.coords(this._id, true);
 			this.left = pos.x;
 			this.top = pos.y;
+			var win = dojo.byId(this._id);
+			var width = win.style.width.replace(/px/g, "");
+			var height = win.style.height.replace(/px/g, "");
+			var t = width.indexOf("%");
+			var s = height.indexOf("%");
+			width = parseInt(width);
+			height = parseInt(height);
+			if(t != -1){
+				width = width.replace(/%/g, "");
+				width = (parseInt(win.parentNode.style.width.replace(/px/g, ""))/100)*width;
+			}
+			if(s != -1){
+				height = height.replace(/%/g, "");
+				height = (parseInt(win.parentNode.style.height.replace(/px/g, ""))/100)*height;
+			}
+			this._width = width;
+			this._height = height;
 			var pos = dojo.coords("task_"+this._id, true);
+			
 			var fade = dojo.fadeOut({ node: this._id, duration: 200 });
 			var slide = dojo.fx.slideTo({ node: this._id, duration: 200, top: pos.y, left: pos.x});
-			var anim = dojo.fx.combine([fade, slide]);
+			var squish = dojo.animateProperty({
+				node: this._id,
+				duration: 200,
+				properties: {
+					height: {end: 26}, //TODO: is there a way of detecting this?
+					width: {end: 191} //and this?
+				}
+			});
+			var anim = dojo.fx.combine([fade, slide, squish]);
 			dojo.connect(anim, "onEnd", null, dojo.hitch(this, function() {
 				dojo.byId(this._id).style.display = "none";
 			}));
@@ -296,6 +362,33 @@ api.window = function()
 		{
 			dojo.style(this._id, "opacity", 100)
 			dojo.byId(this._id).style.display = "none";
+		}
+	}
+	/** 
+	* Restores the window from the taskbar
+	* 
+	* @method
+	* @alias api.window.restore
+	* @memberOf api.window
+	*/
+	this.restore = function()
+	{
+		dojo.byId(this._id).style.display = "inline";
+		if(desktop.config.fx == true)
+		{
+			var fade = dojo.fadeIn({ node: this._id, duration: 200 });
+			var slide = dojo.animateProperty({
+				node: this._id,
+				duration: 200,
+				properties: {
+					top: {end: this.top,},
+					left: {end: this.left},
+					height: {end: this._height},
+					width: {end: this._width}
+				}
+			});
+			var anim = dojo.fx.combine([fade, slide]);
+			anim.play();
 		}
 	}
 	/** 
@@ -311,7 +404,7 @@ api.window = function()
 		this._drag.destroy();
 		if(this.resizable == true)
 		{
-			//TODO: get rid of the resizer
+			this._resize.destroy();
 		}
 		this.pos.top = dojo.byId(this._id).style.top.replace(/px/g, "");
 		this.pos.bottom = dojo.byId(this._id).style.bottom.replace(/px/g, "");
@@ -357,7 +450,7 @@ api.window = function()
 	{
 		if(this.resizable == true)
 		{		
-			//TODO: restore the resizer
+			this._resize = new dojo.dnd.Moveable(this._id+"resize", {});
 		}
 		this._drag = new dojo.dnd.Moveable(this._id, {
 			handle: this._id+"handle",
@@ -389,24 +482,6 @@ api.window = function()
 			win.style.width= this.pos.width;
 		}
 		this.maximized = false;
-	}
-	/** 
-	* Restores the window from the taskbar
-	* 
-	* @method
-	* @alias api.window.restore
-	* @memberOf api.window
-	*/
-	this.restore = function()
-	{
-		dojo.byId(this._id).style.display = "inline";
-		if(desktop.config.fx == true)
-		{
-			var fade = dojo.fadeIn({ node: this._id, duration: 200 });
-			var slide = dojo.fx.slideTo({ node: this._id, duration: 200, top: this.top, left: this.left});
-			var anim = dojo.fx.combine([fade, slide]);
-			anim.play();
-		}
 	}
 	/** 
 	* Brings the window to the front of the stack

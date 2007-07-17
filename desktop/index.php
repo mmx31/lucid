@@ -32,8 +32,10 @@ if($_SESSION['userloggedin'] == true)
 <html>
 <title>Psych Desktop</title>
 <head>
-<script type="text/javascript" src="./dojo/dojo/dojo.js"></script>
-<script type="text/javascript" src="./dojo/dijit/dijit-all.js"></script>
+<script type="text/javascript" src="./dojo/dojo/dojo.js.uncompressed.js"></script>
+<script type="text/javascript" src="./dojo/dijit/dijit-all.js.uncompressed.js"></script>
+<!-- this is just so we can actually read the errors dojo outputs, 
+		releases will use compressed versions. -->
 <script type="text/javascript" language="javascript" src="psychdesktop.js"></script>
 </head>
 <body>
