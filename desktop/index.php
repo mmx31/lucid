@@ -32,8 +32,8 @@ if($_SESSION['userloggedin'] == true)
 <html>
 <title>Psych Desktop</title>
 <head>
-<script type="text/javascript" src="./dojo-0.9.0beta/dojo/dojo.js"></script>
-<script type="text/javascript" src="./dojo-0.9.0beta/dijit/dijit-all.js"></script>
+<script type="text/javascript" src="./dojo/dojo/dojo.js"></script>
+<script type="text/javascript" src="./dojo/dijit/dijit-all.js"></script>
 <script type="text/javascript" language="javascript" src="psychdesktop.js"></script>
 </head>
 <body>

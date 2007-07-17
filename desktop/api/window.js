@@ -307,7 +307,7 @@ api.window = function()
 	*/
 	this.maximize = function()
 	{
-		//TODO: give this effects
+		this.maximized = true;
 		this._drag.destroy();
 		if(this.resizable == true)
 		{
@@ -323,27 +323,30 @@ api.window = function()
 		
 		if(desktop.config.fx == true)
 		{
-			win.style.height= "auto";
-			win.style.width= "auto";
+			api.console("unmaximizing... (in style!)");
+			//win.style.height= "auto";
+			//win.style.width= "auto";
 			dojo.animateProperty({
 				node: win,
 				properties: {
 					top: {end: 0},
 					left: {end: 0},
 					right: {end: 0},
-					bottom: {end: 0}
+					bottom: {end: 0},
+					width: {end: dojo.byId(this._id).parentNode.width},
+					height: {end: dojo.byId(this._id).parentNode.height}
 				},
 				duration: 150
 			}).play();
 		}
 		else
 		{
+			api.console("unmaximizing...");
 			win.style.top = "0px";
 			win.style.left = "0px";
 			win.style.width = "100%";
 			win.style.height = "100%";
 		}
-		this.maximized = true;
 	}
 	/** 
 	* UnMaximizes the window
@@ -365,15 +368,15 @@ api.window = function()
 		var win = dojo.byId(this._id);
 		if(desktop.config.fx == true)
 		{
-			win.style.height= "auto";
-			win.style.width= "auto";
 			dojo.animateProperty({
 				node: win,
 				properties: {
 					top: {end: this.pos.top},
 					left: {end: this.pos.left},
 					right: {end: this.pos.right},
-					bottom: {end: this.pos.bottom}
+					bottom: {end: this.pos.bottom},
+					width: {end: this.pos.width},
+					height: {end: this.pos.height}
 				},
 				duration: 150
 			}).play();
