@@ -75,7 +75,7 @@ desktop.app = new function()
 			    load: dojo.hitch(this, function(data, ioArgs)
 				{
 					app = eval('('+data+')'); //TODO: get a json interpriter in place for more security
-					eval("this.apps["+app[0].ID+"] = function()\n{\n\tthis.id = "+app[0].ID+";\n\tthis.instance = -1;\n"+app[0].code+"\n\tthis.hitch = function(func)\n{return dojo.hitch(this, func);}\n}");
+					eval("this.apps["+app[0].ID+"] = function()\n{\n\tthis.id = "+app[0].ID+";\n\tthis.instance = -1;\n"+app[0].code+"\n}");
 					if(callback)
 					{
 						if(args != undefined)
