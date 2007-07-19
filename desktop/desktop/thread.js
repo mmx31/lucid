@@ -184,6 +184,7 @@ this._subscription = dojo.subscribe("desktopload", this, function(){
 }
 catch(e)
 {
+	desktop.thread = {disabled: true};
 	//nope, no threading support. oh well...
 	this._subscription = dojo.subscribe("desktopload", this, function(){
 		api.console("threading support disabled due to browser limitations.");

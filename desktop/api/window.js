@@ -381,7 +381,7 @@ api.window = function()
 				node: this._id,
 				duration: 200,
 				properties: {
-					top: {end: this.top,},
+					top: {end: this.top},
 					left: {end: this.left},
 					height: {end: this._height},
 					width: {end: this._width}

@@ -24,6 +24,40 @@
 var desktop = new Object();
 desktop.modules = new Object();
 dojo.require("dojo.io.script");
+if(navigator.appName == "Microsoft Internet Explorer")
+{
+	//they give us shit poor debuging utilities, so we have no way of debugging our bootstrap.
+	window.onerror = function()
+	{
+		err  = "An error occurred:\n";
+		for(mod in desktop.modules)
+		{
+			if((typeof desktop[mod]) != "undefined")
+			{
+				err += mod+": loaded\n";
+			}
+			else
+			{
+				err += mod+": failed ("+(typeof desktop[mod])+")\n";
+				if(mod == "api")
+				{
+					for(lib in api.libList)
+					{
+						if((typeof api[lib]) != "undefined")
+						{
+							err += "--"+lib+": loaded\n";
+						}
+						else
+						{
+							err += "--"+lib+": failed\n";
+						}
+					}
+				}
+			}
+		}
+		alert(err);
+	}
+}
 
 /**
 * Bootstrap methods to load the desktop.
@@ -46,6 +80,7 @@ var PsychDesktop = {
 		element.src = url;
 		element.id = "lib_"+libraryName;
 		document.getElementsByTagName("head")[0].appendChild(element);
+		desktop.modules[libraryName].version = version;
 	}
 	else
 	{
@@ -54,6 +89,7 @@ var PsychDesktop = {
 			preventCache: true, //change to false in releases, this is to make debugging easier
 			id: "lib_"+libraryName
 		});
+		desktop.modules[libraryName].version = "";
 	}
 },
   checkifloaded: function()
@@ -68,9 +104,17 @@ var PsychDesktop = {
 				}
 				else
 				{
+					if(desktop.modules[mod].version == "1.7")
+					{
+						desktop[mod] = {disabled: true};
+						desktop.modules[mod].loaded = true;
+					}
+					else
+					{
 						desktop.modules[mod].loaded = false;
 						setTimeout(PsychDesktop.checkifloaded, 50);
 						return;
+					}
 				}
 			}
 			for(lib in desktop.modules) if((typeof desktop[lib].draw) == "function") desktop[lib].draw();
