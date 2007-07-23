@@ -37,7 +37,15 @@ api.window = function()
 	 * @alias api.window.bodyWidget
 	 * @memberOf api.window
 	 */
-	this.bodyWidget = dijit.layout.LayoutContainer;
+	this.bodyWidget = "LayoutContainer";
+	/**
+	 * The window body's widget params
+	 * 
+	 * @type {Object}
+	 * @alias api.window.bodyWidgetParams
+	 * @memberOf api.window
+	 */
+	this.bodyWidgetParams = {};
 	/**
 	 * Whether or not the window is maximized
 	 * 
@@ -195,7 +203,8 @@ api.window = function()
 			}
 			document.getElementById("windowcontainer").appendChild(windiv);
 			
-			this.body = new this.bodyWidget({id: this._id+"body"}, winbody);
+			this.bodyWidgetParams.id = this._id+"body";
+			this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, winbody);
 			
 			this._drag = new dojo.dnd.Moveable(this._id, {
 				handle: this._id+"handle",
@@ -541,8 +550,8 @@ api.window = function()
 	* @alias api.window.addChild
 	* @memberOf api.window
 	*/
-    this.addChild = function(node)
-    {
-        dijit.byId(this._id+"body").addChild(node);
-    }
+	this.addChild = function(node)
+	{
+		dijit.byId(this._id+"body").addChild(node);
+	}
 }

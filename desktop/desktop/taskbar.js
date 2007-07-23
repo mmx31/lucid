@@ -150,6 +150,13 @@ desktop.taskbar = new function()
 			div.innerHTML = "<img src='./themes/default/images/icons/hidetask.gif'>";
 			document.body.appendChild(div);
 			div.setAttribute("onclick", "desktop.taskbar.hider();");
+		}
+		this.init = function()
+		{
+			dojo.subscribe("configApply", this, function(){
+				var p = desktop.config.taskbar.isShown;
+				this.setVisibility(p);
+			});
 			this.clockinterval = setInterval(function(){
 				var clock_time = new Date();
 				var clock_hours = clock_time.getHours();

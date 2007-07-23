@@ -74,8 +74,16 @@ desktop.app = new function()
 			    url: "../backend/app.php?id="+appID,
 			    load: dojo.hitch(this, function(data, ioArgs)
 				{
-					app = eval('('+data+')'); //TODO: get a json interpriter in place for more security
-					eval("this.apps["+app[0].ID+"] = function()\n{\n\tthis.id = "+app[0].ID+";\n\tthis.instance = -1;\n"+app[0].code+"\n}");
+					this._fetchApp(data, callback, args);
+				}),
+			    error: function(error, ioArgs) { desktop.core.loadingIndicator(1); api.toaster("Error: "+error.message); },
+			    mimetype: "text/plain"
+			});
+		}
+		this._fetchApp = function(data, callback, args)
+		{
+			app = dojo.fromJson(data);
+					this.apps[app[0].ID] = eval("function()\n{\n\tthis.id = "+app[0].ID+";\n\tthis.instance = -1;\n"+app[0].code+"\n}");
 					if(callback)
 					{
 						if(args != undefined)
@@ -87,10 +95,6 @@ desktop.app = new function()
 							callback(app[0].ID);
 						}
 					}
-				}),
-			    error: function(error, ioArgs) { desktop.core.loadingIndicator(1); api.toaster("Error: "+error.message); },
-			    mimetype: "text/plain"
-			});
 		}
 		/** 
 		* Fetches an app and stores it into the cache

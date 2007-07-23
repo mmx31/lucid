@@ -91,15 +91,28 @@ api.ide = new function()
 			url: "../backend/app.php?id="+appID,
 			load: function(data, ioArgs)
 			{
-				//TODO: get rid of "function() { " ... " }"
-				var app = eval("new function() {"+data+"}");
-				if(callback) callback(app)
+				data = dojo.fromJson(data);
+				var app = eval("new function() {"+data[0].code+"}");
+				var a = new Object();
+				for(item in app)
+				{
+					if((typeof app[item]) == "function")
+					{
+						a[item] = new Object();
+						//TODO: parse contents, pull out args, name, and code
+						a[item].code = app[item].toString(); //TODO: get rid of "function() { " ... " }"
+					}
+					else
+					{
+						a[item] = app[item];
+					}
+				}
+				if(callback) callback(a);
 			},
 			mimetype: "text/plain"
 		});
 	}
 	this.getAppList = function(callback) {
-		var call = function(test) {alert(test)}
 	dojo.xhrGet({
 		url: "../backend/app.php?action=getPrograms",
 		load: function(data, ioArgs)
@@ -115,7 +128,7 @@ api.ide = new function()
 				apps[data[x+3]][apps[data[x+3]].length-1].id=data[x];
 				apps[data[x+3]][apps[data[x+3]].length-1].name=data[x+1];
 			}
-			call(apps);
+			callback(apps);
 		},
 		mimetype: "text/plain"
 	});

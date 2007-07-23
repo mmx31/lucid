@@ -1,20 +1,20 @@
 /*
-    Psych Desktop
-    Copyright (C) 2006 Psychiccyberfreak
+	Psych Desktop
+	Copyright (C) 2006 Psychiccyberfreak
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+	You should have received a copy of the GNU General Public License along
+	with this program; if not, write to the Free Software Foundation, Inc.,
+	51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
 /**
 * Contains all the menu functions of the desktop
@@ -148,77 +148,32 @@ desktop.menu = new function()
 		desktop.core.loadingIndicator(0);
 		var url = "../backend/app.php?action=getPrograms";
 		dojo.xhrGet({
-		    url: url,
-		    load: dojo.hitch(this, function(data, ioArgs){
-				app_return = data;
+			url: url,
+			load: dojo.hitch(this, function(data, ioArgs){
+				data = dojo.fromJson(data);
 				html = '<ul id="nav">';
-				rawcode = app_return.split(desktop.app.xml_seperator);
-				app_amount = rawcode.length;
-				app_amount--;
-				app_amount = app_amount/3;
-				var x = 0;
-				var y = 0;
-				var z = 1;
-				office_id = new Array();
-				office_name = new Array();
-				office_count = 0;
-				system_id = new Array();
-				system_name = new Array();
-				system_count = 0;
-				internet_id = new Array();
-				internet_name = new Array();
-				internet_count = 0;
-				while (x <= app_amount)
+				var cats = new Object();
+				for(item in data)
 				{
-					var app_id = rawcode[y];
-					var app_name = rawcode[z];
-					var app_category = rawcode[z+1];
-					switch(app_category)
+					cats[data[item].category] = true;
+				}
+				for(cat in cats)
+				{
+					html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./themes/default/images/icons/applications-'+(cat.toLowerCase())+'.png" />&nbsp;'+cat+'<ul>';
+					for(app in data)
 					{
-						case "Office":
-							office_id[office_id.length] = app_id;
-							office_name[office_name.length] = app_name;
-						break;
-						case "System":
-							system_id[system_id.length] = app_id;
-							system_name[system_name.length] = app_name;			
-						break;
-						case "Internet":
-							internet_id[internet_id.length] = app_id;
-							internet_name[internet_name.length] = app_name;
-							internet_count++;			
-						break;
+						if(data[app].category == cat)
+						html += '<li onClick="javascript:desktop.app.launch('+data[app].ID+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+data[app].name+'</li>';
 					}
-					x++;
-					y++; y++; y++;
-					z++; z++; z++;
+					html += '</ul></li>';
 				}
-				html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./themes/default/images/icons/applications-office.png" />&nbsp;Office<ul>';
-				for(count=0;count<=office_id.length-1;count++)
-				{
-					html += '<li onClick="javascript:desktop.app.launch('+office_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+office_name[count]+'</li>';
-				}
-				html += '</ul>';
-				html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./themes/default/images/icons/applications-internet.png" />&nbsp;Internet<ul>';
-				for(count=0;count<=internet_id.length-1;count++)
-				{
-					html += '<li onClick="javascript:desktop.app.launch('+internet_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+internet_name[count]+'</li>';
-				}
-				html += '</ul>';
-				html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./themes/default/images/icons/preferences-system.png" />&nbsp;System<ul>';
-				for(count=0;count<=system_id.length-1;count++)
-				{
-					html += '<li onClick="javascript:desktop.app.launch('+system_id[count]+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+system_name[count]+'</li>';
-				}
-				html += '</ul>';
 				html += '<li onClick="javascript:desktop.core.logout();" style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./themes/default/images/icons/system-log-out.png" />&nbsp;Logout</li>';
 				html += '</ul>';
-				
 				document.getElementById("menu").innerHTML = html;
 				desktop.core.loadingIndicator(1);
 				}),
-		    error: function(type, data, evt) { desktop.core.loadingIndicator(1) },
-		    mimetype: "text/plain"
+			error: function(type, data, evt) { desktop.core.loadingIndicator(1) },
+			mimetype: "text/plain"
 		});
 		}
 		

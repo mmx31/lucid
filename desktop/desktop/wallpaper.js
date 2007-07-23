@@ -86,5 +86,9 @@ desktop.wallpaper = new function()
 			div.name="wallpaper";
 			document.body.appendChild(div);
 		}
-		this.init = this.loadPrefs;
+		this.init = function()
+		{
+			dojo.subscribe("configApply", this, this.loadPrefs);
+			this.loadPrefs();
+		}
 	}

@@ -57,6 +57,10 @@ desktop.config = {
             mimetype: "text/plain"
         });
 	},
+	apply: function()
+	{
+		dojo.publish("configApply", []);
+	},
 	/**
 	 * Whether or not the desktop's effects should be enabled (fading and such)
 	 * 

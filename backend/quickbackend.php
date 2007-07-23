@@ -6,7 +6,6 @@
  * @author Psychiccyberfreak
  * @version 0.1
  */
-$CONFIG_FILE = "configuration.php";
 /**
  * The Quick Backend class
  * @classDescription contains functions that make ajax backend creation easier
@@ -32,6 +31,7 @@ class qback
 	 */
 	function query($query)
 	{
+		require("configuration.php");
 		$query = str_replace("#__", $db["prefix"], $query);
 		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		return $result;
@@ -73,7 +73,7 @@ class qback
 	 */
 	function hash($pass)
 	{
-		require($CONFIG_FILE);
+		require("configuration.php");
 		return crypt($pass, $conf["salt"]);
 	}
 	/** 
@@ -85,7 +85,7 @@ class qback
 	 */
 	function comparePass($providedPass, $hashedPass)
 	{
-		require($CONFIG_FILE);
+		require("configuration.php");
 		qback::hash($providedPass);
 		if($pass == $hashedPass)
 		{
@@ -122,7 +122,7 @@ class qback
 	 */
 	function mysqlLink()
 	{
-		require($CONFIG_FILE);
+		require("configuration.php");
 		if(func_num_args() == 1) $dbname = func_get_arg(0);
 		$link = mysql_connect($db["host"], $db["username"], $db["password"]) or die('Could not connect: ' . mysql_error());
 		if($dbname != NULL)
@@ -142,93 +142,53 @@ class qback
 	 * @param {Integer} $affectedRecords	The number of affected records, usually just mysql_affected_rows()
 	 * @return {String} $json	The json of the provided mysql result
 	 */
-	function toJSON($resultSet,$affectedRecords)
+	function toJSON($resultSet, $affectedRecords)
 	{
-		require($CONFIG_FILE);
+		//TODO: get the "never print these" thing working
 		$numberRows=0;
 		$arrfieldName=array();
 		$i=0;
 		$json="";
-		while ($i < mysql_num_fields($resultSet))
-		{
-			$meta = mysql_fetch_field($resultSet, $i);
-			if (!$meta)
-			{
-			}
-			else
-			{
-				$arrfieldName[$i]=$meta->name;
-			}
-			$i++;
-		}
-		$i=0;
-		$json="[\n";
-		while($row=mysql_fetch_array($resultSet, MYSQL_NUM))
-		{
-			for($c=1; $c < count($arrfieldName); $c++)
-			{
-				$allowedrowcount = 0;
-				foreach($db["nowrite"] as $column)
-				{
-					if($arrfieldName[count($arrfieldName)-$c] == $column)
-					{
-						$rowisok = false;
-						break;
-					}
-					else
-					{
-						$rowisok = true;
-					}
-				}
-				if($rowisok == true)
-				{
-					$allowedrowcount++;
-				}
-			}
-			$i++;
-			$json.="{\n";
-			for($r=0;$r < count($arrfieldName);$r++)
-			{
-				foreach($db["nowrite"] as $column)
-				{
-					if($column == $arrfieldName[$r])
-					{
-						$stop = true;
-						break;
-					}
-					else
-					{
-						$stop = false;
-					}
-				}
-				if($stop == false)
-				{
-					$json.="\"".$arrfieldName[$r]."\" :    ";
-					$string = str_replace("\r\n", "\\r\\n", $row[$r]);
-					$string = str_replace("\r", "\\r", $string);
-					$string = str_replace("\n", "\\n", $string);
-					$json .= "\"".$string."\"";
-					if($r < $allowedrowcount-1)
-					{
-						$json.=",\n";
-					}
-					else
-					{
-						$json.="\n";
-					}
-				}
-			}
-			if($i!=$affectedRecords)
-			{
-				$json.="},\n";
-			}
-			else
-			{
-				$json.="}\n";
-			}
-		}
-		$json.="]";
-		return $json;
+	    while ($i < mysql_num_fields($resultSet))  {
+	        $meta = mysql_fetch_field($resultSet, $i);
+	        if (!$meta) {
+	        }else{
+	        $arrfieldName[$i]=$meta->name;
+	        }
+	        $i++;
+	    }
+	     $i=0;
+	      $json="[\n";
+	    while($row=mysql_fetch_array($resultSet, MYSQL_NUM)) {
+	        $i++;
+	        //print("Ind ".$i."-$affectedRecords<br>");
+	        $json.="{\n";
+	        for($r=0;$r < count($arrfieldName);$r++) {
+	            $json.="\"".str_replace('_', ' ', $arrfieldName[$r])."\" :    ";
+				$string = str_replace("\r\n", "\\r\\n", $row[$r]);
+				$string = str_replace("\r", "\\r", $string);
+				$string = str_replace("\n", "\\n", $string);
+				$json .= "\"".$string."\"";
+	            if($r < count($arrfieldName)-1){
+	                $json.=",\n";
+	            }else{
+	                $json.="\n";
+	            }
+	        }
+	        
+	        
+	         if($i!=$affectedRecords){
+	             $json.="},\n";
+	         }else{
+	             $json.="}\n";
+	         }
+	        
+	        
+	        
+	    }
+	    $json.="]";
+	    
+	    return $json;
 	}
 }
 ?>
