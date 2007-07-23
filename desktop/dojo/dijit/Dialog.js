@@ -5,11 +5,9 @@ dojo.provide("dijit.Dialog");
 dojo.require("dojo.dnd.move");
 dojo.require("dojo.fx");
 
-dojo.require("dijit.util.place");
-dojo.require("dijit.util.sniff");
-dojo.require("dijit.util.popup");			// for BackgroundIFrame
-dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
+dojo.require("dijit.layout.ContentPane");
 
 dojo.declare(
 	"dijit.DialogUnderlay",
@@ -24,7 +22,7 @@ dojo.declare(
 		postCreate: function(){
 			var b = dojo.body();
 			b.appendChild(this.domNode);
-			this.bgIframe = new dijit.util.BackgroundIframe(this.domNode);
+			this.bgIframe = new dijit.BackgroundIframe(this.domNode);
 		},
 
 		layout: function(){
@@ -33,7 +31,7 @@ dojo.declare(
 			//		of the document) since we need to cover the whole browser window, even
 			//		if the document is only a few lines long.
 
-			var viewport = dijit.util.getViewport();
+			var viewport = dijit.getViewport();
 			var is = this.node.style,
 				os = this.domNode.style;
 
@@ -44,7 +42,7 @@ dojo.declare(
 			
 			// process twice since the scroll bar may have been removed
 			// by the previous resizing
-			var viewport2 = dijit.util.getViewport();
+			var viewport2 = dijit.getViewport();
 			if(viewport.w != viewport2.w){ is.width = viewport2.w + "px"; }
 			if(viewport.h != viewport2.h){ is.height = viewport2.h + "px"; }
 		},
@@ -82,7 +80,7 @@ dojo.declare(
 		//		and also graying out the screen Dialog is extended from
 		//		ContentPane so it supports all the same parameters (href, etc.)
 
-		templateString:"<div class=\"dijitDialog\">\n\t\t<div dojoAttachPoint=\"titleBar\" class=\"dijitDialogTitleBar\" tabindex=\"0\" waiRole=\"dialog\" title=\"${title}\">\n\t\t<span dojoAttachPoint=\"titleNode\" class=\"dijitDialogTitle\">${title}</span>\n\t\t<span dojoAttachPoint=\"closeButtonNode\" class=\"dijitDialogCloseIcon\" dojoAttachEvent=\"onclick: hide\">\n\t\t\t<span dojoAttachPoint=\"closeText\" class=\"closeText\">x</span>\n\t\t</span>\n\t</div>\n\t\t<div dojoAttachPoint=\"containerNode\" class=\"dijitTitlePaneContent\"></div>\n\t<span dojoAttachPoint=\"tabEnd\" dojoAttachEvent=\"onfocus:_cycleFocus;\" tabindex=\"0\"></span>\n</div>\n",
+		templateString:"<div class=\"dijitDialog\">\n\t\t<div dojoAttachPoint=\"titleBar\" class=\"dijitDialogTitleBar\" tabindex=\"0\" waiRole=\"dialog\" title=\"${title}\">\n\t\t<span dojoAttachPoint=\"titleNode\" class=\"dijitDialogTitle\">${title}</span>\n\t\t<span dojoAttachPoint=\"closeButtonNode\" class=\"dijitDialogCloseIcon\" dojoAttachEvent=\"onclick: hide\">\n\t\t\t<span dojoAttachPoint=\"closeText\" class=\"closeText\">x</span>\n\t\t</span>\n\t</div>\n\t\t<div dojoAttachPoint=\"containerNode\" class=\"dijitDialogPaneContent\"></div>\n\t<span dojoAttachPoint=\"tabEnd\" dojoAttachEvent=\"onfocus:_cycleFocus\" tabindex=\"0\"></span>\n</div>\n",
 
 		// title: String
 		//		Title of the dialog
@@ -106,6 +104,7 @@ dojo.declare(
 				var closeNode = dojo.byId(this.closeNode);
 				this.connect(closeNode, "onclick", "hide");
 			}
+			dijit.Dialog.superclass.startup.apply(this, arguments);// makes preload=true possible
 		},
 
 		onLoad: function(){
@@ -169,7 +168,7 @@ dojo.declare(
 		_position: function(){
 			// summary: position modal dialog in center of screen
 
-			var viewport = dijit.util.getViewport();
+			var viewport = dijit.getViewport();
 			var mb = dojo.marginBox(this.domNode);
 
 			var style = this.domNode.style;
@@ -256,13 +255,11 @@ dojo.declare(
 
 			this._fadeIn.play();
 			
-			this._savedFocus = dijit.util.focus.save(this);
+			this._savedFocus = dijit.getFocus(this);
 			
 			// set timeout to allow the browser to render dialog
 			setTimeout(dojo.hitch(this, function(){
-				try{
-					this.titleBar.focus();
-				}catch(e){/*squelch*/}
+				dijit.focus(this.titleBar);
 			}), 50);
 		},
 
@@ -285,8 +282,10 @@ dojo.declare(
 			}
 			dojo.forEach(this._modalconnects, dojo.disconnect);
 			this._modalconnects = [];
-			
-			dijit.util.focus.restore(this._savedFocus);
+
+			// TODO: this is failing on FF presumably because the DialogUnderlay hasn't disappeared yet?
+			// Attach it to fire at the end of the animation
+			dijit.focus(this._savedFocus);
 		},
 
 		layout: function() {
@@ -305,17 +304,29 @@ dojo.declare(
 		// summary:
 		//		Pops up a dialog that appears like a Tooltip
 
-		// closeNode: String
-		//	Id of button or other dom node to click to close this dialog
-		closeNode: "",
+		// submitNode: String
+		//	Id of button or other dom node to click to submit this dialog
+		submitNode: "",
+		
+		// cancelNode: String
+		//	Id of button or other dom node to click to cancel this dialog
+		cancelNode: "",
 		
 		// title: String
 		// Description of tooltip dialog (required for a11Y)
 		title: "",
-		
+
+		// onCancel: Function
+		//	Callback when user has canceled dialog
+		onCancel: function(){},
+
+		// onExecute: Function
+		//	Callback when user has executed dialog
+		onExecute: function(){},
+
 		_lastFocusItem: null,
 
-		templateString:"<div id=\"${id}\" class=\"dijitTooltipDialog\" >\n\t<div class=\"dijitTooltipContainer dijitTooltipContents\" dojoAttachPoint=\"containerNode\" tabindex=\"0\" waiRole=\"dialog\"></div>\n\t<span dojoAttachPoint=\"tabEnd\" tabindex=\"0\" dojoAttachEvent=\"focus:_cycleFocus\"></span>\n\t<div class=\"dijitTooltipConnector\" ></div>\n</div>\n",
+		templateString:"<div id=\"${id}\" class=\"dijitTooltipDialog\" >\n\t<div class=\"dijitTooltipContainer\">\n\t\t<div  class =\"dijitTooltipContents dijitTooltipFocusNode\" dojoAttachPoint=\"containerNode\" tabindex=\"0\" waiRole=\"dialog\"></div>\n\t</div>\n\t<span dojoAttachPoint=\"tabEnd\" tabindex=\"0\" dojoAttachEvent=\"focus:_cycleFocus\"></span>\n\t<div class=\"dijitTooltipConnector\" ></div>\n</div>\n",
 
 		postCreate: function(){
 			dijit.TooltipDialog.superclass.postCreate.apply(this, arguments);
@@ -325,31 +336,31 @@ dojo.declare(
 			var ev = typeof(document.ondeactivate) == "object" ? "ondeactivate" : "onblur";
 			this.connect(this.containerNode, ev, "_findLastFocus");
 			this.containerNode.title=this.title;
-	},
-	
-	startup: function(){
-			if(this.closeNode){
-				var closeNode = dojo.byId(this.closeNode);
-				this.connect(closeNode, "onclick", "_hide");
+		},
+
+		startup: function(){
+			if(this.cancelNode){
+				var cancelNode = dojo.byId(this.cancelNode);
+				this.connect(cancelNode, "onclick", "onCancel");
 			}
+			if(this.submitNode){
+				var submitNode = dojo.byId(this.submitNode);
+				this.connect(submitNode, "onclick", "onExecute");
+			}
+			dijit.TooltipDialog.superclass.startup.apply(this, arguments);// makes preload=true possible
 		},
 
 		onOpen: function(/*Object*/ pos){
 			// summary: called when dialog is displayed, with info on where it's being displayed relative to the button
 			this.domNode.className="dijitTooltipDialog dijitTooltip" + (pos.corner=='TL' ? "Below" : "Above");
-						
+			this._loadCheck(); // lazy load trigger
 			this.containerNode.focus();
-		},
-		
-		_hide: function(){
-			// summary: hide the dialog
-			dijit.util.popup.closeAll();
 		},
 		
 		_onKey: function(/*Event*/ evt){
 			//summary: keep keyboard focus in dialog; close dialog on escape key
 			if (evt.keyCode == dojo.keys.ESCAPE){
-				this._hide();
+				this.onCancel();
 			}else if (evt.target == this.containerNode && evt.shiftKey && evt.keyCode == dojo.keys.TAB){
 				if (this._lastFocusItem){
 					this._lastFocusItem.focus();

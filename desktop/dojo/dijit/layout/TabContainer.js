@@ -129,11 +129,11 @@ dojo.declare(
 
 	baseClass: "dijitTab",
 
-	templateString: "<div baseClass='dijitTab' dojoAttachEvent='onclick:onClick; onmouseover:_onMouse; onmouseout:_onMouse'>"
+	templateString: "<div baseClass='dijitTab' dojoAttachEvent='onclick:onClick,onmouseover:_onMouse,onmouseout:_onMouse'>"
 						+"<div class='dijitTabInnerDiv' dojoAttachPoint='innerDiv'>"
-							+"<span dojoAttachPoint='titleNode;focusNode' tabIndex='-1' waiRole='tab'>${label}</span>"
+							+"<span dojoAttachPoint='titleNode,focusNode' tabIndex='-1' waiRole='tab'>${label}</span>"
 							+"<span dojoAttachPoint='closeButtonNode' class='closeImage'"
-							+" dojoAttachEvent='onmouseover:_onMouse; onmouseout:_onMouse; onclick:onClickCloseButton'"
+							+" dojoAttachEvent='onmouseover:_onMouse, onmouseout:_onMouse, onclick:onClickCloseButton'"
 							+" baseClass='dijitTabCloseButton'>"
 								+"<span dojoAttachPoint='closeText' class='closeText'>x</span>"
 							+"</span>"
@@ -141,7 +141,9 @@ dojo.declare(
 					+"</div>",
 
 	postCreate: function(){
-		if(!this.closeButton){
+		if(this.closeButton){
+			dojo.addClass(this.innerDiv, "dijitClosable");
+		} else {
 			this.closeButtonNode.style.display="none";
 		}
 		dijit.layout._TabButton.superclass.postCreate.apply(this, arguments);

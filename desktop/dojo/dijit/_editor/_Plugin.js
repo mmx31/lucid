@@ -50,9 +50,9 @@ dojo.declare("dijit._editor._Plugin", null,
 			if(this.button){
 				try{
 					var enabled = _e.queryCommandEnabled(_c);
-					this.button._setDisabled(!enabled);
-					if(this.button.setSelected){
-						this.button.setSelected(_e.queryCommandState(_c));
+					this.button.setDisabled(!enabled);
+					if(this.button.setChecked){
+						this.button.setChecked(_e.queryCommandState(_c));
 					}
 				}catch(e){
 					console.debug(e);

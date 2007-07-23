@@ -20,10 +20,12 @@
 	<!-- programatic creation -->
 	<script>
 		function init(){
-			var toolbar = new dijit.Toolbar({}, dojo.byId("toolbar2"));
-			dojo.forEach(["Cut", "Copy", "Paste"], function(label){
-				var button = new dijit.form.Button({id: "toolbar2."+label, label: label, iconClass: "dijitEditorIcon"+label});
-				toolbar.addChild(button);
+			dojo.forEach(["toolbar2", "toolbar3", "toolbar4"], function(toolbarId){
+				var toolbar = new dijit.Toolbar({}, dojo.byId(toolbarId));
+				dojo.forEach(["Cut", "Copy", "Paste"], function(label){
+					var button = new dijit.form.Button({id: toolbarId+"."+label, label: label, iconClass: "dijitEditorIcon"+label});
+					toolbar.addChild(button);
+				});
 			});
 		}
 
@@ -98,16 +100,31 @@
 			</div
 			><div dojoType="dijit.form.DropDownButton" id="toolbar1.backcolor" iconClass="dijitEditorIconBackColor">
 				<span>Background</span>
-				<div dojoType="dijit.ColorPalette" id="toolbar1.colorPalette" style="display: none" palette="3x4" onColorSelect="console.log(this.selectedColor);"></div>
+				<div dojoType="dijit.ColorPalette" id="toolbar1.colorPalette" style="display: none" palette="3x4" onChange="console.log(this.value);"></div>
 			</div
             ><div dojoType="dijit.form.DropDownButton" id="toolbar1.forecolor" iconClass="dijitEditorIconForeColor">
 				<span>Foreground</span>
-				<div dojoType="dijit.ColorPalette" id="toolbar1.colorPalette2" style="display: none" palette="3x4" onColorSelect="console.log(this.selectedColor);"></div>
+				<div dojoType="dijit.ColorPalette" id="toolbar1.colorPalette2" style="display: none" palette="3x4" onChange="console.log(this.value);"></div>
 			</div
     ></div>
 
     <h2>Toolbar from script</h2>
-
 	<div id="toolbar2"></div>
+
+	<!--  Tundra turns off text in toolbar buttons, by default.  To override this, add your own classes and/or CSS rules -->
+	<style>
+		.tundra .toolbarWithText .dijitButtonContents .dijitButtonText {
+			display: block;
+		}		
+		.tundra .toolbarWithNoImages .dijitButtonContents .dijitInline {
+			display: none;
+		}		
+	</style>
+
+    <h2>Toolbar with text and icons</h2>
+	<div id="toolbar3" class="toolbarWithText"></div>
+
+    <h2>Toolbar with text only</h2>
+	<div id="toolbar4" class="toolbarWithText toolbarWithNoImages"></div>
   </body>
 </html>

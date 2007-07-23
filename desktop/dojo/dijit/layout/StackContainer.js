@@ -44,7 +44,7 @@ dojo.declare(
 			this.selectedChildWidget.selected = true;
 		}
 		if(this.selectedChildWidget){
-			this._showChild(this.selectedChildWidget)
+			this._showChild(this.selectedChildWidget);
 		}
 
 		// Now publish information about myself so any StackControllers can initialize..
@@ -66,7 +66,7 @@ dojo.declare(
 		return page;
 	},
 
-	addChild: function(/*Widget*/ child, /*Integer*/ insertIndex){
+	addChild: function(/*Widget*/ child, /*Integer?*/ insertIndex){
 		dijit._Container.prototype.addChild.apply(this, arguments);
 		child = this._setupChild(child);
 
@@ -76,13 +76,13 @@ dojo.declare(
 			this.layout();
 		}
 
+		if(started){
+			dojo.publish(this.id+"-addChild", [child]);
+		}
+
 		// if this is the first child, then select it
 		if(!this.selectedChildWidget && started){
 			this.selectChild(child);
-		}
-
-		if(started){
-			dojo.publish(this.id+"-addChild", [child]);
 		}
 	},
 
@@ -123,7 +123,6 @@ dojo.declare(
 			// Deselect old page and select new one
 			this._transition(page, this.selectedChildWidget);
 			this.selectedChildWidget = page;
-//			this.selectedChild = page ? page.id : null; //TODO is this used anywhere?
 			dojo.publish(this.id+"-selectChild", [page]);
 		}
 	},
@@ -133,18 +132,27 @@ dojo.declare(
 			this._hideChild(oldWidget);
 		}
 		this._showChild(newWidget);
+
+		// Size the new widget, in case this is the first time it's being shown,
+		// or I have been resized since the last time it was shown.
+		// page must be visible for resizing to work
+		if(this.doLayout && newWidget.resize){
+			newWidget.resize(this._containerContentBox || this._contentBox);
+		}
 	},
 
 	forward: function(){
 		// Summary: advance to next page
-		var index = dojo.indexOf(this.getChildren(), this.selectedChildWidget);
-		this.selectChild(this.getChildren()[index+1]);
+		var children = this.getChildren();
+		var index = dojo.indexOf(children, this.selectedChildWidget);
+		this.selectChild(children[index+1]);
 	},
 
 	back: function(){
 		// Summary: go back to previous page
-		var index = dojo.indexOf(this.getChildren(), this.selectedChildWidget);
-		this.selectChild(this.getChildren()[index-1]);
+		var children = this.getChildren();
+		var index = dojo.indexOf(children, this.selectedChildWidget);
+		this.selectChild(children[index-1]);
 	},
 
 	layout: function(){
@@ -160,12 +168,7 @@ dojo.declare(
 		page.isLastChild = (page == children[children.length-1]);
 		page.selected = true;
 
-		// size the current page (in case this is the first time it's being shown, or I have been resized)
-		// page must be visible for resizing to work
 		page.domNode.style.display="";
-		if(this.doLayout && page.resize){
-			page.resize(this._containerContentBox || this._contentBox);
-		}
 	},
 
 	_hideChild: function(/*Widget*/ page){
@@ -216,7 +219,7 @@ dojo.declare(
 		childInTabOrder: undefined,
 
 		postCreate: function(){
-			dijit.util.wai.setAttr(this.domNode, "waiRole", "role", "tablist");
+			dijit.wai.setAttr(this.domNode, "waiRole", "role", "tablist");
 
 			this.pane2button = {};		// mapping from panes to buttons
 			this._subscriptions=[
@@ -283,12 +286,12 @@ dojo.declare(
 
 			if(this._currentChild){
 				var oldButton=this.pane2button[this._currentChild];
-				oldButton.setSelected(false);
+				oldButton.setChecked(false);
 				oldButton.focusNode.setAttribute("tabIndex", "-1");
 			}
 
 			var newButton=this.pane2button[page];
-			newButton.setSelected(true);
+			newButton.setChecked(true);
 			this._currentChild = page;
 			newButton.focusNode.setAttribute("tabIndex", "0");
 		},
@@ -306,7 +309,9 @@ dojo.declare(
 			var container = dijit.byId(this.containerId);
 			container.closeChild(page);
 			var b = this.pane2button[this._currentChild];
-			(b.focusNode || b.domNode).focus();
+			if(b){
+				dijit.focus(b.focusNode || b.domNode);
+			}
 		},
 
 		onkeypress: function(/*Event*/ evt){
@@ -353,7 +358,10 @@ dojo.declare(
 	//	The button-like or tab-like object you click to select or delete a page
 
 	onClick: function(/*Event*/ evt) {
-		if(this.focusNode){ this.focusNode.focus(); }
+		// this is for TabContainer where the tabs are <span> rather than button,
+		// so need to set focus explicitly (on some browsers)
+		dijit.focus(this.focusNode);
+
 		// ... now let StackController catch the event and tell me what to do
 	},
 

@@ -28,11 +28,38 @@ dojo.declare("dojox.wire.Wire",
 
 		if(this.converter){
 			if(dojo.isString(this.converter)){
-				var converterClass = dojox.wire._getClass(this.converter);
-				if(converterClass){
-					this.converter = new converterClass();
-				}else{
-					this.converter = undefined;
+				//First check the object tree for it.  Might be defined variable
+				//name/global function (like a jsId, or just a function name).
+				var convertObject = dojo.getObject(this.converter);
+				if (dojo.isFunction(convertObject)){
+					//We need to see if this is a pure function or an object constructor...
+					try{
+						var testObj = new convertObject();
+						if(testObj && !dojo.isFunction(testObj["convert"])){
+							//Looks like a 'pure' function...
+							this.converter = {convert: convertObject};
+						}else{
+							this.converter = testObj;
+						}
+					}catch(e){
+						//Do if this fails.	
+					}
+				}else if(dojo.isObject(convertObject)){
+					//It's an object, like a jsId ... see if it has a convert function
+					if(dojo.isFunction(convertObject["convert"])){
+						this.converter = convertObject;
+					}
+				}
+
+				//No object with that name (Converter is still a string), 
+				//then look for a class that needs to be dynamically loaded...
+				if (dojo.isString(this.converter)) {
+					var converterClass = dojox.wire._getClass(this.converter);
+					if(converterClass){
+						this.converter = new converterClass();
+					}else{
+						this.converter = undefined;
+					}
 				}
 			}else if(dojo.isFunction(this.converter)){
 				this.converter = {convert: this.converter};
@@ -92,7 +119,7 @@ dojo.declare("dojox.wire.Wire",
 			var list = this.property.split('.');
 			for(var i in list){
 				if(!object){
-					throw new Error(this._wireClass + ".getValue(): invalid property=" + this.property);
+					return object; //anything (null, undefined, etc)
 				}
 				object = this._getPropertyValue(object, list[i]);
 			}

@@ -1,12 +1,12 @@
 if(!dojo._hasResource["dojox.data.demos.stores.LazyLoadJSIStore"]){
 dojo._hasResource["dojox.data.demos.stores.LazyLoadJSIStore"] = true;
 dojo.provide("dojox.data.demos.stores.LazyLoadJSIStore");
-dojo.require("dojo.data.JsonItemStore");
+dojo.require("dojo.data.ItemFileReadStore");
 
 dojo.declare("dojox.data.demos.stores.LazyLoadJSIStore", 
-	dojo.data.JsonItemStore, 
+	dojo.data.ItemFileReadStore, 
 	function(/* object */ keywordParameters){
-		// LazyLoadJSIStore extends JsonItemStore to implement an 
+		// LazyLoadJSIStore extends ItemFileReadStore to implement an 
 		// example of lazy-loading/faulting in items on-demand.
 		// Note this is certianly not a perfect implementation, it is 
 		// an example.
@@ -32,7 +32,7 @@ dojo.declare("dojox.data.demos.stores.LazyLoadJSIStore",
 		//	summary:
 		//		Overload of the loadItem function to fault in items.  This assumes the data for an item is laid out
 		//		in a RESTful sort of pattern name0/name1/data.json and so on and uses that to load the data.
-		//		It will also detect stub items in the newly loaded item and insert the stubs into the JsonItemStore
+		//		It will also detect stub items in the newly loaded item and insert the stubs into the ItemFileReadStore
 		//		list so they can also be loaded in on-demand.
 		//
 		//	item:
@@ -70,7 +70,7 @@ dojo.declare("dojox.data.demos.stores.LazyLoadJSIStore",
 			delete item.type;
 			delete item.parent;
 
-			//Set up the loaded values in the format JsonItemStore uses for attributes.
+			//Set up the loaded values in the format ItemFileReadStore uses for attributes.
 			for (i in data) {
 				if (dojo.isArray(data[i])) {
 					item[i] = data[i];
@@ -102,10 +102,10 @@ dojo.declare("dojox.data.demos.stores.LazyLoadJSIStore",
 								//Add in any parents to your parent so URL construstruction is accurate.
 								stub.parent[0] = parent + "/" + stub.parent[0]; 
 							}
-							//Finalize the addition of the new stub item into the JsonItemStore list.
+							//Finalize the addition of the new stub item into the ItemFileReadStore list.
 							self._arrayOfAllItems.push(stub);
-							stub[self._storeRef] = self;
-							stub[self._itemId] = (self._arrayOfAllItems.length - 1); //Last one pushed in should be the item
+							stub[self._storeRefPropName] = self;
+							stub[self._itemNumPropName] = (self._arrayOfAllItems.length - 1); //Last one pushed in should be the item
 							values[j] = stub; //Set the stub item back in its place and replace the stub notation.
 						}
 					}

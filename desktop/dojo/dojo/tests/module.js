@@ -13,10 +13,11 @@ try{
 	dojo.require("tests.AdapterRegistry");
 	dojo.require("tests.io.script");
 	dojo.require("tests.io.iframe");
-	dojo.require("tests.rpc");
+	dojo.requireIf(dojo.isBrowser, "tests.rpc");
 	dojo.require("tests.string");
 	dojo.require("tests.behavior");
 	dojo.require("tests.parser");
+	dojo.require("tests.colors");
 }catch(e){
 	doh.debug(e);
 }

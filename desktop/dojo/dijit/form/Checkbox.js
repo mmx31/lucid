@@ -3,8 +3,6 @@ dojo._hasResource["dijit.form.Checkbox"] = true;
 dojo.provide("dijit.form.Checkbox");
 
 dojo.require("dijit.form.Button");
-dojo.require("dijit.util.sniff");
-dojo.require("dijit.util.wai");
 
 dojo.declare(
 	"dijit.form.Checkbox",
@@ -26,18 +24,12 @@ dojo.declare(
 		// In case 2, the regular html inputs are invisible but still used by
 		// the user. They are turned quasi-invisible and overlay the background-image.
 
-		templateString:"<span class=\"${baseClass}\" baseClass=\"${baseClass}\"\n\t><input\n\t \tid=\"${id}\" tabIndex=\"${tabIndex}\" type=\"${_type}\" name=\"${name}\" value=\"${value}\"\n\t\tclass=\"dijitCheckboxInput\"\n\t\tdojoAttachPoint=\"inputNode;focusNode\"\n\t \tdojoAttachEvent=\"onmouseover:_onMouse;onmouseout:_onMouse;onclick:onClick\"\n></span>\n",
+		templateString:"<span class=\"${baseClass}\" baseClass=\"${baseClass}\"\n\t><input\n\t \tid=\"${id}\" tabIndex=\"${tabIndex}\" type=\"${_type}\" name=\"${name}\" value=\"${value}\"\n\t\tclass=\"dijitCheckboxInput\"\n\t\tdojoAttachPoint=\"inputNode,focusNode\"\n\t \tdojoAttachEvent=\"onmouseover:_onMouse,onmouseout:_onMouse,onclick:onClick\"\n></span>\n",
 
 		baseClass: "dijitCheckbox",
 
 		//	Value of "type" attribute for <input>
 		_type: "checkbox",
-
-		// checked: Boolean
-		// Corresponds to the native HTML <input> element's attribute.
-		// If true, checkbox is initially marked turned on;
-		// in markup, specified as "checked='checked'" or just "checked"
-		checked: false,
 
 		// value: Value
 		//	equivalent to value field on normal checkbox (if checked, the value is passed as
@@ -46,13 +38,13 @@ dojo.declare(
 
 		postCreate: function(){
 			dojo.setSelectable(this.inputNode, false);
-			this.setSelected(this.checked);
+			this.setChecked(this.checked);
 			dijit.form.ToggleButton.prototype.postCreate.apply(this, arguments);
 		},
 
-		setSelected: function(/*Boolean*/ selected){
-			this.inputNode.checked = this.checked = selected;
-			dijit.form.ToggleButton.prototype.setSelected.apply(this, arguments);
+		setChecked: function(/*Boolean*/ checked){
+			this.inputNode.checked = this.checked = checked;
+			dijit.form.ToggleButton.prototype.setChecked.apply(this, arguments);
 		},
 
 		setValue: function(/*String*/ value){
@@ -101,21 +93,21 @@ dojo.declare(
 			}, this);
 		},
 
-		setSelected: function(/*Boolean*/ selected){
-			// If I am being selected then have to deselect currently selected radio button
-			if(selected){
+		setChecked: function(/*Boolean*/ checked){
+			// If I am being checked then have to deselect currently checked radio button
+			if(checked){
 				dojo.forEach(this._groups[this.name], function(widget){
-					if(widget != this && widget.selected){
-						widget.setSelected(false);
+					if(widget != this && widget.checked){
+						widget.setChecked(false);
 					}
 				}, this);
 			}
-			dijit.form.Checkbox.prototype.setSelected.apply(this, arguments);			
+			dijit.form.Checkbox.prototype.setChecked.apply(this, arguments);			
 		},
 
 		onClick: function(/*Event*/ e){
-			if(!this.selected){
-				this.setSelected(true);
+			if(!this.checked){
+				this.setChecked(true);
 			}
 		}
 	}

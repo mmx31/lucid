@@ -18,15 +18,14 @@ dojo.mixin(dojox.off, {
 	// NET_CHECK: int
 	//		For advanced usage; most developers can ignore this.
 	//		Time in seconds on how often we should check the status of the
-	//		network with an automatic background timer. Defaults to 5.
+	//		network with an automatic background timer. The current default
+	//		is 5 seconds.
 	NET_CHECK: 5,
 	
 	// STORAGE_NAMESPACE: String
 	//		For advanced usage; most developers can ignore this.
 	//		The namespace we use to save core data into Dojo Storage.
-	//		We namespace based on the page's URL so that multiple
-	//		apps served from this domain won't have their data clash
-	STORAGE_NAMESPACE: "dot_" + window.location.href.replace(/[:\/\\ \.]/g, "_"),
+	STORAGE_NAMESPACE: "_dot",
 	
 	// enabled: boolean
 	//		For advanced usage; most developers can ignore this.
@@ -83,6 +82,8 @@ dojo.mixin(dojox.off, {
 	//		a new host added offline (from a call to addHostOffline); if false,
 	//		then nothing is needed.
 	browserRestart: false,
+	
+	_STORAGE_APP_NAME: window.location.href.replace(/[^0-9A-Za-z_]/g, "_"),
 	
 	_initializeCalled: false,
 	_storageLoaded: false,
@@ -171,6 +172,7 @@ dojo.mixin(dojox.off, {
 		//		we are able to go online.
 		
 		//console.debug("goOnline");
+		
 		if(dojox.off.sync.isSyncing || dojox.off.goingOnline){
 			return;
 		}
@@ -245,11 +247,15 @@ dojo.mixin(dojox.off, {
 		if(type == "save"){
 			if(saveData.isCoreSave && (saveData.status == dojox.storage.FAILED)){
 				dojox.off.coreOpFailed = true;
-				dojox.off.enabledabled = false;
+				dojox.off.enabled = false;
 			
 				// FIXME: Stop the background network thread
 				dojox.off.onFrameworkEvent("coreOperationFailed");
 			}
+		}else if(type == "coreOperationFailed"){
+			dojox.off.coreOpFailed = true;
+			dojox.off.enabled = false;
+			// FIXME: Stop the background network thread
 		}
 	},
 	
@@ -262,6 +268,7 @@ dojo.mixin(dojox.off, {
 	
 	_onLoad: function(){
 		//console.debug("dojox.off._onLoad");
+		
 		// both local storage and the page are finished loading
 		
 		// cache the Dojo JavaScript -- just use the default dojo.js
@@ -325,16 +332,19 @@ dojo.mixin(dojox.off, {
 	
 	_finishStartingUp: function(){
 		//console.debug("dojox.off._finishStartingUp");
+		
 		// this method is part of our _onLoad series of startup tasks
 		
-		if(this.enabled){
+		if(!this.hasOfflineCache){
+			this.onLoad();
+		}else if(this.enabled){
 			// kick off a thread to check network status on
 			// a regular basis
 			this._startNetworkThread();
 
 			// try to go online
 			this.goOnline(dojo.hitch(this, function(){
-				
+				//console.debug("Finished trying to go online");
 				// indicate we are ready to be used
 				dojox.off.onLoad();
 			}));
@@ -392,6 +402,7 @@ dojo.mixin(dojox.off, {
 		dojo.xhrGet({
 			url:		this._getAvailabilityURL(),
 			handleAs:	"text",
+			timeout:	this.NET_CHECK * 1000, 
 			error:		dojo.hitch(this, function(err){
 				//console.debug("dojox.off._isSiteAvailable.error: " + err);
 				this.goingOnline = false;
@@ -418,30 +429,44 @@ dojo.mixin(dojox.off, {
 			return;
 		}
 		
-		var errFunc = dojo.hitch(this, 
-			function(err){
-				if(this.isOnline){
-					this.isOnline = false;
-					this.onNetwork("offline");
-				}
-			}
-		);
-
-		var successFunc = dojo.hitch(this, 
-			function(data){
-				if(!this.isOnline){
-					this.isOnline = true;
-					this.onNetwork("online");
-				}
-			}
-		);
-
-		window.setInterval(dojo.hitch(this, function(){
-			dojo.xhrGet({
+		window.setInterval(dojo.hitch(this, function(){	
+			var d = dojo.xhrGet({
 				url:	 	this._getAvailabilityURL(),
 				handleAs:	"text",
-				error:		errFunc,
-				load:		successFunc
+				timeout: 	this.NET_CHECK * 1000,
+				error:		dojo.hitch(this, 
+								function(err){
+									if(this.isOnline){
+										this.isOnline = false;
+										
+										// FIXME: xhrGet() is not
+										// correctly calling abort
+										// on the XHR object when
+										// it times out; fix inside
+										// there instead of externally
+										// here
+										try{
+											if(typeof d.ioArgs.xhr.abort == "function"){
+												d.ioArgs.xhr.abort();
+											}
+										}catch(e){}
+					
+										// if things fell in the middle of syncing, 
+										// stop syncing
+										dojox.off.sync.isSyncing = false;
+					
+										this.onNetwork("offline");
+									}
+								}
+							),
+				load:		dojo.hitch(this, 
+								function(data){
+									if(!this.isOnline){
+										this.isOnline = true;
+										this.onNetwork("online");
+									}
+								}
+							)
 			});
 
 		}), this.NET_CHECK * 1000);

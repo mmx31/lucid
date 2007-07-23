@@ -106,7 +106,7 @@ dojo.locale = djConfig.locale;
 //TODOC:  HOW TO DOC THIS?
 dojo.version = {
 	// summary: version number of this instance of dojo.
-	major: 0, minor: 9, patch: 0, flag: "beta",
+	major: 0, minor: 0, patch: 0, flag: "dev",
 	revision: Number("$Rev: 9142 $".match(/[0-9]+/)[0]),
 	toString: function(){
 		with(dojo.version){
@@ -1354,7 +1354,7 @@ dojo._mixin = function(/*Object*/ obj, /*Object*/ props){
 		// the "tobj" condition avoid copying properties in "props"
 		// inherited from Object.prototype.  For example, if obj has a custom
 		// toString() method, don't overwrite it with the toString() method
-		// that props inherited from Object.protoype
+		// that props inherited from Object.prototype
 		if((typeof tobj[x] == "undefined") || (tobj[x] != props[x])){
 			obj[x] = props[x];
 		}
@@ -1469,6 +1469,45 @@ dojo._toArray = function(/*Object*/obj, /*Number?*/offset){
 	return arr;
 }
 
+// FIXME: this is unreviewed dojo.clone() function, 
+// which can clone any objects including HTML nodes
+
+//dojo.clone = function(/*anything*/ o){
+//	// summary:
+//	//		Clones objects (including DOM nodes) and all children.
+//	//		Warning: do not clone cyclic structures.
+//	if(!o){ return o; }
+//	if(dojo.isArray(o)){
+//		var r = [];
+//		for(var i = 0; i < o.length; ++i){
+//			r.push(dojo.clone(o[i]));
+//		}
+//		return r;
+//	}else if(dojo.isObject(o)){
+//		if(o.nodeType && o.cloneNode){ // isNode
+//			return o.cloneNode(true);
+//		}else{
+//			var r = new o.constructor();
+//			for(var i in o){
+//				if(!(i in r) || r[i] != o[i]){
+//					r[i] = dojo.clone(o[i]);
+//				}
+//			}
+//			return r;
+//		}
+//	}
+//	return o;
+//}
+
+dojo.trim = function(/*String*/ str){
+	// summary: trims whitespaces from both sides of the string
+	// description:
+	//	This version of trim() was selected for inclusion into the base
+	//	due to its compact size and relatively good performance (see Steven Levithan's blog: 
+	//	http://blog.stevenlevithan.com/archives/faster-trim-javascript).
+	//	The fastest but longest version of this function is going to be placed in dojo.string.
+	return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');	// String
+}
 
 }
 
@@ -2014,7 +2053,7 @@ dojo.Deferred = function(/*Function?*/ canceller){
 	//		callbacks can be added at any time.
 	//
 	//			// Deferred style:
-	//			function renderLotsOfData(data, callback){
+	//			function renderLotsOfData(data){
 	//				var d = new dojo.Deferred();
 	//				try{
 	//					for(var x in data){
@@ -2040,7 +2079,7 @@ dojo.Deferred = function(/*Function?*/ canceller){
 	//		timeout helps show why Deferreds rock:
 	//
 	//			// Deferred style and async func
-	//			function renderLotsOfData(data, callback){
+	//			function renderLotsOfData(data){
 	//				var d = new dojo.Deferred();
 	//				setTimeout(function(){
 	//					try{
@@ -2464,7 +2503,7 @@ dojo.provide("dojo._base.array");
 		d.mixin(d, {
 			indexOf: function(	/*Array*/		array, 
 								/*Object*/		value,
-								/*Integer*/		fromIndex,
+								/*Integer?*/	fromIndex,
 								/*Boolean?*/	findLast){
 				// summary:
 				//		locates the first index of the provided value in the passed
@@ -2491,14 +2530,14 @@ dojo.provide("dojo._base.array");
 				return -1;	// number
 			},
 
-			lastIndexOf: function(/*Array*/array, /*Object*/value, /*boolean?*/identity){
+			lastIndexOf: function(/*Array*/array, /*Object*/value, /*Integer?*/fromIndex){
 				// summary:
-				//		locates the lat index of the provided value in the passed
+				//		locates the last index of the provided value in the passed
 				//		array. If the value is not found, -1 is returned.
 				// description:
 				//		For details on this method, see:
 				// 			http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:lastIndexOf
-				return d.indexOf(array, value, identity, true); // number
+				return d.indexOf(array, value, fromIndex, true); // number
 			},
 
 			map: function(/*Array*/arr, /*Function*/func, /*Function?*/obj){
@@ -2624,13 +2663,14 @@ dojo.provide("dojo._base.Color");
 
 
 
-dojo.Color = function(/*r, g, b, a*/){
-	this.setColor.apply(this, arguments);
-}
+dojo.Color = function(/*Array|String|Object*/ color){
+	// summary:
+	//		takes a named string, hex string, array of rgb or rgba values,
+	//		an object with r, g, b, and a properties, or another dojo.Color object
+	if(color){ this.setColor(color); }
+};
 
-// FIXME: there's got to be a more space-efficient way to encode or discover these!!
-// eugene: let's support at least HTML4 colors (a standard subset of CSS3 color module),
-// we can add the rest later (with compact representation, of course)
+// FIXME: there's got to be a more space-efficient way to encode or discover these!!  Use hex?
 dojo.Color.named = {
 	black:      [0,0,0],
 	silver:     [192,192,192],
@@ -2650,109 +2690,116 @@ dojo.Color.named = {
 	aqua:		[0,255,255]
 };
 
-dojo.extend(dojo.Color, {
-	// FIXME: implement caching of the RGBA array generation!! It's stupid that we realloc
-	_cache: null,
-	setColor: function(/*r, g, b, a*/){
-		// summary:
-		// 		takes an r, g, b, a(lpha) value, [r, g, b, a] array, "rgb(...)"
-		// 		string, hex string (#aaa, #aaaaaa, aaaaaaa)
 
-		this._cache = [];
-		var d = dojo;
-		var a = arguments;
-		var a0 = a[0];
-		var pmap = (d.isArray(a0) ? a0 : (d.isString(a0) ? d.extractRgb(a0) : d._toArray(a)) );
-		d.forEach(["r", "g", "b", "a"], function(p, i){
-			this._cache[i] = this[p] = parseFloat(pmap[i]);
-		}, this);
-		this._cache[3] = this.a = this.a || 1.0;
+dojo.extend(dojo.Color, {
+	r: 255, g: 255, b: 255, a: 1,
+	_set: function(r, g, b, a){
+		var t = this; t.r = r; t.g = g; t.b = b; t.a = a;
 	},
-	toRgb: function(includeAlpha){
-		return this._cache.slice(0, (includeAlpha ? 4 : 3));
+	setColor: function(/*Array|String|Object*/ color){
+		// summary:
+		//		takes a named string, hex string, array of rgb or rgba values,
+		//		an object with r, g, b, and a properties, or another dojo.Color object
+		var d = dojo;
+		if(d.isString(color)){
+			d.colorFromString(color, this);
+		}else if(d.isArray(color)){
+			d.colorFromArray(color, this);
+		}else{
+			this._set(color.r, color.g, color.b, color.a);
+			if(!(color instanceof d.Color)){ this.sanitize(); }
+		}
+		return this;	// dojo.Color
+	},
+	sanitize: function(){
+		// summary: makes sure that the object has correct attributes
+		// description: the default implementation does nothing, 
+		//	include dojo.colors to augment it to real checks
+		return this;	// dojo.Color
+	},
+	toRgb: function(){
+		// summary: returns 3 component array of rgb values
+		var t = this;
+		return [t.r, t.g, t.b];	// Array
 	},
 	toRgba: function(){
-		return this._cache.slice(0, 4);
+		// summary: returns a 4 component array of rgba values
+		var t = this;
+		return [t.r, t.g, t.b, t.a];	// Array
 	},
 	toHex: function(){
-		return dojo.rgb2hex(this.toRgb());
+		// summary: returns a css color string in hexadecimal representation
+		var arr = dojo.map(["r", "g", "b"], function(x){
+			var s = this[x].toString(16);
+			return s.length < 2 ? "0" + s : s;
+		}, this);
+		return "#" + arr.join("");	// String
 	},
-	toCss: function(){
-		return "rgb(" + this.toRgb().join(", ") + ")";
+	toCss: function(/*Boolean?*/ includeAlpha){
+		// summary: returns a css color string in rgb(a) representation
+		var t = this, rgb = t.r + ", " + t.g + ", " + t.b;
+		return (includeAlpha ? "rgba(" + rgb + ", " + t.a : "rgb(" + rgb) + ")";	// String
 	},
 	toString: function(){
-		return this.toHex(); // decent default?
+		// summary: returns a visual representation of the color
+		return this.toCss(true); // String
 	}
 });
 
-dojo.blendColors = function(a, b, weight){
+dojo.blendColors = function(
+	/*dojo.Color*/ start, 
+	/*dojo.Color*/ end, 
+	/*Number*/ weight,
+	/*dojo.Color?*/ obj
+){
 	// summary: 
-	//		blend colors a and b with weight
-	//		from -1 to +1, 0 being a 50/50 blend
-	if(typeof a == "string"){ a = dojo.extractRgb(a); }
-	if(typeof b == "string"){ b = dojo.extractRgb(b); }
-	if(a["_cache"]){ a = a._cache; }
-	if(b["_cache"]){ b = b._cache; }
-	weight = Math.min(Math.max(-1, (weight||0)), 1);
-
-	// alex: this interface blows.
-	// map -1 to 1 to the range 0 to 1
-	weight = (weight + 1)/2;
-	
-	var c = [];
-
-	// var stop = (1000*weight);
-	for(var x = 0; x < 3; x++){
-		// console.debug(b[x] + ((a[x] - b[x]) * weight));
-		c[x] = parseInt( b[x] + ( (a[x] - b[x]) * weight) );
-	}
-	return c;
-}
-
-// get RGB array from css-style color declarations
-dojo.extractRgb = function(color){
-	color = color.toLowerCase();
-	if(!color.indexOf("rgb")){
-		var matches = color.match(/rgba*\((\d+), *(\d+), *(\d+)/i);
-		return dojo.map(matches.splice(1, 3), parseFloat);
-	}else{
-		return dojo.hex2rgb(color) || dojo.Color.named[color] || [255, 255, 255];
-	}
-}
-
-dojo.hex2rgb = function(hex){
-	var hexNum = "0123456789abcdef";
-	var rgb = new Array(3);
-	if(hex.charAt(0) == "#"){ hex = hex.substr(1); }
-	hex = hex.toLowerCase();
-	if(hex.replace(new RegExp("["+hexNum+"]", "g"), "") != ""){
-		return null;
-	}
-	if(hex.length == 3){
-		rgb[0] = hex.charAt(0) + hex.charAt(0);
-		rgb[1] = hex.charAt(1) + hex.charAt(1);
-		rgb[2] = hex.charAt(2) + hex.charAt(2);
-	}else{
-		rgb[0] = hex.substr(0, 2);
-		rgb[1] = hex.substr(2, 2);
-		rgb[2] = hex.substr(4);
-	}
-	for(var i = 0; i < rgb.length; i++){
-		rgb[i] = hexNum.indexOf(rgb[i].charAt(0)) * 16 + hexNum.indexOf(rgb[i].charAt(1));
-	}
-	return rgb;
-}
-
-dojo.rgb2hex = function(r, g, b){
-	// summary: converts an RGB numbers set to hex color code
-	var ret = dojo.map(((r._cache)||((!g) ? r : [r, g, b])), function(x, i){
-		var s = (new Number(x)).toString(16);
-		while(s.length < 2){ s = "0" + s; }
-		return s;
+	//		blend colors end and start with weight from 0 to 1, 0.5 being a 50/50 blend,
+	//		can reuse a previously allocated dojo.Color object for the result
+	var d = dojo, t = obj || new dojo.Color();
+	d.forEach(["r", "g", "b", "a"], function(x){
+		t[x] = start[x] + (end[x] - start[x]) * weight;
+		if(x != "a"){ t[x] = Math.round(t[x]); }
 	});
-	ret.unshift("#");
-	return ret.join("");  // String
-}
+	return t.sanitize();	// dojo.Color
+};
+
+dojo.colorFromRgb = function(/*String*/ color, /*dojo.Color?*/ obj){
+	// summary: get rgb(a) array from css-style color declarations
+	var m = color.toLowerCase().match(/^rgba?\(([\s\.,0-9]+)\)/);
+	return m && dojo.colorFromArray(m[1].split(/\s*,\s*/), obj);	// dojo.Color
+};
+
+dojo.colorFromHex = function(/*String*/ color, /*dojo.Color?*/ obj){
+	// summary: converts a hex string with a '#' prefix to a color object.
+	//	Supports 12-bit #rgb shorthand.
+	var d = dojo, t = obj || new d.Color(),
+		bits = (color.length == 4) ? 4 : 8,
+		mask = (1 << bits) - 1;
+	color = Number("0x" + color.substr(1));
+	if(isNaN(color)){
+		return null; // dojo.Color
+	}
+	d.forEach(["b", "g", "r"], function(x){
+		var c = color & mask;
+		color >>= bits;
+		t[x] = bits == 4 ? 17 * c : c;
+	});
+	t.a = 1;
+	return t;	// dojo.Color
+};
+
+dojo.colorFromArray = function(/*Array*/ a, /*dojo.Color?*/ obj){
+	// summary: builds a color from 1, 2, 3, or 4 element array
+	var t = obj || new dojo.Color();
+	t._set(Number(a[0]), Number(a[1]), Number(a[2]), Number(a[3]));
+	if(isNaN(t.a)){ t.a = 1; }
+	return t.sanitize();	// dojo.Color
+};
+
+dojo.colorFromString = function(/*String*/ str, /*dojo.Color?*/ obj){
+	var a = dojo.Color.named[str];
+	return a && dojo.colorFromArray(a, obj) || dojo.colorFromRgb(str, obj) || dojo.colorFromHex(str, obj);
+};
 
 }
 
@@ -3046,8 +3093,9 @@ dojo.provide("dojo._base.event");
 				// DO NOT replace the following to use dojo.body(), in IE, document.documentElement should be used
 				// here rather than document.body
 				var docBody = ((dojo.isIE<6)||(doc["compatMode"]=="BackCompat")) ? doc.body : doc.documentElement;
-				evt.pageX = evt.clientX + (docBody.scrollLeft || 0);
-				evt.pageY = evt.clientY + (docBody.scrollTop || 0);
+				var offset = dojo._getIeDocumentElementOffset();
+				evt.pageX = evt.clientX + dojo._fixIeBiDiScrollLeft(docBody.scrollLeft || 0) - offset.x;
+				evt.pageY = evt.clientY + (docBody.scrollTop || 0) - offset.y;
 				if(evt.type == "mouseover"){ 
 					evt.relatedTarget = evt.fromElement;
 				}
@@ -3804,7 +3852,7 @@ if(dojo.isIE && (dojo.isIE<7)){ // || dojo.isOpera){
 				// If child's computed left/top are not parseable as a number (e.g. "auto"), we
 				// have no choice but to examine the parent's computed style.
 				var p = node.parentNode;
-				if(p){
+				if(p && p.style){
 					var pcs = gcs(p);
 					if(pcs.overflow != "visible"){
 						var be = dojo._getBorderExtents(p, pcs);
@@ -3998,12 +4046,10 @@ if(dojo.isIE && (dojo.isIE<7)){ // || dojo.isOpera){
 		if(!node){ return 0; } // FIXME: throw an error?
 		var _b = dojo.body();
 		var retVal = 0;
-		while(node){
-			try{
-				if(gcs(node).position == "fixed"){
-					return 0;
-				}
-			}catch(e){}
+		while(node && node.style){
+			if(gcs(node).position == "fixed"){
+				return 0;
+			}
 			var val = node[prop];
 			if(val){
 				retVal += val - 0;
@@ -4022,12 +4068,55 @@ if(dojo.isIE && (dojo.isIE<7)){ // || dojo.isOpera){
 		var de = dojo.doc.documentElement;
 		return {
 			y: (_w.pageYOffset || de.scrollTop || _b.scrollTop || 0),
-			x: (_w.pageXOffset || de.scrollLeft || _b.scrollLeft || 0)
+			x: (_w.pageXOffset || dojo._fixIeBiDiScrollLeft(de.scrollLeft) || _b.scrollLeft || 0)
 		};
 	};
+	
+	dojo._isBodyLtr = function(){
+		//FIXME: could check html and body tags directly instead of computed style?  need to ignore case, accept empty values
+		return typeof dojo._bodyLtr == "undefined" ? 
+				(dojo._bodyLtr = dojo.getComputedStyle(dojo.body()).direction == "ltr") :
+				dojo._bodyLtr; // Boolean 
+	}
+	
+	dojo._getIeDocumentElementOffset = function(){
+		// summary
+		// The following values in IE contain an offset:
+		//     event.clientX 
+		//     event.clientY 
+		//     node.getBoundingClientRect().left
+		//     node.getBoundingClientRect().top
+		// But other position related values do not contain this offset, such as
+		// node.offsetLeft, node.offsetTop, node.style.left and node.style.top.
+		// The offset is always (2, 2) in LTR direction. When the body is in RTL
+		// direction, the offset counts the width of left scroll bar's width.
+		// This function computes the actual offset.
 
-	// IE version and quirks dependent. ugg.
-	var _d_off = ((dojo.isIE >= 7)&&(dojo.boxModel != "border-box")) ? 2 : 0; 
+		//NOTE: assumes we're being called in an IE browser
+
+		var de = dojo.doc.documentElement;
+		if(dojo.isIE >= 7){
+			return {x: de.getBoundingClientRect().left, y: de.getBoundingClientRect().top}; // Object
+		}else{
+			// IE 6.0
+			return {x: dojo._isBodyLtr() || window.parent == window ?
+				de.clientLeft : de.offsetWidth - de.clientWidth - de.clientLeft, 
+				y: de.clientTop}; // Object
+		}
+	};
+	
+	dojo._fixIeBiDiScrollLeft = function(/*Integer*/ scrollLeft){
+		// In RTL direction, scrollLeft should be a negative value, but IE 
+		// returns a positive one. All codes using documentElement.scrollLeft
+		// must call this function to fix this error, otherwise the position
+		// will offset to right when there is a horizonal scrollbar.
+		if(dojo.isIE && !dojo._isBodyLtr()){
+			var de = dojo.doc.documentElement;
+			return scrollLeft + de.clientWidth - de.scrollWidth; // Integer
+		}
+		return scrollLeft; // Integer
+	}
+	
 	dojo._abs = function(/*HTMLElement*/node, /*Boolean?*/includeScroll){
 		//	summary:
 		//		Gets the absolute position of the passed element based on the
@@ -4049,10 +4138,10 @@ if(dojo.isIE && (dojo.isIE<7)){ // || dojo.isOpera){
 		var db = dojo.body();
 
 		if(dojo.isIE){
-			with(node.getBoundingClientRect()){
-				ret.x = left-_d_off;
-				ret.y = top-_d_off;
-			}
+			var client = node.getBoundingClientRect();
+			var offset = dojo._getIeDocumentElementOffset();
+			ret.x = client.left - offset.x;
+			ret.y = client.top - offset.y;
 		}else if(ownerDocument["getBoxObjectFor"]){
 			// mozilla
 			var bo = ownerDocument.getBoxObjectFor(node);
@@ -4179,21 +4268,10 @@ dojo.addClass = function(/*HTMLElement*/node, /*String*/classStr){
 	}
 };
 
-(function(){
-	// FIXME: can be generally useful for trimming strings
-	var _trimRegEx = /^\s*([^\s]|[^\s].*[^\s])\s*$/;
-	var _trim = function(s){
-		// summary: trims spaces from left and right of the string
-		// s: String: a string to be trimmed
-		var t = _trimRegEx.exec(s);
-		return t ? t[1] : "";	// String
-	};
-	
-	dojo.removeClass = function(/*HTMLElement*/node, /*String*/classStr){
-		// summary: Removes classes from node.
-		node.className = _trim((" " + node.className + " ").replace(" " + classStr + " ", " "));
-	};
-})();
+dojo.removeClass = function(/*HTMLElement*/node, /*String*/classStr){
+	// summary: Removes classes from node.
+	node.className = dojo.trim((" " + node.className + " ").replace(" " + classStr + " ", " "));
+};
 
 dojo.toggleClass = function(/*HTMLElement*/node, /*String*/classStr, /*Boolean?*/condition){
 	//	summary: 	
@@ -4662,11 +4740,6 @@ dojo.provide("dojo._base.query");
 		}
 	];
 
-	var strip = function(val){
-		var re = /^\s+|\s+$/g;
-		return val.replace(re, "");	//	string
-	}
-
 	var handleAttrs = function(	attrList, 
 								query, 
 								getDefault, 
@@ -4693,7 +4766,7 @@ dojo.provide("dojo._base.query");
 							(value.charAt(0) == "\'")){
 							value = value.substring(1, value.length-1);
 						}
-						matcher = ta.match(strip(attr), strip(value));
+						matcher = ta.match(d.trim(attr), d.trim(value));
 						break;
 					}
 				}
@@ -5578,11 +5651,11 @@ dojo.provide("dojo._base.query");
 			return new d.NodeList(query);
 		}
 		if(typeof root == "string"){
-			root = dojo.byId(root);
+			root = d.byId(root);
 		}
 
 		// FIXME: should support more methods on the return than the stock array.
-		return _zip(getQueryFunc(query)(root||dojo.doc));
+		return _zip(getQueryFunc(query)(root||d.doc));
 	}
 
 	/*
@@ -6474,24 +6547,20 @@ dojo.declare("dojo._Animation", null,
 				if(dojo.isFunction(prop.end)){
 					prop.end = prop.end(prop);
 				}
-				/*
 				if(prop.start instanceof dojo.Color){
-					// save these so we don't have to call toRgb() every getValue() call
-					prop.startRgb = prop.start.toRgb();
-					prop.endRgb = prop.end.toRgb();
+					// create a reusable temp color object to keep intermediate results
+					prop.tempColor = new dojo.Color();
 				}
-				*/
 			}
-			this.getValue = function(n){
+			this.getValue = function(r){
 				var ret = {};
 				for(var p in this._properties){
 					var prop = this._properties[p];
 					var value = null;
 					if(prop.start instanceof dojo.Color){
-						value = dojo.rgb2hex(dojo.blendColors(prop.end, prop.start, n));
-						// value = "rbg("+dojo.blendColors(prop.end, prop.start, n).join(",")+")";
+						value = dojo.blendColors(prop.start, prop.end, r, prop.tempColor).toCss();
 					}else if(!dojo.isArray(prop.start)){
-						value = ((prop.end - prop.start) * n) + prop.start + (p != "opacity" ? prop.units||"px" : "");
+						value = ((prop.end - prop.start) * r) + prop.start + (p != "opacity" ? prop.units||"px" : "");
 					}
 					ret[p] = value;
 				}

@@ -32,7 +32,7 @@ dojo.declare(
 		 	-or-
 			<div dojoType="dijit._Calendar"></div>
 		*/
-		templateString:"<table cellspacing=\"0\" cellpadding=\"0\" class=\"calendarContainer\">\n\t<thead>\n\t\t<tr class=\"dijitReset calendarMonthContainer\" valign=\"top\">\n\t\t\t<th class='dijitReset' dojoAttachEvent=\"onclick: _onDecrementMonth;\">\n\t\t\t\t<span class=\"dijitA11yLeftArrow calendarIncrementControl calendarDecrease\">&#9668;</span>\n\t\t\t</th>\n\t\t\t<th class='dijitReset' colspan=\"5\">\n\t\t\t\t<div dojoAttachPoint=\"monthLabelSpacer\" class=\"calendarMonthLabelSpacer\"></div>\n\t\t\t\t<div dojoAttachPoint=\"monthLabelNode\" class=\"calendarMonth\"></div>\n\t\t\t</th>\n\t\t\t<th class='dijitReset' dojoAttachEvent=\"onclick: _onIncrementMonth;\">\n\t\t\t\t<span class=\"dijitA11yRightArrow calendarIncrementControl calendarIncrease\">&#9658;</span>\n\t\t\t</th>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<th class=\"dijitReset calendarDayLabelTemplate\"><span class=\"calendarDayLabel\"></span></th>\n\t\t</tr>\n\t</thead>\n\t<tbody dojoAttachEvent=\"onclick: _onDayClick;\" class=\"dijitReset calendarBodyContainer\">\n\t\t<tr class=\"dijitReset calendarWeekTemplate\">\n\t\t\t<td class=\"dijitReset calendarDateTemplate\"><span class=\"calendarDateLabel\"></span></td>\n\t\t</tr>\n\t</tbody>\n\t<tfoot class=\"dijitReset calendarYearContainer\">\n\t\t<tr>\n\t\t\t<td class='dijitReset' valign=\"top\" colspan=\"7\">\n\t\t\t\t<h3 class=\"calendarYearLabel\">\n\t\t\t\t\t<span dojoAttachPoint=\"previousYearLabelNode\"\n\t\t\t\t\t\tdojoAttachEvent=\"onclick: _onDecrementYear;\" class=\"calendarPreviousYear\"></span>\n\t\t\t\t\t<span dojoAttachPoint=\"currentYearLabelNode\" class=\"calendarSelectedYear\"></span>\n\t\t\t\t\t<span dojoAttachPoint=\"nextYearLabelNode\"\n\t\t\t\t\t\tdojoAttachEvent=\"onclick: _onIncrementYear;\" class=\"calendarNextYear\"></span>\n\t\t\t\t</h3>\n\t\t\t</td>\n\t\t</tr>\n\t</tfoot>\n</table>\t\n",
+		templateString:"<table cellspacing=\"0\" cellpadding=\"0\" class=\"calendarContainer\">\n\t<thead>\n\t\t<tr class=\"dijitReset calendarMonthContainer\" valign=\"top\">\n\t\t\t<th class='dijitReset' dojoAttachEvent=\"onclick: _onDecrementMonth\">\n\t\t\t\t<span class=\"calendarIncrementControl calendarDecrease\"><span class=\"dijitA11yLeftArrow calendarDecreaseInner\">&#9668;</span></span>\n\t\t\t</th>\n\t\t\t<th class='dijitReset' colspan=\"5\">\n\t\t\t\t<div dojoAttachPoint=\"monthLabelSpacer\" class=\"calendarMonthLabelSpacer\"></div>\n\t\t\t\t<div dojoAttachPoint=\"monthLabelNode\" class=\"calendarMonth\"></div>\n\t\t\t</th>\n\t\t\t<th class='dijitReset' dojoAttachEvent=\"onclick: _onIncrementMonth\">\n\t\t\t\t<span class=\"calendarIncrementControl calendarIncrease\"><span class=\"dijitA11yRightArrow calendarIncreaseInner\">&#9658;</span></span>\n\t\t\t</th>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<th class=\"dijitReset calendarDayLabelTemplate\"><span class=\"calendarDayLabel\"></span></th>\n\t\t</tr>\n\t</thead>\n\t<tbody dojoAttachEvent=\"onclick: _onDayClick\" class=\"dijitReset calendarBodyContainer\">\n\t\t<tr class=\"dijitReset calendarWeekTemplate\">\n\t\t\t<td class=\"dijitReset calendarDateTemplate\"><span class=\"calendarDateLabel\"></span></td>\n\t\t</tr>\n\t</tbody>\n\t<tfoot class=\"dijitReset calendarYearContainer\">\n\t\t<tr>\n\t\t\t<td class='dijitReset' valign=\"top\" colspan=\"7\">\n\t\t\t\t<h3 class=\"calendarYearLabel\">\n\t\t\t\t\t<span dojoAttachPoint=\"previousYearLabelNode\"\n\t\t\t\t\t\tdojoAttachEvent=\"onclick: _onDecrementYear\" class=\"calendarPreviousYear\"></span>\n\t\t\t\t\t<span dojoAttachPoint=\"currentYearLabelNode\" class=\"calendarSelectedYear\"></span>\n\t\t\t\t\t<span dojoAttachPoint=\"nextYearLabelNode\"\n\t\t\t\t\t\tdojoAttachEvent=\"onclick: _onIncrementYear\" class=\"calendarNextYear\"></span>\n\t\t\t\t</h3>\n\t\t\t</td>\n\t\t</tr>\n\t</tfoot>\n</table>\t\n",
 
 		// value: Date
 		// the currently selected Date
@@ -51,10 +51,17 @@ dojo.declare(
 				if(!this.isDisabledDate(value, this.lang)){
 					this.value = value;
 					this.value.setHours(0,0,0,0);
-					this.onValueChanged(this.value);
+					this.onChange(this.value);
 				}
 				this._populateGrid();
 			}
+		},
+
+		_appendText: function(node, text){
+			while(node.firstChild){
+				node.removeChild(node.firstChild);
+			}
+			node.appendChild(document.createTextNode(text));
 		},
 
 		_populateGrid: function(){
@@ -108,18 +115,18 @@ dojo.declare(
 				template.className =  clazz + "Month calendarDateTemplate";
 				template.dijitDateValue = date.valueOf();
 				var label = dojo.query(".calendarDateLabel", template)[0];
-				label.innerHTML = date.getDate();
+				this._appendText(label, date.getDate());
 			}, this);
 
 			// Fill in localized month name
 			var monthNames = dojo.date.locale.getNames('months', 'wide', 'standAlone', this.lang);
-			this.monthLabelNode.innerHTML = monthNames[month.getMonth()];
+			this._appendText(this.monthLabelNode, monthNames[month.getMonth()]);
 
 			// Fill in localized prev/current/next years
 			var y = month.getFullYear() - 1;
 			dojo.forEach(["previous", "current", "next"], function(name){
-				this[name+"YearLabelNode"].innerHTML =
-					dojo.date.locale.format(new Date(y++, 0), {selector:'year', locale:this.lang});
+				this._appendText(this[name+"YearLabelNode"],
+					dojo.date.locale.format(new Date(y++, 0), {selector:'year', locale:this.lang}));
 			}, this);
 		},
 
@@ -144,14 +151,14 @@ dojo.declare(
 			var dayNames = dojo.date.locale.getNames('days', this.dayWidth, 'standAlone', this.lang);
 			var dayOffset = dojo.cldr.supplemental.getFirstDayOfWeek(this.lang);
 			dojo.query(".calendarDayLabel", this.domNode).forEach(function(label, i){
-				label.innerHTML = dayNames[(i + dayOffset) % 7];
-			});
+				this._appendText(label, dayNames[(i + dayOffset) % 7]);
+			}, this);
 
 			// Fill in spacer element with all the month names (invisible) so that the maximum width will affect layout
 			var monthNames = dojo.date.locale.getNames('months', 'wide', 'standAlone', this.lang);
 			dojo.forEach(monthNames, function(name){
 				var monthSpacer = dojo.doc.createElement("div");
-				monthSpacer.innerHTML = name;
+				this._appendText(monthSpacer, name);
 				this.monthLabelSpacer.appendChild(monthSpacer);
 			}, this);
 
@@ -204,7 +211,7 @@ dojo.declare(
 			//summary: a date cell was selected.  It may be the same as the previous value.
 		},
 
-		onValueChanged: function(/*Date*/date){
+		onChange: function(/*Date*/date){
 			//summary: called only when the selected date has changed
 		},
 

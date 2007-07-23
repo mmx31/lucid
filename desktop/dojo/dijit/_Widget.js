@@ -2,7 +2,7 @@ if(!dojo._hasResource["dijit._Widget"]){
 dojo._hasResource["dijit._Widget"] = true;
 dojo.provide("dijit._Widget");
 
-dojo.require("dijit.util.manager");
+dojo.require("dijit._base");
 
 dojo.declare("dijit._Widget", null,
 function(params, srcNodeRef){
@@ -42,9 +42,16 @@ function(params, srcNodeRef){
 	if(params){
 		dojo.mixin(this,params);
 	}
-
 	this.postMixInProperties();
-	dijit.util.manager.add(this);
+	
+	// generate an id for the widget if one wasn't specified
+	// (be sure to do this before buildRendering() because that function might
+	// expect the id to be there.
+	if(!this.id){
+		this.id=dijit.getUniqueId(this.declaredClass.replace(/\./g,"_"));
+	}
+	dijit.registry.add(this);
+
 	this.buildRendering();
 	if(this.domNode){
 		this.domNode.setAttribute("widgetId", this.id);
@@ -143,7 +150,7 @@ function(params, srcNodeRef){
 			dojo.forEach(array, dojo.disconnect);
 		});
 		this.destroyRendering(finalize);
-		dijit.util.manager.remove(this.id);
+		dijit.registry.remove(this.id);
 	},
 
 	destroyRendering: function(/*Boolean*/ finalize){
@@ -200,7 +207,7 @@ function(params, srcNodeRef){
 		// summary:
 		//	return all the descendent widgets
 		var list = dojo.query('[widgetId]', this.domNode);
-		return list.map(dijit.util.manager.byNode);		// Array
+		return list.map(dijit.byNode);		// Array
 	},
 
 	nodesWithKeyClick : ["input", "button"],

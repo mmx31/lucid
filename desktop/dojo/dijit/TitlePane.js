@@ -26,9 +26,7 @@ dojo.declare(
 	//		milliseconds to fade in/fade out
 	duration: 250,
 
-	contentClass : "dijitTitlePaneContent",
-
-	templateString:"<div id=\"${id}\">\n\t<div dojoAttachEvent=\"onclick: _onTitleClick; onkeypress: _onTitleKey\" tabindex=\"0\"\n\t\t\twaiRole=\"button\" class=\"dijitTitlePaneTitle\" dojoAttachPoint=\"focusNode\">\n\t\t<span class=\"dijitOpenCloseArrowOuter\" style=\"float: left;\"><span class=\"dijitOpenCloseArrowInner\"></span></span>\n\t\t<span dojoAttachPoint=\"titleNode\" class=\"dijitInlineBox dijitTitleNode\"></span>\n\t</div>\n\t<div dojoAttachPoint=\"containerNode\" waiRole=\"region\" tabindex=\"-1\" class=\"dijitTitlePaneContent\"></div>\n</div>\n",
+	templateString:"<div id=\"${id}\">\n\t<div dojoAttachEvent=\"onclick:_onTitleClick,onkeypress: _onTitleKey\" tabindex=\"0\"\n\t\t\twaiRole=\"button\" class=\"dijitTitlePaneTitle\" dojoAttachPoint=\"focusNode\">\n\t\t<span dojoAttachPoint=\"arrowNode\" class=\"dijitArrowNode\"><span dojoAttachPoint=\"arrowNodeInner\" class=\"dijit_a11y dijitArrowNodeInner\"></span></span>\n\t\t<span dojoAttachPoint=\"titleNode\" class=\"dijitInlineBox dijitTitleNode\"></span>\n\t</div>\n\t<div dojoAttachPoint=\"containerNode\" waiRole=\"region\" tabindex=\"-1\" class=\"dijitTitlePaneContent\"></div>\n</div>\n",
 
 	postCreate: function(){
 		this.setTitle(this.title);
@@ -36,9 +34,10 @@ dojo.declare(
 			dojo.style(this.containerNode, "display", "none");
 		}
 		this._setCss();
+		dojo.setSelectable(this.titleNode, false);
 		dijit.TitlePane.superclass.postCreate.apply(this, arguments);
-		dijit.util.wai.setAttr(this.containerNode, "waiState", "titleledby", this.titleNode.id);
-		dijit.util.wai.setAttr(this.focusNode, "waiState", "haspopup", "true");
+		dijit.wai.setAttr(this.containerNode, "waiState", "titleledby", this.titleNode.id);
+		dijit.wai.setAttr(this.focusNode, "waiState", "haspopup", "true");
 
 		// setup open/close animations
 		this._slideIn = dojo.fx.slideIn({node: this.containerNode, duration: this.duration});
@@ -62,7 +61,11 @@ dojo.declare(
 		var boolIndex = this.open;
 		dojo.removeClass(this.domNode, classes[!boolIndex+0]);
 		this.domNode.className += " " + classes[boolIndex+0];
-	},
+
+		// provide a character based indicator for images-off mode
+		this.arrowNodeInner.innerHTML =
+			this.open ? "&#9660;" : "&#9658;";
+	},	
 
 	_onTitleKey: function(/*Event*/ e){
 		// summary: callback when user hits a key

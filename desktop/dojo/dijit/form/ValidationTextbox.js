@@ -3,12 +3,11 @@ dojo._hasResource["dijit.form.ValidationTextbox"] = true;
 dojo.provide("dijit.form.ValidationTextbox");
 
 dojo.require("dojo.i18n");
-dojo.require("dijit.util.wai");
 
 dojo.require("dijit.form.Textbox");
 dojo.require("dijit.Tooltip");
 
-dojo.requireLocalization("dijit.form", "validate", null, "zh-cn,ja,it,ROOT,fr,de");
+dojo.requireLocalization("dijit.form", "validate", null, "fr,ja,it,de,ROOT,zh-cn");
 
 dojo.declare(
 	"dijit.form.ValidationTextbox",
@@ -28,9 +27,6 @@ dojo.declare(
 		// invalidMessage: String
 		// 		The message to display if value is invalid.
 		invalidMessage: "",
-		// listenOnKeyPress: Boolean
-		//		Updates messages on each key press.  Default is true.
-		listenOnKeyPress: true,
 		// constraints: Object
 		//		user-defined object needed to pass parameters to the validator functions
 		constraints: {},
@@ -126,18 +122,14 @@ dojo.declare(
 			dojo.addClass(this.nodeWithBorder, "dijitInputFieldValidation"+className);
 		},
 
-		onblur: function(evt){
+		_onBlur: function(evt){
 			this.validate(false);
-			dijit.form.ValidationTextbox.superclass.onblur.apply(this, arguments);
+			this.inherited('_onBlur', arguments);
 		},
 
 		onfocus: function(evt){
 			dijit.form.ValidationTextbox.superclass.onfocus.apply(this, arguments);
-			if(this.listenOnKeyPress){
-				this.validate(true);
-			}else{
-				this.updateClass("Warning");
-			}
+			this.validate(true);
 		},
 
 		onkeyup: function(evt){
@@ -177,7 +169,7 @@ dojo.declare(
 		toString: function(){
 			// summary: display the widget as a printable string using the widget's value
 			var val = this.getValue();
-			return val ? ((typeof val == "string") ? val : this.serialize(val)) : "";
+			return val ? ((typeof val == "string") ? val : this.serialize(val, this.constraints)) : "";
 		},
 
 		validate: function(){
@@ -262,10 +254,10 @@ dojo.declare(
 		postCreate: function(){
 			dijit.form.RangeBoundTextbox.superclass.postCreate.apply(this, arguments);
 			if(typeof this.constraints.min != "undefined"){
-				dijit.util.wai.setAttr(this.domNode, "waiState", "valuemin", this.constraints.min);
+				dijit.wai.setAttr(this.domNode, "waiState", "valuemin", this.constraints.min);
 			}
 			if(typeof this.constraints.max != "undefined"){
-				dijit.util.wai.setAttr(this.domNode, "waiState", "valuemax", this.constraints.max);
+				dijit.wai.setAttr(this.domNode, "waiState", "valuemax", this.constraints.max);
 			}
 		}
 	}

@@ -2,8 +2,6 @@ if(!dojo._hasResource["dijit.ColorPalette"]){
 dojo._hasResource["dijit.ColorPalette"] = true;
 dojo.provide("dijit.ColorPalette");
 
-dojo.require("dijit.util.place");
-dojo.require("dijit.util.typematic");
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 
@@ -28,9 +26,9 @@ dojo.declare(
 	//		Size of grid, either "7x10" or "3x4".
 	palette: "7x10",
 
-	//_selectedColor: String
+	//_value: String
 	//		The value of the selected color.
-	selectedColor: null,
+	value: null,
 
 	//_currentFocus: Integer
 	//		Index of the currently focused color.
@@ -106,17 +104,16 @@ dojo.declare(
 				highlightNode.alt = highlightNode.color = color;
 				var highlightStyle = highlightNode.style;
 				highlightStyle.color = highlightStyle.backgroundColor = "#" + color;
-				dojo.forEach(["onMouseOver", "onBlur", "onFocus", "onKeyDown"], function(handler){
-					this.connect(highlightNode, handler.toLowerCase(), handler);
+				dojo.forEach(["MouseDown", "MouseOut", "MouseOver", "Blur", "Focus", "KeyDown"], function(handler){
+					this.connect(highlightNode, "on"+handler.toLowerCase(), "_onColor"+handler);
 				}, this);
-				this.connect(highlightNode, "onmousedown", "onClick");
 				this.divNode.appendChild(highlightNode);
 				var coords = this._paletteCoords;
 				highlightStyle.top = coords.topOffset + (row * coords.cHeight) + "px";
 				highlightStyle.left = coords.leftOffset + (col * coords.cWidth) + "px";
 				highlightNode.setAttribute("tabIndex","-1");
 				highlightNode.title = color+ " "; //color name will go here
-				dijit.util.wai.setAttr(highlightNode, "waiRole", "role", "td");
+				dijit.wai.setAttr(highlightNode, "waiRole", "role", "td");
 				highlightNode.index = this._highlightNodes.length;
 				this._highlightNodes.push(highlightNode);
 			}
@@ -140,7 +137,7 @@ dojo.declare(
 			LEFT_ARROW: -1
 		};
 		for(var key in keyIncrementMap){
-			dijit.util.typematic.addKeyListener(this.domNode,
+			dijit.typematic.addKeyListener(this.domNode,
 				{keyCode:dojo.keys[key], ctrlKey:false, altKey:false, shiftKey:false},
 				this,
 				function(){
@@ -151,7 +148,13 @@ dojo.declare(
 		}
 	},
 
-	onColorSelect: function(color){
+	focus: function(){
+		// summary:
+		//		Focus this ColorPalette.
+		dijit.focus(this._highlightNodes[this._currentFocus]);
+	},
+
+	onChange: function(color){
 		// summary:
 		//		Callback when a color is selected.
 		// color: String
@@ -159,20 +162,28 @@ dojo.declare(
 		console.debug("Color selected is: "+color);
 	},
 
-	onClick: function(/*Event*/ evt){
+	_onColorMouseDown: function(/*Event*/ evt){
 		// summary:
-		//		Handler when a mouse click occurs. This causes the color that is clicked to be selected.
+		//		Handler for onMouseDown. Selects the color.
 		// evt:
-		//			The click event.
+		//		The mouse event.
 		var target = evt.currentTarget;
 		this._currentFocus = target.index;
-		target.focus();
+		dijit.focus(target);
 		this._selectColor(target);	
 	},
 
-	onMouseOver: function(evt){
+	_onColorMouseOut: function(/*Event*/ evt){
 		// summary:
-		//		Handler for onMouseOver. This changes the color being highlighted.
+		//		Handler for onMouseOut. Removes highlight.
+		// evt:
+		//		The mouse event.
+		dojo.removeClass(evt.currentTarget, "dijitPaletteImgHighlight");
+	},
+
+	_onColorMouseOver: function(/*Event*/ evt){
+		// summary:
+		//		Handler for onMouseOver. Highlights the color.
 		// evt:
 		//		The mouse event.
 		var target = evt.currentTarget;
@@ -180,20 +191,21 @@ dojo.declare(
 		target.focus();
 	},
 
-	onBlur: function(evt){
+	_onColorBlur: function(/*Event*/ evt){
 		// summary:
-		//		Handler for the onBlur event. Causes the highlight Div
-		//		to be destroyed.
+		//		Handler for onBlur. Removes highlight and sets
+		//		the first color as the palette's tab point.
 		// evt:
 		//		The blur event.
 		dojo.removeClass(evt.currentTarget, "dijitPaletteImgHighlight");
+		evt.currentTarget.tabIndex = -1;
+		this._currentFocus = 0;
+		this._highlightNodes[0].tabIndex = 0;
 	},
 
-	onFocus: function(evt){
+	_onColorFocus: function(/*Event*/ evt){
 		// summary:
-		//		Handler for onFocus. This highlights the first color in the
-		//		palette if it is the first time the palette is focused.
-		//		Otherwise the last color highlighted is focused.
+		//		Handler for onFocus. Highlights the color.
 		// evt:
 		//		The focus event.
 		if(this._currentFocus != evt.currentTarget.index){
@@ -204,12 +216,10 @@ dojo.declare(
 
 	},
 
-	onKeyDown: function(evt){
+	_onColorKeyDown: function(/*Event*/ evt){
 		// summary:
 		//		Handler for the onKeyDown event.
-		//		It handles space and tab being pressed.
 		//		Space selects the color currently highlighted.
-		//		Tab blurs the area currently highlighted.
 		// evt:
 		//		The keydown event.
 
@@ -220,11 +230,11 @@ dojo.declare(
 
 	_selectColor: function(selectNode){	
 		// summary:
-		// 		This selects a color. It triggers the onColorSelect event
+		// 		This selects a color. It triggers the onChange event
 		// area:
 		//		The area node that covers the color being selected.
-		this.selectedColor = selectNode.color;
-		this.onColorSelect(selectNode.color);
+		this.value = selectNode.color;
+		this.onChange(selectNode.color);
 	},
 
 	_navigateByKey: function(increment, typeCount){

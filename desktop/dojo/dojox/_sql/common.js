@@ -2,7 +2,7 @@ if(!dojo._hasResource["dojox._sql.common"]){
 dojo._hasResource["dojox._sql.common"] = true;
 dojo.provide("dojox._sql.common");
 
-dojo.require("dojox.crypto.DES");
+dojo.require("dojox._sql._crypto");
 
 // summary:
 //	Executes a SQL expression.
@@ -37,11 +37,7 @@ dojo.require("dojox.crypto.DES");
 dojox.sql = new Function("return dojox.sql._exec(arguments);");
 
 dojo.mixin(dojox.sql, {
-	// FIXME: This database name might make conflicts with
-	// other web applications that are also using Dojo SQL
-	// on the same host -- create a way to differentiate the
-	// database names
-	dbName: "PersistentStorage",
+	dbName: null,
 	
 	// summary:
 	//	If true, then we print out any SQL that is executed
@@ -53,10 +49,19 @@ dojo.mixin(dojox.sql, {
 			return;
 		}
 		
+		if(!this.dbName){
+			this.dbName = "dot_store_" 
+				+ window.location.href.replace(/[^0-9A-Za-z_]/g, "_");
+			//console.debug("Using Google Gears database " + this.dbName);
+		}
+		
+		if(!dbName){
+			dbName = this.dbName;
+		}
+		
 		try{
 			this._initDb();
-		
-			this.db.open(dbName||this.dbName);
+			this.db.open(dbName);
 			this._dbOpen = true;
 		}catch(exp){
 			throw exp.message||exp;
@@ -75,8 +80,12 @@ dojo.mixin(dojox.sql, {
 			return;
 		}
 		
+		if(!dbName){
+			dbName = this.dbName;
+		}
+		
 		try{
-			this.db.close(dbName||this.dbName);
+			this.db.close(dbName);
 			this._dbOpen = false;
 		}catch(exp){
 			throw exp.message||exp;
@@ -137,7 +146,7 @@ dojo.mixin(dojox.sql, {
 
 			// execute the SQL and get the results
 			var rs = this.db.execute(sql, args);
-
+			
 			// Gears ResultSet object's are ugly -- normalize
 			// these into something JavaScript programmers know
 			// how to work with, basically an array of 
@@ -170,7 +179,13 @@ dojo.mixin(dojox.sql, {
 
 	_initDb: function(){
 		if(!this.db){
-			this.db = google.gears.factory.create('beta.database', '1.0');
+			try{
+				this.db = google.gears.factory.create('beta.database', '1.0');
+			}catch(exp){
+				dojo.setObject("google.gears.denied", true);
+				dojox.off.onFrameworkEvent("coreOperationFailed");
+				throw "Google Gears must be allowed to run";
+			}
 		}
 	},
 
@@ -365,7 +380,7 @@ dojo.declare("dojox.sql._SQLCrypto", null,
 				// a Google Gears Worker Pool
 			
 				// do the actual encryption now, asychronously on a Gears worker thread
-				dojox.crypto.DES.encrypt(sqlParam, password, dojo.hitch(this, function(results){
+				dojox._sql._crypto.encrypt(sqlParam, password, dojo.hitch(this, function(results){
 					// set the new encrypted value
 					this._finalArgs[paramIndex] = results;
 					this._finishedCrypto++;
@@ -503,7 +518,7 @@ dojo.declare("dojox.sql._SQLCrypto", null,
 	_decryptSingleColumn: function(columnName, columnValue, password, currentRowIndex,
 											callback){
 		//console.debug("decryptSingleColumn, columnName="+columnName+", columnValue="+columnValue+", currentRowIndex="+currentRowIndex)
-		dojox.crypto.DES.decrypt(columnValue, password, dojo.hitch(this, function(results){
+		dojox._sql._crypto.decrypt(columnValue, password, dojo.hitch(this, function(results){
 			// set the new decrypted value
 			this._finalResultSet[currentRowIndex][columnName] = results;
 			this._finishedCrypto++;

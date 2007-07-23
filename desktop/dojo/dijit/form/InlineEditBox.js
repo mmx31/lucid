@@ -17,7 +17,7 @@ dojo.declare(
 	//		Wrapper widget to a text edit widget.
 	//		The text is displayed on the page using normal user-styling.
 	//		When clicked, the text is hidden, and the edit widget is
-	//		visible, allowing the text to be updated.  Additionally,
+	//		visible, allowing the text to be updated.  Optionally,
 	//		Save and Cancel button are displayed below the edit widget.
 	//		When Save is clicked, the text is pulled from the edit
 	//		widget and redisplayed and the edit widget is again hidden.
@@ -29,11 +29,15 @@ dojo.declare(
 	//		void focus()
 	//		It must also be able to initialize with style="display:none;" set.
 {
-	templateString:"<span>\n\t<span class='dijitInlineValue' tabIndex=\"0\" dojoAttachPoint=\"editable;focusNode\" style=\"\" waiRole=\"button\"\n\t\tdojoAttachEvent=\"onkeypress:_onKeyPress;onclick:_onClick;onmouseout:_onMouseOut;onmouseover:_onMouseOver;onfocus:_onMouseOver;onblur:_onMouseOut;\"></span>\n\t<fieldset style=\"display:none;\" dojoAttachPoint=\"editNode\" class=\"dijitInlineEditor\">\n\t\t<div dojoAttachPoint=\"containerNode\" dojoAttachEvent=\"onkeyup:checkForValueChange;\"></div>\n\t\t<button class='saveButton' dojoAttachPoint=\"saveButton\" dojoType=\"dijit.form.Button\" dojoAttachEvent=\"onClick:save\">${buttonSave}</button>\n\t\t<button class='cancelButton' dojoAttachPoint=\"cancelButton\" dojoType=\"dijit.form.Button\" dojoAttachEvent=\"onClick:cancel\">${buttonCancel}</button>\n\t</fieldset>\n</span>\n",
+	templateString:"<span>\n\t<span class='dijitInlineValue' tabIndex=\"0\" dojoAttachPoint=\"editable,focusNode\" style=\"\" waiRole=\"button\"\n\t\tdojoAttachEvent=\"onkeypress:_onKeyPress,onclick:_onClick,onmouseout:_onMouseOut,onmouseover:_onMouseOver,onfocus:_onMouseOver,onblur:_onMouseOut\"></span>\n\t<fieldset style=\"display:none;\" dojoAttachPoint=\"editNode\" class=\"dijitInlineEditor\">\n\t\t<div dojoAttachPoint=\"containerNode\" dojoAttachEvent=\"onkeypress:_onEditWidgetKeyPress\"></div>\n\t\t<span dojoAttachPoint=\"buttonSpan\">\n\t\t\t<button class='saveButton' dojoAttachPoint=\"saveButton\" dojoType=\"dijit.form.Button\" dojoAttachEvent=\"onClick:save\">${buttonSave}</button>\n\t\t\t<button class='cancelButton' dojoAttachPoint=\"cancelButton\" dojoType=\"dijit.form.Button\" dojoAttachEvent=\"onClick:cancel\">${buttonCancel}</button>\n\t\t</span>\n\t</fieldset>\n</span>\n",
 
 	// editing: Boolean
 	//		Is the node currently in edit mode?
 	editing: false,
+
+	// autoSave: Boolean
+	//				Changing the value automatically saves it, don't have to push save button
+	autoSave: true,
 
 	// buttonSave: String
 	//              Save button label
@@ -43,31 +47,45 @@ dojo.declare(
 	//              Cancel button label
 	buttonCancel: "",
 
-	// renderHTML: Boolean
+	// renderAsHtml: Boolean
 	//              should text render as HTML(true) or plain text(false)
-	renderHTML: false,
+	renderAsHtml: false,
 
 	widgetsInTemplate: true,
 
-	postCreate: function(){
+	startup: function(){
 		// look for the input widget as a child of the containerNode
-		var _this = this;
-		dojo.addOnLoad(function(){
-			if(_this.editWidget){
-				_this.containerNode.appendChild(_this.editWidget.domNode);
+		if(!this._started){
+
+			if(this.editWidget){
+				this.containerNode.appendChild(this.editWidget.domNode);
 			}else{
-				_this.editWidget = _this.getChildren()[0];
+				this.editWidget = this.getChildren()[0];
 			}
-			_this._setEditValue = dojo.hitch(_this.editWidget,_this.editWidget.setDisplayedValue||_this.editWidget.setValue);
-			_this._getEditValue = dojo.hitch(_this.editWidget,_this.editWidget.getDisplayedValue||_this.editWidget.getValue);
-			_this._setEditFocus = dojo.hitch(_this.editWidget,_this.editWidget.focus);
-			_this.editWidget.onValueChanged = dojo.hitch(_this,"checkForValueChange");
-			_this.checkForValueChange();
-			_this._showText();
-		});
+			// #3209: copy the style from the source
+			// don't copy ALL properties though, just the necessary/applicable ones
+			dojo.forEach(["fontSize","fontFamily","fontWeight"], function(prop){
+				this.editWidget.focusNode.style[prop]=this._srcStyle[prop];
+				this.editable.style[prop]=this._srcStyle[prop];
+			}, this);
+			this._setEditValue = dojo.hitch(this.editWidget,this.editWidget.setDisplayedValue||this.editWidget.setValue);
+			this._getEditValue = dojo.hitch(this.editWidget,this.editWidget.getDisplayedValue||this.editWidget.getValue);
+			this._setEditFocus = dojo.hitch(this.editWidget,this.editWidget.focus);
+			this.editWidget.onChange = dojo.hitch(this,"_onChange");
+			this._showText();
+
+			this._started = true;
+		}
+	},
+
+	postCreate: function(){
+		if(this.autoSave){
+			this.buttonSpan.style.display="none";
+		}
 	},
 
 	postMixInProperties: function(){
+		this._srcStyle=dojo.getComputedStyle(this.srcNodeRef);
 		dijit.form.InlineEditBox.superclass.postMixInProperties.apply(this, arguments);
 		this.messages = dojo.i18n.getLocalization("dijit", "common", this.lang);
 		dojo.forEach(["buttonSave", "buttonCancel"], function(prop){
@@ -76,6 +94,7 @@ dojo.declare(
 	},
 
 	_onKeyPress: function(e){
+		// summary: handle keypress when edit box is not open
 		if(this.disabled || e.altKey || e.ctrlKey){ return; }
 		if(e.charCode == dojo.keys.SPACE || e.keyCode == dojo.keys.ENTER){
 			dojo.stopEvent(e);
@@ -97,10 +116,6 @@ dojo.declare(
 		}
 	},
 
-	onClick: function(/*Event*/ e){
-		// summary: callback for when button is clicked; user can override this function
-	},
-
 	_onClick: function(e){
 		// summary
 		// 		When user clicks the text, then start editing.
@@ -111,18 +126,18 @@ dojo.declare(
 		this.editing = true;
 
 		// show the edit form and hide the read only version of the text
-		this._setEditValue(this._isEmpty ? '' : (this.renderHTML ? this.editable.innerHTML : this.editable.firstChild.nodeValue));
+		this._setEditValue(this._isEmpty ? '' : (this.renderAsHtml ? this.editable.innerHTML : this.editable.firstChild.nodeValue));
 		this._initialText = this._getEditValue();
 		this._visualize();
 
-		this._setEditFocus();
-		this.saveButton.disable();
-		// moved to postCreate to always listen
-		//this.editWidget.onValueChanged = dojo.hitch(this,"checkForValueChange");
-		this.onClick();
+		// Before changing the focus, give the browser time to render.
+		setTimeout(dojo.hitch(this, function(){	
+			this._setEditFocus();
+			this.saveButton.setDisabled(true);
+		}), 1);
 	},
 
-	_visualize: function(e){
+	_visualize: function(){
 		dojo.style(this.editNode, "display", this.editing ? "" : "none");
 		dojo.style(this.editable, "display", this.editing ? "none" : "");
 	},
@@ -134,27 +149,50 @@ dojo.declare(
 		// TODO: show user defined message in gray
 		if(/^\s*$/.test(value)){ value = "?"; this._isEmpty = true; }
 		else { this._isEmpty = false; }
-		if(this.renderHTML){
+		if(this.renderAsHtml){
 			this.editable.innerHTML = value;
 		}else{
 			this.editable.innerHTML = "";
 			this.editable.appendChild(document.createTextNode(value));
 		}
 		this._visualize();
+		// #3209: resize the textarea to match the text
+		// height scales automatically; only width needs setting
+		// TODO: implement resize functions in the widgets so InlineEditBox doesn't have to know about things like TextArea's iframe
+		/*
+		if(this.editWidget.iframe){
+			dojo.contentBox(this.editWidget.iframe, {w:dojo.contentBox(this.editable).w});
+		}else{
+			dojo.contentBox(this.editWidget.focusNode, {w:dojo.contentBox(this.editable).w});
+		}*/
 	},
 
 	save: function(e){
-		// summary: Callback when user presses "Save" button
+		// summary: Callback when user presses "Save" button or it's simulated.
+		// e is passed in if click on save button or user presses Enter.  It's not
+		// passed in when called by _onBlur.
 		if(e){ dojo.stopEvent(e); }
 		this.editing = false;
 		this._showText();
+		// If save button pressed on non-autoSave widget or Enter pressed on autoSave
+		// widget, restore focus to the inline text.
+		if(e){ dijit.focus(this.focusNode); }
+
+		if(this._lastValue != this._lastValueReported){
+			this.onChange(this._lastValue); // tell the world that we have changed
+		}
 	},
 
 	cancel: function(e){
-		// summary: Callback when user presses "Cancel" button
+		// summary: Callback when user presses "Cancel" button or it's simulated.
+		// e is passed in if click on cancel button or user presses Esc.  It's not
+		// passed in when called by _onBlur.
 		if(e){ dojo.stopEvent(e); }
 		this.editing = false;
 		this._visualize();
+		// If cancel button pressed on non-autoSave widget or Esc pressed on autoSave
+		// widget, restore focus to the inline text.
+		if(e){ dijit.focus(this.focusNode); }
 	},
 
 	setValue: function(/*String*/ value){
@@ -164,32 +202,53 @@ dojo.declare(
 		this._showText();
 	},
 
-	checkForValueChange: function(){
-		// summary
-		//		Callback when user changes input value.
-		//		Enable save button if the text value is different than the original value.
-		if(this.editing){
-			(this._getEditValue() == this._initialText) ? this.saveButton.disable() : this.saveButton.enable();
+	_onEditWidgetKeyPress: function(e){
+		// summary:
+		//		Callback when keypress in the edit box (see template).
+		//		For autoSave widgets, if Esc/Enter, call cancel/save.
+		//		For non-autoSave widgets, enable save button if the text value is 
+		//		different than the original value.
+		if(this.autoSave){
+			// If Enter/Esc pressed, treat as save/cancel.
+			if(e.keyCode == dojo.keys.ESCAPE){
+				this.cancel(e);
+			}else if(e.keyCode == dojo.keys.ENTER){
+				this.save(e);
+			}
 		}else{
-			this._showText();
+			this.saveButton.setDisabled(false);
 		}
 
 	},
 
-	disable: function(){
-		this.saveButton.disable();
-		this.cancelButton.disable();
-		this.editable.disabled = true;
-		this.editWidget.disable();
-		dijit.form.InlineEditBox.superclass.disable.apply(this, arguments);
+	_onBlur: function(){
+		// summary:
+		//	Called by the focus manager in focus.js when focus moves outside of the 
+		//	InlineEditBox widget (or it's descendants).
+		if(this.autoSave && this.editing){
+			if(this._getEditValue() == this._initialText){
+				this.cancel();
+			}else{
+				this.save();
+			}
+		}
 	},
 
-	enable: function(){
-		this.checkForValueChange();
-		this.cancelButton.enable();
-		this.editable.disabled = false;
-		this.editWidget.enable();
-		dijit.form.InlineEditBox.superclass.enable.apply(this, arguments);
+	_onChange: function(){
+		// summary:
+		//	This is called when the underlying widget fires an onChange event,
+		//	which means that the user has finished entering the value
+		if(this.autoSave){
+			this.save();
+		}
+	},
+
+	setDisabled: function(/*Boolean*/ disabled){
+		this.saveButton.setDisabled(disabled);
+		this.cancelButton.setDisabled(disabled);
+		this.editable.disabled = disabled;
+		this.editWidget.setDisabled(disabled);
+		dijit.form.InlineEditBox.superclass.setDisabled.apply(this, arguments);
 	}
 });
 

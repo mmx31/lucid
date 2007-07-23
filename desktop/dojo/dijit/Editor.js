@@ -6,7 +6,7 @@ dojo.require("dijit.Toolbar");
 dojo.require("dijit._Container");
 dojo.require("dijit._editor.plugins.DefaultToolbar");
 dojo.require("dojo.i18n");
-dojo.requireLocalization("dijit._editor", "commands", null, "it,ROOT,de");
+dojo.requireLocalization("dijit._editor", "commands", null, "ROOT,it,de");
 
 dojo.declare(
 	"dijit.Editor",

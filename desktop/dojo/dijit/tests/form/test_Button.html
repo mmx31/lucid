@@ -52,7 +52,7 @@
 		document.write("<style>	@import '../../themes/"+theme+"/"+theme+".css'; </style>");
 	</script>
 		<h1 class="testTitle">Dijit Button Test</h1>
-		<h2>Simple, drop down & combo buttons</h2>
+		<h2>Simple, drop down &amp; combo buttons</h2>
 		<p>
 		Buttons can do an action, display a menu, or both:
 		</p>
@@ -75,7 +75,7 @@
 			<div dojoType="dijit.form.DropDownButton" iconClass="noteIcon">
 				<span>Color</span>
 				<div dojoType="dijit.ColorPalette" id="colorPalette" style="display: none" palette="3x4"
-					onColorSelect="console.log(this.selectedColor);"></div>
+					onChange="console.log(this.value);"></div>
 			</div>
 			<div dojoType="dijit.form.ComboButton" optionsTitle='save options' onClick='logMessage("clicked combo save")'
 					iconClass="plusBlockIcon">
@@ -95,10 +95,10 @@
 		<h2>Toggle buttons</h2>
 		<p>The button CSS as well as the icon CSS can change on toggle </p>
 		<div class="box">
-			<button dojoType="dijit.form.ToggleButton" onChange="console.log('toggled button selected='+arguments[0]);" iconClass="dijitCheckboxIcon">
+			<button dojoType="dijit.form.ToggleButton" onChange="console.log('toggled button checked='+arguments[0]);" iconClass="dijitCheckboxIcon">
 				Toggle me
 			</button>
-			<button dojoType="dijit.form.ToggleButton" onChange="console.log('toggled button selected='+arguments[0]);" iconClass="dijitRadioIcon">
+			<button dojoType="dijit.form.ToggleButton" onChange="console.log('toggled button checked='+arguments[0]);" iconClass="dijitRadioIcon">
 				Toggle me
 			</button>
 		</div>
@@ -193,7 +193,7 @@
 		<script type="text/javascript">
 			// FIXME: doesn't the manager have a function for filtering by type?
 			function forEachButton(func){
-				var registry = dijit.util.manager.getWidgets();
+				var registry = dijit.manager.getWidgets();
 				for(var id in registry){
 					if(registry[id] instanceof dijit.form.Button){
 						func(registry[id]);
@@ -204,7 +204,7 @@
 			var disabled=false;
 			function toggleDisabled(){	
 				disabled=!disabled;
-				forEachButton(function(widget){ widget._setDisabled(disabled); });
+				forEachButton(function(widget){ widget.setDisabled(disabled); });
 				dojo.byId("toggle").innerHTML= disabled ? "Enable all" : "Disable all";
 			}
 			var labels=["<img src='../images/note.gif' width='20' height='20'>All", "<i>work</i>", "and no", "<h1>play</h1>",

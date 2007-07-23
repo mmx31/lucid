@@ -6,7 +6,7 @@
 		</style>
 		<script type="text/javascript"
 			src="../dojo.js"
-			djConfig="isDebug:true"></script>
+			djConfig="isDebug: true, parseOnLoad: true"></script>
 		<script type="text/javascript">
 			dojo.require("dojo.parser");
 			dojo.require("doh.runner");
@@ -43,6 +43,15 @@
 						i.fromMarkup = true;
 						return i;
 					}
+				}
+			);
+
+			dojo.declare("tests.parser.inputClass", null, 
+				function(args, node){ dojo.mixin(this, args); },
+				{
+					// these attributes are special in HTML, they don't have a value specified
+					disabled: false,
+					checked: false
 				}
 			);
 
@@ -94,7 +103,15 @@
 						function testMarkupFactory(t){
 							t.t(dojo.exists("obj3"));
 							t.t(obj3.fromMarkup);
-						}
+						},
+						function testDisabledFlag(t){
+							t.t(disabledObj.disabled);
+							t.f(disabledObj.checked);
+						},
+						function testCheckedFlag(t){
+							t.f(checkedObj.disabled);
+							t.t(checkedObj.checked);
+						}						
 					]
 				);
 				doh.run();
@@ -103,7 +120,7 @@
 	</head>
 	<body>
 		<div dojoType="tests.parser.Class1" jsId="obj" 
-			strProp="3" intProp="5" arrProp="foo; bar; baz" boolProp="true">
+			strProp="3" intProp="5" arrProp="foo, bar, baz" boolProp="true">
 			<script type="dojo/method" event="preamble">
 				this.preambleTestProp = 3;
 			</script>
@@ -124,5 +141,7 @@
 		</div>
 		<div dojoType="tests.parser.Class2" jsId="obj3">
 		</div>
+		<input dojoType="tests.parser.inputClass" jsId="checkedObj" checked type="checkbox">
+		<button dojoType="tests.parser.inputClass" jsId="disabledObj" disabled>hi</button>
 	</body>
 </html>

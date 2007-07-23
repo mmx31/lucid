@@ -1,9 +1,11 @@
 if(!dojo._hasResource["dijit._editor.plugins.LinkDialog"]){
 dojo._hasResource["dijit._editor.plugins.LinkDialog"] = true;
 dojo.provide("dijit._editor.plugins.LinkDialog");
+
+dojo.require("dijit._Widget");
+dojo.require("dijit._Templated");
 dojo.require("dijit._editor._Plugin");
 dojo.require("dijit.Dialog");
-dojo.require("dijit._Templated");
 
 dojo.declare("dijit._editor.plugins.LinkDialog", 
 	[ dijit._editor._Plugin, dijit._Widget ],  
@@ -29,8 +31,8 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 			"<span>url: &nbsp;</span>",
 			"<input class='dijitComboBoxInput' type='text' dojoAttachPoint='urlInput'>",
 			"<br>",
-			"<input class='dijitButtonNode' type='button' dojoAttachEvent='onclick: setValue;' value='set'>",
-			"<input class='dijitButtonNode' type='button' dojoAttachEvent='onclick: hideEditor;' value='cancel'>"
+			"<input class='dijitButtonNode' type='button' dojoAttachEvent='onclick: setValue' value='set'>",
+			"<input class='dijitButtonNode' type='button' dojoAttachEvent='onclick: hideEditor' value='cancel'>"
 		].join(""),
 		useDefaultCommand: false,
 		command: "createLink",
@@ -53,10 +55,10 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 			}
 		},
 		showEditor: function(){
-			if(!this.button.selected){
+			if(!this.button.checked){
 				console.debug("selected");
 				this.editor.execCommand("unlink");
-				// this.button.setSelected();
+				// this.button.setChecked();
 			}else{
 
 				// FIXME: IE is *really* b0rken
@@ -66,7 +68,7 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 				}
 				dojo.coords(this.button.domNode);
 				this._linkDialog.show(this.button.domNode);
-				this.urlInput.focus();
+				dijit.focus(this.urlInput);
 			}
 		},
 		updateState: function(){
@@ -84,10 +86,10 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 				try{
 					// var enabled = _e.queryCommandEnabled("unlink");
 					var enabled = _e.queryCommandEnabled("createlink");
-					// this.button._setDisabled(!enabled);
-					if(this.button.setSelected){
-						var selected = !!dojo.withGlobal(this.editor.window, "getAncestorElement",dijit._editor.selection, ['a']);
-						this.button.setSelected(selected);
+					// this.button.setDisabled(!enabled);
+					if(this.button.setChecked){
+						var checked = !!dojo.withGlobal(this.editor.window, "getAncestorElement",dijit._editor.selection, ['a']);
+						this.button.setChecked(checked);
 					}
 				}catch(e){
 					console.debug(e);

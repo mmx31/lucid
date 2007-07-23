@@ -131,7 +131,7 @@ dojo.declare(
 	//		name of attribute that holds children of a tree node
 	childrenAttr: "children",
 
-	templateString:"<div class=\"TreeContainer\" style=\"\" waiRole=\"tree\"\n\tdojoAttachEvent=\"onclick:_onClick;onkeypress:_onKeyPress\"\n></div>\n",		
+	templateString:"<div class=\"TreeContainer\" style=\"\" waiRole=\"tree\"\n\tdojoAttachEvent=\"onclick:_onClick,onkeypress:_onKeyPress\"\n></div>\n",		
 
 	isExpanded: true, // consider this "root node" to be always expanded
 
@@ -166,7 +166,7 @@ dojo.declare(
 		var div = document.createElement('div');
 		div.style.display = 'none';
 		div.className="TreeContainer";	
-		dijit.util.wai.setAttr(div, "waiRole", "role", "presentation");
+		dijit.wai.setAttr(div, "waiRole", "role", "presentation");
 		this.containerNodeTemplate = div;
 
 
@@ -197,7 +197,7 @@ dojo.declare(
 	_domElement2TreeNode: function(/*DomNode*/ domElement){
 		var ret;
 		do{
-			ret=dijit.util.manager.byNode(domElement);
+			ret=dijit.byNode(domElement);
 		}while(!ret && (domElement=domElement.parentNode));
 		return ret;
 	},
@@ -269,7 +269,7 @@ dojo.declare(
 	// summary
 	//		Single node within a tree
 
-	templateString:"<div class=\"TreeNode TreeExpandLeaf TreeChildrenNo\" waiRole=\"presentation\"\n\tdojoAttachEvent=\"onfocus:_onFocus\";\n\t><span dojoAttachPoint=\"expandoNode\" class=\"TreeExpando\" waiRole=\"presentation\"\n\t></span\n\t><span dojoAttachPoint=\"expandoNodeText\" class=\"dijitExpandoText\" waiRole=\"presentation\"\n\t></span\n\t><div dojoAttachPoint=\"iconNode\" class=\"TreeIcon\" waiRole=\"presentation\"\n\t ><div dojoAttachPoint=\"contentNode\" class=\"TreeContent\" waiRole=\"presentation\"\n\t  ><span dojoAttachPoint=labelNode class=\"TreeLabel\" wairole=\"treeitem\" expanded=\"true\" tabindex=\"-1\"\n\t  ></span\n\t ></div\n\t></div\n></div>\n",		
+	templateString:"<div class=\"TreeNode TreeExpandLeaf TreeChildrenNo\" waiRole=\"presentation\"\n\t><span dojoAttachPoint=\"expandoNode\" class=\"TreeExpando\" waiRole=\"presentation\"\n\t></span\n\t><span dojoAttachPoint=\"expandoNodeText\" class=\"dijitExpandoText\" waiRole=\"presentation\"\n\t></span\n\t><div dojoAttachPoint=\"iconNode\" class=\"TreeIcon\" waiRole=\"presentation\"\n\t ><div dojoAttachPoint=\"contentNode\" class=\"TreeContent\" waiRole=\"presentation\"\n\t  ><span dojoAttachPoint=labelNode class=\"TreeLabel\" wairole=\"treeitem\" expanded=\"true\" tabindex=\"-1\"\n\t  ></span\n\t ></div\n\t></div\n></div>\n",		
 
 	// type: String
 	//		User defined identifier to differentiate nodes, and to control icon used
@@ -311,12 +311,6 @@ dojo.declare(
 		this._setExpando(false);	
 	},
 	
-	_onFocus: function(/*Event*/ e){
-		// summary: don't bubble focus out of tree
-
-		dojo.stopEvent(e);
-	},
-
 	_updateLayout: function(){
 		// summary: set appropriate CSS classes for this.domNode
 
@@ -372,8 +366,8 @@ dojo.declare(
 		}
 
 		this.isExpanded = true;
-		dijit.util.wai.setAttr(this.labelNode, "waiState", "expanded", "true");
-		dijit.util.wai.setAttr(this.containerNode, "waiRole", "role", "group");
+		dijit.wai.setAttr(this.labelNode, "waiState", "expanded", "true");
+		dijit.wai.setAttr(this.containerNode, "waiRole", "role", "group");
 
 		this._setExpando();
 
@@ -395,7 +389,7 @@ dojo.declare(
 		}
 
 		this.isExpanded = false;
-		dijit.util.wai.setAttr(this.labelNode, "waiState", "expanded", "false");
+		dijit.wai.setAttr(this.labelNode, "waiState", "expanded", "false");
 		this._setExpando();
 
 		this._slideOut.play();

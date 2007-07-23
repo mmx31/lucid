@@ -2,9 +2,7 @@ if(!dojo._hasResource["dijit.form.ComboBox"]){
 dojo._hasResource["dijit.form.ComboBox"] = true;
 dojo.provide("dijit.form.ComboBox");
 
-dojo.require("dijit.util.scroll");
-dojo.require("dijit.util.wai");
-dojo.require("dojo.data.JsonItemStore");
+dojo.require("dojo.data.ItemFileReadStore");
 dojo.require("dijit.form._DropDownTextBox");
 dojo.require("dijit.form.ValidationTextbox");
 
@@ -31,6 +29,11 @@ dojo.declare(
 		// store: Object
 		//		Reference to data provider object used by this ComboBox
 		store: null,
+
+		// query: Object 
+		//		A query that can be passed to 'store' to initially filter the items, 
+		//		before doing further filtering based on searchAttr and the key. 
+		query: {},
 
 		// autoComplete: Boolean
 		//		If you type in a partial string, and then tab out of the <input> box,
@@ -103,7 +106,7 @@ dojo.declare(
 			// Mozilla
 			// parts borrowed from http://www.faqts.com/knowledge_base/view.phtml/aid/13562/fid/130
 			if(element.setSelectionRange){
-				element.focus();
+				dijit.focus(element);
 				element.setSelectionRange(start, end);
 			}else if(element.createTextRange){ // IE
 				var range = element.createTextRange();
@@ -117,7 +120,7 @@ dojo.declare(
 				// do we need these?
 				element.value = element.value;
 				element.blur();
-				element.focus();
+				dijit.focus(element);
 				// figure out how far back to go
 				var dist = parseInt(element.value.length)-end;
 				var tchar = String.fromCharCode(37);
@@ -156,8 +159,14 @@ dojo.declare(
 				case dojo.keys.PAGE_UP:
 				case dojo.keys.UP_ARROW:
 					if(this._isShowingNow){
-						evt.keyCode==dojo.keys.PAGE_UP ? this._popupWidget.pageUp() : this._popupWidget._highlightPrevOption();
-						this._announceOption(this._popupWidget.getHighlightedOption());
+						if(!this._popupWidget.getHighlightedOption()){
+							this._hideResultList();
+						}else{
+							evt.keyCode==dojo.keys.PAGE_UP ? 
+								this._popupWidget.pageUp() :
+								this._popupWidget._highlightPrevOption();
+							this._announceOption(this._popupWidget.getHighlightedOption());
+						}
 					}
 					dojo.stopEvent(evt);
 					this._prev_key_backspace = false;
@@ -174,7 +183,7 @@ dojo.declare(
 						this._prev_key_backspace = false;
 						this._prev_key_esc = false;
 						if(this._popupWidget.getHighlightedOption()){
-							this._popupWidget.setValue({target:this._popupWidget.getHighlightedOption()});
+							this._popupWidget.setValue({target:this._popupWidget.getHighlightedOption()}, true);
 						}else{
 							this.setDisplayedValue(this.getDisplayedValue());
 						}
@@ -243,7 +252,10 @@ dojo.declare(
 			// IE7: clear selection so next highlight works all the time
 			this._setSelectedRange(this.focusNode, this.focusNode.value.length, this.focusNode.value.length);
 			// does text autoComplete the value in the textbox?
-			if(new RegExp("^"+this.focusNode.value, this.ignoreCase ? "i" : "").test(text)){
+			// #3744: escape regexp so the user's input isn't treated as a regular expression.
+			// Example: If the user typed "(" then the regexp would throw "unterminated parenthetical."
+			// Also see #2558 for the autocompletion bug this regular expression fixes.
+			if(new RegExp("^"+escape(this.focusNode.value), this.ignoreCase ? "i" : "").test(escape(text))){
 				var cpos = this._getCaretPos(this.focusNode);
 				// only try to extend if we added the last character at the end of the input
 				if((cpos+1) > this.focusNode.value.length){
@@ -286,7 +298,7 @@ dojo.declare(
 			(dataObject.query[this.searchAttr]!="*")){
 				this._autoCompleteText(zerothvalue);
 				// announce the autocompleted value
-				dijit.util.wai.setAttr(this.focusNode || this.domNode, "waiState", "valuenow", zerothvalue);
+				dijit.wai.setAttr(this.focusNode || this.domNode, "waiState", "valuenow", zerothvalue);
 			}
 			// #2309: iterate over cache nondestructively
 			for(var i=0; i<results.length; i++){
@@ -327,7 +339,7 @@ dojo.declare(
 			this.parentClass.onfocus.apply(this, arguments);
 		},
 
-		onblur:function(){
+		onblur:function(){ /* not _onBlur! */
 			// call onblur first to avoid race conditions with _hasFocus
 			dijit.form._DropDownTextBox.prototype.onblur.apply(this, arguments);
 			if(!this._isShowingNow){
@@ -368,16 +380,16 @@ dojo.declare(
 			}else{
 				tgt = evt.target;
 			}
-			this._doSelect(tgt);
 			if(!evt.noHide){
 				this._hideResultList();
-				this._setSelectedRange(this.focusNode, 0, null);
+				this._setCaretPos(this.focusNode, this.store.getValue(tgt.item, this.searchAttr).length);
 			}
+			this._doSelect(tgt);
 			this.focus();
 		},
 
 		_doSelect: function(tgt){
-			this.setValue(this.store.getValue(tgt.item, this.searchAttr));
+			this.setValue(this.store.getValue(tgt.item, this.searchAttr), true);
 		},
 
 		_onArrowClick: function(){
@@ -403,7 +415,7 @@ dojo.declare(
 		_startSearch: function(/*String*/ key){
 			this.makePopup();
 			// create a new query to prevent accidentally querying for a hidden value from FilteringSelect's keyField
-			var query={};
+			var query=this.query;
 			this._lastQuery=query[this.searchAttr]=key+"*";
 			// no need to page; no point in caching the return object
 			this.store.fetch({queryOptions:{ignoreCase:this.ignoreCase}, query: query, onComplete:dojo.hitch(this, "_openResultList"), count:this.searchLimit});
@@ -420,12 +432,14 @@ dojo.declare(
 				var items = dojo.query("> option", this.srcNodeRef).map(function(node){
 					return { value: node.getAttribute("value"), name: String(node.innerHTML) };
 				});
-				this.store = new dojo.data.JsonItemStore({data: {identifier:this._getValueField(), items:items}});
+				this.store = new dojo.data.ItemFileReadStore({data: {identifier:this._getValueField(), items:items}});
 
 				// if there is no value set and there is an option list,
 				// set the value to the first value to be consistent with native Select
 				if(items&&items.length&&!this.value){
-					this.value=items[0][this._getValueField()];
+					// For <select>, IE does not let you set the value attribute of the srcNodeRef (and thus dojo.mixin does not copy it).
+					// IE does understand selectedIndex though, which is automatically set by the selected attribute of an option tag
+					this.value=items[this.srcNodeRef.selectedIndex!=-1?this.srcNodeRef.selectedIndex:0][this._getValueField()];
 				}
 				
 				this.srcNodeRef.innerHTML="";
@@ -440,7 +454,7 @@ dojo.declare(
 		},
 
 		open:function(){
-			this._popupWidget.onValueChanged=dojo.hitch(this, this._selectOption);
+			this._popupWidget.onChange=dojo.hitch(this, this._selectOption);
 			// connect onkeypress to ComboBox
 			this._popupWidget._onkeypresshandle=this.connect(this._popupWidget.domNode, "onkeypress", "onkeypress");
 			return dijit.form._DropDownTextBox.prototype.open.apply(this, arguments);
@@ -470,13 +484,13 @@ dojo.declare(
 //
 // Also, doesn't seem like this should inherit from FormElement, and again I'm not
 // sure of the utility of dijit.form._DropDownTextBox.Popup;
-// all the popup functionality is supposed to be in dijit.util.popup
+// all the popup functionality is supposed to be in dijit.popup
 //
 	{
 		// summary:
 		//	Focus-less div based menu for internal use in ComboBox
 
-		templateString:"<div class='dijitMenu' dojoAttachEvent='onclick; onmouseover; onmouseout;' tabIndex='-1' style='display:none; position:absolute; overflow:\"auto\";'></div>",
+		templateString:"<div class='dijitMenu' dojoAttachEvent='onclick,onmouseover,onmouseout' tabIndex='-1' style='display:none; position:absolute; overflow:\"auto\";'></div>",
 		_onkeypresshandle:null,
 
 		postCreate:function(){
@@ -517,7 +531,7 @@ dojo.declare(
 				// recurse to the top
 				tgt=tgt.parentNode;
 			}
-			this.setValue({target:tgt});
+			this.setValue({target:tgt}, true);
 		},
 
 		onmouseover:function(/*Event*/ evt){
@@ -558,18 +572,15 @@ dojo.declare(
 			}else if(this._highlighted_option.nextSibling){
 				this._focusOptionNode(this._highlighted_option.nextSibling);
 			}
-			dijit.util.scroll.scrollIntoView(this._highlighted_option);
+			dijit.scrollIntoView(this._highlighted_option);
 		},
 
 
 		_highlightPrevOption:function(){
-			if(!this.getHighlightedOption()){
-				dijit.util.popup.close(true);
-				return;
-			}else if(this._highlighted_option.previousSibling){
+			if(this._highlighted_option.previousSibling){
 				this._focusOptionNode(this._highlighted_option.previousSibling);
 			}
-			dijit.util.scroll.scrollIntoView(this._highlighted_option);
+			dijit.scrollIntoView(this._highlighted_option);
 		},
 
 		_page:function(/*Boolean*/ up){

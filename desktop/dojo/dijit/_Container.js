@@ -2,8 +2,6 @@ if(!dojo._hasResource["dijit._Container"]){
 dojo._hasResource["dijit._Container"] = true;
 dojo.provide("dijit._Container");
 
-dojo.require("dijit.util.manager");
-
 dojo.declare("dijit._Contained",
 	null,
 	{
@@ -98,7 +96,7 @@ dojo.declare("dijit._Container",
 		getChildren: function(){
 			// summary:
 			//		returns array of children widgets
-			return dojo.query("> [widgetId]", this.containerNode || this.domNode).map(dijit.util.manager.byNode); // Array
+			return dojo.query("> [widgetId]", this.containerNode || this.domNode).map(dijit.byNode); // Array
 		},
 
 		hasChildren: function(){

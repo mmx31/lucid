@@ -150,7 +150,7 @@ dojo.mixin(dojox.off.ui, {
 	},
 	
 	_templateLoaded: function(data){
-		//console.debug("dojo.off.ui._templateLoaded");
+		//console.debug("dojox.off.ui._templateLoaded");
 		// inline our HTML
 		var container = dojo.byId(this.autoEmbedID);
 		if(container){ container.innerHTML = data; }
@@ -191,13 +191,16 @@ dojo.mixin(dojox.off.ui, {
 		// if offline functionality is disabled, disable everything
 		this._setOfflineEnabled(dojox.off.enabled);
 		
+		// update our UI based on the state of the network
+		this._onNetwork(dojox.off.isOnline ? "online" : "offline");
+		
 		// try to go online
 		this._testNet();
 	},
 	
 	_testNet: function(){
 		dojox.off.goOnline(dojo.hitch(this, function(isOnline){
-			//console.debug("testNetwork callback, isOnline="+isOnline);
+			//console.debug("testNet callback, isOnline="+isOnline);
 			
 			// display our online/offline results
 			this._onNetwork(isOnline ? "online" : "offline");
@@ -297,6 +300,10 @@ dojo.mixin(dojox.off.ui, {
 			if(roller){ roller.style.display = "none"; }
 			
 			if(cancel){ cancel.style.display = "none"; }
+			
+			if(syncMessages){
+				dojo.removeClass(syncMessages, "dot-sync-error");
+			}
 		}
 	},
 	
@@ -497,7 +504,10 @@ dojo.mixin(dojox.off.ui, {
 		}else if(type == "coreOperationFailed"){
 			console.log("Application does not have permission to use Dojo Offline");
 		
-			// FIXME: TODO: Update UI based on core operation failing
+			if(!this._userInformed){
+				alert("This application will not work if Google Gears is not allowed to run");
+				this._userInformed = true;
+			}
 		}else if(type == "offlineCacheInstalled"){
 			// clear out the 'needs offline cache' info
 			this._hideNeedsOfflineCache();
@@ -585,6 +595,10 @@ dojo.mixin(dojox.off.ui, {
 			// clear old details
 			var details = dojo.byId("dot-sync-details");
 			if(details){ details.style.display = "none"; }
+			
+			// if we fell offline during a sync, hide
+			// the sync info
+			this._updateSyncUI();
 		}else{ // online
 			// synchronize, but pause for a few seconds
 			// so that the user can orient themselves

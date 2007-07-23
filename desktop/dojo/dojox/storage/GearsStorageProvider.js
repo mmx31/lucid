@@ -36,10 +36,14 @@ if(dojo.isGears){
 				_available: null,
 				
 				initialize: function(){
-					// console.debug("dojox.storage.GearsStorageProvider.initialize");
+					//console.debug("dojox.storage.GearsStorageProvider.initialize");
 					if(djConfig["disableGearsStorage"] == true){
 						return;
 					}
+					
+					// partition our storage data so that multiple apps
+					// on the same host won't collide
+					this.TABLE_NAME = "__DOJO_STORAGE";
 					
 					// create the table that holds our data
 					try{

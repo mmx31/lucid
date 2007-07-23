@@ -50,7 +50,7 @@
 		dojo.require("dojo.date.locale");
 
 		// for the Tree
-		dojo.require("dojo.data.JsonItemStore");
+		dojo.require("dojo.data.ItemFileReadStore");
 
 		// for the colorpalette
 		function setColor(color){
@@ -62,7 +62,7 @@
 
 		// for the calendar
 		function myHandler(id,newValue){
-				console.debug("onValueChanged for id = " + id + ", value: " + newValue);
+				console.debug("onChange for id = " + id + ", value: " + newValue);
 		};
 
 		dojo.addOnLoad(function() {
@@ -112,16 +112,32 @@
 	}
 
 	</style>
+	<script>
+		/***
+		dojo.addOnLoad(function(){
+			// use "before advice" to print log message each time resize is called on a layout widget
+			var origResize = dijit.layout._LayoutWidget.prototype.resize;
+			dijit.layout._LayoutWidget.prototype.resize = function(mb){
+				console.log(this + ": resize({w:"+ mb.w + ", h:" + mb.h + "})");
+				origResize.apply(this, arguments);
+			};
 
+			// content pane has no children so just use dojo's builtin after advice
+			dojo.connect(dijit.layout.ContentPane.prototype, "resize", function(mb){
+				console.log(this + ": resize({w:"+ mb.w + ", h:" + mb.h + "})");
+			});
+		});
+		***/
+	</script>
 </head>
 <body id="container">
         <script type="text/javascript">
                 document.getElementById('container').className = themeName;
         </script>
 	<!-- data for tree and combobox -->
-	<div dojoType="dojo.data.JsonItemStore" jsId="continentStore"
+	<div dojoType="dojo.data.ItemFileReadStore" jsId="continentStore"
 		url="../tests/countries.json"></div>
-	<div dojoType="dojo.data.JsonItemStore" jsId="stateStore"
+	<div dojoType="dojo.data.ItemFileReadStore" jsId="stateStore"
 		url="../tests/form/comboBoxData.json"></div>
 	<!-- contentMenu popup -->
 	<div dojoType="dijit.Menu" id="submenu1" contextMenuForWindow="true" style="display: none;">
@@ -185,13 +201,13 @@
 	
 				<div dojoType="dijit.layout.AccordionPane" title="Calendar" selected="true">
 					<!-- calendar widget pane -->
-					<input id="calendar1" dojoType="dijit._Calendar" onValueChanged="myHandler(this.id,arguments[0])">
+					<input id="calendar1" dojoType="dijit._Calendar" onChange="myHandler(this.id,arguments[0])">
 				</div>
 	
 				<div dojoType="dijit.layout.AccordionPane" title="Color Picker">
 					<!-- color palette picker -->
 					<h2 class="testHeader">Dijit Color Palette(7x10)</h2>
-					<div dojoType="dijit.ColorPalette" onColorSelect="setColor(this.selectedColor);"></div>
+					<div dojoType="dijit.ColorPalette" onChange="setColor(this.value);"></div>
 					<br>
 					Test color is: <span id="outputSpan"></span>.
 				</div>
@@ -218,7 +234,7 @@
 			<div dojoType="dijit.layout.SplitContainer" orientation="vertical" sizerWidth="7" sizeShare="75" id="verticalSplit">
 	
 				<!-- top half, vertical split container -->
-				<div dojoType="dijit.layout.TabContainer" selectedChild="tab11" sizeShare="40">
+				<div dojoType="dijit.layout.TabContainer" sizeShare="40">
 					<!-- first tab? -->
 					<div id="tab1" dojoType="dijit.layout.ContentPane" title="Form Feel"
 						style="padding:10px; background:#fff; display:none;">
@@ -441,8 +457,8 @@
 						<h2 class="testTitle">Dijit InlineEditBox Test</h2>
 	
 						before
-						<span id="editable" style="font-size:larger;" dojoType="dijit.form.InlineEditBox" onValueChanged="myHandler(this.id,arguments[0])">
-							<input dojoType="dijit.form.Textbox" value="Edit me - I trigger the onValueChanged callback">
+						<span id="editable" style="font-size:larger;" dojoType="dijit.form.InlineEditBox" onChange="myHandler(this.id,arguments[0])">
+							<input dojoType="dijit.form.Textbox" value="Edit me - I trigger the onChange callback">
 						</span>
 						after
 	
@@ -455,8 +471,8 @@
 						</blockquote>
 						<p>
 							These links will
-							<a href="#" onClick="dijit.byId('areaEditable').disable()">disable</a> /
-							<a href="#" onClick="dijit.byId('areaEditable').enable()">enable</a>
+							<a href="#" onClick="dijit.byId('areaEditable').setDisabled(true)">disable</a> /
+							<a href="#" onClick="dijit.byId('areaEditable').setDisabled(false)">enable</a>
 							the text area above.
 						</p>
 	
@@ -470,7 +486,7 @@
 							invalidMessage="Invalid date. Use mm/dd/yyyy format.">
 						</p>
 						<p/>
-						<b>FilteringSelect Dijit with JsonItemStore of States::</b>
+						<b>FilteringSelect Dijit with ItemFileReadStore of States::</b>
 						<p id="backgroundArea" dojoType="dijit.form.InlineEditBox">
 						<input searchField="name" keyField="abbreviation" id="setvaluetest"
 							dojoType="dijit.form.FilteringSelect" value="IA"
@@ -490,7 +506,7 @@
 				</div><!-- end top part vertical split container -->
 	
 				<!-- bottom half, vertical split container -->
-				<div dojoType="dijit.layout.TabContainer" tabPosition="bottom" selectedChild="btab1">
+				<div dojoType="dijit.layout.TabContainer" tabPosition="bottom">
 	
 					<!-- btab 1 -->
 					<div id="btab1" dojoType="dijit.layout.ContentPane" title="Info"

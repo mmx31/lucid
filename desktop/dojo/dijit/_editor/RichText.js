@@ -1,12 +1,9 @@
 if(!dojo._hasResource["dijit._editor.RichText"]){
 dojo._hasResource["dijit._editor.RichText"] = true;
 dojo.provide("dijit._editor.RichText");
+
 dojo.require("dijit._Widget");
 dojo.require("dijit._editor.selection");
-
-// dojo.require("dojo.html.layout");
-// dojo.require("dojo.html.range");
-// dojo.require("dojo.string.extras");
 
 // used to save content
 // but do not try doing document.write if we are using xd loading.
@@ -152,7 +149,7 @@ dojo.declare(
 			// summary: add some default key handlers
 			// description:
 			// 		Overwrite this to setup your own handlers. The default
-			// 		implementation does not use Editor2 commands, but directly
+			// 		implementation does not use Editor commands, but directly
 			//		executes the builtin commands within the underlying browser
 			//		support.
 			var ctrl = this.KEY_CTRL;
@@ -203,6 +200,11 @@ dojo.declare(
 				return;
 			}
 			this._editorCommandsLocalized = true;
+			
+			//in IE, names for blockformat is locale dependent, so we cache the values here
+
+			//if the normal way fails, we try the hard way to get the list
+		
 			//do not use _cacheLocalBlockFormatNames here, as it will
 			//trigger security warning in IE7
 
@@ -397,10 +399,6 @@ dojo.declare(
 				// this. Sadly _firstChildContributingMargin and
 				// _lastChildContributingMargin don't work on IE unless all
 				// elements have margins set in CSS :-(
-
-				//in IE, names for blockformat is locale dependent, so we cache the values here
-
-				//if the normal way fails, we try the hard way to get the list
 				
 				this._localizeEditorCommands();
 				
@@ -575,9 +573,6 @@ dojo.declare(
 			//		Draws an iFrame using the existing one if one exists.
 			//		Used by Mozilla, Safari, and Opera
 
-			// detect firefox < 1.5, which has some iframe loading issues
-			var oldMoz = Boolean(dojo.isMoz && (typeof window.XML == 'undefined'));
-
 			if(!this.iframe){
 				var ifr = this.iframe = dojo.doc.createElement("iframe");
 				// this.iframe.src = "about:blank";
@@ -666,7 +661,7 @@ dojo.declare(
 					}
 
 					dojo._destroyElement(tmpContent);
-					this.document.body.innerHTML = html;
+					dojo.query("body", this.document.documentElement)[0].innerHTML = html;
 					this.document.designMode = "on";
 					//	try{
 					//	this.document.designMode = "on";
@@ -692,10 +687,9 @@ dojo.declare(
 			if(this.editNode){
 				ifrFunc(); // iframe already exists, just set content
 			}else if(dojo.isMoz){
-//				// FIXME: if we put this on a delay, we get a height of 20px.
-//				// Otherwise we get the correctly specified minHeight value.
+				//mozilla requires some time to make the iframe content window/document ready
 				setTimeout(ifrFunc, 250);
-			}else{ // new mozillas, opera, safari
+			}else{ // opera, safari
 				ifrFunc();
 			}
 		},
@@ -780,26 +774,20 @@ dojo.declare(
 			}
 		},
 
-		enabled: true,
-		enable: function(){
+		disabled: false,
+		setDisabled: function(/*Boolean*/ disabled){
 			if(dojo.isIE || this._safariIsLeopard() || dojo.isOpera){
-				this.editNode.contentEditable=true;
+				this.editNode.contentEditable=!disabled;
 			}else{ //moz
-				this.document.execCommand('contentReadOnly', false, false);
-//				this.document.designMode='on';
+				this.document.execCommand('contentReadOnly', false, disabled);
+//				if(disabled){
+//					this.blur(); //to remove the blinking caret
+//				}
+//				this.document.designMode=(disabled?'off':'on');
 			}
-			this.enabled=true;
+			this.disabled=disabled;
 		},
-		disable: function(){
-			if(dojo.isIE || this._safariIsLeopard() || dojo.isOpera){
-				this.editNode.contentEditable=false;
-			}else{ //moz
-				this.document.execCommand('contentReadOnly', false, true);
-//				this.blur(); //to remove the blinking caret
-//				this.document.designMode='off';
-			}
-			this.enabled=false;
-		},
+
 	/* Event handlers
 	 *****************/
 
@@ -1127,10 +1115,10 @@ dojo.declare(
 			if(!para){ return; }
 			if(para.lastChild){
 				if(para.childNodes.length>1 && para.lastChild.nodeType==3 && /^[\s\xAD]*$/ .test(para.lastChild.nodeValue)){
-					dojo.html.destroyNode(para.lastChild);
+					dojo._destroyElement(para.lastChild);
 				}
 				if(para.lastChild && para.lastChild.tagName=='BR'){
-					dojo.html.destroyNode(para.lastChild);
+					dojo._destroyElement(para.lastChild);
 				}
 			}
 			if(para.childNodes.length==0){
@@ -1172,10 +1160,10 @@ dojo.declare(
 		focus: function(){
 			// summary: move focus to this instance
 			if(this.iframe && !dojo.isIE){
-				this.window.focus();
+				dijit.focus(this.iframe);
 			}else if(this.editNode && this.editNode.focus){
 				// editNode may be hidden in display:none div, lets just punt in this case
-				this.editNode.focus();
+				dijit.focus(this.editNode);
 			}else{
 				console.debug("Have no idea how to focus into the editor!");
 			}
@@ -1758,10 +1746,7 @@ dojo.declare(
 				}else{
 					this.textarea.value = this.savedContent;
 				}
-				// dojo.html.removeNode(this.domNode);
-				if(this.domNode.parentNode){ // FIXME
-					this.domNode.parentNode.removeNode(this.domNode);
-				}
+				dojo._destroyElement(this.domNode);
 				this.domNode = this.textarea;
 			}else{
 				if(save){

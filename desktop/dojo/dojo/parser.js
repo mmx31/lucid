@@ -31,7 +31,11 @@ dojo.parser = new function(){
 				return typeof value == "boolean" ? value : !(value.toLowerCase()=="false");
 			case "function":
 				if(dojo.isFunction(value)){
-					return value;
+					// IE gives us a function, even when we say something like onClick="foo"
+					// (in which case it gives us an invalid function "function(){ foo }"). 
+					//  Therefore, convert to string
+					value=value.toString();
+					value=dojo.trim(value.substring(value.indexOf('{')+1, value.length-1));
 				}
 				try{
 					if(value.search(/[^\w\.]+/i) != -1){
@@ -41,16 +45,13 @@ dojo.parser = new function(){
 					return dojo.getObject(value, false);
 				}catch(e){ return new Function(); }
 			case "array":
-				// FIXME: should we split on "," instead?
-				return value.split(/\s*;\s*/);
+				return value.split(/\s*,\s*/);
 			case "date":
 				return dojo.date.stamp.fromISOString(value);
 			case "url":
-//PORT FIXME: is value absolute or relative?  Need to join with "/"?
 				return dojo.baseUrl + value;
 			default:
-				try{ eval("var tmp = "+value); return tmp; }
-				catch(e){ return value; }
+				return dojo.fromJson(value);
 		}
 	}
 
@@ -145,7 +146,7 @@ dojo.parser = new function(){
 					var attrType = clsInfo.params[attrName];
 					var val = str2obj(attrValue, attrType);
 					// console.debug(attrName, attrValue, val, (typeof val));
-					if(val != null){
+					if(val !== undefined){
 						params[attrName] = val;
 					}
 				}
@@ -165,17 +166,13 @@ dojo.parser = new function(){
 			// grab the rest of the scripts for processing later
 			var scripts = dojo.query("> script[type='dojo/method']", node).orphan();
 
-			var markupFactory = clsInfo.cls["markupFactory"];
-			if((!markupFactory) && (clsInfo.cls["prototype"])){
-				markupFactory = clsInfo.cls.prototype["markupFactory"];
+			var clazz = clsInfo.cls;
+			var markupFactory = clazz["markupFactory"];
+			if(!markupFactory && clazz["prototype"]){
+				markupFactory = clazz.prototype["markupFactory"];
 			}
 			// create the instance
-			var instance;
-			if(markupFactory){
-				instance = markupFactory(params, node);
-			}else{
-				instance = new clsInfo.cls(params, node);
-			}
+			var instance = markupFactory ? markupFactory(params, node) : new clazz(params, node);
 			thelist.push(instance);
 
 			// map it to the JS namespace if that makes sense
@@ -236,7 +233,7 @@ dojo.parser = new function(){
 	};
 
 	// FIXME: need to clobber cross-dependency!!
-	if(dojo.exists("dijit.util.wai.onload") && (dijit.util.wai.onload === dojo._loaders[0])){
+	if(dojo.exists("dijit.wai.onload") && (dijit.wai.onload === dojo._loaders[0])){
 		dojo._loaders.splice(1, 0, parseRunner);
 	}else{
 		dojo._loaders.unshift(parseRunner);

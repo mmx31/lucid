@@ -142,15 +142,10 @@ tests.register("tests.number",
 				var partLocaleList = ["en-us", "fr-fr", "de-de"];
 
 				for(var i = 0 ; i < partLocaleList.length; i ++){
-					dojo.requireLocalization("dojo.cldr","number",partLocaleList[i], "zh-cn,en,en-ca,zh-tw,en-us,it,ja-jp,ROOT,de-de,es-es,fr,pt,ko-kr,es,de");
+					dojo.requireLocalization("dojo.cldr","number",partLocaleList[i], "en-us,en,ROOT,ja-jp,zh-tw,fr,en-ca,pt,de-de,es,es-es,it,de,zh-cn,ko-kr");
 				}
 			},
 			runTest: function(t){
-			},
-			tearDown: function(){
-				//Clean up bundles that should not exist if
-				//the test is re-run.
-				delete dojo.cldr.nls.number;
 			}
 		},
 		{
@@ -400,7 +395,7 @@ tests.register("tests.number",
 	var result;
 	var expectResult;
 	
-    //TODO: !!Failed case - ###.###\u2030(\u2030 is ‰)
+    //TODO: !!Failed case - ###.###\u2030(\u2030 is ?)
 	//Pattern ###.###\u2030 should format 0.4857 as 485.7\u2030,but got 485.700\u2030 instead    
 	pattern = "###.###\u2030";
 	expectResult = "485.7\u2030";
@@ -569,7 +564,7 @@ function test_number_format_pad(){
 //	t.is(0,result);
 
 	/**************************************** tolerant parse *****************************************
-	 * refere to ICU4J's NumberFormatTest.TestStrictParse()��
+	 * refere to ICU4J's NumberFormatTest.TestStrictParse()??
 	 * TODO: Seems dojo.number parses string in a tolerant way.  
 	 */
 	 var options = {locale:"en"};
@@ -901,7 +896,7 @@ function test_number_format_pad(){
  * pattern:'0'#0'0'; expect:"01230"; but got "'3'#0'0'" instead
  * pattern:','#0','; expect:",123,"; but got "','123','" instead
  * pattern:'.'#0'.'; expect:".123."; but got "'.'123'.'" instead
- * pattern:'‰'#0'‰'; expect:"‰123‰"; but got "'‰'123000'‰'" instead
+ * pattern:'?'#0'?'; expect:"?123?"; but got "'?'123000'?'" instead
  * pattern:'%'#0'%'; expect:"%123%"; but got "'%'12300'%'" instead
  * pattern:'#'#0'#'; expect:"#123#"; but got "'123'#0'#'" instead
  * pattern:';'#0';'; expect:";123;"; but got "[dojo-test] FATAL exception raised: 

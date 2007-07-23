@@ -29,12 +29,18 @@ dojo.extend(dojo.dnd.Avatar, {
 		dojo.style(tr, "opacity", 0.9);
 		b.appendChild(tr);
 		var k = Math.min(5, this.manager.nodes.length);
+		var source = this.manager.source;
 		for(var i = 0; i < k; ++i){
 			tr = dojo.doc.createElement("tr");
 			tr.className = "dojoDndAvatarItem";
 			td = dojo.doc.createElement("td");
-			var t = this.manager.source.nodeCreator(this.manager.source.map[this.manager.nodes[i].id].data, "avatar");
-			td.appendChild(t.node);
+			var node = source.creator ?
+				// create an avatar representation of the node
+				node = source._normalizedCreator(source.map[this.manager.nodes[i].id].data, "avatar").node :
+				// or just clone the node and hope it works
+				node = this.manager.nodes[i].cloneNode(true);
+			node.id = "";
+			td.appendChild(node);
 			tr.appendChild(td);
 			dojo.style(tr, "opacity", (6 - i) / 10);
 			b.appendChild(tr);
@@ -44,7 +50,7 @@ dojo.extend(dojo.dnd.Avatar, {
 	},
 	destroy: function(){
 		// summary: a desctructor for the avatar, called to remove all references so it can be garbage-collected
-		this.node.parentNode.removeChild(this.node);
+		dojo._destroyElement(this.node);
 		this.node = false;
 	},
 	update: function(){

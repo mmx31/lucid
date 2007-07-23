@@ -4,8 +4,6 @@ dojo.provide("dijit.form._FormWidget");
 
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
-dojo.require("dijit.util.sniff");
-dojo.require("dijit.util.wai");
 
 dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 {
@@ -57,31 +55,19 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 	//		In markup, this is specified as "disabled='disabled'", or just "disabled".
 	disabled: false,
 
-	enable: function(){
-		// summary:
-		//		enables the widget, usually involving unmasking inputs and
-		//		turning on event handlers. Not implemented here.
-		this._setDisabled(false);
-	},
+	// intermediateChanges: Boolean
+	//              Fires onChange for each value change or only on demand
+	intermediateChanges: false,
 
-	disable: function(){
-		// summary:
-		//		disables the widget, usually involves masking inputs and
-		//		unsetting event handlers. Not implemented here.
-		this._setDisabled(true);
-	},
-
-	_setDisabled: function(/*Boolean*/ disabled){
+	setDisabled: function(/*Boolean*/ disabled){
 		// summary:
 		//		Set disabled state of widget.
-		// TODO:
-		//		not sure which parts of disabling a widget should be here;
-		//		not sure which code is common to many widgets and which is specific to a particular widget.
+
 		this.domNode.disabled = this.disabled = disabled;
 		if(this.focusNode){
 			this.focusNode.disabled = disabled;
 		}
-		dijit.util.wai.setAttr(this.focusNode || this.domNode, "waiState", "disabled", disabled);
+		dijit.wai.setAttr(this.focusNode || this.domNode, "waiState", "disabled", disabled);
 		this._setStateClass();
 	},
 
@@ -131,9 +117,7 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 	},
 
 	focus: function(){
-		if(this.focusNode && this.focusNode.focus){	// mozilla 1.7 doesn't have focus() func
-			this.focusNode.focus();
-		}
+		dijit.focus(this.focusNode);
 	},
 
 	_setStateClass: function(/*String*/ base){
@@ -144,57 +128,90 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 		//	State will be one of:
 		//		<baseClass>
 		//		<baseClass> + "Disabled"	- if the widget is disabled
-		//		<baseClass> + "Active"		- if the mouse is being pressed down
-		//		<baseClass> + "Hover"		- if the mouse is over the widget
+		//		<baseClass> + "Active"		- if the mouse (or space/enter key?) is being pressed down
+		//		<baseClass> + "Hover"		- if the mouse is over the widget (TODO: also on focus?)
 		//
-		//	For widgets which can be in a selected state (like checkbox or radio),
+		//	Note: if you don't want to change the way the widget looks on hover, then don't call
+		//	this routine on hover.  Similarly for mousedown --> active
+		//
+		//	For widgets which can be in a checked state (like checkbox or radio),
 		//	in addition to the above classes...
-		//		<baseClass> + "Selected"
-		//		<baseClass> + "SelectedDisabled"	- if the widget is disabled
-		//		<baseClass> + "SelectedActive"		- if the mouse is being pressed down
-		//		<baseClass> + "SelectedHover"		- if the mouse is over the widget
+		//		<baseClass> + "Checked"
+		//		<baseClass> + "CheckedDisabled"	- if the widget is disabled
+		//		<baseClass> + "CheckedActive"		- if the mouse is being pressed down
+		//		<baseClass> + "CheckedHover"		- if the mouse is over the widget
 
-		// get original class specified in template
+		// get original class (non state related) specified in template
 		var origClass = this._origClass || (this._origClass = this.domNode.className);
 
-		// compute the single classname representing the state of the widget
-		var state = this.baseClass || this.domNode.getAttribute("baseClass");
+		// compute list of classname representing the states of the widget
+		var base = this.baseClass || this.domNode.getAttribute("baseClass");
+		var classes = [ base ];
+		
+		function multiply(modifier){
+			classes=classes.concat(dojo.map(classes, function(c){ return c+modifier; }));
+		}
+
+		if(this.checked){
+			multiply("Checked");
+		}
 		if(this.selected){
-			state += "Selected"
+			multiply("Selected");
 		}
+		
+		// Only one of these three can be applied.
+		// Active trumps Hover, and Disabled trumps Active.
 		if(this.disabled){
-			state += "Disabled";
+			multiply("Disabled");
 		}else if(this._active){
-			state += "Active";
+			multiply("Active");
 		}else if(this._hovering){
-			state += "Hover";
+			multiply("Hover");
 		}
-		this.domNode.className = origClass + " " + " " + state;
-		//console.log(this.id + ": disabled=" + this.disabled + ", active=" + this._active + ", hover=" + this._hovering + "; state=" + state + "--> className is " + this.domNode.className);
+
+		this.domNode.className = origClass + " " + classes.join(" ");
 	},
 
-	onValueChanged: function(newValue){
+	onChange: function(newValue){
 		// summary: callback when value is changed
 	},
 
 	postCreate: function(){
-		this._setDisabled(this.disabled == true);
+		this.setDisabled(this.disabled);
 		this._setStateClass();
+		this.setValue(this.value, true);
 	},
 
-	_lastValueReported: null,
-	setValue: function(newValue){
+	setValue: function(/*anything*/ newValue, /*Boolean, optional*/ priorityChange){
 		// summary: set the value of the widget.
-		dijit.util.wai.setAttr(this.focusNode || this.domNode, "waiState", "valuenow", this.forWaiValuenow());
-		if(newValue != this._lastValueReported){
+		this._lastValue = newValue;
+		dijit.wai.setAttr(this.focusNode || this.domNode, "waiState", "valuenow", this.forWaiValuenow());
+		if((this.intermediateChanges || priorityChange) && newValue != this._lastValueReported){
 			this._lastValueReported = newValue;
-			this.onValueChanged(newValue);
+			this.onChange(newValue);
 		}
 	},
 
 	getValue: function(){
 		// summary: get the value of the widget.
-		return this._lastValueReported;
+		return this._lastValue;
+	},
+
+	undo: function(){
+		// summary: restore the value to the last value passed to onChange
+		this.setValue(this._lastValueReported, false);
+	},
+
+	_onKeyPress: function(e){
+		if(e.keyCode == 27 && !e.shiftKey && !e.ctrlKey && !e.altKey){
+			var v = this.getValue();
+			if(v != this._lastValueReported && this._lastValueReported != undefined){
+				this.undo();
+				dojo.stopEvent(e);
+			}else if(dojo.isMozilla){ // needed by FF2 to keep it from putting the value back
+				this.setValue(v, false);
+			}
+		}
 	},
 
 	forWaiValuenow: function(){

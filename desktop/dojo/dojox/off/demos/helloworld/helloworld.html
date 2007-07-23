@@ -1,5 +1,8 @@
 <html>
 	<head>
+		<script type="text/javascript" src="../../../../dojo/dojo.js" djConfig="isDebug: true"></script>
+		<script type="text/javascript" src="../../../../dojox/off/offline.js"></script>
+		
 		<style type="text/css">
 			@import "../../../../dojo/resources/dojo.css";
 			
@@ -7,16 +10,8 @@
 			   Dojo Offline UI widget */
 			@import "../../../../dojox/off/resources/offline-widget.css";
 	    </style>
-
-	    <script type="text/javascript" src="../../../../dojo/dojo.js" djConfig="isDebug: true"></script>
-		<script type="text/javascript" src="../../../../dojox/off/offline.js"></script>
 		
-		<script>
-			dojo.require("dojox.off");
-			dojo.require("dojox.off.ui");
-			dojo.require("dojox.off.sync");
-			dojo.require("dojox.storage");
-			
+		<script>	
 			// configure how we should work offline
 
 			// set our application name
@@ -31,7 +26,7 @@
 				_messages: [],
 				
 				initialize: function(){
-					//console.debug("helloWorld.initialize");
+					console.debug("helloWorld.initialize");
 					
 					// Dojo Offline and Dojo Storage are ready to be used;
 					// the page is also finished loading
@@ -181,7 +176,7 @@
 				}
 			}
 					
-			// Wait until Dojo Offline and Dojo Storage are ready
+			// Wait until Dojo Offline is ready
 			// before we initialize ourselves. When this gets called the page
 			// is also finished loading.
 			dojo.connect(dojox.off.ui, "onLoad", helloWorld, "initialize");
@@ -235,7 +230,7 @@
 			necessary to create an offline web application.</p>
 			
 		<p>As you play with this example, after installing the
-				Dojo Offline client runtime, experiment with 
+				Google Gears plugin, experiment with 
 				dropping the network and going off- and on-line.</p>
 			
 		<p>To be somewhat of a real example, we need to be able

@@ -15,8 +15,8 @@ tests.register("tests.currency",
 			setUp: function(){
 				var partLocaleList = ["en-us", "en-ca", "de-de"];
 				for(var i = 0 ; i < partLocaleList.length; i ++){
-					dojo.requireLocalization("dojo.cldr","currency",partLocaleList[i], "ko,zh,ja,en,en-ca,en-au,ROOT,en-us,it,fr,pt,es,de");
-					dojo.requireLocalization("dojo.cldr","number",partLocaleList[i], "zh-cn,en,en-ca,zh-tw,en-us,it,ja-jp,ROOT,de-de,es-es,fr,pt,ko-kr,es,de");
+					dojo.requireLocalization("dojo.cldr","currency",partLocaleList[i], "en-us,en,en-au,fr,ja,zh,en-ca,pt,ROOT,es,it,ko,de");
+					dojo.requireLocalization("dojo.cldr","number",partLocaleList[i], "en-us,en,ROOT,ja-jp,zh-tw,fr,en-ca,pt,de-de,es,es-es,it,de,zh-cn,ko-kr");
 				}
 			},
 			runTest: function(t){
@@ -40,11 +40,6 @@ tests.register("tests.currency",
 				t.is(1234, dojo.currency.parse("$1,234", {currency: "USD", locale: "en-us"}));
 				t.is(1234, dojo.currency.parse("$1,234", {currency: "USD", fractional: false, locale: "en-us"}));
 				t.t(isNaN(dojo.currency.parse("$1,234", {currency: "USD", fractional: true, locale: "en-us"})));
-			},
-			tearDown: function(){
-				//Clean up bundles that should not exist if
-				//the test is re-run.
-				delete dojo.cldr.nls.currency;
 			}
 		}
 	]
