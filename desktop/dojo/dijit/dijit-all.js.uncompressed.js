@@ -102,7 +102,7 @@ dojo.declare(
 
 	_paletteDims: {
 		"7x10": {"width": "185px", "height": "117px"},
-		"3x4": {"width": "82px", "height": "58px"}
+		"3x4": {"width": "77px", "height": "53px"}
 	},
 
 
@@ -1560,7 +1560,7 @@ dojo.declare(
 
 		onOpen: function(/*Object*/ pos){
 			// summary: called when dialog is displayed, with info on where it's being displayed relative to the button
-			this.domNode.className="dijitTooltipDialog dijitTooltip" + (pos.corner=='TL' ? "Below" : "Above");
+			this.domNode.className="dijitTooltipDialog " +" dijitTooltipAB"+(pos.corner.charAt(1)=='L'?"Left":"Right")+" dijitTooltip"+(pos.corner.charAt(0)=='T' ? "Below" : "Above");
 			this._loadCheck(); // lazy load trigger
 			this.containerNode.focus();
 		},
@@ -3839,6 +3839,16 @@ dojo.declare(
 		
 		onClick: function(/*Event*/ e){
 			// summary: callback for when button is clicked; user can override this function
+			
+			// for some reason type=submit buttons don't automatically submit the form; do it manually
+			if(this.type=="submit"){
+				for(var node=this.domNode; node; node=node.parentNode){
+					if(node.tagName.toLowerCase() == "form"){
+						node.submit();
+						break;
+					}
+				}
+			}
 		},
 
 		setLabel: function(/*String*/ content){
@@ -3936,6 +3946,7 @@ dojo.declare(
 					host: this,
 					popup: dropDown,
 					around: this.domNode,
+					orient: {'BL':'TL', 'BR':'TR', 'TL':'BL', 'TR':'BR'},
 					onExecute: function(){
 						dijit.popup.closeAll();
 						self.focus();
@@ -5620,10 +5631,8 @@ dojo.number._integerRegexp = function(/*Object?*/flags){
 			}
 
 			sep = dojo.regexp.escapeString(sep);
-			if(dojo.isIE){
-				if(sep == " "){ sep = "\\s"; }
-				else if(sep == "\xa0"){ sep = "\\s\\xa0"; }
-			}
+			if(sep == " "){ sep = "\\s"; }
+			else if(sep == "\xa0"){ sep = "\\s\\xa0"; }
 
 			var grp = flags.groupSize, grp2 = flags.groupSize2;
 			if(grp2){
@@ -5710,6 +5719,9 @@ dojo.declare(
 			// MOW: don't think so because it needs to be set to the absolute size
 			//		of the dom node, not the size of the containing element (the full part)
 			this.fullLabel.style.width = dojo.getComputedStyle(this.domNode).width;
+			if(!this.isLeftToRight()){
+				this.fullLabel.style.right = "0px"; // necessary for FF
+			}
 			this.inteterminateHighContrastImage.setAttribute("src",
 				this._indeterminateHighContrastImagePath);
 			this.update();
@@ -7818,7 +7830,7 @@ dojo.declare(
 		// summary:
 		//		Mixin text box with drop down
 
-		templateString:"<fieldset class='dijit dijitInline dijitLeft ${baseClass}'  baseClass='${baseClass}'\n\tid=\"widget_${id}\" name=\"${name}\"\n\tdojoAttachEvent=\"onmouseover:_onMouse,onmouseout:_onMouse\"\twaiRole=\"presentation\"\n>\n<table cellspacing=0 cellpadding=0 waiRole=\"presentation\">\n\t<tr>\n\t\t<td class='dijitReset dijitStretch dijitComboBoxInput'\n\t\t\t><input class='XdijitInputField' type=\"text\" autocomplete=\"off\" name=\"${name}\"\n\t\t\tdojoAttachEvent=\"onkeypress, onkeyup, onfocus, onblur, compositionend\"\n\t\t\tdojoAttachPoint=\"textbox,focusNode\" id='${id}'\n\t\t\ttabIndex='${tabIndex}' size='${size}' maxlength='${maxlength}'\n\t\t\twaiRole=\"combobox\"\n\t></td><td class='dijitReset dijitRight dijitButtonNode dijitDownArrowButton'\n\t\t\tdojoAttachPoint=\"downArrowNode\"\n\t\t\tdojoAttachEvent=\"onklick:_onArrowClick,onmousedown:_onMouse,onmouseup:_onMouse,onmouseover:_onMouse,onmouseout:_onMouse\"\n\t\t><div waiRole=\"presentation\">&#9660;</div>\n\t</td></tr>\n</table>\n</fieldset>\n",
+		templateString:"<fieldset class='dijit dijitInline dijitLeft ${baseClass}'  baseClass='${baseClass}'\n\tid=\"widget_${id}\" name=\"${name}\"\n\tdojoAttachEvent=\"onmouseover:_onMouse,onmouseout:_onMouse\"\twaiRole=\"presentation\"\n>\n<table cellspacing=0 cellpadding=0 waiRole=\"presentation\">\n\t<tr>\n\t\t<td class='dijitReset dijitStretch dijitComboBoxInput'\n\t\t\t><input class='XdijitInputField' type=\"text\" autocomplete=\"off\" name=\"${name}\"\n\t\t\tdojoAttachEvent=\"onkeypress, onkeyup, onfocus, onblur, compositionend\"\n\t\t\tdojoAttachPoint=\"textbox,focusNode\" id='${id}'\n\t\t\ttabIndex='${tabIndex}' size='${size}' maxlength='${maxlength}'\n\t\t\twaiRole=\"combobox\"\n\t></td><td class='dijitReset dijitRight dijitButtonNode dijitDownArrowButton'\n\t\t\tdojoAttachPoint=\"downArrowNode\"\n\t\t\tdojoAttachEvent=\"onklick:_onArrowClick,onmousedown:_onMouse,onmouseup:_onMouse,onmouseover:_onMouse,onmouseout:_onMouse\"\n\t\t><div waiRole=\"presentation\" tabIndex=\"-1\">&#9660;</div>\n\t</td></tr>\n</table>\n</fieldset>\n",
 		
 		baseClass:"dijitComboBox",
 
@@ -11347,7 +11359,7 @@ dojo.declare(
 		//      adjust the value by this much when spinning using the PgUp/Dn keys
 		largeDelta: 10,
 
-		templateString:"<div class=\"dijit dijitInline dijitLeft dijitSpinner\" baseClass=\"dijitSpinner\"\n\tid=\"${id}\" name=\"${name}\"\n\tdojoAttachEvent=\"onmouseover:_onMouse,onmouseout:_onMouse,onkeypress:_onKeyPress\"\n\twaiRole=\"presentation\"\n><table class=\"dijitReset\" cellspacing=\"0\"  cellpadding=\"0\" waiRole=\"presentation\">\n\t<tr class=\"dijitReset\">\n\t\t<td rowspan=\"2\" class=\"dijitReset dijitStretch dijitSpinnerInput\">\n\t\t\t<input dojoAttachPoint=\"textbox,focusNode\" type=\"${type}\" dojoAttachEvent=\"onfocus,onkeyup\"\n\t\t\t\tvalue=\"${value}\" name=\"${name}\" size=\"${size}\" maxlength=\"${maxlength}\"\n\t\t\t\twaiRole=\"spinbutton\" autocomplete=\"off\" tabIndex=\"${tabIndex}\"\n\t\t\t></td>\n\t\t<td class=\"dijitReset dijitRight dijitButtonNode dijitUpArrowButton\" \n\t\t\t\tdojoAttachPoint=\"upArrowNode\"\n\t\t\t\tdojoAttachEvent=\"onmousedown:_handleUpArrowEvent,onmouseup:_handleUpArrowEvent,onmouseover:_handleUpArrowEvent,onmouseout:_handleUpArrowEvent\"\n\t\t\t\tbaseClass=\"dijitSpinnerUpArrow\"\n\t\t\t><div class=\"dijitA11yUpArrow\">&#9650;</div></td>\n\t</tr><tr class=\"dijitReset\">\n\t\t<td class=\"dijitReset dijitRight dijitButtonNode dijitDownArrowButton\" \n\t\t\t\tdojoAttachPoint=\"downArrowNode\"\n\t\t\t\tdojoAttachEvent=\"onmousedown:_handleDownArrowEvent,onmouseup:_handleDownArrowEvent,onmouseover:_handleDownArrowEvent,onmouseout:_handleDownArrowEvent\"\n\t\t\t\tbaseClass=\"dijitSpinnerDownArrow\"\n\t\t\t><div class=\"dijitA11yDownArrow\">&#9660;</div></td>\n\t</tr>\n</table></div>\n\n",
+		templateString:"<div class=\"dijit dijitInline dijitLeft dijitSpinner\" baseClass=\"dijitSpinner\"\n\tid=\"widget_${id}\" name=\"${name}\"\n\tdojoAttachEvent=\"onmouseover:_onMouse,onmouseout:_onMouse,onkeypress:_onKeyPress\"\n\twaiRole=\"presentation\"\n><table class=\"dijitReset\" cellspacing=\"0\"  cellpadding=\"0\" waiRole=\"presentation\">\n\t<tr class=\"dijitReset\">\n\t\t<td rowspan=\"2\" class=\"dijitReset dijitStretch dijitSpinnerInput\">\n\t\t\t<input dojoAttachPoint=\"textbox,focusNode\" type=\"${type}\" dojoAttachEvent=\"onfocus,onkeyup\"\n\t\t\t\tvalue=\"${value}\" name=\"${name}\" size=\"${size}\" maxlength=\"${maxlength}\"\n\t\t\t\twaiRole=\"spinbutton\" autocomplete=\"off\" tabIndex=\"${tabIndex}\" id=\"${id}\"\n\t\t\t></td>\n\t\t<td class=\"dijitReset dijitRight dijitButtonNode dijitUpArrowButton\" \n\t\t\t\tdojoAttachPoint=\"upArrowNode\"\n\t\t\t\tdojoAttachEvent=\"onmousedown:_handleUpArrowEvent,onmouseup:_handleUpArrowEvent,onmouseover:_handleUpArrowEvent,onmouseout:_handleUpArrowEvent\"\n\t\t\t\tbaseClass=\"dijitSpinnerUpArrow\"\n\t\t\t><div class=\"dijitA11yUpArrow\" waiRole=\"presentation\" tabIndex=\"-1\">&#9650;</div></td>\n\t</tr><tr class=\"dijitReset\">\n\t\t<td class=\"dijitReset dijitRight dijitButtonNode dijitDownArrowButton\" \n\t\t\t\tdojoAttachPoint=\"downArrowNode\"\n\t\t\t\tdojoAttachEvent=\"onmousedown:_handleDownArrowEvent,onmouseup:_handleDownArrowEvent,onmouseover:_handleDownArrowEvent,onmouseout:_handleDownArrowEvent\"\n\t\t\t\tbaseClass=\"dijitSpinnerDownArrow\"\n\t\t\t><div class=\"dijitA11yDownArrow\" waiRole=\"presentation\" tabIndex=\"-1\">&#9660;</div></td>\n\t</tr>\n</table></div>\n\n",
 
 		adjust: function(/* Object */ val, /*Number*/ delta){
 			// summary: user replaceable function used to adjust a primitive value(Number/Date/...) by the delta amount specified

@@ -23,11 +23,11 @@
 * @memberOf desktop
 */
 desktop.config = {
-	init: function() {
-		desktop.config.load();
+	init: function(cback) {
+		desktop.config.load(cback);
 		setInterval(desktop.config.save, 1000*60);
 	},
-	load: function() {
+	load: function(cback) {
 		//TODO: give this it's own mySQL table
 		dojo.xhrGet({
         url: "../backend/api/registry.php?registry=load&appid=0&varname=config",
@@ -42,6 +42,7 @@ desktop.config = {
 				desktop.config = config;
 				delete config;
 			}
+			if(cback) cback();
 		},
         error: function(error, ioArgs) { api.console("Error loading the config: "+error.message); },
 		mimetype: "text/plain"

@@ -41,6 +41,16 @@ dojo.declare(
 		
 		onClick: function(/*Event*/ e){
 			// summary: callback for when button is clicked; user can override this function
+			
+			// for some reason type=submit buttons don't automatically submit the form; do it manually
+			if(this.type=="submit"){
+				for(var node=this.domNode; node; node=node.parentNode){
+					if(node.tagName.toLowerCase() == "form"){
+						node.submit();
+						break;
+					}
+				}
+			}
 		},
 
 		setLabel: function(/*String*/ content){
@@ -138,6 +148,7 @@ dojo.declare(
 					host: this,
 					popup: dropDown,
 					around: this.domNode,
+					orient: {'BL':'TL', 'BR':'TR', 'TL':'BL', 'TR':'BR'},
 					onExecute: function(){
 						dijit.popup.closeAll();
 						self.focus();

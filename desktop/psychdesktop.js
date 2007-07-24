@@ -117,13 +117,15 @@ var PsychDesktop = {
 					}
 				}
 			}
-			for(lib in desktop.modules) if((typeof desktop[lib].draw) == "function") desktop[lib].draw();
-			for(lib in desktop.modules)
-			{
-				if(lib != "core" && lib != "api") if((typeof desktop[lib].init) == "function") desktop[lib].init();
-				desktop.modules[lib].initiated = true;
-			}
-			desktop.core.init();
+			desktop.config.init(function() {
+				for(lib in desktop.modules) if((typeof desktop[lib].draw) == "function") desktop[lib].draw();
+				for(lib in desktop.modules)
+				{
+					if(lib != "core" && lib != "api" & lib != "config") if((typeof desktop[lib].init) == "function") desktop[lib].init();
+					desktop.modules[lib].initiated = true;
+				}
+				desktop.core.init();
+			});
 		}
 		else
 		{
