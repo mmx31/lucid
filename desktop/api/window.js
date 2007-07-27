@@ -550,8 +550,9 @@ api.window = function()
 	* @alias api.window.addChild
 	* @memberOf api.window
 	*/
-	this.addChild = function(node)
+	this.addChild = function(node, restartWidget)
 	{
 		dijit.byId(this._id+"body").addChild(node);
+		if(restartWidget != false) dijit.byId(this._id+"body").start()
 	}
 }
