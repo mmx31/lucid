@@ -17,12 +17,14 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-/** 
-* An API that allows an app to communicate with other applications on a system-wide level.
-* 
-* @classDescription An API that allows an app to communicate with other applications on a system-wide level.
-* @memberOf api
-*/
+/* 
+ * Group: api
+ * 
+ * Package: crosstalk
+ * 
+ * Summary:
+ * 		An API that allows an app to communicate with other applications on a system-wide level.
+ */
 api.crosstalk = new function()
 {
 	this.session = new Array();	// handler storage

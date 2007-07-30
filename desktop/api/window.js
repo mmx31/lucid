@@ -1,106 +1,112 @@
-/**
- * A counter for assigning window IDs
- * 
- * @type {Integer}
- * @memberOf api
- */
 api.windowcounter = 0;
-/** 
-* The window constructor
-* 
-* @memberOf api
-* @constructor
-*/
+/*
+ * Package: window
+ * 
+ * Summary:
+ * 		The window constructor
+ * 
+ * Example:
+ * 		(start code)
+ * 		win = new api.window();
+ * 		win.title = "foo";
+ * 		win.height =  "200px";
+ * 		win.width = "20%";
+ * 		win.bodyWidget = "ContentPane";
+ * 		win.bodyWidgetParams = {parseOnLoad: true};
+ * 		win.write("bar");
+ * 		//you can't use addChild before the window is shown...
+ * 		win.show();
+ * 		widget = new dijit.layout.ContentPane();
+ * 		widget.setContent("baz");
+ * 		win.addChild(widget, true);
+ * 		setTimeout(dojo.hitch(win, win.destroy), 1000*5);
+ * 		(end code)
+ */
 api.window = function()
 {
-	/**
-	 * A unique ID for the window
-	 * 
-	 * @type {String}
-	 * @alias api.window.id
-	 * @memberOf api.window
+	/*
+	 * Property: _id
+	 *
+	 * Summary:
+	 * 		A unique ID for the window
 	 */
 	this._id = "win"+api.windowcounter;
 	api.windowcounter++;
-	/**
-	 * The window's contents
+	/*
+	 * Property: _innerHTML
 	 * 
-	 * @type {String}
-	 * @alias api.window._innerHTML
-	 * @memberOf api.window
+	 * Summary:
+	 * 		The window's contents. Use <window.write> to write content to a window.
 	 */
 	this._innerHTML = "";
-	/**
-	 * The window body's widget type (usefull for things like layout container creation)
+	/*
+	 * Property: bodyWidget
 	 * 
-	 * @type {Object}
-	 * @alias api.window.bodyWidget
-	 * @memberOf api.window
+	 * Summary:
+	 * 		The window body's widget type
+	 * 
+	 * Note:
+	 * 		This must be a member of dijit.layout
+	 * 
+	 * Notes:
+	 * 		 This is usefull for things like layout container creation
 	 */
 	this.bodyWidget = "LayoutContainer";
-	/**
-	 * The window body's widget params
+	/*
+	 * Property: bodyWidgetParams
 	 * 
-	 * @type {Object}
-	 * @alias api.window.bodyWidgetParams
-	 * @memberOf api.window
+	 * Summary:
+	 * 		The window body's widget params
 	 */
 	this.bodyWidgetParams = {};
-	/**
-	 * Whether or not the window is maximized
+	/*
+	 * Property: maximized
 	 * 
-	 * @type {Boolean}
-	 * @alias api.window.maximized
-	 * @memberOf api.window
+	 * Summary:
+	 * 		Whether or not the window is maximized
 	 */
 	this.maximized = false;
-	/**
-	 * The window's height in px, or %.
+	/*
+	 * Property: height
 	 * 
-	 * @type {String}
-	 * @alias api.window.height
-	 * @memberOf api.window
+	 * Summary:
+	 * 		The window's height in px, or %.
 	 */
 	this.height = "400px";
-	/**
-	 * The windows width in px, or %.
+	/*
+	 * Property: width
 	 * 
-	 * @type {String}
-	 * @alias api.window.width
-	 * @memberOf api.window
+	 * Summary:
+	 * 		The window's width in px, or %.
 	 */
 	this.width = "500px";
-	/**
-	 * The window's title
+	/*
+	 * Property: title
 	 * 
-	 * @type {String}
-	 * @alias api.window.title
-	 * @memberOf api.window
+	 * Summary:
+	 * 		The window's title
 	 */
 	this.title = "";
-	/**
-	 * Weather or not the window is resizable.
+	/*
+	 * Property: resizable
 	 * 
-	 * @type {Boolean}
-	 * @alias api.window.resizable
-	 * @memberOf api.window
+	 * Summary:
+	 * 		Weather or not the window is resizable.
 	 */
 	this.resizable = true;
-	/**
-	 * Internal variable used by the window maximizer
+	/*
+	 * Property: pos
 	 * 
-	 * @type {Object}
-	 * @alias api.window.pos
-	 * @memberOf api.window
+	 * Summary:
+	 * 		Internal variable used by the window maximizer
 	 */
 	this.pos = new Object();
-	/** 
-	* Emptys the window's contents
-	* 
-	* @method
-	* @alias api.window.empty
-	* @memberOf api.window
-	*/
+	/*
+	 * Method: empty
+	 * 
+	 * Summary:
+	 * 		Emptys the window's contents
+	 */
 	this.empty = function()
 	{
 		this._innerHTML = "";
@@ -109,29 +115,30 @@ api.window = function()
 			document.getElementById(this._id+"body").innerHTML = "";
 		}
 	}
-	/** 
-	* Writes HTML to the window
-	* 
-	* @method
-	* @param {String} string	the HTML to append to the window
-	* @alias api.window.write
-	* @memberOf api.window
-	*/
-	this.write = function(string)
+	/*
+	 * Method: write
+	 * 
+	 * Summary:
+	 * 		Writes HTML to the window
+	 * 
+	 * Parameters:
+	 * 		string - the HTML to append to the window
+	 */
+	this.write = function(/*String*/string)
 	{
+		//TODO: would this interfere with addChild?
 		this._innerHTML += string;
 		if(document.getElementById(this._id+"body"))
 		{
 			document.getElementById(this._id+"body").innerHTML += string;
 		}		
 	}
-	/** 
-	* Shows the window
-	* 
-	* @method
-	* @alias api.window.show
-	* @memberOf api.window
-	*/
+	/*
+	 * Method: show
+	 *  
+	 * Summary:
+	 * 		Shows the window
+	 */
 	this.show = function()
 	{
 		if(document.getElementById(this._id) == null) //dojo.byId allways seems to return an objecct...
@@ -187,12 +194,12 @@ api.window = function()
 			
 			windiv.appendChild(wintitlebar);
 			
-			winbody=document.createElement("div");
-			winbody.id=this._id+"body";
-			winbody.innerHTML=this._innerHTML;
-			winbody.setAttribute("class", "winbody");
+			this.winbody=document.createElement("div");
+			this.winbody.id=this._id+"body";
+			this.winbody.innerHTML=this._innerHTML;
+			this.winbody.setAttribute("class", "winbody");
 			
-			windiv.appendChild(winbody);
+			windiv.appendChild(this.winbody);
 			
 			if(this.resizable == true)
 			{
@@ -204,7 +211,7 @@ api.window = function()
 			document.getElementById("windowcontainer").appendChild(windiv);
 			
 			this.bodyWidgetParams.id = this._id+"body";
-			this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, winbody);
+			this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.winbody);
 			
 			this._drag = new dojo.dnd.Moveable(this._id, {
 				handle: this._id+"handle",
@@ -212,42 +219,7 @@ api.window = function()
 			});
 			if(this.resizable == true)
 			{
-				this._resize = new dojo.dnd.Moveable(this._id+"resize", {});
-				//TODO: figure out a way that we can get it so it will resize during the drag
-				dojo.subscribe("dndMoveStop",dojo.hitch(this, function(elem){
-					if(elem.id ==  this._id+"resize")
-					{
-						var dragger = dojo.byId(this._id+"resize");
-						var win = dojo.byId(this._id);
-						var y = dragger.style.top.replace(/px/g, "");
-						var x = dragger.style.left.replace(/px/g, "");
-						y = parseInt(y)+5;
-						x = parseInt(x)+5;
-						var width = win.style.width.replace(/px/g, "");
-						var height = win.style.height.replace(/px/g, "");
-						var t = width.indexOf("%");
-						var s = height.indexOf("%");
-						width = parseInt(width);
-						height = parseInt(height);
-						if(t != -1){
-							width = width.replace(/%/g, "");
-							width = (parseInt(win.parentNode.style.width.replace(/px/g, ""))/100)*width;
-						}
-						if(s != -1){
-							height = height.replace(/%/g, "");
-							height = (parseInt(win.parentNode.style.height.replace(/px/g, ""))/100)*height;
-						}
-						var top = win.style.top.replace(/px/g, "");
-						var left = win.style.left.replace(/px/g, "");
-						top = parseInt(top);
-						left = parseInt(left);
-						var winx = left+width;
-						var winy = top+height;
-						console.log(width+"+("+(x-winx)+")");
-						win.style.width = (winx+(x-winx))+"px";
-						win.style.height = (winy+(y-winy))+"px";
-					}
-				}));
+				this.makeResizer();
 			}
 			dojo.connect(closebutton, "onmouseup", dojo.hitch(this, this.destroy));
 			dojo.connect(minimizebutton, "onmouseup", dojo.hitch(this, this.minimize));
@@ -317,14 +289,74 @@ api.window = function()
 			if(this.maximized == true) this.maximize();
 		}
 	}
-	/** 
-	* Minimizes the window to the taskbar
-	* 
-	* @method
-	* @alias api.window.minimize
-	* @memberOf api.window
-	* @return {Boolean}	returns true if it had to be rased, false if it was allready on top.
-	*/
+	/*
+	 * Method: makeResizer
+	 * 
+	 * Summary:
+	 * 		Internal method that makes a resizer for the window.
+	 */
+	this.makeResizer = function() {
+		dojo.byId(this._id+"resize").style.cursor = "se-resize";
+		this._resizeEvent = dojo.connect(dojo.byId(this._id+"resize"), "onmousedown", this, function(e) {
+			this._dragging = dojo.connect(document, "onmousemove", this, function(e) {
+				var win = dojo.byId(this._id);
+				var x = e.clientX
+				var y = e.clientY
+				var width = win.style.width.replace(/px/g, "");
+				var height = win.style.height.replace(/px/g, "");
+				var t = width.indexOf("%");
+				var s = height.indexOf("%");
+				if((s != -1 && t != -1) ||
+				   (s != -1 || t != -1))
+				{
+					width = parseInt(width);
+					height = parseInt(height);
+				}
+				if(t != -1){
+					width = width.replace(/%/g, "");
+					width = (parseInt(win.parentNode.style.width.replace(/px/g, ""))/100)*width;
+				}
+				if(s != -1){
+					height = height.replace(/%/g, "");
+					height = (parseInt(win.parentNode.style.height.replace(/px/g, ""))/100)*height;
+				}
+				if(width >= 20 && height >= 20)
+				{
+					var top = win.style.top.replace(/px/g, "");
+					var left = win.style.left.replace(/px/g, "");
+					top = parseInt(top);
+					left = parseInt(left);
+					var winx = left+width;
+					var winy = top+height;
+					win.style.width = ((winx+(x-winx))-(left-2))+"px";
+					win.style.height = ((winy+(y-winy))-(top-2))+"px";
+				}
+			});
+			this._doconmouseup = dojo.connect(document, "onmouseup", this, function(e) {
+				dojo.disconnect(this._dragging);
+				dojo.disconnect(this._doconmouseup);
+			});
+		});
+	}
+	/*
+	 * Method: killResizer
+	 * 
+	 * Summary:
+	 * 		Internal method that gets rid of the resizer on the window.
+	 */
+	this.killResizer = function()
+	{
+		dojo.disconnect(this._dragging);
+		dojo.disconnect(this._resizeEvent);
+		dojo.disconnect(this._doconmouseup);
+		dojo.byId(this._id+"resize").style.cursor = "default";
+	}
+	/* 
+	 * Method: minimize
+	 * 
+	 * Summary:
+	 * 		Minimizes the window to the taskbar
+	 */
 	this.minimize = function()
 	{
 		if(desktop.config.fx == true)
@@ -373,13 +405,12 @@ api.window = function()
 			dojo.byId(this._id).style.display = "none";
 		}
 	}
-	/** 
-	* Restores the window from the taskbar
-	* 
-	* @method
-	* @alias api.window.restore
-	* @memberOf api.window
-	*/
+	/*
+	 * Method: restore
+	 * 
+	 * Summary:
+	 * 		Restores the window from the taskbar
+	 */
 	this.restore = function()
 	{
 		dojo.byId(this._id).style.display = "inline";
@@ -400,20 +431,19 @@ api.window = function()
 			anim.play();
 		}
 	}
-	/** 
-	* Maximizes the window
-	* 
-	* @method
-	* @alias api.window.maximize
-	* @memberOf api.window
-	*/
+	/*
+	 * Method: maximize
+	 * 
+	 * Summary:
+	 * 		Maximizes the window
+	 */
 	this.maximize = function()
 	{
 		this.maximized = true;
 		this._drag.destroy();
 		if(this.resizable == true)
 		{
-			this._resize.destroy();
+			this.killResizer();
 		}
 		this.pos.top = dojo.byId(this._id).style.top.replace(/px/g, "");
 		this.pos.bottom = dojo.byId(this._id).style.bottom.replace(/px/g, "");
@@ -448,23 +478,21 @@ api.window = function()
 			win.style.height = "100%";
 		}
 	}
-	/** 
-	* UnMaximizes the window
-	* 
-	* @method
-	* @alias api.window.umaximize
-	* @memberOf api.window
-	*/
+	/*
+	 * Method: unmaximize
+	 * Summary:
+	 * 		UnMaximizes the window
+	 */
 	this.unmaximize = function()
 	{
-		if(this.resizable == true)
-		{		
-			this._resize = new dojo.dnd.Moveable(this._id+"resize", {});
-		}
 		this._drag = new dojo.dnd.Moveable(this._id, {
 			handle: this._id+"handle",
 			mover: dojo.dnd.parentConstrainedMover("border", true)
 		});
+		if(this.resizable == true)
+		{		
+			this.makeResizer();
+		}
 		var win = dojo.byId(this._id);
 		if(desktop.config.fx == true)
 		{
@@ -492,14 +520,16 @@ api.window = function()
 		}
 		this.maximized = false;
 	}
-	/** 
-	* Brings the window to the front of the stack
-	* 
-	* @method
-	* @alias api.window.bringToFront
-	* @memberOf api.window
-	* @return {Boolean}	returns false if it had to be rased, true if it was allready on top.
-	*/
+	/*
+	 * Method: bringToFront
+	 * 
+	 * Summary:
+	 * 		Brings the window to the front of the stack
+	 * 
+	 * Returns:	
+	 * 		false - it had to be rased
+	 * 		true - it was allready on top.
+	 */
 	this.bringToFront = function()
 	{
 		var ns = document.getElementById("windowcontainer").getElementsByTagName("div");
@@ -524,13 +554,12 @@ api.window = function()
 		}
 		else return true;
 	}
-	/** 
-	* Destroys the window (or closes it)
-	* 
-	* @method
-	* @alias api.window.destroy
-	* @memberOf api.window
-	*/
+	/* 
+	 * Method: destroy
+	 * 
+	 * Summary:
+	 * 		Destroys the window (or closes it)
+	 */
 	this.destroy = function()
 	{
 		var anim = dojo.fadeOut({ node: this._id, duration: 200 });
@@ -542,14 +571,18 @@ api.window = function()
 		this._task.destroy();
 		anim.play();
 	}
-	/** 
-	* Adds a dojo widget or HTML element to the window.
-	* 
-	* @method
-	* @param {Node} node	A dojo widget or HTML element.
-	* @alias api.window.addChild
-	* @memberOf api.window
-	*/
+	/*
+	 * Adds a dojo widget or HTML element to the window.
+	 * 
+	 * Parameters:
+	 * 		node - A dojo widget or HTML element.
+	 * 		restartWidget - should the window's body widget be reinitialized?
+	 * 
+	 * Note:
+	 * 		If you are adding widgets in bulk, you should not set restartWidget
+	 * 		to 'true' untill adding the very last widget, otherwize the UI will
+	 * 		take forever to render
+	 */
 	this.addChild = function(node, restartWidget)
 	{
 		dijit.byId(this._id+"body").addChild(node);

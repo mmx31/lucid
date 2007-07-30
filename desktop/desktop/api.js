@@ -24,14 +24,14 @@
 | 	  via api.functionname();      |
 \**********************************/
 
-/**
-* Contains all the public APIs
-* TODO: document some things in here
-* @classDescription	Contains all the public APIs
-* @alias desktop.api
-* @constructor	
-*/
+/*
+ * Package: api
+ * 
+ * Summary:
+ * 		Contains all the public APIs
+ */
 var api = new function() {
+	//TODO: document some things in here
 	this.libList = new Object();
 	this.consoleBuffer = new Array();
 	dojo.subscribe("desktopload", null, function() {

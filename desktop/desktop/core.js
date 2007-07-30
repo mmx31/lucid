@@ -17,13 +17,14 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 desktop.isLoaded = false;
-/**
-* Contains all the core functions of the desktop
-*
-* @classDescription	Contains all the core functions of the desktop
-* @memberOf desktop
-* @constructor	
-*/
+/*
+ * Package: core
+ * 
+ * Group: desktop
+ * 
+ * Summary:
+ * 		Contains all the core functions of the desktop
+ */
 desktop.core = new function()
 {
 		/** 

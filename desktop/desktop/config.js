@@ -16,12 +16,15 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-/**
-* Contains configuraton for the desktop.
-*  
-* @type {Object}
-* @memberOf desktop
-*/
+/*
+ * Package: config
+ * 
+ * Group: desktop
+ * 
+ * Summary: 
+ * 		Contains configuraton for the desktop.
+ * 
+ */
 desktop.config = {
 	init: function(cback) {
 		desktop.config.load(cback);

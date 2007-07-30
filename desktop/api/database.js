@@ -1,13 +1,15 @@
-/** 
-* An API that allows storage in a table format.
-* TODO: tie this in more with the dojo.data stuff
-* 
-* @classDescription An API that allows storage in a table format.
-* @alias api.db
-* @memberOf api
-*/
+/*
+ * Group: api
+ * 
+ * Package: Database
+ * 
+ * Summary:
+ * 		An API that allows storage in a table format.
+ * 
+ */
 api.database = new function()
 {
+	//TODO: tie this in more with the dojo.data stuff
 	/** 
 	* Gets a table from the database.
 	* 

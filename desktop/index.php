@@ -36,7 +36,7 @@ if($_SESSION['userloggedin'] == true)
 <script type="text/javascript" src="./dojo/dijit/dijit.js.uncompressed.js"></script>
 <!-- this is just so we can actually read the errors dojo outputs, 
 		releases will use compressed versions. -->
-<script type="text/javascript" language="javascript" src="psychdesktop.js"></script>
+<script type="text/javascript" language="javascript" src="bootstrap.js"></script>
 </head>
 <body>
 </body>

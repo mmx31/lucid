@@ -16,11 +16,6 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-/**
-* Contains all the functions of the desktop
-*
-* @classDescription	Contains all the functions of the desktop
-*/
 var desktop = new Object();
 desktop.modules = new Object();
 dojo.require("dojo.io.script");
@@ -58,13 +53,20 @@ if(navigator.appName == "Microsoft Internet Explorer")
 		alert(err);
 	}
 }
-
-/**
-* Bootstrap methods to load the desktop.
-*
-* @classDescription	Bootstrap methods to load the desktop.
-*/
-var PsychDesktop = {
+/* 
+ * Package: bootstrap
+ * 
+ * Summary:
+ * 		Bootstrap methods to load the desktop.
+ * 
+ * Description:
+ * 		This initiates each module of the desktop. First, it adds the <script>
+ * 		tags dynamically for each module, and waits for it to load.
+ * 		Then, it looks for a 'draw()' method in each module and calls it.
+ * 		Finally, it looks for an 'init()' method, and calls it.
+ * 		If a module does not have an 'init' or 'draw' method, it does not get called.
+ */
+var bootstrap = {
   require: function(libraryName, version, callback) {
   	/*
     // inserting via DOM fails in Safari 2.0, so brute force approach
@@ -112,7 +114,7 @@ var PsychDesktop = {
 					else
 					{
 						desktop.modules[mod].loaded = false;
-						setTimeout(PsychDesktop.checkifloaded, 50);
+						setTimeout(bootstrap.checkifloaded, 50);
 						return;
 					}
 				}
@@ -134,7 +136,7 @@ var PsychDesktop = {
 				desktop.modules.api.initiated = true;
 				//alert((typeof api)+", "+desktop.modules.api.initiated);
 			}
-			setTimeout(PsychDesktop.checkifloaded, 50);
+			setTimeout(bootstrap.checkifloaded, 50);
 		}
 	},
   link: function(file, id)
@@ -154,24 +156,24 @@ var PsychDesktop = {
  dojo.require("dijit.Menu");
  dojo.require("dojo.dnd.move");
  dojo.require("dojo.fx");
- PsychDesktop.require('api');
- PsychDesktop.require('app');
- PsychDesktop.require('config');
- PsychDesktop.require('console');
- PsychDesktop.require('core');
- PsychDesktop.require('icon');
- PsychDesktop.require('menu');
- PsychDesktop.require('rightclick');
- PsychDesktop.require('screensaver');
- PsychDesktop.require('taskbar');
- PsychDesktop.require('thread', "1.7");
- PsychDesktop.require('wallpaper');
- PsychDesktop.require('widget');
- PsychDesktop.require('windows');
- PsychDesktop.link("./themes/default/theme.css", "desktop_theme");
- PsychDesktop.link("./themes/default/window.css", "window_theme");
- PsychDesktop.link("desktop.css", "corestyle");
- PsychDesktop.checkifloaded();
+ bootstrap.require('api');
+ bootstrap.require('app');
+ bootstrap.require('config');
+ bootstrap.require('console');
+ bootstrap.require('core');
+ bootstrap.require('icon');
+ bootstrap.require('menu');
+ bootstrap.require('rightclick');
+ bootstrap.require('screensaver');
+ bootstrap.require('taskbar');
+ bootstrap.require('thread', "1.7");
+ bootstrap.require('wallpaper');
+ bootstrap.require('widget');
+ bootstrap.require('windows');
+ bootstrap.link("./themes/default/theme.css", "desktop_theme");
+ bootstrap.link("./themes/default/window.css", "window_theme");
+ bootstrap.link("desktop.css", "corestyle");
+ bootstrap.checkifloaded();
 }
 }
-dojo.addOnLoad(PsychDesktop.load);
+dojo.addOnLoad(bootstrap.load);
