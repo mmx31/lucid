@@ -10,12 +10,8 @@
 	</head>
 	<body>
 		<div style="position: absolute; top: 0px; left: 0px;"><h3>NOTE: this does not do anything yet. If you're installing, use /install.php</h3></div>
-		<div class="buttons">
-			<div dojoType="dijit.form.Button" id="previous" onClick="dijit.byId('wizard').back()">&lt;</div>
-			<div dojoType="dijit.form.Button" id="next" onClick="dijit.byId('wizard').forward()">&gt;</div>
-		</div>
-		<div dojoType="dijit.layout.StackContainer" id="wizard">
-			<div dojoType="dijit.layout.ContentPane" title="Start">
+		<div dojoType="dijit.layout.StackContainer" id="wizard" widgetid="wizard">
+			<div dojoType="dijit.layout.ContentPane" title="Start" id="start">
 				<div class="title">Welcome to the Psych Desktop installer!</div>
 				Before you start the installation, we recomend you do the following:<br />
 				<ul>
@@ -23,6 +19,9 @@
 					<li>chmod the /backend/configuration.php file to 777</li>
 					<li>create a database for the desktop, and grant a user all permissions to it</li>
 				</ul>
+				
+				Results of the test:
+				<div id="perms">loading...</div>
 			</div>
 			<div dojoType="dijit.layout.ContentPane" title="Todo">
 				<div class="title">What do you want to do?</div>
@@ -61,6 +60,10 @@
 				<div class="title">Installation</div>
 				Please delete the /install/ directory for security purposes. Enjoy!
 			</div>
+		</div>
+		<div class="buttons">			
+			<button dojoType="dijit.form.Button" id="previous" onClick="dijit.byId('wizard').back()">&lt;</button>
+			<button dojoType="dijit.form.Button" id="next" onClick="dijit.byId('wizard').forward()">&gt;</button>
 		</div>
 	</body>
 </html>

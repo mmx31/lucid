@@ -1,14 +1,34 @@
-dojo.require("dojo.parser");
 dojo.require("dijit.layout.ContentPane");
 dojo.require("dijit.layout.StackContainer");
+dojo.require("dijit.form.Button");
 
-function selected(page)
-{
-	var widget=dijit.byId("wizard");
-	if(page.title=="Start") dijit.byId("previous").setDisabled(true);
-	else dijit.byId("previous").setDisabled(false);
-	if(page.title=="Finish") dijit.byId("next").setDisabled(true);
-	else dijit.byId("next").setDisabled(false);
+function selected(page){
+	dijit.byId("previous").setDisabled(page.isFirstChild);
+	dijit.byId("next").setDisabled(page.isLastChild);
 }
 dojo.subscribe("wizard-selectChild", selected);
-dojo.addOnLoad(function() { selected({title: "Start"}); });
+dojo.addOnLoad(function() {
+	selected(dijit.byId("start"));
+});
+
+function getPerms()
+{
+	dojo.xhrGet({
+		url: "./backend.php?action=checkpermissions",
+		load: function(data, args)
+		{
+			var d = data.split("\n");
+			delete d[d.length-1];
+			var html = "";
+			for(p in d)
+			{
+				q = d[p].split(":");
+				html += "<b>"+q[0]+":</b>";
+				if(q[1] == "ok") html += "<span style='color: green'>";
+				else html += "<span style='color: red'>";
+				html += q[1] + "</span>";
+			}
+			dojo.byId("perms").innerHTML = html;
+		}
+	});
+}
