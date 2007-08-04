@@ -101,11 +101,11 @@ dojo.declare(
 		//		whether focusing into this instance of richtext when page onload
 		focusOnLoad: false,
 
-		// saveName: String
+		// name: String
 		//		If a save name is specified the content is saved and restored when the user
 		//		leave this page can come back, or if the editor is not properly closed after
 		//		editing has started.
-		saveName: "",
+		name: "",
 
 		// styleSheets: String
 		//		semicolon (";") separated list of css files for the editing area
@@ -262,17 +262,14 @@ dojo.declare(
 				// if we were created from a textarea, then we need to create a
 				// new editing harness node.
 				this.textarea = this.domNode;
+				this.name=this.textarea.name;
 				var html = this._preFilterContent(this.textarea.value);
 				this.domNode = dojo.doc.createElement("div");
+				this.domNode.setAttribute('widgetId',this.id);
+				this.textarea.removeAttribute('widgetId');
 				this.domNode.cssText = this.textarea.cssText;
 				this.domNode.className += " "+this.textarea.className;
-
-				if(!dojo.isSafari){
-					// FIXME: VERY STRANGE safari 2.0.4 behavior here caused by
-					// moving the textarea. Often crashed the browser!!! Seems
-					// fixed on webkit nightlies.
-					dojo.place(this.domNode, this.textarea, "before");
-				}
+				dojo.place(this.domNode, this.textarea, "before");
 				var tmpFunc = dojo.hitch(this, function(){
 					//some browsers refuse to submit display=none textarea, so
 					//move the textarea out of screen instead
@@ -295,28 +292,19 @@ dojo.declare(
 
 				// this.domNode.innerHTML = html;
 
-				if(this.textarea.form){
-					// FIXME: port: this used to be before advice!!!
-					dojo.connect(this.textarea.form, "onsubmit", this, function(){
-						// FIXME: should we be calling close() here instead?
-						this.textarea.value = this.getValue();
-					});
-				}
-
-				// dojo plucks our original domNode from the document so we need
-				// to go back and put ourselves back in
-				//	var editor = this;
-				//	dojo.connect(this, "postCreate", function (){
-				//		dojo.place(editor.textarea, editor.domNode, "after");
-				//	});
+//				if(this.textarea.form){
+//					// FIXME: port: this used to be before advice!!!
+//					dojo.connect(this.textarea.form, "onsubmit", this, function(){
+//						// FIXME: should we be calling close() here instead?
+//						this.textarea.value = this.getValue();
+//					});
+//				}
 			}else{
 				var html = this._preFilterContent(this.getNodeChildrenHtml(this.domNode));
 				this.domNode.innerHTML = '';
 			}
 			if(html == ""){ html = "&nbsp;"; }
 
-			// dojo.body().appendChild(this.domNode);
-			dojo.place(this.domNode, this.srcNodeRef, "before");
 			var content = dojo.contentBox(this.domNode);
 			// var content = dojo.contentBox(this.srcNodeRef);
 			this._oldHeight = content.h;
@@ -338,13 +326,13 @@ dojo.declare(
 			this.editingArea = dojo.doc.createElement("div");
 			this.domNode.appendChild(this.editingArea);
 
-			if(this.saveName != "" && (!djConfig["useXDomain"] || djConfig["allowXdRichTextSave"])){
+			if(this.name != "" && (!djConfig["useXDomain"] || djConfig["allowXdRichTextSave"])){
 				var saveTextarea = dojo.byId("dijit._editor.RichText.savedContent");
 				if(saveTextarea.value != ""){
 					var datas = saveTextarea.value.split(this._SEPARATOR), i=0, dat;
 					while(dat=datas[i++]){
 						var data = dat.split(":");
-						if(data[0] == this.saveName){
+						if(data[0] == this.name){
 							html = data[1];
 							datas.splice(i, 1);
 							break;
@@ -603,15 +591,19 @@ dojo.declare(
 				this.iframe.height = height;
 			}
 
-			var tmpContent = this.srcNodeRef;
-			// var tmpContent = dojo.doc.createElement('div');
-			//	tmpContent.style.display="none";
-			// tmpContent.innerHTML = html;
-			//append tmpContent to under the current domNode so that the margin
-			//calculation below is correct
-			// this.editingArea.appendChild(tmpContent);
+			if(this.textarea){
+				var tmpContent = this.srcNodeRef;
+			}else{
+				var tmpContent = dojo.doc.createElement('div');
+				tmpContent.style.display="none";
+				tmpContent.innerHTML = html;
+				//append tmpContent to under the current domNode so that the margin
+				//calculation below is correct
+				this.editingArea.appendChild(tmpContent);
+			}
 
-			dojo.place(this.iframe, this.srcNodeRef, "before");
+
+			this.editingArea.appendChild(this.iframe);
 
 			if(!this.height){
 				// fix margins on tmpContent
@@ -721,14 +713,15 @@ dojo.declare(
 			//		add an external stylesheet for the editing area
 			// uri:	a dojo.uri.Uri pointing to the url of the external css file
 			var url=uri.toString();
-			if(dojo.indexOf(this.editingAreaStyleSheets, url) > -1){
-				console.debug("dijit._editor.RichText.addStyleSheet: Style sheet "+url+" is already applied to the editing area!");
-				return;
-			}
 
 			//if uri is relative, then convert it to absolute so that it can be resolved correctly in iframe
 			if(url.charAt(0) == '.' || (url.charAt(0) != '/' && !uri.host)){
 				url = (new dojo._Url(dojo.global.location, url)).toString();
+			}
+
+			if(dojo.indexOf(this.editingAreaStyleSheets, url) > -1){
+				console.debug("dijit._editor.RichText.addStyleSheet: Style sheet "+url+" is already applied to the editing area!");
+				return;
 			}
 
 			this.editingAreaStyleSheets.push(url);
@@ -760,18 +753,7 @@ dojo.declare(
 				return;
 			}
 			delete this.editingAreaStyleSheets[index];
-
-			var link, i=0, links = this.document.getElementsByTagName("link");
-			while(link=links[i++]){
-				if(link.href == url){
-					if(dojo.isIE){//we need to empty the href first, to get IE to remove the rendered styles
-						link.href="";
-					}
-					// FIXME
-					dojo.html.removeNode(link);
-					break;
-				}
-			}
+			dojo.withGlobal(this.window,'query', dojo, ['link:[href="'+url+'"]']).orphan()
 		},
 
 		disabled: false,
@@ -879,17 +861,21 @@ dojo.declare(
 			// we need this event at the moment to get the events from control keys
 			// such as the backspace. It might be possible to add this to Dojo, so that
 			// keyPress events can be emulated by the keyDown and keyUp detection.
-			if((dojo.isIE)&&(e.keyCode == dojo.keys.TAB)){
-				e.preventDefault();
-				e.stopPropagation();
-				// FIXME: this is a poor-man's indent/outdent. It would be
-				// better if it added 4 "&nbsp;" chars in an undoable way.
-				// Unfortuantly pasteHTML does not prove to be undoable
-				this.execCommand((e.shiftKey ? "outdent" : "indent"));
-			}else if(dojo.isIE){
-				// FIXME: get this from connect() instead!
-				if(	(65 <= e.keyCode&&e.keyCode <= 90) ||
-					(e.keyCode>=37&&e.keyCode<=40)
+			if(dojo.isIE){
+				if(e.keyCode === dojo.keys.TAB){
+					dojo.stopEvent(e);
+					// FIXME: this is a poor-man's indent/outdent. It would be
+					// better if it added 4 "&nbsp;" chars in an undoable way.
+					// Unfortuantly pasteHTML does not prove to be undoable
+					this.execCommand((e.shiftKey ? "outdent" : "indent"));
+				}else if(e.keyCode === dojo.keys.BACKSPACE && this.document.selection.type === "Control"){
+					// IE has a bug where if a non-text object is selected in the editor,
+		      // hitting backspace would act as if the browser's back button was
+		      // clicked instead of deleting the object. see #1069
+					dojo.stopEvent(e);
+					this.execCommand("delete");
+				}else if(	(65 <= e.keyCode&&e.keyCode <= 90) ||
+					(e.keyCode>=37&&e.keyCode<=40) // FIXME: get this from connect() instead!
 				){ //arrow keys
 					e.charCode = e.keyCode;
 					this.onKeyPress(e);
@@ -1169,12 +1155,34 @@ dojo.declare(
 			}
 		},
 
+//		_lastUpdate: 0,
+		updateInterval: 200,
+		_updateTimer: null,
 		onDisplayChanged: function(e){
 			// summary:
 			//		this event will be fired everytime the display context
-			//		changes and the result needs to be reflected in the UI
-		},
+			//		changes and the result needs to be reflected in the UI.
+			// description:
+			//		if you don't want to have update too often, 
+			//		onNormalizedDisplayChanged should be used instead
 
+//			var _t=new Date();
+			if(!this._updateTimer){
+//				this._lastUpdate=_t;
+				if(this._updateTimer){
+					clearTimeout(this._updateTimer);
+				}
+				this._updateTimer=setTimeout(dojo.hitch(this,this.onNormalizedDisplayChanged),this.updateInterval);
+			}
+		},
+		onNormalizedDisplayChanged: function(){
+			// summary:
+			//		this event is fired every updateInterval ms or more
+			// description:
+			//		if something needs to happen immidiately after a 
+			//		user change, please use onDisplayChanged instead
+			this._updateTimer=null;
+		},
 		_normalizeCommand: function(/*String*/cmd){
 			// summary:
 			//		Used as the advice function by dojo.connect to map our
@@ -1451,6 +1459,7 @@ dojo.declare(
 					last = last.previousSibling;
 				}
 			}else{
+				isvalid=true;
 				dojo.withGlobal(this.window, "selectElementChildren",dijit._editor.selection, [this.editNode]);
 			}
 			if(isvalid){
@@ -1461,17 +1470,19 @@ dojo.declare(
 		getValue: function(/*Boolean?*/nonDestructive){
 			// summary:
 			//		return the current content of the editing area (post filters are applied)
-			if(this.isClosed && this.textarea){
-				return this.textarea.value;
-			}else{
-				return this._postFilterContent(null, nonDestructive);
+			if(this.textarea){
+				if(this.isClosed || !this.isLoaded){
+					return this.textarea.value;
+				}
 			}
+
+			return this._postFilterContent(null, nonDestructive);
 		},
 
 		setValue: function(/*String*/html){
 			// summary:
 			//		this function set the content. No undo history is preserved
-			if(this.isClosed && this.textarea){
+			if(this.textarea && (this.isClosed || !this.isLoaded)){
 				this.textarea.value=html;
 			}else{
 				html = this._preFilterContent(html);
@@ -1606,7 +1617,7 @@ dojo.declare(
 			// summary:
 			//		Saves the content in an onunload event if the editor has not been closed
 			var saveTextarea = dojo.byId("dijit._editor.RichText.savedContent");
-			saveTextarea.value += this._SEPARATOR + this.saveName + ":" + this.getValue();
+			saveTextarea.value += this._SEPARATOR + this.name + ":" + this.getValue();
 		},
 
 
@@ -1750,13 +1761,15 @@ dojo.declare(
 				this.domNode = this.textarea;
 			}else{
 				if(save){
-					if(dojo.isMoz){
-						var nc = dojo.doc.createElement("span");
-						this.domNode.appendChild(nc);
-						nc.innerHTML = this.editNode.innerHTML;
-					}else{
-						this.domNode.innerHTML = this._content;
-					}
+					//why we treat moz differently? comment out to fix #1061
+//					if(dojo.isMoz){
+//						var nc = dojo.doc.createElement("span");
+//						this.domNode.appendChild(nc);
+//						nc.innerHTML = this.editNode.innerHTML;
+//					}else{
+//						this.domNode.innerHTML = this._content;
+//					}
+					this.domNode.innerHTML = this._content;
 				}else{
 					this.domNode.innerHTML = this.savedContent;
 				}

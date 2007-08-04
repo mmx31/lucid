@@ -8,6 +8,7 @@ dojo.require("dojo.fx");
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit.form.Form");
 
 dojo.declare(
 	"dijit.DialogUnderlay",
@@ -20,8 +21,7 @@ dojo.declare(
 		templateString: "<div class=dijitDialogUnderlayWrapper id='${id}_underlay'><div class=dijitDialogUnderlay dojoAttachPoint='node'></div></div>",
 		
 		postCreate: function(){
-			var b = dojo.body();
-			b.appendChild(this.domNode);
+			dojo.body().appendChild(this.domNode);
 			this.bgIframe = new dijit.BackgroundIframe(this.domNode);
 		},
 
@@ -53,6 +53,7 @@ dojo.declare(
 			if(this.bgIframe.iframe){
 				this.bgIframe.iframe.style.display = "block";
 			}
+			this._resizeHandler = this.connect(window, "onresize", "layout");
 		},
 
 		hide: function(){
@@ -61,6 +62,7 @@ dojo.declare(
 			if(this.bgIframe.iframe){
 				this.bgIframe.iframe.style.display = "none";
 			}
+			this.disconnect(this._resizeHandler);
 		},
 
 		uninitialize: function(){
@@ -73,38 +75,30 @@ dojo.declare(
 	
 dojo.declare(
 	"dijit.Dialog",
-	[dijit.layout.ContentPane, dijit._Templated],
+	[dijit.layout.ContentPane, dijit._Templated, dijit.form._FormMixin],
 	{
 		// summary:
 		//		Pops up a modal dialog window, blocking access to the screen
 		//		and also graying out the screen Dialog is extended from
 		//		ContentPane so it supports all the same parameters (href, etc.)
 
+		templateString: null,
 		templateString:"<div class=\"dijitDialog\">\n\t\t<div dojoAttachPoint=\"titleBar\" class=\"dijitDialogTitleBar\" tabindex=\"0\" waiRole=\"dialog\" title=\"${title}\">\n\t\t<span dojoAttachPoint=\"titleNode\" class=\"dijitDialogTitle\">${title}</span>\n\t\t<span dojoAttachPoint=\"closeButtonNode\" class=\"dijitDialogCloseIcon\" dojoAttachEvent=\"onclick: hide\">\n\t\t\t<span dojoAttachPoint=\"closeText\" class=\"closeText\">x</span>\n\t\t</span>\n\t</div>\n\t\t<div dojoAttachPoint=\"containerNode\" class=\"dijitDialogPaneContent\"></div>\n\t<span dojoAttachPoint=\"tabEnd\" dojoAttachEvent=\"onfocus:_cycleFocus\" tabindex=\"0\"></span>\n</div>\n",
 
 		// title: String
 		//		Title of the dialog
 		title: "",
 
-		// closeNode: String
-		//	Id of button or other dom node to click to close this dialog
-		closeNode: "",
-
-		_duration: 400,
+		duration: 400,
 		
 		_lastFocusItem:null,
 				
 		postCreate: function(){
+			dojo.body().appendChild(this.domNode);
 			dijit.Dialog.superclass.postCreate.apply(this, arguments);
 			this.domNode.style.display="none";
-		},
-
-		startup: function(){
-			if(this.closeNode){
-				var closeNode = dojo.byId(this.closeNode);
-				this.connect(closeNode, "onclick", "hide");
-			}
-			dijit.Dialog.superclass.startup.apply(this, arguments);// makes preload=true possible
+			this.connect(this, "onExecute", "hide");
+			this.connect(this, "onCancel", "hide");
 		},
 
 		onLoad: function(){
@@ -132,11 +126,11 @@ dojo.declare(
 			this._fadeIn = dojo.fx.combine(
 				[dojo.fadeIn({
 					node: node,
-					duration: this._duration
+					duration: this.duration
 				 }),
 				 dojo.fadeIn({
 					node: this._underlay.domNode,
-					duration: this._duration,
+					duration: this.duration,
 					onBegin: dojo.hitch(this._underlay, "show")
 				 })
 				]
@@ -145,14 +139,14 @@ dojo.declare(
 			this._fadeOut = dojo.fx.combine(
 				[dojo.fadeOut({
 					node: node,
-					duration: this._duration,
+					duration: this.duration,
 					onEnd: function(){
 						node.style.display="none";
 					}
 				 }),
 				 dojo.fadeOut({
 					node: this._underlay.domNode,
-					duration: this._duration,
+					duration: this.duration,
 					onEnd: dojo.hitch(this._underlay, "hide")
 				 })
 				]
@@ -299,33 +293,18 @@ dojo.declare(
 	
 dojo.declare(
 	"dijit.TooltipDialog",
-	[dijit.layout.ContentPane, dijit._Templated],
+	[dijit.layout.ContentPane, dijit._Templated, dijit.form._FormMixin],
 	{
 		// summary:
 		//		Pops up a dialog that appears like a Tooltip
 
-		// submitNode: String
-		//	Id of button or other dom node to click to submit this dialog
-		submitNode: "",
-		
-		// cancelNode: String
-		//	Id of button or other dom node to click to cancel this dialog
-		cancelNode: "",
-		
 		// title: String
 		// Description of tooltip dialog (required for a11Y)
 		title: "",
 
-		// onCancel: Function
-		//	Callback when user has canceled dialog
-		onCancel: function(){},
-
-		// onExecute: Function
-		//	Callback when user has executed dialog
-		onExecute: function(){},
-
 		_lastFocusItem: null,
 
+		templateString: null,
 		templateString:"<div id=\"${id}\" class=\"dijitTooltipDialog\" >\n\t<div class=\"dijitTooltipContainer\">\n\t\t<div  class =\"dijitTooltipContents dijitTooltipFocusNode\" dojoAttachPoint=\"containerNode\" tabindex=\"0\" waiRole=\"dialog\"></div>\n\t</div>\n\t<span dojoAttachPoint=\"tabEnd\" tabindex=\"0\" dojoAttachEvent=\"focus:_cycleFocus\"></span>\n\t<div class=\"dijitTooltipConnector\" ></div>\n</div>\n",
 
 		postCreate: function(){
@@ -338,21 +317,14 @@ dojo.declare(
 			this.containerNode.title=this.title;
 		},
 
-		startup: function(){
-			if(this.cancelNode){
-				var cancelNode = dojo.byId(this.cancelNode);
-				this.connect(cancelNode, "onclick", "onCancel");
-			}
-			if(this.submitNode){
-				var submitNode = dojo.byId(this.submitNode);
-				this.connect(submitNode, "onclick", "onExecute");
-			}
-			dijit.TooltipDialog.superclass.startup.apply(this, arguments);// makes preload=true possible
+		orient: function(/*Object*/ corner){
+			// summary: configure widget to be displayed in given position relative to the button
+			this.domNode.className="dijitTooltipDialog " +" dijitTooltipAB"+(corner.charAt(1)=='L'?"Left":"Right")+" dijitTooltip"+(corner.charAt(0)=='T' ? "Below" : "Above");
 		},
 
 		onOpen: function(/*Object*/ pos){
-			// summary: called when dialog is displayed, with info on where it's being displayed relative to the button
-			this.domNode.className="dijitTooltipDialog " +" dijitTooltipAB"+(pos.corner.charAt(1)=='L'?"Left":"Right")+" dijitTooltip"+(pos.corner.charAt(0)=='T' ? "Below" : "Above");
+			// summary: called when dialog is displayed
+			this.orient(pos.corner);
 			this._loadCheck(); // lazy load trigger
 			this.containerNode.focus();
 		},

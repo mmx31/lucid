@@ -22,12 +22,12 @@ dijit.popup = new function(){
 		// args: Object
 		//		popup: Widget
 		//			widget to display,
-		//		host: Widget
+		//		parent: Widget
 		//			the button etc. that is displaying this popup
 		//		around: DomNode
 		//			DOM node (typically a button); place popup relative to this node
 		//		orient: Object
-		//			structure specifying position of object relative to "around" node
+		//			structure specifying possible positions of popup relative to "around" node
 		//		onCancel: Function
 		//			callback when user has canceled the popup by 
 		//          	1. hitting ESC or
@@ -44,10 +44,10 @@ dijit.popup = new function(){
 		//		1. opening at the mouse position
 		//			dijit.popup.open({popup: menuWidget, x: evt.pageX, y: evt.pageY});
 		//		2. opening the widget as a dropdown
-		//			dijit.popup.open({host: this, popup: menuWidget, around: this.domNode, onClose: function(){...}  });
+		//			dijit.popup.open({parent: this, popup: menuWidget, around: this.domNode, onClose: function(){...}  });
 		//
 		//	Note that whatever widget called dijit.popup.open() should also listen to it's own _onBlur callback
-		//	(fired by widgetFocusTracer) to know that focus has moved somewhere else and thus the popup should be closed.
+		//	(fired from _base/focus.js) to know that focus has moved somewhere else and thus the popup should be closed.
 
 		var widget = args.popup,
 			orient = args.orient || {'BL':'TL', 'TL':'BL'},
@@ -65,8 +65,8 @@ dijit.popup = new function(){
 		wrapper.id = id;
 		wrapper.className="dijitPopup";
 		wrapper.style.zIndex = beginZIndex + stack.length;
-		if(args.host){
-			wrapper.host=args.host.id;
+		if(args.parent){
+			wrapper.dijitPopupParent=args.parent.id;
 		}
 		dojo.body().appendChild(wrapper);
 
@@ -77,13 +77,10 @@ dijit.popup = new function(){
 
 		// position the wrapper node
 		var best = around ?
-			dijit.placeOnScreenAroundElement(wrapper, around, orient) :
-			dijit.placeOnScreen(wrapper, args, ['TL','BL','TR','BR']);
+			dijit.placeOnScreenAroundElement(wrapper, around, orient, widget.orient ? dojo.hitch(widget, "orient") : null) :
+			dijit.placeOnScreen(wrapper, args, orient == 'R' ? ['TR','BR','TL','BL'] : ['TL','BL','TR','BR']);
 
 		// TODO: use effects to fade in wrapper
-
-		// announce that popup has opened (and has focus)
-		dijit.widgetFocusTracer.entered(widget);
 
 		var handlers = [];
 
@@ -134,6 +131,9 @@ dijit.popup = new function(){
 			widget.onClose();
 		}
 
+		if(!stack.length){
+			return;
+		}
 		var top = stack.pop();
 		var wrapper = top.wrapper,
 			iframe = top.iframe,
@@ -148,9 +148,6 @@ dijit.popup = new function(){
 		dojo.body().appendChild(widget.domNode);
 		iframe.destroy();
 		dojo._destroyElement(wrapper);
-
-		// announce that popup has closed (and no longer has focus)
-		dijit.widgetFocusTracer.exited(widget);
 
 		if(onClose){
 			onClose();

@@ -70,18 +70,6 @@ dojo.declare(
 		}
 	},
 
-	_onKeyPress: function(e){
-		// summary
-		//	Keystroke handling for keystrokes on the tab panel itself (that were bubbled up to me)
-		//	Ctrl-w: close tab
-		if((e.keyChar == "w") && e.ctrlKey){
-			if (this.selectedChildWidget.closable){
-				this.closeChild(this.selectedChildWidget);
-				dojo.stopEvent(e);
-			}
-		}
-	},
-
 	destroy: function(){
 		this.tablist.destroy();
 		dijit.layout.TabContainer.superclass.destroy.apply(this, arguments);
@@ -131,7 +119,7 @@ dojo.declare(
 
 	templateString: "<div baseClass='dijitTab' dojoAttachEvent='onclick:onClick,onmouseover:_onMouse,onmouseout:_onMouse'>"
 						+"<div class='dijitTabInnerDiv' dojoAttachPoint='innerDiv'>"
-							+"<span dojoAttachPoint='titleNode,focusNode' tabIndex='-1' waiRole='tab'>${label}</span>"
+							+"<span dojoAttachPoint='titleNode,focusNode' tabIndex='-1' waiRole='tab'>${!label}</span>"
 							+"<span dojoAttachPoint='closeButtonNode' class='closeImage'"
 							+" dojoAttachEvent='onmouseover:_onMouse, onmouseout:_onMouse, onclick:onClickCloseButton'"
 							+" baseClass='dijitTabCloseButton'>"

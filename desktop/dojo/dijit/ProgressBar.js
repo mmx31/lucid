@@ -38,7 +38,7 @@ dojo.declare(
 
 		// progress: String (Percentage or Number)
 		// initial progress value.
-		// with "%": percentual value, 0% <= progress <= 100%
+		// with "%": percentage value, 0% <= progress <= 100%
 		// or without "%": absolute value, 0 <= progress <= maximum
 		progress: "0",
 
@@ -55,7 +55,7 @@ dojo.declare(
 		// true: show that a process is underway but that the progress is unknown
 		indeterminate: false,
 
-		templateString:"<div class=\"dijitProgressBar dijitProgressBarEmpty\"\n\t><div dojoAttachPoint=\"emptyLabel\" class=\"dijitProgressBarEmptyLabel\"\n\t></div\n\t><div waiRole=\"progressbar\" tabindex=\"0\" dojoAttachPoint=\"internalProgress\" class=\"dijitProgressBarFull\"\n\t\t><div class=\"dijitProgressBarTile\"\n\t\t></div\n\t\t><div dojoAttachPoint=\"fullLabel\" class=\"dijitProgressBarFullLabel\"\n\t\t></div\n\t></div\n\t><img dojoAttachPoint=\"inteterminateHighContrastImage\" class=\"dijitIndeterminateProgressBarHighContrastImage\"\n\t></img\n></div>\n",
+		templateString:"<div class=\"dijitProgressBar dijitProgressBarEmpty\"\n\t><div dojoAttachPoint=\"emptyLabel\" class=\"dijitProgressBarLabel\"\n\t>&nbsp;</div\n\t><div waiRole=\"progressbar\" tabindex=\"0\" dojoAttachPoint=\"internalProgress\" class=\"dijitProgressBarFull\"\n\t\t><div class=\"dijitProgressBarTile\"\n\t\t></div\n\t\t><div dojoAttachPoint=\"fullLabel\" class=\"dijitProgressBarLabel\"\n\t\t>&nbsp;</div\n\t></div\n\t><img dojoAttachPoint=\"inteterminateHighContrastImage\" class=\"dijitProgressBarIndeterminateHighContrastImage\"\n\t></img\n></div>\n",
 
 		_indeterminateHighContrastImagePath:
 			dojo.moduleUrl("dijit", "themes/a11y/indeterminate_progress.gif"),
@@ -63,15 +63,10 @@ dojo.declare(
 		// public functions
 		postCreate: function(){
 			dijit.ProgressBar.superclass.postCreate.apply(this, arguments);
-			//TODO: can this be accomplished in the template layout?
-			// MOW: don't think so because it needs to be set to the absolute size
-			//		of the dom node, not the size of the containing element (the full part)
-			this.fullLabel.style.width = dojo.getComputedStyle(this.domNode).width;
-			if(!this.isLeftToRight()){
-				this.fullLabel.style.right = "0px"; // necessary for FF
-			}
+
 			this.inteterminateHighContrastImage.setAttribute("src",
 				this._indeterminateHighContrastImagePath);
+
 			this.update();
 		},
 
@@ -81,14 +76,12 @@ dojo.declare(
 			// attributes: may provide progress and/or maximum properties on this parameter,
 			//	see attribute specs for details.
 			dojo.mixin(this, attributes||{});
+			var percent = 1, classFunc;
 			if(this.indeterminate){
-				dojo.addClass(this.domNode, "dijitProgressBarIndeterminate");
-				this.internalProgress.style.width = "100%";
+				classFunc = "addClass";
 				dijit.wai.removeAttr(this.internalProgress, "waiState", "valuenow");
-				this._setLabels("");
 			}else{
-				dojo.removeClass(this.domNode, "dijitProgressBarIndeterminate");
-				var percent;
+				classFunc = "removeClass";
 				if(String(this.progress).indexOf("%") != -1){
 					percent = Math.min(parseFloat(this.progress)/100, 1);
 					this.progress = percent * this.maximum;
@@ -96,28 +89,14 @@ dojo.declare(
 					this.progress = Math.min(this.progress, this.maximum);
 					percent = this.progress / this.maximum;
 				}
-				this.internalProgress.style.width = (percent * 100) + "%";
 				var text = this.report(percent);
+				this.fullLabel.firstChild.nodeValue = this.emptyLabel.firstChild.nodeValue = text;
 				dijit.wai.setAttr(this.internalProgress, "waiState", "valuenow", text);
-				this._setLabels(text);
 			}
+			dojo[classFunc](this.domNode, "dijitProgressBarIndeterminate");
+			this.internalProgress.style.width = (percent * 100) + "%";
+			this.fullLabel.style.width = ((1*this.progress) ? (this.maximum / this.progress) * 100 : 0) + "%";
 			this.onChange();
-		},
-
-		_setLabels: function(/*string*/text){
-			dojo.forEach(["full", "empty"], function(name){
-				var labelNode = this[name+"Label"];
-				if(labelNode.firstChild){
-					labelNode.firstChild.nodeValue = text;
-				}else{
-					labelNode.appendChild(dojo.doc.createTextNode(text));
-				}
-
-// move this out of update, or perhaps replace with css or template layout?
-				var dim = dojo.contentBox(labelNode);
-				var labelBottom = (parseInt(dojo.getComputedStyle(this.domNode).height) - dim.h)/2;
-				labelNode.style.bottom = labelBottom + 'px';
-			}, this);
 		},
 
 		report: function(/*float*/percent){

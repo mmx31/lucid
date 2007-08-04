@@ -41,8 +41,6 @@ dojo.declare(
 				style.display = "";
 				style.overflow = "auto";
 				this.selectedChildWidget._setSelectedState(true);
-			}else{
-				this.getChildren()[0].focusNode.setAttribute("tabIndex","0");
 			}
 		},
 
@@ -120,7 +118,9 @@ inside the AccordionPane??
 
 		// note: we are treating the container as controller here
 		processKey: function(/*Event*/ evt){
-			if(this.disabled || evt.altKey || evt.shiftKey || evt.ctrlKey){ return; }
+			if(this.disabled || evt.altKey || evt.shiftKey || evt.ctrlKey){
+				return 	dijit.layout.AccordionContainer.superclass._onKeyPress.apply(this, arguments);
+			}
 			var forward = true;
 			switch(evt.keyCode){				
 				case dojo.keys.LEFT_ARROW:
@@ -154,7 +154,7 @@ dojo.declare(
 	//	if true, this is the open pane
 	selected: false,
 
-	templateString:"<div class='dijitAccordionPane'\n\t><div dojoAttachPoint='titleNode,focusNode' dojoAttachEvent='onklick:_onTitleClick,onkeypress:_onKeyPress'\n\t\tclass='dijitAccordionTitle' wairole=\"tab\"\n\t\t><div class='dijitAccordionArrow'></div\n\t\t><div class='arrowTextUp' waiRole=\"presentation\">&#9650;&#9650;</div\n\t\t><div class='arrowTextDown' waiRole=\"presentation\">&#9660;&#9660;</div\n\t\t><span dojoAttachPoint='titleTextNode'>${title}</span></div\n\t><div><div dojoAttachPoint='containerNode' style='overflow: hidden; height: 1px; display: none'\n\t\tclass='dijitAccordionBody' waiRole=\"tabpanel\"\n\t></div></div>\n</div>\n",
+	templateString:"<div class='dijitAccordionPane'\n\t><div dojoAttachPoint='titleNode,focusNode' dojoAttachEvent='ondijitclick:_onTitleClick,onkeypress:_onKeyPress'\n\t\tclass='dijitAccordionTitle' wairole=\"tab\"\n\t\t><div class='dijitAccordionArrow'></div\n\t\t><div class='arrowTextUp' waiRole=\"presentation\">&#9650;</div\n\t\t><div class='arrowTextDown' waiRole=\"presentation\">&#9660;</div\n\t\t><span dojoAttachPoint='titleTextNode'>${title}</span></div\n\t><div><div dojoAttachPoint='containerNode' style='overflow: hidden; height: 1px; display: none'\n\t\tdojoAttachEvent='onkeypress:_onKeyPress'\n\t\tclass='dijitAccordionBody' waiRole=\"tabpanel\"\n\t></div></div>\n</div>\n",
 
 	postCreate: function(){
 		dijit.layout.AccordionPane.superclass.postCreate.apply(this, arguments);

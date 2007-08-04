@@ -21,7 +21,7 @@ dojo.declare(
 	//		Save and Cancel button are displayed below the edit widget.
 	//		When Save is clicked, the text is pulled from the edit
 	//		widget and redisplayed and the edit widget is again hidden.
-	//		Currently all textboxes that inherit from dijit.form.Textbox
+	//		Currently all textboxes that inherit from dijit.form.TextBox
 	//		are supported edit widgets.
 	//		An edit widget must support the following API to be used:
 	//		String getTextValue() OR String getValue()
@@ -126,7 +126,7 @@ dojo.declare(
 		this.editing = true;
 
 		// show the edit form and hide the read only version of the text
-		this._setEditValue(this._isEmpty ? '' : (this.renderAsHtml ? this.editable.innerHTML : this.editable.firstChild.nodeValue));
+		this._setEditValue(this._isEmpty ? '' : (this.renderAsHtml ? this.editable.innerHTML : this.editable.innerHTML.replace(/<br\/?>/gi, "\n")));
 		this._initialText = this._getEditValue();
 		this._visualize();
 
@@ -138,12 +138,14 @@ dojo.declare(
 	},
 
 	_visualize: function(){
+		// #3209: resize the textarea to match the text
+		this.editWidget.resize(dojo.contentBox(this.editable));
 		dojo.style(this.editNode, "display", this.editing ? "" : "none");
 		dojo.style(this.editable, "display", this.editing ? "none" : "");
 	},
 
 	_showText: function(){
-		var value = this._getEditValue();
+		var value = "" + this._getEditValue(); // "" is to make sure its a string
 		dijit.form.InlineEditBox.superclass.setValue.call(this, value);
 		// whitespace is really hard to click so show a ?
 		// TODO: show user defined message in gray
@@ -153,18 +155,21 @@ dojo.declare(
 			this.editable.innerHTML = value;
 		}else{
 			this.editable.innerHTML = "";
-			this.editable.appendChild(document.createTextNode(value));
+			if(value.split){
+				var _this=this;
+				var isFirst = true;
+				dojo.forEach(value.split("\n"), function(line){
+					if(isFirst){ isFirst = false; }
+					else {
+						_this.editable.appendChild(document.createElement("BR")); // preserve line breaks
+					}
+					_this.editable.appendChild(document.createTextNode(line)); // use text nodes so that imbedded tags can be edited
+				});
+			}else{
+				this.editable.appendChild(document.createTextNode(value));
+			}
 		}
 		this._visualize();
-		// #3209: resize the textarea to match the text
-		// height scales automatically; only width needs setting
-		// TODO: implement resize functions in the widgets so InlineEditBox doesn't have to know about things like TextArea's iframe
-		/*
-		if(this.editWidget.iframe){
-			dojo.contentBox(this.editWidget.iframe, {w:dojo.contentBox(this.editable).w});
-		}else{
-			dojo.contentBox(this.editWidget.focusNode, {w:dojo.contentBox(this.editable).w});
-		}*/
 	},
 
 	save: function(e){
@@ -216,7 +221,11 @@ dojo.declare(
 				this.save(e);
 			}
 		}else{
-			this.saveButton.setDisabled(false);
+			var _this = this;
+			setTimeout(
+				function(){
+					_this.saveButton.setDisabled(_this._getEditValue() == _this._initialText);	// ignore the tab key
+				}, 100); // the delay gives the browser a chance to update the textarea
 		}
 
 	},
@@ -240,6 +249,11 @@ dojo.declare(
 		//	which means that the user has finished entering the value
 		if(this.autoSave){
 			this.save();
+		}else{
+			// #3752
+			// if the keypress does not bubble up to the div, (iframe in TextArea blocks it for example)
+			// make sure the save button gets enabled
+			this.saveButton.setDisabled(false);
 		}
 	},
 

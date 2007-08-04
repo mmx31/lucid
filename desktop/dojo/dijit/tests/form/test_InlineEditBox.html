@@ -11,8 +11,8 @@
 			dojo.require("dojo.data.ItemFileReadStore");
 			dojo.require("dijit.form.InlineEditBox");
 			dojo.require("dijit.form.Textarea");
-			dojo.require("dijit.form.Textbox");
-			dojo.require("dijit.form.DateTextbox");
+			dojo.require("dijit.form.TextBox");
+			dojo.require("dijit.form.DateTextBox");
 			dojo.require("dijit.form.FilteringSelect");
 			dojo.require("dijit.form.NumberSpinner");
 			dojo.require("dijit.form.Slider");
@@ -21,6 +21,15 @@
 			function myHandler(id,newValue){
 				console.debug("onChange for id = " + id + ", value: " + newValue);
 			};
+			dojo.addOnLoad(function(){
+				dojo.subscribe("widgetFocus", function(widget){
+					console.log("focused on widget " + (widget?widget:"nothing"));
+				});
+				dojo.subscribe("widgetBlur", function(widget){
+					console.log("blurred widget " + (widget?widget:"nothing"));
+				});
+				dojo.subscribe("focusNode", function(node){ console.log("focused on node " + (node?(node.id||node.tagName):"nothing"));});
+			});
 		</script>
 		<style type="text/css">
 			@import "../../../dojo/resources/dojo.css";
@@ -34,7 +43,7 @@
 		<h1 class="testTitle">Dijit InlineEditBox Test</h1>
 		before
 		<span id="editable" style="font-size:larger;" dojoType="dijit.form.InlineEditBox" onChange="myHandler(this.id,arguments[0])">
-			<input dojoType="dijit.form.Textbox" value="Edit me - I trigger the onChange callback">
+			<input dojoType="dijit.form.TextBox" value="Edit me - I trigger the onChange callback">
 		</span>
 		after<br>
 
@@ -42,14 +51,15 @@
 
 		before
 		<span id="editableWithButtons" style="font-size:larger;" dojoType="dijit.form.InlineEditBox" onChange="myHandler(this.id,arguments[0])" autoSave="false">
-			<input dojoType="dijit.form.Textbox" value="Edit me - I trigger the onChange callback when Save button is clicked">
+			<input dojoType="dijit.form.TextBox" value="Edit me - I trigger the onChange callback when Save button is clicked">
 		</span>
 		after<br>
 
 		<hr style="width:100%;">
+		The following inline text area has Save/Cancel buttons when open.		
 		<blockquote style="width:50%;">
-			<p><span id="areaEditable" dojoType="dijit.form.InlineEditBox" renderAsHtml="true" autoSave="true">
-				<textarea dojoType="dijit.form.Textarea">I'm one big paragraph.  Go ahead and <i>edit</i> me.  <b>I dare you.</b> The quick brown fox jumped over the lazy dog.  Blah blah blah blah blah blah blah ...</textarea>
+			<p><span id="areaEditable" dojoType="dijit.form.InlineEditBox" renderAsHtml="false" autoSave="false">
+				<textarea dojoType="dijit.form.Textarea">I'm one big paragraph.  Go ahead and edit me.  I dare you. The quick brown fox jumped over the lazy dog.  Blah blah blah blah blah blah blah ...</textarea>
 			</span></p>
 		</blockquote>
 		These links will
@@ -58,11 +68,19 @@
 		the text area above.
 
 		<hr style="width:100%;">
+		The following inline text area does not have Save/Cancel buttons when open.		
+		<blockquote style="width:50%;">
+			<p><span id="areaEditable" dojoType="dijit.form.InlineEditBox" renderAsHtml="false" autoSave="true">
+				<textarea dojoType="dijit.form.Textarea">I'm one big paragraph.  Go ahead and edit me.  I dare you. The quick brown fox jumped over the lazy dog.  Blah blah blah blah blah blah blah ...</textarea>
+			</span></p>
+		</blockquote>
+		
+		<hr style="width:100%;">
 
 		<b>Date text box:</b>
 		<p id="backgroundArea" dojoType="dijit.form.InlineEditBox" >
 			<input name="date" value="2005-12-30"
-					dojoType="dijit.form.DateTextbox"
+					dojoType="dijit.form.DateTextBox"
 					constraints={datePattern:'MM/dd/yy'}
 					lang="en-us"
 					required="true"
@@ -73,7 +91,7 @@
 		<b>FilteringSelect:</b>
 		<span dojoType="dojo.data.ItemFileReadStore" jsId="stateStore"
 			url="comboBoxData.json"></span>
-		<span id="backgroundArea" dojoType="dijit.form.InlineEditBox" >
+		<span id="filteringSelect" dojoType="dijit.form.InlineEditBox" >
 			<input searchAttr="name" keyAttr="abbreviation" id="setvaluetest" dojoType="dijit.form.FilteringSelect" value="IA"
 					store="stateStore" name="state1" autocomplete="true" hasDownArrow="false">
 		</span>
@@ -83,8 +101,8 @@
 			// See if we can make a widget in script
 			var inlineWidget = new dijit.form.InlineEditBox({renderAsHtml: true}, 'programmatic');
 
- 			var editorWidget = new dijit.form.Textbox({
-									value:"Click here to edit a programmatically created<BR>inline edit region"
+ 			var editorWidget = new dijit.form.TextBox({
+									value:"Click here to edit a programmatically created inline edit region"
 								});
 
  			inlineWidget.addChild(editorWidget);

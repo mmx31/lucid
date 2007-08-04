@@ -203,15 +203,15 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 	},
 
 	_onKeyPress: function(e){
-		if(e.keyCode == 27 && !e.shiftKey && !e.ctrlKey && !e.altKey){
+		if(e.keyCode == dojo.keys.ESCAPE && !e.shiftKey && !e.ctrlKey && !e.altKey){
 			var v = this.getValue();
 			if(v != this._lastValueReported && this._lastValueReported != undefined){
 				this.undo();
 				dojo.stopEvent(e);
-			}else if(dojo.isMozilla){ // needed by FF2 to keep it from putting the value back
-				this.setValue(v, false);
+				return false;
 			}
 		}
+		return true;
 	},
 
 	forWaiValuenow: function(){
@@ -220,6 +220,17 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 		// 		This method may be overridden by subclasses that want
 		// 		to use something other than this.getValue() for valuenow
 		return this.getValue();
+	},
+
+	resize:function(/*Object*/ contentBox){
+		// summary:
+		//		Explicitly set this widget's size (in pixels).
+		//		Unlike layout containers, this sets the content box size.
+		//		Subwidgets may override this function
+		//	
+		// contentBox: Object
+		//		{w: int, h: int}
+		dojo.contentBox(this.domNode, contentBox);
 	}
 });
 

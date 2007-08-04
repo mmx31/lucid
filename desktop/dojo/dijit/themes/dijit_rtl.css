@@ -1,0 +1,42 @@
+/* Tree */
+
+.dijitRtl .TreeContainer .TreeExpando {
+	float:right;
+}
+
+.dijitRtl .TreeContainer .TreeExpand {
+	float:right;
+}
+
+/* ComboBox */
+
+.dijitRtl .dijitComboBoxInput {
+	border-right-width:1px !important;
+	border-left-width:0px !important;
+}
+
+/* Calendar */
+
+.dijitRtl .dijitCalendarNextYear {
+	margin:0 0.55em 0 0;
+}
+
+.dijitRtl .dijitCalendarPreviousYear {
+	margin:0 0 0 0.55em;
+}
+
+.dijitRtl .dijitProgressBarFull .dijitProgressBarLabel {
+	right:0px; /* FF workaround */
+}
+
+/* Button */
+
+.dijitRtl .dijitComboButton .dijitButtonContents {
+	border-right-width:1px !important;
+}
+
+/* A11y */
+.dijitA11ySideArrow {
+	margin-left:1em;
+	margin-right:0;
+}

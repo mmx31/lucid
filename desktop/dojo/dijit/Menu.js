@@ -29,9 +29,9 @@ dojo.declare(
 	// pointer to menu that displayed me
 	parentMenu: null,
 
-	// submenuDelay: Integer
-	//	number of milliseconds before hovering (without clicking) causes the submenu to automatically open
-	submenuDelay: 500,
+	// popupDelay: Integer
+	//	number of milliseconds before hovering (without clicking) causes the popup to automatically open
+	popupDelay: 500,
 
 	// _contextMenuWithMouse: Boolean
 	//	used to record mouse and keyboard events to determine if a context
@@ -43,10 +43,6 @@ dojo.declare(
 			this.bindDomNode(dojo.body());
 		}else{
 			dojo.forEach(this.targetNodeIds, this.bindDomNode, this);
-		}
-
-		if(!this.isLeftToRight()){
-			this.containerNode.className += " dojoRTL";
 		}
 	},
 
@@ -62,7 +58,11 @@ dojo.declare(
 		// summary: attach point for notification about when the user cancels the current menu
 	},
 
-	_moveToChildMenu: function(/*Event*/ evt){
+	focus: function(){
+		this._focusFirstItem();
+	},
+
+	_moveToPopup: function(/*Event*/ evt){
 		if(this._focusedItem && this._focusedItem.popup && !this._focusedItem.disabled){
 			return this._activateCurrentItem(evt);
 		}
@@ -71,10 +71,7 @@ dojo.declare(
 
 	_activateCurrentItem: function(/*Event*/ evt){
 		if(this._focusedItem){
-			this._focusedItem._onClick();
-			if(this.currentSubmenu){
-				this.currentSubmenu._focusFirstItem();
-			}
+			this._focusedItem._onClick(evt);
 			return true; //do not pass to parent menu
 		}
 		return false;
@@ -93,9 +90,10 @@ dojo.declare(
 				break;
 			case dojo.keys.UP_ARROW:
 				this._focusNeighborItem(-1);
+				dojo.stopEvent(evt);
 				break;
 			case dojo.keys.RIGHT_ARROW:
-				this._moveToChildMenu(evt);
+				this._moveToPopup(evt);
 				dojo.stopEvent(evt);
 				break;
 			case dojo.keys.LEFT_ARROW:
@@ -165,17 +163,17 @@ dojo.declare(
 		this._focusItem(item);
 
 		if(this._focusedItem.popup && !this._focusedItem.disabled && !this.hover_timer){
-			this.hover_timer = setTimeout(dojo.hitch(this, "_openSubmenu"), this.submenuDelay);
+			this.hover_timer = setTimeout(dojo.hitch(this, "_openPopup"), this.popupDelay);
 		}
 	},
 
 	_blurFocusedItem: function(){
 		// summary: internal function to remove focus from the currently focused item
 		if(this._focusedItem){
-			// Close all submenus that are open and descendants of this menu
+			// Close all popups that are open and descendants of this menu
 			dijit.popup.closeTo(this);
 			this._focusedItem._blur();
-			this._stopSubmenuTimer();
+			this._stopPopupTimer();
 			this._focusedItem = null;
 		}
 	},
@@ -184,7 +182,7 @@ dojo.declare(
 		//this._blurFocusedItem();
 	},
 
-	_stopSubmenuTimer: function(){
+	_stopPopupTimer: function(){
 		if(this.hover_timer){
 			clearTimeout(this.hover_timer);
 			this.hover_timer = null;
@@ -203,7 +201,7 @@ dojo.declare(
 
 		if(item.popup){
 			if(!this.is_open){
-				this._openSubmenu();
+				this._openPopup();
 			}
 		}else{
 			// before calling user defined handler, close hierarchy of menus
@@ -311,7 +309,7 @@ dojo.declare(
 		var self=this;
 		var savedFocus = dijit.getFocus(this);
 		function closeAndRestoreFocus(){
-			// user has clicked on a menu or submenu
+			// user has clicked on a menu or popup
 			dijit.focus(savedFocus);
 			dijit.popup.closeAll();
 		}
@@ -320,8 +318,10 @@ dojo.declare(
 			x: x,
 			y: y,
 			onExecute: closeAndRestoreFocus,
-			onCancel: closeAndRestoreFocus
+			onCancel: closeAndRestoreFocus,
+			orient: this.isLeftToRight() ? 'L' : 'R'
 		});
+		this.focus();
 		
 		this._onBlur = function(){
 			// Usually the parent closes the child widget but if this is a context
@@ -335,46 +335,49 @@ dojo.declare(
 	onOpen: function(/*Event*/ e){
 		// summary
 		//		Open menu relative to the mouse
-		this._focusFirstItem();
 		this.isShowingNow = true;
 	},
 
 	onClose: function(){
 		// summary: callback when this menu is closed
-		this._stopSubmenuTimer();
+		this._stopPopupTimer();
 		this.parentMenu = null;
 		this.isShowingNow = false;
-		this.currentSubmenu = null;
+		this.currentPopup = null;
 		if(this._focusedItem){
 			this._blurFocusedItem();
 		}
 	},
 
-	_openSubmenu: function(){
-		// summary: open the submenu to the side of the current menu item
-		this._stopSubmenuTimer();
+	_openPopup: function(){
+		// summary: open the popup to the side of the current menu item
+		this._stopPopupTimer();
 		var from_item = this._focusedItem;
-		var submenu = from_item.popup;
+		var popup = from_item.popup;
 
-		if(submenu.isShowingNow){ return; }
-		submenu.parentMenu = this;
+		if(popup.isShowingNow){ return; }
+		popup.parentMenu = this;
 		var self = this;
 		dijit.popup.open({
-			host: this,
-			popup: submenu,
+			parent: this,
+			popup: popup,
 			around: from_item.arrowCell,
-			orient: {'TR': 'TL', 'TL': 'TR'},
+			orient: this.isLeftToRight() ? {'TR': 'TL', 'TL': 'TR'} : {'TL': 'TR', 'TR': 'TL'},
 			submenu: true,
 			onCancel: function(){
 				// called when the child menu is canceled
 				dijit.popup.close();
 				self._focusedItem._focus();	// put focus back on my node
-				self.currentSubmenu = null;
+				self.currentPopup = null;
 			}
 		});
 			
 
-		this.currentSubmenu = submenu;
+		this.currentPopup = popup;
+		
+		if(popup.focus){
+			popup.focus();
+		}
 	}
 }
 );
@@ -387,15 +390,15 @@ dojo.declare(
 	//	A line item in a Menu2
 
 	// Make 3 columns
-	//   icon, label, and arrow (BiDi-dependent) indicating sub-menu
+	//   icon, label, and expand arrow (BiDi-dependent) indicating sub-menu
 	templateString:
 		 '<tr class="dijitReset dijitMenuItem"'
-		+'dojoAttachEvent="onmouseover:_onHover,onmouseout:_onUnhover,onklick:_onClick">'
+		+'dojoAttachEvent="onmouseover:_onHover,onmouseout:_onUnhover,ondijitclick:_onClick">'
 		+'<td class="dijitReset"><div class="dijitMenuItemIcon ${iconClass}"></div></td>'
 		+'<td tabIndex="-1" class="dijitReset dijitMenuItemLabel" dojoAttachPoint="containerNode" waiRole="menuitem"></td>'
 		+'<td class="dijitReset" dojoAttachPoint="arrowCell">'
-			+'<span class="dijitMenuRightArrow" dojoAttachPoint="arrow" style="display:none">'
-			+'<span class="dijit_a11y dijitMenuRightArrowInner">&#9658;</span>'
+			+'<span class="dijitMenuExpand" dojoAttachPoint="expand" style="display:none">'
+			+'<span class="dijit_a11y dijitInline dijitArrowNode dijitMenuExpandInner">+</span>'
 			+'</span>'
 		+'</td>'
 		+'</tr>',
@@ -437,8 +440,9 @@ dojo.declare(
 		this.getParent().onItemUnhover(this);
 	},
 
-	_onClick: function(focus){
+	_onClick: function(evt){
 		this.getParent().onItemClick(this);
+		dojo.stopEvent(evt);
 	},
 
 	onClick: function() {
@@ -472,9 +476,12 @@ dojo.declare(
 	dijit.MenuItem,
 {
 	_fillContent: function(){
-		// my inner HTML contains both the label and a drop down widget, like
-		// <SubMenu>  <span>click me</span>  <Menu> ... </Menu> </SubMenu>
-		// first part holds button label and second part is popup
+		// my inner HTML contains both the menu item text and a popup widget, like
+		// <div dojoType="dijit.PopupMenuItem">
+		//		<span>pick me</span>
+		//		<popup> ... </popup>
+		// </div>
+		// the first part holds the menu item text and the second part is the popup
 		if(this.srcNodeRef){
 			var nodes = dojo.query("*", this.srcNodeRef);
 			dijit.PopupMenuItem.superclass._fillContent.call(this, nodes[0]);
@@ -494,8 +501,8 @@ dojo.declare(
 		dojo.body().appendChild(this.popup.domNode);
 
 		this.popup.domNode.style.display="none";
-		dojo.addClass(this.arrow, "dijitMenuRightArrowEnabled");
-		dojo.style(this.arrow, "display", "");
+		dojo.addClass(this.expand, "dijitMenuExpandEnabled");
+		dojo.style(this.expand, "display", "");
 		dijit.wai.setAttr(this.containerNode, "waiState", "haspopup", "true");
 	}
 });

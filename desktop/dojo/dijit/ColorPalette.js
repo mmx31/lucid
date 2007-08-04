@@ -4,6 +4,9 @@ dojo.provide("dijit.ColorPalette");
 
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
+dojo.require("dojo.colors");
+dojo.require("dojo.i18n");
+dojo.requireLocalization("dojo", "colors", null, "ROOT");
 
 dojo.declare(
 		"dijit.ColorPalette",
@@ -47,18 +50,19 @@ dojo.declare(
 	//		The first level is a hashmap of the different arrays available
 	//		The next two dimensions represent the columns and rows of colors.
 	_palettes: {
-		"7x10": [["fff", "fcc", "fc9", "ff9", "ffc", "9f9", "9ff", "cff", "ccf", "fcf"],
-			["ccc", "f66", "f96", "ff6", "ff3", "6f9", "3ff", "6ff", "99f", "f9f"],
-			["c0c0c0", "f00", "f90", "fc6", "ff0", "3f3", "6cc", "3cf", "66c", "c6c"],
-			["999", "c00", "f60", "fc3", "fc0", "3c0", "0cc", "36f", "63f", "c3c"],
-			["666", "900", "c60", "c93", "990", "090", "399", "33f", "60c", "939"],
-			["333", "600", "930", "963", "660", "060", "366", "009", "339", "636"],
-			["000", "300", "630", "633", "330", "030", "033", "006", "309", "303"]],
-
-		"3x4": [["ffffff"/*white*/, "00ff00"/*lime*/, "008000"/*green*/, "0000ff"/*blue*/],
-			["c0c0c0"/*silver*/, "ffff00"/*yellow*/, "ff00ff"/*fuchsia*/, "000080"/*navy*/],
-			["808080"/*gray*/, "ff0000"/*red*/, "800080"/*purple*/, "000000"/*black*/]]
-			//["00ffff"/*aqua*/, "808000"/*olive*/, "800000"/*maroon*/, "008080"/*teal*/]];
+			
+		"7x10":	[["white", "seashell", "cornsilk", "lemonchiffon","lightyellow", "palegreen", "paleturquoise", "lightcyan",	"lavender", "plum"],
+				["lightgray", "pink", "bisque", "moccasin", "khaki", "lightgreen", "lightseagreen", "lightskyblue", "cornflowerblue", "violet"],
+				["silver", "lightcoral", "sandybrown", "orange", "palegoldenrod", "chartreuse", "mediumturquoise", 	"skyblue", "mediumslateblue","orchid"],
+				["gray", "red", "orangered", "darkorange", "yellow", "limegreen", 	"darkseagreen", "royalblue", "slateblue", "mediumorchid"],
+				["dimgray", "crimson", 	"chocolate", "coral", "gold", "forestgreen", "seagreen", "blue", "blueviolet", "darkorchid"],
+				["darkslategray","firebrick","saddlebrown", "sienna", "olive", "green", "darkcyan", "mediumblue","darkslateblue", "darkmagenta" ],
+				["black", "darkred", "maroon", "brown", "darkolivegreen", "darkgreen", "midnightblue", "navy", "indigo", 	"purple"]],
+				
+		"3x4": [["white", "lime", "green", "blue"],
+			["silver", "yellow", "fuchsia", "navy"],
+			["gray", "red", "purple", "black"]]	
+			
 	},
 
 	// _imagePaths: Map
@@ -78,7 +82,7 @@ dojo.declare(
 
 	// templatePath: String
 	//		Path to the template of this widget.
-	templateString:"<fieldset class=\"dijitInlineBox\">\n\t<div style=\"overflow: hidden\" dojoAttachPoint=\"divNode\" >\n\t\t<img style=\"border-style: none;\" dojoAttachPoint=\"imageNode\" tabIndex=\"-1\" />\n\t</div>\t\n</fieldset>\n",
+	templateString:"<fieldset class=\"dijitInlineBox\">\n\t<div style=\"overflow: hidden\" dojoAttachPoint=\"divNode\" waiRole=\"grid\" tabIndex=\"-1\">\n\t\t<img style=\"border-style: none;\" dojoAttachPoint=\"imageNode\" tabIndex=\"-1\" />\n\t</div>\t\n</fieldset>\n",
 
 
 	_paletteDims: {
@@ -94,6 +98,7 @@ dojo.declare(
 		var choices = this._palettes[this.palette];	
 		this.domNode.style.position = "relative";
 		this._highlightNodes = [];	
+		this.colorNames = dojo.i18n.getLocalization("dojo", "colors", this.lang);
 
 		for(var row=0; row < choices.length; row++){
 			for(var col=0; col < choices[row].length; col++){
@@ -101,10 +106,12 @@ dojo.declare(
 				highlightNode.src = dojo.moduleUrl("dijit", "templates/blank.gif");
 				dojo.addClass(highlightNode, "dijitPaletteImg");
 				var color = choices[row][col];
-				highlightNode.alt = highlightNode.color = color;
+				var colorValue = new dojo.Color(dojo.Color.named[color]);
+				highlightNode.alt = this.colorNames[color];
+				highlightNode.color = colorValue.toHex();
 				var highlightStyle = highlightNode.style;
-				highlightStyle.color = highlightStyle.backgroundColor = "#" + color;
-				dojo.forEach(["MouseDown", "MouseOut", "MouseOver", "Blur", "Focus", "KeyDown"], function(handler){
+				highlightStyle.color = highlightStyle.backgroundColor = highlightNode.color;
+				dojo.forEach(["Dijitclick", "MouseOut", "MouseOver", "Blur", "Focus"], function(handler){
 					this.connect(highlightNode, "on"+handler.toLowerCase(), "_onColor"+handler);
 				}, this);
 				this.divNode.appendChild(highlightNode);
@@ -112,8 +119,8 @@ dojo.declare(
 				highlightStyle.top = coords.topOffset + (row * coords.cHeight) + "px";
 				highlightStyle.left = coords.leftOffset + (col * coords.cWidth) + "px";
 				highlightNode.setAttribute("tabIndex","-1");
-				highlightNode.title = color+ " "; //color name will go here
-				dijit.wai.setAttr(highlightNode, "waiRole", "role", "td");
+				highlightNode.title = this.colorNames[color];
+				dijit.wai.setAttr(highlightNode, "waiRole", "role", "gridcell");
 				highlightNode.index = this._highlightNodes.length;
 				this._highlightNodes.push(highlightNode);
 			}
@@ -162,15 +169,18 @@ dojo.declare(
 		console.debug("Color selected is: "+color);
 	},
 
-	_onColorMouseDown: function(/*Event*/ evt){
+	_onColorDijitclick: function(/*Event*/ evt){
 		// summary:
-		//		Handler for onMouseDown. Selects the color.
+		//		Handler for click, enter key & space key. Selects the color.
 		// evt:
-		//		The mouse event.
+		//		The event.
 		var target = evt.currentTarget;
-		this._currentFocus = target.index;
-		dijit.focus(target);
-		this._selectColor(target);	
+		if (this._currentFocus != target.index){
+			this._currentFocus = target.index;
+			dijit.focus(target);
+		}
+		this._selectColor(target);
+		dojo.stopEvent(evt);
 	},
 
 	_onColorMouseOut: function(/*Event*/ evt){
@@ -216,18 +226,6 @@ dojo.declare(
 
 	},
 
-	_onColorKeyDown: function(/*Event*/ evt){
-		// summary:
-		//		Handler for the onKeyDown event.
-		//		Space selects the color currently highlighted.
-		// evt:
-		//		The keydown event.
-
-		if((evt.keyCode == dojo.keys.SPACE) && this._currentFocus){
-			this._selectColor(this._highlightNodes[this._currentFocus]);
-		}
-	},
-
 	_selectColor: function(selectNode){	
 		// summary:
 		// 		This selects a color. It triggers the onChange event
@@ -238,7 +236,7 @@ dojo.declare(
 	},
 
 	_navigateByKey: function(increment, typeCount){
-		// summary:
+		// summary:we
 		// 	  	This is the callback for typematic.
 		// 		It changes the focus and the highlighed color.
 		// increment:

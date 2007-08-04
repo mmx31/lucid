@@ -30,12 +30,23 @@ dojo.declare("dijit.form._FormMixin", null,
 		//	User defined function to do stuff when the user hits the submit button
 		execute: function(/*Object*/ formContents){},
 
+		// onCancel: Function
+		//	Callback when user has canceled dialog, to notify container
+		//	(user shouldn't override)
+		onCancel: function(){},
+
+		// onExecute: Function
+		//	Callback when user is about to execute dialog, to notify container
+		//	(user shouldn't override)
+		onExecute: function(){},
+
    		templateString: "<form dojoAttachPoint='containerNode' dojoAttachEvent='onsubmit:_onSubmit' enctype='multipart/form-data'></form>",
 
  		_onSubmit: function(/*event*/e) {
- 			// summary: callback when user hits submit button
-    		dojo.stopEvent(e);
-    		this.execute(this.getValues());
+			// summary: callback when user hits submit button
+			dojo.stopEvent(e);
+			this.onExecute();	// notify container that we are about to execute
+			this.execute(this.getValues());
   		},
 
 		submit: function() {
@@ -181,7 +192,8 @@ dojo.declare("dijit.form._FormMixin", null,
 			});
 
 			/***
-			 * code for plain input boxex
+			 * code for plain input boxes (see also dojo.formToObject, can we use that instead of this code?
+			 * but it doesn't understand [] notation, presumably)
 			var obj = { };
 			dojo.forEach(this.containerNode.elements, function(elm){
 				if (!elm.name)	{
@@ -241,7 +253,7 @@ dojo.declare("dijit.form._FormMixin", null,
 		},
 
 	 	isValid: function() {
-	 		// TODO: Combobox might need time to process a recently input value.  This should be async?
+	 		// TODO: ComboBox might need time to process a recently input value.  This should be async?
 	 		// make sure that every widget that has a validator function returns true
 	 		return dojo.every(this.getDescendants(), function(widget){
 	 			return !widget.isValid || widget.isValid();

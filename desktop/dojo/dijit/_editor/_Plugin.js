@@ -6,12 +6,16 @@ dojo.require("dijit.Editor");
 dojo.require("dijit.form.Button");
 
 dojo.declare("dijit._editor._Plugin", null, 
-	function(/*Object*/args, /*DomNode?*/node){
+	function(/*Object?*/args, /*DomNode?*/node){
 		if(args){
 			dojo.mixin(this, args);
 		}
 	},
 	{
+		// summary
+		//		This represents a "plugin" to the editor, which is basically
+		//		a single button on the Toolbar and some associated code
+
 		editor: null,
 		iconClassPrefix: "dijitEditorIcon",
 		button: null,
@@ -28,20 +32,15 @@ dojo.declare("dijit._editor._Plugin", null,
 				if(!this.button){
 					var props = {
 						label: label,
-						iconClass: className
+						showLabel: false,
+						iconClass: className,
+						dropDown: this.dropDown
 					};
 					this.button = new this.buttonClass(props);
 				}
 			}
 		},
 		updateState: function(){
-			if(!this._lastUpdate){
-				this._lateUpdate = new Date();
-			}else{
-				if(((new Date())-this._lastUpdate) < this.updateInterval){
-					return;
-				}
-			}
 			var _e = this.editor;
 			var _c = this.command;
 			if(!_e){ return; }
@@ -58,7 +57,6 @@ dojo.declare("dijit._editor._Plugin", null,
 					console.debug(e);
 				}
 			}
-			this._lateUpdate = new Date();
 		},
 		setEditor: function(/*Widget*/editor){
 			// FIXME: detatch from previous editor!!
@@ -81,7 +79,7 @@ dojo.declare("dijit._editor._Plugin", null,
 					dojo.hitch(this.editor, "execCommand", this.command, this.commandArg)
 				);
 			}
-			dojo.connect(this.editor, "onDisplayChanged", this, "updateState");
+			dojo.connect(this.editor, "onNormalizedDisplayChanged", this, "updateState");
 		},
 		setToolbar: function(/*Widget*/toolbar){
 			if(this.button){

@@ -78,7 +78,7 @@ function(node, params){
 		// summary: inserts new data items (see Container's insertNodes method for details)
 		// addSelected: Boolean: all new nodes will be added to selected items, if true, no selection change otherwise
 		// data: Array: a list of data items, which should be processed by the creator function
-		// before: Boolean: insert before the anchor, if true, and after the anchot otherwise
+		// before: Boolean: insert before the anchor, if true, and after the anchor otherwise
 		// anchor: Node: the anchor node to be used as a point of insertion
 		var oldCreator = this._normalizedCreator;
 		this._normalizedCreator = function(item, hint){
@@ -129,7 +129,7 @@ function(node, params){
 			if(!dojo.dnd.getCopyKeyState(e)){
 				this._removeSelection();
 			}
-			var c = dojo.query("> .dndItem", this.parent);
+			var c = dojo.query("> .dojoDndItem", this.parent);
 			if(c.length){
 				if(!this.anchor){
 					this.anchor = c[0];
@@ -175,8 +175,8 @@ function(node, params){
 							delete this.selection[this.current.id];
 						}else{
 							if(this.anchor){
-								dojo.removeClass(this.anchor, "dojoDndItemAnchor");
-								dojo.addClass(this.anchor, "dojoDndItemSelected");
+								this._removeItemClass(this.anchor, "Anchor");
+								this._addItemClass(this.anchor, "Selected");
 							}
 							this.anchor = this.current;
 							this._addItemClass(this.current, "Anchor");

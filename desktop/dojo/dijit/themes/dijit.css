@@ -155,8 +155,7 @@
 
 .dijitA11yDownArrow,
 .dijitA11yUpArrow,
-.dijitA11yLeftArrow,
-.dijitA11yRightArrow {
+.dijitA11ySideArrow {
 	/* down arrow shown when in a11y mode */
 	font-family:Arial, sans serif;
 	/* 
@@ -168,9 +167,17 @@
 	padding:0em .25em;
 }
 
+.dijitToolbar .dijitDropDownButton .dijitA11yDownArrow{
+	/*make the arrow smaller in toolbar*/
+	padding:0;
+	margin:0;
+}
+.dj_ie6 .dijitToolbar .dijitDropDownButton .dijitA11yDownArrow{
+	/*vertical-align: middle does not place the arrow in the middle of the toolbar in IE*/
+	vertical-align: bottom;
+}
 
-.dijitA11yRightArrow,
-.dijitA11yLeftArrow {
+.dijitA11ySideArrow {
 	vertical-align:top;
 	margin-right:1em;
 	line-height:2em;
@@ -329,7 +336,7 @@ table .dijitComboButton .dijitButtonNode {
 /****
 		dijit.form.NumberSpinner  (template: form/templates/Spinner.html)
 
-		Note: works differently than other Textbox types:
+		Note: works differently than other TextBox types:
 			The outer fieldset element is the one that shows the border, etc.
 			rather than the actual INPUT element. 
 
@@ -406,7 +413,7 @@ table .dijitComboButton .dijitButtonNode {
 /****
 		dijit.form.ComboBox 
 
-		Note: these works differently than other Textbox types:
+		Note: these works differently than other TextBox types:
 			The outer fieldset element is the one that shows the border, etc.
 			rather than the actual INPUT element. 
 
@@ -473,59 +480,46 @@ table .dijitComboButton .dijitButtonNode {
 
 
 /****
-		dijit.form.Checkbox
+		dijit.form.CheckBox
  	 & 
   		dijit.form.RadioButton 
  ****/
 
-.dijitCheckbox,
+.dijitCheckBox,
 .dijitRadio,
-.dijitCheckboxInput {
+.dijitCheckBoxInput {
 	padding: 0;
 	border: 0;
 	width: 16px;
-	height: 16px;
+	height: 15px;
+	overflow:hidden;
 }
 
-.dijitCheckboxInput {
+.dijitCheckBox INPUT,
+.dijitRadio INPUT {
+	margin: 0; 
+	padding: 0;
+} 
+
+.dijitCheckBoxInput {
 	/* place the actual input on top, but all-but-invisible */
 	opacity: 0.01;
 }
 
-.dj_ie .dijitCheckboxInput {
+.dj_ie .dijitCheckBoxInput {
 	filter: alpha(opacity=0);
 }
 
-.dijit_a11y .dijitCheckbox,
+.dijit_a11y .dijitCheckBox,
 .dijit_a11y .dijitRadio {
 	width: auto;
 	height: auto;
 }
-.dijit_a11y .dijitCheckboxInput {
+.dijit_a11y .dijitCheckBoxInput {
 	opacity: 1;
 	filter: none;
 	width: auto;
 	height: auto;
-}
-
-
-/****
-		dijit.Toaster (?)
-		TODO: move to dojox
- ****/
- 
-.dijitToasterClip {
-	position: absolute;
-	overflow: hidden;
-}
-
-.dijitToasterContainer {
-	display: block;
-	position: absolute;
-	width: 17.5em;
-	z-index: 5000;
-	margin: 0px;
-	font:0.75em Tahoma, Helvetica, Verdana, Arial;
 }
 
 
@@ -539,7 +533,6 @@ table .dijitComboButton .dijitButtonNode {
 	border:1px solid black; 	/* a11y: border necessary for high-contrast mode */
 	height:20px;
 }
-
 
 .dijitProgressBarFull {
 	/* outer container for background of bar that is finished */
@@ -584,18 +577,7 @@ table .dijitComboButton .dijitButtonNode {
 	height:100%;
 }
 
-.dj_ie6 .dijitProgressBarVertical .dijitProgressBarTile{
-	position:absolute;
-	/* can't use position:static here -- need absolute positioning to place
-	   the bar at the bottom of a vertical progressbar */
-	width:100%;
-}
-
-.dijitProgressBarIndeterminate .dijitProgressBarEmptyLabel{
-	display:none;
-}
-
-.dijitProgressBarIndeterminate .dijitProgressBarFullLabel{
+.dijitProgressBarIndeterminate .dijitProgressBarLabel{
 	display:none;
 }
 
@@ -603,34 +585,33 @@ table .dijitComboButton .dijitButtonNode {
 	/* animated gif for 'indeterminate' mode */
 }
 
-.dijitIndeterminateProgressBarHighContrastImage{
+.dijitProgressBarIndeterminateHighContrastImage{
 	display:none;
 }
 
-.dijit_a11y .dijitProgressBarIndeterminate .dijitIndeterminateProgressBarHighContrastImage{
+.dijit_a11y .dijitProgressBarIndeterminate .dijitProgressBarIndeterminateHighContrastImage{
 	display:block;
 	width:100%;
 	height:100%;
 }
 
-.dijitProgressBarEmptyLabel{
-	/* label for portion of the bar that's not finished yet */
-	display:block;
-	position:absolute;
-	width:100%;
-	text-align:center
-}
-.dijitProgressBarFullLabel{
-	/* label for portion of the bar that is finished */
+.dijitProgressBarLabel{
 	display:block;
 	position:absolute;
 	width:100%;
 	text-align:center;
 }
 
-/* progress bar in vertical mode */
+/* progress bar in vertical mode - TODO: remove? no longer supported? */
 .dijitProgressBarVertical .dijitProgressBarFull{
 	bottom:0px;		/* start at the bottom */
+}
+
+.dj_ie6 .dijitProgressBarVertical .dijitProgressBarTile{
+	position:absolute;
+	/* can't use position:static here -- need absolute positioning to place
+	   the bar at the bottom of a vertical progressbar */
+	width:100%;
 }
 
 
@@ -640,10 +621,10 @@ table .dijitComboButton .dijitButtonNode {
 
 .dijitTooltip {
 	position: absolute;
-	z-index: 10;
+	z-index: 2000;
 	display: block;
 	/* make visible but off screen */
-	left: -10000px;
+	left: 50%;
 	top: -10000px;
 	overflow: visible;
 }
@@ -782,6 +763,11 @@ body .dijitAlignClient { position: absolute; }
 	display: block;
 	overflow: auto;	/* if we don't have this (or overflow:hidden), then Widget.resizeTo() doesn't make sense for ContentPane */
 }
+/* TitlePane */
+.dijitTitlePane {
+	display: block;
+	overflow: hidden;
+}
 
 /* Color Palette */
 .dijitPaletteImg {
@@ -863,66 +849,58 @@ body .dijitAlignClient { position: absolute; }
 
 /* Calendar */
 
-.calendarContainer thead tr th, .calendarContainer thead tr td, .calendarContainer tbody tr td, .calendarContainer tfoot tr td { 
+.dijitCalendarContainer thead tr th, .dijitCalendarContainer thead tr td, .dijitCalendarContainer tbody tr td, .dijitCalendarContainer tfoot tr td { 
 	padding: 0;
 }
 
-.calendarNextYear {
+.dijitCalendarNextYear {
 	margin:0 0 0 0.55em;
 }
 
-.calendarPreviousYear {
+.dijitCalendarPreviousYear {
 	margin:0 0.55em 0 0;
 }
 
-.calendarIncrementControl {
+.dijitCalendarIncrementControl {
 	cursor:pointer;
 	cursor:hand;
 	width:1em;
 }
 
-.calendarIncrease {}
-
-.calendarDecrease {}
-
-
-.calendarDisabledDate {
+.dijitCalendarDisabledDate {
 	color:gray !important;
 }
 
-
-.calendarBodyContainer tbody tr td {
+.dijitCalendarBodyContainer tbody tr td {
 	cursor:pointer;
 	cursor:hand;
 }
 
-.calendarPreviousMonthDisabled {
+.dijitCalendarPreviousMonthDisabled {
 	cursor:default !important
 }
 
-.calendarCurrentMonthDisabled {
+.dijitCalendarCurrentMonthDisabled {
 	cursor:default !important
 }
 
-.calendarNextMonthDisabled {
+.dijitCalendarNextMonthDisabled {
 	cursor:default !important;
 }
 
-.calendarDateTemplate {
+.dijitCalendarDateTemplate {
 	cursor:pointer;
 }
 
-.calendarSelectedYear {
+.dijitCalendarSelectedYear {
 	cursor:pointer;
 }
-.calendarNextYear, 
-.calendarPreviousYear {
+.dijitCalendarNextYear, 
+.dijitCalendarPreviousYear {
 	cursor:pointer;
 }
 
-.calendarMontLabel {}
-
-.calendarMonthLabelSpacer {
+.dijitCalendarMonthLabelSpacer {
 	/* don't display it, but make it affect the width */
   	position: relative;
   	height: 1px;
@@ -1050,8 +1028,8 @@ body .dijitAlignClient { position: absolute; }
 }
 
 .dijitTab .close {
-	display : inline-block;
-	cursor : default;
+	display: inline-block;
+	cursor: default;
 	font-size: small;
 }
 
@@ -1076,7 +1054,6 @@ body .dijitAlignClient { position: absolute; }
 .dijit_a11y .closeText:hover { 
 	border:thin solid;
 } 
-
 
 
 
@@ -1111,7 +1088,6 @@ body .dijitAlignClient { position: absolute; }
     display: inline;
     clear:both;
 }
-
 
 .TreeExpand {
     float: left;
@@ -1186,24 +1162,14 @@ body .dijitAlignClient { position: absolute; }
 	right:0px;
 }
 
-.dijitSliderA11yHandle {
-	text-decoration:none;
-	font-style:normal;
-	font-family:monospace;
-	font-size:32px;
-	position:relative !important;
-	line-height:1.1em;
-	top:-.45em;
-	left:-0.3em;
-}
-
+.dijit_a11y div.dijitSliderImageHandle,
 .dijitSliderImageHandle {
 	margin:0px;
 	padding:0px;
-	border:0px;
 	position:absolute !important;
-	width:16px;
-	height:16px;
+	border:8px solid gray;
+	width:0px;
+	height:0px;
 }
 
 .dijitVerticalSliderImageHandle {
@@ -1213,16 +1179,8 @@ body .dijitAlignClient { position: absolute; }
 
 .dijitHorizontalSliderImageHandle {
 	left:-8px;
-	top:-4px;
+	top:-5px;
 	vertical-align:top;
-}
-
-.dijit_a11y .dijitSliderA11yHandle {
-	display: inline !important;
-}
-
-.dijit_a11y .dijitSliderHandle {
-	display: none !important;
 }
 
 .dijitSliderBar {

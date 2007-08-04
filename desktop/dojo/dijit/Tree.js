@@ -207,28 +207,44 @@ dojo.declare(
 		var domElement = e.target;
 
 		// find node
-        var nodeWidget = this._domElement2TreeNode(domElement);	
+		var nodeWidget = this._domElement2TreeNode(domElement);	
 		if(!nodeWidget || !nodeWidget.isTreeNode){
 			return;
 		}
 
-		this._publish(
-			(domElement == nodeWidget.expandoNode ||
-			 domElement == nodeWidget.expandoNodeText) ? "toggleOpen" : "execute",
-			 { node: nodeWidget} );	
-
+		if(domElement == nodeWidget.expandoNode ||
+			 domElement == nodeWidget.expandoNodeText){
+			// expando node was clicked
+			if(nodeWidget.isFolder){
+				this._publish("toggleOpen", {node:nodeWidget});
+			}
+		}else{
+			this._publish("execute", { node: nodeWidget} );	
+		}
 		dojo.stopEvent(e);
 	},
 
 	_onKeyPress: function(/*Event*/ e){
-		// summary: translates key events into commands for the controller to process
-		if(!e.keyCode || e.altKey){ return; }
-		var nodeWidget = this._domElement2TreeNode(e.target);
-		if(!nodeWidget){ return; }
+		// summary: translates keypress events into commands for the controller
+		if(e.altKey){ return; }
+		var treeNode = this._domElement2TreeNode(e.target);
+		if(!treeNode){ return; }
 
-		if(this._keyTopicMap[e.keyCode]){
-			this._publish(this._keyTopicMap[e.keyCode], { node: nodeWidget} );	
-			dojo.stopEvent(e);
+		// Note: On IE e.keyCode is not 0 for printables so check e.charCode.
+		// In dojo charCode is universally 0 for non-printables.
+		if(e.charCode){  // handle printables (letter navigation)
+			// Check for key navigation.
+			var navKey = e.charCode;
+			if(!e.altKey && !e.ctrlKey && !e.shiftKey && !e.metaKey){
+				navKey = (String.fromCharCode(navKey)).toLowerCase();
+				this._publish("letterKeyNav", { node: treeNode, key: navKey } );
+				dojo.stopEvent(e);
+			}
+		}else{  // handle non-printables (arrow keys)
+			if(this._keyTopicMap[e.keyCode]){
+				this._publish(this._keyTopicMap[e.keyCode], { node: treeNode } );	
+				dojo.stopEvent(e);
+			}
 		}
 	},
 
@@ -259,6 +275,28 @@ dojo.declare(
 
 		// set focus so that the label wil be voiced using screen readers
 		labelNode.focus();
+	},
+	
+	_onBlur: function(){
+		// summary:
+		// 		We've moved away from the whole tree.  The currently "focused" node
+		//		(see focusNode above) should remain as the lastFocused node so we can
+		//		tab back into the tree.  Just change CSS to get rid of the dotted border
+		//		until that time
+		if(this.lastFocused){
+			var labelNode = this.lastFocused.labelNode;
+			dojo.removeClass(labelNode, "TreeLabelFocused");	
+		}
+	},
+	
+	_onFocus: function(){
+		// summary:
+		//		If we were previously on the tree, there's a currently "focused" node
+		//		already.  Just need to set the CSS back so it looks focused.
+		if(this.lastFocused){
+			var labelNode = this.lastFocused.labelNode;
+			dojo.addClass(labelNode, "TreeLabelFocused");			
+		}
 	}
 });
 
@@ -343,7 +381,7 @@ dojo.declare(
 		this.expandoNodeText.innerHTML =
 			processing ? "*" :
 				(this.isFolder ?
-					(this.isExpanded ? "&#9660;" : "&#9658;") : "-");
+					(this.isExpanded ? "-" : "+") : "*");
 	},	
 
 	setChildren: function(items){

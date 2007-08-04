@@ -19,7 +19,7 @@ dojo.declare(
 		//		Milliseconds to fade in/fade out
 		duration: 200,
 
-		templateString:"<div class=\"dijitTooltip\" id=\"dojoTooltip\">\n\t<div class=\"dijitTooltipContainer dijitTooltipContents\" dojoAttachPoint=\"containerNode\" waiRole='alert'></div>\n\t<div class=\"dijitTooltipConnector\"></div>\n</div>\n",
+		templateString:"<div class=\"dijitTooltip dijitTooltipLeft\" id=\"dojoTooltip\">\n\t<div class=\"dijitTooltipContainer dijitTooltipContents\" dojoAttachPoint=\"containerNode\" waiRole='alert'></div>\n\t<div class=\"dijitTooltipConnector\"></div>\n</div>\n",
 
 		postCreate: function(){
 			dojo.body().appendChild(this.domNode);
@@ -47,6 +47,10 @@ dojo.declare(
 				return;
 			}
 			this.containerNode.innerHTML=innerHTML;
+			
+			// Firefox bug. when innerHTML changes to be shorter than previous
+			// one, the node size will not be updated until it moves.  
+			this.domNode.style.top = (this.domNode.offsetTop + 1) + "px"; 
 
 			// position the element and change CSS according to position	
 			var align = this.isLeftToRight() ? {'BR': 'BL', 'BL': 'BR'} : {'BL': 'BR', 'BR': 'BL'};

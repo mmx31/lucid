@@ -154,7 +154,7 @@ dojo.declare("dojox.wire.ml.Invocation",
 		var parameters = [];
 		var list = this.parameters.split(",");
 		if(list.length == 1){
-			var parameter = dojox.wire.ml._getValue(list[0]);
+			var parameter = dojox.wire.ml._getValue(list[0], args);
 			if(dojo.isArray(parameter)){
 				parameters = parameter;
 			}else{
@@ -162,7 +162,7 @@ dojo.declare("dojox.wire.ml.Invocation",
 			}
 		}else{
 			for(var i in list){
-				parameters.push(dojox.wire.ml._getValue(list[i]));
+				parameters.push(dojox.wire.ml._getValue(list[i], args));
 			}
 		}
 		return parameters; //Array

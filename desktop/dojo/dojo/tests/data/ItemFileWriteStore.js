@@ -23,8 +23,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test of the getFeatures function of the store
 			//	description:
 			//		Simple test of the getFeatures function of the store
-
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 
 			var features = store.getFeatures(); 
@@ -52,7 +50,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test of the setValue API
 			//	description:
 			//		Simple test of the setValue API
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 
 			var deferred = new doh.Deferred();
@@ -93,7 +90,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test of the setValues API
 			//	description:
 			//		Simple test of the setValues API
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 
 			var deferred = new doh.Deferred();
@@ -122,7 +118,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test of the unsetAttribute API
 			//	description:
 			//		Simple test of the unsetAttribute API
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 
 			var deferred = new doh.Deferred();
@@ -149,12 +144,22 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test of the newItem API
 			//	description:
 			//		Simple test of the newItem API
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 
 			var deferred = new doh.Deferred();
 			doh.assertTrue(!store.isDirty());
+
+			var onNewInvoked = false;
+			store.onNew = function(newItem, parentInfo){
+
+				doh.assertTrue(newItem !== null);
+				doh.assertTrue(parentInfo === null);
+				doh.assertTrue(store.isItem(newItem));
+				onNewInvoked = true;
+			};
 			var canada = store.newItem({name: "Canada", abbr:"ca", capital:"Ottawa"});
+			doh.assertTrue(onNewInvoked);
+			
 			doh.assertTrue(store.isDirty(canada));
 			doh.assertTrue(store.isDirty());
 			doh.assertTrue(store.getValues(canada, "name") == "Canada");
@@ -170,12 +175,131 @@ doh.register("tests.data.ItemFileWriteStore",
 			store.fetch({query:{name:"Canada"}, onComplete: onComplete, onError: onError});
 			return deferred; //Object
 		},
+		function testWriteAPI_newItem_withParent(){
+			//	summary: 
+			//		Simple test of the newItem API with a parent assignment
+			//	description:
+			//		Simple test of the newItem API with a parent assignment
+			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
+
+			var deferred = new doh.Deferred();
+			doh.assertTrue(!store.isDirty());
+			function onComplete(items, request){
+				doh.assertEqual(1, items.length);
+				var item = items[0];
+				doh.assertTrue(store.containsValue(item, "name", "Egypt"));
+
+				//Attach an onNew to validate we get expected values.
+				var onNewInvoked = false;
+				store.onNew = function(newItem, parentInfo){
+					doh.assertEqual(item, parentInfo.item);
+					doh.assertEqual("cities", parentInfo.attribute);
+					doh.assertTrue(parentInfo.oldValue === undefined);
+					doh.assertTrue(parentInfo.newValue === newItem);
+					onNewInvoked = true;
+				};
+                
+				//Attach an onSet and verify onSet is NOT called in this case.
+				store.onSet = function(item, attribute, oldValue, newValue){
+					doh.assertTrue(false);
+				};
+
+				//See if we can add in a new item representing the city of Cairo.
+				//This should also call the onNew set above....
+				var newItem = store.newItem({name: "Cairo", abbr: "Cairo"}, {parent: item, attribute: "cities"});
+				doh.assertTrue(onNewInvoked);
+
+				function onCompleteNewItemShallow(items, request){
+					doh.assertEqual(0, items.length);
+					function onCompleteNewItemDeep(items, request){
+						doh.assertEqual(1, items.length);
+						var item = items[0];
+						doh.assertEqual("Cairo", store.getValue(item, "name"));
+						deferred.callback(true);
+					}
+					//Do a deep search now, should find the new item of the city with name attribute Cairo.
+					store.fetch({query:{name:"Cairo"}, onComplete: onCompleteNewItemDeep, onError: onError, queryOptions: {deep:true}});
+				}
+				//Do a shallow search first, should find nothing.
+				store.fetch({query:{name:"Cairo"}, onComplete: onCompleteNewItemShallow, onError: onError});
+			}
+			function onError(error, request){
+				deferred.errback(error);
+			}
+			store.fetch({query:{name:"Egypt"}, onComplete: onComplete, onError: onError});
+			return deferred; //Object
+		},
+		
+		function testWriteAPI_newItem_multiple_withParent(){
+			//	summary: 
+			//		Simple test of the newItem API with a parent assignment multiple times.
+			//	description:
+			//		Simple test of the newItem API with a parent assignment multiple times.
+			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
+
+			var deferred = new doh.Deferred();
+			
+			doh.assertTrue(!store.isDirty());
+			
+			function onComplete(items, request){
+				doh.assertEqual(1, items.length);
+				var item = items[0];
+				doh.assertTrue(store.containsValue(item, "name", "Egypt"));
+
+				//Attach an onNew to validate we get expected values.
+				store.onNew = function(newItem, parentInfo){
+					doh.assertEqual(item, parentInfo.item);
+					doh.assertEqual("cities", parentInfo.attribute);
+					
+					doh.assertTrue(parentInfo.oldValue === undefined);
+					
+					doh.assertTrue(parentInfo.newValue === newItem);
+				};
+
+				//See if we can add in a new item representing the city of Cairo.
+				//This should also call the onNew set above....
+				var newItem1 = store.newItem({name: "Cairo", abbr: "Cairo"}, {parent: item, attribute: "cities"});
+				
+				//Attach a new onNew to validate we get expected values.
+				store.onNew = function(newItem, parentInfo){
+					doh.assertEqual(item, parentInfo.item);
+					doh.assertEqual("cities", parentInfo.attribute);
+					
+					console.log(parentInfo.oldValue);
+					doh.assertTrue(parentInfo.oldValue == newItem1);
+					
+					doh.assertTrue(parentInfo.newValue[0] == newItem1);
+					doh.assertTrue(parentInfo.newValue[1] == newItem);
+				};
+				var newItem2 = store.newItem({name: "Banha", abbr: "Banha"}, {parent: item, attribute: "cities"});
+				
+				//Attach a new onNew to validate we get expected values.
+				store.onNew = function(newItem, parentInfo){
+					doh.assertEqual(item, parentInfo.item);
+					doh.assertEqual("cities", parentInfo.attribute);
+					
+					doh.assertTrue(parentInfo.oldValue[0] == newItem1);
+					doh.assertTrue(parentInfo.oldValue[1] == newItem2);
+					
+					doh.assertTrue(parentInfo.newValue[0] == newItem1);
+					doh.assertTrue(parentInfo.newValue[1] == newItem2);
+					doh.assertTrue(parentInfo.newValue[2] == newItem);
+				};
+				var newItem3 = store.newItem({name: "Damanhur", abbr: "Damanhur"}, {parent: item, attribute: "cities"});
+				deferred.callback(true);
+			}
+			function onError(error, request){
+				deferred.errback(error);
+			}
+			store.fetch({query:{name:"Egypt"}, onComplete: onComplete, onError: onError});
+			return deferred; //Object
+		},
+
 		function testWriteAPI_deleteItem(){
 			//	summary: 
 			//		Simple test of the deleteItem API
 			//	description:
 			//		Simple test of the deleteItem API
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 
 			var deferred = new doh.Deferred();
@@ -205,7 +329,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test of the isDirty API
 			//	description:
 			//		Simple test of the isDirty API
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 
 			var deferred = new doh.Deferred();
@@ -229,7 +352,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test of the revert API
 			//	description:
 			//		Simple test of the revert API
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 
 			var deferred = new doh.Deferred();
@@ -265,7 +387,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test of the save API
 			//	description:
 			//		Simple test of the save API
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 
 			var deferred = new doh.Deferred();
@@ -287,7 +408,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test of the save API
 			//	description:
 			//		Simple test of the save API
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 			var egypt;
 			store._saveEverything = function(saveCompleteCallback, saveFailedCallback, newFileContentString){
@@ -296,7 +416,6 @@ doh.register("tests.data.ItemFileWriteStore",
 				doh.assertEqual(struct.label, store.getLabelAttributes(egypt)[0]);
 				doh.assertEqual(struct.items.length, 7);
 				
-				// var cloneStore = tests.data.ItemFileWriteStore.getCountriesStore({data:newFileContentString});
 				var cloneStore = new dojo.data.ItemFileWriteStore({data:struct});
 				function onItemClone(itemClone){
 					var egyptClone = itemClone;
@@ -329,10 +448,8 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test of the save API	with a non-atomic type (Date) that has a type mapping.
 			//	description:
 			//		Simple test of the save API	with a non-atomic type (Date) that has a type mapping.
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 			store._saveEverything = function(saveCompleteCallback, saveFailedCallback, newFileContentString){
-				//console.log(newFileContentString);
 
 				//Now load the new data into a datastore and validate that it stored the date right.
 				var dataset = dojo.fromJson(newFileContentString);
@@ -487,7 +604,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test of the onSet API
 			//	description:
 			//		Simple test of the onSet API
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 
 			var deferred = new doh.Deferred();
@@ -516,7 +632,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test of the onNew API
 			//	description:
 			//		Simple test of the onNew API
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 
 			var deferred = new doh.Deferred();
@@ -535,7 +650,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test of the onDelete API
 			//	description:
 			//		Simple test of the onDelete API
-			//var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var store = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 
 			var deferred = new doh.Deferred();
@@ -561,8 +675,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test read API conformance.  Checks to see all declared functions are actual functions on the instances.
 			//	description:
 			//		Simple test read API conformance.  Checks to see all declared functions are actual functions on the instances.
-
-			//var testStore = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var testStore = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 			var readApi = new dojo.data.api.Read();
 			var passed = true;
@@ -585,8 +697,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test write API conformance.  Checks to see all declared functions are actual functions on the instances.
 			//	description:
 			//		Simple test write API conformance.  Checks to see all declared functions are actual functions on the instances.
-
-			//var testStore = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var testStore = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 			var writeApi = new dojo.data.api.Write();
 			var passed = true;
@@ -609,8 +719,6 @@ doh.register("tests.data.ItemFileWriteStore",
 			//		Simple test Notification API conformance.  Checks to see all declared functions are actual functions on the instances.
 			//	description:
 			//		Simple test Notification API conformance.  Checks to see all declared functions are actual functions on the instances.
-
-			//var testStore = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.testFile["countries"]);
 			var testStore = new dojo.data.ItemFileWriteStore(tests.data.readOnlyItemFileTestTemplates.getTestData("countries"));
 			var api = new dojo.data.api.Notification();
 			var passed = true;
@@ -627,6 +735,60 @@ doh.register("tests.data.ItemFileWriteStore",
 				}
 			}
 			doh.assertTrue(passed);
+		},
+		function testIdentityAPI_noIdentifierSpecified(){
+			//	summary: 
+			//		Test for bug #3873. Given a datafile that does not specify an
+			//		identifier, make sure ItemFileWriteStore auto-creates identities 
+			//		that are unique even after calls to deleteItem() and newItem()
+
+			var args = {data: {
+				label:"name",
+				items:[
+					{name:'Ecuador', capital:'Quito'},
+					{name:'Egypt', capital:'Cairo'},
+					{name:'El Salvador', capital:'San Salvador'},
+					{name:'Equatorial Guinea', capital:'Malabo'},
+					{name:'Eritrea', capital:'Asmara'},
+					{name:'Estonia', capital:'Tallinn'},
+					{name:'Ethiopia', capital:'Addis Ababa'}
+				]
+			} }; 
+			var store = new dojo.data.ItemFileWriteStore(args);
+			var deferred = new doh.Deferred();
+			
+			function onError(error, request){
+				deferred.errback(error);
+			}
+			function onComplete(items, request){
+				doh.assertEqual(7, items.length);
+				
+				var lastItem = items[(items.length - 1)];
+				var idOfLastItem = store.getIdentity(lastItem);
+				store.deleteItem(lastItem);
+				store.newItem({name:'Canada', capital:'Ottawa'});
+				
+				function onCompleteAgain(itemsAgain, requestAgain){
+					doh.assertEqual(7, itemsAgain.length);
+					var identitiesInUse = {};
+					for(var i = 0; i < itemsAgain.length; ++i){
+						var item = itemsAgain[i];
+						var id = store.getIdentity(item);
+						if(identitiesInUse.hasOwnProperty(id)){
+							// there should not already be an entry for this id
+							doh.assertTrue(false);
+						}else{
+							// we want to add the entry now
+							identitiesInUse[id] = item;
+						}
+					}
+					deferred.callback(true);
+				}
+				store.fetch({onComplete:onCompleteAgain, onError:onError});
+			}
+			
+			store.fetch({onComplete:onComplete, onError:onError});
+			return deferred;
 		}
 	]
 );

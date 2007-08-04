@@ -22,13 +22,17 @@ dojo.declare(
 		//	text to display in button
 		label: "",
 
+		// showLabel: Boolean
+		// whether or not to display the text label in button 
+		showLabel: true,
+
 		// iconClass: String
 		//	class to apply to div in button to make it display an icon
 		iconClass: "",
 
 		type: "button",
 		baseClass: "dijitButton",
-		templateString:"<div class=\"dijit dijitLeft dijitInline dijitButton\" baseClass=\"${baseClass}\"\n\tdojoAttachEvent=\"onclick:_onButtonClick,onmouseover:_onMouse,onmouseout:_onMouse,onmousedown:_onMouse\"\n\t><div class='dijitRight'\n\t><button class=\"dijitStretch dijitButtonNode dijitButtonContents\" dojoAttachPoint=\"focusNode\"\n\t\ttabIndex=\"${tabIndex}\" type=\"${type}\" id=\"${id}\" name=\"${name}\"\n\t\t><div class=\"dijitInline ${iconClass}\"></div\n\t\t><span class=\"dijitButtonText\" dojoAttachPoint=\"containerNode\">${label}</span\n\t></button\n></div></div>\n",
+		templateString:"<div class=\"dijit dijitLeft dijitInline dijitButton\" baseClass=\"${baseClass}\"\n\tdojoAttachEvent=\"onclick:_onButtonClick,onmouseover:_onMouse,onmouseout:_onMouse,onmousedown:_onMouse\"\n\t><div class='dijitRight'\n\t><button class=\"dijitStretch dijitButtonNode dijitButtonContents\" dojoAttachPoint=\"focusNode,titleNode\"\n\t\ttabIndex=\"${tabIndex}\" type=\"${type}\" id=\"${id}\" name=\"${name}\" waiRole=\"button\" waiState=\"labelledby-${id}_label\"\n\t\t><div class=\"dijitInline ${iconClass}\"></div\n\t\t><span class=\"dijitButtonText\" id=\"${id}_label\" dojoAttachPoint=\"containerNode\">${label}</span\n\t></button\n></div></div>\n",
 
 		// TODO: set button's title to this.containerNode.innerText
 
@@ -38,13 +42,32 @@ dojo.declare(
 			if(this.disabled){ return; }
 			return this.onClick(e);
 		},
-		
+
+		postCreate: function(){
+			// summary:
+			//	get label and set as title on button icon if necessary
+			if (this.showLabel == false){
+				var labelText = "";
+				this.label = this.containerNode.innerHTML;
+				labelText = dojo.trim(this.containerNode.innerText || this.containerNode.textContent);
+				// set title attrib on iconNode
+				this.titleNode.title=labelText;
+				dojo.addClass(this.containerNode,"dijitDisplayNone");
+			}
+			dijit.form._FormWidget.prototype.postCreate.apply(this, arguments);
+		},
+
 		onClick: function(/*Event*/ e){
 			// summary: callback for when button is clicked; user can override this function
-			
+
 			// for some reason type=submit buttons don't automatically submit the form; do it manually
 			if(this.type=="submit"){
 				for(var node=this.domNode; node; node=node.parentNode){
+					var widget=dijit.byNode(node);
+					if(widget && widget._onSubmit){
+						widget._onSubmit(e);
+						break;
+					}
 					if(node.tagName.toLowerCase() == "form"){
 						node.submit();
 						break;
@@ -62,7 +85,9 @@ dojo.declare(
 				var _this = this;
 				setTimeout(function(){_this.domNode.style.display=oldDisplay;},1);
 			}
-			// TODO: set button's title to this.containerNode.innerText
+			if (this.showLabel == false){
+					this.titleNode.title=dojo.trim(this.containerNode.innerText || this.containerNode.textContent);
+			}
 		}		
 	}
 );
@@ -83,7 +108,7 @@ dojo.declare(
 
 		baseClass : "dijitDropDownButton",
 
-		templateString:"<div class=\"dijit dijitLeft dijitInlineBox dijitDropDownButton\" baseClass=\"dijitDropDownButton\"\n\tdojoAttachEvent=\"onmouseover:_onMouse,onmouseout:_onMouse,onmousedown:_onMouse,onclick:_onArrowClick,onkeypress:_onKey\"\n\t><div class='dijitRight'>\n\t<button tabIndex=\"${tabIndex}\" class=\"dijitStretch dijitButtonNode dijitButtonContents\" type=\"${type}\" id=\"${id}\" name=\"${name}\"\n\t\tdojoAttachPoint=\"focusNode\" waiRole=\"button\" waiState=\"haspopup-true,labelledby-${id}_label\"\n\t\t><div class=\"dijitInline ${iconClass}\" title=\"${label}\"></div\n\t\t><span class=\"dijitButtonText\" \tdojoAttachPoint=\"containerNode,popupStateNode\"\n\t\tid=\"${id}_label\">${label}</span\n\t\t><span class='dijitA11yDownArrow'>&#9660;</span>\n\t</button>\n</div></div>\n",
+		templateString:"<div class=\"dijit dijitLeft dijitInline dijitDropDownButton\" baseClass=\"dijitDropDownButton\"\n\tdojoAttachEvent=\"onmouseover:_onMouse,onmouseout:_onMouse,onmousedown:_onMouse,onclick:_onArrowClick,onkeypress:_onKey\"\n\t><div class='dijitRight'>\n\t<button tabIndex=\"${tabIndex}\" class=\"dijitStretch dijitButtonNode dijitButtonContents\" type=\"${type}\" id=\"${id}\" name=\"${name}\"\n\t\tdojoAttachPoint=\"focusNode,titleNode\" waiRole=\"button\" waiState=\"haspopup-true,labelledby-${id}_label\"\n\t\t><div class=\"dijitInline ${iconClass}\"></div\n\t\t><span class=\"dijitButtonText\" \tdojoAttachPoint=\"containerNode,popupStateNode\"\n\t\tid=\"${id}_label\">${label}</span\n\t\t><span class='dijitA11yDownArrow'>&#9660;</span>\n\t</button>\n</div></div>\n",
 
 		_fillContent: function(){
 			// my inner HTML contains both the button contents and a drop down widget, like
@@ -144,11 +169,20 @@ dojo.declare(
 			if(!dropDown.isShowingNow){
 				var oldWidth=dropDown.domNode.style.width;
 				var self = this;
+/***
+ * TODO: this doesn't work.  dropDown.domNode is hidden so offsetWidth is 0
+
+				if(this.domNode.offsetWidth > dropDown.domNode.offsetWidth){
+					// make menu at least as wide as the button
+					dojo.marginBox(dropDown.domNode, {w:this.domNode.offsetWidth});
+				}
+***/
 				dijit.popup.open({
-					host: this,
+					parent: this,
 					popup: dropDown,
 					around: this.domNode,
-					orient: {'BL':'TL', 'BR':'TR', 'TL':'BL', 'TR':'BR'},
+					orient: this.isLeftToRight() ? {'BL':'TL', 'BR':'TR', 'TL':'BL', 'TR':'BR'}
+						: {'BR':'TR', 'BL':'TL', 'TR':'BR', 'TL':'BL'},
 					onExecute: function(){
 						dijit.popup.closeAll();
 						self.focus();
@@ -162,10 +196,6 @@ dojo.declare(
 						self.popupStateNode.removeAttribute("popupActive");
 					}
 				});
-				if(this.domNode.offsetWidth > dropDown.domNode.offsetWidth){
-					// make menu at least as wide as the button
-					dojo.marginBox(dropDown.domNode, {w:this.domNode.offsetWidth});
-				}
 				this.popupStateNode.setAttribute("popupActive", "true");
 				this._opened=true;
 				if(dropDown.focus){
@@ -193,7 +223,7 @@ dojo.declare(
 	{
 		// summary
 		//		left side is normal button, right side displays menu
-		templateString:"<fieldset class='dijit dijitInline dijitLeft dijitComboButton'  baseClass='dijitComboButton'\n\tid=\"${id}\" name=\"${name}\"\n\tdojoAttachEvent=\"onmouseover:_onMouse,onmouseout:_onMouse,onmousedown:_onMouse\"\t\n>\n<table cellspacing='0' cellpadding='0'  waiRole=\"presentation\" >\n\t<tr>\n\t\t<td\tclass=\"dijitStretch dijitButtonContents dijitButtonNode\"\n\t\t\ttabIndex=\"${tabIndex}\"\n\t\t\tdojoAttachEvent=\"onklick:_onButtonClick\"\n\t\t\twaiRole=\"button\" waiState=\"labelledby-${id}_label\">\n\t\t\t<div class=\"dijitInline ${iconClass}\" title=\"${label}\"></div>\n\t\t\t<span class=\"dijitButtonText\" id=\"${id}_label\" dojoAttachPoint=\"containerNode\">${label}</span>\n\t\t</td>\n\t\t<td class='dijitReset dijitRight dijitButtonNode dijitDownArrowButton'\n\t\t\tdojoAttachPoint=\"popupStateNode,focusNode\"\n\t\t\tdojoAttachEvent=\"onmouseover:_onMouse,onmouseout:_onMouse,onmousedown:_onMouse,onklick:_onArrowClick, onkeypress:_onKey\"\n\t\t\tbaseClass=\"dijitComboButtonDownArrow\"\n\t\t\ttitle=\"${optionsTitle}\"\n\t\t\ttabIndex=\"${tabIndex}\"\n\t\t\twaiRole=\"button\" waiState=\"haspopup-true\"\n\t\t><div waiRole=\"presentation\">&#9660;</div>\n\t</td></tr>\n</table>\n</fieldset>\n",
+		templateString:"<table class='dijit dijitReset dijitInline dijitLeft dijitComboButton'  baseClass='dijitComboButton'\n\tid=\"${id}\" name=\"${name}\" cellspacing='0' cellpadding='0'\n\tdojoAttachEvent=\"onmouseover:_onMouse,onmouseout:_onMouse,onmousedown:_onMouse\">\n\t<tr>\n\t\t<td\tclass=\"dijitStretch dijitButtonContents dijitButtonNode\"\n\t\t\ttabIndex=\"${tabIndex}\"\n\t\t\tdojoAttachEvent=\"ondijitclick:_onButtonClick\"  dojoAttachPoint=\"titleNode\"\n\t\t\twaiRole=\"button\" waiState=\"labelledby-${id}_label\">\n\t\t\t<div class=\"dijitInline ${iconClass}\"></div>\n\t\t\t<span class=\"dijitButtonText\" id=\"${id}_label\" dojoAttachPoint=\"containerNode\">${label}</span>\n\t\t</td>\n\t\t<td class='dijitReset dijitRight dijitButtonNode dijitDownArrowButton'\n\t\t\tdojoAttachPoint=\"popupStateNode,focusNode\"\n\t\t\tdojoAttachEvent=\"onmouseover:_onMouse,onmouseout:_onMouse,onmousedown:_onMouse,ondijitclick:_onArrowClick, onkeypress:_onKey\"\n\t\t\tbaseClass=\"dijitComboButtonDownArrow\"\n\t\t\ttitle=\"${optionsTitle}\"\n\t\t\ttabIndex=\"${tabIndex}\"\n\t\t\twaiRole=\"button\" waiState=\"haspopup-true\"\n\t\t><div waiRole=\"presentation\">&#9660;</div>\n\t</td></tr>\n</table>\n",
 
 		// optionsTitle: String
 		//  text that describes the options menu (accessibility)

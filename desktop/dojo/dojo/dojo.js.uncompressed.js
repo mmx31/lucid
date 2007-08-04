@@ -251,9 +251,6 @@ dojo._getText = function(/*String*/ uri){
 ;(function(){
 	//Additional properties for dojo
 	var _add = {
-		// FIXME: we're not populting djConfig from markup before we hit this!!
-		_pkgFileName: djConfig["packageFileName"]||"__package__",
-	
 		// for recursion protection
 		_loadedModules: {},
 		_inFlightCount: 0,
@@ -354,8 +351,7 @@ dojo._loadUri = function(/*String (URL)*/uri, /*Function?*/cb){
 	this._loadedUrls[uri] = true;
 	this._loadedUrls.push(uri);
 	if(cb){ contents = '('+contents+')'; }
-	// var value = dojo["eval"](contents);
-	var value = dojo["eval"]("//@ sourceURL="+uri+"\r\n"+contents);
+	var value = dojo["eval"](contents+"\r\n//@ sourceURL="+uri);
 	if(cb){ cb(value); }
 	return true; // Boolean
 }
@@ -534,7 +530,7 @@ dojo._loadModule = function(	/*String*/moduleName,
 	if(last=="*"){
 		moduleName = nsyms.slice(0, -1).join('.');
 		syms.pop();
-		relpath = syms.join("/") + "/" + this._pkgFileName + '.js';
+		relpath = syms.join("/") + "/" + (djConfig["packageFileName"]||"__package__") + '.js';
 		if(startedRelative && relpath.charAt(0)=="/"){
 			relpath = relpath.slice(1);
 		}
@@ -938,6 +934,12 @@ if(typeof window != 'undefined'){
 			}
 		}catch(e){}
 
+		//Workaround to get local file loads of dojo to work on IE 7
+		//by forcing to not use native xhr.
+		if(dojo.isIE && (window.location.protocol === "file:")){
+			djConfig.ieForceActiveXXhr=true;
+		}
+
 		d._gearsObject = function(){
 			// summary: 
 			//		factory method to get a Google Gears plugin instance to
@@ -1004,7 +1006,9 @@ if(typeof window != 'undefined'){
 			//		object.
 			var http = null;
 			var last_e = null;
-			try{ http = new XMLHttpRequest(); }catch(e){}
+			if(!dojo.isIE || !djConfig.ieForceActiveXXhr){
+				try{ http = new XMLHttpRequest(); }catch(e){}
+			}
 			if(!http){
 				for(var i=0; i<3; ++i){
 					var progid = dojo._XMLHTTP_PROGIDS[i];
@@ -1469,35 +1473,32 @@ dojo._toArray = function(/*Object*/obj, /*Number?*/offset){
 	return arr;
 }
 
-// FIXME: this is unreviewed dojo.clone() function, 
-// which can clone any objects including HTML nodes
-
-//dojo.clone = function(/*anything*/ o){
-//	// summary:
-//	//		Clones objects (including DOM nodes) and all children.
-//	//		Warning: do not clone cyclic structures.
-//	if(!o){ return o; }
-//	if(dojo.isArray(o)){
-//		var r = [];
-//		for(var i = 0; i < o.length; ++i){
-//			r.push(dojo.clone(o[i]));
-//		}
-//		return r;
-//	}else if(dojo.isObject(o)){
-//		if(o.nodeType && o.cloneNode){ // isNode
-//			return o.cloneNode(true);
-//		}else{
-//			var r = new o.constructor();
-//			for(var i in o){
-//				if(!(i in r) || r[i] != o[i]){
-//					r[i] = dojo.clone(o[i]);
-//				}
-//			}
-//			return r;
-//		}
-//	}
-//	return o;
-//}
+dojo.clone = function(/*anything*/ o){
+	// summary:
+	//		Clones objects (including DOM nodes) and all children.
+	//		Warning: do not clone cyclic structures.
+	if(!o){ return o; }
+	if(dojo.isArray(o)){
+		var r = [];
+		for(var i = 0; i < o.length; ++i){
+			r.push(dojo.clone(o[i]));
+		}
+		return r;
+	}else if(dojo.isObject(o)){
+		if(o.nodeType && o.cloneNode){ // isNode
+			return o.cloneNode(true);
+		}else{
+			var r = new o.constructor(); // specific to dojo.declare()'d classes!
+			for(var i in o){
+				if(!(i in r) || r[i] != o[i]){
+					r[i] = dojo.clone(o[i]);
+				}
+			}
+			return r;
+		}
+	}
+	return o;
+}
 
 dojo.trim = function(/*String*/ str){
 	// summary: trims whitespaces from both sides of the string
@@ -2837,7 +2838,7 @@ dojo.provide("dojo._base.event");
 	var del = {
 		add: function(/*DOMNode*/node, /*String*/event, /*Function*/fp){
 			if(!node){return;} 
-			event = del._normalizeEventName(event)
+			event = del._normalizeEventName(event);
 			fp = del._fixCallback(event, fp);
 			node.addEventListener(event, fp, false);
 			return fp; /*Handle*/
@@ -2845,10 +2846,10 @@ dojo.provide("dojo._base.event");
 		remove: function(/*DOMNode*/node, /*String*/event, /*Handle*/handle){
 			// summary:
 			//		clobbers the listener from the node
-			// evtName:
-			//		the name of the handler to remove the function from
 			// node:
 			//		DOM node to attach the event to
+			// event:
+			//		the name of the handler to remove the function from
 			// handle:
 			//		the handle returned from add
 			(node)&&(node.removeEventListener(del._normalizeEventName(event), handle, false));
@@ -2889,8 +2890,10 @@ dojo.provide("dojo._base.event");
 		// summary:
 		//		normalizes properties on the event object including event
 		//		bubbling methods, keystroke normalization, and x/y positions
-		// evt: native event object
-		// sender: node to treat as "currentTarget"
+		// evt: Event
+		//		native event object
+		// sender: DOMNode
+		//		node to treat as "currentTarget"
 		return del._fixEvent(evt, sender);
 	}
 
@@ -2898,9 +2901,11 @@ dojo.provide("dojo._base.event");
 		// summary:
 		//		prevents propagation and clobbers the default action of the
 		//		passed event
-		// evt: Optional for IE. The native event object.
+		// evt: Event
+		//		The event object. If omitted, window.event is used on IE.
 		evt.preventDefault();
 		evt.stopPropagation();
+		// NOTE: below, this method is overridden for IE
 	}
 
 	// the default listener to use on dontFix nodes, overriden for IE<7
@@ -2908,7 +2913,7 @@ dojo.provide("dojo._base.event");
 	
 	// Unify connect and event listeners
 	
-	dojo._connect = function(obj, event, context, method, dontFix) {
+	dojo._connect = function(obj, event, context, method, dontFix){
 		// FIXME: need a more strict test
 		var isNode = obj && (obj.nodeType||obj.attachEvent||obj.addEventListener);
 		// choose one of three listener options: raw (connect.js), DOM event on a Node, custom event on a Node
@@ -2992,7 +2997,7 @@ dojo.provide("dojo._base.event");
 			try{
 				// squelch errors when keyCode is read-only
 				// (e.g. if keyCode is ctrl or shift)
-				return e.keyCode = code;
+				return (e.keyCode = code);
 			}catch(e){
 				return 0;
 			}
@@ -3196,7 +3201,7 @@ dojo.provide("dojo._base.event");
 		}
 	}
 
-	del._synthesizeEvent = function(evt, props) {
+	del._synthesizeEvent = function(evt, props){
 			var faux = dojo.mixin({}, evt, props);
 			del._setKeyChar(faux);
 			// FIXME: would prefer to use dojo.hitch: dojo.hitch(evt, evt.preventDefault); 
@@ -3342,7 +3347,9 @@ if(dojo.isIE && (dojo.isIE<7)){ // || dojo.isOpera){
 		if(dojo.isString(id)){
 			var _d = (doc||dojo.doc);
 			var te = _d.getElementById(id);
-			if((te) && (te.id == id)){
+			// attributes.id.value is better than just id in case the 
+			// user has a name=id inside a form
+			if((te) && (te.attributes.id.value == id)){
 				return te;
 			}else{
 				var eles = _d.all[id];
@@ -3351,7 +3358,7 @@ if(dojo.isIE && (dojo.isIE<7)){ // || dojo.isOpera){
 				// if more than 1, choose first with the correct id
 				var i=0;
 				while(te=eles[i++]){
-					if(te.id == id){ return te; }
+					if(te.attributes.id.value == id){ return te; }
 				}
 			}
 		}else{
@@ -5742,6 +5749,25 @@ dojo.formToObject = function(/*DOMNode||String*/ formNode){
 }
 
 dojo.objectToQuery = function(/*Object*/ map){
+	//	summary:
+	//		takes a key/value mapping object and returns a string representing
+	//		a URL-encoded version of that object.
+	//	examples:
+	//		this object:
+	//
+	//			{ 
+	//				blah: "blah",
+	//				multi: [
+	//					"thud",
+	//					"thonk"
+	//				]
+	//			};
+	//
+	//		yeilds the following query string:
+	//	
+	//			"blah=blah&multi=thud&multi=thonk"
+
+
 	// FIXME: need to implement encodeAscii!!
 	var ec = encodeURIComponent;
 	var ret = "";
@@ -5884,7 +5910,18 @@ dojo._contentHandlers = {
 		return dojo.eval(xhr.responseText);
 	},
 	"xml": function(xhr){ 
-		return xhr.responseXML;
+		if(dojo.isIE && !xhr.responseXML){
+			dojo.forEach(["MSXML2", "Microsoft", "MSXML", "MSXML3"], function(i){
+				try{
+					var doc = new ActiveXObject(prefixes[i]+".XMLDOM");
+					doc.async = false;
+					doc.loadXML(xhr.responseText);
+					return doc;	//	DOMDocument
+				}catch(e){ /* squelch */ };
+			});
+		}else{
+			return xhr.responseXML;
+		}
 	}
 };
 
@@ -5903,38 +5940,68 @@ dojo._contentHandlers = {
 		//		url:
 		//				String URL to server endpoint.
 		//		content:
-		//				Object containing properties with string values. These properties will be serialized as name1=value2 and passed in the request.
+		//				Object containing properties with string values. These
+		//				properties will be serialized as name1=value2 and
+		//				passed in the request.
 		//		timeout:
-		//				Milliseconds to wait for the response. If this time passes, the then error callbacks are called.
+		//				Milliseconds to wait for the response. If this time
+		//				passes, the then error callbacks are called.
 		//		form:
-		//				DOM node for a form. Used to extract the form values and send to the server.
+		//				DOM node for a form. Used to extract the form values
+		//				and send to the server.
 		//		preventCache:
-		//				Boolean. Default is false. If true, then a "dojo.preventCache" parameter is sent in the request with a value that changes with each request (timestamp). Useful only with GET-type requests.
+		//				Boolean. Default is false. If true, then a
+		//				"dojo.preventCache" parameter is sent in the request
+		//				with a value that changes with each request
+		//				(timestamp). Useful only with GET-type requests.
 		//		handleAs:
-		//				String. Acceptable values depend on the type of IO transport (see below).
+		//				String. Acceptable values depend on the type of IO
+		//				transport (see below).
 		//		load:
-		//				function(response, ioArgs){}. The load function will be called on a successful response.
+		//				function(response, ioArgs){}. The load function will be
+		//				called on a successful response.
 		//		error:
-		//				function(response, ioArgs){}. The error function will be called in an error case. 
+		//				function(response, ioArgs){}. The error function will
+		//				be called in an error case. 
 		//		handle
-		//				function(response, ioArgs){}. The handle function will be called in either the successful or error case.
-		//				For the load, error and handle functions, the ioArgs object will contain the following properties:
+		//				function(response, ioArgs){}. The handle function will
+		//				be called in either the successful or error case.  For
+		//				the load, error and handle functions, the ioArgs object
+		//				will contain the following properties: 
+		//
 		//				args:
-		//				the original object argument to the IO call.
+		//						the original object argument to the IO call.
 		//				xhr:
-		//						For XMLHttpRequest calls only, the XMLHttpRequest object that was used for the request.
+		//						For XMLHttpRequest calls only, the
+		//						XMLHttpRequest object that was used for the
+		//						request.
 		//				url:
-		//						The final URL used for the call. Many times it will be different than the original args.url value.
+		//						The final URL used for the call. Many times it
+		//						will be different than the original args.url
+		//						value.
 		//				query:
-		//						For non-GET requests, the name1=value1&name2=value2 parameters sent up in the request.
+		//						For non-GET requests, the
+		//						name1=value1&name2=value2 parameters sent up in
+		//						the request.
 		//				handleAs:
-		//						The final indicator on how the response will be handled.
+		//						The final indicator on how the response will be
+		//						handled.
 		//				id:
-		//						For dojo.io.script calls only, the internal script ID used for the request.
+		//						For dojo.io.script calls only, the internal
+		//						script ID used for the request.
 		//				canDelete:
-		//						For dojo.io.script calls only, indicates whether the script tag that represents the request can be deleted after callbacks have been called. Used internally to know when cleanup can happen on JSONP-type requests.
+		//						For dojo.io.script calls only, indicates
+		//						whether the script tag that represents the
+		//						request can be deleted after callbacks have
+		//						been called. Used internally to know when
+		//						cleanup can happen on JSONP-type requests.
 		//				json:
-		//						For dojo.io.script calls only: holds the JSON response for JSONP-type requests. Used internally to hold on to the JSON responses. You should not need to access it directly -- the same object should be passed to the success callbacks directly.
+		//						For dojo.io.script calls only: holds the JSON
+		//						response for JSONP-type requests. Used
+		//						internally to hold on to the JSON responses.
+		//						You should not need to access it directly --
+		//						the same object should be passed to the success
+		//						callbacks directly.
 		//	canceller:
 		//		The canceller function used for the Deferred object. The function
 		//		will receive one argument, the Deferred object that is related to the
@@ -5955,7 +6022,10 @@ dojo._contentHandlers = {
 		var formQuery = null;
 		if(args.form){ 
 			var form = dojo.byId(args.form);
-			ioArgs.url = args.url || form.getAttribute("action");
+			//IE requires going through getAttributeNode instead of just getAttribute in some form cases, 
+			//so use it for all.  See #2844
+			var actnNode = form.getAttributeNode("action");
+			ioArgs.url = args.url || (actnNode ? actnNode.value : null); 
 			formQuery = dojo.formToQuery(form);
 		}else{
 			ioArgs.url = args.url;
@@ -6032,7 +6102,7 @@ dojo._contentHandlers = {
 	var _deferError = function(/*Error*/error, /*Deferred*/dfd){
 		//summary: errHandler function for dojo._ioSetArgs call.
 		
-		console.debug("xhr error in:", dfd.ioArgs.xhr);
+		// console.debug("xhr error in:", dfd.ioArgs.xhr);
 		console.debug(error);
 		return error;
 	}
@@ -6092,6 +6162,18 @@ dojo._contentHandlers = {
 			_inFlightIntvl = null;
 			return;
 		}
+
+		// FIXME: need to kill things on unload for #2357
+	}
+
+	if(dojo.isIE){
+		dojo.addOnUnload(function(){
+			try{
+				dojo.forEach(_inFlight, function(i){
+					i.dfd.cancel();
+				});
+			}catch(e){/*squelch*/}
+		});
 	}
 
 	dojo._ioWatch = function(/*Deferred*/dfd,
@@ -6175,14 +6257,23 @@ dojo._contentHandlers = {
 	// TODOC: FIXME!!!
 
 	dojo.xhrGet = function(/*Object*/ args){
-		//summary: Sends an HTTP GET request to the server. See dojo._ioSetArgs in this file
-		//for a list of commonly accepted properties on the args argument. Additional properties
-		//that apply to all of the dojo.xhr* methods:
-		//handleAs: 
-		//		String. Acceptable values are "text" (default), "json", "json-comment-optional", "json-comment-filtered", "javascript", "xml"
-		//sync:
-		//		Boolean. false is default. Indicates whether the request should be a synchronous (blocking) request.
-		//headers:
+		//	summary: 
+		//		Sends an HTTP GET request to the server. See dojo._ioSetArgs in
+		//		this file for a list of commonly accepted properties on the
+		//		args argument. Additional properties that apply to all of the
+		//		dojo.xhr* methods:
+		//	handleAs: 
+		//		String. Acceptable values are:
+		//			"text" (default)
+		//			"json"
+		//			"json-comment-optional"
+		//			"json-comment-filtered"
+		//			"javascript"
+		//			"xml"
+		//	sync:
+		//		Boolean. false is default. Indicates whether the request should
+		//		be a synchronous (blocking) request.
+		//	headers:
 		//		Object. Additional HTTP headers to send in the request.
 		var dfd = _makeXhrDeferred(args);
 		dojo._ioAddQueryToUrl(dfd.ioArgs);
@@ -6190,16 +6281,19 @@ dojo._contentHandlers = {
 	}
 
 	dojo.xhrPost = function(/*Object*/ args){
-		//summary: Sends an HTTP POST request to the server. See dojo.xhrGet in this file
-		//for a list of commonly accepted properties on the args argument.
+		//summary: 
+		//		Sends an HTTP POST request to the server. See dojo.xhrGet() for
+		//		a list of commonly accepted properties on args.
 		return _doIt("POST", _makeXhrDeferred(args)); // dojo.Deferred
 	}
 
 	dojo.rawXhrPost = function(/*Object*/ args){
-		//summary: Sends an HTTP POST request to the server. See dojo.xhrGet in this file
-		//for a list of commonly accepted properties on the args argument. Additional properties
-		//that apply only to this function:
-		//postData:
+		//	summary:
+		//		Sends an HTTP POST request to the server. See dojo.xhrGet in
+		//		this file for a list of commonly accepted properties on the
+		//		args argument. Additional properties that apply only to this
+		//		function:
+		//	postData:
 		//		String. The raw data to send in the body of the POST request.
 		var dfd = _makeXhrDeferred(args);
 		dfd.ioArgs.query = args.postData;
@@ -6207,16 +6301,18 @@ dojo._contentHandlers = {
 	}
 
 	dojo.xhrPut = function(/*Object*/ args){
-		//summary: Sends an HTTP PUT request to the server. See dojo.xhrGet in this file
-		//for a list of commonly accepted properties on the args argument.
+		//	summary:
+		//		Sends an HTTP PUT request to the server. See dojo.xhrGet() for
+		//		a list of commonly accepted properties on args.
 		return _doIt("PUT", _makeXhrDeferred(args)); // dojo.Deferred
 	}
 
 	dojo.rawXhrPut = function(/*Object*/ args){
-		//summary: Sends an HTTP PUT request to the server. See dojo.xhrGet in this file
-		//for a list of commonly accepted properties on the args argument. Additional properties
-		//that apply only to this function:
-		//putData:
+		//	summary:
+		//		Sends an HTTP PUT request to the server. See dojo.xhrGet() for
+		//		a list of commonly accepted properties on args. Additional
+		//		properties that apply only to this function:
+		//	putData:
 		//		String. The raw data to send in the body of the PUT request.
 		var dfd = _makeXhrDeferred(args);
 		var ioArgs = dfd.ioArgs;
@@ -6228,16 +6324,18 @@ dojo._contentHandlers = {
 	}
 
 	dojo.xhrDelete = function(/*Object*/ args){
-		//summary: Sends an HTTP DELETE request to the server. See dojo.xhrGet in this file
-		//for a list of commonly accepted properties on the args argument.
+		//	summary:
+		//		Sends an HTTP DELETE request to the server. See dojo.xhrGet()
+		//		for a list of commonly accepted properties on args.
 		var dfd = _makeXhrDeferred(args);
 		dojo._ioAddQueryToUrl(dfd.ioArgs);
 		return _doIt("DELETE", dfd); // dojo.Deferred
 	}
 
 	dojo.wrapForm = function(formNode){
-		//summary: A replacement for FormBind, but not implemented yet.
-		// was FormBind
+		//summary:
+		//		A replacement for FormBind, but not implemented yet.
+
 		// FIXME: need to think harder about what extensions to this we might
 		// want. What should we allow folks to do w/ this? What events to
 		// set/send?
@@ -6390,6 +6488,7 @@ dojo.declare("dojo._Animation", null,
 		stop: function(/*boolean?*/ gotoEnd){
 			// summary: Stops a running animation.
 			// gotoEnd: If true, the animation will end.
+			if(!this._timer){ return; }
 			clearTimeout(this._timer);
 			if(gotoEnd){
 				this._percent = 1;
@@ -6529,6 +6628,31 @@ dojo.declare("dojo._Animation", null,
 		}
 	}
 
+	var PropLine = function(properties){
+		this._properties = properties;
+		for(var p in properties){
+			var prop = properties[p];
+			if(prop.start instanceof dojo.Color){
+				// create a reusable temp color object to keep intermediate results
+				prop.tempColor = new dojo.Color();
+			}
+		}
+		this.getValue = function(r){
+			var ret = {};
+			for(var p in this._properties){
+				var prop = this._properties[p];
+				var value = null;
+				if(prop.start instanceof dojo.Color){
+					value = dojo.blendColors(prop.start, prop.end, r, prop.tempColor).toCss();
+				}else if(!dojo.isArray(prop.start)){
+					value = ((prop.end - prop.start) * r) + prop.start + (p != "opacity" ? prop.units||"px" : "");
+				}
+				ret[p] = value;
+			}
+			return ret;
+		}
+	}
+
 	dojo.animateProperty = function(/*Object*/ args){
 		// summary: Returns an animation that will transition the properties of node
 		// defined in 'args' depending how they are defined in 'args.properties'
@@ -6536,43 +6660,14 @@ dojo.declare("dojo._Animation", null,
 		args.node = dojo.byId(args.node);
 		if (!args.easing){ args.easing = dojo._defaultEasing; }
 		
-		var PropLine = function(properties){
-			this._properties = properties;
-			for (var p in properties){
-				var prop = properties[p];
-				// calculate the end - start to optimize a bit
-				if(dojo.isFunction(prop.start)){
-					prop.start = prop.start(prop);
-				}
-				if(dojo.isFunction(prop.end)){
-					prop.end = prop.end(prop);
-				}
-				if(prop.start instanceof dojo.Color){
-					// create a reusable temp color object to keep intermediate results
-					prop.tempColor = new dojo.Color();
-				}
-			}
-			this.getValue = function(r){
-				var ret = {};
-				for(var p in this._properties){
-					var prop = this._properties[p];
-					var value = null;
-					if(prop.start instanceof dojo.Color){
-						value = dojo.blendColors(prop.start, prop.end, r, prop.tempColor).toCss();
-					}else if(!dojo.isArray(prop.start)){
-						value = ((prop.end - prop.start) * r) + prop.start + (p != "opacity" ? prop.units||"px" : "");
-					}
-					ret[p] = value;
-				}
-				return ret;
-			}
-		}
-		
 		var anim = new dojo._Animation(args);
 		dojo.connect(anim, "beforeBegin", anim, function(){
-			var pm = this.properties;
-			for(var p in pm){
-				var prop = pm[p];
+			var pm = {};
+			for(var p in this.properties){
+				// Make shallow copy of properties into pm because we overwrite some values below.
+				// In particular if start/end are functions we don't want to overwrite them or
+				// the functions won't be called if the animation is reused.
+				var prop = pm[p] = dojo.mixin({}, this.properties[p]);
 
 				if(dojo.isFunction(prop.start)){
 					prop.start = prop.start();
@@ -6582,10 +6677,19 @@ dojo.declare("dojo._Animation", null,
 				}
 
 				var isColor = (p.toLowerCase().indexOf("color") >= 0);
+				function getStyle(node, p){
+					// dojo.style(node, "height") can return "auto" or "" on IE; this is more reliable:
+					switch(p){
+						case "height": return node.offsetHeight;
+						case "width": return node.offsetWidth;
+					}
+					var v = dojo.style(node, p);
+					return (p=="opacity") ? Number(v) : parseInt(v);
+				}
 				if(typeof prop.end == "undefined"){
-					prop.end = dojo.style(this.node, p);
+					prop.end = getStyle(this.node, p);
 				}else if(typeof prop.start == "undefined"){
-					prop.start = dojo.style(this.node, p);
+					prop.start = getStyle(this.node, p);
 				}
 
 				if(isColor){

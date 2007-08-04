@@ -26,7 +26,7 @@ dojox.wire.ml._getValue = function(/*String*/source, /*Array*/args){
 	}
 	var property = undefined;
 	if(args && source.length >= 9 && source.substring(0, 9) == "arguments"){
-		property = this.required.substring(9);
+		property = source.substring(9);
 		return new dojox.wire.Wire({property: property}).getValue(args);
 	}
 	var i = source.indexOf('.');
@@ -120,7 +120,7 @@ dojo.declare("dojox.wire.ml.XmlElement",
 			var elements = [];
 			for(var i = 0; i < this.element.childNodes.length; i++){
 				var child = this.element.childNodes[i];
-				if(child.nodeName == property){
+				if(child.nodeType === 1 /* ELEMENT_NODE */ && child.nodeName == property){
 					elements.push(new dojox.wire.ml.XmlElement(child));
 				}
 			}
@@ -176,7 +176,7 @@ dojo.declare("dojox.wire.ml.XmlElement",
 			var nextChild = null;
 			for(var i = this.element.childNodes.length - 1; i >= 0; i--){
 				var child = this.element.childNodes[i];
-				if(child.nodeName == property){
+				if(child.nodeType === 1 /* ELEMENT_NODE */ && child.nodeName == property){
 					if(!nextChild){
 						nextChild = child.nextSibling;
 					}
