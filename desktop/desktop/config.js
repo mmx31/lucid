@@ -101,5 +101,6 @@ desktop.config = {
 	wallpaper: {
 		image: "./wallpaper/default.gif",
 		color: "#eeeeee"
-	}
+	},
+	theme: "default"
 }

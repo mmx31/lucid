@@ -166,12 +166,13 @@ var bootstrap = {
  bootstrap.require('rightclick');
  bootstrap.require('screensaver');
  bootstrap.require('taskbar');
+ bootstrap.require('theme');
  bootstrap.require('thread', "1.7");
  bootstrap.require('wallpaper');
  bootstrap.require('widget');
  bootstrap.require('windows');
- bootstrap.link("./themes/default/theme.css", "desktop_theme");
- bootstrap.link("./themes/default/window.css", "window_theme");
+// bootstrap.link("./themes/default/theme.css", "desktop_theme");
+// bootstrap.link("./themes/default/window.css", "window_theme");
  bootstrap.link("desktop.css", "corestyle");
  bootstrap.checkifloaded();
 }
