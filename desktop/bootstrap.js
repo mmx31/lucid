@@ -119,11 +119,11 @@ var bootstrap = {
 					}
 				}
 			}
-			desktop.config.init(function() {
+			desktop.config.draw(function() {
 				for(lib in desktop.modules) if((typeof desktop[lib].draw) == "function") desktop[lib].draw();
 				for(lib in desktop.modules)
 				{
-					if(lib != "core" && lib != "api" & lib != "config") if((typeof desktop[lib].init) == "function") desktop[lib].init();
+					if(lib != "core" && lib != "api" && lib != "config") if((typeof desktop[lib].init) == "function") desktop[lib].init();
 					desktop.modules[lib].initiated = true;
 				}
 				desktop.core.init();
@@ -174,6 +174,11 @@ var bootstrap = {
 // bootstrap.link("./themes/default/theme.css", "desktop_theme");
 // bootstrap.link("./themes/default/window.css", "window_theme");
  bootstrap.link("desktop.css", "corestyle");
+ bootstrap.link("./dojo/dijit/themes/dijit.css", "dijit");
+ bootstrap.link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
+ bootstrap.link("./dojo/dijit/themes/tundra/tundra.css", "tundra");
+ bootstrap.link("./dojo/dijit/themes/tundra/tundra_rtl.css", "tundra_rtl");
+ dojo.addClass(document.body, "tundra");
  bootstrap.checkifloaded();
 }
 }

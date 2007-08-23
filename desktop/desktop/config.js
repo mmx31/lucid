@@ -26,7 +26,7 @@
  * 
  */
 desktop.config = {
-	init: function(cback) {
+	draw: function(cback) {
 		desktop.config.load(cback);
 		setInterval(desktop.config.save, 1000*60);
 	},
@@ -102,5 +102,6 @@ desktop.config = {
 		image: "./wallpaper/default.gif",
 		color: "#eeeeee"
 	},
-	theme: "default"
+	theme: "default",
+	startupapps: []
 }

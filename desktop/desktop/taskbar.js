@@ -138,18 +138,34 @@ desktop.taskbar = new function()
 		*/
 		this.draw = function()
 		{
-			document.body.appendChild(div);
-			tasktray = '<table id="tasktray"><tr id="tasklist"><td><div id="trayclock"></div></td></tr></table>';
+			tasktray = '<table id="tasktray"><tr id="tasklist"><td id="taskclock">&nbsp;</td><td><div id="trayclock"></div></td></tr></table>';
 			html='<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td width="30"><img src="./themes/default/images/icons/apps.gif" onmousedown ="desktop.menu.button();" border="0"></td><td width="1%"><div class="seperator"></div></td><td width="80%"><div id="appbar"></div></td><td width="1%"><div class="seperator"></div></td><td width="15%">'+tasktray+'</td></tr></table>';
+			
 			div = document.createElement("div");
 			div.innerHTML = html;
 			div.id="taskbar";
 			document.body.appendChild(div);
+			
 			div = document.createElement("div");
 			div.id="taskbarhider";
 			div.innerHTML = "<img src='./themes/default/images/icons/hidetask.gif'>";
 			document.body.appendChild(div);
 			div.setAttribute("onclick", "desktop.taskbar.hider();");
+			
+			div = document.createElement("td");
+			div.innerHTML = "<div class='icon-22-status-network-idle' id='networkStatus'></div>";
+			dojo.byId("tasklist").insertBefore(div, dojo.byId("taskclock"));
+			this._xhrStart = dojo.connect(dojo,"_ioSetArgs",this,function(m)
+			{
+				var f = Math.random();
+				if(f <= (1/3)) dojo.byId("networkStatus").setAttribute("class", "icon-22-status-network-receive");
+				else if(f <= (2/3)) dojo.byId("networkStatus").setAttribute("class", "icon-22-status-network-transmit");
+				else dojo.byId("networkStatus").setAttribute("class", "icon-22-status-network-transmit-receive");
+			}); 
+		    this._xhrEnd = dojo.connect(dojo.Deferred.prototype,"_fire",this,function(m)
+			{
+				dojo.byId("networkStatus").setAttribute("class", "icon-22-status-network-idle");
+			}); 
 		}
 		this.init = function()
 		{

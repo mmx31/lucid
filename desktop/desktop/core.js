@@ -37,7 +37,6 @@ desktop.core = new function()
 		this.init = function()
 		{
 			//dojo.require("dojox.widget.Toaster");
-
 			//set up page elements
 			/* TODO: get this to be normal (toaster widget does not work in 0.9
 			div = document.createElement("div");
@@ -74,6 +73,13 @@ desktop.core = new function()
 			//cleanup
 			desktop.isLoaded = true;
 			dojo.publish("desktopload", ["yes"]);
+			
+			//startup applications
+			g = desktop.config.startupapps;
+			for(f in g)
+			{
+				desktop.app.launch(g[f]);
+			}
 		}
 		/** 
 		* Logs the user out
@@ -126,7 +132,8 @@ desktop.core = new function()
 		*/
 		this.loadingIndicator = function(action)
 		{
-			if(action == 0)
+			api.console("desktop.core.loadingIndicator is depricated!")
+			/*if(action == 0)
 			{	
 				dojo.byId("loadingIndicator").style.display = "inline";
 				dojo.fadeIn({ node: 'loadingIndicator', duration: 300 }).play();
@@ -138,21 +145,7 @@ desktop.core = new function()
 					dojo.byId("loadingIndicator").style.display = "none";
 				});
 				anim.play();
-			}
-		}
-		/** 
-		* Draws the loading indicator
-		* 
-		* @alias desktop.core.draw
-		* @type {Function}
-		* @memberOf desktop.core
-		*/
-		this.draw = function()
-		{
-			div = document.createElement("div");
-			div.innerHTML = "<center><img style='vertical-align: middle;' src='./themes/default/images/icons/loading.gif' /><span style='vertical-align: middle;'> <b>Loading...</b></span></center>";
-			div.id="loadingIndicator";
-			document.body.appendChild(div);
+			}*/
 		}
 
 	}

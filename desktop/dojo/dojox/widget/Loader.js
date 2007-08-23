@@ -81,7 +81,7 @@ dojo.declare("dojox.widget.Loader",
 
 	_show: function(){
 		// summary: publish and show progress indicator
-		dojo.publish("Loader",{ message: 'started' });
+		dojo.publish("Loader", { message: 'started' });
 		if(this.hasVisuals){ 
 			if(this.attachToPointer){
 				this._pointerConnect = dojo.connect(document,"onmousemove",this,"_putLoader");

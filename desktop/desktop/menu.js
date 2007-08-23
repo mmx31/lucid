@@ -159,7 +159,7 @@ desktop.menu = new function()
 				}
 				for(cat in cats)
 				{
-					html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./themes/default/images/icons/applications-'+(cat.toLowerCase())+'.png" />&nbsp;'+cat+'<ul>';
+					html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><div style="float: left;" class="icon-16-categories-applications-'+(cat.toLowerCase())+'"></div>&nbsp;'+cat+'<ul>';
 					for(app in data)
 					{
 						if(data[app].category == cat)
@@ -167,7 +167,7 @@ desktop.menu = new function()
 					}
 					html += '</ul></li>';
 				}
-				html += '<li onClick="javascript:desktop.core.logout();" style="border-top: 1px solid white; border-bottom: 1px solid white;"><img src="./themes/default/images/icons/system-log-out.png" />&nbsp;Logout</li>';
+				html += '<li onClick="javascript:desktop.core.logout();" style="border-top: 1px solid white; border-bottom: 1px solid white;"><div style="float: left;" class="icon-16-actions-system-log-out"></div>&nbsp;Logout</li>';
 				html += '</ul>';
 				document.getElementById("menu").innerHTML = html;
 				desktop.core.loadingIndicator(1);

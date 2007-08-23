@@ -63,9 +63,17 @@ else { echo "<OPTION>Stable</OPTION><OPTION>Beta</OPTION><OPTION selected>Alpha<
 <b>Category:</b>
 <SELECT name="category">
 <?php
-if($category == "Office") { echo "<OPTION selected>Office</OPTION><OPTION>Internet</OPTION><OPTION>System</OPTION>"; }
-if($category == "Internet") { echo "<OPTION>Office</OPTION><OPTION selected>Internet</OPTION><OPTION>System</OPTION>"; }
-if($category == "System") { echo "<OPTION>Office</OPTION><OPTION>Internet</OPTION><OPTION selected>System</OPTION>"; }
+if($category == "Office") { echo "<OPTION selected>Office</OPTION><OPTION>Internet</OPTION><OPTION>System</OPTION><OPTION>Development</OPTION><OPTION>Accessories</OPTION><OPTION>Games</OPTION><OPTION>Graphics</OPTION><OPTION>Multimedia</OPTION><OPTION>Other</OPTION>"; }
+if($category == "Internet") { echo "<OPTION>Office</OPTION><OPTION selected>Internet</OPTION><OPTION>System</OPTION><OPTION>Development</OPTION><OPTION>Accessories</OPTION><OPTION>Games</OPTION><OPTION>Graphics</OPTION><OPTION>Multimedia</OPTION><OPTION>Other</OPTION>"; }
+if($category == "System") { echo "<OPTION>Office</OPTION><OPTION>Internet</OPTION><OPTION selected>System</OPTION><OPTION>Development</OPTION><OPTION>Accessories</OPTION><OPTION>Games</OPTION><OPTION>Graphics</OPTION><OPTION>Multimedia</OPTION><OPTION>Other</OPTION>"; }
+if($category == "Development") { echo "<OPTION>Office</OPTION><OPTION>Internet</OPTION><OPTION>System</OPTION><OPTION selected>Development</OPTION><OPTION>Accessories</OPTION><OPTION>Games</OPTION><OPTION>Graphics</OPTION><OPTION>Multimedia</OPTION><OPTION>Other</OPTION>"; }
+if($category == "Accessories") { echo "<OPTION>Office</OPTION><OPTION>Internet</OPTION><OPTION>System</OPTION><OPTION>Development</OPTION><OPTION selected>Accessories</OPTION><OPTION>Games</OPTION><OPTION>Graphics</OPTION><OPTION>Multimedia</OPTION><OPTION>Other</OPTION>"; }
+if($category == "Games") { echo "<OPTION>Office</OPTION><OPTION>Internet</OPTION><OPTION>System</OPTION><OPTION>Development</OPTION><OPTION>Accessories</OPTION><OPTION selected>Games</OPTION><OPTION>Graphics</OPTION><OPTION>Multimedia</OPTION><OPTION>Other</OPTION>"; }
+if($category == "Graphics") { echo "<OPTION>Office</OPTION><OPTION>Internet</OPTION><OPTION>System</OPTION><OPTION>Development</OPTION><OPTION>Accessories</OPTION><OPTION>Games</OPTION><OPTION selected>Graphics</OPTION><OPTION>Multimedia</OPTION><OPTION>Other</OPTION>"; }
+if($category == "Multimedia") { echo "<OPTION>Office</OPTION><OPTION>Internet</OPTION><OPTION>System</OPTION><OPTION>Development</OPTION><OPTION>Accessories</OPTION><OPTION>Games</OPTION><OPTION>Graphics</OPTION><OPTION selected>Multimedia</OPTION><OPTION>Other</OPTION>"; }
+if($category == "Other") { echo "<OPTION>Office</OPTION><OPTION>Internet</OPTION><OPTION>System</OPTION><OPTION>Development</OPTION><OPTION>Accessories</OPTION><OPTION>Games</OPTION><OPTION>Graphics</OPTION><OPTION>Multimedia</OPTION><OPTION selected>Other</OPTION>"; }
+
+
 ?>
 </SELECT>
 </td></tr>

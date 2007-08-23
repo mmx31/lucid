@@ -17,18 +17,40 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-$module = $_GET['module'];
-$dirs = $module.explode(".", ".");
-print_r($dirs);
-$path = ".";
-foreach($dirs as $dir)
+
+require("quickbackend.php");
+
+$blocked_tables = Array(
+	"users"
+);
+
+$user_data_tables = Array(
+	"database",
+	"registry",
+	"crosstalk"
+);
+
+foreach($blocked_tables as $table)
 {
-	$path .= "/" . $dir;
+	if($_POST["table"] == $table)
+	{
+		quit("1");
+	}
 }
-$path .= ".php";
-echo $path;
-require($path) or die("could not load backend!");
-$action = $_GET["action"];
-eval("backend::" . $action . "();");
+
+foreach($user_data_tables as $table)
+{
+	if($_POST["table"] == $table)
+	{
+		$link = qback::mysqlLink();
+		$table = qback::esc($table);
+		$column = qback::esc($_POST['column']);
+		$value = qback::esc($_POST['value']);
+		$result = qback::query("SELECT * FROM #__".$table." WHERE '".$column."' = '".$value."';");
+		echo qback::toJSON($result, mysql_affected_rows());
+		qback::close($link, $result);
+		quit();
+	}
+}
 
 ?>

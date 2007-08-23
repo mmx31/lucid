@@ -34,12 +34,20 @@ desktop.theme = new function()
 		element.href = "./themes/"+(desktop.config.theme ? desktop.config.theme : "default")+"/window.css";
 		element.id = "desktop_window";
 		document.getElementsByTagName("head")[0].appendChild(element);
+		var element = document.createElement("link");
+		element.rel = "stylesheet";
+		element.type = "text/css";
+		element.media = "screen";
+		element.href = "./themes/"+(desktop.config.theme ? desktop.config.theme : "default")+"/icons.css";
+		element.id = "desktop_icons";
+		document.getElementsByTagName("head")[0].appendChild(element);
 	}
 	this.set = function(theme)
 	{
 		desktop.config.theme = theme;
 		dojo.byId("desktop_theme").href ="./themes/"+desktop.config.theme+"/theme.css";
 		dojo.byId("desktop_window").href ="./themes/"+desktop.config.theme+"/window.css";
+		dojo.byId("desktop_icons").href ="./themes/"+desktop.config.theme+"/icons.css";
 	}
 	this.list = function(callback)
 	{

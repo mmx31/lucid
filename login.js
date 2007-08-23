@@ -45,7 +45,7 @@ psychdesktop_home();
 }else{
 psychdesktop_continue();
 }
-setInterval("psychdesktop_detectLogout();",1000*5);
+setInterval("psychdesktop_detectLogout();",100);
 }else{
 psychdesktop_cannotconnect();
 }
@@ -354,4 +354,3 @@ return null;
 function psychdesktop_eraseCookie(_14){
 psychdesktop_createCookie(_14,"",-1);
 }
-

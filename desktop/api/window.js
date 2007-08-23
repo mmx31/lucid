@@ -22,7 +22,7 @@ api.windowcounter = 0;
  * 		setTimeout(dojo.hitch(win, win.destroy), 1000*5);
  * 		(end code)
  */
-api.window = function()
+api.window = function(params)
 {
 	/*
 	 * Property: _id
@@ -51,7 +51,7 @@ api.window = function()
 	 * Notes:
 	 * 		 This is usefull for things like layout container creation
 	 */
-	this.bodyWidget = "LayoutContainer";
+	this.bodyWidget = "ContentPane";
 	/*
 	 * Property: bodyWidgetParams
 	 * 
@@ -94,6 +94,10 @@ api.window = function()
 	 * 		Weather or not the window is resizable.
 	 */
 	this.resizable = true;
+	for(p in params)
+	{
+		this[p] = params[p];
+	}
 	/*
 	 * Property: pos
 	 * 
@@ -101,6 +105,30 @@ api.window = function()
 	 * 		Internal variable used by the window maximizer
 	 */
 	this.pos = new Object();
+	/*
+	 * Property: body
+	 * 
+	 * Summary:
+	 * 		The window's body widget
+	 */
+	this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, dojo.doc.createElement('div'));
+	this.body.id=this._id+"body"
+	/*
+	 * Method: setBodyWidget
+	 * 
+	 * Summary:
+	 * 		sets the body widget. Cannot use after the window has been shown.
+	 * Parameters:
+	 * 		widget - the body widget's name. must be a member of dijit.layout
+	 * 		widgetParams - The body widget params
+	 */
+	this.setBodyWidget = function(widget, widgetParams)
+	{
+		this.bodyWidget = widget;
+		this.bodyWidgetParams = widgetParams;
+		this.bodyWidgetParams.id=this._id+"body";
+		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, dojo.doc.createElement('div'));
+	}
 	/*
 	 * Method: empty
 	 * 
@@ -194,12 +222,12 @@ api.window = function()
 			
 			windiv.appendChild(wintitlebar);
 			
-			this.winbody=document.createElement("div");
-			this.winbody.id=this._id+"body";
-			this.winbody.innerHTML=this._innerHTML;
-			this.winbody.setAttribute("class", "winbody");
+			this.body.id=this._id+"body";
+			if(this.bodyWidget == "ContentPane") this.body.setContent(this._innerHTML);
 			
-			windiv.appendChild(this.winbody);
+			dojo.addClass(this.body.domNode, "winbody")
+						
+			windiv.appendChild(this.body.domNode);
 			
 			if(this.resizable == true)
 			{
@@ -210,8 +238,9 @@ api.window = function()
 			}
 			document.getElementById("windowcontainer").appendChild(windiv);
 			
-			this.bodyWidgetParams.id = this._id+"body";
-			this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.winbody);
+			//this.body.startup();
+			//this.bodyWidgetParams.id = this._id+"body";
+			//this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.winbody);
 			
 			this._drag = new dojo.dnd.Moveable(this._id, {
 				handle: this._id+"handle",
@@ -299,6 +328,7 @@ api.window = function()
 		dojo.byId(this._id+"resize").style.cursor = "se-resize";
 		this._resizeEvent = dojo.connect(dojo.byId(this._id+"resize"), "onmousedown", this, function(e) {
 			this._dragging = dojo.connect(document, "onmousemove", this, function(f) {
+				//TODO: use the computed style technique instead of this
 				var win = dojo.byId(this._id);
 				var x = f.clientX;
 				var y = f.clientY;
@@ -320,7 +350,7 @@ api.window = function()
 					height = height.replace(/%/g, "");
 					height = (parseInt(win.parentNode.style.height.replace(/px/g, ""))/100)*height;
 				}
-				if(width >= 20 && height >= 20)
+				if(width >= 30 && height >= 30)
 				{
 					var top = win.style.top.replace(/px/g, "");
 					var left = win.style.left.replace(/px/g, "");
@@ -331,6 +361,7 @@ api.window = function()
 					win.style.width = ((winx+(x-winx))-(left-2))+"px";
 					win.style.height = ((winy+(y-winy))-(top-2))+"px";
 				}
+				this.body.resize();
 			});
 			this._doconmouseup = dojo.connect(document, "onmouseup", this, function(e) {
 				dojo.disconnect(this._dragging);
@@ -477,6 +508,7 @@ api.window = function()
 			win.style.width = "100%";
 			win.style.height = "100%";
 		}
+		this.body.resize();
 	}
 	/*
 	 * Method: unmaximize
@@ -519,6 +551,7 @@ api.window = function()
 			win.style.width= this.pos.width;
 		}
 		this.maximized = false;
+		this.body.resize();
 	}
 	/*
 	 * Method: bringToFront
@@ -576,16 +609,18 @@ api.window = function()
 	 * 
 	 * Parameters:
 	 * 		node - A dojo widget or HTML element.
-	 * 		restartWidget - should the window's body widget be reinitialized?
 	 * 
 	 * Note:
 	 * 		If you are adding widgets in bulk, you should not set restartWidget
 	 * 		to 'true' untill adding the very last widget, otherwize the UI will
 	 * 		take forever to render
 	 */
-	this.addChild = function(node, restartWidget)
+	this.addChild = function(node)
 	{
-		dijit.byId(this._id+"body").addChild(node);
-		if(restartWidget != false) dijit.byId(this._id+"body").start()
+		this.body.addChild(node);
+	}
+	this.startup = function()
+	{
+		this.body.startup();
 	}
 }

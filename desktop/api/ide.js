@@ -100,7 +100,30 @@ api.ide = new function()
 					{
 						a[item] = new Object();
 						//TODO: parse contents, pull out args, name, and code
-						a[item].code = app[item].toString(); //TODO: get rid of "function() { " ... " }"
+						a[item].name = item;
+						var start = app[item].indexOf("(");
+						var s = start;
+						var i = 0;
+						var p;
+						while(i=0)
+						{
+							p = app[item].indexOf(")", s);
+							s = app[item].indexOf("(", s);
+							if(s > p)
+							{
+								var end = p;
+								i=1;
+							}
+							else
+							{
+								s = p;
+							}
+						}
+						a[item].args = a[item].substring(start+1, end-1);
+						a[item].code = app[item].toString().substring(end+1, app[item].length-1);
+						end = a[item].code.lastIndexOf("}");
+						start = a[item].code.indexOf("{");
+						a[item].code = a[item].code.substring(start, end);
 					}
 					else
 					{
@@ -117,17 +140,7 @@ api.ide = new function()
 		url: "../backend/app.php?action=getPrograms",
 		load: function(data, ioArgs)
 		{
-			data = data.split(desktop.app.xml_seperator);
-			for(x=3;x<=data.length-1;x=x+3)
-			{
-				apps[data[x]] = new Array();
-			}
-			for(x=0;x<=data.length-1;x=x+4)
-			{
-				apps[data[x+3]][apps[data[x+3]].length] = new Object();
-				apps[data[x+3]][apps[data[x+3]].length-1].id=data[x];
-				apps[data[x+3]][apps[data[x+3]].length-1].name=data[x+1];
-			}
+			var apps = dojo.fromJson(data);
 			callback(apps);
 		},
 		mimetype: "text/plain"
