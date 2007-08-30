@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.tests.layout.ContentPane"]){
+if(!dojo._hasResource["dijit.tests.layout.ContentPane"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.tests.layout.ContentPane"] = true;
 dojo.provide("dijit.tests.layout.ContentPane");
 

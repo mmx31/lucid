@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.validate.us"]){
+if(!dojo._hasResource["dojox.validate.us"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.validate.us"] = true;
 dojo.provide("dojox.validate.us");
 dojo.require("dojox.validate._base");

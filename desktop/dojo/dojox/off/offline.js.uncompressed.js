@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2004-2006, The Dojo Foundation
+	Copyright (c) 2004-2007, The Dojo Foundation
 	All Rights Reserved.
 
 	Licensed under the Academic Free License version 2.1 or above OR the
@@ -17,248 +17,335 @@
 	for documentation and information on getting the source.
 */
 
-if(!dojo._hasResource["dojox.storage.Provider"]){
+if(!dojo._hasResource["dojox.storage.Provider"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.storage.Provider"] = true;
 dojo.provide("dojox.storage.Provider");
 
-dojo.declare("dojox.storage.Provider", 
-	function(){
-		// summary: A singleton for working with dojox.storage.
+dojo.declare("dojox.storage.Provider", null, {
+	// summary: A singleton for working with dojox.storage.
+	// description:
+	//		dojox.storage exposes the current available storage provider on this
+	//		platform. It gives you methods such as dojox.storage.put(),
+	//		dojox.storage.get(), etc.
+	//		
+	//		For more details on dojox.storage, see the primary documentation
+	//		page at
+	//			http://manual.dojotoolkit.org/storage.html
+	//		
+	//		Note for storage provider developers who are creating subclasses-
+	//		This is the base class for all storage providers Specific kinds of
+	//		Storage Providers should subclass this and implement these methods.
+	//		You should avoid initialization in storage provider subclass's
+	//		constructor; instead, perform initialization in your initialize()
+	//		method. 
+	constructor: function(){
+	},
+	
+	// SUCCESS: String
+	//	Flag that indicates a put() call to a 
+	//	storage provider was succesful.
+	SUCCESS: "success",
+	
+	// FAILED: String
+	//	Flag that indicates a put() call to 
+	//	a storage provider failed.
+	FAILED: "failed",
+	
+	// PENDING: String
+	//	Flag that indicates a put() call to a 
+	//	storage provider is pending user approval.
+	PENDING: "pending",
+	
+	// SIZE_NOT_AVAILABLE: String
+	//	Returned by getMaximumSize() if this storage provider can not determine
+	//	the maximum amount of data it can support. 
+	SIZE_NOT_AVAILABLE: "Size not available",
+	
+	// SIZE_NO_LIMIT: String
+	//	Returned by getMaximumSize() if this storage provider has no theoretical
+	//	limit on the amount of data it can store. 
+	SIZE_NO_LIMIT: "No size limit",
+
+	// DEFAULT_NAMESPACE: String
+	//	The namespace for all storage operations. This is useful if several
+	//	applications want access to the storage system from the same domain but
+	//	want different storage silos. 
+	DEFAULT_NAMESPACE: "default",
+	
+	// onHideSettingsUI: Function
+	//	If a function is assigned to this property, then when the settings
+	//	provider's UI is closed this function is called. Useful, for example,
+	//	if the user has just cleared out all storage for this provider using
+	//	the settings UI, and you want to update your UI.
+	onHideSettingsUI: null,
+
+	initialize: function(){
+		// summary: 
+		//		Allows this storage provider to initialize itself. This is
+		//		called after the page has finished loading, so you can not do
+		//		document.writes(). Storage Provider subclasses should initialize
+		//		themselves inside of here rather than in their function
+		//		constructor.
+		console.warn("dojox.storage.initialize not implemented");
+	},
+	
+	isAvailable: function(){ /*Boolean*/
+		// summary: 
+		//		Returns whether this storage provider is available on this
+		//		platform. 
+		console.warn("dojox.storage.isAvailable not implemented");
+	},
+
+	put: function(	/*string*/ key,
+					/*object*/ value, 
+					/*function*/ resultsHandler,
+					/*string?*/ namespace){
+		// summary:
+		//		Puts a key and value into this storage system.
 		// description:
-		//		dojox.storage exposes the current available storage provider on this
-		//		platform. It gives you methods such as dojox.storage.put(),
-		//		dojox.storage.get(), etc.
-		//		
-		//		For more details on dojox.storage, see the primary documentation
-		//		page at
-		//			http://manual.dojotoolkit.org/storage.html
-		//		
-		//		Note for storage provider developers who are creating subclasses-
-		//		This is the base class for all storage providers Specific kinds of
-		//		Storage Providers should subclass this and implement these methods.
-		//		You should avoid initialization storage provider subclass's
-		//		constructor; instead, perform initialization in your initialize()
-		//		method. 	
-	}, {
-		// SUCCESS: String
-		//	Flag that indicates a put() call to a 
-		//	storage provider was succesful.
-		SUCCESS: "success",
+		//		Example-
+		//			var resultsHandler = function(status, key, message){
+		//			  alert("status="+status+", key="+key+", message="+message);
+		//			};
+		//			dojox.storage.put("test", "hello world", resultsHandler);
+		//	
+		//		Important note: if you are using Dojo Storage in conjunction with
+		//		Dojo Offline, then you don't need to provide
+		//		a resultsHandler; this is because for Dojo Offline we 
+		//		use Google Gears to persist data, which has unlimited data
+		//		once the user has given permission. If you are using Dojo
+		//		Storage apart from Dojo Offline, then under the covers hidden
+		//		Flash might be used, which is both asychronous and which might
+		//		get denied; in this case you must provide a resultsHandler.
+		// key:
+		//		A string key to use when retrieving this value in the future.
+		// value:
+		//		A value to store; this can be any JavaScript type.
+		// resultsHandler:
+		//		A callback function that will receive three arguments. The
+		//		first argument is one of three values: dojox.storage.SUCCESS,
+		//		dojox.storage.FAILED, or dojox.storage.PENDING; these values
+		//		determine how the put request went. In some storage systems
+		//		users can deny a storage request, resulting in a
+		//		dojox.storage.FAILED, while in other storage systems a storage
+		//		request must wait for user approval, resulting in a
+		//		dojox.storage.PENDING status until the request is either
+		//		approved or denied, resulting in another call back with
+		//		dojox.storage.SUCCESS. 
+		//		The second argument in the call back is the key name that was being stored.
+		//		The third argument in the call back is an optional message that
+		//		details possible error messages that might have occurred during
+		//		the storage process.
+		//	namespace:
+		//		Optional string namespace that this value will be placed into;
+		//		if left off, the value will be placed into dojox.storage.DEFAULT_NAMESPACE
 		
-		// FAILED: String
-		//	Flag that indicates a put() call to 
-		//	a storage provider failed.
-		FAILED: "failed",
+		console.warn("dojox.storage.put not implemented");
+	},
+
+	get: function(/*string*/ key, /*string?*/ namespace){ /*Object*/
+		// summary:
+		//		Gets the value with the given key. Returns null if this key is
+		//		not in the storage system.
+		// key:
+		//		A string key to get the value of.
+		//	namespace:
+		//		Optional string namespace that this value will be retrieved from;
+		//		if left off, the value will be retrieved from dojox.storage.DEFAULT_NAMESPACE
+		// return: Returns any JavaScript object type; null if the key is not present
+		console.warn("dojox.storage.get not implemented");
+	},
+
+	hasKey: function(/*string*/ key, /*string?*/ namespace){ /*Boolean*/
+		// summary: Determines whether the storage has the given key. 
+		return (this.get(key) != null);
+	},
+
+	getKeys: function(/*string?*/ namespace){ /*Array*/
+		// summary: Enumerates all of the available keys in this storage system.
+		// return: Array of available keys
+		console.warn("dojox.storage.getKeys not implemented");
+	},
+	
+	clear: function(/*string?*/ namespace){
+		// summary: 
+		//		Completely clears this storage system of all of it's values and
+		//		keys. If 'namespace' is provided just clears the keys in that
+		//		namespace.
+		console.warn("dojox.storage.clear not implemented");
+	},
+  
+	remove: function(/*string*/ key, /*string?*/ namespace){
+		// summary: Removes the given key from this storage system.
+		console.warn("dojox.storage.remove not implemented");
+	},
+	
+	getNamespaces: function(){ /*string[]*/
+		console.warn("dojox.storage.getNamespaces not implemented");
+	},
+
+	isPermanent: function(){ /*Boolean*/
+		// summary:
+		//		Returns whether this storage provider's values are persisted
+		//		when this platform is shutdown. 
+		console.warn("dojox.storage.isPermanent not implemented");
+	},
+
+	getMaximumSize: function(){ /* mixed */
+		// summary: The maximum storage allowed by this provider
+		// returns: 
+		//	Returns the maximum storage size 
+		//	supported by this provider, in 
+		//	thousands of bytes (i.e., if it 
+		//	returns 60 then this means that 60K 
+		//	of storage is supported).
+		//
+		//	If this provider can not determine 
+		//	it's maximum size, then 
+		//	dojox.storage.SIZE_NOT_AVAILABLE is 
+		//	returned; if there is no theoretical
+		//	limit on the amount of storage 
+		//	this provider can return, then
+		//	dojox.storage.SIZE_NO_LIMIT is 
+		//	returned
+		console.warn("dojox.storage.getMaximumSize not implemented");
+	},
 		
-		// PENDING: String
-		//	Flag that indicates a put() call to a 
-		//	storage provider is pending user approval.
-		PENDING: "pending",
+	putMultiple: function(	/*array*/ keys,
+							/*array*/ values, 
+							/*function*/ resultsHandler,
+							/*string?*/ namespace){
+		// summary:
+		//		Puts multiple keys and values into this storage system.
+		// description:
+		//		Example-
+		//			var resultsHandler = function(status, key, message){
+		//			  alert("status="+status+", key="+key+", message="+message);
+		//			};
+		//			dojox.storage.put(["test"], ["hello world"], resultsHandler);
+		//	
+		//		Important note: if you are using Dojo Storage in conjunction with
+		//		Dojo Offline, then you don't need to provide
+		//		a resultsHandler; this is because for Dojo Offline we 
+		//		use Google Gears to persist data, which has unlimited data
+		//		once the user has given permission. If you are using Dojo
+		//		Storage apart from Dojo Offline, then under the covers hidden
+		//		Flash might be used, which is both asychronous and which might
+		//		get denied; in this case you must provide a resultsHandler.
+		// keys:
+		//		An array of string keys to use when retrieving this value in the future,
+		//		one per value to be stored
+		// values:
+		//		An array of values to store; this can be any JavaScript type, though the
+		//		performance of plain strings is considerably better
+		// resultsHandler:
+		//		A callback function that will receive three arguments. The
+		//		first argument is one of three values: dojox.storage.SUCCESS,
+		//		dojox.storage.FAILED, or dojox.storage.PENDING; these values
+		//		determine how the put request went. In some storage systems
+		//		users can deny a storage request, resulting in a
+		//		dojox.storage.FAILED, while in other storage systems a storage
+		//		request must wait for user approval, resulting in a
+		//		dojox.storage.PENDING status until the request is either
+		//		approved or denied, resulting in another call back with
+		//		dojox.storage.SUCCESS. 
+		//		The second argument in the call back is the key name that was being stored.
+		//		The third argument in the call back is an optional message that
+		//		details possible error messages that might have occurred during
+		//		the storage process.
+		//	namespace:
+		//		Optional string namespace that this value will be placed into;
+		//		if left off, the value will be placed into dojox.storage.DEFAULT_NAMESPACE
 		
-		// SIZE_NOT_AVAILABLE: String
-		//	Returned by getMaximumSize() if this storage provider can not determine
-		//	the maximum amount of data it can support. 
-		SIZE_NOT_AVAILABLE: "Size not available",
-		
-		// SIZE_NO_LIMIT: String
-		//	Returned by getMaximumSize() if this storage provider has no theoretical
-		//	limit on the amount of data it can store. 
-		SIZE_NO_LIMIT: "No size limit",
+		console.warn("dojox.storage.putMultiple not implemented");
+		//	JAC: We could implement a 'default' puMultiple here by just doing each put individually
+	},
 
-		// DEFAULT_NAMESPACE: String
-		//	The namespace for all storage operations. This is useful if several
-		//	applications want access to the storage system from the same domain but
-		//	want different storage silos. 
-		DEFAULT_NAMESPACE: "default",
-		
-		// onHideSettingsUI: Function
-		//	If a function is assigned to this property, then when the settings
-		//	provider's UI is closed this function is called. Useful, for example,
-		//	if the user has just cleared out all storage for this provider using
-		//	the settings UI, and you want to update your UI.
-		onHideSettingsUI: null,
+	getMultiple: function(/*array*/ keys, /*string?*/ namespace){ /*Object*/
+		// summary:
+		//		Gets the valuse corresponding to each of the given keys. 
+		//		Returns a null array element for each given key that is
+		//		not in the storage system.
+		// keys:
+		//		An array of string keys to get the value of.
+		//	namespace:
+		//		Optional string namespace that this value will be retrieved from;
+		//		if left off, the value will be retrieved from dojox.storage.DEFAULT_NAMESPACE
+		// return: Returns any JavaScript object type; null if the key is not present
 
-		initialize: function(){
-			// summary: 
-			//		Allows this storage provider to initialize itself. This is
-			//		called after the page has finished loading, so you can not do
-			//		document.writes(). Storage Provider subclasses should initialize
-			//		themselves inside of here rather than in their function
-			//		constructor.
-			console.warn("dojox.storage.initialize not implemented");
-		},
-		
-		isAvailable: function(){ /*Boolean*/
-			// summary: 
-			//		Returns whether this storage provider is available on this
-			//		platform. 
-			console.warn("dojox.storage.isAvailable not implemented");
-		},
+		console.warn("dojox.storage.getMultiple not implemented");
+		//	JAC: We could implement a 'default' getMultiple here by just doing each get individually
+	},
 
-		put: function(	/*string*/ key,
-						/*object*/ value, 
-						/*function*/ resultsHandler,
-						/*string?*/ namespace){
-			// summary:
-			//		Puts a key and value into this storage system.
-			// description:
-			//		Example-
-			//			var resultsHandler = function(status, key, message){
-			//			  alert("status="+status+", key="+key+", message="+message);
-			//			};
-			//			dojox.storage.put("test", "hello world", resultsHandler);
-			//	
-			//		Important note: if you are using Dojo Storage in conjunction with
-			//		Dojo Offline, then you don't need to provide
-			//		a resultsHandler; this is because for Dojo Offline we 
-			//		use Google Gears to persist data, which has unlimited data
-			//		once the user has given permission. If you are using Dojo
-			//		Storage apart from Dojo Offline, then under the covers hidden
-			//		Flash might be used, which is both asychronous and which might
-			//		get denied; in this case you must provide a resultsHandler.
-			// key:
-			//		A string key to use when retrieving this value in the future.
-			// value:
-			//		A value to store; this can be any JavaScript type.
-			// resultsHandler:
-			//		A callback function that will receive three arguments. The
-			//		first argument is one of three values: dojox.storage.SUCCESS,
-			//		dojox.storage.FAILED, or dojox.storage.PENDING; these values
-			//		determine how the put request went. In some storage systems
-			//		users can deny a storage request, resulting in a
-			//		dojox.storage.FAILED, while in other storage systems a storage
-			//		request must wait for user approval, resulting in a
-			//		dojox.storage.PENDING status until the request is either
-			//		approved or denied, resulting in another call back with
-			//		dojox.storage.SUCCESS. 
-			//		The second argument in the call back is the key name that was being stored.
-			//		The third argument in the call back is an optional message that
-			//		details possible error messages that might have occurred during
-			//		the storage process.
-			//	namespace:
-			//		Optional string namespace that this value will be placed into;
-			//		if left off, the value will be placed into dojox.storage.DEFAULT_NAMESPACE
-			
-			console.warn("dojox.storage.put not implemented");
-		},
+	removeMultiple: function(/*array*/ keys, /*string?*/ namespace) {
+		// summary: Removes the given keys from this storage system.
 
-		get: function(/*string*/ key, /*string?*/ namespace){ /*Object*/
-			// summary:
-			//		Gets the value with the given key. Returns null if this key is
-			//		not in the storage system.
-			// key:
-			//		A string key to get the value of.
-			//	namespace:
-			//		Optional string namespace that this value will be retrieved from;
-			//		if left off, the value will be retrieved from dojox.storage.DEFAULT_NAMESPACE
-			// return: Returns any JavaScript object type; null if the key is not present
-			console.warn("dojox.storage.get not implemented");
-		},
-
-		hasKey: function(/*string*/ key, /*string?*/ namespace){ /*Boolean*/
-			// summary: Determines whether the storage has the given key. 
-			return (this.get(key) != null);
-		},
-
-		getKeys: function(/*string?*/ namespace){ /*Array*/
-			// summary: Enumerates all of the available keys in this storage system.
-			// return: Array of available keys
-			console.warn("dojox.storage.getKeys not implemented");
-		},
-		
-		clear: function(/*string?*/ namespace){
-			// summary: 
-			//		Completely clears this storage system of all of it's values and
-			//		keys. If 'namespace' is provided just clears the keys in that
-			//		namespace.
-			console.warn("dojox.storage.clear not implemented");
-		},
-	  
-		remove: function(/*string*/ key, /*string?*/ namespace){
-			// summary: Removes the given key from this storage system.
-			console.warn("dojox.storage.remove not implemented");
-		},
-		
-		getNamespaces: function(){ /*string[]*/
-			console.warn("dojox.storage.getNamespaces not implemented");
-		},
-
-		isPermanent: function(){ /*Boolean*/
-			// summary:
-			//		Returns whether this storage provider's values are persisted
-			//		when this platform is shutdown. 
-			console.warn("dojox.storage.isPermanent not implemented");
-		},
-
-		getMaximumSize: function(){ /* mixed */
-			// summary: The maximum storage allowed by this provider
-			// returns: 
-			//	Returns the maximum storage size 
-			//	supported by this provider, in 
-			//	thousands of bytes (i.e., if it 
-			//	returns 60 then this means that 60K 
-			//	of storage is supported).
-			//
-			//	If this provider can not determine 
-			//	it's maximum size, then 
-			//	dojox.storage.SIZE_NOT_AVAILABLE is 
-			//	returned; if there is no theoretical
-			//	limit on the amount of storage 
-			//	this provider can return, then
-			//	dojox.storage.SIZE_NO_LIMIT is 
-			//	returned
-			console.warn("dojox.storage.getMaximumSize not implemented");
-		},
-
-		hasSettingsUI: function(){ /*Boolean*/
-			// summary: Determines whether this provider has a settings UI.
+		//	JAC: We could implement a 'default' removeMultiple here by just doing each remove individually
+		console.warn("dojox.storage.remove not implemented");
+	},
+	
+	isValidKeyArray: function( keys) {
+		if(keys === null || typeof keys === "undefined" || ! keys instanceof Array){
 			return false;
-		},
-
-		showSettingsUI: function(){
-			// summary: If this provider has a settings UI, determined
-			// by calling hasSettingsUI(), it is shown. 
-			console.warn("dojox.storage.showSettingsUI not implemented");
-		},
-
-		hideSettingsUI: function(){
-			// summary: If this provider has a settings UI, hides it.
-			console.warn("dojox.storage.hideSettingsUI not implemented");
-		},
+		}
 		
-		isValidKey: function(/*string*/ keyName){ /*Boolean*/
-			// summary:
-			//		Subclasses can call this to ensure that the key given is valid
-			//		in a consistent way across different storage providers. We use
-			//		the lowest common denominator for key values allowed: only
-			//		letters, numbers, and underscores are allowed. No spaces. 
-			if((keyName == null)||(typeof keyName == "undefined")){
+		//	JAC: This could be optimized by running the key validity test directly over a joined string
+		for(var k=0;k<keys.length;k++){
+			if(!this.isValidKey(keys[k])){
 				return false;
 			}
-				
-			return /^[0-9A-Za-z_]*$/.test(keyName);
-		},
-		
-		getResourceList: function(){ /* Array[] */
-			// summary:
-			//	Returns a list of URLs that this
-			//	storage provider might depend on.
-			// description:
-			//	This method returns a list of URLs that this
-			//	storage provider depends on to do its work.
-			//	This list is used by the Dojo Offline Toolkit
-			//	to cache these resources to ensure the machinery
-			//	used by this storage provider is available offline.
-			//	What is returned is an array of URLs.
-			
-			return [];
 		}
+		return true;
+	},
+
+	hasSettingsUI: function(){ /*Boolean*/
+		// summary: Determines whether this provider has a settings UI.
+		return false;
+	},
+
+	showSettingsUI: function(){
+		// summary: If this provider has a settings UI, determined
+		// by calling hasSettingsUI(), it is shown. 
+		console.warn("dojox.storage.showSettingsUI not implemented");
+	},
+
+	hideSettingsUI: function(){
+		// summary: If this provider has a settings UI, hides it.
+		console.warn("dojox.storage.hideSettingsUI not implemented");
+	},
+	
+	isValidKey: function(/*string*/ keyName){ /*Boolean*/
+		// summary:
+		//		Subclasses can call this to ensure that the key given is valid
+		//		in a consistent way across different storage providers. We use
+		//		the lowest common denominator for key values allowed: only
+		//		letters, numbers, and underscores are allowed. No spaces. 
+		if((keyName == null)||(typeof keyName == "undefined")){
+			return false;
+		}
+			
+		return /^[0-9A-Za-z_]*$/.test(keyName);
+	},
+	
+	getResourceList: function(){ /* Array[] */
+		// summary:
+		//	Returns a list of URLs that this
+		//	storage provider might depend on.
+		// description:
+		//	This method returns a list of URLs that this
+		//	storage provider depends on to do its work.
+		//	This list is used by the Dojo Offline Toolkit
+		//	to cache these resources to ensure the machinery
+		//	used by this storage provider is available offline.
+		//	What is returned is an array of URLs.
+		
+		return [];
 	}
-);
+});
 
 }
 
-if(!dojo._hasResource["dojox.storage.manager"]){
+if(!dojo._hasResource["dojox.storage.manager"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.storage.manager"] = true;
 dojo.provide("dojox.storage.manager");
 //dojo.require("dojo.AdapterRegistry");
@@ -272,7 +359,7 @@ dojox.storage.manager = new function(){
 	
 	// currentProvider: Object
 	//	The storage provider that was automagically chosen to do storage
-	//	on this platform, such as dojox.storage.browser.FlashStorageProvider.
+	//	on this platform, such as dojox.storage.FlashStorageProvider.
 	this.currentProvider = null;
 	
 	// available: Boolean
@@ -300,12 +387,12 @@ dojox.storage.manager = new function(){
 		//		matters. 
 		// name:
 		//		The full class name of this provider, such as
-		//		"dojox.storage.browser.FlashStorageProvider".
+		//		"dojox.storage.FlashStorageProvider".
 		// instance:
 		//		An instance of this provider, which we will use to call
 		//		isAvailable() on. 
-		this._providers[this._providers.length] = instance;
-		this._providers[name] = instance;
+		this._providers[this._providers.length] = instance; //FIXME: push?
+		this._providers[name] = instance; // FIXME: this._providers is an array, not a hash
 	};
 	
 	this.setProvider = function(storageClass){
@@ -315,7 +402,7 @@ dojox.storage.manager = new function(){
 		// description:
 		//		Example-
 		//			dojox.storage.setProvider(
-		//				dojox.storage.browser.IEStorageProvider)
+		//				dojox.storage.IEStorageProvider)
 	
 	};
 	
@@ -333,11 +420,12 @@ dojox.storage.manager = new function(){
 
 		// a flag to force the storage manager to use a particular 
 		// storage provider type, such as 
-		// djConfig = {forceStorageProvider: "dojox.storage.browser.WhatWGStorageProvider"};
+		// djConfig = {forceStorageProvider: "dojox.storage.WhatWGStorageProvider"};
 		var forceProvider = djConfig["forceStorageProvider"]||false;
 
 		// go through each provider, seeing if it can be used
 		var providerToUse;
+		//FIXME: use dojo.some
 		for(var i = 0; i < this._providers.length; i++){
 			providerToUse = this._providers[i];
 			if(forceProvider == providerToUse.declaredClass){
@@ -415,7 +503,7 @@ dojox.storage.manager = new function(){
 		// FIXME: This should REALLY not be in here, but it fixes a tricky
 		// Flash timing bug
 		if(this.currentProvider != null
-			&& this.currentProvider.declaredClass == "dojox.storage.browser.FlashStorageProvider" 
+			&& this.currentProvider.declaredClass == "dojox.storage.FlashStorageProvider" 
 			&& dojox.flash.ready == false){
 			return false;
 		}else{
@@ -428,7 +516,7 @@ dojox.storage.manager = new function(){
 		// description:
 		//		Example-
 		//			dojox.storage.manager.supportsProvider(
-		//				"dojox.storage.browser.InternetExplorerStorageProvider");
+		//				"dojox.storage.InternetExplorerStorageProvider");
 
 		// construct this class dynamically
 		try{
@@ -509,7 +597,7 @@ dojox.storage.manager = new function(){
 
 }
 
-if(!dojo._hasResource["dojox._sql._crypto"]){
+if(!dojo._hasResource["dojox._sql._crypto"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox._sql._crypto"] = true;
 // Taken from http://www.movable-type.co.uk/scripts/aes.html by
 // Chris Veness (CLA signed); adapted for Dojo and Google Gears Worker Pool
@@ -638,7 +726,7 @@ dojo.mixin(dojox._sql._crypto,{
 		
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 		
-		// Sbox is pre-computed multiplicative inverse in GF(2^8) used in SubBytes and KeyExpansion [?5.1.1]
+		// Sbox is pre-computed multiplicative inverse in GF(2^8) used in SubBytes and KeyExpansion [§5.1.1]
 		var Sbox =	[0x63,0x7c,0x77,0x7b,0xf2,0x6b,0x6f,0xc5,0x30,0x01,0x67,0x2b,0xfe,0xd7,0xab,0x76,
 					 0xca,0x82,0xc9,0x7d,0xfa,0x59,0x47,0xf0,0xad,0xd4,0xa2,0xaf,0x9c,0xa4,0x72,0xc0,
 					 0xb7,0xfd,0x93,0x26,0x36,0x3f,0xf7,0xcc,0x34,0xa5,0xe5,0xf1,0x71,0xd8,0x31,0x15,
@@ -656,7 +744,7 @@ dojo.mixin(dojox._sql._crypto,{
 					 0xe1,0xf8,0x98,0x11,0x69,0xd9,0x8e,0x94,0x9b,0x1e,0x87,0xe9,0xce,0x55,0x28,0xdf,
 					 0x8c,0xa1,0x89,0x0d,0xbf,0xe6,0x42,0x68,0x41,0x99,0x2d,0x0f,0xb0,0x54,0xbb,0x16];
 
-		// Rcon is Round Constant used for the Key Expansion [1st col is 2^(r-1) in GF(2^8)] [?5.2]
+		// Rcon is Round Constant used for the Key Expansion [1st col is 2^(r-1) in GF(2^8)] [§5.2]
 		var Rcon = [ [0x00, 0x00, 0x00, 0x00],
 					 [0x01, 0x00, 0x00, 0x00],
 					 [0x02, 0x00, 0x00, 0x00],
@@ -679,11 +767,11 @@ dojo.mixin(dojox._sql._crypto,{
 		 *
 		 *	 returns byte-array encrypted value (16 bytes)
 		 */
-		function Cipher(input, w) {	   // main Cipher function [?5.1]
+		function Cipher(input, w) {	   // main Cipher function [§5.1]
 		  var Nb = 4;				// block size (in words): no of columns in state (fixed at 4 for AES)
 		  var Nr = w.length/Nb - 1; // no of rounds: 10/12/14 for 128/192/256-bit keys
 
-		  var state = [[],[],[],[]];  // initialise 4xNb byte-array 'state' with input [?3.4]
+		  var state = [[],[],[],[]];  // initialise 4xNb byte-array 'state' with input [§3.4]
 		  for (var i=0; i<4*Nb; i++) state[i%4][Math.floor(i/4)] = input[i];
 
 		  state = AddRoundKey(state, w, 0, Nb);
@@ -699,13 +787,13 @@ dojo.mixin(dojox._sql._crypto,{
 		  state = ShiftRows(state, Nb);
 		  state = AddRoundKey(state, w, Nr, Nb);
 
-		  var output = new Array(4*Nb);	 // convert state to 1-d array before returning [?3.4]
+		  var output = new Array(4*Nb);	 // convert state to 1-d array before returning [§3.4]
 		  for (var i=0; i<4*Nb; i++) output[i] = state[i%4][Math.floor(i/4)];
 		  return output;
 		}
 
 
-		function SubBytes(s, Nb) {	  // apply SBox to state S [?5.1.1]
+		function SubBytes(s, Nb) {	  // apply SBox to state S [§5.1.1]
 		  for (var r=0; r<4; r++) {
 			for (var c=0; c<Nb; c++) s[r][c] = Sbox[s[r][c]];
 		  }
@@ -713,7 +801,7 @@ dojo.mixin(dojox._sql._crypto,{
 		}
 
 
-		function ShiftRows(s, Nb) {	   // shift row r of state S left by r bytes [?5.1.2]
+		function ShiftRows(s, Nb) {	   // shift row r of state S left by r bytes [§5.1.2]
 		  var t = new Array(4);
 		  for (var r=1; r<4; r++) {
 			for (var c=0; c<4; c++) t[c] = s[r][(c+r)%Nb];	// shift into temp copy
@@ -723,15 +811,15 @@ dojo.mixin(dojox._sql._crypto,{
 		}
 
 
-		function MixColumns(s, Nb) {   // combine bytes of each col of state S [?5.1.3]
+		function MixColumns(s, Nb) {   // combine bytes of each col of state S [§5.1.3]
 		  for (var c=0; c<4; c++) {
 			var a = new Array(4);  // 'a' is a copy of the current column from 's'
-			var b = new Array(4);  // 'b' is a?{02} in GF(2^8)
+			var b = new Array(4);  // 'b' is a•{02} in GF(2^8)
 			for (var i=0; i<4; i++) {
 			  a[i] = s[i][c];
 			  b[i] = s[i][c]&0x80 ? s[i][c]<<1 ^ 0x011b : s[i][c]<<1;
 			}
-			// a[n] ^ b[n] is a?{03} in GF(2^8)
+			// a[n] ^ b[n] is a•{03} in GF(2^8)
 			s[0][c] = b[0] ^ a[1] ^ b[1] ^ a[2] ^ a[3]; // 2*a0 + 3*a1 + a2 + a3
 			s[1][c] = a[0] ^ b[1] ^ a[2] ^ b[2] ^ a[3]; // a0 * 2*a1 + 3*a2 + a3
 			s[2][c] = a[0] ^ a[1] ^ b[2] ^ a[3] ^ b[3]; // a0 + a1 + 2*a2 + 3*a3
@@ -741,7 +829,7 @@ dojo.mixin(dojox._sql._crypto,{
 		}
 
 
-		function AddRoundKey(state, w, rnd, Nb) {  // xor Round Key into state S [?5.1.4]
+		function AddRoundKey(state, w, rnd, Nb) {  // xor Round Key into state S [§5.1.4]
 		  for (var r=0; r<4; r++) {
 			for (var c=0; c<Nb; c++) state[r][c] ^= w[rnd*4+c][r];
 		  }
@@ -749,7 +837,7 @@ dojo.mixin(dojox._sql._crypto,{
 		}
 
 
-		function KeyExpansion(key) {  // generate Key Schedule (byte-array Nr+1 x Nb) from Key [?5.2]
+		function KeyExpansion(key) {  // generate Key Schedule (byte-array Nr+1 x Nb) from Key [§5.2]
 		  var Nb = 4;			 // block size (in words): no of columns in state (fixed at 4 for AES)
 		  var Nk = key.length/4	 // key length (in words): 4/6/8 for 128/192/256-bit keys
 		  var Nr = Nk + 6;		 // no of rounds: 10/12/14 for 128/192/256-bit keys
@@ -810,7 +898,7 @@ dojo.mixin(dojox._sql._crypto,{
 
 		  key = key.concat(key.slice(0, nBytes-16));  // key is now 16/24/32 bytes long
 
-		  // initialise counter block (NIST SP800-38A ?B.2): millisecond time-stamp for nonce in 1st 8 bytes,
+		  // initialise counter block (NIST SP800-38A §B.2): millisecond time-stamp for nonce in 1st 8 bytes,
 		  // block counter in 2nd 8 bytes
 		  var blockSize = 16;  // block size fixed at 16 bytes / 128 bits (Nb=4) for AES
 		  var counterBlock = new Array(blockSize);	// block size fixed at 16 bytes / 128 bits (Nb=4) for AES
@@ -953,7 +1041,7 @@ dojo.mixin(dojox._sql._crypto,{
 
 }
 
-if(!dojo._hasResource["dojox._sql.common"]){
+if(!dojo._hasResource["dojox._sql.common"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox._sql.common"] = true;
 dojo.provide("dojox._sql.common");
 
@@ -1195,8 +1283,8 @@ dojo.mixin(dojox.sql, {
 // 	on a SQL statement. We instantiate this class and have it hold
 //	it's state so that we can potentially have several encryption
 //	operations happening at the same time by different SQL statements.
-dojo.declare("dojox.sql._SQLCrypto", null,
-	function(action, sql, password, args, callback){
+dojo.declare("dojox.sql._SQLCrypto", null, {
+	constructor: function(action, sql, password, args, callback){
 		if(action == "encrypt"){
 			this._execEncryptSQL(sql, password, args, callback);
 		}else{
@@ -1204,7 +1292,6 @@ dojo.declare("dojox.sql._SQLCrypto", null,
 		}		
 	}, 
 	
-	{					
 	_execEncryptSQL: function(sql, password, args, callback){
 		// strip the ENCRYPT/DECRYPT keywords from the SQL
 		var strippedSQL = this._stripCryptoSQL(sql);
@@ -1490,14 +1577,14 @@ dojo.declare("dojox.sql._SQLCrypto", null,
 
 }
 
-if(!dojo._hasResource["dojox.sql"]){
+if(!dojo._hasResource["dojox.sql"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.sql"] = true;
 
 dojo.provide("dojox.sql");
 
 }
 
-if(!dojo._hasResource["dojox.storage.GearsStorageProvider"]){
+if(!dojo._hasResource["dojox.storage.GearsStorageProvider"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.storage.GearsStorageProvider"] = true;
 dojo.provide("dojox.storage.GearsStorageProvider");
 
@@ -1510,202 +1597,307 @@ if(dojo.isGears){
 		// make sure we don't define the gears provider if we're not gears
 		// enabled
 		
-		dojo.declare("dojox.storage.GearsStorageProvider", 
-			[ dojox.storage.Provider ],
-			function(){
-				// summary:
-				//		Storage provider that uses the features of Google Gears
-				//		to store data (it is saved into the local SQL database
-				//		provided by Gears, using dojox.sql)
-				// description: 
-				//		
-				//
-				//		You can disable this storage provider with the following djConfig
-				//		variable:
-				//		var djConfig = { disableGearsStorage: true };
-				//		
-				//		Authors of this storage provider-	
-				//			Brad Neuberg, bkn3@columbia.edu 
+		dojo.declare("dojox.storage.GearsStorageProvider", dojox.storage.Provider, {
+			// summary:
+			//		Storage provider that uses the features of Google Gears
+			//		to store data (it is saved into the local SQL database
+			//		provided by Gears, using dojox.sql)
+			// description: 
+			//		
+			//
+			//		You can disable this storage provider with the following djConfig
+			//		variable:
+			//		var djConfig = { disableGearsStorage: true };
+			//		
+			//		Authors of this storage provider-	
+			//			Brad Neuberg, bkn3@columbia.edu 
+			constructor: function(){
 			},
-			{
-				// instance methods and properties
-				TABLE_NAME: "__DOJO_STORAGE",
-				initialized: false,
+			// instance methods and properties
+			TABLE_NAME: "__DOJO_STORAGE",
+			initialized: false,
+			
+			_available: null,
+			
+			initialize: function(){
+				//console.debug("dojox.storage.GearsStorageProvider.initialize");
+				if(djConfig["disableGearsStorage"] == true){
+					return;
+				}
 				
-				_available: null,
+				// partition our storage data so that multiple apps
+				// on the same host won't collide
+				this.TABLE_NAME = "__DOJO_STORAGE";
 				
-				initialize: function(){
-					//console.debug("dojox.storage.GearsStorageProvider.initialize");
-					if(djConfig["disableGearsStorage"] == true){
-						return;
-					}
+				// create the table that holds our data
+				try{
+					dojox.sql("CREATE TABLE IF NOT EXISTS " + this.TABLE_NAME + "( "
+								+ " namespace TEXT, "
+								+ " key TEXT, "
+								+ " value TEXT "
+								+ ")"
+							);
+					dojox.sql("CREATE UNIQUE INDEX IF NOT EXISTS namespace_key_index" 
+								+ " ON " + this.TABLE_NAME
+								+ " (namespace, key)");
+				}catch(e){
+					console.debug("dojox.storage.GearsStorageProvider.initialize:", e);
 					
-					// partition our storage data so that multiple apps
-					// on the same host won't collide
-					this.TABLE_NAME = "__DOJO_STORAGE";
-					
-					// create the table that holds our data
-					try{
-						dojox.sql("CREATE TABLE IF NOT EXISTS " + this.TABLE_NAME + "( "
-									+ " namespace TEXT, "
-									+ " key TEXT, "
-									+ " value TEXT "
-									+ ")"
-								);
-						dojox.sql("CREATE UNIQUE INDEX IF NOT EXISTS namespace_key_index" 
-									+ " ON " + this.TABLE_NAME
-									+ " (namespace, key)");
-					}catch(e){
-						console.debug("dojox.storage.GearsStorageProvider.initialize:", e);
-						
-						this.initialized = false; // we were unable to initialize
-						dojox.storage.manager.loaded();
-						return;
-					}
-					
-					// indicate that this storage provider is now loaded
-					this.initialized = true;
-					dojox.storage.manager.loaded();	
-				},
+					this.initialized = false; // we were unable to initialize
+					dojox.storage.manager.loaded();
+					return;
+				}
 				
-				isAvailable: function(){
-					// is Google Gears available and defined?
-					return this._available = dojo.isGears;
-				},
+				// indicate that this storage provider is now loaded
+				this.initialized = true;
+				dojox.storage.manager.loaded();	
+			},
+			
+			isAvailable: function(){
+				// is Google Gears available and defined?
+				return this._available = dojo.isGears;
+			},
 
-				put: function(key, value, resultsHandler, namespace){
-					if(this.isValidKey(key) == false){
-						throw new Error("Invalid key given: " + key);
+			put: function(key, value, resultsHandler, namespace){
+				if(this.isValidKey(key) == false){
+					throw new Error("Invalid key given: " + key);
+				}
+				namespace = namespace||this.DEFAULT_NAMESPACE;
+				
+				// serialize the value;
+				// handle strings differently so they have better performance
+				if(dojo.isString(value)){
+					value = "string:" + value;
+				}else{
+					value = dojo.toJson(value);
+				}
+				
+				// try to store the value	
+				try{
+					dojox.sql("DELETE FROM " + this.TABLE_NAME
+								+ " WHERE namespace = ? AND key = ?",
+								namespace, key);
+					dojox.sql("INSERT INTO " + this.TABLE_NAME
+								+ " VALUES (?, ?, ?)",
+								namespace, key, value);
+				}catch(e){
+					// indicate we failed
+					console.debug("dojox.storage.GearsStorageProvider.put:", e);
+					resultsHandler(this.FAILED, key, e.toString());
+					return;
+				}
+				
+				if(resultsHandler){
+					resultsHandler(dojox.storage.SUCCESS, key, null);
+				}
+			},
+
+			get: function(key, namespace){
+				if(this.isValidKey(key) == false){
+					throw new Error("Invalid key given: " + key);
+				}
+				namespace = namespace||this.DEFAULT_NAMESPACE;
+				
+				// try to find this key in the database
+				var results = dojox.sql("SELECT * FROM " + this.TABLE_NAME
+											+ " WHERE namespace = ? AND "
+											+ " key = ?",
+											namespace, key);
+				if(!results.length){
+					return null;
+				}else{
+					results = results[0].value;
+				}
+				
+				// destringify the content back into a 
+				// real JavaScript object;
+				// handle strings differently so they have better performance
+				if(dojo.isString(results) && (/^string:/.test(results))){
+					results = results.substring("string:".length);
+				}else{
+					results = dojo.fromJson(results);
+				}
+				
+				return results;
+			},
+			
+			getNamespaces: function(){
+				var results = [ dojox.storage.DEFAULT_NAMESPACE ];
+				
+				var rs = dojox.sql("SELECT namespace FROM " + this.TABLE_NAME
+									+ " DESC GROUP BY namespace");
+				for(var i = 0; i < rs.length; i++){
+					if(rs[i].namespace != dojox.storage.DEFAULT_NAMESPACE){
+						results.push(rs[i].namespace);
 					}
-					namespace = namespace||this.DEFAULT_NAMESPACE;
-					
-					// serialize the value;
-					// handle strings differently so they have better performance
-					if(dojo.isString(value)){
-						value = "string:" + value;
-					}else{
-						value = dojo.toJson(value);
+				}
+				
+				return results;
+			},
+
+			getKeys: function(namespace){
+				namespace = namespace||this.DEFAULT_NAMESPACE;
+				if(this.isValidKey(namespace) == false){
+					throw new Error("Invalid namespace given: " + namespace);
+				}
+				
+				var rs = dojox.sql("SELECT key FROM " + this.TABLE_NAME
+									+ " WHERE namespace = ?",
+									namespace);
+				
+				var results = [];
+				for(var i = 0; i < rs.length; i++){
+					results.push(rs[i].key);
+				}
+				
+				return results;
+			},
+
+			clear: function(namespace){
+				if(this.isValidKey(namespace) == false){
+					throw new Error("Invalid namespace given: " + namespace);
+				}
+				namespace = namespace||this.DEFAULT_NAMESPACE;
+				
+				dojox.sql("DELETE FROM " + this.TABLE_NAME 
+							+ " WHERE namespace = ?",
+							namespace);
+			},
+			
+			remove: function(key, namespace){
+				namespace = namespace||this.DEFAULT_NAMESPACE;
+				
+				dojox.sql("DELETE FROM " + this.TABLE_NAME 
+							+ " WHERE namespace = ? AND"
+							+ " key = ?",
+							namespace,
+							key);
+			},
+			
+			putMultiple: function(keys, values, resultsHandler, namespace) {
+ 				if(this.isValidKeyArray(keys) === false 
+						|| ! values instanceof Array 
+						|| keys.length != values.length){
+					throw new Error("Invalid arguments: keys = [" 
+									+ keys + "], values = [" + values + "]");
+				}
+				
+				if(namespace == null || typeof namespace == "undefined"){
+					namespace = dojox.storage.DEFAULT_NAMESPACE;		
+				}
+	
+				if(this.isValidKey(namespace) == false){
+					throw new Error("Invalid namespace given: " + namespace);
+				}
+	
+				this._statusHandler = resultsHandler;
+
+				// try to store the value	
+				try{
+					dojox.sql.open();
+					dojox.sql.db.execute("BEGIN TRANSACTION");
+					var _stmt = "REPLACE INTO " + this.TABLE_NAME + " VALUES (?, ?, ?)";
+					for(var i=0;i<keys.length;i++) {
+						// serialize the value;
+						// handle strings differently so they have better performance
+						var value = values[i];
+						if(dojo.isString(value)){
+							value = "string:" + value;
+						}else{
+							value = dojo.toJson(value);
+						}
+				
+						dojox.sql.db.execute( _stmt,
+							[namespace, keys[i], value]);
 					}
-					
-					// try to store the value	
-					try{
-						dojox.sql("DELETE FROM " + this.TABLE_NAME
-									+ " WHERE namespace = ? AND key = ?",
-									namespace, key);
-						dojox.sql("INSERT INTO " + this.TABLE_NAME
-									+ " VALUES (?, ?, ?)",
-									namespace, key, value);
-					}catch(e){
-						// indicate we failed
-						console.debug("dojox.storage.GearsStorageProvider.put:", e);
-						resultsHandler(this.FAILED, key, e.toString());
-						return;
-					}
-					
+					dojox.sql.db.execute("COMMIT TRANSACTION");
+					dojox.sql.close();
+				}catch(e){
+					// indicate we failed
+					console.debug("dojox.storage.GearsStorageProvider.putMultiple:", e);
 					if(resultsHandler){
-						resultsHandler(dojox.storage.SUCCESS, key, null);
+						resultsHandler(this.FAILED, keys, e.toString());
 					}
-				},
-
-				get: function(key, namespace){
-					if(this.isValidKey(key) == false){
-						throw new Error("Invalid key given: " + key);
-					}
-					namespace = namespace||this.DEFAULT_NAMESPACE;
-					
-					// try to find this key in the database
-					var results = dojox.sql("SELECT * FROM " + this.TABLE_NAME
-												+ " WHERE namespace = ? AND "
-												+ " key = ?",
-												namespace, key);
-					if(!results.length){
-						return null;
-					}else{
-						results = results[0].value;
-					}
-					
-					// destringify the content back into a 
-					// real JavaScript object;
-					// handle strings differently so they have better performance
-					if(dojo.isString(results) && (/^string:/.test(results))){
-						results = results.substring("string:".length);
-					}else{
-						results = dojo.fromJson(results);
-					}
-					
-					return results;
-				},
+					return;
+				}
 				
-				getNamespaces: function(){
-					var results = [ dojox.storage.DEFAULT_NAMESPACE ];
-					
-					var rs = dojox.sql("SELECT namespace FROM " + this.TABLE_NAME
-										+ " DESC GROUP BY namespace");
-					for(var i = 0; i < rs.length; i++){
-						if(rs[i].namespace != dojox.storage.DEFAULT_NAMESPACE){
-							results.push(rs[i].namespace);
+				if(resultsHandler){
+					resultsHandler(dojox.storage.SUCCESS, key, null);
+				}
+			},
+
+			getMultiple: function(keys, namespace){
+				//	TODO: Maybe use SELECT IN instead
+
+				if(this.isValidKeyArray(keys) === false){
+					throw new ("Invalid key array given: " + keys);
+				}
+				
+				if(namespace == null || typeof namespace == "undefined"){
+					namespace = dojox.storage.DEFAULT_NAMESPACE;		
+				}
+				
+				if(this.isValidKey(namespace) == false){
+					throw new Error("Invalid namespace given: " + namespace);
+				}
+		
+				var _stmt = "SELECT * FROM " + this.TABLE_NAME	+ 
+					" WHERE namespace = ? AND "	+ " key = ?";
+				
+				var results = [];
+				for(var i=0;i<keys.length;i++){
+					var result = dojox.sql( _stmt, namespace, keys[i]);
+						
+					if( ! result.length){
+						results[i] = null;
+					}else{
+						result = result[0].value;
+						
+						// destringify the content back into a 
+						// real JavaScript object;
+						// handle strings differently so they have better performance
+						if(dojo.isString(result) && (/^string:/.test(result))){
+							results[i] = result.substring("string:".length);
+						}else{
+							results[i] = dojo.fromJson(result);
 						}
 					}
-					
-					return results;
-				},
-
-				getKeys: function(namespace){
-					namespace = namespace||this.DEFAULT_NAMESPACE;
-					if(this.isValidKey(namespace) == false){
-						throw new Error("Invalid namespace given: " + namespace);
-					}
-					
-					var rs = dojox.sql("SELECT key FROM " + this.TABLE_NAME
-										+ " WHERE namespace = ?",
-										namespace);
-					
-					var results = [];
-					for(var i = 0; i < rs.length; i++){
-						results.push(rs[i].key);
-					}
-					
-					return results;
-				},
-
-				clear: function(namespace){
-					if(this.isValidKey(namespace) == false){
-						throw new Error("Invalid namespace given: " + namespace);
-					}
-					namespace = namespace||this.DEFAULT_NAMESPACE;
-					
-					dojox.sql("DELETE FROM " + this.TABLE_NAME 
-								+ " WHERE namespace = ?",
-								namespace);
-				},
-				
-				remove: function(key, namespace){
-					namespace = namespace||this.DEFAULT_NAMESPACE;
-					
-					dojox.sql("DELETE FROM " + this.TABLE_NAME 
-								+ " WHERE namespace = ? AND"
-								+ " key = ?",
-								namespace,
-								key);
-				},
-				
-				isPermanent: function(){ return true; },
-
-				getMaximumSize: function(){ return this.SIZE_NO_LIMIT; },
-
-				hasSettingsUI: function(){ return false; },
-				
-				showSettingsUI: function(){
-					throw new Error(this.declaredClass 
-										+ " does not support a storage settings user-interface");
-				},
-				
-				hideSettingsUI: function(){
-					throw new Error(this.declaredClass 
-										+ " does not support a storage settings user-interface");
 				}
+				
+				return results;
+			},
+			
+			removeMultiple: function(keys, namespace){
+				namespace = namespace||this.DEFAULT_NAMESPACE;
+				
+				dojox.sql.open();
+				dojox.sql.db.execute("BEGIN TRANSACTION");
+				var _stmt = "DELETE FROM " + this.TABLE_NAME + " WHERE namespace = ? AND key = ?";
+
+				for(var i=0;i<keys.length;i++){
+					dojox.sql.db.execute( _stmt,
+						[namespace, keys[i]]);
+				}
+				dojox.sql.db.execute("COMMIT TRANSACTION");
+				dojox.sql.close();
+			}, 				
+			
+			isPermanent: function(){ return true; },
+
+			getMaximumSize: function(){ return this.SIZE_NO_LIMIT; },
+
+			hasSettingsUI: function(){ return false; },
+			
+			showSettingsUI: function(){
+				throw new Error(this.declaredClass 
+									+ " does not support a storage settings user-interface");
+			},
+			
+			hideSettingsUI: function(){
+				throw new Error(this.declaredClass 
+									+ " does not support a storage settings user-interface");
 			}
-		);
+		});
 
 		// register the existence of our storage providers
 		dojox.storage.manager.register("dojox.storage.GearsStorageProvider",
@@ -1717,7 +1909,7 @@ if(dojo.isGears){
 
 }
 
-if(!dojo._hasResource["dojox.storage._common"]){
+if(!dojo._hasResource["dojox.storage._common"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.storage._common"] = true;
 dojo.provide("dojox.storage._common");
 
@@ -1736,14 +1928,14 @@ dojox.storage.manager.initialize();
 
 }
 
-if(!dojo._hasResource["dojox.storage"]){
+if(!dojo._hasResource["dojox.storage"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.storage"] = true;
 dojo.provide("dojox.storage");
 
 
 }
 
-if(!dojo._hasResource["dojox.off.files"]){
+if(!dojo._hasResource["dojox.off.files"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.off.files"] = true;
 dojo.provide("dojox.off.files");
 
@@ -2193,7 +2385,7 @@ dojox.off.files = {
 
 }
 
-if(!dojo._hasResource["dojox.off.sync"]){
+if(!dojo._hasResource["dojox.off.sync"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.off.sync"] = true;
 dojo.provide("dojox.off.sync");
 
@@ -2573,7 +2765,7 @@ dojo.mixin(dojox.off.sync, {
 //		Note that the actions log is always automatically persisted locally while using it, so
 //		that if the user closes the browser or it crashes the actions will safely be stored
 //		for later replaying.
-dojo.declare("dojox.off.sync.ActionLog", null, null, {
+dojo.declare("dojox.off.sync.ActionLog", null, {
 		// entries: Array
 		//		An array of our action entries, where each one is simply a custom
 		//		object literal that were passed to add() when this action entry
@@ -2884,7 +3076,7 @@ dojox.off.sync.actions = new dojox.off.sync.ActionLog();
 
 }
 
-if(!dojo._hasResource["dojox.off._common"]){
+if(!dojo._hasResource["dojox.off._common"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.off._common"] = true;
 dojo.provide("dojox.off._common");
 
@@ -3444,14 +3636,14 @@ dojo.addOnLoad(dojox.off, "_onPageLoad");
 
 }
 
-if(!dojo._hasResource["dojox.off"]){
+if(!dojo._hasResource["dojox.off"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.off"] = true;
 dojo.provide("dojox.off");
 
 
 }
 
-if(!dojo._hasResource["dojox.off.ui"]){
+if(!dojo._hasResource["dojox.off.ui"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.off.ui"] = true;
 dojo.provide("dojox.off.ui");
 
@@ -4070,7 +4262,7 @@ dojo.connect(dojox.off, "onLoad", dojox.off.ui, dojox.off.ui._initialize);
 
 }
 
-if(!dojo._hasResource["dojox.off.offline"]){
+if(!dojo._hasResource["dojox.off.offline"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.off.offline"] = true;
 dojo.provide("dojox.off.offline");
 

@@ -6,11 +6,13 @@
 	@import "../../../dijit/tests/css/dijitTests.css";
 </style>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="Silverlight.js"></script>
 <script type="text/javascript" src="../../../dojo/dojo.js" djConfig="isDebug: true"></script>
 <!--<script type="text/javascript" src="../_base.js"></script>-->
 <!--<script type="text/javascript" src="../path.js"></script>-->
 <!--<script type="text/javascript" src="../vml.js"></script>-->
 <!--<script type="text/javascript" src="../svg.js"></script>-->
+<!--<script type="text/javascript" src="../silverlight.js"></script>-->
 <script type="text/javascript">
 dojo.require("dojox.gfx");
 
@@ -21,9 +23,9 @@ makeShapes = function(){
 	// create a reference ellipse
 	var rx = 200;
 	var ry = 100;
-	var startAngle = 30;
-	var arcAngle = 90;
-	var axisAngle = 30;
+	var startAngle = -30;
+	var arcAngle = -90;
+	var axisAngle = -30;
 	var e = g.createEllipse({rx: rx, ry: ry}).setStroke({});
 	
 	// calculate a bezier

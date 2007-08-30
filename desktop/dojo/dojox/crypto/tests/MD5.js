@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.crypto.tests.MD5"]){
+if(!dojo._hasResource["dojox.crypto.tests.MD5"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.crypto.tests.MD5"] = true;
 dojo.provide("dojox.crypto.tests.MD5");
 dojo.require("dojox.crypto.MD5");

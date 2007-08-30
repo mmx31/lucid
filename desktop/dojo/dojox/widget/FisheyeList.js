@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.widget.FisheyeList"]){
+if(!dojo._hasResource["dojox.widget.FisheyeList"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.widget.FisheyeList"] = true;
 dojo.provide("dojox.widget.FisheyeList");
 
@@ -6,14 +6,7 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
 
-dojo.declare("dojox.widget.FisheyeList",
-	[dijit._Widget, dijit._Templated, dijit._Container],
-	function(){
-	//
-	// TODO
-	// fix really long labels in vertical mode
-	//
-	//
+dojo.declare("dojox.widget.FisheyeList", [dijit._Widget, dijit._Templated, dijit._Container], {
 	// summary
 	//	Menu similar to the fish eye menu on the Mac OS
 	// usage
@@ -30,18 +23,23 @@ dojo.declare("dojox.widget.FisheyeList",
 	//			id="item1"
 	//			onclick="alert('click on' + this.label + '(from widget id ' + this.widgetId + ')!');"
 	//			label="Item 1"
-	//			iconsrc="images/fisheye_1.png">
+	//			iconSrc="images/fisheye_1.png">
 	//		</div>
 	//		...
 	//	</div>
 	//
-		 
-	this.pos = {'x': -1, 'y': -1};	// current cursor position, relative to the grid
-
-	// for conservative trigger mode, when triggered, timerScale is gradually increased from 0 to 1
-	this.timerScale = 1.0;
+	constructor: function(){
+		//
+		// TODO
+		// fix really long labels in vertical mode
+		//
 	
-},{
+		this.pos = {'x': -1, 'y': -1};	// current cursor position, relative to the grid
+		
+		// for conservative trigger mode, when triggered, timerScale is gradually increased from 0 to 1
+		this.timerScale = 1.0;
+	
+	},
 
 	EDGE: {
 		CENTER: 0,
@@ -51,7 +49,7 @@ dojo.declare("dojox.widget.FisheyeList",
 		BOTTOM: 4
 	},
 
-	templateString: '<div class="dojoHtmlFisheyeListBar"></div>',
+	templateString: '<div class="dojoxFisheyeListBar" dojoAttachPoint="containerNode"></div>',
 
 	snarfChildDomOutput: true,
 	
@@ -608,11 +606,7 @@ dojo.declare("dojox.widget.FisheyeList",
 	}
 });
 
-dojo.declare("dojox.widget.FisheyeListItem",
-	[dijit._Widget, dijit._Templated, dijit._Contained],
-	null,
-	{
-
+dojo.declare("dojox.widget.FisheyeListItem", [dijit._Widget, dijit._Templated, dijit._Contained], {
 	/*
 	 * summary
 	 *	Menu item inside of a FisheyeList.
@@ -634,9 +628,9 @@ dojo.declare("dojox.widget.FisheyeListItem",
 	_blankImgPath: dojo.moduleUrl("dojox.widget", "FisheyeList/blank.gif"),
 
 	templateString:
-		'<div class="dojoHtmlFisheyeListItem">' +
-		'  <img class="dojoHtmlFisheyeListItemImage" dojoAttachPoint="imgNode" dojoAttachEvent="onmouseover:onMouseOver,onmouseout:onMouseOut,onclick:onClick">' +
-		'  <div class="dojoHtmlFisheyeListItemLabel" dojoAttachPoint="lblNode"></div>' +
+		'<div class="dojoxFisheyeListItem">' +
+		'  <img class="dojoxFisheyeListItemImage" dojoAttachPoint="imgNode" dojoAttachEvent="onmouseover:onMouseOver,onmouseout:onMouseOut,onclick:onClick">' +
+		'  <div class="dojoxFisheyeListItemLabel" dojoAttachPoint="lblNode"></div>' +
 		'</div>',
 
 	_isNode: function(/* object */wh){

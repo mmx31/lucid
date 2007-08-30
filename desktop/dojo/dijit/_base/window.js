@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit._base.window"]){
+if(!dojo._hasResource["dijit._base.window"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit._base.window"] = true;
 dojo.provide("dijit._base.window");
 

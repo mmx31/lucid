@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.encoding.lzw"]){
+if(!dojo._hasResource["dojox.encoding.lzw"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.encoding.lzw"] = true;
 dojo.provide("dojox.encoding.lzw");
 

@@ -1,14 +1,11 @@
-if(!dojo._hasResource["dojox.data.demos.widgets.FlickrViewList"]){
+if(!dojo._hasResource["dojox.data.demos.widgets.FlickrViewList"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.data.demos.widgets.FlickrViewList"] = true;
 dojo.provide("dojox.data.demos.widgets.FlickrViewList");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Widget");
 dojo.require("dojox.data.demos.widgets.FlickrView");
 
-dojo.declare(
-	"dojox.data.demos.widgets.FlickrViewList",
-	[dijit._Widget, dijit._Templated],
-	null,{
+dojo.declare("dojox.data.demos.widgets.FlickrViewList", [dijit._Widget, dijit._Templated], {
 	//Simple demo widget that is just a list of FlickrView Widgets.
 
 	templateString:"<div dojoAttachPoint=\"list\"></div>\n\n",

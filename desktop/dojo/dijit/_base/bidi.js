@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit._base.bidi"]){
+if(!dojo._hasResource["dijit._base.bidi"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit._base.bidi"] = true;
 dojo.provide("dijit._base.bidi");
 

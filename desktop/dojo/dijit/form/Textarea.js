@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.form.Textarea"]){
+if(!dojo._hasResource["dijit.form.Textarea"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.form.Textarea"] = true;
 dojo.provide("dijit.form.Textarea");
 
@@ -17,12 +17,11 @@ dojo.declare(
 	//	Rows is not supported since this widget adjusts the height.
 	// usage:
 	//	<textarea dojoType="dijit.form.TextArea">...</textarea>
-
-	templateString: (dojo.isIE || dojo.isSafari || dojo.isMozilla) ? '<fieldset id="${id}" class="dijitInlineBox dijitInputField dijitTextArea">'
-				+ ((dojo.isIE || dojo.isSafari) ? '<div dojoAttachPoint="editNode" waiRole="textarea" tabIndex="${tabIndex}" style="text-decoration:none;_padding-bottom:16px;display:block;overflow:auto;" contentEditable="true"></div>'
-					: '<iframe dojoAttachPoint="iframe" dojoAttachEvent="onblur:_onIframeBlur" src="javascript:void(0)" style="border:0px;margin:0px;padding:0px;display:block;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;"></iframe>')
+	templateString: (dojo.isIE || dojo.isSafari || dojo.isMozilla) ?
+				((dojo.isIE || dojo.isSafari) ? '<fieldset id="${id}" class="dijitInlineBox dijitInputField dijitTextArea"><div dojoAttachPoint="editNode" waiRole="textarea" tabIndex="${tabIndex}" style="text-decoration:none;_padding-bottom:16px;display:block;overflow:auto;" contentEditable="true"></div>'
+					: '<span id="${id}" class="dijitReset"><iframe dojoAttachPoint="iframe, styleNode" dojoAttachEvent="onblur:_onIframeBlur" src="javascript:void(0)" class="dijitInlineBox dijitInputField dijitTextArea"></iframe>')
 				+ '<textarea name="${name}" value="${value}" dojoAttachPoint="formValueNode" style="display:none;"></textarea>'
-				+ '</fieldset>'
+				+ ((dojo.isIE || dojo.isSafari) ? '</fieldset>':'</span>')
 			: '<textarea id="${id}" name="${name}" value="${value}" dojoAttachPoint="formValueNode,editNode" class="dijitInputField dijitTextArea"></textarea>',
 
 	_nlsResources: null,	// Needed for screen readers on FF2
@@ -39,16 +38,42 @@ dojo.declare(
 		}
 	},
 
-	_setFormValue: function(/*Boolean, optional*/ priorityChange){
-		// blah<BR>blah --> blah\nblah
-		// <P>blah</P><P>blah</P> --> blah\nblah
-		// <DIV>blah</DIV><DIV>blah</DIV> --> blah\nblah
-		// &amp;&lt;&nbsp;&gt; --> &< >
-		value = this.editNode.innerHTML.replace(/<(br[^>]*|\/(p|div))>$|^<(p|div)[^>]*>|\r/gi,"").replace(/<\/(p|div)>\s*<\1[^>]*>|<(br|p|div)[^>]*>/gi,"\n").replace(/<[^>]*>/g,"").replace(/&amp;/gi,"\&").replace(/&nbsp;/gi," ").replace(/&lt;/gi,"<").replace(/&gt;/gi,">");
+	setValue: function(/*String*/ value, /*Boolean, optional*/ priorityChange){
+		var editNode = this.editNode;
+		if(typeof value == "string"){
+			editNode.innerHTML = ""; // wipe out old nodes
+			if(value.split){
+				var _this=this;
+				var isFirst = true;
+				dojo.forEach(value.split("\n"), function(line){
+					if(isFirst){ isFirst = false; }
+					else {
+						editNode.appendChild(document.createElement("BR")); // preserve line breaks
+					}
+					editNode.appendChild(document.createTextNode(line)); // use text nodes so that imbedded tags can be edited
+				});
+			}else{
+				editNode.appendChild(document.createTextNode(value));
+			}
+			if(this.iframe){
+				this.sizeNode = document.createElement('div');
+				editNode.appendChild(this.sizeNode);
+			}
+		}else{
+			// blah<BR>blah --> blah\nblah
+			// <P>blah</P><P>blah</P> --> blah\nblah
+			// <DIV>blah</DIV><DIV>blah</DIV> --> blah\nblah
+			// &amp;&lt;&gt; -->&< >
+			value = editNode.innerHTML;
+			if(this.iframe){ // strip sizeNode
+				value = value.replace(/<div><\/div>\r?\n?$/i,"");
+			}
+			value = value.replace(/\s*\r?\n|^\s+|\s+$|&nbsp;/g,"").replace(/>\s+</g,"><").replace(/<\/(p|div)>$|^<(p|div)[^>]*>/gi,"").replace(/([^>])<div>/g,"$1\n").replace(/<\/p>\s*<p[^>]*>|<br[^>]*>/gi,"\n").replace(/<[^>]*>/g,"").replace(/&amp;/gi,"\&").replace(/&lt;/gi,"<").replace(/&gt;/gi,">");
+		}
 		this.formValueNode.value = value;
 		if(this.iframe){
-			var newHeight = this.editNode.scrollHeight;
-			if(this.editNode.scrollWidth > this.editNode.clientWidth){ newHeight+=16; } // scrollbar space needed?
+			var newHeight = this.sizeNode.offsetTop;
+			if(editNode.scrollWidth > editNode.clientWidth){ newHeight+=16; } // scrollbar space needed?
 			if(this.lastHeight != newHeight){ // cache size so that we don't get a resize event because of a resize event
 				if(newHeight == 0){ newHeight = 16; } // height = 0 causes the browser to not set scrollHeight
 				dojo.contentBox(this.iframe, {h: newHeight});
@@ -56,27 +81,6 @@ dojo.declare(
 			}
 		}
 		dijit.form.Textarea.superclass.setValue.call(this, value, priorityChange);
-	},
-
-	setValue: function(/*String*/ value, /*Boolean, optional*/ priorityChange){
-		var node = this.editNode;
-		if(node){
-			node.innerHTML = ""; // wipe out old nodes
-			if(value.split){
-				var _this=this;
-				var isFirst = true;
-				dojo.forEach(value.split("\n"), function(line){
-					if(isFirst){ isFirst = false; }
-					else {
-						node.appendChild(document.createElement("BR")); // preserve line breaks
-					}
-					node.appendChild(document.createTextNode(line)); // use text nodes so that imbedded tags can be edited
-				});
-			}else{
-				node.appendChild(document.createTextNode(value));
-			}
-		}
-		this._setFormValue(priorityChange);
 	},
 
 	getValue: function(){
@@ -94,6 +98,7 @@ dojo.declare(
 			this.value = this.srcNodeRef.value;
 		}
 		if(!this.value){ this.value = ""; }
+		this.value = this.value.replace(/\r\n/g,"\n").replace(/&gt;/g,">").replace(/&lt;/g,"<").replace(/&amp;/g,"&");
 	},
 
 	postCreate: function(){
@@ -125,15 +130,15 @@ dojo.declare(
 			d.open();
 			d.write('<html><head><title>' +
 				this._nlsResources.iframeTitle1 +	// "edit area"
-				'</title><style>body > br{display:none;}</style></head><body style="margin:0px;padding:0px;border:0px;"><div></div></body></html>');
+				'</title></head><body style="margin:0px;padding:0px;border:0px;"></body></html>');
 				// body > br style is to remove the <br> that gets added by FF
 			d.close();
-			try{ this.iframe.contentDocument.designMode="on"; }catch(e){/*squelch*/} // this can fail if display:none
-			this.editNode = d.body.firstChild;
-			this.domNode.style.overflowY = 'hidden';
+			this.editNode = d.body;
+			this.iframe.style.overflowY = 'hidden';
+			// resize is a method of window, not document
 			this.eventNode = d;
 			this.focusNode = this.editNode;
-			this.eventNode.addEventListener("resize", dojo.hitch(this, "_changed"), false);
+			this.connect(w, "resize", this._changed); // resize is only on the window object
 		}else{
 			this.focusNode = this.domNode;
 		}
@@ -151,12 +156,12 @@ dojo.declare(
 
 	// event handlers, you can over-ride these in your own subclasses
 	_focused: function(e){
-		dojo.addClass(this.domNode, "dijitInputFieldFocused");
+		dojo.addClass(this.iframe||this.domNode, "dijitInputFieldFocused");
 		this._changed(e);
 	},
 
 	_blurred: function(e){
-		dojo.removeClass(this.domNode, "dijitInputFieldFocused");
+		dojo.removeClass(this.iframe||this.domNode, "dijitInputFieldFocused");
 		this._changed(e, true);
 	},
 
@@ -182,8 +187,7 @@ dojo.declare(
 			// dijit.focus and if that receives an iframe target it will set focus
 			// on the iframe's contentWindow.
 			this.iframe.focus();  // this.focus(); won't work
-			e.preventDefault();
-			e.stopPropagation();
+			dojo.stopEvent(e);
 		}else if(e.keyCode == dojo.keys.ENTER){
 			e.stopPropagation();
 		}else if(this.inherited("_onKeyPress", arguments) && this.iframe){
@@ -209,12 +213,7 @@ dojo.declare(
 		if(this.iframe && this.iframe.contentDocument.designMode != "on"){
 			this.iframe.contentDocument.designMode="on"; // in case this failed on init due to being hidden
 		}
-		this._setFormValue(priorityChange);
-	},
-
-	resize:function(/*Object*/ contentBox){
-		// summary: set content box size
-		dojo.contentBox(this.iframe || this.focusNode, {w:contentBox.w});
+		this.setValue(null, priorityChange);
 	}
 });
 

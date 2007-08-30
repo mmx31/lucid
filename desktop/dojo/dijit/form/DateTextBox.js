@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.form.DateTextBox"]){
+if(!dojo._hasResource["dijit.form.DateTextBox"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.form.DateTextBox"] = true;
 dojo.provide("dijit.form.DateTextBox");
 

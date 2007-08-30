@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit._editor.selection"]){
+if(!dojo._hasResource["dijit._editor.selection"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit._editor.selection"] = true;
 dojo.provide("dijit._editor.selection");
 
@@ -166,7 +166,7 @@ dojo.mixin(dijit._editor.selection, {
 		}
 	},
 
-	selectElementChildren: function(/*DomNode*/element){
+	selectElementChildren: function(/*DomNode*/element,/*Boolean?*/nochangefocus){
 		// summary:
 		//		clear previous selection and select the content of the node
 		//		(excluding the node itself)
@@ -176,7 +176,9 @@ dojo.mixin(dijit._editor.selection, {
 		if(_document.selection && dojo.body().createTextRange){ // IE
 			var range = element.ownerDocument.body.createTextRange();
 			range.moveToElementText(element);
-			range.select();
+			if(!nochangefocus){
+				range.select();
+			}
 		}else if(_window["getSelection"]){
 			var selection = _window.getSelection();
 			if(selection["setBaseAndExtent"]){ // Safari
@@ -187,7 +189,7 @@ dojo.mixin(dijit._editor.selection, {
 		}
 	},
 
-	selectElement: function(/*DomNode*/element){
+	selectElement: function(/*DomNode*/element,/*Boolean?*/nochangefocus){
 		// summary:
 		//		clear previous selection and select element (including all its children)
 		var _document = dojo.doc;
@@ -196,9 +198,11 @@ dojo.mixin(dijit._editor.selection, {
 			try{
 				var range = dojo.body().createControlRange();
 				range.addElement(element);
-				range.select();
+				if(!nochangefocus){
+					range.select();
+				}
 			}catch(e){
-				this.selectElementChildren(element);
+				this.selectElementChildren(element,nochangefocus);
 			}
 		}else if(dojo.global["getSelection"]){
 			var selection = dojo.global.getSelection();

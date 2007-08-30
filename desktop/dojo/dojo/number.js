@@ -1,9 +1,9 @@
-if(!dojo._hasResource["dojo.number"]){
+if(!dojo._hasResource["dojo.number"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojo.number"] = true;
 dojo.provide("dojo.number");
 
 dojo.require("dojo.i18n");
-dojo.requireLocalization("dojo.cldr", "number", null, "en-us,en,ROOT,ja-jp,zh-tw,fr,en-ca,pt,de-de,es,es-es,it,de,zh-cn,ko-kr");
+dojo.requireLocalization("dojo.cldr", "number", null, "zh-cn,en,en-ca,zh-tw,en-us,it,ja-jp,ROOT,de-de,es-es,fr,pt,ko-kr,es,de");
 dojo.require("dojo.string");
 dojo.require("dojo.regexp");
 
@@ -201,11 +201,11 @@ dojo.number.regexp = function(/*Object?*/options){
 	//		and decimal separators
 	//
 	// options: object {pattern: String, type: String locale: String, strict: Boolean, places: mixed}
-	//		pattern- override pattern with this string
+	//		pattern- override pattern with this string.  Default is provided based on locale.
 	//		type- choose a format type based on the locale from the following: decimal, scientific, percent, currency. decimal by default.
 	//		locale- override the locale used to determine formatting rules
 	//		strict- strict parsing, false by default
-	//		places- number of decimal places to accept: Infinity, a positive number, or a range "n,m"
+	//		places- number of decimal places to accept: Infinity, a positive number, or a range "n,m".  By default, defined by pattern.
 	return dojo.number._parseInfo(options).regexp; // String
 }
 
@@ -367,7 +367,7 @@ dojo.number._realNumberRegexp = function(/*Object?*/flags){
 	flags = flags || {};
 	if(typeof flags.places == "undefined"){ flags.places = Infinity; }
 	if(typeof flags.decimal != "string"){ flags.decimal = "."; }
-	if(typeof flags.fractional == "undefined"){ flags.fractional = [true, false]; }
+	if(typeof flags.fractional == "undefined" || /^0/.test(flags.places)){ flags.fractional = [true, false]; }
 	if(typeof flags.exponent == "undefined"){ flags.exponent = [true, false]; }
 	if(typeof flags.eSigned == "undefined"){ flags.eSigned = [true, false]; }
 

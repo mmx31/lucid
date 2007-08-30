@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojo.fx"]){
+if(!dojo._hasResource["dojo.fx"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojo.fx"] = true;
 dojo.provide("dojo.fx");
 dojo.provide("dojo.fx.Toggler");
@@ -34,9 +34,8 @@ dojo.fx.combine = function(/*dojo._Animation[]*/ animations){
 	return first; // dojo._Animation
 };
 
-dojo.declare(
-	"dojo.fx.Toggler", null,
-	function(args){
+dojo.declare("dojo.fx.Toggler", null, {
+	constructor: function(args){
 		// summary:
 		//		class constructor for an animation toggler. It accepts a packed
 		//		set of arguments about what type of animation to use in each
@@ -46,7 +45,7 @@ dojo.declare(
 		//			node: "nodeId",
 		//			showDuration: 500,
 		//			// hideDuration will default to "200"
-		//			showFunc: dojo.slideIn, 
+		//			showFunc: dojo.wipeIn, 
 		//			// hideFunc will default to "fadeOut"
 		//		});
 		//		t.show(100); // delay showing for 100ms
@@ -60,7 +59,7 @@ dojo.declare(
 		var _t = this;
 
 		dojo.mixin(_t, args);
-		_t.node = args["node"];
+		_t.node = args.node;
 		_t._showArgs = dojo.mixin({}, args);
 		_t._showArgs.node = _t.node;
 		_t._showArgs.duration = _t.showDuration;
@@ -73,37 +72,36 @@ dojo.declare(
 
 		dojo.connect(_t.showAnim, "beforeBegin", dojo.hitch(_t.hideAnim, "stop", true));
 		dojo.connect(_t.hideAnim, "beforeBegin", dojo.hitch(_t.showAnim, "stop", true));
+	},
+	
+	node: null,
+	showFunc: dojo.fadeIn,
+	hideFunc: dojo.fadeOut,
 
-	},{
-		node: null,
-		showFunc: dojo.fadeIn,
-		hideFunc: dojo.fadeOut,
+	showDuration: 200,
+	hideDuration: 200,
 
-		showDuration: 200,
-		hideDuration: 200,
+	_showArgs: null,
+	_showAnim: null,
 
-		_showArgs: null,
-		_showAnim: null,
+	_hideArgs: null,
+	_hideAnim: null,
 
-		_hideArgs: null,
-		_hideAnim: null,
+	_isShowing: false,
+	_isHiding: false,
 
-		_isShowing: false,
-		_isHiding: false,
+	show: function(delay){
+		delay = delay||0;
+		return this.showAnim.play(delay);
+	},
 
-		show: function(delay){
-			delay = delay||0;
-			return this.showAnim.play(delay);
-		},
-
-		hide: function(delay){
-			delay = delay||0;
-			return this.hideAnim.play(delay);
-		}
+	hide: function(delay){
+		delay = delay||0;
+		return this.hideAnim.play(delay);
 	}
-);
+});
 
-dojo.fx.slideIn = function(/*Object*/ args){
+dojo.fx.wipeIn = function(/*Object*/ args){
 	// summary
 	//		Returns an animation that will expand the
 	//		node defined in 'args' object from it's current height to
@@ -144,11 +142,11 @@ dojo.fx.slideIn = function(/*Object*/ args){
 	return anim; // dojo._Animation
 }
 
-dojo.fx.slideOut = function(/*Object*/ args){
+dojo.fx.wipeOut = function(/*Object*/ args){
 	// summary
 	//		Returns an animation that will shrink node defined in "args"
 	//		from it's current height to 1px, and then hide it.
-	var node = args.node = dojo.byId(args.node);
+	var node = (args.node = dojo.byId(args.node));
 
 	var anim = dojo.animateProperty(dojo.mixin({
 		properties: {
@@ -213,6 +211,5 @@ dojo.fx.slideTo = function(/*Object?*/ args){
 
 	return anim; // dojo._Animation
 }
-
 
 }

@@ -33,10 +33,8 @@
 	vertical-align:middle;
 }
 .dj_ie .dijitInline {
-	#display:inline;				/* IE */
-}
-.dj_ie6 .dijitInline {
-	#zoom: 1;								/* IE6 */
+	display:inline;
+	zoom: 1;
 }
 
 .dijitInlineBox {
@@ -47,10 +45,6 @@
 	border:0px;
 	padding:0px;
 	vertical-align:middle;
-}
-
-.dj_ie6 .dijitInlineBox {
-	#display:inline;				/* IE */
 }
 
 .dijitTeeny {
@@ -118,32 +112,16 @@
 	cursor : pointer;
 }
 
-.dijitDisabledClickableRegion {
-	/* a region the user would be able to click on, but it's disabled */
-	cursor: default;        /* makes opera happy */
-	cursor: url("no.gif"), not-allowed, default;
-}
 
 .dijitDisplayNone {
 	/* hide something.  Use this as a class rather than element.style so another class can override */
 	display:none !important;
 }
 
-
-
-.dijitSpinnerDisabled *,
-.dijitButtonDisabled *,
-.dijitDropDownButtonDisabled *,
-.dijitComboButtonDisabled *,
-.dijitComboBoxDisabled * {
-	cursor: default;
-	cursor: not-allowed !important;
-	cursor: url("no.gif"), not-allowed, default;
+.dijitContainer {
+	/* for all layout containers */
+	overflow: hidden;	/* need on IE so something can be reduced in size, and so scrollbars aren't temporarily displayed */
 }
-
-
-
-
 
 /**** 
 		A11Y 
@@ -153,18 +131,9 @@
 	background-color:transparent !important;
 }
 
-.dijitA11yDownArrow,
-.dijitA11yUpArrow,
-.dijitA11ySideArrow {
-	/* down arrow shown when in a11y mode */
-	font-family:Arial, sans serif;
-	/* 
-	font-size:.5em;
-	line-height:.5em;
-	*/
-	line-height: 0.5em;
-	font-size: x-small;
-	padding:0em .25em;
+.dijit_a11y .dijitCalendarIncrementControl .dijitA11ySideArrow { 
+	padding-left:.2em; 
+	visibility:visible !important; 
 }
 
 .dijitToolbar .dijitDropDownButton .dijitA11yDownArrow{
@@ -179,8 +148,10 @@
 
 .dijitA11ySideArrow {
 	vertical-align:top;
-	margin-right:1em;
+	margin-right:0em; 
+	margin-left:.2em; 
 	line-height:2em;
+	text-align:center; 
 }
 
 .dj_ie .dijitA11yDownArrow,
@@ -531,13 +502,15 @@ table .dijitComboButton .dijitButtonNode {
 	/* outer container and background of the bar that's not finished yet*/
 	position:relative;overflow:hidden;
 	border:1px solid black; 	/* a11y: border necessary for high-contrast mode */
-	height:20px;
+	z-index:0;			/* establish a stacking context for this progress bar */
 }
 
 .dijitProgressBarFull {
 	/* outer container for background of bar that is finished */
 	position:absolute;
 	overflow:hidden;
+	z-index:-1;
+	top:0;
 	width:100%;
 	height:100%;
 }
@@ -578,7 +551,7 @@ table .dijitComboButton .dijitButtonNode {
 }
 
 .dijitProgressBarIndeterminate .dijitProgressBarLabel{
-	display:none;
+	visibility:hidden;
 }
 
 .dijitProgressBarIndeterminate .dijitProgressBarTile{
@@ -591,15 +564,21 @@ table .dijitComboButton .dijitButtonNode {
 
 .dijit_a11y .dijitProgressBarIndeterminate .dijitProgressBarIndeterminateHighContrastImage{
 	display:block;
+	position:absolute;
+	top:0;
+	bottom:0;
+	margin:0;
+	padding:0;
 	width:100%;
-	height:100%;
+	height:auto;
 }
 
 .dijitProgressBarLabel{
 	display:block;
-	position:absolute;
+	position:static;
 	width:100%;
 	text-align:center;
+	background-color:transparent;
 }
 
 /* progress bar in vertical mode - TODO: remove? no longer supported? */
@@ -813,6 +792,10 @@ body .dijitAlignClient { position: absolute; }
 }
 
 /* Accordion */
+
+.dijitAccordionPane {
+	overflow: hidden !important;	/* prevent spurious scrollbars */
+}
 
 .dijitAccordionPane .dijitAccordionBody {
 	overflow: auto;
@@ -1083,18 +1066,18 @@ body .dijitAlignClient { position: absolute; }
 
 /* Tree */
 
-.TreeExpando {
+.dijitTreeExpando {
     float: left;
     display: inline;
     clear:both;
 }
 
-.TreeExpand {
+.dijitTreeExpand {
     float: left;
     display: inline;
 }
 
-.TreeContent {
+.dijitTreeContent {
     cursor: default;
     /* can't make inline - multiline bugs */
 }
@@ -1207,7 +1190,6 @@ body .dijitAlignClient { position: absolute; }
 	position:static !important;
 	height:0%;
 	vertical-align:top;
-	overflow:hidden;
 	text-align:left;
 }
 
@@ -1358,4 +1340,16 @@ body .dijitAlignClient { position: absolute; }
 /* Toolbar A11y */
 .dijit_a11y .dijitButtonContents .dijitButtonText {
 	display: block !important;
+}
+
+.dj_ie .dijitTextArea p {
+	margin-top:0px;
+	margin-bottom:0px;
+}
+
+/* Editor */
+.IEFixedToolbar {
+	position:absolute;
+	/* top:0; */
+	top: expression(eval((document.documentElement||document.body).scrollTop));
 }

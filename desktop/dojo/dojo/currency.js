@@ -1,10 +1,10 @@
-if(!dojo._hasResource["dojo.currency"]){
+if(!dojo._hasResource["dojo.currency"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojo.currency"] = true;
 dojo.provide("dojo.currency");
 
 dojo.require("dojo.number");
 dojo.require("dojo.i18n");
-dojo.requireLocalization("dojo.cldr", "currency", null, "en-us,en,en-au,fr,ja,zh,en-ca,pt,ROOT,es,it,ko,de");
+dojo.requireLocalization("dojo.cldr", "currency", null, "ko,zh,ja,en,en-ca,en-au,ROOT,en-us,it,fr,pt,es,de");
 dojo.require("dojo.cldr.monetary");
 
 dojo.currency._mixInDefaults = function(options){

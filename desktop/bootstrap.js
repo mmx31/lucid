@@ -22,7 +22,7 @@ dojo.require("dojo.io.script");
 if(navigator.appName == "Microsoft Internet Explorer")
 {
 	//they give us shit poor debuging utilities, so we have no way of debugging our bootstrap.
-	window.onerror = function()
+	window.onerror = function(e)
 	{
 		err  = "An error occurred:\n";
 		for(mod in desktop.modules)
@@ -50,6 +50,7 @@ if(navigator.appName == "Microsoft Internet Explorer")
 				}
 			}
 		}
+		err += "\nerror:\n"+e;
 		alert(err);
 	}
 }
@@ -94,15 +95,22 @@ var bootstrap = {
 		desktop.modules[libraryName].version = "";
 	}
 },
+numberOfModulesLoaded: 0,
   checkifloaded: function()
 	{
 		if(desktop.modules.api.initiated == true)
 		{
+			var nom = 0;
+			for(mod in desktop.modules) nom++;
 			for(mod in desktop.modules)
 			{
 				if((typeof desktop[mod]) != "undefined")
 				{
 					desktop.modules[mod].loaded = true;
+					bootstrap.numberOfModulesLoaded++;
+					var p = bootstrap.numberOfModulesLoaded.toString()
+					bootstrap._indicator.update({progress: p, maximum: nom});
+					setTimeout(function(){1+1},0); //yield
 				}
 				else
 				{
@@ -126,6 +134,7 @@ var bootstrap = {
 					if(lib != "core" && lib != "api" && lib != "config") if((typeof desktop[lib].init) == "function") desktop[lib].init();
 					desktop.modules[lib].initiated = true;
 				}
+				dojo.doc.body.removeChild(bootstrap._loading);
 				desktop.core.init();
 			});
 		}
@@ -141,7 +150,6 @@ var bootstrap = {
 	},
   link: function(file, id)
   {
-  	//document.write('<link id="'+id+'" rel="stylesheet" href="'+file+'" type="text/css" media="screen" />');
 	var element = document.createElement("link");
 	element.rel = "stylesheet";
 	element.type = "text/css";
@@ -151,6 +159,26 @@ var bootstrap = {
 	document.getElementsByTagName("head")[0].appendChild(element);
   },
   load: function() {
+  	bootstrap._loading = dojo.doc.createElement("div");
+	bootstrap._loading.innerHTML = "Loading...";
+	bootstrap._loading.style.position="absolute";
+	var d=dijit.getViewport();
+	bootstrap._loading.style.top=(d.h)+"px";
+	bootstrap._loading.style.left=(d.w)+"px";
+	bootstrap._loading.style.height=(d.h)+"px";
+	bootstrap._loading.style.width=(d.w)+"px";
+	bootstrap._loading.style.textAlign= "center";
+	bootstrap._loading.style.zIndex = "1000000";
+	dojo.require("dijit.ProgressBar");
+	bootstrap._indicator = new dijit.ProgressBar({indeterminate: true});
+	bootstrap._loading.appendChild(bootstrap._indicator.domNode);
+	dojo.doc.body.appendChild(bootstrap._loading);
+	  
+ bootstrap.link("desktop.css", "corestyle");
+ bootstrap.link("./dojo/dijit/themes/dijit.css", "dijit");
+ bootstrap.link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
+ bootstrap.link("./dojo/dijit/themes/tundra/tundra.css", "tundra");
+ bootstrap.link("./dojo/dijit/themes/tundra/tundra_rtl.css", "tundra_rtl");
  dojo.require("dijit.layout.LayoutContainer");
  dojo.require("dijit.layout.ContentPane");
  dojo.require("dijit.Menu");
@@ -171,14 +199,8 @@ var bootstrap = {
  bootstrap.require('wallpaper');
  bootstrap.require('widget');
  bootstrap.require('windows');
-// bootstrap.link("./themes/default/theme.css", "desktop_theme");
-// bootstrap.link("./themes/default/window.css", "window_theme");
- bootstrap.link("desktop.css", "corestyle");
- bootstrap.link("./dojo/dijit/themes/dijit.css", "dijit");
- bootstrap.link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
- bootstrap.link("./dojo/dijit/themes/tundra/tundra.css", "tundra");
- bootstrap.link("./dojo/dijit/themes/tundra/tundra_rtl.css", "tundra_rtl");
  dojo.addClass(document.body, "tundra");
+ bootstrap._indicator.update({indeterminate: false, progress: 0});
  bootstrap.checkifloaded();
 }
 }

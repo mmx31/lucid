@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.ColorPalette"]){
+if(!dojo._hasResource["dijit.ColorPalette"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.ColorPalette"] = true;
 dojo.provide("dijit.ColorPalette");
 

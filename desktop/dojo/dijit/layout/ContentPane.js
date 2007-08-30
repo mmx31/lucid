@@ -1,9 +1,11 @@
-if(!dojo._hasResource["dijit.layout.ContentPane"]){
+if(!dojo._hasResource["dijit.layout.ContentPane"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.layout.ContentPane"] = true;
 dojo.provide("dijit.layout.ContentPane");
 
 dojo.require("dijit._Widget");
 dojo.require("dojo.parser");
+dojo.require("dojo.string");
+dojo.requireLocalization("dijit", "loading", null, "ROOT");
 
 dojo.declare(
 	"dijit.layout.ContentPane",
@@ -57,11 +59,11 @@ dojo.declare(
 
 	// loadingMessage: String
 	//	Message that shows while downloading
-	loadingMessage: "<span class='dijitContentPaneLoading'>Loading...</span>", //TODO: i18n or set a image containing the same info (no i18n required)
+	loadingMessage: "<span class='dijitContentPaneLoading'>${loadingState}</span>", // TODO: consider a graphical representation for this state which does not require localization
 
 	// errorMessage: String
 	//	Message that shows if an error occurs
-	errorMessage: "<span class='dijitContentPaneError'>Sorry, but an error occured</span>", // TODO: i18n?  But do we really need I18N for an unexpected error??
+	errorMessage: "<span class='dijitContentPaneError'>${errorState}</span>", // TODO: consider a graphical representation for this state which does not require localization
 
 	// isLoaded: Boolean
 	//	Tells loading status see onLoad|onUnload for event hooks
@@ -80,6 +82,10 @@ dojo.declare(
 			this._loadCheck();
 		}
 
+		var messages = dojo.i18n.getLocalization("dijit", "loading", this.lang);
+		this.loadingMessage = dojo.string.substitute(this.loadingMessage, messages);
+		this.errorMessage = dojo.string.substitute(this.errorMessage, messages);
+
 		// for programatically created ContentPane (with <span> tag), need to muck w/CSS
 		// or it's as though overflow:visible is set
 		dojo.addClass(this.domNode, this["class"]);
@@ -87,7 +93,7 @@ dojo.declare(
 
 	startup: function(){
 		if(!this._started){
-			this._loadCheck()
+			this._loadCheck();
 			this._started = true;
 		}
 	},

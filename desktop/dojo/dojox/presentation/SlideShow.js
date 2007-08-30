@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.presentation.SlideShow"]){
+if(!dojo._hasResource["dojox.presentation.SlideShow"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.presentation.SlideShow"] = true;
 dojo.provide("dojox.presentation.SlideShow");
 dojo.experimental("dojox.presentation.SlideShow"); 
@@ -6,11 +6,7 @@ dojo.experimental("dojox.presentation.SlideShow");
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 
-dojo.declare(
-	"dojox.presentation.SlideShow",
-	[dijit._Widget, dijit._Templated],
-	null,
-	{
+dojo.declare("dojox.presentation.SlideShow", [dijit._Widget, dijit._Templated], {
 	/*
 		summary: 
 			Takes a bunch of pictures and displays them one by one, like a slide show.

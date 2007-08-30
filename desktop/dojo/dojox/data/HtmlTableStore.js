@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.data.HtmlTableStore"]){
+if(!dojo._hasResource["dojox.data.HtmlTableStore"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.data.HtmlTableStore"] = true;
 dojo.provide("dojox.data.HtmlTableStore");
 
@@ -6,9 +6,8 @@ dojo.require("dojox.data.dom");
 dojo.require("dojo.data.util.simpleFetch");
 dojo.require("dojo.data.util.filter");
 
-dojo.declare("dojox.data.HtmlTableStore",
-	null,
-	function(/*Object*/args){
+dojo.declare("dojox.data.HtmlTableStore", null, {
+	constructor: function(/*Object*/args){
 		//	summary:
 		//		Initializer for the HTML table store.  
 		//	description:
@@ -60,7 +59,7 @@ dojo.declare("dojox.data.HtmlTableStore",
 				this._rootNode.rows[i].store = this;
 			}
 		}
-	},{
+	},
 
 	url: "",     // So the parser can instantiate the store via markup.
 	tableId: "", // So the parser can instantiate the store via markup.

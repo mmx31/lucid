@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.data.dom"]){
+if(!dojo._hasResource["dojox.data.dom"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.data.dom"] = true;
 dojo.provide("dojox.data.dom");
 

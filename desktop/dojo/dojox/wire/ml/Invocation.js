@@ -1,11 +1,10 @@
-if(!dojo._hasResource["dojox.wire.ml.Invocation"]){
+if(!dojo._hasResource["dojox.wire.ml.Invocation"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.wire.ml.Invocation"] = true;
 dojo.provide("dojox.wire.ml.Invocation");
 
 dojo.require("dojox.wire.ml.Action");
 
-dojo.declare("dojox.wire.ml.Invocation",
-	dojox.wire.ml.Action, {
+dojo.declare("dojox.wire.ml.Invocation", dojox.wire.ml.Action, {
 	//	summary:
 	//		A widget to invoke a method or publish a topic
 	//	description:

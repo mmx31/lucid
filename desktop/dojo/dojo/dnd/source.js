@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojo.dnd.source"]){
+if(!dojo._hasResource["dojo.dnd.source"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojo.dnd.source"] = true;
 dojo.provide("dojo.dnd.source");
 
@@ -21,61 +21,65 @@ dojo.require("dojo.dnd.manager");
 		"After"		- insert point is after the anchor
 */
 
-dojo.declare("dojo.dnd.Source", dojo.dnd.Selector,
+dojo.declare("dojo.dnd.Source", dojo.dnd.Selector, {
 	// summary: a Source object, which can be used as a DnD source, or a DnD target
-function(node, params){
-	// summary: a constructor of the Source
-	// node: Node: node or node's id to build the source on
-	// params: Object: a dict of parameters, recognized parameters are:
-	//	isSource: Boolean: can be used as a DnD source, if true; assumed to be "true" if omitted
-	//	accept: Array: list of accepted types (text strings) for a target; assumed to be ["text"] if omitted
-	//	horizontal: Boolean: a horizontal container, if true, vertical otherwise or when omitted
-	//	copyOnly: Boolean: always copy items, if true, use a state of Ctrl key otherwise
-	//	the rest of parameters are passed to the selector
-	if(!params){ params = {}; }
-	this.isSource = typeof params.isSource == "undefined" ? true : params.isSource;
-	var type = params.accept instanceof Array ? params.accept : ["text"];
-	this.accept = null;
-	if(type.length){
-		this.accept = {};
-		for(var i = 0; i < type.length; ++i){
-			this.accept[type[i]] = 1;
-		}
-	}
-	this.horizontal = params.horizontal;
-	this.copyOnly = params.copyOnly;
-	// class-specific variables
-	this.isDragging = false;
-	this.mouseDown = false;
-	this.targetAnchor = null;
-	this.targetBox = null;
-	this.before = true;
-	// states
-	this.sourceState  = "";
-	if(this.isSource){
-		dojo.addClass(this.node, "dojoDndSource");
-	}
-	this.targetState  = "";
-	if(this.accept){
-		dojo.addClass(this.node, "dojoDndTarget");
-	}
-	if(this.horizontal){
-		dojo.addClass(this.node, "dojoDndHorizontal");
-	}
-	// set up events
-	this.topics = [
-		dojo.subscribe("/dnd/source/over", this, "onDndSourceOver"),
-		dojo.subscribe("/dnd/start",  this, "onDndStart"),
-		dojo.subscribe("/dnd/drop",   this, "onDndDrop"),
-		dojo.subscribe("/dnd/cancel", this, "onDndCancel")
-	];
-},
-{
+	
 	// object attributes (for markup)
 	isSource: true,
 	horizontal: false,
 	copyOnly: false,
+	skipForm: false,
 	accept: ["text"],
+	
+	constructor: function(node, params){
+		// summary: a constructor of the Source
+		// node: Node: node or node's id to build the source on
+		// params: Object: a dict of parameters, recognized parameters are:
+		//	isSource: Boolean: can be used as a DnD source, if true; assumed to be "true" if omitted
+		//	accept: Array: list of accepted types (text strings) for a target; assumed to be ["text"] if omitted
+		//	horizontal: Boolean: a horizontal container, if true, vertical otherwise or when omitted
+		//	copyOnly: Boolean: always copy items, if true, use a state of Ctrl key otherwise
+		//	skipForm: Boolean: don't start the drag operation, if clicked on form elements
+		//	the rest of parameters are passed to the selector
+		if(!params){ params = {}; }
+		this.isSource = typeof params.isSource == "undefined" ? true : params.isSource;
+		var type = params.accept instanceof Array ? params.accept : ["text"];
+		this.accept = null;
+		if(type.length){
+			this.accept = {};
+			for(var i = 0; i < type.length; ++i){
+				this.accept[type[i]] = 1;
+			}
+		}
+		this.horizontal = params.horizontal;
+		this.copyOnly = params.copyOnly;
+		this.skipForm = params.skipForm;
+		// class-specific variables
+		this.isDragging = false;
+		this.mouseDown = false;
+		this.targetAnchor = null;
+		this.targetBox = null;
+		this.before = true;
+		// states
+		this.sourceState  = "";
+		if(this.isSource){
+			dojo.addClass(this.node, "dojoDndSource");
+		}
+		this.targetState  = "";
+		if(this.accept){
+			dojo.addClass(this.node, "dojoDndTarget");
+		}
+		if(this.horizontal){
+			dojo.addClass(this.node, "dojoDndHorizontal");
+		}
+		// set up events
+		this.topics = [
+			dojo.subscribe("/dnd/source/over", this, "onDndSourceOver"),
+			dojo.subscribe("/dnd/start",  this, "onDndStart"),
+			dojo.subscribe("/dnd/drop",   this, "onDndDrop"),
+			dojo.subscribe("/dnd/cancel", this, "onDndCancel")
+		];
+	},
 	
 	// methods
 	checkAcceptance: function(source, nodes){
@@ -84,7 +88,7 @@ function(node, params){
 		// nodes: Array: the list of transferred items
 		if(this == source){ return true; }
 		for(var i = 0; i < nodes.length; ++i){
-			var type = source.map[nodes[i].id].type;
+			var type = source.getItem(nodes[i].id).type;
 			// type instanceof Array
 			var flag = false;
 			for(var j = 0; j < type.length; ++j){
@@ -158,14 +162,18 @@ function(node, params){
 	onMouseDown: function(e){
 		// summary: event processor for onmousedown
 		// e: Event: mouse event
-		this.mouseDown = true;
-		dojo.dnd.Source.superclass.onMouseDown.call(this, e);
+		if(!this.skipForm || !dojo.dnd.isFormElement(e)){
+			this.mouseDown = true;
+			dojo.dnd.Source.superclass.onMouseDown.call(this, e);
+		}
 	},
 	onMouseUp: function(e){
 		// summary: event processor for onmouseup
 		// e: Event: mouse event
-		this.mouseDown = false;
-		dojo.dnd.Source.superclass.onMouseUp.call(this, e);
+		if(this.mouseDown){
+			this.mouseDown = false;
+			dojo.dnd.Source.superclass.onMouseUp.call(this, e);
+		}
 	},
 	
 	// topic event processors
@@ -210,14 +218,14 @@ function(node, params){
 				if(this.creator){
 					// use defined creator
 					this._normalizedCreator = function(node, hint){
-						return oldCreator.call(this, source.map[node.id].data, hint);
+						return oldCreator.call(this, source.getItem(node.id).data, hint);
 					};
 				}else{
 					// we have no creator defined => move/clone nodes
 					if(copy){
 						// clone nodes
 						this._normalizedCreator = function(node, hint){
-							var t = source.map[node.id];
+							var t = source.getItem(node.id);
 							var n = node.cloneNode(true);
 							n.id = dojo.dnd.getUniqueId();
 							return {node: n, data: t.data, type: t.type};
@@ -225,8 +233,8 @@ function(node, params){
 					}else{
 						// move nodes
 						this._normalizedCreator = function(node, hint){
-							var t = source.map[node.id];
-							delete source.map[node.id];
+							var t = source.getItem(node.id);
+							source.delItem(node.id);
 							return {node: node, data: t.data, type: t.type};
 						};
 					}
@@ -239,12 +247,12 @@ function(node, params){
 					if(copy){
 						// create new copies of data items
 						this._normalizedCreator = function(node, hint){
-							return oldCreator.call(this, source.map[node.id].data, hint);
+							return oldCreator.call(this, source.getItem(node.id).data, hint);
 						};
 					}else{
 						// move nodes
 						this._normalizedCreator = function(node, hint){
-							var t = source.map[node.id];
+							var t = source.getItem(node.id);
 							return {node: node, data: t.data, type: t.type};
 						};
 					}
@@ -253,7 +261,7 @@ function(node, params){
 					if(copy){
 						// clone nodes
 						this._normalizedCreator = function(node, hint){
-							var t = source.map[node.id];
+							var t = source.getItem(node.id);
 							var n = node.cloneNode(true);
 							n.id = dojo.dnd.getUniqueId();
 							return {node: n, data: t.data, type: t.type};
@@ -261,7 +269,7 @@ function(node, params){
 					}else{
 						// move nodes
 						this._normalizedCreator = function(node, hint){
-							var t = source.map[node.id];
+							var t = source.getItem(node.id);
 							return {node: node, data: t.data, type: t.type};
 						};
 					}
@@ -334,14 +342,15 @@ function(node, params){
 	}
 });
 
-dojo.declare("dojo.dnd.Target", dojo.dnd.Source,
+dojo.declare("dojo.dnd.Target", dojo.dnd.Source, {
 	// summary: a Target object, which can be used as a DnD target
-function(node, params){
-	// summary: a constructor of the Target --- see the Source constructor for details
-	this.isSource = false;
-	dojo.removeClass(this.node, "dojoDndSource");
-},
-{
+	
+	constructor: function(node, params){
+		// summary: a constructor of the Target --- see the Source constructor for details
+		this.isSource = false;
+		dojo.removeClass(this.node, "dojoDndSource");
+	},
+
 	// markup methods
 	markupFactory: function(params, node){
 		params._skipStartup = true;

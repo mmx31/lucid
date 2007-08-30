@@ -1,14 +1,21 @@
-if(!dojo._hasResource["dojox.data.OpmlStore"]){
+if(!dojo._hasResource["dojox.data.OpmlStore"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.data.OpmlStore"] = true;
 dojo.provide("dojox.data.OpmlStore");
 
 dojo.require("dojo.data.util.filter");
 dojo.require("dojo.data.util.simpleFetch");
 
-dojo.declare("dojox.data.OpmlStore",
-	null,
-	function(/* Object */ keywordParameters){
-		// summary: initializer
+dojo.declare("dojox.data.OpmlStore", null, {
+	/* summary:
+	 *   The OpmlStore implements the dojo.data.api.Read API.  
+	 */
+	 
+	/* examples:
+	 *   var opmlStore = new dojo.data.OpmlStore({url:"geography.xml"});
+	 *   var opmlStore = new dojo.data.OpmlStore({url:"http://example.com/geography.xml"});
+	 */
+	constructor: function(/* Object */ keywordParameters){
+		// summary: constructor
 		// keywordParameters: {url: String, label: String}  Where label is optional and configures what should be used as the return from getLabel()
 		this._xmlData = null;
 		this._arrayOfTopLevelItems = [];
@@ -20,20 +27,14 @@ dojo.declare("dojox.data.OpmlStore",
 		if(keywordParameters.label){
 			this.label = keywordParameters.label;
 		}
-	},{
+		this._loadInProgress = false;	//Got to track the initial load to prevent duelling loads of the dataset.
+		this._queuedFetches = [];
+	},
 
 	label: "text",
 
 	url: "",
 
-	/* summary:
-	 *   The OpmlStore implements the dojo.data.api.Read API.  
-	 */
-	 
-	/* examples:
-	 *   var opmlStore = new dojo.data.OpmlStore({url:"geography.xml"});
-	 *   var opmlStore = new dojo.data.OpmlStore({url:"http://example.com/geography.xml"});
-	 */
 	_assertIsItem: function(/* item */ item){
 		if(!this.isItem(item)){ 
 			throw new Error("dojo.data.OpmlStore: a function was passed an item argument that was not an item");
@@ -336,25 +337,35 @@ dojo.declare("dojox.data.OpmlStore",
 		if(this._loadFinished){
 			filter(keywordArgs, this._getItemsArray(keywordArgs.queryOptions));
 		}else{
-			if(this.url !== ""){
-				var getArgs = {
-						url: self.url, 
-						handleAs: "xml"
-					};
-				var getHandler = dojo.xhrGet(getArgs);
-				getHandler.addCallback(function(data){
-					self._processRawXmlTree(data);
-					filter(keywordArgs, self._getItemsArray(keywordArgs.queryOptions));
-				});
-				getHandler.addErrback(function(error){
-					throw error;
-				});
-			}else if(this._opmlData){
-				this._processRawXmlTree(this._opmlData);
-				this._opmlData = null;
-				filter(keywordArgs, this._getItemsArray(keywordArgs.queryOptions));
+
+			//If fetches come in before the loading has finished, but while
+			//a load is in progress, we have to defer the fetching to be 
+			//invoked in the callback.
+			if(this._loadInProgress){
+				this._queuedFetches.push({args: keywordArgs, filter: filter});
 			}else{
-				throw new Error("dojox.data.OpmlStore: No OPML source data was provided as either URL or XML data input.");
+				if(this.url !== ""){
+					this._loadInProgress = true;
+					var getArgs = {
+							url: self.url, 
+							handleAs: "xml"
+						};
+					var getHandler = dojo.xhrGet(getArgs);
+					getHandler.addCallback(function(data){
+						self._processRawXmlTree(data);
+						filter(keywordArgs, self._getItemsArray(keywordArgs.queryOptions));
+						self._handleQueuedFetches();
+					});
+					getHandler.addErrback(function(error){
+						throw error;
+					});
+				}else if(this._opmlData){
+					this._processRawXmlTree(this._opmlData);
+					this._opmlData = null;
+					filter(keywordArgs, this._getItemsArray(keywordArgs.queryOptions));
+				}else{
+					throw new Error("dojox.data.OpmlStore: No OPML source data was provided as either URL or XML data input.");
+				}
 			}
 		}
 	},
@@ -365,6 +376,23 @@ dojo.declare("dojox.data.OpmlStore",
 			 'dojo.data.api.Read': true
 		 };
 		 return features; //Object
+	},
+
+	_handleQueuedFetches: function(){
+		//	summary: 
+		//		Internal function to execute delayed request in the store.
+		//Execute any deferred fetches now.
+		if (this._queuedFetches.length > 0) {
+			for(var i = 0; i < this._queuedFetches.length; i++){
+				var fData = this._queuedFetches[i];
+				var delayedQuery = fData.args;
+				var delayedFilter = fData.filter;
+				if(delayedFilter){
+					delayedFilter(delayedQuery, this._getItemsArray(delayedQuery.queryOptions)); 
+				}
+			}
+			this._queuedFetches = [];
+		}
 	},
 
 	close: function(/*dojo.data.api.Request || keywordArgs || null */ request){

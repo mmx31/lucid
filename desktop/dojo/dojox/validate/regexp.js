@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.validate.regexp"]){
+if(!dojo._hasResource["dojox.validate.regexp"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.validate.regexp"] = true;
 dojo.provide("dojox.validate.regexp");
 

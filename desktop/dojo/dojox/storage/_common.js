@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.storage._common"]){
+if(!dojo._hasResource["dojox.storage._common"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.storage._common"] = true;
 dojo.provide("dojox.storage._common");
 dojo.require("dojox.storage.Provider");

@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.form.NumberSpinner"]){
+if(!dojo._hasResource["dijit.form.NumberSpinner"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.form.NumberSpinner"] = true;
 dojo.provide("dijit.form.NumberSpinner");
 

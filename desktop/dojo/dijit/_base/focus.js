@@ -1,8 +1,6 @@
-if(!dojo._hasResource["dijit._base.focus"]){
+if(!dojo._hasResource["dijit._base.focus"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit._base.focus"] = true;
 dojo.provide("dijit._base.focus");
-
-dojo.require("dijit._base.window");
 
 // summary:
 //		These functions are used to query or set the focus and selection.
@@ -173,10 +171,8 @@ dojo.mixin(dijit,
 		//		window or an iframe) to detect when the user has clicked somewhere.
 		//		Anyone that creates an iframe should call this function.
 
-		if(!targetWindow){ //see comment below
-			try{
-				targetWindow = dijit.getDocumentWindow(window.top && window.top.document || window.document);
-			}catch(e){ return; /* squelch error for cross domain iframes and abort */ }
+		if(!targetWindow){
+			targetWindow = window;
 		}
 
 		dojo.connect(targetWindow.document, "onmousedown", null, function(evt){
@@ -202,16 +198,6 @@ dojo.mixin(dijit,
 				body.addEventListener('blur', function(evt){ dijit._onBlurNode(); }, true);
 			}
 		}
-
-		dojo.forEach(targetWindow.frames, function(frame){
-			try{
-				//do not remove dijit.getDocumentWindow, see comment in it
-				var win = dijit.getDocumentWindow(frame.document);
-				if(win){
-					dijit.registerWin(win);
-				}
-			}catch(e){ /* squelch error for cross domain iframes */ }
-		});
 	},
 	
 	_onBlurNode: function(){
@@ -277,29 +263,43 @@ dojo.mixin(dijit,
 		if(node && node.tagName && node.tagName.toLowerCase() == "body"){
 			return;
 		}
+		dijit._onTouchNode(node);
 		if(node==dijit._curFocus){ return; }
 		dijit._prevFocus = dijit._curFocus;
 		dijit._curFocus = node;
-		dijit._onTouchNode(node);
 		dojo.publish("focusNode", [node]);
+
+		// handle focus/blur styling
+		var w = dijit.byId(node.id);
+		if (w && w._setStateClass){
+			w._focused = true;
+			w._setStateClass();
+			// watch for a blur on the node that received focus
+			var blurConnector = dojo.connect(node, "onblur", function(){
+				w._focused = false;
+				w._setStateClass();
+				dojo.disconnect(blurConnector);
+			});
+		}
 	},
 
 	_setStack: function(newStack){
 		// summary
 		//	The stack of active widgets has changed.  Send out appropriate events and record new stack
 
-		var stack = dijit._activeStack;
+		var oldStack = dijit._activeStack;		
+		dijit._activeStack = newStack;
 
 		// compare old stack to new stack to see how many elements they have in common
-		for(var nCommon=0; nCommon<Math.min(stack.length, newStack.length); nCommon++){
-			if(stack[nCommon] != newStack[nCommon]){
+		for(var nCommon=0; nCommon<Math.min(oldStack.length, newStack.length); nCommon++){
+			if(oldStack[nCommon] != newStack[nCommon]){
 				break;
 			}
 		}
 
 		// for all elements that have gone out of focus, send blur event
-		for(var i=stack.length-1; i>=nCommon; i--){
-			var widget = dijit.byId(stack[i]);
+		for(var i=oldStack.length-1; i>=nCommon; i--){
+			var widget = dijit.byId(oldStack[i]);
 			if(widget){
 				dojo.publish("widgetBlur", [widget]);
 				if(widget._onBlur){
@@ -318,8 +318,6 @@ dojo.mixin(dijit,
 				}
 			}
 		}
-		
-		dijit._activeStack = newStack;
 	}
 });
 

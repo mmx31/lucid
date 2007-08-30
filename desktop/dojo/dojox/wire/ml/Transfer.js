@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.wire.ml.Transfer"]){
+if(!dojo._hasResource["dojox.wire.ml.Transfer"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.wire.ml.Transfer"] = true;
 dojo.provide("dojox.wire.ml.Transfer");
 dojo.provide("dojox.wire.ml.ChildWire");
@@ -11,8 +11,7 @@ dojo.require("dijit._Container");
 dojo.require("dojox.wire._base");
 dojo.require("dojox.wire.ml.Action");
 
-dojo.declare("dojox.wire.ml.Transfer",
-	dojox.wire.ml.Action, {
+dojo.declare("dojox.wire.ml.Transfer", dojox.wire.ml.Action, {
 	//	summary:
 	//		A widget to transfer values through source and target Wires
 	//	description:
@@ -145,8 +144,7 @@ dojo.declare("dojox.wire.ml.Transfer",
 	}
 });
 
-dojo.declare("dojox.wire.ml.ChildWire",
-	dijit._Widget, {
+dojo.declare("dojox.wire.ml.ChildWire", dijit._Widget, {
 	//	summary:
 	//		A widget to add a child wire
 	//	description:
@@ -224,8 +222,7 @@ dojo.declare("dojox.wire.ml.ChildWire",
 	}
 });
 
-dojo.declare("dojox.wire.ml.ColumnWire",
-	dojox.wire.ml.ChildWire, {
+dojo.declare("dojox.wire.ml.ColumnWire", dojox.wire.ml.ChildWire, {
 	//	summary:
 	//		A widget to add a column wire
 	//	description:
@@ -260,8 +257,7 @@ dojo.declare("dojox.wire.ml.ColumnWire",
 	}
 });
 
-dojo.declare("dojox.wire.ml.NodeWire",
-	[dojox.wire.ml.ChildWire, dijit._Container], {
+dojo.declare("dojox.wire.ml.NodeWire", [dojox.wire.ml.ChildWire, dijit._Container], {
 	//	summary:
 	//		A widget to add node wires
 	//	description:
@@ -332,8 +328,7 @@ dojo.declare("dojox.wire.ml.NodeWire",
 	}
 });
 
-dojo.declare("dojox.wire.ml.SegmentWire",
-	dojox.wire.ml.ChildWire, {
+dojo.declare("dojox.wire.ml.SegmentWire", dojox.wire.ml.ChildWire, {
 	//	summary:
 	//		A widget to add a segment wire
 	//	description:

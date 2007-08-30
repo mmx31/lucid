@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.collections.BinaryTree"]){
+if(!dojo._hasResource["dojox.collections.BinaryTree"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.collections.BinaryTree"] = true;
 dojo.provide("dojox.collections.BinaryTree");
 dojo.require("dojox.collections");

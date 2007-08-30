@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.collections.tests.ArrayList"]){
+if(!dojo._hasResource["dojox.collections.tests.ArrayList"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.collections.tests.ArrayList"] = true;
 dojo.provide("dojox.collections.tests.ArrayList");
 dojo.require("dojox.collections.ArrayList");

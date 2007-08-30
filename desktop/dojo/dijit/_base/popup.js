@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit._base.popup"]){
+if(!dojo._hasResource["dijit._base.popup"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit._base.popup"] = true;
 dojo.provide("dijit._base.popup");
 
@@ -170,6 +170,51 @@ dijit.popup = new function(){
 
 }();
 
+dijit._frames = new function(){
+	// summary: cache of iframes
+	var queue = [];
+
+	this.pop = function(){
+		var iframe;
+		if(queue.length){
+			iframe = queue.pop();
+			iframe.style.display="";
+		}else{
+			if(dojo.isIE){
+				var html="<iframe src='javascript:\"\"'"
+					+ " style='position: absolute; left: 0px; top: 0px;"
+					+ "z-index: -1; filter:Alpha(Opacity=\"0\");'>";
+				iframe = dojo.doc.createElement(html);
+			}else{
+			 	var iframe = dojo.doc.createElement("iframe");
+				iframe.src = 'javascript:""';
+				iframe.className = "dijitBackgroundIframe";
+			}
+			iframe.tabIndex = -1; // Magic to prevent iframe from getting focus on tab keypress - as style didnt work.
+			dojo.body().appendChild(iframe);
+		}
+		return iframe;
+	};
+	
+	this.push = function(iframe){
+		iframe.style.display="";
+		if(dojo.isIE){
+			iframe.style.removeExpression("width");
+			iframe.style.removeExpression("height");
+		}
+		queue.push(iframe);
+	}
+}();
+
+// fill the queue
+if(dojo.isIE && dojo.isIE < 7){
+	dojo.addOnLoad(function(){
+		var f = dijit._frames;
+		dojo.forEach([f.pop()], f.push);
+	});
+}
+
+
 dijit.BackgroundIframe = function(/* HTMLElement */node){
 	//	summary:
 	//		For IE z-index schenanigans. id attribute is required.
@@ -180,23 +225,13 @@ dijit.BackgroundIframe = function(/* HTMLElement */node){
 	//			area (and position) of node
 
 	if(!node.id){ throw new Error("no id"); }
-
 	if((dojo.isIE && dojo.isIE < 7) || (dojo.isFF && dojo.isFF < 3 && dojo.hasClass(dojo.body(), "dijit_a11y"))){
-		var iframe;
-		if(dojo.isIE){
-			var html="<iframe src='javascript:\"\"'"
-				+ " style='position: absolute; left: 0px; top: 0px;"
-				+ " width: expression(document.getElementById(\"" + node.id + "\").offsetWidth);"
-				+ " height: expression(document.getElementById(\"" + node.id + "\").offsetHeight); "
-				+ "z-index: -1; filter:Alpha(Opacity=\"0\");'>";
-			iframe = dojo.doc.createElement(html);
-		}else{
-		 	iframe = dojo.doc.createElement("iframe");
-			iframe.src = 'javascript:""';
-			iframe.className = "dijitBackgroundIframe";
-		}
-		iframe.tabIndex = -1; // Magic to prevent iframe from getting focus on tab keypress - as style didnt work.
+		var iframe = dijit._frames.pop();
 		node.appendChild(iframe);
+		if(dojo.isIE){
+			iframe.style.setExpression("width", "document.getElementById('" + node.id + "').offsetWidth");
+			iframe.style.setExpression("height", "document.getElementById('" + node.id + "').offsetHeight");
+		}
 		this.iframe = iframe;
 	}
 };
@@ -205,7 +240,7 @@ dojo.extend(dijit.BackgroundIframe, {
 	destroy: function(){
 		//	summary: destroy the iframe
 		if(this.iframe){
-			dojo._destroyElement(this.iframe);
+			dijit._frames.push(this.iframe);
 			delete this.iframe;
 		}
 	}

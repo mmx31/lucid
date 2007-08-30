@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.validate.creditCard"]){
+if(!dojo._hasResource["dojox.validate.creditCard"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.validate.creditCard"] = true;
 dojo.provide("dojox.validate.creditCard");
 

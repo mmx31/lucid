@@ -1,25 +1,10 @@
-if(!dojo._hasResource["dojox.wire.TreeAdapter"]){
+if(!dojo._hasResource["dojox.wire.TreeAdapter"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.wire.TreeAdapter"] = true;
 dojo.provide("dojox.wire.TreeAdapter");
 
 dojo.require("dojox.wire.CompositeWire");
 
-dojo.declare("dojox.wire.TreeAdapter",
-	dojox.wire.CompositeWire,
-	function(/*Object*/args){
-		//	summary:
-		//		Initialize properties
-		//	description:
-		//		If object properties ('node', 'title' and 'children') of array
-		//		elements specified in 'nodes' property are not Wires, Wires are
-		//		created from them as arguments, with 'parent' property set to
-		//		this Wire instance.
-		//	args:
-		//		Arguments to initialize properties
-		//		nodes:
-		//			An array containing objects for child Wires for node values
-		this._initializeChildren(this.nodes);
-	}, {
+dojo.declare("dojox.wire.TreeAdapter", dojox.wire.CompositeWire, {
 	//	summary:
 	//		A composite Wire for tree nodes
 	//	description:
@@ -45,8 +30,23 @@ dojo.declare("dojox.wire.TreeAdapter",
 	//				...
 	//			]
 	//		This class only supports getValue(), but not setValue().
+	
 	_wireClass: "dojox.wire.TreeAdapter",
-
+	
+	constructor: function(/*Object*/args){
+		//	summary:
+		//		Initialize properties
+		//	description:
+		//		If object properties ('node', 'title' and 'children') of array
+		//		elements specified in 'nodes' property are not Wires, Wires are
+		//		created from them as arguments, with 'parent' property set to
+		//		this Wire instance.
+		//	args:
+		//		Arguments to initialize properties
+		//		nodes:
+		//			An array containing objects for child Wires for node values
+		this._initializeChildren(this.nodes);
+	},
 	_getValue: function(/*Array*/object){
 		//	summary:
 		//		Return an array of tree node values

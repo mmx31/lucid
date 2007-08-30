@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.form.ComboBox"]){
+if(!dojo._hasResource["dijit.form.ComboBox"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.form.ComboBox"] = true;
 dojo.provide("dijit.form.ComboBox");
 
@@ -166,19 +166,24 @@ dojo.declare(
 
 				case dojo.keys.ENTER:
 					// prevent submitting form if user presses enter
-					dojo.stopEvent(evt);
 					// also prevent accepting the value if either Next or Previous are selected
 					if(this._isShowingNow){
+						// only stop event on prev/next
 						var highlighted=this._popupWidget.getHighlightedOption();
 						if(highlighted==this._popupWidget.nextButton){
 							this._nextSearch(1);
+							dojo.stopEvent(evt);
 							break;
 						}
 						else if(highlighted==this._popupWidget.previousButton){
 							this._nextSearch(-1);
+							dojo.stopEvent(evt);
 							break;
 						}
 					}
+					// default case:
+					// prevent submit, but allow event to bubble
+					evt.preventDefault();
 					// fall through
 
 				case dojo.keys.TAB:
@@ -310,7 +315,7 @@ dojo.declare(
 
 		onfocus:function(){
 			dijit.form._DropDownTextBox.prototype.onfocus.apply(this, arguments);
-			this.parentClass.onfocus.apply(this, arguments);
+			this.inherited('onfocus', arguments);
 		},
 
 		onblur:function(){ /* not _onBlur! */
@@ -364,7 +369,6 @@ dojo.declare(
 				this._setCaretPos(this.focusNode, this.store.getValue(tgt.item, this.searchAttr).length);
 			}
 			this._doSelect(tgt);
-			this.focus();
 		},
 
 		_doSelect: function(tgt){
@@ -427,14 +431,13 @@ dojo.declare(
 				}
 			}
 			// instantiate query so comboboxes with different data stores and default query work together
-			if(this.query==dijit.form.ComboBoxMixin.prototype.query){query={};}
+			if(this.query==dijit.form.ComboBoxMixin.prototype.query){this.query={};}
 		},
 
 		postCreate: function(){
 			// call the associated TextBox postCreate
 			// ValidationTextBox for ComboBox; MappedTextBox for FilteringSelect
-			this.parentClass=dojo.getObject(this.declaredClass, false).superclass;
-			this.parentClass.postCreate.apply(this, arguments);
+			this.inherited('postCreate', arguments);
 		},
 
 		_getMenuLabelFromItem:function(/*Item*/ item){

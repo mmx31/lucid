@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.Dialog"]){
+if(!dojo._hasResource["dijit.Dialog"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.Dialog"] = true;
 dojo.provide("dijit.Dialog");
 

@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.form._TimePicker"]){
+if(!dojo._hasResource["dijit.form._TimePicker"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.form._TimePicker"] = true;
 dojo.provide("dijit.form._TimePicker");
 

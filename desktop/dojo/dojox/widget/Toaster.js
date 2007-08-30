@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.widget.Toaster"]){
+if(!dojo._hasResource["dojox.widget.Toaster"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.widget.Toaster"] = true;
 dojo.provide("dojox.widget.Toaster");
 
@@ -11,11 +11,7 @@ dojo.require("dijit._Templated");
 // Modified by Bryan Forbes to support topics and a variable delay.
 // Modified by Karl Tiedt to support 0 duration messages that require user interaction and message stacking
 
-dojo.declare(
-	"dojox.widget.Toaster",
-	[dijit._Widget, dijit._Templated],
-	null,
-	{
+dojo.declare("dojox.widget.Toaster", [dijit._Widget, dijit._Templated], {
 		// summary
 		//		Message that slides in from the corner of the screen, used for notifications
 		//		like "new email".

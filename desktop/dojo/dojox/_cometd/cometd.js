@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox._cometd.cometd"]){
+if(!dojo._hasResource["dojox._cometd.cometd"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox._cometd.cometd"] = true;
 dojo.provide("dojox._cometd.cometd");
 dojo.require("dojo.AdapterRegistry");

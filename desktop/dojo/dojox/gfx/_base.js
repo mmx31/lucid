@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.gfx._base"]){
+if(!dojo._hasResource["dojox.gfx._base"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.gfx._base"] = true;
 dojo.provide("dojox.gfx._base");
 
@@ -242,47 +242,60 @@ dojo.mixin(dojox.gfx, {
 	pathSvgRegExp: /([A-Za-z])|(\d+(\.\d+)?)|(\.\d+)|(-\d+(\.\d+)?)|(-\.\d+)/g
 });
 
-dojo.declare("dojox.gfx.Surface", null,
-	function(){
-		// summary: a surface object to be used for drawings
-		
+dojox.gfx._createShape = function(shape){
+	// summary: creates a shape object based on its type; it is meant to be used
+	//	by group-like objects
+	// shape: Object: a shape object
+	switch(shape.type){
+		case dojox.gfx.defaultPath.type:		return this.createPath(shape);
+		case dojox.gfx.defaultRect.type:		return this.createRect(shape);
+		case dojox.gfx.defaultCircle.type:		return this.createCircle(shape);
+		case dojox.gfx.defaultEllipse.type:		return this.createEllipse(shape);
+		case dojox.gfx.defaultLine.type:		return this.createLine(shape);
+		case dojox.gfx.defaultPolyline.type:	return this.createPolyline(shape);
+		case dojox.gfx.defaultImage.type:		return this.createImage(shape);
+		case dojox.gfx.defaultText.type:		return this.createText(shape);
+		case dojox.gfx.defaultTextPath.type:	return this.createTextPath(shape);
+	}
+	return null;
+};
+
+dojox.gfx._eventsProcessing = {
+	connect: function(name, object, method){
+		return arguments.length > 2 ? 
+			dojo.connect(this.getEventSource(), name, object, method) :
+			dojo.connect(this.getEventSource(), name, object);
+	},
+	disconnect: function(token){
+		dojo.disconnect(token);
+	}
+};
+
+dojo.declare("dojox.gfx.Surface", null, {
+	// summary: a surface object to be used for drawings
+
+	constructor: function(){
 		// underlying node
 		this.rawNode = null;
 	},
-{
 	getEventSource: function(){
 		// summary: returns a node, which can be used to attach event listeners
 		
 		return this.rawNode; // Node
-	},
-	createShape: function(shape){
-		// summary: creates a shape object based on its type
-		// shape: Object: a shape object
-		switch(shape.type){
-			case dojox.gfx.defaultPath.type:		return this.createPath(shape);
-			case dojox.gfx.defaultRect.type:		return this.createRect(shape);
-			case dojox.gfx.defaultCircle.type:		return this.createCircle(shape);
-			case dojox.gfx.defaultEllipse.type:		return this.createEllipse(shape);
-			case dojox.gfx.defaultLine.type:		return this.createLine(shape);
-			case dojox.gfx.defaultPolyline.type:	return this.createPolyline(shape);
-			case dojox.gfx.defaultImage.type:		return this.createImage(shape);
-			case dojox.gfx.defaultText.type:		return this.createText(shape);
-			case dojox.gfx.defaultTextPath.type:	return this.createTextPath(shape);
-		}
-		return null;
 	}
 });
+dojo.extend(dojox.gfx.Surface, dojox.gfx._eventsProcessing);
 
 dojo.declare("dojox.gfx.Point", null, {
 	// summary: a hypothetical 2D point to be used for drawings - {x, y}
 	// description: This object is defined for documentation purposes.
-	//	You should use a naked object instead: {x: 1, y: 2}.
+	//	You should use the naked object instead: {x: 1, y: 2}.
 });
 
 dojo.declare("dojox.gfx.Rectangle", null, {
 	// summary: a hypothetical rectangle - {x, y, width, height}
 	// description: This object is defined for documentation purposes.
-	//	You should use a naked object instead: {x: 1, y: 2, width: 100, height: 200}.
+	//	You should use the naked object instead: {x: 1, y: 2, width: 100, height: 200}.
 });
 
 }

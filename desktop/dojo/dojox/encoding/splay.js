@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.encoding.splay"]){
+if(!dojo._hasResource["dojox.encoding.splay"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.encoding.splay"] = true;
 dojo.provide("dojox.encoding.splay");
 

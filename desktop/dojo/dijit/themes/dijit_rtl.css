@@ -1,12 +1,19 @@
 /* Tree */
 
-.dijitRtl .TreeContainer .TreeExpando {
+.dijitRtl .dijitTreeContainer .dijitTreeExpando {
 	float:right;
 }
 
-.dijitRtl .TreeContainer .TreeExpand {
+.dijitRtl .dijitTreeContainer .dijitTreeExpand {
 	float:right;
 }
+
+/* can't specify .dijitRtl and .dijit_a11y on this rule, since they are on the same node */
+.dijitRtl .dijitExpandoText { 
+	float: right; 
+	padding-left: 3px;
+	padding-right: 0; 
+} 
 
 /* ComboBox */
 
@@ -36,7 +43,15 @@
 }
 
 /* A11y */
-.dijitA11ySideArrow {
+.dijitRtl .dijitA11ySideArrow {
 	margin-left:1em;
 	margin-right:0;
+}
+
+/* AccordionPane */
+
+.dijitRtl .dijitAccordionPane .dijitAccordionTitle .dijitAccordionArrow,
+.dijitRtl .dijitAccordionPane .dijitAccordionTitle .arrowTextUp,
+.dijitRtl .dijitAccordionPane .dijitAccordionTitle .arrowTextDown {
+	float: left;
 }

@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.data.FlickrStore"]){
+if(!dojo._hasResource["dojox.data.FlickrStore"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.data.FlickrStore"] = true;
 dojo.provide("dojox.data.FlickrStore");
 
@@ -6,9 +6,8 @@ dojo.require("dojo.data.util.simpleFetch");
 dojo.require("dojo.io.script");
 dojo.require("dojo.date.stamp");
 
-dojo.declare("dojox.data.FlickrStore",
-	null,
-	function(/*Object*/args){
+dojo.declare("dojox.data.FlickrStore", null, {
+	constructor: function(/*Object*/args){
 		//	summary:
 		//		Initializer for the FlickrStore store.  
 		//	description:
@@ -20,7 +19,7 @@ dojo.declare("dojox.data.FlickrStore",
 		if(args && args.label){
 			this.label = args.label;
 		}
-	},{
+	},
 
 	_flickrUrl: "http://api.flickr.com/services/feeds/photos_public.gne",
 

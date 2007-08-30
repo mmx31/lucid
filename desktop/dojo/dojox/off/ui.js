@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.off.ui"]){
+if(!dojo._hasResource["dojox.off.ui"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.off.ui"] = true;
 dojo.provide("dojox.off.ui");
 

@@ -1,10 +1,13 @@
-if(!dojo._hasResource["dijit.layout.AccordionContainer"]){
+if(!dojo._hasResource["dijit.layout.AccordionContainer"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.layout.AccordionContainer"] = true;
 dojo.provide("dijit.layout.AccordionContainer");
 
 dojo.require("dojo.fx");
 
+dojo.require("dijit._Container");
+dojo.require("dijit._Templated");
 dojo.require("dijit.layout.StackContainer");
+dojo.require("dijit.layout.ContentPane");
 
 dojo.declare(
 	"dijit.layout.AccordionContainer",
@@ -35,6 +38,7 @@ dojo.declare(
 		},
 
 		startup: function(){
+			if(this._started){ return; }
 			dijit.layout.StackContainer.prototype.startup.apply(this, arguments);
 			if(this.selectedChildWidget){
 				var style = this.selectedChildWidget.containerNode.style;
@@ -80,11 +84,6 @@ inside the AccordionPane??
 				newWidget.setSelected(true);
 				var newContents = newWidget.containerNode;
 				newContents.style.display = "";
-				dojo.forEach(newWidget.getChildren(), function(widget){
-					if(widget.resize){
-						widget.resize({h: paneHeight});
-					}
-				});
 
 				animations.push(dojo.animateProperty({ 
 					node: newContents, 
@@ -144,15 +143,11 @@ inside the AccordionPane??
 
 dojo.declare(
 	"dijit.layout.AccordionPane",
-	[dijit.layout._LayoutWidget, dijit._Templated],
+	[dijit.layout.ContentPane, dijit._Templated, dijit._Contained],
 {
 	// summary
 	//		AccordionPane is a box with a title that contains another widget (often a ContentPane).
 	//		It's a widget used internally by AccordionContainer.
-
-	// selected: Boolean
-	//	if true, this is the open pane
-	selected: false,
 
 	templateString:"<div class='dijitAccordionPane'\n\t><div dojoAttachPoint='titleNode,focusNode' dojoAttachEvent='ondijitclick:_onTitleClick,onkeypress:_onKeyPress'\n\t\tclass='dijitAccordionTitle' wairole=\"tab\"\n\t\t><div class='dijitAccordionArrow'></div\n\t\t><div class='arrowTextUp' waiRole=\"presentation\">&#9650;</div\n\t\t><div class='arrowTextDown' waiRole=\"presentation\">&#9660;</div\n\t\t><span dojoAttachPoint='titleTextNode'>${title}</span></div\n\t><div><div dojoAttachPoint='containerNode' style='overflow: hidden; height: 1px; display: none'\n\t\tdojoAttachEvent='onkeypress:_onKeyPress'\n\t\tclass='dijitAccordionBody' waiRole=\"tabpanel\"\n\t></div></div>\n</div>\n",
 

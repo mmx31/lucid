@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojo.dnd.avatar"]){
+if(!dojo._hasResource["dojo.dnd.avatar"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojo.dnd.avatar"] = true;
 dojo.provide("dojo.dnd.avatar");
 
@@ -36,13 +36,13 @@ dojo.extend(dojo.dnd.Avatar, {
 			td = dojo.doc.createElement("td");
 			var node = source.creator ?
 				// create an avatar representation of the node
-				node = source._normalizedCreator(source.map[this.manager.nodes[i].id].data, "avatar").node :
+				node = source._normalizedCreator(source.getItem(this.manager.nodes[i].id).data, "avatar").node :
 				// or just clone the node and hope it works
 				node = this.manager.nodes[i].cloneNode(true);
 			node.id = "";
 			td.appendChild(node);
 			tr.appendChild(td);
-			dojo.style(tr, "opacity", (6 - i) / 10);
+			dojo.style(tr, "opacity", (9 - i) / 10);
 			b.appendChild(tr);
 		}
 		a.appendChild(b);
@@ -68,7 +68,7 @@ dojo.extend(dojo.dnd.Avatar, {
 	},
 	_generateText: function(){
 		// summary: generates a proper text to reflect copying or moving of items
-		return (this.manager.copy ? "copy" : "mov") + "ing " + this.manager.nodes.length + " item" + (this.manager.nodes.length != 1 ? "s" : "");	
+		return this.manager.nodes.length.toString();
 	}
 });
 

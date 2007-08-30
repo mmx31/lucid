@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojo.dnd.selector"]){
+if(!dojo._hasResource["dojo.dnd.selector"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojo.dnd.selector"] = true;
 dojo.provide("dojo.dnd.selector");
 
@@ -12,25 +12,26 @@ dojo.require("dojo.dnd.container");
 		"Anchor"	- an item is selected, and is an anchor for a "shift" selection
 */
 
-dojo.declare("dojo.dnd.Selector", dojo.dnd.Container,
+dojo.declare("dojo.dnd.Selector", dojo.dnd.Container, {
 	// summary: a Selector object, which knows how to select its children
-function(node, params){
-	// summary: a constructor of the Selector
-	// node: Node: node or node's id to build the selector on
-	// params: Object: a dict of parameters, recognized parameters are:
-	//	singular: Boolean: allows selection of only one element, if true
-	//	the rest of parameters are passed to the container
-	this.singular = params && params.singular;
-	// class-specific variables
-	this.selection = {};
-	this.anchor = null;
-	this.simpleSelection = false;
-	// set up events
-	this.events.push(
-		dojo.connect(this.node, "onmousedown", this, "onMouseDown"),
-		dojo.connect(this.node, "onmouseup",   this, "onMouseUp"));
-},
-{
+	
+	constructor: function(node, params){
+		// summary: a constructor of the Selector
+		// node: Node: node or node's id to build the selector on
+		// params: Object: a dict of parameters, recognized parameters are:
+		//	singular: Boolean: allows selection of only one element, if true
+		//	the rest of parameters are passed to the container
+		this.singular = params && params.singular;
+		// class-specific variables
+		this.selection = {};
+		this.anchor = null;
+		this.simpleSelection = false;
+		// set up events
+		this.events.push(
+			dojo.connect(this.node, "onmousedown", this, "onMouseDown"),
+			dojo.connect(this.node, "onmouseup",   this, "onMouseUp"));
+	},
+	
 	// object attributes (for markup)
 	singular: false,	// is singular property
 	
@@ -38,11 +39,10 @@ function(node, params){
 	getSelectedNodes: function(){
 		// summary: returns a list (an array) of selected nodes
 		var t = new dojo.NodeList();
-		var empty = {};
+		var e = dojo.dnd._empty;
 		for(var i in this.selection){
-			if(!(i in empty)){
-				t.push(dojo.byId(i));
-			}
+			if(i in e){ continue; }
+			t.push(dojo.byId(i));
 		}
 		return t;	// Array
 	},
@@ -52,23 +52,20 @@ function(node, params){
 	},
 	selectAll: function(){
 		// summary: selects all items
-		var empty = {};
-		for(var id in this.map){
-			if(id in empty){ continue; }
+		this.forInItems(function(data, id){
 			this._addItemClass(dojo.byId(id), "Selected");
 			this.selection[id] = 1;
-		}
+		}, this);
 		return this._removeAnchor();	// self
 	},
 	deleteSelectedNodes: function(){
 		// summary: deletes all selected items
-		var empty = {};
+		var e = dojo.dnd._empty;
 		for(var i in this.selection){
-			if(!(i in empty)){
-				var n = dojo.byId(i);
-				delete this.map[i];
-				dojo._destroyElement(n);
-			}
+			if(i in e){ continue; }
+			var n = dojo.byId(i);
+			this.delItem(i);
+			dojo._destroyElement(n);
 		}
 		this.anchor = null;
 		this.selection = {};
@@ -225,12 +222,11 @@ function(node, params){
 	},
 	_removeSelection: function(){
 		// summary: unselects all items
-		var empty = {};
+		var e = dojo.dnd._empty;
 		for(var i in this.selection){
-			if(!(i in empty)){
-				var node = dojo.byId(i);
-				if(node){ this._removeItemClass(node, "Selected"); }
-			}
+			if(i in e){ continue; }
+			var node = dojo.byId(i);
+			if(node){ this._removeItemClass(node, "Selected"); }
 		}
 		this.selection = {};
 		return this;	// self

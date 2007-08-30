@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.uuid.generateRandomUuid"]){
+if(!dojo._hasResource["dojox.uuid.generateRandomUuid"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.uuid.generateRandomUuid"] = true;
 dojo.provide("dojox.uuid.generateRandomUuid");
 

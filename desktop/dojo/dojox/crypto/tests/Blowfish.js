@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.crypto.tests.Blowfish"]){
+if(!dojo._hasResource["dojox.crypto.tests.Blowfish"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.crypto.tests.Blowfish"] = true;
 dojo.provide("dojox.crypto.tests.Blowfish");
 dojo.require("dojox.crypto.Blowfish");

@@ -30,6 +30,7 @@
 		dojo.require('dojox.layout.ContentPane');
 		dojo.require('dojo.parser');
 		dojo.require('dijit._Container');
+		dojo.require('dijit._Templated');
 
 
 		// create a do nothing, only for test widget
@@ -554,6 +555,21 @@
 							setTimeout(d.getTestCallback(function(){
 								t.assertEqual('number', typeof unTypedVarInDocScope);
 								t.assertEqual(1, unTypedVarInDocScope);
+							}), 40);
+							return d;
+						}
+					},
+					{
+						name: 'scriptsWithTypeTextJavascript',
+						runTest: function(t){
+							pane1.setContent("<"
+								+"script type='text/javascript'> unTypedVarInDocScope = 'text/javascript'; <"
+								+"/script>");
+
+							var d = new t.Deferred();
+							// IE needs async here
+							setTimeout(d.getTestCallback(function(){
+								t.assertEqual('text/javascript', unTypedVarInDocScope);
 							}), 40);
 							return d;
 						}

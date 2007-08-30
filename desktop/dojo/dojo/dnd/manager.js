@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojo.dnd.manager"]){
+if(!dojo._hasResource["dojo.dnd.manager"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojo.dnd.manager"] = true;
 dojo.provide("dojo.dnd.manager");
 

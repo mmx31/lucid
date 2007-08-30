@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojo.dnd.move"]){
+if(!dojo._hasResource["dojo.dnd.move"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojo.dnd.move"] = true;
 dojo.provide("dojo.dnd.move");
 
@@ -105,16 +105,7 @@ dojo.extend(dojo.dnd.Moveable, {
 	onMouseDown: function(e){
 		// summary: event processor for onmousedown, creates a Mover for the node
 		// e: Event: mouse event
-		if(this.skip){
-			var t = e.target;
-			if(t.nodeType == 3 /*TEXT_NODE*/){
-				t = t.parentNode;
-			}
-			// do not trigger move if user interacts with form elements
-			if(" button textarea input select option ".indexOf(" " + t.tagName.toLowerCase() + " ") >= 0) {
-				return;
-			}
-		}
+		if(this.skip && dojo.dnd.isFormElement(e)){ return; }
 		if(this.delay){
 			this.events.push(dojo.connect(this.handle, "onmousemove", this, "onMouseMove"));
 			this.events.push(dojo.connect(this.handle, "onmouseup", this, "onMouseUp"));

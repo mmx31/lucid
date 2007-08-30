@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.wire.tests.programmatic.TableAdapter"]){
+if(!dojo._hasResource["dojox.wire.tests.programmatic.TableAdapter"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.wire.tests.programmatic.TableAdapter"] = true;
 dojo.provide("dojox.wire.tests.programmatic.TableAdapter");
 

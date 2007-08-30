@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.wire.tests.programmatic.XmlWire"]){
+if(!dojo._hasResource["dojox.wire.tests.programmatic.XmlWire"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.wire.tests.programmatic.XmlWire"] = true;
 dojo.provide("dojox.wire.tests.programmatic.XmlWire");
 

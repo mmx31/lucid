@@ -1,4 +1,4 @@
-if(!dojo._hasResource["tests.currency"]){
+if(!dojo._hasResource["tests.currency"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["tests.currency"] = true;
 dojo.provide("tests.currency");
 
@@ -15,8 +15,8 @@ tests.register("tests.currency",
 			setUp: function(){
 				var partLocaleList = ["en-us", "en-ca", "de-de"];
 				for(var i = 0 ; i < partLocaleList.length; i ++){
-					dojo.requireLocalization("dojo.cldr","currency",partLocaleList[i], "en-us,en,en-au,fr,ja,zh,en-ca,pt,ROOT,es,it,ko,de");
-					dojo.requireLocalization("dojo.cldr","number",partLocaleList[i], "en-us,en,ROOT,ja-jp,zh-tw,fr,en-ca,pt,de-de,es,es-es,it,de,zh-cn,ko-kr");
+					dojo.requireLocalization("dojo.cldr","currency",partLocaleList[i], "ko,zh,ja,en,en-ca,en-au,ROOT,en-us,it,fr,pt,es,de");
+					dojo.requireLocalization("dojo.cldr","number",partLocaleList[i], "zh-cn,en,en-ca,zh-tw,en-us,it,ja-jp,ROOT,de-de,es-es,fr,pt,ko-kr,es,de");
 				}
 			},
 			runTest: function(t){

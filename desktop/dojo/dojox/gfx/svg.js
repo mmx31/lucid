@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.gfx.svg"]){
+if(!dojo._hasResource["dojox.gfx.svg"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.gfx.svg"] = true;
 dojo.provide("dojox.gfx.svg");
 
@@ -89,6 +89,7 @@ dojo.extend(dojox.gfx.Shape, {
 					dojo.forEach(["x", "y", "width", "height"], setter, pattern);
 					break;
 			}
+			this.fillStyle = f;
 			return this;
 		}
 		// color object
@@ -125,7 +126,7 @@ dojo.extend(dojox.gfx.Shape, {
 			rn.setAttribute("stroke-opacity", s.color.a);
 			rn.setAttribute("stroke-width",   s.width);
 			rn.setAttribute("stroke-linecap", s.cap);
-			if(typeof(s.join) == "number"){
+			if(typeof s.join == "number"){
 				rn.setAttribute("stroke-linejoin",   "miter");
 				rn.setAttribute("stroke-miterlimit", s.join);
 			}else{
@@ -134,6 +135,7 @@ dojo.extend(dojox.gfx.Shape, {
 			var da = s.style.toLowerCase();
 			if(da in dojox.gfx.svg.dasharray){ da = dojox.gfx.svg.dasharray[da]; }
 			if(da instanceof Array){
+				da = dojo.clone(da);
 				for(var i = 0; i < da.length; ++i){
 					da[i] *= s.width;
 				}
@@ -202,6 +204,7 @@ dojo.extend(dojox.gfx.Shape, {
 				var t = document.createElementNS(svgns, "stop");
 				t.setAttribute("offset",     f.colors[i].offset.toFixed(8));
 				t.setAttribute("stop-color", f.colors[i].color.toCss());
+				t.setAttribute("stop-opacity", f.colors[i].color.a);
 				fill.appendChild(t);
 			}
 		}
@@ -406,7 +409,7 @@ dojo.extend(dojox.gfx.Shape, {
 dojo.declare("dojox.gfx.Group", dojox.gfx.Shape, {
 	// summary: a group shape (SVG), which can be used 
 	//	to logically group shapes (e.g, to propagate matricies)
-
+	
 	setRawNode: function(rawNode){
 		// summary: sets a raw SVG node to be used by this shape
 		// rawNode: Node: an SVG node
@@ -808,6 +811,7 @@ dojox.gfx.svg._creators = {
 		this.add(shape);
 		return shape;	// dojox.gfx.Shape
 	},
+	createShape: dojox.gfx._createShape,
 	// group control
 	add: function(shape){
 		// summary: adds a shape to a group/surface
@@ -945,11 +949,13 @@ delete dojox.gfx.svg._creators;
 dojox.gfx.svg.Defines = function(){
 	this.rawNode = null;
 };
+
 dojo.extend(dojox.gfx.svg.Defines, {
 	setRawNode: function(rawNode){
 		this.rawNode = rawNode;
 	}
 });
+
 dojox.gfx.svg.Defines.nodeType = "defs";
 
 }

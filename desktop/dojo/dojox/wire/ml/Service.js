@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.wire.ml.Service"]){
+if(!dojo._hasResource["dojox.wire.ml.Service"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.wire.ml.Service"] = true;
 dojo.provide("dojox.wire.ml.Service");
 dojo.provide("dojox.wire.ml.RestHandler");
@@ -10,8 +10,7 @@ dojo.require("dojox.data.dom");
 dojo.require("dojox.wire._base");
 dojo.require("dojox.wire.ml.util");
 
-dojo.declare("dojox.wire.ml.Service",
-	dijit._Widget, {
+dojo.declare("dojox.wire.ml.Service", dijit._Widget, {
 	//	summary:
 	//		A widget for a service
 	//	description:
@@ -107,8 +106,7 @@ dojo.declare("dojox.wire.ml.Service",
 	}
 });
 
-dojo.declare("dojox.wire.ml.RestHandler",
-	null, {
+dojo.declare("dojox.wire.ml.RestHandler", null, {
 	//	summary:
 	//		A REST service handler
 	//	description:
@@ -238,8 +236,7 @@ dojo.declare("dojox.wire.ml.RestHandler",
 	}
 });
 
-dojo.declare("dojox.wire.ml.XmlHandler",
-	dojox.wire.ml.RestHandler, {
+dojo.declare("dojox.wire.ml.XmlHandler", dojox.wire.ml.RestHandler, {
 	//	summary:
 	//		A REST service handler for XML
 	//	description:
@@ -295,8 +292,7 @@ dojo.declare("dojox.wire.ml.XmlHandler",
 	}
 });
 
-dojo.declare("dojox.wire.ml.JsonHandler",
-	dojox.wire.ml.RestHandler, {
+dojo.declare("dojox.wire.ml.JsonHandler", dojox.wire.ml.RestHandler, {
 	//	summary:
 	//		A REST service handler for JSON
 	//	description:

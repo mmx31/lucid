@@ -1,4 +1,4 @@
-if(!dojo._hasResource["tests.date.locale"]){
+if(!dojo._hasResource["tests.date.locale"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["tests.date.locale"] = true;
 dojo.provide("tests.date.locale");
 
@@ -16,7 +16,7 @@ tests.register("tests.date.locale",
 				var partLocaleList = ["en-us", "fr-fr", "es", "de-at", "ja-jp", "zh-cn"];
 
 				for(var i = 0 ; i < partLocaleList.length; i ++){
-					dojo.requireLocalization("dojo.cldr","gregorian",partLocaleList[i], "ROOT,en,en-au,fr,ja,zh,en-ca,pt-br,pt,es,es-es,it,ko,de,zh-cn,ko-kr,en-gb,it-it");
+					dojo.requireLocalization("dojo.cldr","gregorian",partLocaleList[i], "ko,zh-cn,zh,ja,en,it-it,en-ca,en-au,it,en-gb,es-es,fr,pt,ROOT,ko-kr,es,de,pt-br");
 				}
 			},
 			runTest: function(t){

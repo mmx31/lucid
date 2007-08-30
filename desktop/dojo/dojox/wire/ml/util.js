@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.wire.ml.util"]){
+if(!dojo._hasResource["dojox.wire.ml.util"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.wire.ml.util"] = true;
 dojo.provide("dojox.wire.ml.util");
 
@@ -70,9 +70,13 @@ dojox.wire.ml._setValue = function(/*String*/target, /*anything*/value){
 	new dojox.wire.Wire({object: object, property: property}).setValue(value);
 };
 
-dojo.declare("dojox.wire.ml.XmlElement",
-	null,
-	function(/*Element||String*/element){
+dojo.declare("dojox.wire.ml.XmlElement", null, {
+	//	summary:
+	//		An object wrapping an XML element
+	//	description:
+	//		This class represents an XML element.
+
+	constructor: function(/*Element||String*/element){
 		//	summary:
 		//		Initialize with an XML element or a tag name
 		//	element:
@@ -81,12 +85,7 @@ dojo.declare("dojox.wire.ml.XmlElement",
 			element = this._getDocument().createElement(element);
 		}
 		this.element = element;
-	}, {
-	//	summary:
-	//		An object wrapping an XML element
-	//	description:
-	//		This class represents an XML element.
-
+	},
 	getPropertyValue: function(/*String*/property){
 		//	summary:
 		//		Return a property value

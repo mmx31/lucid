@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.off.files"]){
+if(!dojo._hasResource["dojox.off.files"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.off.files"] = true;
 dojo.provide("dojox.off.files");
 

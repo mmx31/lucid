@@ -1,10 +1,10 @@
-if(!dojo._hasResource["dojox.wire.tests.programmatic.Wire"]){
+if(!dojo._hasResource["dojox.wire.tests.programmatic.Wire"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.wire.tests.programmatic.Wire"] = true;
 dojo.provide("dojox.wire.tests.programmatic.Wire");
 dojo.require("dojox.wire.Wire");
 
 //Simple connverter class to try to use.
-dojo.declare("dojox.wire.tests.programmatic.Wire.Converter", null, null, {
+dojo.declare("dojox.wire.tests.programmatic.Wire.Converter", null, {
 	convert: function(v){
 		return v + 1;
 	}

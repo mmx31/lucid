@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.off.sync"]){
+if(!dojo._hasResource["dojox.off.sync"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.off.sync"] = true;
 dojo.provide("dojox.off.sync");
 
@@ -378,7 +378,7 @@ dojo.mixin(dojox.off.sync, {
 //		Note that the actions log is always automatically persisted locally while using it, so
 //		that if the user closes the browser or it crashes the actions will safely be stored
 //		for later replaying.
-dojo.declare("dojox.off.sync.ActionLog", null, null, {
+dojo.declare("dojox.off.sync.ActionLog", null, {
 		// entries: Array
 		//		An array of our action entries, where each one is simply a custom
 		//		object literal that were passed to add() when this action entry

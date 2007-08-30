@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.form._FormWidget"]){
+if(!dojo._hasResource["dijit.form._FormWidget"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.form._FormWidget"] = true;
 dojo.provide("dijit.form._FormWidget");
 
@@ -67,6 +67,12 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 		if(this.focusNode){
 			this.focusNode.disabled = disabled;
 		}
+		if(disabled){
+			//reset those, because after the domNode is disabled, we can no longer receive
+			//mouse related events, see #4200
+			this._hovering = false;
+			this._active = false;
+		}
 		dijit.wai.setAttr(this.focusNode || this.domNode, "waiState", "disabled", disabled);
 		this._setStateClass();
 	},
@@ -87,7 +93,7 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 				case "mouseover" :
 					this._hovering = true;
 					var baseClass, node=mouseNode;
-					while( !(baseClass=node.getAttribute("baseClass")) && node != this.domNode ){
+					while( node.nodeType===1 && !(baseClass=node.getAttribute("baseClass")) && node != this.domNode ){
 						node=node.parentNode;
 					}
 					this.baseClass= baseClass || "dijit"+this.declaredClass.replace(/.*\./g,"");
@@ -102,7 +108,6 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 					this._active = true;
 					// set a global event to handle mouseup, so it fires properly
 					//	even if the cursor leaves the button
-					this._active = true;
 					var self = this;
 					// #2685: use this.connect and disconnect so destroy works properly
 					var mouseUpConnector = this.connect(dojo.body(), "onmouseup", function(){
@@ -129,7 +134,8 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 		//		<baseClass>
 		//		<baseClass> + "Disabled"	- if the widget is disabled
 		//		<baseClass> + "Active"		- if the mouse (or space/enter key?) is being pressed down
-		//		<baseClass> + "Hover"		- if the mouse is over the widget (TODO: also on focus?)
+		//		<baseClass> + "Hover"		- if the mouse is over the widget
+		//		<baseClass> + "Focused"		- if the widget has focus
 		//
 		//	Note: if you don't want to change the way the widget looks on hover, then don't call
 		//	this routine on hover.  Similarly for mousedown --> active
@@ -140,12 +146,14 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 		//		<baseClass> + "CheckedDisabled"	- if the widget is disabled
 		//		<baseClass> + "CheckedActive"		- if the mouse is being pressed down
 		//		<baseClass> + "CheckedHover"		- if the mouse is over the widget
+		//		<baseClass> + "CheckedFocused"		- if the widget has focus
 
 		// get original class (non state related) specified in template
-		var origClass = this._origClass || (this._origClass = this.domNode.className);
+		var origClass = (this.styleNode||this.domNode).className;
 
 		// compute list of classname representing the states of the widget
-		var base = this.baseClass || this.domNode.getAttribute("baseClass");
+		var base = this.baseClass || this.domNode.getAttribute("baseClass") || "dijitFormWidget";
+		origClass = origClass.replace(new RegExp("\\b"+base+"(Checked)?(Selected)?(Disabled|Active|Focused|Hover)?\\b\\s*", "g"), "");
 		var classes = [ base ];
 		
 		function multiply(modifier){
@@ -159,17 +167,19 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 			multiply("Selected");
 		}
 		
-		// Only one of these three can be applied.
-		// Active trumps Hover, and Disabled trumps Active.
+		// Only one of these four can be applied.
+		// Active trumps Focused, Focused trumps Hover, and Disabled trumps all.
 		if(this.disabled){
 			multiply("Disabled");
 		}else if(this._active){
 			multiply("Active");
+		}else if(this._focused){
+			multiply("Focused");
 		}else if(this._hovering){
 			multiply("Hover");
 		}
 
-		this.domNode.className = origClass + " " + classes.join(" ");
+		(this.styleNode || this.domNode).className = origClass + " " + classes.join(" ");
 	},
 
 	onChange: function(newValue){
@@ -177,9 +187,9 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 	},
 
 	postCreate: function(){
+		this.setValue(this.value, true);
 		this.setDisabled(this.disabled);
 		this._setStateClass();
-		this.setValue(this.value, true);
 	},
 
 	setValue: function(/*anything*/ newValue, /*Boolean, optional*/ priorityChange){
@@ -205,7 +215,11 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 	_onKeyPress: function(e){
 		if(e.keyCode == dojo.keys.ESCAPE && !e.shiftKey && !e.ctrlKey && !e.altKey){
 			var v = this.getValue();
-			if(v != this._lastValueReported && this._lastValueReported != undefined){
+			var lv = this._lastValueReported;
+			// Equality comparison of objects such as dates are done by reference so 
+			// two distinct objects are != even if they have the same data. So use 
+			// toStrings in case the values are objects.
+			if(lv != undefined && v.toString() != lv.toString()){	
 				this.undo();
 				dojo.stopEvent(e);
 				return false;
@@ -220,17 +234,6 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 		// 		This method may be overridden by subclasses that want
 		// 		to use something other than this.getValue() for valuenow
 		return this.getValue();
-	},
-
-	resize:function(/*Object*/ contentBox){
-		// summary:
-		//		Explicitly set this widget's size (in pixels).
-		//		Unlike layout containers, this sets the content box size.
-		//		Subwidgets may override this function
-		//	
-		// contentBox: Object
-		//		{w: int, h: int}
-		dojo.contentBox(this.domNode, contentBox);
 	}
 });
 

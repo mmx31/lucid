@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojo.date.locale"]){
+if(!dojo._hasResource["dojo.date.locale"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojo.date.locale"] = true;
 dojo.provide("dojo.date.locale");
 
@@ -12,7 +12,7 @@ dojo.require("dojo.i18n");
 
 // Load the bundles containing localization information for
 // names and formats
-dojo.requireLocalization("dojo.cldr", "gregorian", null, "ROOT,en,en-au,fr,ja,zh,en-ca,pt-br,pt,es,es-es,it,ko,de,zh-cn,ko-kr,en-gb,it-it");
+dojo.requireLocalization("dojo.cldr", "gregorian", null, "ko,zh-cn,zh,ja,en,it-it,en-ca,en-au,it,en-gb,es-es,fr,pt,ROOT,ko-kr,es,de,pt-br");
 
 //NOTE: Everything in this module assumes Gregorian calendars.
 // Other calendars will be implemented in separate modules.

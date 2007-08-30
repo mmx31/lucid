@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.data.tests.stores.HtmlTableStore"]){
+if(!dojo._hasResource["dojox.data.tests.stores.HtmlTableStore"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.data.tests.stores.HtmlTableStore"] = true;
 dojo.provide("dojox.data.tests.stores.HtmlTableStore");
 dojo.require("dojox.data.HtmlTableStore");

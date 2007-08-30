@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.layout.StackContainer"]){
+if(!dojo._hasResource["dijit.layout.StackContainer"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.layout.StackContainer"] = true;
 dojo.provide("dijit.layout.StackContainer");
 
@@ -25,6 +25,8 @@ dojo.declare(
 	_started: false,
 
 	startup: function(){
+		if(this._started){ return; }
+
 		var children = this.getChildren();
 
 		// Setup each page panel
@@ -70,19 +72,16 @@ dojo.declare(
 		dijit._Container.prototype.addChild.apply(this, arguments);
 		child = this._setupChild(child);
 
-		var started = this._started;
-		if(started){
+		if(this._started){
 			// in case the tab titles have overflowed from one line to two lines
 			this.layout();
-		}
 
-		if(started){
 			dojo.publish(this.id+"-addChild", [child]);
-		}
 
-		// if this is the first child, then select it
-		if(!this.selectedChildWidget && started){
-			this.selectChild(child);
+			// if this is the first child, then select it
+			if(!this.selectedChildWidget){
+				this.selectChild(child);
+			}
 		}
 	},
 
@@ -164,7 +163,9 @@ dojo.declare(
 			switch(e.keyCode){
 				case dojo.keys.PAGE_DOWN:
 				case dojo.keys.PAGE_UP:
-					if (e.keyCode == dojo.keys.PAGE_DOWN){
+				case dojo.keys.TAB:
+					if ((e.keyCode == dojo.keys.PAGE_DOWN) ||
+						(e.keyCode == dojo.keys.TAB && !e.shiftKey)){
 						this.forward();
 					}else{
 						this.back();

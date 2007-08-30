@@ -33,8 +33,7 @@
 		dojo.require("dojox.wire.ml.Transfer");
 		dojo.require("dojox.wire.ml.Data");
 
-		dojo.require("dijit.form.Textbox");
-		dojo.require("dijit.form.Textarea");
+		dojo.require("dijit.form.TextBox");
 	</script>
 </head>
 
@@ -48,33 +47,19 @@
 	<table>
 		<tr>
 			<td>
-				<div dojoType="dijit.form.Textbox" jsId="inputField" value="" size="50"></div>
+				<div dojoType="dijit.form.TextBox" jsId="inputField" value="" size="50"></div>
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<div dojoType="dijit.form.Textbox" jsId="targetField1" value="" disabled="true" size="50"></div>
+				<div dojoType="dijit.form.TextBox" jsId="targetField1" value="" disabled="true" size="50"></div>
 			</td>
 		</tr>
 	</table>
 
 
 	<!-------------------------------- Using dojox.wire, declaratively wire up the widgets. --------------------------->
-
-	<!--
-		This is an example of using the declarative data value definition.
-		These are effectively declarative variables to act as placeholders
-		for data values.
-	-->
-	<div dojoType="dojox.wire.ml.Data"
-		jsId="data">
-		<div dojoType="dojox.wire.ml.DataProperty"
-			name="tempData"
-			value="">
-		</div>
-	</div>
-
-
+	
 	<!-- 
 		Whenever a key is entered into the textbox, publish the value of it to a topic.
 	-->
@@ -82,12 +67,11 @@
 		id="action1"
 		trigger="inputField"
 		triggerEvent="onkeyup">
-		<div dojoType="dojox.wire.ml.Invocation" object="inputField"    method="getValue" result="data.tempData"></div>
-		<div dojoType="dojox.wire.ml.Invocation" topic="sampleTopic"    parameters="data.tempData"></div>
+		<div dojoType="dojox.wire.ml.Invocation" topic="sampleTopic"    parameters="inputField.value"></div>
 	</div>    
 
 	<!-- 
-		Whenever a value is published to a topic, set it as the value of the textbox
+		Whenever a value is published to a topic, set it as the value of the textbox by calling the setValue function.
 	-->
 	<div dojoType="dojox.wire.ml.Invocation" triggerTopic="sampleTopic" object="targetField1"    method="setValue" parameters="arguments[0]"></div>
 </body>

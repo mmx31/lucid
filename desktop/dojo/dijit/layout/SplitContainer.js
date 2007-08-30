@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.layout.SplitContainer"]){
+if(!dojo._hasResource["dijit.layout.SplitContainer"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.layout.SplitContainer"] = true;
 dojo.provide("dijit.layout.SplitContainer");
 
@@ -80,10 +80,10 @@ dojo.declare(
 	},
 
 	startup: function(){
+		if(this._started){ return; }
 		dojo.forEach(this.getChildren(), function(child, i, children){
 			// attach the children and create the draggers
-			child.domNode.style.position = "absolute";
-			dojo.addClass(child.domNode, "dijitSplitPane");
+			this._injectChild(child);
 
 			if(i < children.length-1){
 				this._addSizer();
@@ -140,13 +140,16 @@ dojo.declare(
 
 	addChild: function(/*Widget*/ child, /*Integer?*/ insertIndex){
 		dijit._Container.prototype.addChild.apply(this, arguments);
-		this._injectChild(child);
 
-		var children = this.getChildren();
-		if(children.length > 1){
-			this._addSizer();
-		}
 		if(this._started){
+			// Do the stuff that startup() does for each widget
+			this._injectChild(child);
+			var children = this.getChildren();
+			if(children.length > 1){
+				this._addSizer();
+			}
+			
+			// and then reposition (ie, shrink) every pane to make room for the new guy
 			this.layout();
 		}
 	},

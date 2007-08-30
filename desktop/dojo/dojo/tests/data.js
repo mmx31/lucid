@@ -1,4 +1,4 @@
-if(!dojo._hasResource["tests.data"]){
+if(!dojo._hasResource["tests.data"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["tests.data"] = true;
 dojo.provide("tests.data");
 dojo.require("tests.data.utils");

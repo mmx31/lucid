@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.fx._base"]){
+if(!dojo._hasResource["dojox.fx._base"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.fx._base"] = true;
 dojo.provide("dojox.fx._base");
 dojo.experimental("dojox.fx");
@@ -10,8 +10,8 @@ dojo.require("dojo.fx");
 // for the dojo.fx animation cases.
 dojox.fx.chain = dojo.fx.chain;
 dojox.fx.combine = dojo.fx.combine;
-dojox.fx.slideIn = dojo.fx.slideIn;
-dojox.fx.slideOut = dojo.fx.slideOut;
+dojox.fx.wipeIn = dojo.fx.wipeIn;
+dojox.fx.wipeOut = dojo.fx.wipeOut;
 dojox.fx.slideTo = dojo.fx.slideTo;
 
 /* dojox.fx _Animations: */
@@ -36,7 +36,7 @@ dojox.fx.sizeTo = function(/* Object */args){
 	//	}).play();
 	//
 	//
-	var node = args.node = dojo.byId(args.node);
+	var node = (args.node = dojo.byId(args.node));
 	var compute = dojo.getComputedStyle;
 
 	var method = args.method || "chain"; 
@@ -82,19 +82,14 @@ dojox.fx.sizeTo = function(/* Object */args){
 	}, args));
 
 	// FIXME: 
-	// dojo.fx[args.method]([anim1,anim2]); 	
-	if(args.method == "combine"){
-		var anim = dojo.fx.combine([anim1,anim2]);
-	}else{
-		var anim = dojo.fx.chain([anim1,anim2]);
-	}
+	// dojo.fx[args.method]([anim1,anim2]);
+	var anim = dojo.fx[((args.method == "combine") ? "combine" : "chain")]([anim1,anim2]);
 	dojo.connect(anim, "beforeBegin", anim, init);
 	return anim; // dojo._Animation
 };
 
 
 /* dojox.fx CSS Class _Animations: */
-
 dojox.fx.addClass = function(/* Object */args){
 	// summary:
 	//		returns an animation that will animate
@@ -108,7 +103,7 @@ dojox.fx.addClass = function(/* Object */args){
 	//
 	//		args.cssClass: String - class string (to be added onEnd)
 	//		
-	var node = args.node = dojo.byId(args.node); 
+	var node = (args.node = dojo.byId(args.node)); 
 
 	var pushClass = (function(){
 		// summary: onEnd we want to add the class to the node 
@@ -149,7 +144,7 @@ dojox.fx.removeClass = function(/* Object */args){
 	//
 	//	args.cssClass: String - class string (to be removed from node)
 	//		
-	var node = args.node = dojo.byId(args.node); 
+	var node = (args.node = dojo.byId(args.node)); 
 
 	var pullClass = (function(){
 		// summary: onEnd we want to remove the class from the node 
@@ -172,7 +167,21 @@ dojox.fx.removeClass = function(/* Object */args){
 		properties: mixedProperties
 	},args));
 	dojo.connect(_anim,"onEnd",_anim,pullClass); 
-	return _anim; 
+	return _anim; // dojo._Animation
+};
+
+dojox.fx.toggleClass = function(/*HTMLElement*/node, /*String*/classStr, /*Boolean?*/condition){
+        //      summary:
+	//		creates an animation that will animate the effect of 
+	//		toggling a class on or off of a node.
+        //              Adds a class to node if not present, or removes if present.
+        //              Pass a boolean condition if you want to explicitly add or remove.
+        //      condition:
+        //              If passed, true means to add the class, false means to remove.
+        if(typeof condition == "undefined"){
+                condition = !dojo.hasClass(node, classStr);
+        }
+        return dojox.fx[(condition ? "addClass" : "removeClass")](node, classStr); // dojo._Animation
 };
 
 dojox.fx._allowedProperties = [
@@ -182,28 +191,26 @@ dojox.fx._allowedProperties = [
 	//	"predict" intent, or even something more clever ... 
 	//	open to suggestions.
 
+	// no-brainers:
 	"width",
 	"height",
-
+	// only if position = absolute || relative?
+	"left", "top", "right", "bottom", 
 	// these need to be filtered through dojo.colors?
 	// "background", // normalize to:
-		/* "backgroundImage", */
-		"backgroundColor", // so we can use background offset?
-	"color",
+	/* "backgroundImage", */
+	"backgroundPosition", // FIXME: to be effective, this needs "#px #px"?
+	"backgroundColor",
 
+	"color",
 	//
 	// "border", // the normalize on this one will be _hideous_ 
 	//	(color/style/width)
 	//	(left,top,right,bottom for each of _those_)
 	//
-
-	// only if pos = absolute || relative?
-	"left", "top", "right", "bottom", 
-
-	"padding", // normalize to: 
+	// "padding", // normalize to: 
 	"paddingLeft", "paddingRight", "paddingTop", "paddingBottom",
-
-	"margin", // normalize to:
+	// "margin", // normalize to:
 	"marginLeft", "marginTop", "marginRight", "marginBottom",
 
 	// unit import/delicate?:
@@ -219,9 +226,8 @@ dojox.fx._getStyleSnapshot = function(/* Object */cache){
 	// 	properties. 
 	//
 	// returns:  Array
-	//	an array of raw, calculcated values, to be normalized/compared
+	//	an array of raw, calculcated values (no keys), to be normalized/compared
 	//	elsewhere	
-
 	return dojo.map(dojox.fx._allowedProperties,function(style){
 		return cache[style]; // String
 	}); // Array
@@ -242,7 +248,7 @@ dojox.fx._getCalculatedStyleChanges = function(/* Object */args, /*Boolean*/addC
 	// 	true to calculate what adding a class would do, 
 	// 	false to calculate what removing the class would do
 
-	var node = args.node = dojo.byId(args.node); 
+	var node = (args.node = dojo.byId(args.node)); 
 	var compute = dojo.getComputedStyle(node);
 
 	// take our snapShots

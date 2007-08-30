@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.off._common"]){
+if(!dojo._hasResource["dojox.off._common"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.off._common"] = true;
 dojo.provide("dojox.off._common");
 

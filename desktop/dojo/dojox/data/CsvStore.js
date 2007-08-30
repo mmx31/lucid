@@ -1,31 +1,11 @@
-if(!dojo._hasResource["dojox.data.CsvStore"]){
+if(!dojo._hasResource["dojox.data.CsvStore"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.data.CsvStore"] = true;
 dojo.provide("dojox.data.CsvStore");
 
 dojo.require("dojo.data.util.filter");
 dojo.require("dojo.data.util.simpleFetch");
 
-dojo.declare("dojox.data.CsvStore",
-	null,
-	function(/* Object */ keywordParameters){
-		// summary: initializer
-		// keywordParameters: {url: String}
-		// keywordParameters: {data: String}
-		// keywordParameters: {label: String} The column label for the column to use for the label returned by getLabel.
-		
-		this._attributes = [];			// e.g. ["Title", "Year", "Producer"]
-		this._attributeIndexes = {};	// e.g. {Title: 0, Year: 1, Producer: 2}
- 		this._dataArray = [];			// e.g. [[<Item0>],[<Item1>],[<Item2>]]
- 		this._arrayOfAllItems = [];		// e.g. [{_csvId:0,_csvStore:store},...]
-		this._loadFinished = false;
-		this._csvFileUrl = keywordParameters.url;
-		this._csvData = keywordParameters.data;
-		this._labelAttr = keywordParameters.label;
-		this._storeProp = "_csvStore";	// Property name for the store reference on every item.
-		this._idProp = "_csvId"; 		// Property name for the Item Id on every item.
-		this._features = {	'dojo.data.api.Read': true,
-							'dojo.data.api.Identity': true };
-	},{
+dojo.declare("dojox.data.CsvStore", null, {
 	//	summary:
 	//		The CsvStore implements the dojo.data.api.Read API and reads
 	//		data from files in CSV (Comma Separated Values) format.
@@ -46,6 +26,30 @@ dojo.declare("dojox.data.CsvStore",
 	 *   var csvStore = new dojox.data.CsvStore({url:"http://example.com/movies.csv");
 	 */
 
+	constructor: function(/* Object */ keywordParameters){
+		// summary: initializer
+		// keywordParameters: {url: String}
+		// keywordParameters: {data: String}
+		// keywordParameters: {label: String} The column label for the column to use for the label returned by getLabel.
+		
+		this._attributes = [];			// e.g. ["Title", "Year", "Producer"]
+		this._attributeIndexes = {};	// e.g. {Title: 0, Year: 1, Producer: 2}
+ 		this._dataArray = [];			// e.g. [[<Item0>],[<Item1>],[<Item2>]]
+ 		this._arrayOfAllItems = [];		// e.g. [{_csvId:0,_csvStore:store},...]
+		this._loadFinished = false;
+		this._csvFileUrl = keywordParameters.url;
+		this._csvData = keywordParameters.data;
+		this._labelAttr = keywordParameters.label;
+		this._storeProp = "_csvStore";	// Property name for the store reference on every item.
+		this._idProp = "_csvId"; 		// Property name for the Item Id on every item.
+		this._features = {	
+			'dojo.data.api.Read': true,
+			'dojo.data.api.Identity': true 
+		};
+		this._loadInProgress = false;	//Got to track the initial load to prevent duelling loads of the dataset.
+		this._queuedFetches = [];
+	},
+	
 	_assertIsItem: function(/* item */ item){
 		//	summary:
 		//      This function tests whether the item passed in is indeed an item in the store.
@@ -65,7 +69,6 @@ dojo.declare("dojox.data.CsvStore",
 			throw new Error("dojox.data.CsvStore: a function was passed an attribute argument that was not an attribute object nor an attribute name string");
 		}
 	},
-	
 
 /***************************************
      dojo.data.api.Read API
@@ -238,6 +241,7 @@ dojo.declare("dojox.data.CsvStore",
 		//		See dojo.data.util.simpleFetch.fetch()
 		
 		var self = this;
+
 		var filter = function(requestArgs, arrayOfAllItems){
 			var items = null;
 			if(requestArgs.query){
@@ -278,21 +282,31 @@ dojo.declare("dojox.data.CsvStore",
 		};
 
 		if(this._loadFinished){
-			filter(keywordArgs, this._dataArray);
+			filter(keywordArgs, this._arrayOfAllItems);
 		}else{
 			if(this._csvFileUrl){
-				var getArgs = {
-						url: self._csvFileUrl, 
-						handleAs: "text"
-					};
-				var getHandler = dojo.xhrGet(getArgs);
-				getHandler.addCallback(function(data){
-					self._processData(data);
-					filter(keywordArgs, self._arrayOfAllItems);
-				});
-				getHandler.addErrback(function(error){
-					throw error;
-				});
+				//If fetches come in before the loading has finished, but while
+				//a load is in progress, we have to defer the fetching to be 
+				//invoked in the callback.
+				if(this._loadInProgress){
+					this._queuedFetches.push({args: keywordArgs, filter: filter});
+				}else{
+					this._loadInProgress = true;
+					var getArgs = {
+							url: self._csvFileUrl, 
+							handleAs: "text"
+						};
+					var getHandler = dojo.xhrGet(getArgs);
+					getHandler.addCallback(function(data){
+						self._processData(data);
+						filter(keywordArgs, self._arrayOfAllItems);
+						self._handleQueuedFetches();
+					});
+					getHandler.addErrback(function(error){
+						self._loadInProgress = false;
+						throw error;
+					});
+				}
 			}else if(this._csvData){
 				this._processData(this._csvData);
 				this._csvData = null;
@@ -390,12 +404,13 @@ dojo.declare("dojox.data.CsvStore",
 	},
 	
 	_processData: function(/* String */ data){
-		this._loadFinished = true;
 		this._getArrayOfArraysFromCsvFileContents(data);
 		this._arrayOfAllItems = [];
 		for(var i=0; i<this._dataArray.length; i++){
 			this._arrayOfAllItems.push(this._createItemFromIdentity(i));
 		}
+		this._loadFinished = true;
+		this._loadInProgress = false;
 	},
 	
 	_createItemFromIdentity: function(/* String */ identity){
@@ -428,34 +443,44 @@ dojo.declare("dojox.data.CsvStore",
 		if(!this._loadFinished){
 			var self = this;
 			if(this._csvFileUrl){
-				var getArgs = {
-						url: self._csvFileUrl, 
-						handleAs: "text"
-					};
-				var getHandler = dojo.xhrGet(getArgs);
-				getHandler.addCallback(function(data){
-					var scope =  keywordArgs.scope?keywordArgs.scope:dojo.global;
-					try{
-						self._processData(data);
-						var item = self._createItemFromIdentity(keywordArgs.identity);
-						if(!self.isItem(item)){
-							item = null;
+				//If fetches come in before the loading has finished, but while
+				//a load is in progress, we have to defer the fetching to be 
+				//invoked in the callback.
+				if(this._loadInProgress){
+					this._queuedFetches.push({args: keywordArgs});
+				}else{
+					this._loadInProgress = true;
+					var getArgs = {
+							url: self._csvFileUrl, 
+							handleAs: "text"
+						};
+					var getHandler = dojo.xhrGet(getArgs);
+					getHandler.addCallback(function(data){
+						var scope =  keywordArgs.scope?keywordArgs.scope:dojo.global;
+						try{
+							self._processData(data);
+							var item = self._createItemFromIdentity(keywordArgs.identity);
+							if(!self.isItem(item)){
+								item = null;
+							}
+							if(keywordArgs.onItem){
+								keywordArgs.onItem.call(scope, item);
+							}
+							self._handleQueuedFetches();
+						}catch(error){
+							if(keywordArgs.onError){
+								keywordArgs.onError.call(scope, error);
+							}
 						}
-						if(keywordArgs.onItem){
-							keywordArgs.onItem.call(scope, item);
-						}
-					}catch(error){
+					});
+					getHandler.addErrback(function(error){
+						this._loadInProgress = false;
 						if(keywordArgs.onError){
+							var scope =  keywordArgs.scope?keywordArgs.scope:dojo.global;
 							keywordArgs.onError.call(scope, error);
 						}
-					}
-				});
-				getHandler.addErrback(function(error){
-					if(keywordArgs.onError){
-						var scope =  keywordArgs.scope?keywordArgs.scope:dojo.global;
-						keywordArgs.onError.call(scope, error);
-					}
-				});
+					});
+				}
 			}else if(this._csvData){
 				self._processData(self._csvData);
 				self._csvData = null;
@@ -488,6 +513,25 @@ dojo.declare("dojox.data.CsvStore",
 		 //Identity isn't a public attribute in the item, it's the row position index.
 		 //So, return null.
 		 return null;
+	},
+
+	_handleQueuedFetches: function(){
+		//	summary: 
+		//		Internal function to execute delayed request in the store.
+		//Execute any deferred fetches now.
+		if (this._queuedFetches.length > 0) {
+			for(var i = 0; i < this._queuedFetches.length; i++){
+				var fData = this._queuedFetches[i];
+				var delayedFilter = fData.filter;
+				var delayedQuery = fData.args;
+				if(delayedFilter){
+					delayedFilter(delayedQuery, this._arrayOfAllItems); 
+				}else{
+					this.fetchItemByIdentity(fData.args);
+				}
+			}
+			this._queuedFetches = [];
+		}
 	}
 });
 //Mix in the simple fetch implementation to this class.

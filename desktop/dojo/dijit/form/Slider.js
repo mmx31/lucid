@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.form.Slider"]){
+if(!dojo._hasResource["dijit.form.Slider"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.form.Slider"] = true;
 dojo.provide("dijit.form.Slider");
 
@@ -102,7 +102,7 @@ dojo.declare(
 	_setPixelValue: function(/*Number*/ pixelValue, /*Number*/ maxPixels, /*Boolean, optional*/ priorityChange){
 		pixelValue = pixelValue < 0 ? 0 : maxPixels < pixelValue ? maxPixels : pixelValue;
 		var count = this.discreteValues;
-		if(count > maxPixels){ count = maxPixels; }
+		if(count > maxPixels || count <= 1){ count = maxPixels; }
 		count--;
 		var pixelsPerValue = maxPixels / count;
 		var wholeIncrements = Math.round(pixelValue / pixelsPerValue);
@@ -121,7 +121,7 @@ dojo.declare(
 		var s = dojo.getComputedStyle(this.sliderBarContainer);
 		var c = dojo._getContentBox(this.sliderBarContainer, s);
 		var count = this.discreteValues;
-		if(count > c[this._pixelCount]){ count = c[this._pixelCount]; }
+		if(count > c[this._pixelCount] || count <= 1){ count = c[this._pixelCount]; }
 		count--;
 		var value = (this.value - this.minimum) * count / (this.maximum - this.minimum) + signedChange;
 		if(value < 0){ value = 0; }
@@ -174,11 +174,24 @@ dojo.declare(
 			this.incrementButton.domNode.style.display="";
 			this.decrementButton.domNode.style.display="";
 		}
-		this.sliderHandle.widget = this;
-
 		this.connect(this.domNode, dojo.isIE ? "onmousewheel" : 'DOMMouseScroll', "_mouseWheeled");
-		new dojo.dnd.Moveable(this.sliderHandle, {mover: dijit.form._slider});
+
+		// define a custom constructor for a SliderMover that points back to me
+		var _self = this;
+		var mover = function(node, e){
+			dijit.form._SliderMover.call(this, node, e);
+			this.widget = _self;
+		};
+		dojo.extend(mover, dijit.form._SliderMover.prototype);
+		
+
+		this._movable = new dojo.dnd.Moveable(this.sliderHandle, {mover: mover});
 		this.inherited('postCreate', arguments);
+	},
+	
+	destroy: function(){
+		this._movable.destroy();
+		dijit.form.HorizontalSlider.superclass.destroy.apply(this, arguments);	
 	}
 });
 
@@ -199,11 +212,11 @@ dojo.declare(
 	_upsideDown: true
 });
 
-dojo.declare("dijit.form._slider",
+dojo.declare("dijit.form._SliderMover",
 	dojo.dnd.Mover,
 {
 	onMouseMove: function(e){
-		var widget = this.node.widget;
+		var widget = this.widget;
 		var c = this.constraintBox;
 		if(!c){
 			var container = widget.sliderBarContainer;
@@ -218,11 +231,12 @@ dojo.declare("dijit.form._slider",
 	},
 
 	destroy: function(e){
-		var widget = this.node.widget;
+		var widget = this.widget;
 		widget.setValue(widget.value, true);
-		this.inherited('destroy', arguments);
+		dojo.dnd.Mover.prototype.destroy.call(this);
 	}
 });
+
 
 dojo.declare("dijit.form.HorizontalRule", [dijit._Widget, dijit._Templated],
 {

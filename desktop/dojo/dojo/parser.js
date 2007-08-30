@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojo.parser"]){
+if(!dojo._hasResource["dojo.parser"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojo.parser"] = true;
 dojo.provide("dojo.parser");
 dojo.require("dojo.date.stamp");
@@ -28,8 +28,9 @@ dojo.parser = new function(){
 			case "string":
 				return value;
 			case "number":
-				return value.length ? Number(value) : null;
+				return value.length ? Number(value) : NaN;
 			case "boolean":
+				// for checked/disabled value might be "" or "checked".  interpret as true.
 				return typeof value == "boolean" ? value : !(value.toLowerCase()=="false");
 			case "function":
 				if(d.isFunction(value)){
@@ -49,7 +50,11 @@ dojo.parser = new function(){
 			case "array":
 				return value.split(/\s*,\s*/);
 			case "date":
-				return d.date.stamp.fromISOString(value);
+				switch(value){
+					case "": return new Date("");	// the NaN of dates
+					case "now": return new Date();	// current date
+					default: return d.date.stamp.fromISOString(value);
+				}
 			case "url":
 				return d.baseUrl + value;
 			default:
@@ -118,11 +123,13 @@ dojo.parser = new function(){
 		// if there's a destination, connect it to that, otherwise run it now
 		var source = script.getAttribute("event");
 		if(source){
-			var mode = script.getAttribute("mode");
-			if(mode && (mode == "connect")){
+			var mode = script.getAttribute("type");
+			if(mode && (mode == "dojo/connect")){
 				// FIXME: need to implement EL here!!
-				d.connect(instance, source, instance, nf);
-			}else{
+				d.connect(instance, source, null, nf);
+			}else{ 
+				// otherwise we assume it's type "dojo/method", and therefore a
+				// replacement
 				instance[source] = nf;
 			}
 		}else{
@@ -141,40 +148,43 @@ dojo.parser = new function(){
 			var type = node.getAttribute("dojoType");
 			if((!type)||(!type.length)){ return; }
 			var clsInfo = getClassInfo(type);
+			var clazz = clsInfo.cls;
+			var ps = clazz._noScript||clazz.prototype._noScript;
+
+			// read parameters (ie, attributes).
+			// clsInfo.params lists expected params like {"checked": "boolean", "n": "number"}
 			var params = {};
-			for(var attrName in clsInfo.params){
-				var attrValue = node.getAttribute(attrName);
-				if(attrValue && !d.isAlien(attrValue)){ // see bug#3074; ignore builtin attributes
-					var attrType = clsInfo.params[attrName];
-					var val = str2obj(attrValue, attrType);
-					// console.debug(attrName, attrValue, val, (typeof val));
-					if(val !== undefined){
-						params[attrName] = val;
-					}
-				}
+			var attributes = node.attributes;
+			for(var name in clsInfo.params){
+				var item = attributes.getNamedItem(name);
+				if(!item || (!item.specified && (!dojo.isIE || name.toLowerCase()!="value"))){ continue; }
+				var _type = clsInfo.params[name];
+				params[name] = str2obj(item.value, _type);
 			}
+
 			// FIXME (perf): making two iterations of the DOM to find the
 			// <script> elements feels dirty. Still need a separate iteration
 			// if we do it another way, though, so we should probably benchmark
 			// the various approaches at some point.
 
-			// preambles are magic. Handle it.
-			var preambles = d.query("> script[type='dojo/method'][event='preamble']", node).orphan();
-			if(preambles.length){
-				// we only support one preamble. So be it.
-				params.preamble = d.parser._functionFromScript(preambles[0]);
+			if(!ps){
+				// preambles are magic. Handle it.
+				var preambles = d.query("> script[type='dojo/method'][event='preamble']", node).orphan();
+				if(preambles.length){
+					// we only support one preamble. So be it.
+					params.preamble = d.parser._functionFromScript(preambles[0]);
+				}
+
+				// grab the rest of the scripts for processing later
+				var scripts = d.query("> script[type^='dojo/']", node).orphan();
 			}
 
-			// grab the rest of the scripts for processing later
-			var scripts = d.query("> script[type='dojo/method']", node).orphan();
-
-			var clazz = clsInfo.cls;
 			var markupFactory = clazz["markupFactory"];
 			if(!markupFactory && clazz["prototype"]){
 				markupFactory = clazz.prototype["markupFactory"];
 			}
 			// create the instance
-			var instance = markupFactory ? markupFactory(params, node) : new clazz(params, node);
+			var instance = markupFactory ? markupFactory(params, node, clazz) : new clazz(params, node);
 			thelist.push(instance);
 
 			// map it to the JS namespace if that makes sense
@@ -184,9 +194,11 @@ dojo.parser = new function(){
 			}
 
 			// check to see if we need to hook up events for non-declare()-built classes
-			scripts.forEach(function(script){
-				d.parser._wireUpMethod(instance, script);
-			});
+			if(!ps){
+				scripts.forEach(function(script){
+					d.parser._wireUpMethod(instance, script);
+				});
+			}
 		});
 
 		// Call startup on each top level instance if it makes sense (as for

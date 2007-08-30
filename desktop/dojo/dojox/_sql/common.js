@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox._sql.common"]){
+if(!dojo._hasResource["dojox._sql.common"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox._sql.common"] = true;
 dojo.provide("dojox._sql.common");
 
@@ -240,8 +240,8 @@ dojo.mixin(dojox.sql, {
 // 	on a SQL statement. We instantiate this class and have it hold
 //	it's state so that we can potentially have several encryption
 //	operations happening at the same time by different SQL statements.
-dojo.declare("dojox.sql._SQLCrypto", null,
-	function(action, sql, password, args, callback){
+dojo.declare("dojox.sql._SQLCrypto", null, {
+	constructor: function(action, sql, password, args, callback){
 		if(action == "encrypt"){
 			this._execEncryptSQL(sql, password, args, callback);
 		}else{
@@ -249,7 +249,6 @@ dojo.declare("dojox.sql._SQLCrypto", null,
 		}		
 	}, 
 	
-	{					
 	_execEncryptSQL: function(sql, password, args, callback){
 		// strip the ENCRYPT/DECRYPT keywords from the SQL
 		var strippedSQL = this._stripCryptoSQL(sql);

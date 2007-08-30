@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojo.data.ItemFileReadStore"]){
+if(!dojo._hasResource["dojo.data.ItemFileReadStore"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojo.data.ItemFileReadStore"] = true;
 dojo.provide("dojo.data.ItemFileReadStore");
 
@@ -6,13 +6,23 @@ dojo.require("dojo.data.util.filter");
 dojo.require("dojo.data.util.simpleFetch");
 dojo.require("dojo.date.stamp");
 
-dojo.declare("dojo.data.ItemFileReadStore",
-	null,
-	function(/* Object */ keywordParameters){
-		// 	summary: initializer
-		// 	keywordParameters: {url: String}
-		// 	keywordParameters: {data: jsonObject}
-		// 	keywordParameters: {typeMap: object)
+dojo.declare("dojo.data.ItemFileReadStore", null,{
+	//	summary:
+	//		The ItemFileReadStore implements the dojo.data.api.Read API and reads
+	//		data from JSON files that have contents in this format --
+	//		{ items: [
+	//			{ name:'Kermit', color:'green', age:12, friends:['Gonzo', {_reference:{name:'Fozzie Bear'}}]},
+	//			{ name:'Fozzie Bear', wears:['hat', 'tie']},
+	//			{ name:'Miss Piggy', pets:'Foo-Foo'}
+	//		]}
+	//		Note that it can also contain an 'identifer' property that specified which attribute on the items 
+	//		in the array of items that acts as the unique identifier for that item.
+	//
+	constructor: function(/* Object */ keywordParameters){
+		//	summary: constructor
+		//	keywordParameters: {url: String}
+		//	keywordParameters: {data: jsonObject}
+		//	keywordParameters: {typeMap: object)
 		//		The structure of the typeMap object is as follows:
 		//		{
 		//			type0: function || object,
@@ -50,25 +60,15 @@ dojo.declare("dojo.data.ItemFileReadStore",
 		this._storeRefPropName = "_S";  // Default name for the store reference to attach to every item.
 		this._itemNumPropName = "_0"; // Default Item Id for isItem to attach to every item.
 		this._rootItemPropName = "_RI"; // Default Item Id for isItem to attach to every item.
-	},{
-	//	summary:
-	//		The ItemFileReadStore implements the dojo.data.api.Read API and reads
-	//		data from JSON files that have contents in this format --
-	//		{ items: [
-	//			{ name:'Kermit', color:'green', age:12, friends:['Gonzo', {_reference:{name:'Fozzie Bear'}}]},
-	//			{ name:'Fozzie Bear', wears:['hat', 'tie']},
-	//			{ name:'Miss Piggy', pets:'Foo-Foo'}
-	//		]}
-	//		Note that it can also contain an 'identifer' property that specified which attribute on the items 
-	//		in the array of items that acts as the unique identifier for that item.
-	//
-	//
-
+		this._loadInProgress = false;	//Got to track the initial load to prevent duelling loads of the dataset.
+		this._queuedFetches = [];
+	},
+	
 	url: "",	// use "" rather than undefined for the benefit of the parser (#3539)
 
 	_assertIsItem: function(/* item */ item){
 		//	summary:
-		//      This function tests whether the item passed in is indeed an item in the store.
+		//		This function tests whether the item passed in is indeed an item in the store.
 		//	item: 
 		//		The item to test for being contained by the store.
 		if(!this.isItem(item)){ 
@@ -90,7 +90,7 @@ dojo.declare("dojo.data.ItemFileReadStore",
 						/* attribute-name-string */ attribute, 
 						/* value? */ defaultValue){
 		//	summary: 
-		//      See dojo.data.api.Read.getValue()
+		//		See dojo.data.api.Read.getValue()
 		var values = this.getValues(item, attribute);
 		return (values.length > 0)?values[0]:defaultValue; // Anything
 	},
@@ -199,13 +199,6 @@ dojo.declare("dojo.data.ItemFileReadStore",
 	getFeatures: function(){
 		//	summary: 
 		//		See dojo.data.api.Read.getFeatures()
-		if (!this._loadFinished){
-			// We need to load the data first, because the data set may specify
-			// what attribute is used as the identifier, and we include that
-			// identifier-attribute info in the property value we return for the
-			// 'dojo.data.api.Identity' feature.
-			this._forceLoad();
-		}
 		return this._features; //Object
 	},
 
@@ -287,25 +280,37 @@ dojo.declare("dojo.data.ItemFileReadStore",
 		}else{
 
 			if(this._jsonFileUrl){
-				var getArgs = {
-						url: self._jsonFileUrl, 
-						handleAs: "json-comment-optional"
-					};
-				var getHandler = dojo.xhrGet(getArgs);
-				getHandler.addCallback(function(data){
-					// console.debug(dojo.toJson(data));
-					self._loadFinished = true;
-					try{
-						self._getItemsFromLoadedData(data);
-						filter(keywordArgs, self._getItemsArray(keywordArgs.queryOptions));
-					}catch(e){
-						errorCallback(e, keywordArgs);
-					}
-
-				});
-				getHandler.addErrback(function(error){
-					errorCallback(error, keywordArgs);
-				});
+				//If fetches come in before the loading has finished, but while
+				//a load is in progress, we have to defer the fetching to be 
+				//invoked in the callback.
+				if(this._loadInProgress){
+					this._queuedFetches.push({args: keywordArgs, filter: filter});
+				}else{
+					this._loadInProgress = true;
+					var getArgs = {
+							url: self._jsonFileUrl, 
+							handleAs: "json-comment-optional"
+						};
+					var getHandler = dojo.xhrGet(getArgs);
+					getHandler.addCallback(function(data){
+						try{
+							self._getItemsFromLoadedData(data);
+							self._loadFinished = true;
+							self._loadInProgress = false;
+							
+							filter(keywordArgs, self._getItemsArray(keywordArgs.queryOptions));
+							self._handleQueuedFetches();
+						}catch(e){
+							self._loadFinished = true;
+							self._loadInProgress = false;
+							errorCallback(e, keywordArgs);
+						}
+					});
+					getHandler.addErrback(function(error){
+						self._loadInProgress = false;
+						errorCallback(error, keywordArgs);
+					});
+				}
 			}else if(this._jsonData){
 				try{
 					this._loadFinished = true;
@@ -318,6 +323,25 @@ dojo.declare("dojo.data.ItemFileReadStore",
 			}else{
 				errorCallback(new Error("dojo.data.ItemFileReadStore: No JSON source data was provided as either URL or a nested Javascript object."), keywordArgs);
 			}
+		}
+	},
+
+	_handleQueuedFetches: function(){
+		//	summary: 
+		//		Internal function to execute delayed request in the store.
+		//Execute any deferred fetches now.
+		if (this._queuedFetches.length > 0) {
+			for(var i = 0; i < this._queuedFetches.length; i++){
+				var fData = this._queuedFetches[i];
+				var delayedQuery = fData.args;
+				var delayedFilter = fData.filter;
+				if(delayedFilter){
+					delayedFilter(delayedQuery, this._getItemsArray(delayedQuery.queryOptions)); 
+				}else{
+					this.fetchItemByIdentity(delayedQuery);
+				}
+			}
+			this._queuedFetches = [];
 		}
 	},
 
@@ -386,7 +410,7 @@ dojo.declare("dojo.data.ItemFileReadStore",
 					if(dojo.isArray(valueForAttribute)){
 						var valueArray = valueForAttribute;
 						for(var k = 0; k < valueArray.length; ++k){
-							singleValue = valueArray[k];
+							var singleValue = valueArray[k];
 							if(valueIsAnItem(singleValue)){
 								addItemAndSubItemsToArrayOfAllItems(singleValue);
 							}
@@ -579,32 +603,42 @@ dojo.declare("dojo.data.ItemFileReadStore",
 		if(!this._loadFinished){
 			var self = this;
 			if(this._jsonFileUrl){
-				var getArgs = {
-						url: self._jsonFileUrl, 
-						handleAs: "json-comment-optional"
+
+				if(this._loadInProgress){
+					this._queuedFetches.push({args: keywordArgs});
+				}else{
+					var getArgs = {
+							url: self._jsonFileUrl, 
+							handleAs: "json-comment-optional"
 					};
-				var getHandler = dojo.xhrGet(getArgs);
-				getHandler.addCallback(function(data){
-					var scope =  keywordArgs.scope?keywordArgs.scope:dojo.global;
-					try{
-						self._getItemsFromLoadedData(data);
-						self._loadFinished = true;
-						var item = self._getItemByIdentity(keywordArgs.identity);
-						if(keywordArgs.onItem){
-							keywordArgs.onItem.call(scope, item);
+					var getHandler = dojo.xhrGet(getArgs);
+					getHandler.addCallback(function(data){
+						var scope =  keywordArgs.scope?keywordArgs.scope:dojo.global;
+						try{
+							self._getItemsFromLoadedData(data);
+							self._loadFinished = true;
+							self._loadInProgress = false;
+							var item = self._getItemByIdentity(keywordArgs.identity);
+							if(keywordArgs.onItem){
+								keywordArgs.onItem.call(scope, item);
+							}
+							self._handleQueuedFetches();
+						}catch(error){
+							self._loadInProgress = false;
+							if(keywordArgs.onError){
+								keywordArgs.onError.call(scope, error);
+							}
 						}
-					}catch(error){
+					});
+					getHandler.addErrback(function(error){
+						self._loadInProgress = false;
 						if(keywordArgs.onError){
+							var scope =  keywordArgs.scope?keywordArgs.scope:dojo.global;
 							keywordArgs.onError.call(scope, error);
 						}
-					}
-				});
-				getHandler.addErrback(function(error){
-					if(keywordArgs.onError){
-						var scope =  keywordArgs.scope?keywordArgs.scope:dojo.global;
-						keywordArgs.onError.call(scope, error);
-					}
-				});
+					});
+				}
+
 			}else if(this._jsonData){
 				// Passed in data, no need to xhr.
 				self._getItemsFromLoadedData(self._jsonData);
@@ -656,14 +690,14 @@ dojo.declare("dojo.data.ItemFileReadStore",
 			return [identifier]; // Array
 		}
 	},
-
+	
 	_forceLoad: function(){
 		//	summary: 
 		//		Internal function to force a load of the store if it hasn't occurred yet.  This is required
-		//		for specific functions to work properly.  See dojo.data.api.Identity.getItemByIdentity()
+		//		for specific functions to work properly.  
 		var self = this;
 		if(this._jsonFileUrl){
-			var getArgs = {
+				var getArgs = {
 					url: self._jsonFileUrl, 
 					handleAs: "json-comment-optional",
 					sync: true
@@ -671,8 +705,16 @@ dojo.declare("dojo.data.ItemFileReadStore",
 			var getHandler = dojo.xhrGet(getArgs);
 			getHandler.addCallback(function(data){
 				try{
-					self._getItemsFromLoadedData(data);
-					self._loadFinished = true;
+					//Check to be sure there wasn't another load going on concurrently 
+					//So we don't clobber data that comes in on it.  If there is a load going on
+					//then do not save this data.  It will potentially clobber current data.
+					//We mainly wanted to sync/wait here.
+					//TODO:  Revisit the loading scheme of this store to improve multi-initial
+					//request handling.
+					if (self._loadInProgress !== true && !self._loadFinished) {
+						self._getItemsFromLoadedData(data);
+						self._loadFinished = true;
+					}
 				}catch(e){
 					console.log(e);
 					throw e;

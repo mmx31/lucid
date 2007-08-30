@@ -1,16 +1,15 @@
-if(!dojo._hasResource["dojox.data.demos.stores.LazyLoadJSIStore"]){
+if(!dojo._hasResource["dojox.data.demos.stores.LazyLoadJSIStore"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.data.demos.stores.LazyLoadJSIStore"] = true;
 dojo.provide("dojox.data.demos.stores.LazyLoadJSIStore");
 dojo.require("dojo.data.ItemFileReadStore");
 
-dojo.declare("dojox.data.demos.stores.LazyLoadJSIStore", 
-	dojo.data.ItemFileReadStore, 
-	function(/* object */ keywordParameters){
+dojo.declare("dojox.data.demos.stores.LazyLoadJSIStore", dojo.data.ItemFileReadStore, {
+	constructor: function(/* object */ keywordParameters){
 		// LazyLoadJSIStore extends ItemFileReadStore to implement an 
 		// example of lazy-loading/faulting in items on-demand.
 		// Note this is certianly not a perfect implementation, it is 
 		// an example.
-	}, {
+	},
 	
 	isItemLoaded: function(/*object*/ item) {
 		//	summary:

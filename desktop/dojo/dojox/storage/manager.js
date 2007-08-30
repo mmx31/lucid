@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.storage.manager"]){
+if(!dojo._hasResource["dojox.storage.manager"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.storage.manager"] = true;
 dojo.provide("dojox.storage.manager");
 //dojo.require("dojo.AdapterRegistry");
@@ -12,7 +12,7 @@ dojox.storage.manager = new function(){
 	
 	// currentProvider: Object
 	//	The storage provider that was automagically chosen to do storage
-	//	on this platform, such as dojox.storage.browser.FlashStorageProvider.
+	//	on this platform, such as dojox.storage.FlashStorageProvider.
 	this.currentProvider = null;
 	
 	// available: Boolean
@@ -40,12 +40,12 @@ dojox.storage.manager = new function(){
 		//		matters. 
 		// name:
 		//		The full class name of this provider, such as
-		//		"dojox.storage.browser.FlashStorageProvider".
+		//		"dojox.storage.FlashStorageProvider".
 		// instance:
 		//		An instance of this provider, which we will use to call
 		//		isAvailable() on. 
-		this._providers[this._providers.length] = instance;
-		this._providers[name] = instance;
+		this._providers[this._providers.length] = instance; //FIXME: push?
+		this._providers[name] = instance; // FIXME: this._providers is an array, not a hash
 	};
 	
 	this.setProvider = function(storageClass){
@@ -55,7 +55,7 @@ dojox.storage.manager = new function(){
 		// description:
 		//		Example-
 		//			dojox.storage.setProvider(
-		//				dojox.storage.browser.IEStorageProvider)
+		//				dojox.storage.IEStorageProvider)
 	
 	};
 	
@@ -73,11 +73,12 @@ dojox.storage.manager = new function(){
 
 		// a flag to force the storage manager to use a particular 
 		// storage provider type, such as 
-		// djConfig = {forceStorageProvider: "dojox.storage.browser.WhatWGStorageProvider"};
+		// djConfig = {forceStorageProvider: "dojox.storage.WhatWGStorageProvider"};
 		var forceProvider = djConfig["forceStorageProvider"]||false;
 
 		// go through each provider, seeing if it can be used
 		var providerToUse;
+		//FIXME: use dojo.some
 		for(var i = 0; i < this._providers.length; i++){
 			providerToUse = this._providers[i];
 			if(forceProvider == providerToUse.declaredClass){
@@ -155,7 +156,7 @@ dojox.storage.manager = new function(){
 		// FIXME: This should REALLY not be in here, but it fixes a tricky
 		// Flash timing bug
 		if(this.currentProvider != null
-			&& this.currentProvider.declaredClass == "dojox.storage.browser.FlashStorageProvider" 
+			&& this.currentProvider.declaredClass == "dojox.storage.FlashStorageProvider" 
 			&& dojox.flash.ready == false){
 			return false;
 		}else{
@@ -168,7 +169,7 @@ dojox.storage.manager = new function(){
 		// description:
 		//		Example-
 		//			dojox.storage.manager.supportsProvider(
-		//				"dojox.storage.browser.InternetExplorerStorageProvider");
+		//				"dojox.storage.InternetExplorerStorageProvider");
 
 		// construct this class dynamically
 		try{

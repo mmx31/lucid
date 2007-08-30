@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.form.TimeTextBox"]){
+if(!dojo._hasResource["dijit.form.TimeTextBox"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.form.TimeTextBox"] = true;
 dojo.provide("dijit.form.TimeTextBox");
 
@@ -18,11 +18,16 @@ dojo.declare(
 		// constraints object: min, max
 		regExpGen: dojo.date.locale.regexp,
 		compare: dojo.date.compare,
-		format: dojo.date.locale.format,
+		format: function(/*Date*/ value, /*Object*/ constraints){
+			if(!value || value.toString() == this._invalid){ return null; }
+			return dojo.date.locale.format(value, constraints);
+		},
 		parse: dojo.date.locale.parse,
 		serialize: dojo.date.stamp.toISOString,
 
-		value: new Date(),
+		value: new Date(""),	// NaN
+		_invalid: (new Date("")).toString(),	// NaN
+
 		_popupClass: "dijit.form._TimePicker",
 
 		postMixInProperties: function(){
@@ -34,20 +39,19 @@ dojo.declare(
  			if(typeof constraints.max == "string"){ constraints.max = dojo.date.stamp.fromISOString(constraints.max); }
 		},
 
-		onfocus: function(/*Event*/ evt){
+		_onFocus: function(/*Event*/ evt){
 			// open the calendar
 			this._open();
-			dijit.form.RangeBoundTextBox.prototype.onfocus.apply(this, arguments);
 		},
 
-		setValue: function(/*Date*/date, /*Boolean, optional*/ priorityChange){
+		setValue: function(/*Date*/ value, /*Boolean, optional*/ priorityChange){
 			// summary:
 			//	Sets the date on this textbox
 			this.inherited('setValue', arguments);
 			if(this._picker){
 				// #3948: fix blank date on popup only
-				if(!date){date=new Date();}
-				this._picker.setValue(date);
+				if(!value || value.toString() == this._invalid){value=new Date();}
+				this._picker.setValue(value);
 			}
 		},
 
@@ -93,11 +97,6 @@ dojo.declare(
 			dijit.popup.closeAll();
 			this.inherited('_onBlur', arguments);
 			// don't focus on <input>.  the user has explicitly focused on something else.
-		},
-
-		postCreate: function(){
-			this.inherited('postCreate', arguments);
-			this.connect(this.domNode, "onclick", this._open);
 		},
 
 		getDisplayedValue:function(){

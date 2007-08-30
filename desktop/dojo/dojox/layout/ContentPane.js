@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.layout.ContentPane"]){
+if(!dojo._hasResource["dojox.layout.ContentPane"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.layout.ContentPane"] = true;
 dojo.provide("dojox.layout.ContentPane");
 
@@ -156,7 +156,7 @@ dojo.require("dijit.layout.ContentPane");
 		}
 		
 		// match <script>, <script type="text/..., but not <script type="dojo(/method)...
-		return cont.replace(/<script\s*(?![^>]*type=['"]?dojo)(?:[^>]*?src=(['"]?)([^>]*?)\1[^>]*)?>([\s\S]*?)<\/script>/gi,
+		return cont.replace(/<script\s*(?![^>]*type=['"]?dojo)(?:[^>]*?(?:src=(['"]?)([^>]*?)\1[^>]*)?)*>([\s\S]*?)<\/script>/gi,
 			function(ignore, delim, src, code){
 				if(src){
 					download(src);
@@ -199,10 +199,7 @@ dojo.require("dijit.layout.ContentPane");
 	=====*/
 
 
-dojo.declare(
-	"dojox.layout.ContentPane",
-	dijit.layout.ContentPane,
-{
+dojo.declare("dojox.layout.ContentPane", dijit.layout.ContentPane, {
 	// summary:
 	//		An extended version of dijit.layout.ContentPane
 	//		Supports infile scrips and external ones declared by <script src=''

@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.uuid.generateTimeBasedUuid"]){
+if(!dojo._hasResource["dojox.uuid.generateTimeBasedUuid"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.uuid.generateTimeBasedUuid"] = true;
 dojo.provide("dojox.uuid.generateTimeBasedUuid");
 

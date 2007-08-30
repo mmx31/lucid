@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.data.XmlStore"]){
+if(!dojo._hasResource["dojox.data.XmlStore"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.data.XmlStore"] = true;
 dojo.provide("dojox.data.XmlStore");
 dojo.provide("dojox.data.XmlItem");
@@ -7,11 +7,15 @@ dojo.require("dojo.data.util.simpleFetch");
 dojo.require("dojo.data.util.filter");
 dojo.require("dojox.data.dom");
 
-dojo.declare("dojox.data.XmlStore", 
-	null,
-	function(/* object */ args) {
+dojo.declare("dojox.data.XmlStore", null, {
+	//	summary:
+	//		A data store for XML based services or documents
+	//	description:
+	//		A data store for XML based services or documents
+	
+	constructor: function(/* object */ args) {
 		//	summary:
-		//		Initializer for the XML store.  
+		//		Constructor for the XML store.  
 		//	args:
 		//		An anonymous object to initialize properties.  It expects the following values:
 		//		url:		The url to a service or an XML document that represents the store
@@ -32,11 +36,7 @@ dojo.declare("dojox.data.XmlStore",
 		this._newItems = [];
 		this._deletedItems = [];
 		this._modifiedItems = [];
-	}, {
-	//	summary:
-	//		A data store for XML based services or documents
-	//	description:
-    //		A data store for XML based services or documents
+	},
 
 /* dojo.data.api.Read */
 
@@ -1077,8 +1077,8 @@ dojo.declare("dojox.data.XmlStore",
 
 //FIXME: Is a full class here really needed for containment of the item or would
 //an anon object work fine?
-dojo.declare("dojox.data.XmlItem", null,
-	function(element, store) {
+dojo.declare("dojox.data.XmlItem", null, {
+	constructor: function(element, store) {
 		//	summary:
 		//		Initialize with an XML element
 		//	element:
@@ -1087,7 +1087,7 @@ dojo.declare("dojox.data.XmlItem", null,
 		//		The containing store, if any.
 		this.element = element;
 		this.store = store;
-	}, {
+	}, 
 	//	summary:
 	//		A data item of 'XmlStore'
 	//	description:

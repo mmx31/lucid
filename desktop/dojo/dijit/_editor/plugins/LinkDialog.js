@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit._editor.plugins.LinkDialog"]){
+if(!dojo._hasResource["dijit._editor.plugins.LinkDialog"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit._editor.plugins.LinkDialog"] = true;
 dojo.provide("dijit._editor.plugins.LinkDialog");
 
@@ -8,6 +8,9 @@ dojo.require("dijit._editor._Plugin");
 dojo.require("dijit.Dialog");
 dojo.require("dijit.form.Button");
 dojo.require("dijit.form.ValidationTextBox");
+dojo.require("dojo.i18n");
+dojo.require("dojo.string");
+dojo.requireLocalization("dijit._editor", "LinkDialog", null, "ROOT");
 
 dojo.declare("dijit._editor.plugins.DualStateDropDownButton",
 	dijit.form.DropDownButton,
@@ -27,8 +30,11 @@ dojo.declare("dijit._editor.plugins.UrlTextBox",
 
 		required: true,
 
-		invalidMessage: "Invalid URL.  Enter a full URL like 'http://www.dojotoolkit.org'", // FixME: i18n
-		
+		postMixInProperties: function(){
+			dijit._editor.plugins.UrlTextBox.superclass.postMixInProperties.apply(this, arguments);
+			this.invalidMessage = dojo.i18n.getLocalization("dijit._editor", "LinkDialog", this.lang).urlInvalidMessage;
+		},
+
 		getValue: function(){
 			if(!/^(https?|ftps?)/.test(this.textbox.value)){
 				this.textbox.value="http://"+this.textbox.value;
@@ -39,34 +45,17 @@ dojo.declare("dijit._editor.plugins.UrlTextBox",
 );
 
 dojo.declare("dijit._editor.plugins.LinkDialog", 
-	dijit._editor._Plugin,  
-	function(){
-		var _this = this;
-		this.dropDown = new dijit.TooltipDialog({
-			title: "link url", // FIxmE: i18n
-			execute: dojo.hitch(this, "setValue"),
-			onOpen: function(){
-				dijit.TooltipDialog.prototype.onOpen.apply(this, arguments);
-				_this._onOpenDialog();
-			},
-			onCancel: function(){
-				setTimeout(dojo.hitch(_this, "_onCloseDialog"),0);
-			},
-			onClose: dojo.hitch(this, "_onCloseDialog")
-		});
-		this.dropDown.setContent(this.linkDialogTemplate);
-		this.dropDown.startup();
-	},
+	dijit._editor._Plugin, 
 	{
 		buttonClass: dijit._editor.plugins.DualStateDropDownButton,
 
 		linkDialogTemplate: [
-			"<label for='urlInput'>Url:&nbsp;</label>",
+			"<label for='urlInput'>${url}&nbsp;</label>",
 			"<input dojoType=dijit._editor.plugins.UrlTextBox name='urlInput'><br>",
-			"<label for='textInput'>Text:&nbsp;</label>",
+			"<label for='textInput'>${text}&nbsp;</label>",
 			"<input dojoType=dijit.form.TextBox name='textInput'>",
 			"<br>",
-			"<button dojoType=dijit.form.Button type='submit'>Set</button>"
+			"<button dojoType=dijit.form.Button type='submit'>${set}</button>"
 		].join(""),
 
 		useDefaultCommand: false,
@@ -75,26 +64,54 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 
 		dropDown: null,
 
+		constructor: function(){
+			var _this = this;
+			var messages = dojo.i18n.getLocalization("dijit._editor", "LinkDialog", this.lang);
+			this.dropDown = new dijit.TooltipDialog({
+				title: messages.title,
+				execute: dojo.hitch(this, "setValue"),
+				onOpen: function(){
+					_this._onOpenDialog();
+					dijit.TooltipDialog.prototype.onOpen.apply(this, arguments);
+				},
+				onCancel: function(){
+					setTimeout(dojo.hitch(_this, "_onCloseDialog"),0);
+				},
+				onClose: dojo.hitch(this, "_onCloseDialog")
+			});
+			this.dropDown.setContent(dojo.string.substitute(this.linkDialogTemplate, messages));
+			this.dropDown.startup();
+		},
+	
 		setValue: function(args){
 			// summary: callback from the dialog when user hits "set" button
 			//TODO: prevent closing popup if the text is empty
 			this._onCloseDialog();
+			if(dojo.isIE){ //see #4151
+				var a = dojo.withGlobal(this.editor.window, "getAncestorElement",dijit._editor.selection, ['a']);
+				if(a){
+					dojo.withGlobal(this.editor.window, "selectElement",dijit._editor.selection, [a]);
+				}
+			}
 			var attstr='href="'+args.urlInput+'" _djrealurl="'+args.urlInput+'"';
 //			console.log(args,this.editor,'<a '+attstr+'>'+args.textInput+'</a>');
 			this.editor.execCommand('inserthtml', '<a '+attstr+'>'+args.textInput+'</a>');
 //			this.editor.execCommand(this.command, args.urlInput);
  		},
 
-		_savedSelection: null,
+//		_savedSelection: null,
 		_onCloseDialog: function(){
-			this.editor.focus();
 			// FIXME: IE is really messed up here!!
-			if(dojo.isIE && this._savedSelection){
-//				this.editor.focus();
-				var range = this.editor.document.selection.createRange();
-				range.moveToBookmark(this._savedSelection);
-				range.select();
-				this._savedSelection = null;
+			if(dojo.isIE){
+				if(this._savedSelection){
+					var b=this._savedSelection;
+					this._savedSelection=null;
+					this.editor.focus();
+					var range = this.editor.document.selection.createRange();
+					range.moveToBookmark(b);
+					range.select();
+				}
+			}else{this.editor.focus();
 			}
 		},
 		_onOpenDialog: function(){
@@ -103,7 +120,7 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 			if(a){
 				url=a.getAttribute('_djrealurl');
 				text=a.textContent||a.innerText;
-				dojo.withGlobal(this.editor.window, "selectElement",dijit._editor.selection, [a]);
+				dojo.withGlobal(this.editor.window, "selectElement",dijit._editor.selection, [a,true]);
 			}else{
 				text=dojo.withGlobal(this.editor.window, dijit._editor.selection.getSelectedText);
 			}
@@ -114,8 +131,6 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 			}
 			this.dropDown.setValues({'urlInput':url,'textInput':text});
 			//dijit.focus(this.urlInput);
-			// TODO: if there's an existing link when we click this, should suck the
-			// information about that link and prepopulate the dialog
 		},
 
 		updateState: function(){

@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.layout.TabContainer"]){
+if(!dojo._hasResource["dijit.layout.TabContainer"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.layout.TabContainer"] = true;
 dojo.provide("dijit.layout.TabContainer");
 
@@ -44,9 +44,16 @@ dojo.declare(
 	},
 
 	startup: function(){
+		if(this._started){ return; }
+
 		// wire up the tablist and its tabs
 		this.tablist.startup();
 		dijit.layout.TabContainer.superclass.startup.apply(this, arguments);
+		
+		if(dojo.isSafari){
+			// sometimes safari 3.0.3 miscalculates the height of the tab labels, see #4058
+			setTimeout(dojo.hitch(this, "layout"), 0);
+		}
 	},
 
 	layout: function(){
@@ -67,6 +74,9 @@ dojo.declare(
 
 		if(this.selectedChildWidget){
 			this._showChild(this.selectedChildWidget);
+			if(this.doLayout && this.selectedChildWidget.resize){
+				this.selectedChildWidget.resize(this._containerContentBox);
+			}
 		}
 	},
 
@@ -78,8 +88,8 @@ dojo.declare(
 
 //TODO: make private?
 dojo.declare(
-    "dijit.layout.TabController",
-    dijit.layout.StackController,
+	"dijit.layout.TabController",
+	dijit.layout.StackController,
 	{
 		// summary
 		// 	Set of tabs (the things with titles and a close button, that you click to show a tab panel).
@@ -119,7 +129,7 @@ dojo.declare(
 
 	templateString: "<div baseClass='dijitTab' dojoAttachEvent='onclick:onClick,onmouseover:_onMouse,onmouseout:_onMouse'>"
 						+"<div class='dijitTabInnerDiv' dojoAttachPoint='innerDiv'>"
-							+"<span dojoAttachPoint='titleNode,focusNode' tabIndex='-1' waiRole='tab'>${!label}</span>"
+							+"<span dojoAttachPoint='containerNode,focusNode' tabIndex='-1' waiRole='tab'>${!label}</span>"
 							+"<span dojoAttachPoint='closeButtonNode' class='closeImage'"
 							+" dojoAttachEvent='onmouseover:_onMouse, onmouseout:_onMouse, onclick:onClickCloseButton'"
 							+" baseClass='dijitTabCloseButton'>"
@@ -135,7 +145,7 @@ dojo.declare(
 			this.closeButtonNode.style.display="none";
 		}
 		dijit.layout._TabButton.superclass.postCreate.apply(this, arguments);
-		dojo.setSelectable(this.titleNode, false);
+		dojo.setSelectable(this.containerNode, false);
 	}
 });
 

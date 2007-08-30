@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.tests.ondijitclick"]){
+if(!dojo._hasResource["dijit.tests.ondijitclick"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.tests.ondijitclick"] = true;
 dojo.provide("dijit.tests.ondijitclick");
 

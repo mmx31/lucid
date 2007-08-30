@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.flash._common"]){
+if(!dojo._hasResource["dojox.flash._common"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.flash._common"] = true;
 dojo.provide("dojox.flash._common");
 

@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit.Menu"]){
+if(!dojo._hasResource["dijit.Menu"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.Menu"] = true;
 dojo.provide("dijit.Menu");
 
@@ -10,6 +10,10 @@ dojo.declare(
 	"dijit.Menu",
 	[dijit._Widget, dijit._Templated, dijit._Container],
 {
+	preamble: function() {
+		this._bindings = [];
+	},
+	
 	templateString:
 			'<table class="dijit dijitMenu dijitReset dijitMenuTable" waiRole="menu" dojoAttachEvent="onkeypress:_onKeyPress">' +
 				'<tbody class="dijitReset" dojoAttachPoint="containerNode"></tbody>'+
@@ -97,7 +101,11 @@ dojo.declare(
 				dojo.stopEvent(evt);
 				break;
 			case dojo.keys.LEFT_ARROW:
-				this.onCancel(false);
+				if(this.parentMenu){
+					this.onCancel(false);
+				}else{
+					dojo.stopEvent(evt);
+				}
 				break;
 			case dojo.keys.TAB:
 				dojo.stopEvent(evt);
@@ -248,17 +256,20 @@ dojo.declare(
 		// to capture these events at the top level,
 		// attach to document, not body
 		var cn = (node == dojo.body() ? dojo.doc : node);
-		node[this.id+'_connect'] = [
+		
+		node[this.id] = this._bindings.push([
 			dojo.connect(cn, "oncontextmenu", this, "_openMyself"),
 			dojo.connect(cn, "onkeydown", this, "_contextKey"),
 			dojo.connect(cn, "onmousedown", this, "_contextMouse")
-		];
+		]);
 	},
 
 	unBindDomNode: function(/*String|DomNode*/ nodeName){
 		// summary: detach menu from given node
 		var node = dojo.byId(nodeName);
-		dojo.forEach(node[this.id+'_connect'], dojo.disconnect);
+		var bid = node[this.id]-1, b = this._bindings[bid];
+		dojo.forEach(b, dojo.disconnect);
+		delete this._bindings[bid];
 	},
 
 	_contextKey: function(e){
@@ -397,9 +408,9 @@ dojo.declare(
 		+'<td class="dijitReset"><div class="dijitMenuItemIcon ${iconClass}"></div></td>'
 		+'<td tabIndex="-1" class="dijitReset dijitMenuItemLabel" dojoAttachPoint="containerNode" waiRole="menuitem"></td>'
 		+'<td class="dijitReset" dojoAttachPoint="arrowCell">'
-			+'<span class="dijitMenuExpand" dojoAttachPoint="expand" style="display:none">'
+			+'<div class="dijitMenuExpand" dojoAttachPoint="expand" style="display:none">'
 			+'<span class="dijit_a11y dijitInline dijitArrowNode dijitMenuExpandInner">+</span>'
-			+'</span>'
+			+'</div>'
 		+'</td>'
 		+'</tr>',
 

@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.encoding.tests.easy64"]){
+if(!dojo._hasResource["dojox.encoding.tests.easy64"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.encoding.tests.easy64"] = true;
 dojo.provide("dojox.encoding.tests.easy64");
 dojo.require("dojox.encoding.easy64");

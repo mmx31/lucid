@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.string.tests.Builder"]){
+if(!dojo._hasResource["dojox.string.tests.Builder"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.string.tests.Builder"] = true;
 dojo.provide("dojox.string.tests.Builder");
 

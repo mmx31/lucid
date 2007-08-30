@@ -1,4 +1,4 @@
-if(!dojo._hasResource["tests.data.ItemFileReadStore"]){
+if(!dojo._hasResource["tests.data.ItemFileReadStore"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["tests.data.ItemFileReadStore"] = true;
 dojo.provide("tests.data.ItemFileReadStore");
 dojo.require("tests.data.readOnlyItemFileTestTemplates");

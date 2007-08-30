@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dijit._tree.Controller"]){
+if(!dojo._hasResource["dijit._tree.Controller"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit._tree.Controller"] = true;
 dojo.provide("dijit._tree.Controller");
 
@@ -25,6 +25,16 @@ dojo.declare(
 
 	postMixInProperties: function(){
 		// setup to handle events from tree
+
+		// if the store supports Notification, subscribe to the notifcation events
+		if (this.store._features['dojo.data.api.Notification']){
+			dojo.connect(this.store, "onNew", this, "onNew");
+			dojo.connect(this.store, "onDelete", this, "onDelete");
+			dojo.connect(this.store, "onSet", this, "onSet");
+		}
+
+
+		// setup to handle events from tree
 		dojo.subscribe(this.treeId, this, "_listener");	
 	},
 
@@ -47,7 +57,7 @@ dojo.declare(
 		message.node.tree.focusNode(message.node);
 		
 		// TODO: user guide: tell users to listen for execute events
-		console.log("execute message for " + message.node);
+		console.log("execute message for " + message.node + ": ", message);
 	},
 
 	onNext: function(/*Object*/ message){
@@ -59,6 +69,53 @@ dojo.declare(
 		}	
 	},
 
+	onNew: function(/*Object*/ item, parentInfo){
+		//summary: new event from the store.
+
+		if (parentInfo){
+			var parent = this._itemNodeMap[this.store.getIdentity(parentInfo.item)];
+		}
+
+		var childParams = {item:item};
+		if (parent){
+			if (!parent.isFolder){
+				parent.makeFolder();
+			}
+			if (parent.state=="LOADED" || parent.isExpanded){
+				var childrenMap=parent.addChildren([childParams]);
+			}
+		} else {
+			var childrenMap=this.tree.addChildren([childParams]);		
+		}
+
+		if (childrenMap){
+			dojo.mixin(this._itemNodeMap, childrenMap);
+			//this._itemNodeMap[this.store.getIdentity(item)]=child;
+		}
+	},
+
+	onDelete: function(/*Object*/ message){
+		//summary: delete event from the store
+		//since the object has just been deleted, we need to
+		//use the name directly
+		var identity = this.store.getIdentity(message);
+		var node = this._itemNodeMap[identity];
+
+		if (node){
+			parent = node.getParent();
+			parent.deleteNode(node);
+			this._itemNodeMap[identity]=null;
+		}
+	},
+
+
+	onSet: function(/*Object*/ message){
+		//summary: set data event  on an item in the store
+		var identity = this.store.getIdentity(message);
+                var node = this._itemNodeMap[identity];
+		node.setLabelNode(this.store.getLabel(message));
+	},
+
 	_navToNextNode: function(node){
 		// summary: get next visible node
 		var returnNode;
@@ -67,7 +124,7 @@ dojo.declare(
 			returnNode = node.getChildren()[0];			
 		}else{
 			// find a parent node with a sibling
-			while(node.isTreeNode) {
+			while(node.isTreeNode){
 				returnNode = node.getNextSibling();
 				if(returnNode){
 					break;
@@ -204,7 +261,7 @@ dojo.declare(
 		}
 	},
 
-	onLetterKeyNav: function(message) {
+	onLetterKeyNav: function(message){
 		// summary: letter key pressed; search for node starting with first char = key
 		var node = startNode = message.node;
 		var tree = message.tree;
@@ -256,7 +313,8 @@ dojo.declare(
 	onAfterTreeCreate: function(message){
 		// when a tree is created, we query against the store to get the top level nodes
 		// in the tree
-		var tree = message.tree;
+		var tree = this.tree = message.tree;
+		this._itemNodeMap={};
 
 		var _this = this;
 		function onComplete(/*dojo.data.Item[]*/ items){
@@ -267,8 +325,10 @@ dojo.declare(
 						isFolder: _this.store.hasAttribute(item, _this.childrenAttr)
 						};
 				});
-			tree.setChildren(childParams);
+
+			_this._itemNodeMap = tree.setChildren(childParams);
 		}
+
 		this.store.fetch({ query: this.query, onComplete: onComplete });
 	},
 
@@ -329,7 +389,9 @@ dojo.declare(
 				isFolder: this.store.hasAttribute(item, this.childrenAttr)
 			};
 		}, this);
-		node.setChildren(childParams);
+
+		dojo.mixin(this._itemNodeMap,node.setChildren(childParams));
+
 		dijit._tree.Controller.prototype._expand.apply(this, arguments);
 	},
 

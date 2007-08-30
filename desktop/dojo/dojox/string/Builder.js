@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.string.Builder"]){
+if(!dojo._hasResource["dojox.string.Builder"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.string.Builder"] = true;
 dojo.provide("dojox.string.Builder");
 
@@ -13,9 +13,8 @@ dojo.provide("dojox.string.Builder");
 	
 	var m = {
 	 	append: function(/*String*/s){ 
-			// summary: Append all arguments to the end of the buffer
-			this.b += s;
-			return this; // dojox.string.Builder
+			// summary: Append all arguments to the end of the buffer 
+			return this.appendArray(dojo._toArray(arguments)); // dojox.string.Builder
 		},
 		appendArray: function(/*Array*/strings) {
 			this.b = String.prototype.concat.apply(this.b, strings);
@@ -80,11 +79,9 @@ dojo.provide("dojox.string.Builder");
 				// Summary: Get the buffer as a string
 				return this.b.join(""); 
 			},
-			append: function(s){
-				this.b.push(s);
-			},
 			appendArray: function(strings){
 				this.b = this.b.concat(strings);
+				return this;
 			},
 			_clear: function(){
 				this.b = [];

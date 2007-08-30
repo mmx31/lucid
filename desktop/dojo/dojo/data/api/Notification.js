@@ -1,9 +1,9 @@
-if(!dojo._hasResource["dojo.data.api.Notification"]){
+if(!dojo._hasResource["dojo.data.api.Notification"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojo.data.api.Notification"] = true;
 dojo.provide("dojo.data.api.Notification");
 dojo.require("dojo.data.api.Read");
 
-dojo.declare("dojo.data.api.Notification",dojo.data.api.Read,null,{
+dojo.declare("dojo.data.api.Notification", dojo.data.api.Read, {
 	//	summary:
 	//		This is an abstract API that data provider implementations conform to.
 	//		This file defines functions signatures and intentionally leaves all the

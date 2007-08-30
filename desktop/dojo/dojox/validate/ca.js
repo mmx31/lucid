@@ -1,4 +1,4 @@
-if(!dojo._hasResource["dojox.validate.ca"]){
+if(!dojo._hasResource["dojox.validate.ca"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.validate.ca"] = true;
 dojo.provide("dojox.validate.ca");
 
