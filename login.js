@@ -2,13 +2,23 @@ var desktop = {
 	formid: "psychdesktop_login",
 	detect: false,
 	elements: new Object(),
-	loginForm:	"<div name='error'></div>"
-				+"<div style='color: red;' id='desktop_formerror'></div>"
+	loginForm:	"<div style='color: red;' id='desktop_formerror'></div>"
 				+"<div><span class='desktop-inputlabel'>Username:</span>"
 				+"<input type='text' name='username' /></div>"
 				+"<div><span class='desktop-inputlabel'>Password:</span>"
 				+"<input type='password' name='password' /></div>"
-				+"<input type='submit' name='submit' value='Submit' />",
+				+"<input type='submit' name='submit' value='Submit' />"
+				+"<div><a href='javascript: desktop.registerDialog();'>Register</a></div>",
+	registerForm:	"<div style='color: red;' id='desktop_registerformerror'></div>"
+					+"<div><span class='desktop-inputlabel'>Username:</span>"
+					+"<input type='text' name='username' /></div>"
+					+"<div><span class='desktop-inputlabel'>Email:</span>"
+					+"<input type='text' name='email' /></div>"
+					+"<div><span class='desktop-inputlabel'>Password:</span>"
+					+"<input type='text' name='password' /></div>"
+					+"<div><span class='desktop-inputlabel'>Confirm Password:</span>"
+					+"<input type='text' name='confPassword' /></div>"
+					+"<input type='submit' name='submit' value='Submit' />",
 	init: function()
 	{
 		
@@ -43,6 +53,20 @@ var desktop = {
 			element.src = desktop.path+"/desktop/dojo/dojo/dojo.js";
 			element.id = "";
 			document.getElementsByTagName("head")[0].appendChild(element);
+			
+			var element = document.createElement("link");
+			element.rel = "stylesheet";
+			element.type = "text/css";
+			element.media = "screen";
+			element.href = desktop.path+"/desktop/dojo/dijit/themes/tundra/tundra_rtl.css";
+			document.getElementsByTagName("head")[0].appendChild(element);
+			
+			var element = document.createElement("link");
+			element.rel = "stylesheet";
+			element.type = "text/css";
+			element.media = "screen";
+			element.href = desktop.path+"/desktop/dojo/dijit/themes/tundra/tundra.css";
+			document.getElementsByTagName("head")[0].appendChild(element);
 		}
 		desktop.setOnLoad();
 	},
@@ -65,29 +89,34 @@ var desktop = {
 	},
 	login: function(contents)
 	{
+		dojo.byId("desktop_formerror").innerHTML = "";
 		dijit.byId(desktop.formid).domNode.submit.disabled=true;
-		dojo.xhrPost({
-			url: desktop.path+"/backend/login.php",
-			content: contents,
-			load: function(data)
-			{
-				if(data == "0")
+		if(contents.username && contents.password)
+		{
+			dojo.xhrPost({
+				url: desktop.path+"/backend/login.php",
+				content: contents,
+				load: function(data)
 				{
-					desktop.popUp();
-					desktop.loggedin();
-					dojo.disconnect(desktop.elements.onExecuteForm);
+					if(data == "0")
+					{
+						desktop.popUp();
+						desktop.loggedin();
+						dojo.disconnect(desktop.elements.onExecuteForm);
+					}
+					else
+					{
+						desktop.error("Incorrect username or password");
+						dijit.byId(desktop.formid).domNode.submit.disabled=false;
+					}
 				}
-				else
-				{
-					desktop.error("Incorrect username or password");
-					dijit.byId(desktop.formid).domNode.submit.disabled=false;
-				}
-			}
-		});
-	},
-	error: function(msg)
-	{
-		dojo.byId("desktop_formerror").innerHTML=msg;
+			});
+		}
+		else
+		{
+			dojo.byId("desktop_formerror").innerHTML = "Please provide both a username and a password";
+			dijit.byId(desktop.formid).domNode.submit.disabled=false;
+		}
 	},
 	loggedin: function()
 	{
@@ -103,6 +132,46 @@ var desktop = {
 		var day=new Date();
 		var id=day.getTime();
 		desktop.elements.popup=window.open(URL,id,"toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=1,width=1000000,height=1000000,left = 0,top = 0");
+	},
+	registerDialog: function() {
+		var div = dojo.doc.createElement("div");
+		div.setAttribute("class", "tundra");
+		div.style.backgroundColor="white";
+		desktop.elements.registerDialogForm = new dijit.form.Form({});
+		desktop.elements.registerDialogForm.domNode.innerHTML = desktop.registerForm;
+		
+		new dijit.form.TextBox({name: "username"}, desktop.elements.registerDialogForm.domNode.username);
+		new dijit.form.TextBox({name: "email"}, desktop.elements.registerDialogForm.domNode.email);
+		new dijit.form.TextBox({name: "password", type: "password"}, desktop.elements.registerDialogForm.domNode.password);
+		new dijit.form.TextBox({name: "confPassword", type: "password"}, desktop.elements.registerDialogForm.domNode.confPassword);
+		
+		div.appendChild(desktop.elements.registerDialogForm.domNode);
+		dojo.doc.body.appendChild(div);
+		dojo.require("dijit.Dialog");
+		desktop.elements.registerDialog = new dijit.Dialog({title: "Register"}, div);
+		desktop.elements.registerDialog.show();
+		dojo.connect(desktop.elements.registerDialogForm, "execute", desktop, function(contents){
+			dijit.byId(desktop.formid).domNode.submit.disabled=true;
+			dojo.byId("desktop_registerformerror").innerHTML = "";
+			if(contents.username && contents.email && contents.password && contents.confPassword)
+			{
+				if(contents.password == contents.confPassword)
+				{
+					//TODO: send crap to server
+				}
+				else
+				{
+					dojo.byId("desktop_registerformerror").innerHTML = "Two passwords don't match";
+					dijit.byId(desktop.formid).domNode.submit.disabled=false;
+				}
+			}
+			else
+			{
+				dojo.byId("desktop_registerformerror").innerHTML = "Please fill in all fields";
+				dijit.byId(desktop.formid).domNode.submit.disabled=false;
+			}
+		});
 	}
+	//TODO: put in forgot password dialog
 };
 desktop.init();
