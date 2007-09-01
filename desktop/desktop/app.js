@@ -105,7 +105,6 @@ desktop.app = new function()
 		*/
 		this.launch = function(id, args)
 		{
-			desktop.core.loadingIndicator(0);
 			if(this.apps[id] == undefined)
 			{this.fetchApp(id, dojo.hitch(this, this.launch), args);  desktop.core.loadingIndicator(1);}
 			else
@@ -113,8 +112,7 @@ desktop.app = new function()
 				this.instanceCount++;
 				this.instances[this.instanceCount] = new this.apps[id];
 				this.instances[this.instanceCount].instance = this.instances.length-1;
-				this.instances[this.instanceCount].init(args);
-				desktop.core.loadingIndicator(1);
+				this.instances[this.instanceCount].init((args ? args : null));
 			}
 		}
 	}

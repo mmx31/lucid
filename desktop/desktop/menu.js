@@ -44,24 +44,6 @@ desktop.menu = new function()
 		 */
 		this.clickcache = 0;
 		/** 
-		* A function that fixes IE display bugs in the menu
-		* 
-		* @memberOf desktop.menu
-		* @alias desktop.menu.sfHover
-		*/
-		this.sfHover = function() {
-			var sfEls = document.getElementById("sysmenu").getElementsByTagName("LI");
-			for (var i=0; i<sfEls.length; i++) {
-				sfEls[i].onmouseover=function() {
-					this.className+=" sfhover";
-				}
-				sfEls[i].onmouseout=function() {
-					this.className=this.className.replace(new RegExp(" sfhover\\b"), "");
-				}
-			}
-		}
-		if (window.attachEvent) window.attachEvent("onload", dojo.hitch(this, this.sfHover));
-		/** 
 		* Triggered on the document's left click event, used to close the menu.
 		*
 		* @memberOf desktop.menu
@@ -99,7 +81,7 @@ desktop.menu = new function()
 		*/
 		this.button = function()
 		{
-			if(this.visibility == "closed")
+			/*if(this.visibility == "closed")
 			{
 				document.getElementById("sysmenu").style.display = "inline";
 				if(desktop.config.fx == true) dojo.fadeIn({ node: 'sysmenu', duration: 300 }).play();
@@ -112,7 +94,10 @@ desktop.menu = new function()
 				{
 					//this.visibility = "closed";
 				}
-			}
+			}*/
+			dijit.popup.open({
+				dropDown: this._menu
+			});
 		}
 		/** 
 		* Hides the menu
@@ -151,7 +136,11 @@ desktop.menu = new function()
 			url: url,
 			load: dojo.hitch(this, function(data, ioArgs){
 				data = dojo.fromJson(data);
-				html = '<ul id="nav">';
+				var menu = new dijit.Menu({
+					id: "sysmenu"
+				}, dojo.byId("sysmenu"));
+				this._menu = menu;
+				//menu.domNode.id="sysmenu";
 				var cats = new Object();
 				for(item in data)
 				{
@@ -159,19 +148,37 @@ desktop.menu = new function()
 				}
 				for(cat in cats)
 				{
-					html += '<li style="border-top: 1px solid white; border-bottom: 1px solid white;"><div style="float: left;" class="icon-16-categories-applications-'+(cat.toLowerCase())+'"></div>&nbsp;'+cat+'<ul>';
+					//cat.meow();
+					var category = new dijit.PopupMenuItem({iconClass: "icon-16-categories-applications-"+cat.toLowerCase(), label: cat});
+					//category.addChild(dojo.doc.createElement("span"));
+					var catMenu = new dijit.Menu({parentMenu: category});
 					for(app in data)
 					{
 						if(data[app].category == cat)
-						html += '<li onClick="javascript:desktop.app.launch('+data[app].ID+');" style="border-top: 1px solid white; border-bottom: 1px solid white;">'+data[app].name+'</li>';
+						{
+							var item = new dijit.MenuItem({
+								label: data[app].name, 
+								onClick: eval("(function() {desktop.app.launch("+data[app].ID+")})")
+							});
+							catMenu.addChild(item);
+						}
 					}
-					html += '</ul></li>';
+					catMenu.startup();
+					//category.addChild(catMenu);
+					category.popup = catMenu;
+					menu.addChild(category);
 				}
-				html += '<li onClick="javascript:desktop.core.logout();" style="border-top: 1px solid white; border-bottom: 1px solid white;"><div style="float: left;" class="icon-16-actions-system-log-out"></div>&nbsp;Logout</li>';
-				html += '</ul>';
-				document.getElementById("menu").innerHTML = html;
-				desktop.core.loadingIndicator(1);
-				}),
+				menu.addChild(new dijit.MenuItem({
+					label: "Log Out", 
+					iconClass: "icon-16-actions-system-log-out",
+					onClick: desktop.core.logout
+				}));
+				menu.bindDomNode("menubutton");
+				menu.domNode.style.display="none";
+				menu.startup();
+				dojo.doc.body.appendChild(menu.domNode);
+				desktop.taskbar.makeButton();
+			}),
 			error: function(type, data, evt) { desktop.core.loadingIndicator(1) },
 			mimetype: "text/plain"
 		});
@@ -191,8 +198,11 @@ desktop.menu = new function()
 			html += "</td></tr></table>";
 			div = document.createElement("div");
 			div.id="sysmenu";
-			div.innerHTML = html;
+			//div.innerHTML = html;
 			document.body.appendChild(div);
 			this.getApplications();
+		}
+		this.init = function() {
+			dojo.require("dijit.Menu");
 		}
 	}

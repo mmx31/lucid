@@ -9,7 +9,6 @@
  */
 api.database = new function()
 {
-	//TODO: tie this in more with the dojo.data stuff
 	/** 
 	* Gets a table from the database.
 	* 
@@ -17,7 +16,7 @@ api.database = new function()
 	* @param {Object} options	The options
 	* @memberOf api.db
 	*/
-    this.getTable = function(options)
+    this.get = function(options)
     {
 		appid=options.appid;
 		name=options.name;
@@ -40,7 +39,7 @@ api.database = new function()
 	* @param {Object} options	The options
 	* @memberOf api.db
 	*/
-    this.saveTable = function(options)
+    this.save = function(options)
     {		
         dojo.xhrGet({
             url: "../backend/api.php?action=saveDatabase",

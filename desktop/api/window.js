@@ -24,6 +24,7 @@ api.windowcounter = 0;
  */
 api.window = function(params)
 {
+	if(typeof params != "object") params = {};
 	/*
 	 * Property: _id
 	 *
@@ -38,7 +39,7 @@ api.window = function(params)
 	 * Summary:
 	 * 		The window's contents. Use <window.write> to write content to a window.
 	 */
-	this._innerHTML = "";
+	this._innerHTML = ((typeof params.innerHTML == "string") ? params.innerHTML : "");
 	/*
 	 * Property: bodyWidget
 	 * 
@@ -49,51 +50,53 @@ api.window = function(params)
 	 * 		This must be a member of dijit.layout
 	 * 
 	 * Notes:
-	 * 		 This is usefull for things like layout container creation
+	 * 		This is usefull for things like layout container creation
+	 * 		To set this after window creation, use <window.setBodyWidget>
 	 */
-	this.bodyWidget = "ContentPane";
+	this.bodyWidget = ((typeof params.bodyWidget == "string") ? params.bodyWidget : "ContentPane");
 	/*
 	 * Property: bodyWidgetParams
 	 * 
 	 * Summary:
 	 * 		The window body's widget params
 	 */
-	this.bodyWidgetParams = {};
+	this.bodyWidgetParams = ((typeof params.bodyWidgetParams == "object") ? params.bodyWidgetParams : {});
 	/*
 	 * Property: maximized
 	 * 
 	 * Summary:
 	 * 		Whether or not the window is maximized
+	 * 		To set this after window creation, use <window.setBodyWidget>
 	 */
-	this.maximized = false;
+	this.maximized = ((typeof params.maximized == "boolean") ? params.maximized : false);
 	/*
 	 * Property: height
 	 * 
 	 * Summary:
 	 * 		The window's height in px, or %.
 	 */
-	this.height = "400px";
+	this.height = ((typeof params.height == "string") ? params.height : "400px");
 	/*
 	 * Property: width
 	 * 
 	 * Summary:
 	 * 		The window's width in px, or %.
 	 */
-	this.width = "500px";
+	this.width = ((typeof params.width == "string") ? params.width : "500px");
 	/*
 	 * Property: title
 	 * 
 	 * Summary:
 	 * 		The window's title
 	 */
-	this.title = "";
+	this.title = ((typeof params.title == "string") ? params.title : "");
 	/*
 	 * Property: resizable
 	 * 
 	 * Summary:
 	 * 		Weather or not the window is resizable.
 	 */
-	this.resizable = true;
+	this.resizable = ((typeof params.resizable != "undefined") ? params.resizable : true);
 	for(p in params)
 	{
 		this[p] = params[p];
@@ -104,7 +107,7 @@ api.window = function(params)
 	 * Summary:
 	 * 		Internal variable used by the window maximizer
 	 */
-	this.pos = new Object();
+	this.pos = {};
 	/*
 	 * Property: body
 	 * 
@@ -112,7 +115,7 @@ api.window = function(params)
 	 * 		The window's body widget
 	 */
 	this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, dojo.doc.createElement('div'));
-	this.body.id=this._id+"body"
+	this.body.id=this._id+"body";
 	/*
 	 * Method: setBodyWidget
 	 * 
@@ -128,7 +131,7 @@ api.window = function(params)
 		this.bodyWidgetParams = widgetParams;
 		this.bodyWidgetParams.id=this._id+"body";
 		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, dojo.doc.createElement('div'));
-	}
+	};
 	/*
 	 * Method: empty
 	 * 
@@ -578,7 +581,7 @@ api.window = function(params)
 			}
 		}
 		zindex = dojo.byId(this._id).style.zIndex;
-		if(desktop.config.debug == true) api.console(maxZindex+" != "+zindex);
+		if(desktop.config.debug == true) { api.console(maxZindex+" != "+zindex); }
 		if(maxZindex != zindex)
 		{
 			maxZindex++;
@@ -586,7 +589,7 @@ api.window = function(params)
 			return false;
 		}
 		else return true;
-	}
+	};
 	/* 
 	 * Method: destroy
 	 * 
@@ -618,9 +621,9 @@ api.window = function(params)
 	this.addChild = function(node)
 	{
 		this.body.addChild(node);
-	}
+	};
 	this.startup = function()
 	{
 		this.body.startup();
-	}
-}
+	};
+};

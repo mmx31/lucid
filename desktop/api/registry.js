@@ -16,7 +16,7 @@ api.registry = new function()
 	* @param {Function} callback	A function to pass the value to
 	* @memberOf api.registry
 	*/
-    this.getValue = function(appid,varname,callback)
+    this.get = function(appid,varname,callback)
     {
         desktop.core.loadingIndicator(0);
         dojo.xhrGet({
@@ -39,7 +39,7 @@ api.registry = new function()
 	* @param {String} value	The new value of the variable
 	* @memberOf api.registry
 	*/
-    this.saveValue = function(appid,varname,value)
+    this.save = function(appid,varname,value)
     {
         desktop.core.loadingIndicator(0);
         dojo.xhrPost({
@@ -59,7 +59,7 @@ api.registry = new function()
 	* @param {String} varname	The variable's name
 	* @memberOf api.registry
 	*/
-	this.removeValue = function(appid,varname)
+	this.remove = function(appid,varname)
     {
         desktop.core.loadingIndicator(0);
         dojo.xhrGet({

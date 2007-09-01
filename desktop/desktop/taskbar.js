@@ -139,7 +139,7 @@ desktop.taskbar = new function()
 		this.draw = function()
 		{
 			tasktray = '<table id="tasktray"><tr id="tasklist"><td id="taskclock">&nbsp;</td><td><div id="trayclock"></div></td></tr></table>';
-			html='<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td width="30"><img src="./themes/default/images/icons/apps.gif" onmousedown ="desktop.menu.button();" border="0"></td><td width="1%"><div class="seperator"></div></td><td width="80%"><div id="appbar"></div></td><td width="1%"><div class="seperator"></div></td><td width="15%">'+tasktray+'</td></tr></table>';
+			html='<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td width="30"><div id="menubutton"></div></td><td width="1%"><div class="seperator"></div></td><td width="80%"><div id="appbar"></div></td><td width="1%"><div class="seperator"></div></td><td width="15%">'+tasktray+'</td></tr></table>';
 			
 			div = document.createElement("div");
 			div.innerHTML = html;
@@ -166,6 +166,20 @@ desktop.taskbar = new function()
 			{
 				dojo.byId("networkStatus").setAttribute("class", "icon-22-status-network-idle");
 			}); 
+		}
+		this.makeButton = function()
+		{
+			dojo.require("dijit.form.Button");
+			var menubutton = new dijit.form.DropDownButton({
+				iconClass: "menubutton-icon",
+				label: "Apps",
+				showLabel: false,
+				dropDown: dijit.byId("sysmenu")
+			}, dojo.byId("menubutton"));
+			menubutton.domNode.style.height="28px";
+			//menubutton.domNode.id="menubutton";
+			menubutton.startup();
+			
 		}
 		this.init = function()
 		{
@@ -200,7 +214,7 @@ desktop.taskbar = new function()
 			});
 		}
 		/*this isn't in dojo 0.9...
-		///** 
+		/ 
 		* toggles the visibility of the analog clock
 		* 
 		* @alias desktop.taskbar.toggleClock

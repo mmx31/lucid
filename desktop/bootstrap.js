@@ -16,8 +16,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-var desktop = new Object();
-desktop.modules = new Object();
+var desktop = {};
+desktop.modules = {};
 dojo.require("dojo.io.script");
 if(navigator.appName == "Microsoft Internet Explorer")
 {
@@ -52,7 +52,7 @@ if(navigator.appName == "Microsoft Internet Explorer")
 		}
 		err += "\nerror:\n"+e;
 		alert(err);
-	}
+	};
 }
 /* 
  * Package: bootstrap
@@ -74,7 +74,7 @@ var bootstrap = {
 	if(version == "1.7") document.write('<script type="application/javascript;version=1.7" src="'+libraryName+'"></script>');
 	else document.write('<script type="text/javascript" src="'+libraryName+'"></script>');*/
 	var url = "./desktop/"+libraryName+".js";
-	desktop.modules[libraryName] = new Object();
+	desktop.modules[libraryName] = {};
 	desktop.modules[libraryName].initiated = false;
 	if(typeof version == "integer" || typeof version == "string")
 	{
@@ -98,19 +98,19 @@ var bootstrap = {
 numberOfModulesLoaded: 0,
   checkifloaded: function()
 	{
-		if(desktop.modules.api.initiated == true)
+		if(desktop.modules.api.initiated === true)
 		{
 			var nom = 0;
-			for(mod in desktop.modules) nom++;
+			for(mod in desktop.modules) {nom++;}
 			for(mod in desktop.modules)
 			{
 				if((typeof desktop[mod]) != "undefined")
 				{
 					desktop.modules[mod].loaded = true;
 					bootstrap.numberOfModulesLoaded++;
-					var p = bootstrap.numberOfModulesLoaded.toString()
+					var p = bootstrap.numberOfModulesLoaded.toString();
 					bootstrap._indicator.update({progress: p, maximum: nom});
-					setTimeout(function(){1+1},0); //yield
+					setTimeout(function(){}, 0); //yield
 				}
 				else
 				{
@@ -128,10 +128,16 @@ numberOfModulesLoaded: 0,
 				}
 			}
 			desktop.config.draw(function() {
-				for(lib in desktop.modules) if((typeof desktop[lib].draw) == "function") desktop[lib].draw();
+				for(lib in desktop.modules) {
+					if((typeof desktop[lib].draw) == "function") { desktop[lib].draw(); }
+				}
 				for(lib in desktop.modules)
 				{
-					if(lib != "core" && lib != "api" && lib != "config") if((typeof desktop[lib].init) == "function") desktop[lib].init();
+					if(lib != "core" && lib != "api" && lib != "config") {
+						if((typeof desktop[lib].init) == "function") {
+							desktop[lib].init();
+						}
+					}
 					desktop.modules[lib].initiated = true;
 				}
 				dojo.doc.body.removeChild(bootstrap._loading);
@@ -169,16 +175,17 @@ numberOfModulesLoaded: 0,
 	bootstrap._loading.style.width=(d.w)+"px";
 	bootstrap._loading.style.textAlign= "center";
 	bootstrap._loading.style.zIndex = "1000000";
+	dojo.addClass(bootstrap._loading, "tundra");
 	dojo.require("dijit.ProgressBar");
 	bootstrap._indicator = new dijit.ProgressBar({indeterminate: true});
 	bootstrap._loading.appendChild(bootstrap._indicator.domNode);
 	dojo.doc.body.appendChild(bootstrap._loading);
 	  
- bootstrap.link("desktop.css", "corestyle");
  bootstrap.link("./dojo/dijit/themes/dijit.css", "dijit");
  bootstrap.link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
  bootstrap.link("./dojo/dijit/themes/tundra/tundra.css", "tundra");
  bootstrap.link("./dojo/dijit/themes/tundra/tundra_rtl.css", "tundra_rtl");
+ bootstrap.link("desktop.css", "corestyle");
  dojo.require("dijit.layout.LayoutContainer");
  dojo.require("dijit.layout.ContentPane");
  dojo.require("dijit.Menu");
@@ -199,9 +206,8 @@ numberOfModulesLoaded: 0,
  bootstrap.require('wallpaper');
  bootstrap.require('widget');
  bootstrap.require('windows');
- dojo.addClass(document.body, "tundra");
  bootstrap._indicator.update({indeterminate: false, progress: 0});
  bootstrap.checkifloaded();
 }
-}
+};
 dojo.addOnLoad(bootstrap.load);

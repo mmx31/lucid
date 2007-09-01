@@ -1,3 +1,7 @@
+@import url("./icons.css");
+
+@import url("./window.css");
+
 /*
 TODO: there's alot of things in this that should be in /desktop.css instead of here...
 */
@@ -116,4 +120,11 @@ TODO: there's alot of things in this that should be in /desktop.css instead of h
 {
 	background: url(./images/sysmenumiddle.gif);
 	text-align: center;
+}
+.menubutton-icon
+{
+	background-image: url('./images/icons/apps.gif');
+	width: 30px;
+	height: 30px;
+	background-repeat: no-repeat;
 }
