@@ -165,18 +165,18 @@ numberOfModulesLoaded: 0,
 	document.getElementsByTagName("head")[0].appendChild(element);
   },
   load: function() {
+	dojo.require("dijit.ProgressBar");
   	bootstrap._loading = dojo.doc.createElement("div");
 	bootstrap._loading.innerHTML = "Loading...";
 	bootstrap._loading.style.position="absolute";
 	var d=dijit.getViewport();
-	bootstrap._loading.style.top=(d.h)+"px";
-	bootstrap._loading.style.left=(d.w)+"px";
-	bootstrap._loading.style.height=(d.h)+"px";
-	bootstrap._loading.style.width=(d.w)+"px";
+	bootstrap._loading.style.top=(d.h/3)+"px";
+	bootstrap._loading.style.left=(d.w/3)+"px";
+	bootstrap._loading.style.height=(d.h/3)+"px";
+	bootstrap._loading.style.width=(d.w/3)+"px";
 	bootstrap._loading.style.textAlign= "center";
 	bootstrap._loading.style.zIndex = "1000000";
 	dojo.addClass(bootstrap._loading, "tundra");
-	dojo.require("dijit.ProgressBar");
 	bootstrap._indicator = new dijit.ProgressBar({indeterminate: true});
 	bootstrap._loading.appendChild(bootstrap._indicator.domNode);
 	dojo.doc.body.appendChild(bootstrap._loading);
