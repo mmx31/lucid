@@ -1,4 +1,5 @@
 <?php
+session_start();
 if ($_GET['fs'] == "createDirectory") {
 				$odir = $_REQUEST['path'];
 			    $dir = "../files/".$_SESSION['userid']."/$odir";
@@ -41,7 +42,7 @@ if ($_GET['fs'] == "createDirectory") {
 }
 	if ($_GET['fs'] == "getFile") {
 				$odir = $_REQUEST['path'];
-			    	$dir = "../files/".$_SESSION['userid']."/$odir";
+			    	$dir = "../../files/".$_SESSION['userid']."/$odir";
 				$file = file_get_contents($dir);
 				$output = "<" . "?xml version='1.0' encoding='utf-8' ?" .">\r\n" . "<getFileResponse path=\"" . $_REQUEST['path'] . "\">";
 				$output .=  "\r\n" . '<file>' . $file . '</file>';
