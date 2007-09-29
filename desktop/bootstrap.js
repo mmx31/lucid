@@ -76,6 +76,7 @@ var bootstrap = {
 	var url = "./desktop/"+libraryName+".js";
 	desktop.modules[libraryName] = {};
 	desktop.modules[libraryName].initiated = false;
+	desktop.modules[libraryName].loaded = false;
 	if(typeof version == "integer" || typeof version == "string")
 	{
 		var element = document.createElement("script");
@@ -104,7 +105,7 @@ numberOfModulesLoaded: 0,
 			for(mod in desktop.modules) {nom++;}
 			for(mod in desktop.modules)
 			{
-				if(desktop.modules[mod].loaded == false)
+				if(desktop.modules[mod].loaded === false)
 				{
 					if((typeof desktop[mod]) == "object")
 					{
