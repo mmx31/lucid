@@ -71,6 +71,23 @@ api.crosstalk = new function()
 		}
 		api.crosstalk.start();
 		}
+		
+	/** 
+	* the crosstalk api checker, called every 20 or so seconds, internally. then will handle it from the registered crap...
+	* 
+	* @alias api.crosstalk.internalCheck
+	* @memberOf api.crosstalk
+	*/
+	this.sendEvent = function(userid, message, appid, instance)
+		{
+		var url = "../backend/api.php?crosstalk=sendEvent&userid="+userid+"&message="+message+"&appid="+appid+"&instance="+instance+"";
+        	dojo.xhrGet({
+        	url: url,
+        	error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
+        	mimetype: "text/xml"
+        	});
+		}
+
 
 	/** 
 	* the crosstalk api checker, stage2, compare the results with the handled handlers ;)
