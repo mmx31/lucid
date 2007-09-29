@@ -115,7 +115,7 @@ var desktop = {
 					}
 					else
 					{
-						desktop.error("Incorrect username or password");
+						dojo.byId("desktop_formerror").innerHTML = "Incorrect username or password.";
 						dijit.byId(desktop.formid).domNode.submit.disabled=false;
 					}
 				}
@@ -175,6 +175,11 @@ var desktop = {
 							content: contents,
 							load: function(data, ioArgs)
 							{
+								if(data == "User registration disabled")
+								{
+									desktop.elements.registerDialog.hide();
+									dojo.byId("desktop_formerror").innerHTML = "Public registations are disabled";
+								}
 								if(data == "1")
 								{
 									dojo.byId("desktop_registerformerror").innerHTML = "Username allready exists";
