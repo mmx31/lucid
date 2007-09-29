@@ -47,7 +47,7 @@
 	include("../config.php");
     $message = $_GET["message"];
     $sender = $userid;
-    $destination = $_GET["destination"];
+    $destination = $_GET["userid"];
     $appID = $_GET["appID"];
 	$instance = $_GET["instance"];
 	if($destination == 0) {
