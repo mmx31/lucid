@@ -104,7 +104,7 @@ numberOfModulesLoaded: 0,
 			for(mod in desktop.modules) {nom++;}
 			for(mod in desktop.modules)
 			{
-				if(mod != "api")
+				if(desktop.modules[mod].loaded == false)
 				{
 					if((typeof desktop[mod]) == "object")
 					{
