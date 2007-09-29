@@ -17,11 +17,11 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 	session_start();
+	require("config.php");
  $userid = $_SESSION['userid'];
     if ($_GET['crosstalk'] == "checkForEvents")
     {
     header('Content-type: text/xml');
-	include("../config.php");
     $appID = $_GET['appID'];
 	$instance = $_GET['instance'];
 	$query = "SELECT * FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND appID=\"${appID}\"";
@@ -44,7 +44,6 @@
 }
     if ($_GET['crosstalk'] == "sendEvent")
     {
-	include("../config.php");
     $message = $_GET["message"];
     $sender = $userid;
     $destination = $_GET["userid"];
