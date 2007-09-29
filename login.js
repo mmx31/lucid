@@ -2,7 +2,8 @@ var desktop = {
 	formid: "psychdesktop_login",
 	detect: false,
 	elements: {},
-	loginForm:	"<div style='color: red;' id='desktop_formerror'></div>"
+	loginForm:	"<div id='desktop_message'>Desktop Login</div>"
+				+ "<div style='color: red;' id='desktop_formerror'></div>"
 				+"<div><span class='desktop-inputlabel'>Username:</span>"
 				+"<input type='text' class='desktop-input' name='username' /></div>"
 				+"<div><span class='desktop-inputlabel'>Password:</span>"
