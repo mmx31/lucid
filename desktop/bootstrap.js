@@ -104,26 +104,29 @@ numberOfModulesLoaded: 0,
 			for(mod in desktop.modules) {nom++;}
 			for(mod in desktop.modules)
 			{
-				if((typeof desktop[mod]) != "undefined")
+				if(mod != "api")
 				{
-					desktop.modules[mod].loaded = true;
-					bootstrap.numberOfModulesLoaded++;
-					var p = bootstrap.numberOfModulesLoaded.toString();
-					bootstrap._indicator.update({progress: p, maximum: nom});
-					setTimeout(function(){}, 0); //yield
-				}
-				else
-				{
-					if(desktop.modules[mod].version == "1.7")
+					if((typeof desktop[mod]) == "object")
 					{
-						desktop[mod] = {disabled: true};
 						desktop.modules[mod].loaded = true;
+						bootstrap.numberOfModulesLoaded++;
+						var p = bootstrap.numberOfModulesLoaded; //.toString();
+						bootstrap._indicator.update({progress: p, maximum: nom});
+						setTimeout(function(){}, 0); //yield
 					}
 					else
 					{
-						desktop.modules[mod].loaded = false;
-						setTimeout(bootstrap.checkifloaded, 50);
-						return;
+						if(desktop.modules[mod].version == "1.7")
+						{
+							desktop[mod] = {disabled: true};
+							desktop.modules[mod].loaded = true;
+						}
+						else
+						{
+							desktop.modules[mod].loaded = false;
+							setTimeout(bootstrap.checkifloaded, 50);
+							return;
+						}
 					}
 				}
 			}
@@ -202,7 +205,7 @@ numberOfModulesLoaded: 0,
  bootstrap.require('screensaver');
  bootstrap.require('taskbar');
  bootstrap.require('theme');
- bootstrap.require('thread', "1.7");
+ //bootstrap.require('thread', "1.7");
  bootstrap.require('wallpaper');
  bootstrap.require('widget');
  bootstrap.require('windows');
