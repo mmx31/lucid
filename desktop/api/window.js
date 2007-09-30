@@ -159,10 +159,8 @@ api.window = function(params)
 	{
 		//TODO: would this interfere with addChild?
 		this._innerHTML += string;
-		if(document.getElementById(this._id+"body"))
-		{
-			document.getElementById(this._id+"body").innerHTML += string;
-		}		
+		if(this.bodyWidget == "ContentPane") this.body.setContent(this.body.domNode.innerHTML+string);
+		else this.body.domNode.innerHTML += string;
 	}
 	/*
 	 * Method: show
@@ -229,7 +227,7 @@ api.window = function(params)
 			if(this.bodyWidget == "ContentPane") this.body.setContent(this._innerHTML);
 			
 			dojo.addClass(this.body.domNode, "winbody")
-						
+			
 			windiv.appendChild(this.body.domNode);
 			
 			if(this.resizable == true)
@@ -353,22 +351,27 @@ api.window = function(params)
 					height = height.replace(/%/g, "");
 					height = (parseInt(win.parentNode.style.height.replace(/px/g, ""))/100)*height;
 				}
+				var top = win.style.top.replace(/px/g, "");
+				var left = win.style.left.replace(/px/g, "");
+				top = parseInt(top);
+				left = parseInt(left);
+				var winx = left+parseInt(width);
+				var winy = top+parseInt(height);
 				if(width >= 30 && height >= 30)
 				{
-					var top = win.style.top.replace(/px/g, "");
-					var left = win.style.left.replace(/px/g, "");
-					top = parseInt(top);
-					left = parseInt(left);
-					var winx = left+parseInt(width);
-					var winy = top+parseInt(height);
 					win.style.width = ((winx+(x-winx))-(left-2))+"px";
 					win.style.height = ((winy+(y-winy))-(top-2))+"px";
 				}
-				this.body.resize();
+				else {
+					win.style.width = "30px";
+					win.style.height = "30px";
+				}
 			});
+			if(desktop.config.fx === true) this._resizeBody();
 			this._doconmouseup = dojo.connect(document, "onmouseup", this, function(e) {
 				dojo.disconnect(this._dragging);
 				dojo.disconnect(this._doconmouseup);
+				this._resizeBody();
 			});
 		});
 	}
@@ -428,9 +431,9 @@ api.window = function(params)
 				}
 			});
 			var anim = dojo.fx.combine([fade, slide, squish]);
-			dojo.connect(anim, "onEnd", null, dojo.hitch(this, function() {
+			dojo.connect(anim, "onEnd", this, function() {
 				dojo.byId(this._id).style.display = "none";
-			}));
+			});
 			anim.play();
 		}
 		else
@@ -492,7 +495,8 @@ api.window = function(params)
 			api.console("maximizing... (in style!)");
 			//win.style.height= "auto";
 			//win.style.width= "auto";
-			dojo.animateProperty({
+			//this._resizeBody();
+			var anim = dojo.animateProperty({
 				node: win,
 				properties: {
 					top: {end: 0},
@@ -501,7 +505,11 @@ api.window = function(params)
 					height: {end: dojo.byId(this._id).parentNode.style.height.replace(/px/g, "")}
 				},
 				duration: 150
-			}).play();
+			});
+			dojo.connect(anim, "onEnd", this, function() {
+				this._resizeBody();
+			});
+			anim.play();
 		}
 		else
 		{
@@ -510,8 +518,8 @@ api.window = function(params)
 			win.style.left = "0px";
 			win.style.width = "100%";
 			win.style.height = "100%";
+			this._resizeBody();
 		}
-		this.body.resize();
 	}
 	/*
 	 * Method: unmaximize
@@ -531,7 +539,7 @@ api.window = function(params)
 		var win = dojo.byId(this._id);
 		if(desktop.config.fx == true)
 		{
-			dojo.animateProperty({
+			var anim = dojo.animateProperty({
 				node: win,
 				properties: {
 					top: {end: this.pos.top},
@@ -542,7 +550,11 @@ api.window = function(params)
 					height: {end: this.pos.height}
 				},
 				duration: 150
-			}).play();
+			});
+			dojo.connect(anim, "onEnd", this, function() {
+				this._resizeBody();
+			});
+			anim.play();
 		}
 		else
 		{
@@ -552,9 +564,19 @@ api.window = function(params)
 			win.style.right = this.pos.right;
 			win.style.height= this.pos.height;
 			win.style.width= this.pos.width;
+			this._resizeBody();
 		}
 		this.maximized = false;
-		this.body.resize();
+	}
+	/*
+	 * Method: unmaximize
+	 * Summary:
+	 * 		UnMaximizes the window
+	 */
+	this._resizeBody = function()
+	{
+		if(this.body.resize) this.body.resize();
+		if(this.body.layout) this.body.layout();
 	}
 	/*
 	 * Method: bringToFront
