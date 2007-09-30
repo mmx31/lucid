@@ -2,7 +2,7 @@
 //database type (mysql and ini) ini coming soon!
 $db_type="mysql";
 //database name
-$db_name="mysql";
+$db_name="desktop";
 //database host
 $db_host="127.0.0.1";
 //database username
