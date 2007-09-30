@@ -1,5 +1,6 @@
 <?php
 require("../backend/config.php");
+echo "<script src=\"./codepress/codepress.js\" type=\"text/javascript\"></script>";
 if($_POST['appid'])
 {
 $link = mysql_connect($db_host, $db_username, $db_password)
@@ -82,7 +83,7 @@ if($category == "Other") { echo "<OPTION>Office</OPTION><OPTION>Internet</OPTION
 $code = str_replace("<", "&lt;", $code);
 $code = str_replace(">", "&gt;", $code);
 ?>
-<textarea name="code" style="width: 100%; height: 500px;"><?php echo $code; ?></textarea>
+<textarea name="code" id="code" class="codepress javascript" style="width: 100%; height: 500px;"><?php echo $code; ?></textarea>
 </td></tr>
 <tr><td colspan="4"><input type="submit" value="save"> <input type="button" value="close" onclick="window.location='index2.php?backend=app'"></td></tr></table>
 </form>
