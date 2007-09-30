@@ -41,6 +41,7 @@ echo "<h3>Create New App</h3>";
 }
 ?>
 <form action="index2.php?backend=saveapp" id="appform" method="post">
+<input type="hidden" name="action" id="action" value="save" />
 <input type="hidden" name="appid" value="<?php echo $appid; ?>">
 <table border="0" width="100%"><tr><td colspan="2">
 <b>Name:</b><input type="text" name="name" value="<?php echo $name; ?>" style="width: 90%;">
@@ -85,5 +86,12 @@ $code = str_replace(">", "&gt;", $code);
 ?>
 <textarea name="code" id="code" class="codepress javascript" style="width: 100%; height: 500px;"><?php echo $code; ?></textarea>
 </td></tr>
-<tr><td colspan="4"><input type="button" onclick="code.toggleEditor(); document.getElementById('appform').submit();" value="save"> <input type="button" value="close" onclick="window.location='index2.php?backend=app'"></td></tr></table>
+<tr><td colspan="4">
+	<input type="button" onclick="code.toggleEditor(); document.getElementById('action').value='submit'; document.getElementById('appform').submit();" value="save" />
+	<?php if($_POST['appid']) { ?>
+		<input type="button" onclick="code.toggleEditor(); document.getElementById('action').value='edit'; document.getElementById('appform').submit();" value="save and edit again" />
+	<?php } ?>
+	<input type="button" value="close" onclick="window.location='index2.php?backend=app'" />
+	<div id="bottom"></div>
+</td></tr></table>
 </form>

@@ -15,4 +15,7 @@ else
 {
 $query = "UPDATE ${db_prefix}apps  SET name=\"${_POST['name']}\", author=\"${_POST['author']}\", email=\"${_POST['email']}\", code=\"${_POST['code']}\", version=\"${_POST['version']}\", maturity=\"${_POST['maturity']}\", category=\"${_POST['category']}\" WHERE ID=\"${_POST['appid']}\" LIMIT 1";
 }
-mysql_query($query) or die('Query failed: ' . mysql_error());mysql_close($link);echo "<script type='text/javascript'>window.location=\"./index2.php?backend=app&opmessage=App+Saved+Successfully\"</script>";?>
+mysql_query($query) or die('Query failed: ' . mysql_error());mysql_close($link);
+if($_POST['action'] == "save") echo "<script type='text/javascript'>window.location=\"./index2.php?backend=app&opmessage=App+Saved+Successfully\"</script>";
+elseif($_POST['action'] == "edit") echo "<form id='form' action='./index2.php?backend=editapp#bottom' method='POST'><input type='hidden' name='appid' value='" . $_POST['appid'] . "' /></form><script type='text/javascript'>document.getElementById('form').submit();</script>";
+?>
