@@ -40,7 +40,7 @@ $email="your@email.here";
 echo "<h3>Create New App</h3>";
 }
 ?>
-<form action="index2.php?backend=saveapp" method="post">
+<form action="index2.php?backend=saveapp" id="appform" method="post">
 <input type="hidden" name="appid" value="<?php echo $appid; ?>">
 <table border="0" width="100%"><tr><td colspan="2">
 <b>Name:</b><input type="text" name="name" value="<?php echo $name; ?>" style="width: 90%;">
@@ -85,5 +85,5 @@ $code = str_replace(">", "&gt;", $code);
 ?>
 <textarea name="code" id="code" class="codepress javascript" style="width: 100%; height: 500px;"><?php echo $code; ?></textarea>
 </td></tr>
-<tr><td colspan="4"><input type="submit" value="save"> <input type="button" value="close" onclick="window.location='index2.php?backend=app'"></td></tr></table>
+<tr><td colspan="4"><input type="button" onclick="code.toggleEditor(); document.getElementById('appform').submit();" value="save"> <input type="button" value="close" onclick="window.location='index2.php?backend=app'"></td></tr></table>
 </form>
