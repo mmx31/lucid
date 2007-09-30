@@ -54,7 +54,7 @@ var api = new function() {
 		//document.write("<script type='text/javascript' src='./api/"+api+".js'></script>");
 			dojo.io.script.get({
 				url: "./api/"+theapi+".js",
-				preventCache: true, //change to false in releases, this is to make debugging easier
+				preventCache: false,
 				id: "api_"+theapi
 			});
 			this.libList[theapi] = new Object();

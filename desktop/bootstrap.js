@@ -90,7 +90,7 @@ var bootstrap = {
 	{
 		dojo.io.script.get({
 			url: url,
-			preventCache: true, //change to false in releases, this is to make debugging easier
+			preventCache: false,
 			id: "lib_"+libraryName
 		});
 		desktop.modules[libraryName].version = "";
