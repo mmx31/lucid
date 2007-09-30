@@ -101,6 +101,7 @@ numberOfModulesLoaded: 0,
 	{
 		if(desktop.modules.api.initiated === true)
 		{
+			desktop.modules.api.loaded = true;
 			var nom = 0;
 			for(mod in desktop.modules) {nom++;}
 			for(mod in desktop.modules)
