@@ -11,6 +11,7 @@ api.fs = new function()
     {
         dojo.xhrGet({
         url: "../backend/api.php?fs=getFolder&path="+path,
+		handleAs: "xml",
         load: function(data, ioArgs) {
 			var results = data.getElementsByTagName('file');
 			if(api.fs.lsArray) {
@@ -41,6 +42,7 @@ api.fs = new function()
     {
         dojo.xhrGet({
         url: "../backend/api/fs.php?fs=getFile&path="+path,
+		handleAs: "xml",
         load: function(data, ioArgs) {
 			var results = data.getElementsByTagName('file');
 			api.fs.fileArray = new Array(99,99);
