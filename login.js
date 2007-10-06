@@ -108,11 +108,16 @@ var desktop = {
 				{
 					if(data == "0")
 					{
-						desktop.popUp();
+						if(desktop.popUp()) {
 						desktop.loggedin();
 						dojo.disconnect(desktop.elements.onExecuteForm);
 						dijit.byId(desktop.formid).domNode.username.value = "";
 						dijit.byId(desktop.formid).domNode.password.value = "";
+						}
+						else {
+						dojo.byId("desktop_formerror").innerHTML = "Your popup blocker is blocking the Psych Desktop window.";
+						dijit.byId(desktop.formid).domNode.submit.disabled=false;
+						}
 					}
 					else
 					{
@@ -143,6 +148,12 @@ var desktop = {
 		var day=new Date();
 		var id=day.getTime();
 		desktop.elements.popup=window.open(URL,id,"toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=1,width=1000000,height=1000000,left = 0,top = 0");
+		if(!desktop.elements.popup) {
+		return false;
+		}
+		else {
+		return true;
+		}
 	},
 	registerDialog: function() {
 		dojo.require("dijit.Dialog");
