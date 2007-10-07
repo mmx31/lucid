@@ -107,6 +107,7 @@ api.crosstalk = new function()
 		for(var x = 0; x<api.crosstalk.session.length; x++){
 
 		if(results[i].getAttribute("appid") == api.crosstalk.session[x].appid) {
+		if(results[i].getAttribute("instance") == api.crosstalk.session[x].instance || results[i].getAttribute("instance") == 0) {
 		api.console("Found handler, appid: "+results[i].getAttribute("appid"));
 		var id = results[i].getAttribute("id");
 		api.crosstalk.session[x].callback(results[i].firstChild.nodeValue);
@@ -119,6 +120,7 @@ api.crosstalk = new function()
         	mimetype: "text/xml"
         	});
 		handled = true;
+		}
 		}
 
 		}
