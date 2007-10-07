@@ -19,25 +19,32 @@
 	session_start();
 	require("config.php");
  $userid = $_SESSION['userid'];
-    if ($_GET['crosstalk'] == "checkForEvents")
+     if ($_GET['crosstalk'] == "removeEvent")
+    {
+	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
+	mysql_select_db($db_name) or die('Could not select database');
+	$id = $_GET['id'];
+	$query = "DELETE FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND ID=\"${id}\"";
+    $result = mysql_query($query) or die('Query failed: ' . mysql_error());
+	echo("OK.");
+	}
+	if ($_GET['crosstalk'] == "checkForEvents")
     {
     header('Content-type: text/xml');
-    $appID = $_GET['appID'];
-	$instance = $_GET['instance'];
-	$query = "SELECT * FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND appID=\"${appID}\"";
+	$query = "SELECT * FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\"";
 	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
 	mysql_select_db($db_name) or die('Could not select database');
 	$output = "<" . "?xml version='1.0' encoding='utf-8' ?" . ">\r\n" . "<crosstalkEvents>";
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
-		if($row["instance"] == $null || $row["instance"] == $instance || $row["instance"] == 0) {
+		//if($row["instance"] == $null || $row["instance"] == $instance || $row["instance"] == 0) {
 		$appid = $row["appID"];
 		$sender = $row["sender"];
 		$message = $row["message"];
-		$output .=  "\r\n" . '<event sender="'. $row["sender"] . '" appID="'. $row["appID"] .'" instance="'. $row["instance"] .'">'. $row["message"] .'</event>';
-		$query = "DELETE FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND appID=\"${appid}\" AND message=\"${message}\"";
-		mysql_query($query) or die('Query failed: ' . mysql_error());
-		}
+		$output .=  "\r\n" . '<event id="'. $row["ID"] .'" sender="'. $row["sender"] . '" appid="'. $row["appID"] .'" instance="'. $row["instance"] .'">'. $row["message"] .'</event>';
+		//$query = "DELETE FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND appID=\"${appid}\" AND message=\"${message}\"";
+		//mysql_query($query) or die('Query failed: ' . mysql_error());
+		//}
 		}		
 	$output .=  "\r\n" . "</crosstalkEvents>";	
 	echo($output);
@@ -47,7 +54,7 @@
     $message = $_GET["message"];
     $sender = $userid;
     $destination = $_GET["userid"];
-    $appID = $_GET["appID"];
+    $appID = $_GET["appid"];
 	$instance = $_GET["instance"];
 	if($destination == 0) {
 	$destination = $sender;
@@ -61,6 +68,6 @@
 	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
     mysql_select_db($db_name) or die('Could not select database');
     mysql_query($query) or die('Query failed: ' . mysql_error());
-    echo("OK.");
+    echo("OK. appID=$appID");
 }
 ?>

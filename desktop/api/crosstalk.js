@@ -64,7 +64,8 @@ api.crosstalk = new function()
 		var url = "../backend/api.php?crosstalk=checkForEvents";
         	dojo.xhrGet({
         	url: url,
-        	load: function(data, ioArgs) { api.crosstalk.internalCheck2(type, data, http); },
+			handleAs: "xml",
+        	load: function(data, ioArgs) { api.crosstalk._internalCheck2(data, ioArgs); },
         	error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
         	mimetype: "text/xml"
         	});
@@ -83,6 +84,7 @@ api.crosstalk = new function()
 		var url = "../backend/api.php?crosstalk=sendEvent&userid="+userid+"&message="+message+"&appid="+appid+"&instance="+instance+"";
         	dojo.xhrGet({
         	url: url,
+			handleAs: "xml",
         	error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
         	mimetype: "text/xml"
         	});
@@ -95,8 +97,9 @@ api.crosstalk = new function()
 	* @alias api.crosstalk.internalCheck2
 	* @memberOf api.crosstalk
 	*/
-	this._internalCheck2 = function(type, data, http, callback)
+	this._internalCheck2 = function(data, ioArgs)
 		{	// JayM: I tried to optimize the thing as much as possible, add more optimization if needed. 
+		if(data != "") {
 		var results = data.getElementsByTagName('event');
 		var handled = false;
 		for(var i = 0; i<results.length; i++){
@@ -104,7 +107,17 @@ api.crosstalk = new function()
 		for(var x = 0; x<api.crosstalk.session.length; x++){
 
 		if(results[i].getAttribute("appid") == api.crosstalk.session[x].appid) {
+		api.console("Found handler, appid: "+results[i].getAttribute("appid"));
+		var id = results[i].getAttribute("id");
 		api.crosstalk.session[x].callback(results[i].firstChild.nodeValue);
+		//remove the event, now.
+			var url = "../backend/api.php?crosstalk=removeEvent&id="+id+"";
+        	dojo.xhrGet({
+        	url: url,
+			handleAs: "xml",
+        	error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
+        	mimetype: "text/xml"
+        	});
 		handled = true;
 		}
 
@@ -113,6 +126,10 @@ api.crosstalk = new function()
 		api.console("Crosstalk API: Unhandled data, appid: "+results[i].getAttribute("appid")+" instance: "+results[i].getAttribute("instance")+" message: "+results[i].firstChild.nodeValue);
 		}
 
+		}
+		}
+		else {
+		api.console("No events for user.");
 		}
 
 		}
