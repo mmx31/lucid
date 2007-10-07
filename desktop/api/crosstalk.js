@@ -53,6 +53,17 @@ api.crosstalk = new function()
 		api.crosstalk.assignid = api.crosstalk.assignid + 1;
 		return id;
 		}
+			/** 
+	* unregister an event handler
+	* 
+	* @alias api.crosstalk.unregisterHandler
+	* @param {Integer} id	The current registered ID
+	* @memberOf api.crosstalk
+	*/
+		this.unregisterHandler = function(id)
+    		{
+//coming soon
+		}
 	/** 
 	* the crosstalk api checker, called every 20 or so seconds, internally. then will handle it from the registered crap...
 	* 
