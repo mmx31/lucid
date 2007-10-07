@@ -62,8 +62,8 @@ api.crosstalk = new function()
 	*/
 		this.unregisterHandler = function(id)
     		{
-//coming soon
-		}
+			api.crosstalk.session[id].suspended = true;
+			}
 	/** 
 	* the crosstalk api checker, called every 20 or so seconds, internally. then will handle it from the registered crap...
 	* 
@@ -121,7 +121,7 @@ api.crosstalk = new function()
 		for(var i = 0; i<results.length; i++){
 
 		for(var x = 0; x<api.crosstalk.session.length; x++){
-
+		if(api.crosstalk.session[x].suspended != true) {
 		if(results[i].getAttribute("appid") == api.crosstalk.session[x].appid) {
 		if(results[i].getAttribute("instance") == api.crosstalk.session[x].instance || results[i].getAttribute("instance") == 0) {
 		api.console("Found handler, appid: "+results[i].getAttribute("appid"));
@@ -138,7 +138,7 @@ api.crosstalk = new function()
 		handled = true;
 		}
 		}
-
+		}
 		}
 		if(handled != true) {
 		//Found unhandled code. Do NOT remove, it may be useful later on.
