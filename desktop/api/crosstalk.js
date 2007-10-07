@@ -23,7 +23,7 @@
  * Package: crosstalk
  * 
  * Summary:
- * 		An API that allows an app to communicate with other applications on a system-wide level.
+ * 		An API that allows an app to communicate with other applications on a system-wide level. 
  */
 api.crosstalk = new function()
 {
@@ -39,6 +39,11 @@ api.crosstalk = new function()
 	*/
 	this.registerHandler = function(instance, callback)
     		{
+			/*
+			*OMG this code is super-fucked.
+			* infact, it's more of a mess than code
+			*but hey, it works.
+			*/
 		api.crosstalk.session[api.crosstalk.assignid] = new Object();
 		api.crosstalk.session[api.crosstalk.assignid].suspended = false;
 		api.crosstalk.session[api.crosstalk.assignid].appid = desktop.app.instances[instance].id;
@@ -56,10 +61,10 @@ api.crosstalk = new function()
 	*/
 	this._internalCheck = function()
 		{
-		if (api.crosstalk.session.length == 0) {
+		if (api.crosstalk.session.length == 0) { // no data in array (no handlers registered)
 		api.console("Crosstalk API: No events to process...");
 			}
-		else {
+		else { // handlers found. ask to obtain any events.
 		api.console("Crosstalk API: Checking for events...");
 		var url = "../backend/api.php?crosstalk=checkForEvents";
         	dojo.xhrGet({
@@ -99,7 +104,7 @@ api.crosstalk = new function()
 	*/
 	this._internalCheck2 = function(data, ioArgs)
 		{	// JayM: I tried to optimize the thing as much as possible, add more optimization if needed. 
-		if(data != "") {
+		if(data != "") { // No events here. (Screwed up code)
 		var results = data.getElementsByTagName('event');
 		var handled = false;
 		for(var i = 0; i<results.length; i++){
@@ -109,9 +114,9 @@ api.crosstalk = new function()
 		if(results[i].getAttribute("appid") == api.crosstalk.session[x].appid) {
 		if(results[i].getAttribute("instance") == api.crosstalk.session[x].instance || results[i].getAttribute("instance") == 0) {
 		api.console("Found handler, appid: "+results[i].getAttribute("appid"));
-		var id = results[i].getAttribute("id");
+		var id = results[i].getAttribute("id"); //id of the event in database.
 		api.crosstalk.session[x].callback(results[i].firstChild.nodeValue);
-		//remove the event, now.
+		//remove the event, now. it has been handled.
 			var url = "../backend/api.php?crosstalk=removeEvent&id="+id+"";
         	dojo.xhrGet({
         	url: url,
@@ -125,6 +130,7 @@ api.crosstalk = new function()
 
 		}
 		if(handled != true) {
+		//Found unhandled code. Do NOT remove, it may be useful later on.
 		api.console("Crosstalk API: Unhandled data, appid: "+results[i].getAttribute("appid")+" instance: "+results[i].getAttribute("instance")+" message: "+results[i].firstChild.nodeValue);
 		}
 
@@ -143,6 +149,7 @@ api.crosstalk = new function()
 	*/
 	this.start = function()
 		{
+		// start checking for events
 		api.crosstalk.timer = setTimeout("api.crosstalk._internalCheck();",20000);
 		}
 	/** 
@@ -153,6 +160,7 @@ api.crosstalk = new function()
 	*/
 	this.stop = function()
 		{
+		// stop checking for events
 		api.crosstalk.timer = 0;
 		}
 
