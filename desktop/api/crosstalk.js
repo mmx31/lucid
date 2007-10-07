@@ -37,7 +37,7 @@ api.crosstalk = new function()
 	* @param {Function} callback	A callback to pass the data to
 	* @memberOf api.crosstalk
 	*/
-	this.registerHandler = function(instance, callback)
+	this.registerHandler = function(params)
     		{
 			/*
 			*OMG this code is super-fucked.
@@ -46,14 +46,14 @@ api.crosstalk = new function()
 			*/
 		api.crosstalk.session[api.crosstalk.assignid] = new Object();
 		api.crosstalk.session[api.crosstalk.assignid].suspended = false;
-		api.crosstalk.session[api.crosstalk.assignid].appid = desktop.app.instances[instance].id;
-                api.crosstalk.session[api.crosstalk.assignid].callback = callback;
-                api.crosstalk.session[api.crosstalk.assignid].instance = instance;
+		api.crosstalk.session[api.crosstalk.assignid].appid = desktop.app.instances[params.instance].id;
+                api.crosstalk.session[api.crosstalk.assignid].callback = params.callback;
+                api.crosstalk.session[api.crosstalk.assignid].instance = params.instance;
 		id = api.crosstalk.assignid;
 		api.crosstalk.assignid = api.crosstalk.assignid + 1;
 		return id;
 		}
-			/** 
+	/** 
 	* unregister an event handler
 	* 
 	* @alias api.crosstalk.unregisterHandler
@@ -86,7 +86,7 @@ api.crosstalk = new function()
         	mimetype: "text/xml"
         	});
 		}
-		api.crosstalk.start();
+		this.init();
 		}
 		
 	/** 
@@ -95,11 +95,17 @@ api.crosstalk = new function()
 	* @alias api.crosstalk.internalCheck
 	* @memberOf api.crosstalk
 	*/
-	this.sendEvent = function(userid, message, appid, instance)
+	this.sendEvent = function(params)
 		{
-		var url = "../backend/api.php?crosstalk=sendEvent&userid="+userid+"&message="+message+"&appid="+appid+"&instance="+instance+"";
         	dojo.xhrGet({
-        	url: url,
+        	url: "../backend/api.php",
+			content: {
+				crosstalk: "sendEvent",
+				userid: params.userid,
+				message: params.message,
+				appid: params.appid,
+				instance: params.instance
+			},
 			handleAs: "xml",
         	error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
         	mimetype: "text/xml"
@@ -155,14 +161,14 @@ api.crosstalk = new function()
 	/** 
 	* the crosstalk timer starter
 	* 
-	* @alias api.crosstalk.start
+	* @alias api.crosstalk.init
 	* @memberOf api.crosstalk
 	*/
-	this.start = function()
-		{
+	this.init = function()
+	{
 		// start checking for events
-		api.crosstalk.timer = setTimeout("api.crosstalk._internalCheck();",10000);
-		}
+		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), 10000);
+	}
 	/** 
 	* the crosstalk timer stopper
 	* 
@@ -170,11 +176,10 @@ api.crosstalk = new function()
 	* @memberOf api.crosstalk
 	*/
 	this.stop = function()
-		{
+	{
 		// stop checking for events
 		api.crosstalk.timer = 0;
-		}
+	}
 
 		
 }
-		api.crosstalk.start();
