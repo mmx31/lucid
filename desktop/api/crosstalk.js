@@ -161,7 +161,7 @@ api.crosstalk = new function()
 	this.start = function()
 		{
 		// start checking for events
-		api.crosstalk.timer = setTimeout("api.crosstalk._internalCheck();",20000);
+		api.crosstalk.timer = setTimeout("api.crosstalk._internalCheck();",10000);
 		}
 	/** 
 	* the crosstalk timer stopper
