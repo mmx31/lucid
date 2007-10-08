@@ -62,7 +62,7 @@ api.user = new function()
 	this.getUserLevel = function(callback) {
         desktop.core.loadingIndicator(0);
         dojo.xhrGet({
-        url: "../backend/api/misc.php?action=getUserID",
+        url: "../backend/api/misc.php?action=getUserLevel",
         load: function(data, ioArgs) {
 		    api.user.userLevel = data;
     	    if(callback) { callback(data); }
