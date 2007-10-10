@@ -196,6 +196,7 @@ numberOfModulesLoaded: 0,
  dojo.require("dijit.Menu");
  dojo.require("dojo.dnd.move");
  dojo.require("dojo.fx");
+ bootstrap.require('admin');
  bootstrap.require('api');
  bootstrap.require('app');
  bootstrap.require('config');

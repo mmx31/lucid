@@ -132,20 +132,22 @@ desktop.core = new function()
 		*/
 		this.loadingIndicator = function(action)
 		{
-			api.console("desktop.core.loadingIndicator is depricated!")
-			/*if(action == 0)
-			{	
-				dojo.byId("loadingIndicator").style.display = "inline";
-				dojo.fadeIn({ node: 'loadingIndicator', duration: 300 }).play();
-			}
-			if(action == 1)
-			{
-				var anim = dojo.fadeOut({ node: 'loadingIndicator', duration: 300 });
-				dojo.connect(anim, "onEnd", null, function(){
-					dojo.byId("loadingIndicator").style.display = "none";
-				});
-				anim.play();
-			}*/
+			api.console("desktop.core.loadingIndicator is depricated!");
 		}
-
-	}
+		/*
+		 * This generates a backend to use based on the module given
+		 */
+		this.backend = function(module)
+		{
+			var mod=module.split(".");
+			//TODO: put in something so we can switch to python backends when desired
+			var url = "../backend";
+			for(var i=0; i <= mod.length-3; i++)
+			{
+				url += "/"+mod[i];
+			}
+			url += ".php?section="+escape(mod[mod.length-2]);
+			url += "&action="+escape(mod[mod.length-1])
+			return url;
+		}
+}
