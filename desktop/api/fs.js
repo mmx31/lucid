@@ -41,7 +41,7 @@ api.fs = new function()
    this.read = function(path, callback)
     {
         dojo.xhrGet({
-        url: "../backend/api/fs.php?fs=getFile&path="+path,
+        url: "../backend/api.php?fs=getFile&path="+path,
 		handleAs: "xml",
         load: function(data, ioArgs) {
 			var results = data.getElementsByTagName('file');
@@ -59,7 +59,7 @@ api.fs = new function()
    this.write = function(path, content)
    {
         dojo.xhrGet({
-        url: "../backend/api/fs.php?fs=writeFile&path="+path+"&content="+content,
+        url: "../backend/api.php?fs=writeFile&path="+path+"&content="+content,
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
@@ -67,7 +67,7 @@ api.fs = new function()
    this.mkdir = function(path)
     {
         dojo.xhrGet({
-        url: "../backend/api/fs.php?fs=createDirectory&path="+path,
+        url: "../backend/api.php?fs=createDirectory&path="+path,
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
@@ -75,7 +75,7 @@ api.fs = new function()
    this.rm = function(path)
     {
         dojo.xhrGet({
-        url: url = "../backend/api/fs.php?fs=removeFile&path="+path,
+        url: "../backend/api.php?fs=removeFile&path="+path,
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
@@ -83,7 +83,7 @@ api.fs = new function()
    this.rmdir = function(path)
     {
         dojo.xhrGet({
-        url: "../backend/api/fs.php?fs=removeDir&path="+path,
+        url: "../backend/api.php?fs=removeDir&path="+path,
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
