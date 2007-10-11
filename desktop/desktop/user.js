@@ -1,5 +1,5 @@
-desktop.user = function() {
-	this.changeUserPassword(old, newpass, callback) {
+desktop.user = new function() {
+	this.changeUserPassword = function(old, newpass, callback) {
 		dojo.xhrGet({
         url: "../backend/api/misc.php?action=changePassword&old="+old+"&new="+newpass,
         load: function(data, ioArgs) {
