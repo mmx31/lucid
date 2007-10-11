@@ -59,6 +59,7 @@ var api = new function() {
 			});
 			this.libList[theapi] = new Object();
 			this.libList[theapi].loaded = false;
+			this.libList[theapi].inited = false;
 	}
 	this.init = function()
 	{
@@ -82,10 +83,18 @@ var api = new function() {
 			if((typeof this[mod]) != "undefined")
 			{
 				this.libList[mod].loaded = true;
+					if((typeof this[mod].init) != "undefined") { 
+					this[mod].init(); 
+					this.libList[mod].inited = true;
+					}
+					else { 
+									this.libList[mod].inited = false;
+									}
 			}
 			else
 			{
 				this.libList[mod].loaded = false;
+				this.libList[mod].inited = false;
 				setTimeout(function() {api.checkifloaded();}, 50);
 				return;
 			}
