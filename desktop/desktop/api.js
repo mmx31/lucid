@@ -70,7 +70,7 @@ var api = new function() {
 		api.require("registry");
 		api.require("soundmanager");
 		api.require("tray");
-		//api.require("ui"); disabled untill it uses the window API
+		api.require("ui");
 		api.require("user");
 		api.require("window");
 		this.checkifloaded();
