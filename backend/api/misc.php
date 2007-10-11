@@ -41,6 +41,24 @@ echo("FAIL");
 		echo($_row["username"]);
 		}
  }
+  if ($_GET['action'] == "changePassword") {
+ $username = $_SESSION['username'];
+ $old = $_GET['old'];
+ $new = $_GET['new'];
+	$query = "SELECT * FROM ${db_prefix}users WHERE username=\"${username}\"";
+	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
+	mysql_select_db($db_name) or die('Could not select database');
+	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
+		if($_row["password"] == $old) {
+		$query = "UPDATE ${db_prefix}users  SET password=\"${new}\" WHERE username=\"${username}\" LIMIT 1";
+		echo("0");
+		}
+		else {
+		die("1");
+		}
+ }
+ }
  if ($_GET['action'] == "getUserIDFromName") {
  $username = $_GET["username"]; 
 	$query = "SELECT * FROM ${db_prefix}users WHERE username=\"${username}\"";

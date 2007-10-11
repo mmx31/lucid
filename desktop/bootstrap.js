@@ -209,6 +209,7 @@ numberOfModulesLoaded: 0,
  bootstrap.require('taskbar');
  bootstrap.require('theme');
  //bootstrap.require('thread', "1.7");
+ bootstrap.require('user');
  bootstrap.require('wallpaper');
  bootstrap.require('widget');
  bootstrap.require('windows');
