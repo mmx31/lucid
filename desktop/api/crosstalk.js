@@ -73,10 +73,10 @@ api.crosstalk = new function()
 	this._internalCheck = function()
 		{
 		if (api.crosstalk.session.length == 0) { // no data in array (no handlers registered)
-		api.console("Crosstalk API: No events to process...");
+		//api.console("Crosstalk API: No events to process...");
 			}
 		else { // handlers found. ask to obtain any events.
-		api.console("Crosstalk API: Checking for events...");
+		//api.console("Crosstalk API: Checking for events...");
 		var url = "../backend/api.php?crosstalk=checkForEvents";
         	dojo.xhrGet({
         	url: url,
@@ -132,7 +132,7 @@ api.crosstalk = new function()
 		if(results[i].getAttribute("instance") == api.crosstalk.session[x].instance || results[i].getAttribute("instance") == 0) {
 		api.console("Found handler, appid: "+results[i].getAttribute("appid"));
 		var id = results[i].getAttribute("id"); //id of the event in database.
-		api.crosstalk.session[x].callback(results[i].firstChild.nodeValue);
+		api.crosstalk.session[x].callback({ message: results[i].firstChild.nodeValue, appid: results[i].getAttribute("appid"), instance: results[i].getAttribute("instance"), sender: results[i].getAttribute("sender")});
 		//remove the event, now. it has been handled.
 			var url = "../backend/api.php?crosstalk=removeEvent&id="+id+"";
         	dojo.xhrGet({
@@ -148,7 +148,7 @@ api.crosstalk = new function()
 		}
 		if(handled != true) {
 		//Found unhandled code. Do NOT remove, it may be useful later on.
-		api.console("Crosstalk API: Unhandled data, appid: "+results[i].getAttribute("appid")+" instance: "+results[i].getAttribute("instance")+" message: "+results[i].firstChild.nodeValue);
+		//api.console("Crosstalk API: Unhandled event, appid: "+results[i].getAttribute("appid")+" instance: "+results[i].getAttribute("instance")+" message: "+results[i].firstChild.nodeValue);
 		}
 
 		}
@@ -164,8 +164,8 @@ api.crosstalk = new function()
 	* @alias api.crosstalk.handleSystemMessage
 	* @memberOf api.crosstalk
 	*/
-	this.handleSystemMessage = function(message) {
-	api.ui.alert("<center> <b> System Message </b> <br> "+message+" </center>");
+	this.handleSystemMessage = function(object) {
+	api.ui.alert("<center> <b> System Message (senderID: "+object.sender+") </b> <br> "+object.message+" </center>");
 	}
 	/** 
 	* send system messages
