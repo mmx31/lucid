@@ -38,7 +38,7 @@ echo("FAIL");
 	mysql_select_db($db_name) or die('Could not select database');
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
-		echo($_row["username"]);
+		echo($row["username"]);
 		}
  }
   if ($_GET['action'] == "changePassword") {
@@ -50,7 +50,7 @@ echo("FAIL");
 	mysql_select_db($db_name) or die('Could not select database');
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
-		if($_row["password"] == $old) {
+		if($row["password"] == $old) {
 		$query = "UPDATE ${db_prefix}users  SET password=\"${new}\" WHERE username=\"${username}\" LIMIT 1";
 		echo("0");
 		}
@@ -66,7 +66,7 @@ echo("FAIL");
 	mysql_select_db($db_name) or die('Could not select database');
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
-		echo($_row["ID"]);
+		echo($row["ID"]);
 		}
  }
  if ($_GET['action'] == "getUserID") {
