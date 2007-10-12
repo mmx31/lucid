@@ -2,22 +2,22 @@
 session_start();
 if ($_GET['fs'] == "createDirectory") {
 				$odir = $_REQUEST['path'];
-			    $dir = "../files/".$_SESSION['userid']."/$odir";
+			    $dir = "../files/".$_SESSION['username']."/$odir";
 				mkdir($dir);
 }
 	if ($_GET['fs'] == "removeFile") {
 				$odir = $_REQUEST['path'];
-			    $dir = "../files/".$_SESSION['userid']."/$odir";
+			    $dir = "../files/".$_SESSION['username']."/$odir";
 				unlink($dir);
 }
 	if ($_GET['fs'] == "removeDir") {
 				$odir = $_REQUEST['path'];
-			    $dir = "../files/".$_SESSION['userid']."/$odir";
+			    $dir = "../files/".$_SESSION['username']."/$odir";
 				rmdir($dir);
 }
 	if ($_GET['fs'] == "getFolder") {
 				$odir = $_REQUEST['path'];
-			    $dir = opendir("../files/".$_SESSION['userid']."/$odir");
+			    $dir = opendir("../files/".$_SESSION['username']."/$odir");
 				if(!$dir){
 							die();
 				} else {
@@ -27,7 +27,7 @@ if ($_GET['fs'] == "createDirectory") {
 							continue;
 						} else {
 							$t = strtolower($file);
-							if(is_dir("../files/".$_SESSION['userid']."/$odir" . $file)){
+							if(is_dir("../files/".$_SESSION['username']."/$odir" . $file)){
 								$type = 'folder';
 							} else {
 								$type = 'file';
@@ -42,7 +42,7 @@ if ($_GET['fs'] == "createDirectory") {
 }
 	if ($_GET['fs'] == "getFile") {
 				$odir = $_REQUEST['path'];
-			    	$dir = "../files/".$_SESSION['userid']."/$odir";
+			    	$dir = "../files/".$_SESSION['username']."/$odir";
 				$file = file_get_contents($dir);
 				$output = "<" . "?xml version='1.0' encoding='utf-8' ?" .">\r\n" . "<getFileResponse path=\"" . $_REQUEST['path'] . "\">";
 				$output .=  "\r\n" . '<file>' . $file . '</file>';
@@ -53,7 +53,7 @@ if ($_GET['fs'] == "createDirectory") {
 	if ($_GET['fs'] == "writeFile") {
 				$content = $_REQUEST['content'];
 				$odir = $_REQUEST['path'];
-			    	$dir = "../files/".$_SESSION['userid']."/$odir";
+			    	$dir = "../files/".$_SESSION['username']."/$odir";
 				$file = file_put_contents($dir, $content);
 }
 ?>
