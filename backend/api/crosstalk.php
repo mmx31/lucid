@@ -60,10 +60,10 @@
 	$destination = $sender;
 	}
 	if($instance != $null) {
-	$query = "INSERT INTO `${db_prefix}crosstalk` (userid, message, sender, appID, instance) VALUES('${sender}', '${message}', '${destination}', '${appID}', '${instance}');";
+	$query = "INSERT INTO `${db_prefix}crosstalk` (userid, message, sender, appID, instance) VALUES('${destination}', '${message}', '${sender}', '${appID}', '${instance}');";
     }
 	else {
-	$query = "INSERT INTO `${db_prefix}crosstalk` (userid, message, sender, appID) VALUES('${sender}', '${message}', '${destination}', '${appID}');";
+	$query = "INSERT INTO `${db_prefix}crosstalk` (userid, message, sender, appID) VALUES('${destination}', '${message}', '${sender}', '${appID}');";
     }
 	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
     mysql_select_db($db_name) or die('Could not select database');

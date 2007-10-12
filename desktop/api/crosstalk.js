@@ -159,6 +159,25 @@ api.crosstalk = new function()
 
 		}
 	/** 
+	* handle system messages
+	* 
+	* @alias api.crosstalk.handleSystemMessage
+	* @memberOf api.crosstalk
+	*/
+	this.handleSystemMessage = function(message) {
+	api.ui.alert("<center> <b> System Message </b> <br> "+message+" </center>");
+	}
+	/** 
+	* send system messages
+	* 
+	* @alias api.crosstalk.sendSystemMessage
+	* @memberOf api.crosstalk
+	*/
+	this.sendSystemMessage = function(ooo) {
+	//api.ui.alert("<center> <b> System Message </b> <br> "+message" </center>");
+	api.crosstalk.sendEvent({ userid: ooo.userid, appid: 0, instance: 0, message: ooo.message });
+	}
+	/** 
 	* the crosstalk timer starter
 	* 
 	* @alias api.crosstalk.init
@@ -166,6 +185,19 @@ api.crosstalk = new function()
 	*/
 	this.init = function()
 	{
+		if((typeof this.alreadyDone) != "undefined") {
+		}
+		else {
+		// Hack into the API
+		api.crosstalk.session[api.crosstalk.assignid] = new Object();
+		api.crosstalk.session[api.crosstalk.assignid].suspended = false;
+		api.crosstalk.session[api.crosstalk.assignid].appid = 0;
+        api.crosstalk.session[api.crosstalk.assignid].callback = api.crosstalk.handleSystemMessage;
+        api.crosstalk.session[api.crosstalk.assignid].instance = 0;
+		id = api.crosstalk.assignid;
+		api.crosstalk.assignid = api.crosstalk.assignid + 1;
+		this.alreadyDone = true;
+		}
 		// start checking for events
 		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), 10000);
 	}
