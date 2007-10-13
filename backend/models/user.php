@@ -23,14 +23,15 @@
 			{
 				if($line["password"] == $pass)
 				{
-					$this->id = $line['ID'];
-					$this->username = $line['username'];
-					$this->level = $line['level'];
-					$this->login();
-					$this->make_userdir();
+					$p = new User();
+					$p->id = $line['ID'];
+					$p->username = $line['username'];
+					$p->level = $line['level'];
+					$p->login();
+					$p->make_userdir();
 					mysql_free_result($result);
 					mysql_close($link);
-					return true;
+					return $p;
 				}
 				else
 				{
