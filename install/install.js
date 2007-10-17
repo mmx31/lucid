@@ -1,17 +1,20 @@
 dojo.require("dijit.layout.ContentPane");
 dojo.require("dijit.layout.StackContainer");
 dojo.require("dijit.form.Button");
-
-function selected(page){
+install = new function() {
+this.selected = function(page){
 	dijit.byId("previous").setDisabled(page.isFirstChild);
 	dijit.byId("next").setDisabled(page.isLastChild);
+	this.currentPage = page;
 }
-dojo.subscribe("wizard-selectChild", selected);
-dojo.addOnLoad(function() {
-	selected(dijit.byId("start"));
-});
+this.onLoad = function() {
+	dojo.subscribe("wizard-selectChild", install.selected);
+	install.selected(dijit.byId("start"));
+	dijit.byId("next").setDisabled(install.currentPage);
+	install.getPerms();
+}
 
-function getPerms()
+this.getPerms = function()
 {
 	dojo.xhrGet({
 		url: "./backend.php?action=checkpermissions",
@@ -29,6 +32,9 @@ function getPerms()
 				html += q[1] + "</span>";
 			}
 			dojo.byId("perms").innerHTML = html;
+			dijit.byId("next").setEnabled(install.currentPage);
 		}
 	});
 }
+}
+dojo.addOnLoad(install.onLoad);

@@ -6,20 +6,22 @@
 			"./files/",
 			"./backend/configuration.php"
 		);
-		$ok = array();
+		$ok = array("error", "error");
+		$a = 0;
 		foreach($dirs as $dir)
 		{
 			if(!is_writable($dir))
 			{
-				$ok[$dir] = "not writable";
+				$ok[$a] = "not writable";
 			}
 			else
 			{
-				$ok[$dir] = "ok";
+				$ok[$a] = "ok";
 			}
+			$a++;
 		}
 		$x = count($dir);
-		for($i=0;$i<=$x;i++)
+		for($i=0;$i<=$x;$i++)
 		{
 			$p = $dirs[$i];
 			$d = $ok[$i];

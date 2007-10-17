@@ -20,8 +20,8 @@
 					<li>create a database for the desktop, and grant a user all permissions to it</li>
 				</ul>
 				
-				Results of the test:
-				<div id="perms">loading...</div>
+				Results of the test: 
+				<div id="perms">performing test...</div>
 			</div>
 			<div dojoType="dijit.layout.ContentPane" title="Todo">
 				<div class="title">What do you want to do?</div>
