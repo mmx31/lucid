@@ -41,6 +41,27 @@ api.window = function(params)
 	 */
 	this._innerHTML = ((typeof params.innerHTML == "string") ? params.innerHTML : "");
 	/*
+	 * Property: showMaximize
+	 * 
+	 * Summary:
+	 * 		Show whether or not to show the maximize button
+	 */
+	this.showMaximize = true;
+	/*
+	 * Property: showMinimize
+	 * 
+	 * Summary:
+	 * 		Show whether or not to show the minimize button
+	 */
+	this.showMinimize = true;
+	/*
+	 * Property: showClose
+	 * 
+	 * Summary:
+	 * 		Show whether or not to show the close button
+	 */
+	this.showClose = true;
+	/*
 	 * Property: bodyWidget
 	 * 
 	 * Summary:
@@ -54,7 +75,7 @@ api.window = function(params)
 	 * 		To set this after window creation, use <window.setBodyWidget>
 	 */
 	this.bodyWidget = ((typeof params.bodyWidget == "string") ? params.bodyWidget : "ContentPane");
-	/*
+	 /*
 	 * Property: bodyWidgetParams
 	 * 
 	 * Summary:
@@ -207,18 +228,21 @@ api.window = function(params)
 				closebutton = document.createElement("div");
 				closebutton.id = this._id+"closebutton";
 				closebutton.setAttribute("class", "winbuttonclose");
+				if(this.showClose) {
 				winbuttons.appendChild(closebutton);
-				
+				}
 				maximizebutton = document.createElement("div");
 				maximizebutton.id = this._id+"closebutton";
 				maximizebutton.setAttribute("class", "winbuttonmaximize");
+				if(this.showMaximize) {
 				winbuttons.appendChild(maximizebutton);
-				
+				}
 				minimizebutton = document.createElement("div");
 				minimizebutton.id = this._id+"closebutton";
 				minimizebutton.setAttribute("class", "winbuttonminimize");
+				if(this.showMinimize) {
 				winbuttons.appendChild(minimizebutton);
-				
+				}
 			wintitlebar.appendChild(winbuttons);
 			
 			windiv.appendChild(wintitlebar);
@@ -612,6 +636,36 @@ api.window = function(params)
 		}
 		else return true;
 	};
+	/* 
+	 * Method: showMaximizeButton
+	 * 
+	 * Summary:
+	 * 		Set if maximize button is enabled or not
+	 */
+	this.showMaximizeButton = function(blah) 
+	{
+		this.showMaximize = blah;
+	}
+	/* 
+	 * Method: showMinimizeButton
+	 * 
+	 * Summary:
+	 * 		Set if minimize button is enabled or not
+	 */
+	this.showMinimizeButton = function(blah) 
+	{
+		this.showMinimize = blah;
+	}
+	/* 
+	 * Method: showCloseButton
+	 * 
+	 * Summary:
+	 * 		Set if close button is enabled or not
+	 */
+	this.showCloseButton = function(blah) 
+	{
+		this.showClose = blah;
+	}
 	/* 
 	 * Method: destroy
 	 * 
