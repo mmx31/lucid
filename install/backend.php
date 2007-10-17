@@ -3,8 +3,8 @@
 	if($act == "checkpermissions")
 	{
 		$dirs = array(
-			"./files/",
-			"./backend/configuration.php"
+			"../files/",
+			"../backend/configuration.php"
 		);
 		$ok = array("error", "error");
 		$a = 0;
