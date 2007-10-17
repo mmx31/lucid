@@ -14,6 +14,20 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-def index(req):
-    from backend.configuration import DATABASE_ENGINE
-    return DATABASE_ENGINE
+from mod_python import Session
+from base import Model
+import backend.dbhelper.db
+
+class User(Model):
+    def get(self, id):
+        if DATABASE_ENGINE is 'mysql':
+            db=db.connect()
+    def login(self, req):
+        session = Session.Session(req)
+        session['user'] = {
+            'id': self.id,
+            'name': self.name,
+            'username': self.username,
+            'level': self.level,
+        }
+        session.save()
