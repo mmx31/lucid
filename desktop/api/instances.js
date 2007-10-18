@@ -44,6 +44,22 @@
 			return 0;
 		}
 	}
+	 /** 
+	* Kill an instance
+	* 
+	* @alias api.instances.kill
+	* @param {Integer} instance	Instance ID to kill
+	* @memberOf api.instances
+	*/
+	this.kill = function(instance) {
+		try {
+			desktop.app.instances[instance].kill();
+			return 1;
+		}
+		catch(err) {
+			return 0;
+		}
+	}
 	/** 
 	* Get the status of an instance
 	* 
@@ -63,6 +79,10 @@
 	*/
 	this.getAppID = function(instance) {
 		return desktop.app.instances[instance].id;
+	}
+	
+	this.getAppName = function(instance) {
+		return desktop.app.apps[api.instances.getAppID(instance)](null).name;
 	}
 	/** 
 	* Get all instances
@@ -84,5 +104,6 @@
 		}
 		return this.returnObject;
 	}
+	
 	
 	}
