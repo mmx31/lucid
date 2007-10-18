@@ -67,6 +67,7 @@ var api = new function() {
 		api.require("database");
 		api.require("fs");
 		api.require("ide");
+		api.require("instances");
 		api.require("misc");
 		api.require("registry");
 		api.require("soundmanager");
