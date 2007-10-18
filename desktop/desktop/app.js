@@ -112,6 +112,7 @@ desktop.app = new function()
 				this.instanceCount++;
 				this.instances[this.instanceCount] = new this.apps[id];
 				this.instances[this.instanceCount].instance = this.instances.length-1;
+				this.instances[this.instanceCount].status = "unknown";
 				this.instances[this.instanceCount].init((args ? args : null));
 			}
 		}
