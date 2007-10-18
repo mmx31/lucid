@@ -83,7 +83,7 @@ desktop.app = new function()
 		this._fetchApp = function(data, callback, args)
 		{
 			app = dojo.fromJson(data);
-					this.apps[app[0].ID] = eval("function()\n{\n\tthis.id = "+app[0].ID+";\n\tthis.instance = -1;\n"+app[0].code+"\n}");
+					this.apps[app[0].ID] = new Function("\tthis.id = "+app[0].ID+";\n\tthis.instance = -1;\n"+app[0].code);
 					if(callback)
 					{
 						if(args != undefined)
