@@ -41,6 +41,27 @@ api.window = function(params)
 	 */
 	this._innerHTML = ((typeof params.innerHTML == "string") ? params.innerHTML : "");
 	/*
+	 * Property: onDestroy
+	 * 
+	 * Summary:
+	 * 		What to do upon destroy of window
+	 */
+	this.onDestroy = "NONE";
+	/*
+	 * Property: onMinimize
+	 * 
+	 * Summary:
+	 * 		What to do upon minimize of window
+	 */
+	this.onMinimize = "NONE";
+	/*
+	 * Property: onMaximize
+	 * 
+	 * Summary:
+	 * 		What to do upon maximize of window
+	 */
+	this.onMaximize = "NONE";
+	/*
 	 * Property: showMaximize
 	 * 
 	 * Summary:
@@ -420,6 +441,9 @@ api.window = function(params)
 	 */
 	this.minimize = function()
 	{
+		if(this.onMinimize != "NONE") {
+		this.onMinimize();
+		}
 		if(desktop.config.fx == true)
 		{
 			var pos = dojo.coords(this._id, true);
@@ -500,6 +524,9 @@ api.window = function(params)
 	 */
 	this.maximize = function()
 	{
+		if(this.onMaximize != "NONE") {
+		this.onMaximize();
+		}
 		this.maximized = true;
 		this._drag.destroy();
 		if(this.resizable == true)
@@ -637,36 +664,6 @@ api.window = function(params)
 		else return true;
 	};
 	/* 
-	 * Method: showMaximizeButton
-	 * 
-	 * Summary:
-	 * 		Set if maximize button is enabled or not
-	 */
-	this.showMaximizeButton = function(blah) 
-	{
-		this.showMaximize = blah;
-	}
-	/* 
-	 * Method: showMinimizeButton
-	 * 
-	 * Summary:
-	 * 		Set if minimize button is enabled or not
-	 */
-	this.showMinimizeButton = function(blah) 
-	{
-		this.showMinimize = blah;
-	}
-	/* 
-	 * Method: showCloseButton
-	 * 
-	 * Summary:
-	 * 		Set if close button is enabled or not
-	 */
-	this.showCloseButton = function(blah) 
-	{
-		this.showClose = blah;
-	}
-	/* 
 	 * Method: destroy
 	 * 
 	 * Summary:
@@ -674,6 +671,9 @@ api.window = function(params)
 	 */
 	this.destroy = function()
 	{
+		if(this.onDestroy != "NONE") {
+		this.onDestroy();
+		}
 		var anim = dojo.fadeOut({ node: this._id, duration: 200 });
 		dojo.connect(anim, "onEnd", null, dojo.hitch(this, function() {
 			this._drag.destroy();
