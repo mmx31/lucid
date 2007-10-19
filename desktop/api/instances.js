@@ -80,9 +80,35 @@
 	this.getAppID = function(instance) {
 		return desktop.app.instances[instance].id;
 	}
-	
+	/** 
+	* Get instance appname
+	* 
+	* @alias api.instances.getAppName
+	* @param {Integer} instance	Instance ID to get appname of
+	* @memberOf api.instances
+	*/
 	this.getAppName = function(instance) {
 		return desktop.app.instances[instance].name;
+	}
+	/** 
+	* Set instance as active
+	* 
+	* @alias api.instances.setActive
+	* @param {Integer} instance	Instance ID to set active
+	* @memberOf api.instances
+	*/
+	this.setActive = function(instance) {
+		desktop.app.instances[instance].status = "active";
+	}
+	/** 
+	* Set instance as killed
+	* 
+	* @alias api.instances.setKilled
+	* @param {Integer} instance	Instance ID to set killed
+	* @memberOf api.instances
+	*/
+	this.setKilled = function(instance) {
+		desktop.app.instances[instance].status = "killed";
 	}
 	/** 
 	* Get all instances
