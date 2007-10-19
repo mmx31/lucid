@@ -96,7 +96,7 @@ var api = new function() {
 			{
 				this.libList[mod].loaded = false;
 				this.libList[mod].inited = false;
-				setTimeout(function() {api.checkifloaded();}, 50);
+				setTimeout(dojo.hitch(api, api.checkifloaded), 50);
 				return;
 			}
 			desktop.api = api;

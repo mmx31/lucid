@@ -104,7 +104,10 @@ api.crosstalk = new function()
 				instance: params.instance
 			},
 			handleAs: "xml",
-        	error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
+        	error: function(type, error) {
+				alert("Error in Crosstalk call: "+error.message);
+				this.setup_timer();
+			},
         	mimetype: "text/xml"
         	});
 		}
@@ -137,9 +140,8 @@ api.crosstalk = new function()
 								var id = results[i].getAttribute("id"); //id of the event in database.
 								api.crosstalk.session[x].callback({ message: results[i].firstChild.nodeValue, appid: results[i].getAttribute("appid"), instance: results[i].getAttribute("instance"), sender: results[i].getAttribute("sender")});
 								//remove the event, now. it has been handled.
-								var url = "../backend/api.php?crosstalk=removeEvent&id="+id+"";
 						        dojo.xhrGet({
-						        	url: url,
+						        	url: "../backend/api.php?crosstalk=removeEvent&id="+id,
 									handleAs: "xml",
 						        	error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
 						        	mimetype: "text/xml"
@@ -205,7 +207,7 @@ api.crosstalk = new function()
 	this.setup_timer = function()
 	{
 		api.console("starting a timer...");
-		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), 1000);
+		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), 300);
 	}
 	/** 
 	* the crosstalk timer stopper
