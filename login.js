@@ -101,6 +101,7 @@ var desktop = {
 		dijit.byId(desktop.formid).domNode.submit.disabled=true;
 		if(contents.username && contents.password)
 		{
+		dojo.byId("desktop_formerror").innerHTML = "Logging in...";
 			dojo.xhrPost({
 				url: desktop.path+"/backend/login.php",
 				content: contents,
@@ -113,6 +114,7 @@ var desktop = {
 						dojo.disconnect(desktop.elements.onExecuteForm);
 						dijit.byId(desktop.formid).domNode.username.value = "";
 						dijit.byId(desktop.formid).domNode.password.value = "";
+						dojo.byId("desktop_formerror").innerHTML = "Logged in. Window open.";
 						}
 						else {
 						dojo.byId("desktop_formerror").innerHTML = "Your popup blocker is blocking the Psych Desktop window.";
