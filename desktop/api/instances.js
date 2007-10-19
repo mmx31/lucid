@@ -94,17 +94,16 @@
 		this.returnObject = new Array();
 		this.count = 0;
 		for(var x = 1; x<desktop.app.instances.length; x++){
-			if(desktop.app.instances[x].status != "killed") {
 				this.returnObject[count] = new Object();
 				this.returnObject[count].instance = x;
 				this.returnObject[count].status = desktop.app.instances[x].status;
 				this.returnObject[count].appid = desktop.app.instances[x].id;
 				this.returnObject[count].name = desktop.app.instances[x].name;
-			}
+			
 			count++;
 		}
 		return this.returnObject;
 	}
-	
-	
 	}
+	
+	
