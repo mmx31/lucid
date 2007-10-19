@@ -207,7 +207,7 @@ api.crosstalk = new function()
 	this.setup_timer = function()
 	{
 		api.console("starting a timer...");
-		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), 300);
+		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), 800);
 	}
 	/** 
 	* the crosstalk timer stopper

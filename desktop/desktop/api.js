@@ -85,12 +85,15 @@ var api = new function() {
 			{
 				this.libList[mod].loaded = true;
 					if((typeof this[mod].init) != "undefined") { 
-					this[mod].init(); 
-					this.libList[mod].inited = true;
+						if(this.libList[mod].inited === false)
+						{
+							this[mod].init(); 
+							this.libList[mod].inited = true;
+						}
 					}
 					else { 
-									this.libList[mod].inited = false;
-									}
+						this.libList[mod].inited = true;
+					}
 			}
 			else
 			{
