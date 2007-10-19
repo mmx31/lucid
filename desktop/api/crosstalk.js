@@ -77,13 +77,11 @@ api.crosstalk = new function()
 			}
 		else { // handlers found. ask to obtain any events.
 		//api.console("Crosstalk API: Checking for events...");
-		var url = "../backend/api.php?crosstalk=checkForEvents";
         	dojo.xhrGet({
-        	url: url,
-			handleAs: "xml",
-        	load: function(data, ioArgs) { api.crosstalk._internalCheck2(data, ioArgs); },
-        	error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
-        	mimetype: "text/xml"
+	        	url: "../backend/api.php?crosstalk=checkForEvents",
+				handleAs: "xml",
+	        	load: dojo.hitch(this, this._internalCheck2),
+	        	error: function(type, error) { api.console("Error in Crosstalk call: "+error.message); }
         	});
 		}
 		}
@@ -121,11 +119,12 @@ api.crosstalk = new function()
 	this._internalCheck2 = function(data, ioArgs)
 	{	// JayM: I tried to optimize the thing as much as possible, add more optimization if needed. 
 		if(data != "")
-		{ // No events here. (Screwed up code)
+		{
+			// No events here. (Screwed up code)
 			var results = data.getElementsByTagName('event');
 			var handled = false;
-			for(var i = 0; i<results.length; i++){
-	
+			for(var i = 0; i<results.length; i++)
+			{	
 				for(var x = 0; x<api.crosstalk.session.length; x++)
 				{
 					if(api.crosstalk.session[x].suspended != true)
@@ -160,7 +159,7 @@ api.crosstalk = new function()
 		{
 			api.console("No events for user.");
 		}
-		this.init();
+		this.setup_timer();
 	}
 	/** 
 	* handle system messages
@@ -189,21 +188,24 @@ api.crosstalk = new function()
 	*/
 	this.init = function()
 	{
-		if((typeof this.alreadyDone) != "undefined") {
-		}
-		else {
-		// Hack into the API
-		api.crosstalk.session[api.crosstalk.assignid] = new Object();
-		api.crosstalk.session[api.crosstalk.assignid].suspended = false;
-		api.crosstalk.session[api.crosstalk.assignid].appid = 0;
-        api.crosstalk.session[api.crosstalk.assignid].callback = api.crosstalk.handleSystemMessage;
-        api.crosstalk.session[api.crosstalk.assignid].instance = 0;
-		id = api.crosstalk.assignid;
-		api.crosstalk.assignid = api.crosstalk.assignid + 1;
-		this.alreadyDone = true;
+		if(!((typeof this.alreadyDone) != "undefined")) {
+			// Hack into the API
+			api.crosstalk.session[api.crosstalk.assignid] = new Object();
+			api.crosstalk.session[api.crosstalk.assignid].suspended = false;
+			api.crosstalk.session[api.crosstalk.assignid].appid = 0;
+	        api.crosstalk.session[api.crosstalk.assignid].callback = api.crosstalk.handleSystemMessage;
+	        api.crosstalk.session[api.crosstalk.assignid].instance = 0;
+			id = api.crosstalk.assignid;
+			api.crosstalk.assignid = api.crosstalk.assignid + 1;
+			this.alreadyDone = true;
 		}
 		// start checking for events
-		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), 300);
+		this.setup_timer();
+	}
+	this.setup_timer = function()
+	{
+		api.console("starting a timer...");
+		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), 1000);
 	}
 	/** 
 	* the crosstalk timer stopper
