@@ -82,7 +82,7 @@
 	}
 	
 	this.getAppName = function(instance) {
-		return desktop.app.apps[api.instances.getAppID(instance)](null).name;
+		return desktop.app.instances[instance].name;
 	}
 	/** 
 	* Get all instances
@@ -99,6 +99,7 @@
 				this.returnObject[count].instance = x;
 				this.returnObject[count].status = desktop.app.instances[x].status;
 				this.returnObject[count].appid = desktop.app.instances[x].id;
+				this.returnObject[count].name = desktop.app.instances[x].name;
 			}
 			count++;
 		}
