@@ -5,7 +5,7 @@ install = new function() {
 this.selected = function(page){
 	dijit.byId("previous").setDisabled(page.isFirstChild);
 	dijit.byId("next").setDisabled(page.isLastChild);
-	this.currentPage = page;
+	install.currentPage = page;
 }
 this.onLoad = function() {
 	dojo.subscribe("wizard-selectChild", install.selected);
@@ -32,7 +32,7 @@ this.getPerms = function()
 				html += q[1] + "</span>";
 			}
 			dojo.byId("perms").innerHTML = html;
-			dijit.byId("next").setEnabled(install.currentPage);
+			dojo.byId("next").setEnabled(install.currentPage);
 		}
 	});
 }

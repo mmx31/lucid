@@ -99,7 +99,7 @@
 				this.returnObject[count].status = desktop.app.instances[x].status;
 				this.returnObject[count].appid = desktop.app.instances[x].id;
 				this.returnObject[count].name = desktop.app.instances[x].name;
-			
+				this.returnObject[count].version = desktop.app.instances[x].version;
 			count++;
 		}
 		return this.returnObject;
