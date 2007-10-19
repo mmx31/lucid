@@ -86,7 +86,6 @@ api.crosstalk = new function()
         	mimetype: "text/xml"
         	});
 		}
-		this.init();
 		}
 		
 	/** 
@@ -120,44 +119,49 @@ api.crosstalk = new function()
 	* @memberOf api.crosstalk
 	*/
 	this._internalCheck2 = function(data, ioArgs)
-		{	// JayM: I tried to optimize the thing as much as possible, add more optimization if needed. 
-		if(data != "") { // No events here. (Screwed up code)
-		var results = data.getElementsByTagName('event');
-		var handled = false;
-		for(var i = 0; i<results.length; i++){
-
-		for(var x = 0; x<api.crosstalk.session.length; x++){
-		if(api.crosstalk.session[x].suspended != true) {
-		if(results[i].getAttribute("appid") == api.crosstalk.session[x].appid) {
-		if(results[i].getAttribute("instance") == api.crosstalk.session[x].instance || results[i].getAttribute("instance") == 0) {
-		api.console("Found handler, appid: "+results[i].getAttribute("appid"));
-		var id = results[i].getAttribute("id"); //id of the event in database.
-		api.crosstalk.session[x].callback({ message: results[i].firstChild.nodeValue, appid: results[i].getAttribute("appid"), instance: results[i].getAttribute("instance"), sender: results[i].getAttribute("sender")});
-		//remove the event, now. it has been handled.
-			var url = "../backend/api.php?crosstalk=removeEvent&id="+id+"";
-        	dojo.xhrGet({
-        	url: url,
-			handleAs: "xml",
-        	error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
-        	mimetype: "text/xml"
-        	});
-		handled = true;
+	{	// JayM: I tried to optimize the thing as much as possible, add more optimization if needed. 
+		if(data != "")
+		{ // No events here. (Screwed up code)
+			var results = data.getElementsByTagName('event');
+			var handled = false;
+			for(var i = 0; i<results.length; i++){
+	
+				for(var x = 0; x<api.crosstalk.session.length; x++)
+				{
+					if(api.crosstalk.session[x].suspended != true)
+					{
+						if(results[i].getAttribute("appid") == api.crosstalk.session[x].appid)
+						{
+							if(results[i].getAttribute("instance") == api.crosstalk.session[x].instance || results[i].getAttribute("instance") == 0)
+							{
+								api.console("Found handler, appid: "+results[i].getAttribute("appid"));
+								var id = results[i].getAttribute("id"); //id of the event in database.
+								api.crosstalk.session[x].callback({ message: results[i].firstChild.nodeValue, appid: results[i].getAttribute("appid"), instance: results[i].getAttribute("instance"), sender: results[i].getAttribute("sender")});
+								//remove the event, now. it has been handled.
+								var url = "../backend/api.php?crosstalk=removeEvent&id="+id+"";
+						        dojo.xhrGet({
+						        	url: url,
+									handleAs: "xml",
+						        	error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
+						        	mimetype: "text/xml"
+						        });
+								handled = true;
+							}
+						}
+					}
+				}
+				if(handled != true) {
+					//Found unhandled code. Do NOT remove, it may be useful later on.
+					//api.console("Crosstalk API: Unhandled event, appid: "+results[i].getAttribute("appid")+" instance: "+results[i].getAttribute("instance")+" message: "+results[i].firstChild.nodeValue);
+				}
+			}
 		}
+		else
+		{
+			api.console("No events for user.");
 		}
-		}
-		}
-		if(handled != true) {
-		//Found unhandled code. Do NOT remove, it may be useful later on.
-		//api.console("Crosstalk API: Unhandled event, appid: "+results[i].getAttribute("appid")+" instance: "+results[i].getAttribute("instance")+" message: "+results[i].firstChild.nodeValue);
-		}
-
-		}
-		}
-		else {
-		api.console("No events for user.");
-		}
-
-		}
+		this.init();
+	}
 	/** 
 	* handle system messages
 	* 
@@ -199,7 +203,7 @@ api.crosstalk = new function()
 		this.alreadyDone = true;
 		}
 		// start checking for events
-		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), 10000);
+		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), 300);
 	}
 	/** 
 	* the crosstalk timer stopper
@@ -210,7 +214,7 @@ api.crosstalk = new function()
 	this.stop = function()
 	{
 		// stop checking for events
-		api.crosstalk.timer = 0;
+		clearTimeout(this.timer);
 	}
 
 		
