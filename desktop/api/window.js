@@ -41,6 +41,13 @@ api.window = function(params)
 	 */
 	this._innerHTML = ((typeof params.innerHTML == "string") ? params.innerHTML : "");
 	/*
+	 * Property: destroyed
+	 * 
+	 * Summary:
+	 * 		Is the window destroyed?
+	 */
+	this.destroyed = false;
+	/*
 	 * Property: onDestroy
 	 * 
 	 * Summary:
@@ -671,6 +678,7 @@ api.window = function(params)
 	 */
 	this.destroy = function()
 	{
+		this.destroyed = true;
 		if(this.onDestroy != "NONE") {
 		this.onDestroy();
 		}
