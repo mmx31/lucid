@@ -96,6 +96,9 @@ unlink("../apps/tmp/".$_GET["delete"]);
 die("Application cache deleted. <a href=\"index2.php?backend=uploadapp\">go back</a>");
 }
 if(isset($_FILES['uploadedfile']['name'])) {
+if($_FILES['uploadedfile']['name'] == "") {
+die("No appPackage was uploaded.");
+}
 echo("Preparing Installer...");
 $target_path = '../apps/tmp/';
 $target_path = $target_path . basename( $_FILES['uploadedfile']['name']); 
