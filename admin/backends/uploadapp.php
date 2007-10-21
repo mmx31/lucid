@@ -91,10 +91,17 @@ function dircopy($src_dir, $dst_dir, $verbose = false, $use_cached_dir_trees = f
             return $tree;    
     }
 require("../backend/config.php");
+if(isset($_GET['delete'])) {
+unlink("../apps/tmp/".$_GET["delete"]);
+die("Application cache deleted. <a href=\"index2.php?backend=uploadapp\">go back</a>");
+}
 if(isset($_FILES['uploadedfile']['name'])) {
 echo("Preparing Installer...");
 $target_path = '../apps/tmp/';
 $target_path = $target_path . basename( $_FILES['uploadedfile']['name']); 
+if(file_exists($target_path)) { 
+die("ERROR! Application already installed. (If you think this is incorrect, <a href='index2.php?backend=uploadapp&delete=". basename( $_FILES['uploadedfile']['name']).">click here</a>.)");
+ }
 if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
 echo("OK!<br>Extracting application package...");
 require("../backend/lib.unzip.php");
