@@ -200,13 +200,13 @@ api.crosstalk = new function()
 			id = api.crosstalk.assignid;
 			api.crosstalk.assignid = api.crosstalk.assignid + 1;
 			this.alreadyDone = true;
+			api.console("Crosstalk API: Init complete.");
 		}
 		// start checking for events
 		this.setup_timer();
 	}
 	this.setup_timer = function()
 	{
-		api.console("starting a timer...");
 		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), 800);
 	}
 	/** 

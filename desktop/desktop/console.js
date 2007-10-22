@@ -122,8 +122,31 @@ desktop.console = new function()
 			api.console("&nbsp;&nbsp;mkdir [dir]- creates the directory [dir]");
 			api.console("&nbsp;&nbsp;rm [file]- removes the file [file]");
 			api.console("&nbsp;&nbsp;rmdir [dir]- removes the dir [dir]");
+			api.console("&nbsp;&nbsp;ps- show running processes");
+			api.console("&nbsp;&nbsp;kill [instance]- kills an instance/pid");
 			api.console("&nbsp;&nbsp;clear- clear the screen");
 			api.console("&nbsp;&nbsp;logout- logs you out of the desktop");
+		},
+		ps: function(params)
+		{
+			api.console("  PID  TTY  CMD");
+			object = api.instances.getInstances();
+		
+					api.console("0     pts/0   system");
+				for(i=0;i<object.length;i++) {
+					if(object[i].status != "killed") {
+					api.console(object[i].instance+"    pts/0   "+object[i].name);
+					}
+				}
+		},
+		kill: function(params)
+		{
+			if(params == "") { api.console("kill: usage: kill [instance]"); }
+			else if(params == "0") { api.console("kill: system cannot be killed"); }
+			else {
+			if(api.instances.kill(params) == 1) { api.console("kill: process killed"); }
+			else { api.console("kill: process kill failed"); }
+			}
 		},
 		cd: function(params)
 		{
@@ -152,37 +175,37 @@ desktop.console = new function()
 		mkdir: function(params)
 		{
 			if(params == "") {
-				api.console("need a dir name!");
+				api.console("mkdir: need a dir name!");
 			}
 			else {
 			api.fs.mkdir(desktop.console.path+params);
-			api.console("directory created");
+			api.console("mkdir: directory created");
 			}
 		},
 		rm: function(params)
 		{
 			if(params == "") {
-				api.console("need a file!");
+				api.console("rm: need a file!");
 			}
 			else {
 			api.fs.rm(desktop.console.path+params);
-			api.console("file removed");
+			api.console("rm: file removed");
 			}
 		},
 		rmdir: function(params)
 		{
 			if(params == "") {
-				api.console("need a directory!");
+				api.console("rmdir: need a directory!");
 			}
 			else {
 			api.fs.rmdir(desktop.console.path+params);
-			api.console("directory removed");
+			api.console("rmdir: directory removed");
 			}
 		},
 		cat: function(params)
 		{
 			if(params == "") {
-				api.console("need a file!");
+				api.console("cat: need a file!");
 			}
 			else {
 			api.fs.read(desktop.console.path + params, function(array)
