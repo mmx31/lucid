@@ -81,19 +81,17 @@ var api = new function() {
 	{
 		for(mod in this.libList)
 		{
+			if((typeof this.libList[mod]) == "undefined")
+			{
+				this.libList[mod] = new Object();
+				this.libList[mod].loaded = false;
+			}
 			if((typeof this[mod]) != "undefined")
 			{
 				this.libList[mod].loaded = true;
-					if((typeof this[mod].init) != "undefined") { 
-						if(this.libList[mod].inited === false)
-						{
-							this[mod].init(); 
-							this.libList[mod].inited = true;
-						}
-					}
-					else { 
-						this.libList[mod].inited = true;
-					}
+				for(checklib in this.libList) {
+					if(this.libList[checklib].loaded === false) return;
+				}
 			}
 			else
 			{
@@ -101,6 +99,23 @@ var api = new function() {
 				this.libList[mod].inited = false;
 				setTimeout(dojo.hitch(api, api.checkifloaded), 50);
 				return;
+			}
+			for(lib in this.libList) {
+				console.log("loaded api."+lib);
+				setTimeout(function(){}, 0); //yield
+				if((typeof this[lib].draw) == "function") { this[lib].draw(); }
+			}
+			for(lib in this.libList) {
+				if((typeof this[mod].init) != "undefined") { 
+					if(this.libList[mod].inited === false)
+					{
+						this[mod].init(); 
+						this.libList[mod].inited = true;
+					}
+				}
+				else { 
+					this.libList[mod].inited = true;
+				}
 			}
 			desktop.api = api;
 		}

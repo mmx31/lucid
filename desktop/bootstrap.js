@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
 var desktop = {};
+var aflax = new AFLAX("./AFLAX/aflax.swf"); 
 desktop.modules = {};
 dojo.require("dojo.io.script");
 if(navigator.appName == "Microsoft Internet Explorer")
@@ -134,7 +135,11 @@ numberOfModulesLoaded: 0,
 			}
 			desktop.config.draw(function() {
 				for(lib in desktop.modules) {
-					if((typeof desktop[lib].draw) == "function") { desktop[lib].draw(); }
+					console.log("loaded desktop."+lib);
+					setTimeout(function(){}, 0); //yield
+					if((typeof desktop[lib]) == "object") {
+						if((typeof desktop[lib].draw) == "function") desktop[lib].draw();
+					}
 				}
 				for(lib in desktop.modules)
 				{
