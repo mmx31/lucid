@@ -157,7 +157,7 @@ desktop.console = new function()
 		ls: function(params)
 		{
 			if(params == "") params = desktop.console.path;
-			api.fs.ls(params, function(array)
+			api.fs.ls({path: params, callback: function(array)
 			{
 				var i = 0;
 				while(i < array.length) {
@@ -170,7 +170,7 @@ desktop.console = new function()
 				i++;
 				}
 			i = 0;
-			});
+			}});
 		},
 		mkdir: function(params)
 		{
@@ -178,7 +178,7 @@ desktop.console = new function()
 				api.console("mkdir: need a dir name!");
 			}
 			else {
-			api.fs.mkdir(desktop.console.path+params);
+			api.fs.mkdir({path: params});
 			api.console("mkdir: directory created");
 			}
 		},
@@ -188,7 +188,7 @@ desktop.console = new function()
 				api.console("rm: need a file!");
 			}
 			else {
-			api.fs.rm(desktop.console.path+params);
+			api.fs.rm({path: params});
 			api.console("rm: file removed");
 			}
 		},
@@ -198,7 +198,7 @@ desktop.console = new function()
 				api.console("rmdir: need a directory!");
 			}
 			else {
-			api.fs.rmdir(desktop.console.path+params);
+			api.fs.rmdir({path: params});
 			api.console("rmdir: directory removed");
 			}
 		},
@@ -208,11 +208,11 @@ desktop.console = new function()
 				api.console("cat: need a file!");
 			}
 			else {
-			api.fs.read(desktop.console.path + params, function(array)
+			api.fs.read({path: desktop.console.path + params, callback: function(array)
 			{
 				api.console(array[0].contents);
 			}
-			);
+			});
 		}
 	} }
 	/** 

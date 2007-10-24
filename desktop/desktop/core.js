@@ -133,7 +133,7 @@ desktop.core = new function()
 		*/
 		this.loadingIndicator = function(action)
 		{
-			api.console("desktop.core.loadingIndicator is depricated!");
+			//api.console("desktop.core.loadingIndicator is depricated!");
 		}
 		/*
 		 * This generates a backend to use based on the module given
