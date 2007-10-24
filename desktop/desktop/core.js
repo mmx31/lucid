@@ -78,6 +78,7 @@ desktop.core = new function()
 			g = desktop.config.startupapps;
 			for(f in g)
 			{
+				if((typeof f) == "number")
 				desktop.app.launch(g[f]);
 			}
 		}
