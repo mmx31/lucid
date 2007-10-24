@@ -140,6 +140,7 @@ var desktop = {
 		if(desktop.elements.popup.closed === false) {setTimeout(desktop.loggedin, 10);}
 		else {
 			dijit.byId(desktop.formid).domNode.submit.disabled=false;
+			dojo.byId("desktop_formerror").innerHTML = "";
 			desktop.elements.onExecuteForm = dojo.connect(desktop.elements.loginform, "execute", desktop, desktop.login);
 		}
 		
