@@ -85,32 +85,47 @@ var api = new function() {
 			{
 				this.libList[mod] = new Object();
 				this.libList[mod].loaded = false;
+				this.libList[mod].drawn = false;
 			}
 			if((typeof this[mod]) != "undefined")
 			{
 				this.libList[mod].loaded = true;
 				for(checklib in this.libList) {
-					if(this.libList[checklib].loaded === false) return;
+					if((typeof this[checklib]) == "undefined")
+					{
+						 this.libList[mod].loaded = false;
+						 this.libList[mod].inited = false;
+						 this.libList[mod].drawn = false;
+                		        	 setTimeout(dojo.hitch(this, this.checkifloaded), 100);
+						 api.console("api."+checklib+" has not loaded!");
+		                        	 return;
+					}
 				}
 			}
 			else
 			{
 				this.libList[mod].loaded = false;
 				this.libList[mod].inited = false;
-				setTimeout(dojo.hitch(api, api.checkifloaded), 50);
+				this.libList[mod].drawn = false;
+				setTimeout(dojo.hitch(this, this.checkifloaded), 50);
 				return;
 			}
 			for(lib in this.libList) {
 				console.log("loaded api."+lib);
 				setTimeout(function(){}, 0); //yield
-				if((typeof this[lib].draw) == "function") { this[lib].draw(); }
+				if((typeof this[lib].draw) == "function" && this.libList[mod].drawn == false) {
+					this[lib].draw();
+					api.console("drawing api."+lib);
+					this.libList[mod].drawn = true;
+				}
 			}
 			for(lib in this.libList) {
 				if((typeof this[mod].init) != "undefined") { 
-					if(this.libList[mod].inited === false)
+					if(this.libList[mod].inited == false)
 					{
 						this[mod].init(); 
 						this.libList[mod].inited = true;
+						api.console("initiating api."+mod);
 					}
 				}
 				else { 
