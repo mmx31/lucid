@@ -86,6 +86,8 @@ var api = new function() {
 				this.libList[mod] = new Object();
 				this.libList[mod].loaded = false;
 				this.libList[mod].drawn = false;
+				this.libList[mod].inited = false;
+				this.libList[mod].status = "loading";
 			}
 			if((typeof this[mod]) != "undefined")
 			{
@@ -96,9 +98,16 @@ var api = new function() {
 						 this.libList[mod].loaded = false;
 						 this.libList[mod].inited = false;
 						 this.libList[mod].drawn = false;
+						 this.libList[mod].status = "error";
                 		        	 setTimeout(dojo.hitch(this, this.checkifloaded), 100);
 						 api.console("api."+checklib+" has not loaded!");
 		                        	 return;
+					}
+					else {
+						if(this.libList[mod].status != "loaded") {
+							console.log("loaded api."+mod);
+							this.libList[mod].status = "loaded";
+						}
 					}
 				}
 			}
@@ -111,7 +120,6 @@ var api = new function() {
 				return;
 			}
 			for(lib in this.libList) {
-				console.log("loaded api."+lib);
 				setTimeout(function(){}, 0); //yield
 				if((typeof this[lib].draw) == "function" && this.libList[mod].drawn == false) {
 					this[lib].draw();
@@ -131,6 +139,7 @@ var api = new function() {
 				else { 
 					this.libList[mod].inited = true;
 				}
+				this.libList[mod].status = "ok";
 			}
 			desktop.api = api;
 		}
