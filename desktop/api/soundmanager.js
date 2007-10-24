@@ -43,7 +43,7 @@ api.sound = function(object) {
 		this.soundObj.loadSound(object.sound, true);
 	}
 	this.play = this.soundObj.start;
-	this.stop = this.soundObj.stop'
+	this.stop = this.soundObj.stop;
 }
 
 /* 

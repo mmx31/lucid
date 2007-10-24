@@ -105,9 +105,10 @@ var api = new function() {
 					}
 					else {
 						if(this.libList[mod].status != "loaded") {
+						if(this.libList[mod].status != "ok") {
 							console.log("loaded api."+mod);
 							this.libList[mod].status = "loaded";
-						}
+						} }
 					}
 				}
 			}
