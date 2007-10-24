@@ -7,11 +7,11 @@
 * @memberOf api
 */
 api.ui = new function() {
-	this.alert = function(message)
+	this.alert = function(object)
 	{
 		dojo.require("dijit.Dialog");
 		var div = dojo.doc.createElement("div");
-		div.innerHTML = "<center> "+message+" </center>";
+		div.innerHTML = "<center> "+object.message+" </center>";
 		var box = new dijit.Dialog({title: "Alert"}, div);
 		box.show();
 }

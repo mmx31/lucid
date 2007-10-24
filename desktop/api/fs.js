@@ -7,10 +7,10 @@
 */
 api.fs = new function()
 { 
-   this.ls = function(path, callback)
+   this.ls = function(object)
     {
         dojo.xhrGet({
-        url: "../backend/api.php?fs=getFolder&path="+path,
+        url: "../backend/api.php?fs=getFolder&path="+object.path,
 		handleAs: "xml",
         load: function(data, ioArgs) {
 			var results = data.getElementsByTagName('file');
@@ -31,17 +31,17 @@ api.fs = new function()
 			}
 			api.fs.lsArray[i].file = results[i].firstChild.nodeValue;
 			}
-	        if(callback) { callback(api.fs.lsArray); }
+	        if(object.callback) { object.callback(api.fs.lsArray); }
         	desktop.core.loadingIndicator(1);
 		},
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/xml"
         });
     }
-   this.read = function(path, callback)
+   this.read = function(object)
     {
         dojo.xhrGet({
-        url: "../backend/api.php?fs=getFile&path="+path,
+        url: "../backend/api.php?fs=getFile&path="+object.path,
 		handleAs: "xml",
         load: function(data, ioArgs) {
 			var results = data.getElementsByTagName('file');
@@ -49,41 +49,41 @@ api.fs = new function()
 			api.fs.fileArray[0] = new Object();
 			api.fs.fileArray[0].path = path;
 			api.fs.fileArray[0].contents = results[0].firstChild.nodeValue;
-	        if(callback) { callback(api.fs.fileArray); }
+	        if(object.callback) { object.callback(api.fs.fileArray); }
 	        desktop.core.loadingIndicator(1);
 		},
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/xml"
         });
     }
-   this.write = function(path, content)
+   this.write = function(object)
    {
         dojo.xhrGet({
-        url: "../backend/api.php?fs=writeFile&path="+path+"&content="+content,
+        url: "../backend/api.php?fs=writeFile&path="+object.path+"&content="+object.content,
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
     }
-   this.mkdir = function(path)
+   this.mkdir = function(object)
     {
         dojo.xhrGet({
-        url: "../backend/api.php?fs=createDirectory&path="+path,
+        url: "../backend/api.php?fs=createDirectory&path="+object.path,
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
     }
-   this.rm = function(path)
+   this.rm = function(object)
     {
         dojo.xhrGet({
-        url: "../backend/api.php?fs=removeFile&path="+path,
+        url: "../backend/api.php?fs=removeFile&path="+object.path,
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
     }
-   this.rmdir = function(path)
+   this.rmdir = function(object)
     {
         dojo.xhrGet({
-        url: "../backend/api.php?fs=removeDir&path="+path,
+        url: "../backend/api.php?fs=removeDir&path="+object.path,
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
