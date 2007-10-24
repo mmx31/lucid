@@ -26,8 +26,24 @@
  * 		An API that allows an app to play audio content.
  * 		This is a constructor that interfaces with the actual sound manager.
  */
-api.sound = function() {
-	
+api.sound = function(object) {
+	this.soundObj = new AFLAX.FlashObject(aflax, "Sound");
+	this.soundObj.exposeFunction("loadSound", soundObj);		
+	this.soundObj.exposeFunction("start", soundObj);		
+	this.soundObj.exposeFunction("stop", soundObj);		
+	this.soundObj.exposeProperty("position", soundObj);
+	this.soundObj.mapFunction("addEventHandler");		
+	this.soundObj.addEventHandler("onLoad", "readyToPlay");
+	if(typeof object == "string")
+	{
+		this.soundObj.loadSound(object, true);
+	}
+	else
+	{
+		this.soundObj.loadSound(object.sound, true);
+	}
+	this.play = this.soundObj.start;
+	this.stop = this.soundObj.stop'
 }
 
 /* 
