@@ -42,6 +42,8 @@ api.sound = function(object) {
 	{
 		this.soundObj.loadSound(object.sound, true);
 	}
+	this.soundObj.stop();
+	this.getPosition = dojo.hitch(this.soundObj, this.soundObj.getPosition);
 	this.play = dojo.hitch(this.soundObj, this.soundObj.start);
 	this.stop = dojo.hitch(this.soundObj, this.soundObj.stop);
 }
