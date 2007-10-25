@@ -28,12 +28,12 @@
  */
 api.sound = function(object) {
 	this.soundObj = new AFLAX.FlashObject(aflax, "Sound");
-	this.soundObj.exposeFunction("loadSound", soundObj);		
-	this.soundObj.exposeFunction("start", soundObj);		
-	this.soundObj.exposeFunction("stop", soundObj);		
-	this.soundObj.exposeProperty("position", soundObj);
+	this.soundObj.exposeFunction("loadSound", this.soundObj);		
+	this.soundObj.exposeFunction("start", this.soundObj);		
+	this.soundObj.exposeFunction("stop", this.soundObj);		
+	this.soundObj.exposeProperty("position", this.soundObj);
 	this.soundObj.mapFunction("addEventHandler");		
-	this.soundObj.addEventHandler("onLoad", "readyToPlay");
+	//this.soundObj.addEventHandler("onLoad", "readyToPlay");
 	if(typeof object == "string")
 	{
 		this.soundObj.loadSound(object, true);
