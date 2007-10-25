@@ -25,7 +25,7 @@ desktop.theme = new function()
 		element.rel = "stylesheet";
 		element.type = "text/css";
 		element.media = "screen";
-		element.href = "./themes/"+(desktop.config.theme ? desktop.config.theme : "default")+"/theme.css";
+		element.href = "./themes/"+(desktop.config.theme ? desktop.config.theme : "green")+"/theme.css";
 		element.id = "desktop_theme";
 		document.getElementsByTagName("head")[0].appendChild(element);
 	}

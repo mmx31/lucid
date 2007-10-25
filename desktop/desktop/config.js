@@ -102,6 +102,6 @@ desktop.config = {
 		image: "./wallpaper/default.gif",
 		color: "#eeeeee"
 	},
-	theme: "default",
+	theme: "green",
 	startupapps: []
 }
