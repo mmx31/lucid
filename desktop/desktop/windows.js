@@ -79,6 +79,7 @@ desktop.windows = new function()
 	{
 		div = document.createElement("div");
 		div.id="windowcontainer";
+		div.style.overflow="hidden";
 		new dijit.layout.ContentPane({id: "windowcontainer"}, div);
 		//dojo.widget.createWidget("ContentPane", {id: "windowcontainer"}, div);
 		document.body.appendChild(div);
