@@ -36,7 +36,7 @@ desktop.core = new function()
 		*/
 		this.init = function()
 		{
-			setTimeout('dijit.byId("desktop_main").resize()', 300);
+			setTimeout('dijit.byId("desktop_main").resize()', 1000);
 			//dojo.require("dojox.widget.Toaster");
 			//set up page elements
 			/* TODO: get this to be normal (toaster widget does not work in 0.9
