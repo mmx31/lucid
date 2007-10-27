@@ -71,6 +71,7 @@ var api = new function() {
 		api.require("misc");
 		api.require("registry");
 		api.require("soundmanager");
+		api.require("startup");
 		api.require("tray");
 		api.require("ui");
 		api.require("user");
