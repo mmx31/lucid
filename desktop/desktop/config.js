@@ -99,7 +99,7 @@ desktop.config = {
 		isShown: true
 	},
 	wallpaper: {
-		image: "./wallpaper/default.gif",
+		image: "./theme/green/default.gif",
 		color: "#eeeeee"
 	},
 	theme: "green",
