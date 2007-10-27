@@ -84,7 +84,13 @@ desktop.wallpaper = new function()
 			div = document.createElement("div");
 			div.id="wallpaper";
 			div.name="wallpaper";
-			document.body.appendChild(div);
+			//document.body.appendChild(div);
+			var client = new dijit.layout.ContentPane({
+				layoutAlign: "client"
+			}, document.createElement("div"));
+			client.setContent(div);
+			dijit.byId("desktop_main").addChild(client);
+			dijit.byId("desktop_main").resize();
 		}
 		this.init = function()
 		{

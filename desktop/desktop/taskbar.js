@@ -141,10 +141,14 @@ desktop.taskbar = new function()
 			tasktray = '<table id="tasktray"><tr id="tasklist"><td id="taskclock">&nbsp;</td><td><div id="trayclock"></div></td></tr></table>';
 			html='<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td width="30"><div id="menubutton"></div></td><td width="1%"><div class="seperator"></div></td><td width="80%"><div id="appbar"></div></td><td width="1%"><div class="seperator"></div></td><td width="15%">'+tasktray+'</td></tr></table>';
 			
-			div = document.createElement("div");
-			div.innerHTML = html;
-			div.id="taskbar";
-			document.body.appendChild(div);
+			div = new dijit.layout.ContentPane({
+				id: "taskbar",
+				layoutAlign: "bottom"
+			}, document.createElement("div"))
+			div.setContent(html);
+			dijit.byId("desktop_main").addChild(div);
+			dijit.byId("desktop_main").resize();
+			
 			
 			div = document.createElement("div");
 			div.id="taskbarhider";

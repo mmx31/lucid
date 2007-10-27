@@ -36,6 +36,7 @@ desktop.core = new function()
 		*/
 		this.init = function()
 		{
+			setTimeout('dijit.byId("desktop_main").resize()', 300);
 			//dojo.require("dojox.widget.Toaster");
 			//set up page elements
 			/* TODO: get this to be normal (toaster widget does not work in 0.9
@@ -150,5 +151,15 @@ desktop.core = new function()
 			url += ".php?section="+escape(mod[mod.length-2]);
 			url += "&action="+escape(mod[mod.length-1])
 			return url;
+		}
+		this.draw = function()
+		{
+			dojo.require("dijit.layout.LayoutContainer");
+			var elm = new dijit.layout.LayoutContainer({
+				id: "desktop_main",
+				style: "width: 100%; height: 100%;"
+			}, document.createElement("div"));
+			document.body.appendChild(elm.domNode);
+			elm.startup();
 		}
 }
