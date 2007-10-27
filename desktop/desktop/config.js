@@ -31,7 +31,7 @@ desktop.config = {
 		setInterval(desktop.config.save, 1000*60);
 	},
 	load: function(cback) {
-		//TODO: give this it's own mySQL table
+		//TODO: give this it's own mySQL table. jaymacdonald: is this really required? it would work fine under the registry...
 		dojo.xhrGet({
         url: "../backend/api/registry.php?registry=load&appid=0&varname=config",
         load: function(data, ioArgs) {
@@ -44,6 +44,9 @@ desktop.config = {
 				});
 				desktop.config = config;
 				delete config;
+				for(var a=0;a<desktop.config.startupapps.length;a++) {
+					desktop.app.launch(desktop.config.startupapps[a]);
+				}
 			}
 			if(cback) cback();
 		},
