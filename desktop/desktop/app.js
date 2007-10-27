@@ -109,11 +109,16 @@ desktop.app = new function()
 			{this.fetchApp(id, dojo.hitch(this, this.launch), args);  desktop.core.loadingIndicator(1);}
 			else
 			{
-				this.instanceCount++;
-				this.instances[this.instanceCount] = new this.apps[id];
-				this.instances[this.instanceCount].instance = this.instances.length-1;
-				this.instances[this.instanceCount].status = "unknown";
-				this.instances[this.instanceCount].init((args ? args : null));
+				try {
+					this.instanceCount++;
+					this.instances[this.instanceCount] = new this.apps[id];
+					this.instances[this.instanceCount].instance = this.instances.length-1;
+					this.instances[this.instanceCount].status = "unknown";
+					this.instances[this.instanceCount].init((args ? args : null));
+				}
+				catch(e) {
+					api.ui.alert({title: "Psych Desktop", message: "Application ID:"+id+" encountered an error.<br><br>Technical Details: "+e});
+				}
 			}
 		}
 	}
