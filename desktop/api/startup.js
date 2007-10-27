@@ -25,7 +25,7 @@ api.startup = new function()
 	* @memberOf api.startup
 	* @alias api.startup.addApp
 	*/
-	this.addApp(object)
+	this.addApp = function(object)
 	{
 		phail = false;
 		for(a=0; a<desktop.config.startupapps.length; a++) {
@@ -46,7 +46,7 @@ api.startup = new function()
 	* @memberOf api.startup
 	* @alias api.startup.delApp
 	*/
-	this.delApp(object)
+	this.delApp = function(object)
 	{
 		phail = true;
 		for(a=0; a<desktop.config.startupapps.length; a++) {
