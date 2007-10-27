@@ -69,7 +69,10 @@ desktop.taskbar = new function()
 				{
 					var anim = dojo.fadeOut({ node: "taskbar", duration: 200 });
 					dojo.connect(anim, "onEnd", null, dojo.hitch(this, function() {
-						dojo.byId("taskbar").style.display="none";
+						//dojo.byId("taskbar").style.display="none";
+						dijit.byId("taskbar").domNode.style.height="0px";
+						dijit.byId("taskbar").startup();
+						dijit.byId("desktop_main").resize();
 						dojo.byId("taskbarhider").innerHTML='<img src="./themes/default/images/icons/showtask.gif">';
 					}));
 					anim.play();
@@ -84,7 +87,10 @@ desktop.taskbar = new function()
 			else if(desktop.config.taskbar.isShown == false)
 			{
 				desktop.config.taskbar.isShown = true;
-				dojo.byId("taskbar").style.display="block";
+				//dojo.byId("taskbar").style.display="block";
+				dijit.byId("taskbar").domNode.style.height="35px";
+				dijit.byId("taskbar").startup();
+				dijit.byId("desktop_main").resize();
 				dojo.byId("taskbarhider").innerHTML='<img src="./themes/default/images/icons/hidetask.gif">';
 				if(desktop.config.fx == true) dojo.fadeIn({ node: "taskbar", duration: 200 }).play();
 				else dojo.style("taskbar", "opacity", 1);
