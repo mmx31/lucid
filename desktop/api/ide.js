@@ -76,7 +76,7 @@ api.ide = new function()
 			url: "../backend/app.php?id="+appID,
 			load: function(data, ioArgs)
 			{
-				data = dojo.fromJson(data);
+				data = dojo.fromJson(data)[0];
 				if(callback) callback(data.code);
 			},
 			mimetype: "text/plain"
