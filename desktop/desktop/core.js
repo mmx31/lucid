@@ -37,29 +37,10 @@ desktop.core = new function()
 		this.init = function()
 		{
 			setTimeout('dijit.byId("desktop_main").resize()', 1000);
-			//dojo.require("dojox.widget.Toaster");
-			//set up page elements
-			/* TODO: get this to be normal (toaster widget does not work in 0.9
-			div = document.createElement("div");
-			div.id="toaster";
-			document.body.appendChild(div);
-			dojo.widget.createWidget("toaster", {
-				id: "toaster",
-				separator: "<hr>",
-				positionDirection: "tr-down",
-				duration: 0,
-				messageTopic: "psychdesktop"
-			}, div); */
-			//TODO: something's wrong with this (has to do with user API)
-			/*api.user.getUserName(function(data){
-				dojo.byId("menu_name").innerHTML = "<i>"+data+"</i>";
-			});*/
-			//various events
 			dojo.connect(window, "onresize", desktop.windows, desktop.windows.desktopResize);
-			dojo.connect(window, "onbeforeunload", null, function()
-			{				  
-			  desktop.core.logout();
-			  //log out quickly
+			this.beforeUnloadEvent = dojo.connect(window, "onbeforeunload", null, function(e)
+			{
+				desktop.core.logout(true);
 			});
 			dojo.connect(document, "onkeydown", desktop.console, desktop.console.toggle);
 			dojo.connect(document, "onmouseup", desktop.menu, desktop.menu.leftclick);
@@ -91,16 +72,18 @@ desktop.core = new function()
 		* @type {Function}
 		* @memberOf desktop.core
 		*/
-		this.logout = function()
+		this.logout = function(sync)
 		{
-			desktop.config.save();
+			dojo.disconnect(this.beforeUnloadEvent);
+			if(typeof sync == "undefined") sync=false;
+			desktop.config.save(sync);
+			dojo.publish("desktoplogout", ["yes"]);
 			dojo.xhrGet({
 				url: "../backend/logout.php",
+				sync: sync,
 				load: function(data, ioArgs){
 					if(data == "0")
 					{
-						window.onbeforeunload = null;
-						dojo.publish("desktoplogout", ["yes"]);
 						if(desktop.config.fx == true)
 						{
 							var anim = dojo.fadeOut({node: document.body, duration: 1000});

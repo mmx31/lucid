@@ -54,11 +54,13 @@ desktop.config = {
 		mimetype: "text/plain"
         });
 	},
-	save: function() {
+	save: function(sync) {
+		if(typeof sync == "undefined") sync=false;
 		var conf = desktop.config;
 		conf = dojo.toJson(conf);
 		dojo.xhrPost({
             url: "../backend/api/registry.php?registry=save&appid=0&varname=config",
+			sync: sync,
             content: {value: conf},
 			error: function(error, ioArgs) { api.console("Error saving the config: "+error.message); },
             mimetype: "text/plain"

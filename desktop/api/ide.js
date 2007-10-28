@@ -25,26 +25,12 @@
 */
 api.ide = new function()
 {
-	this.compile = function(code)
+	this.execute = function(code)
 	{
-		var compiledCode = "";
-		for(count=0;count<=this.functions.length-1;count++)
-		{
-			if(count != 0)
-			{
-				compiledCode += "this."+code[count].name+" = function("+this.code[count].args+")\n{\n";
-				compiledCode += code[count].code;
-				compiledCode += "\n}\n\n";
-			}
-		}
-		return compiledCode;
-	}
-	this.execute = function(lib, code)
-	{
-		var bin = this.compile(lib, code);
-		var xml_seperator = desktop.app.xml_seperator;
-		var emulated_data = "-666"+xml_seperator+" "+xml_seperator+" "+xml_seperator+" "+xml_seperator+bin.code+xml_seperator+bin.library+xml_seperator+" "+xml_seperator+" "+xml_seperator+" "+xml_seperator;
-		desktop.app.fetchAppCallback("", emulated_data, "");
+		desktop.app._fetchApp(dojo.toJson({
+			id: -666,
+			code: code
+		}));
 		desktop.app.launch(-666);
 	}
 	this.save = function(app)
@@ -76,8 +62,7 @@ api.ide = new function()
 	               },
 	               load: function(data, ioArgs){
 						app.callback(parseInt(data));
-				   },
-	               mimetype: "text/plain"
+				   }
 	          });
 	     }
 		 else
@@ -92,45 +77,7 @@ api.ide = new function()
 			load: function(data, ioArgs)
 			{
 				data = dojo.fromJson(data);
-				var app = eval("new function() {"+data[0].code+"}");
-				var a = new Object();
-				for(item in app)
-				{
-					if((typeof app[item]) == "function")
-					{
-						a[item] = new Object();
-						//TODO: parse contents, pull out args, name, and code
-						a[item].name = item;
-						var start = app[item].indexOf("(");
-						var s = start;
-						var i = 0;
-						var p;
-						while(i=0)
-						{
-							p = app[item].indexOf(")", s);
-							s = app[item].indexOf("(", s);
-							if(s > p)
-							{
-								var end = p;
-								i=1;
-							}
-							else
-							{
-								s = p;
-							}
-						}
-						a[item].args = a[item].substring(start+1, end-1);
-						a[item].code = app[item].toString().substring(end+1, app[item].length-1);
-						end = a[item].code.lastIndexOf("}");
-						start = a[item].code.indexOf("{");
-						a[item].code = a[item].code.substring(start, end);
-					}
-					else
-					{
-						a[item] = app[item];
-					}
-				}
-				if(callback) callback(a);
+				if(callback) callback(data.code);
 			},
 			mimetype: "text/plain"
 		});
