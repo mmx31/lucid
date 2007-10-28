@@ -87,6 +87,14 @@ desktop.config = {
 	 */
 	debug: true,
 	/**
+	 * Crosstalk Ping timer
+	 * 
+	 * @type {Integer}
+	 * @alias desktop.config.crosstalkPing
+	 * @memberOf desktop.config
+	 */
+	crosstalkPing: 800,
+	/**
 	 * Configuration on taskbar elements
 	 * 
 	 * @type {Object}

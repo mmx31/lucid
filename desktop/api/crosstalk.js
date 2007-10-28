@@ -65,7 +65,7 @@ api.crosstalk = new function()
 			api.crosstalk.session[id].suspended = true;
 			}
 	/** 
-	* the crosstalk api checker, called every 20 or so seconds, internally. then will handle it from the registered crap...
+	* the crosstalk api checker, called every somewhat or so seconds, internally. then will handle it from the registered crap...
 	* 
 	* @alias api.crosstalk.internalCheck
 	* @memberOf api.crosstalk
@@ -207,7 +207,7 @@ api.crosstalk = new function()
 	}
 	this.setup_timer = function()
 	{
-		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), 800);
+		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), desktop.config.crosstalkPing);
 	}
 	/** 
 	* the crosstalk timer stopper
