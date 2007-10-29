@@ -35,8 +35,8 @@ api.ide = new function()
 	}
 	this.save = function(app)
 	{
-		if(typeof app.id != "undefined" &&
-	        typeof app.title != "undefined" &&
+		if(typeof app.ID != "undefined" &&
+	        typeof app.name != "undefined" &&
 	        typeof app.author != "undefined" &&
 	        typeof app.email != "undefined" &&
 	        typeof app.version != "undefined" &&
@@ -44,12 +44,13 @@ api.ide = new function()
 	        typeof app.category != "undefined" &&
 	        typeof app.code != "undefined")
 		{
-	          dojo.xhrGet({
-	               url: "../backend/ide.php",
+			  api.console("IDE API: Saving application...");
+	          dojo.xhrPost({
+	               url: "../backend/api/ide.php",
 	               method: "POST",
 	               content : {
-	                    appid: app.id,
-	                    name: app.title,
+	                    appid: app.ID,
+	                    name: app.name,
 	                    author: app.author,
 	                    email: app.email,
 	                    version: app.version,
@@ -59,11 +60,13 @@ api.ide = new function()
 	               },
 	               load: function(data, ioArgs){
 						app.callback(parseInt(data));
+						api.console("IDE API: Save Sucessful");
 				   }
 	          });
 	     }
 		 else
 		 {
+			api.console("IDE API: Error! Could not save. Not all strings in the object are defined.");
 		 	return false;
 		 }
 	}

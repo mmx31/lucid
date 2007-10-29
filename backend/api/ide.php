@@ -17,14 +17,16 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+error_reporting(1);
+require("../config.php");
 require("../quickbackend.php");
-
 if(!$_POST['appid'])
 {
 echo "1";
 exit();
 }
-$link = qback::mysqlLink();
+$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
+mysql_select_db($db_name) or die('Could not select database '.$dbname);
 qback::esc($_POST);
 
 if($_POST['appid'] == -1) qback::query("INSERT INTO #__apps (name, author, email, code, version, maturity, category) VALUES(\"${_POST['name']}\", \"${_POST['author']}\", \"${_POST['email']}\", \"${_POST['code']}\", \"${_POST['version']}\", \"${_POST['maturity']}\", \"${_POST['category']}\")");
