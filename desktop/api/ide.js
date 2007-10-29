@@ -35,29 +35,26 @@ api.ide = new function()
 	}
 	this.save = function(app)
 	{
-		if(app.id != undefined &&
-	        app.metadata.title != undefined &&
-	        app.metadata.author != undefined &&
-	        app.metadata.email != undefined &&
-	        app.metadata.version != undefined &&
-	        app.metadata.maturity != undefined &&
-	        app.metadata.category != undefined &&
-	        app.code != undefined &&
-			app.lib != undefined)
+		if(typeof app.id != "undefined" &&
+	        typeof app.title != "undefined" &&
+	        typeof app.author != "undefined" &&
+	        typeof app.email != "undefined" &&
+	        typeof app.version != "undefined" &&
+	        typeof app.maturity != "undefined" &&
+	        typeof app.category != "undefined" &&
+	        typeof app.code != "undefined")
 		{
-	          var ide_headers = new Object();
-	          this.compile(app.lib, app.code);
 	          dojo.xhrGet({
 	               url: "../backend/ide.php",
 	               method: "POST",
 	               content : {
 	                    appid: app.id,
-	                    name: app.metadata.title,
-	                    author: app.metadata.author,
-	                    email: app.metadata.email,
-	                    version: app.metadata.version,
-	                    maturity: app.metadata.maturity,
-	                    category: app.metadata.category,
+	                    name: app.title,
+	                    author: app.author,
+	                    email: app.email,
+	                    version: app.version,
+	                    maturity: app.maturity,
+	                    category: app.category,
 	                    code: app.code
 	               },
 	               load: function(data, ioArgs){
@@ -77,9 +74,8 @@ api.ide = new function()
 			load: function(data, ioArgs)
 			{
 				data = dojo.fromJson(data)[0];
-				if(callback) callback(data.code);
-			},
-			mimetype: "text/plain"
+				if(callback) callback(data);
+			}
 		});
 	}
 	this.getAppList = function(callback) {
