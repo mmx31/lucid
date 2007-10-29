@@ -42,9 +42,10 @@ echo("FAIL");
 		}
  }
   if ($_GET['action'] == "changePassword") {
+  require("../config.php");
  $username = $_SESSION['username'];
- $old = $_GET['old'];
- $new = $_GET['new'];
+ $old = crypt($_GET['old'], $conf_secretword);
+ $new = crypt($_GET['new'], $conf_secretword);
 	$query = "SELECT * FROM ${db_prefix}users WHERE username=\"${username}\"";
 	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
 	mysql_select_db($db_name) or die('Could not select database');
@@ -52,6 +53,27 @@ echo("FAIL");
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if($row["password"] == $old) {
 		$query = "UPDATE ${db_prefix}users  SET password=\"${new}\" WHERE username=\"${username}\" LIMIT 1";
+		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+		echo("0");
+		}
+		else {
+		die("1");
+		}
+ }
+ }
+   if ($_GET['action'] == "changeEmail") {
+  require("../config.php");
+ $username = $_SESSION['username'];
+ $password = crypt($_GET['pass'], $conf_secretword);
+ $email = $_GET['email'];
+	$query = "SELECT * FROM ${db_prefix}users WHERE username=\"${username}\"";
+	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
+	mysql_select_db($db_name) or die('Could not select database');
+	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
+		if($row["password"] == $password) {
+		$query = "UPDATE ${db_prefix}users  SET email=\"${email}\" WHERE username=\"${username}\" LIMIT 1";
+		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		echo("0");
 		}
 		else {
@@ -67,6 +89,16 @@ echo("FAIL");
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
 		echo($row["ID"]);
+		}
+ }
+  if ($_GET['action'] == "getUserEmail") {
+ $username = $_SESSION['username'];
+	$query = "SELECT * FROM ${db_prefix}users WHERE username=\"${username}\"";
+	$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
+	mysql_select_db($db_name) or die('Could not select database');
+	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
+		echo($row["email"]);
 		}
  }
  if ($_GET['action'] == "getUserID") {

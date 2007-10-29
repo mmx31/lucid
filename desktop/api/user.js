@@ -19,6 +19,19 @@ api.user = new function()
         error: function(error, ioArgs) { api.console("Error in AJAX call: "+error.message); }
         });
 		}
+		
+	this.getUserEmail = function(callback) {
+        desktop.core.loadingIndicator(0);
+        dojo.xhrGet({
+        url: "../backend/api/misc.php?action=getUserEmail",
+        load: function(data, ioArgs) {
+			api.user.userEmail = data;
+        	if(callback) { callback(data); }
+        	desktop.core.loadingIndicator(1);
+		},
+        error: function(error, ioArgs) { api.console("Error in AJAX call: "+error.message); }
+        });
+		}
 
 	this.getUserID = function(callback)
 	{
@@ -33,6 +46,7 @@ api.user = new function()
         error: function(error, ioArgs) { api.console("Error in AJAX call: "+error.message); }, mimetype: "text/plain"
         });
 	}
+	
 	this.userIDToUserName = function(userid, callback)
 	{
         desktop.core.loadingIndicator(0);
