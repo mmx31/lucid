@@ -69,32 +69,33 @@ desktop.app = new function()
 		this.fetchApp = function(appID, callback, args)
 		{
 			//fetch an app, put it into the cache
-			desktop.core.loadingIndicator(0);
 			dojo.xhrGet({
 			    url: "../backend/app.php?id="+appID,
 			    load: dojo.hitch(this, function(data, ioArgs)
 				{
 					this._fetchApp(data, callback, args);
 				}),
-			    error: function(error, ioArgs) { desktop.core.loadingIndicator(1); api.toaster("Error: "+error.message); },
-			    mimetype: "text/plain"
+			    error: function(error, ioArgs) { api.toaster("Error: "+error.message); }
 			});
 		}
 		this._fetchApp = function(data, callback, args)
 		{
-			app = dojo.fromJson(data);
-					this.apps[app[0].ID] = new Function("\tthis.id = "+app[0].ID+";\n\tthis.name = \""+app[0].name+"\";\n\tthis.version = \""+app[0].version+"\";\n\tthis.instance = -1;\n"+app[0].code);
-					if(callback)
-					{
-						if(args != undefined)
-						{
-							callback(app[0].ID, args);
-						}
-						else
-						{
-							callback(app[0].ID);
-						}
-					}
+			var app = dojo.fromJson(data);
+			api.console("creating app constructor...");
+			this.apps[app[0].ID] = new Function("\tthis.id = "+app[0].ID+";\n\tthis.name = \""+app[0].name+"\";\n\tthis.version = \""+app[0].version+"\";\n\tthis.instance = -1;\n"+app[0].code);
+			if(callback)
+			{
+				if(args != undefined)
+				{
+					api.console("Executing callback with args...");
+					callback(app[0].ID, args);
+				}
+				else
+				{
+					api.console("Executing callback...");
+					callback(app[0].ID);
+				}
+			}
 		}
 		/** 
 		* Fetches an app and stores it into the cache
@@ -105,15 +106,19 @@ desktop.app = new function()
 		*/
 		this.launch = function(id, args)
 		{
-			if(this.apps[id] == undefined)
-			{this.fetchApp(id, dojo.hitch(this, this.launch), args);  desktop.core.loadingIndicator(1);}
+			api.console("launching app "+id);
+			if(typeof this.apps[id] == "undefined")
+			{this.fetchApp(id, dojo.hitch(this, this.launch), args);}
 			else
 			{
+				api.console("preparing to launch app...");
 				try {
 					this.instanceCount++;
+					api.console("constructing new instance...");
 					this.instances[this.instanceCount] = new this.apps[id];
 					this.instances[this.instanceCount].instance = this.instances.length-1;
 					this.instances[this.instanceCount].status = "unknown";
+					api.console("Executing app...");
 					this.instances[this.instanceCount].init((args ? args : null));
 				}
 				catch(e) {

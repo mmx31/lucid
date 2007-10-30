@@ -157,9 +157,10 @@ desktop.menu = new function()
 						if(data[app].category == cat)
 						{
 							var item = new dijit.MenuItem({
-								label: data[app].name, 
-								onClick: eval("(function() {desktop.app.launch("+data[app].ID+")})")
+								label: data[app].name
 							});
+							dojo.connect(item, "onClick", desktop.app, 
+							new Function("desktop.app.launch("+data[app].ID+")") );
 							catMenu.addChild(item);
 						}
 					}

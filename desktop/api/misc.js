@@ -15,7 +15,7 @@ api.console = function(text)
 		dojo.byId('console').scrollTop = dojo.byId('console').scrollHeight;
 		if (console.log)
 		{
-			console.log(text);
+			console.debug(text);
 		}
 	}
 	else
