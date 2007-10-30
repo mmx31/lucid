@@ -131,11 +131,12 @@ desktop.console = new function()
 		{
 			api.console("  PID  TTY  CMD");
 			object = api.instances.getInstances();
-		
-					api.console("0     pts/0   system");
+			api.console("0     pts/0   system");
 				for(i=0;i<object.length;i++) {
-					if(object[i].status != "killed") {
-					api.console(object[i].instance+"    pts/0   "+object[i].name);
+					if(typeof(object[i]) != "undefined") {
+						if(object[i].status != "killed") {
+						api.console(object[i].instance+"    pts/0   "+object[i].name+" (AppID: "+object[i].appid+")");
+						}
 					}
 				}
 		},
