@@ -54,6 +54,7 @@ if(navigator.appName == "Microsoft Internet Explorer")
 		err += "\nerror:\n"+e;
 		alert(err);
 	};
+	document.onload = function() { delete window.onerror; }
 }
 /* 
  * Package: bootstrap

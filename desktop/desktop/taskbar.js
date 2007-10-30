@@ -116,7 +116,7 @@ desktop.taskbar = new function()
 			this._div=document.createElement("div");
 			this._div.onclick = this.onclick;
 			this._div.id="task_"+options.winid;
-			this._div.setAttribute("class", "taskBarItem");
+			dojo.addClass(this._div, "taskBarItem");
 			if(this.icon) this._div.innerHTML = "<img src='"+this.icon+"' />";
 			this._div.innerHTML += options.label;
 			dojo.style(this._div, "opacity", 0);

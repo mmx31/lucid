@@ -228,46 +228,46 @@ api.window = function(params)
 			windiv.style.top="50px";
 			windiv.style.left="50px";
 			windiv.style.zIndex=api.windowcounter+100;
-			windiv.setAttribute("class", "win");
-			
+			dojo.addClass(windiv, "win");			
+
 			wintitlebar = document.createElement("div");
 			wintitlebar.id = this._id+"titlebar";
-			wintitlebar.setAttribute("class", "wintitlebar");
-			
+			dojo.addClass(wintitlebar, "wintitlebar");			
+
 			winrightcorner = document.createElement("div");
-			winrightcorner.setAttribute("class", "winrightcorner");
+			dojo.addClass(winrightcorner, "winrightcorner");
 			wintitlebar.appendChild(winrightcorner);
 			
 			winleftcorner = document.createElement("div");
-			winleftcorner.setAttribute("class", "winleftcorner");
+			dojo.addClass(winleftcorner, "winleftcorner");
 			wintitlebar.appendChild(winleftcorner);
 			
 			winhandle = document.createElement("div");
 			winhandle.id = this._id+"handle";
 			winhandle.innerHTML = this.title;
-			winhandle.setAttribute("class", "winhandle");
+			dojo.addClass(winhandle, "winhandle");
 			wintitlebar.appendChild(winhandle);
 	
 			winbuttons = document.createElement("div");
 			winbuttons.id = this._id+"buttons";
 			winbuttons.style.position="absolute";
-			winbuttons.setAttribute("class", "winbuttons");
+			dojo.addClass(winbuttons, "winbuttons");
 				
 				closebutton = document.createElement("div");
 				closebutton.id = this._id+"closebutton";
-				closebutton.setAttribute("class", "winbuttonclose");
+				dojo.addClass(closebutton, "winclosebutton");
 				if(this.showClose) {
 				winbuttons.appendChild(closebutton);
 				}
 				maximizebutton = document.createElement("div");
-				maximizebutton.id = this._id+"closebutton";
-				maximizebutton.setAttribute("class", "winbuttonmaximize");
+				maximizebutton.id = this._id+"maximizebutton";
+				dojo.addClass(maximizebutton, "winbuttonmaximize");
 				if(this.showMaximize) {
 				winbuttons.appendChild(maximizebutton);
 				}
 				minimizebutton = document.createElement("div");
-				minimizebutton.id = this._id+"closebutton";
-				minimizebutton.setAttribute("class", "winbuttonminimize");
+				minimizebutton.id = this._id+"minimizebutton";
+				dojo.addClass(minimizebutton, "winbuttonminimize");
 				if(this.showMinimize) {
 				winbuttons.appendChild(minimizebutton);
 				}
@@ -286,7 +286,7 @@ api.window = function(params)
 			{
 				winresize = document.createElement("div");
 				winresize.id=this._id+"resize";
-				winresize.setAttribute("class", "winresize")
+				dojo.addClass(winresize, "winresize");
 				windiv.appendChild(winresize);
 			}
 			document.getElementById("windowcontainer").appendChild(windiv);

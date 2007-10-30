@@ -18,21 +18,27 @@
 
 desktop.theme = new function()
 {
+	this.fileList = ["theme", "window", "icons"];
 	this.init = function()
 	{
 		dojo.addClass(document.body, "tundra");
-		var element = document.createElement("link");
-		element.rel = "stylesheet";
-		element.type = "text/css";
-		element.media = "screen";
-		element.href = "./themes/"+(desktop.config.theme ? desktop.config.theme : "green")+"/theme.css";
-		element.id = "desktop_theme";
-		document.getElementsByTagName("head")[0].appendChild(element);
+		dojo.forEach(this.fileList, function(e)
+		{
+			var element = document.createElement("link");
+			element.rel = "stylesheet";
+			element.type = "text/css";
+			element.media = "screen";
+			element.href = "./themes/"+(desktop.config.theme ? desktop.config.theme : "green")+"/"+e+".css";
+			element.id = "desktop_theme_"+e;
+			document.getElementsByTagName("head")[0].appendChild(element);
+		});
 	}
 	this.set = function(theme)
 	{
 		desktop.config.theme = theme;
-		dojo.byId("desktop_theme").href ="./themes/"+desktop.config.theme+"/theme.css";
+		dojo.forEach(this.fileList, function(e) {
+			dojo.byId("desktop_theme_"+e).href ="./themes/"+desktop.config.theme+"/"+e+".css";
+		});
 	}
 	this.list = function(callback)
 	{
