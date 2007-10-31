@@ -255,7 +255,7 @@ api.window = function(params)
 				
 				closebutton = document.createElement("div");
 				closebutton.id = this._id+"closebutton";
-				dojo.addClass(closebutton, "winclosebutton");
+				dojo.addClass(closebutton, "winbuttonclose");
 				if(this.showClose) {
 				winbuttons.appendChild(closebutton);
 				}
