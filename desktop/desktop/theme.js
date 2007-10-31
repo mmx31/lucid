@@ -47,6 +47,7 @@ desktop.theme = new function()
 			load: function(data, ioArgs)
 			{
 				data = data.split("\n");
+				delete data[data.length-1];
 				callback(data);
 			}
 		});
