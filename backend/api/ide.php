@@ -37,7 +37,7 @@ $_POST['version'] = mysql_real_escape_string ($_POST['version'], $link);
 $_POST['maturity'] = mysql_real_escape_string ($_POST['maturity'], $link);
 $_POST['category'] = mysql_real_escape_string ($_POST['category'], $link);
 if($_POST['appid'] == -1) qback::query("INSERT INTO #__apps (name, author, email, code, version, maturity, category) VALUES(\"${_POST['name']}\", \"${_POST['author']}\", \"${_POST['email']}\", \"${_POST['code']}\", \"${_POST['version']}\", \"${_POST['maturity']}\", \"${_POST['category']}\")");
-else qback::query("UPDATE ${db_prefix}apps SET name=\"${_POST['name']}\", author=\"${_POST['author']}\", email=\"${_POST['email']}\", code=\"${_POST['code']}\", version=\"${_POST['version']}\", maturity=\"${_POST['maturity']}\", category=\"${_POST['category']}\" WHERE ID=\"${_POST['appid']}\" LIMIT 1");
+else qback::query("UPDATE #__apps SET name=\"${_POST['name']}\", author=\"${_POST['author']}\", email=\"${_POST['email']}\", code=\"${_POST['code']}\", version=\"${_POST['version']}\", maturity=\"${_POST['maturity']}\", category=\"${_POST['category']}\" WHERE ID=\"${_POST['appid']}\" LIMIT 1");
 
 if($_POST['appid'] == -1)
 {

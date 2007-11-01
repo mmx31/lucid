@@ -61,6 +61,7 @@ api.ide = new function()
 	               load: function(data, ioArgs){
 						app.callback(parseInt(data));
 						api.console("IDE API: Save Sucessful");
+						delete desktop.app.apps[parseInt(data)];
 				   }
 	          });
 	     }
