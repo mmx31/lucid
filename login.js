@@ -44,7 +44,6 @@ var desktop = {
 	},
 	start: function()
 	{
-		dojo.addClass(document.body, "tundra");
 		var _1;
 		var _2;
 		var _3=document.getElementsByTagName("script");
@@ -81,6 +80,7 @@ var desktop = {
 	},
 	setOnLoad: function() {
 		if(typeof dojo != "undefined"){
+			dojo.addClass(document.body, "tundra");
 			dojo.require("dijit.form.Form");
 			dojo.require("dijit.form.TextBox");
 			desktop.elements.loginform = new dijit.form.Form({}, dojo.byId(desktop.formid));
