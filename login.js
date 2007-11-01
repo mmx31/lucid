@@ -44,6 +44,7 @@ var desktop = {
 	},
 	start: function()
 	{
+		dojo.addClass(document.body, "tundra");
 		var _1;
 		var _2;
 		var _3=document.getElementsByTagName("script");
