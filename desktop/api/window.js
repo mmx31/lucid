@@ -293,7 +293,7 @@ api.window = function(params)
 			
 				dojo.addClass(this.body.domNode, "winbody");
 				windiv.appendChild(this.body.domNode);
-			windiv.appendChild(winbody);
+			//windiv.appendChild(winbody);
 			
 			/*var winbottom = document.createElement("div");
 			dojo.addClass(winbottom, "winbottomborder");
