@@ -275,9 +275,9 @@ api.window = function(params)
 			
 			windiv.appendChild(wintitlebar);
 			
-			var winbody = document.createElement("div");
+			/*var winbody = document.createElement("div");
 			dojo.addClass(winbody, "winbody");
-				
+			
 				var winleft = document.createElement("div");
 				dojo.addClass(winleft, "winleftborder");
 				dojo.style(winleft, "float", "left");
@@ -287,12 +287,12 @@ api.window = function(params)
 				dojo.addClass(winright, "winrightborder");
 				dojo.style(winright, "float", "right");
 				winbody.appendChild(winright);
-				
+			*/	
 				this.body.id=this._id+"body";
 				if(this.bodyWidget == "ContentPane") this.body.setContent(this._innerHTML);
 			
-				dojo.addClass(this.body.domNode, "wininnerbody");
-				winbody.appendChild(this.body.domNode);
+				dojo.addClass(this.body.domNode, "winbody");
+				windiv.appendChild(this.body.domNode);
 			windiv.appendChild(winbody);
 			
 			/*var winbottom = document.createElement("div");
