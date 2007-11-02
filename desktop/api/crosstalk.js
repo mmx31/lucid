@@ -143,7 +143,7 @@ api.crosstalk = new function()
 						        dojo.xhrGet({
 						        	url: "../backend/api.php?crosstalk=removeEvent&id="+id,
 									handleAs: "xml",
-						        	error: function(type, error) { alert("Error in Crosstalk call: "+error.message); },
+						        	error: function(type, error) { alert("Error in CrosstalkRemoval call: "+error.message); },
 						        	mimetype: "text/xml"
 						        });
 								handled = true;
@@ -170,7 +170,7 @@ api.crosstalk = new function()
 	* @memberOf api.crosstalk
 	*/
 	this.handleSystemMessage = function(object) {
-	api.ui.alert("<center> <b> System Message (senderID: "+object.sender+") </b> <br> "+object.message+" </center>");
+	api.ui.alert({title: "Psych Desktop", message: "<center> <b> System Message (senderID: "+object.sender+") </b> <br> "+object.message+" </center>"});
 	}
 	/** 
 	* send system messages
@@ -190,7 +190,7 @@ api.crosstalk = new function()
 	*/
 	this.init = function()
 	{
-		if(!((typeof this.alreadyDone) != "undefined")) {
+		if(typeof(this.alreadyDone) == "undefined") {
 			// Hack into the API
 			api.crosstalk.session[api.crosstalk.assignid] = new Object();
 			api.crosstalk.session[api.crosstalk.assignid].suspended = false;
