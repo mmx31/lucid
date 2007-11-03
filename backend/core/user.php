@@ -19,7 +19,7 @@
 	*/
 	session_start();
 	require("../models/user.php");
-	$user = $User.get_current()
+	$user = $User->get_current();
 	if($_GET['section'] == "info")
 	{
 		if($user != false)
@@ -48,6 +48,53 @@
 		if($_GET['action'] == "logout")
 		{
 			$user->logout();
+			echo "0";
+		}
+		if($_GET['action'] == "resetpass")
+		{
+			$p = $User->filter("username", $_POST['username']);
+			if(isset($p[0]))
+			{
+				$p = $p[0];
+				if($p->email == $_POST['email'])
+				{
+					$pass = $p->generate_password();
+					$message= "In response to your forgotten password request, here's your new password.\r\n\r\n" . "New Password: '" . $pass . "'\r\n\r\nLog in with this password, then change your password using the control panel. Thanks!\r\n\r\n--The Management";
+					mail($p->email, "Psych Desktop Password Reset", $message, "From: Psych Desktop Account Service");
+					echo "0";
+				}
+				else { echo "2"; }
+			}
+			else { echo "1"; }
+		}
+		if($_GET['action'] == "register")
+		{
+			require("../config.php");
+			if($conf_public == "yes")
+			{
+				$u = $User->filter("username", $_POST['username']);
+				if(isset($u[0])) { echo "1"; }
+				else
+				{
+					$p = new User();
+					$p->username = $_POST['username'];
+					$p->email = $_POST['email'];
+					$p->set_password($_POST['username']);
+					$p->level = "user";
+					$p->logged = 0;
+					$p->save();
+					echo "0";
+				}
+			}
+			else
+			{
+				echo "1";
+			}
+		}
+		if($_GET['action'] == "public")
+		{
+			require("../config.php");
+			echo $conf_public;
 		}
 	}
 ?>

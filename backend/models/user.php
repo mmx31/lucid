@@ -26,12 +26,43 @@
 				$p->password = $line['password'];
 				$p->email = $line['email'];
 				$p->level = $line['level'];
+				mysql_free_result($result);
+				mysql_close($link);
 				return $p;
 			}
 			else
 			{
+				mysql_free_result($result);
+				mysql_close($link);
 				return false;
 			}
+		}
+		function filter($feild, $value)
+		{
+			require("../config.php");
+			$link = mysql_connect($db_host, $db_username, $db_password)
+			   or die('Could not connect: ' . mysql_error());
+			mysql_select_db($db_name) or die('Could not select database');
+			$feild = mysql_real_escape_string($feild);
+			$value = mysql_real_escape_string($value);
+			$query = "SELECT * FROM ${db_prefix}users WHERE ${feild}='${value}'";
+			$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+			$list = Array();
+			while($line = mysql_fetch_array($result, MYSQL_ASSOC))
+			{
+				$p = new User();
+				$p->id = $line['ID'];
+				$p->username = $line['username'];
+				$p->logged = $line['logged'];
+				$p->password = $line['password'];
+				$p->email = $line['email'];
+				$p->level = $line['level'];
+				$list.push($p);
+			}
+			mysql_free_result($result);
+			mysql_close($link);
+			if(!isset($line)) { return false; }
+			else { return $list; }
 		}
 		function get_current()
 		{
@@ -58,19 +89,25 @@
 				$level = mysql_real_escape_string($this->level);
 				$logged = $this->logged;
 				$email = mysql_real_escape_string($this->email);
-				$query = "UPDATE ${db_prefix}users SET username='${username}', password = '${password}', level='${level}', logged=${logged} WHERE ID=${id} LIMIT 1";
+				$query = "UPDATE ${db_prefix}users SET username='${username}', email='${email}', password = '${password}', level='${level}', logged=${logged} WHERE ID=${id} LIMIT 1";
 				mysql_query($query) or die('Query failed: ' . mysql_error());
 			}
 			else
 			{
-				
+				$username = mysql_real_escape_string($this->username);
+				$password = mysql_real_escape_string($this->password);
+				$level = mysql_real_escape_string($this->level);
+				$logged = $this->logged;
+				$email = mysql_real_escape_string($this->email);
+				$query = "INSERT INTO ${db_prefix}users SET username='${username}', email='${email}', password = '${password}', level='${level}', logged=${logged}";
+				mysql_query($query) or die('Query failed: ' . mysql_error());
 			}
 			mysql_close($link);
 		}
 		function authenticate($user, $pass)
 		{
 			require("../config.php");
-			$link = mysql_connect($db_host, $db_username, $db_password)
+			$link2 = mysql_connect($db_host, $db_username, $db_password)
 			   or die('Could not connect: ' . mysql_error());
 			mysql_select_db($db_name) or die('Could not select database');
 			$query = "SELECT * FROM ${db_prefix}users WHERE username='${user}' LIMIT 1";
@@ -81,23 +118,22 @@
 				$pass = crypt($pass, $conf_secretword);
 				if($line["password"] == $pass)
 				{
-					$p = new User();
-					$p = $p->get($line['ID']);
+					$p = $this->get($line['ID']);
 					mysql_free_result($result);
-					mysql_close($link);
+					//mysql_close($link2);
 					return $p;
 				}
 				else
 				{
 					mysql_free_result($result);
-					mysql_close($link);
+					//mysql_close($link2);
 					return false;
 				}
 			}
 			else
 			{
 				mysql_free_result($result);
-				mysql_close($link);
+				//mysql_close($link2);
 				return false;
 			}
 		}
@@ -136,6 +172,19 @@
 		{
 			require("../config.php");
 			$this->password = crypt($pass, $conf_secretword);
+		}
+		function generate_password()
+		{
+			$characters = 10;
+			$possible = '23456789bcdfghjkmnpqrstvwxyz'; 
+			$code = '';
+			$i = 0;
+			while ($i < $characters) { 
+				$code .= substr($possible, mt_rand(0, strlen($possible)-1), 1);
+				$i++;
+			}
+			$this->set_password($code);
+			return $code;
 		}
 	}
 	$User = new User();

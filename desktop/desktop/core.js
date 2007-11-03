@@ -79,7 +79,7 @@ desktop.core = new function()
 			desktop.config.save(sync);
 			dojo.publish("desktoplogout", ["yes"]);
 			dojo.xhrGet({
-				url: "../backend/logout.php",
+				url: desktop.core.backend("core.user.auth.logout"),
 				sync: sync,
 				load: function(data, ioArgs){
 					if(data == "0")

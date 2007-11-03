@@ -104,7 +104,7 @@ var desktop = {
 		{
 		dojo.byId("desktop_formerror").innerHTML = "Logging in...";
 			dojo.xhrPost({
-				url: desktop.path+"/backend/login.php",
+				url: desktop.path+"/backend/core/user.php?section=auth&action=login",
 				content: contents,
 				load: function(data)
 				{
@@ -187,7 +187,7 @@ var desktop = {
 					if(dojox.validate.isEmailAddress(contents.email))
 					{
 						dojo.xhrPost({
-							url: desktop.path+"/backend/register.php",
+							url: desktop.path+"/backend/core/user.php?section=auth&action=register",
 							content: contents,
 							load: function(data, ioArgs)
 							{
@@ -252,7 +252,7 @@ var desktop = {
 				if(dojox.validate.isEmailAddress(contents.email))
 				{
 					dojo.xhrPost({
-						url: desktop.path+"/backend/forgotpass.php",
+						url: desktop.path+"/backend/core/user.php?section=auth&action=resetpass",
 						content: contents,
 						load: function(data, ioArgs) {
 							if(data == "2")
