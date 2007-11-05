@@ -275,29 +275,38 @@ api.window = function(params)
 			
 			windiv.appendChild(wintitlebar);
 			
-			/*var winbody = document.createElement("div");
+			var winbody = document.createElement("div");
 			dojo.addClass(winbody, "winbody");
 			
 				var winleft = document.createElement("div");
 				dojo.addClass(winleft, "winleftborder");
-				dojo.style(winleft, "float", "left");
+				dojo.style(winleft, "position", "absolute");
+				dojo.style(winleft, "top", "0px");
+				dojo.style(winleft, "left", "0px");
 				winbody.appendChild(winleft);
 				
-				var winright = document.createElement("div");
-				dojo.addClass(winright, "winrightborder");
-				dojo.style(winright, "float", "right");
-				winbody.appendChild(winright);
-			*/	
 				this.body.id=this._id+"body";
 				if(this.bodyWidget == "ContentPane") this.body.setContent(this._innerHTML);
 			
-				dojo.addClass(this.body.domNode, "winbody");
-				windiv.appendChild(this.body.domNode);
-			//windiv.appendChild(winbody);
+				dojo.addClass(this.body.domNode, "wininnerbody");
+				winbody.appendChild(this.body.domNode);
+				
+				var winright = document.createElement("div");
+				dojo.addClass(winright, "winrightborder");
+				dojo.style(winright, "position", "absolute");
+				dojo.style(winright, "top", "0px");
+				dojo.style(winright, "right", "0px");
+				winbody.appendChild(winright);
+				
+			windiv.appendChild(winbody);
 			
-			/*var winbottom = document.createElement("div");
+			var winbottom = document.createElement("div");
 			dojo.addClass(winbottom, "winbottomborder");
-			windiv.appendChild(winbottom);*/
+			dojo.style(winbottom, "position", "absolute");
+			dojo.style(winbottom, "bottom", "0px");
+			dojo.style(winbottom, "left", "0px");
+			dojo.style(winbottom, "width", "100%");
+			windiv.appendChild(winbottom);
 			
 			if(this.resizable == true)
 			{
