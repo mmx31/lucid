@@ -42,7 +42,7 @@
 		if($_GET['action'] == "login")
 		{
 			$p = $User->authenticate($_POST['username'], $_POST['password']);
-			if($p == false) { echo "1"; }
+			if($p == FALSE) { echo "1"; }
 			else { $p->login(); echo "0"; }
 		}
 		if($_GET['action'] == "logout")
@@ -79,7 +79,7 @@
 					$p = new User();
 					$p->username = $_POST['username'];
 					$p->email = $_POST['email'];
-					$p->set_password($_POST['username']);
+					$p->set_password($_POST['password']);
 					$p->level = "user";
 					$p->logged = 0;
 					$p->save();

@@ -8,61 +8,36 @@
 		var $logged;
 		var $email;
 		var $level;
-		function get($id)
+		var $_tablename = "users";
+		function _makeModel($line)
 		{
-			require("../config.php");
-			$link = mysql_connect($db_host, $db_username, $db_password)
-			   or die('Could not connect: ' . mysql_error());
-			mysql_select_db($db_name) or die('Could not select database');
-			$query = "SELECT * FROM ${db_prefix}users WHERE ID='${id}' LIMIT 1";
-			$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
-			if($line)
-			{
-				$p = new User();
-				$p->id = $line['ID'];
-				$p->username = $line['username'];
-				$p->logged = $line['logged'];
-				$p->password = $line['password'];
-				$p->email = $line['email'];
-				$p->level = $line['level'];
-				mysql_free_result($result);
-				mysql_close($link);
-				return $p;
-			}
-			else
-			{
-				mysql_free_result($result);
-				mysql_close($link);
-				return false;
-			}
+			$p = new User();
+			$p->id = $line['ID'];
+			$p->username = $line['username'];
+			$p->logged = $line['logged'];
+			$p->password = $line['password'];
+			$p->email = $line['email'];
+			$p->level = $line['level'];
+			return $p;
 		}
-		function filter($feild, $value)
+		function _make_mysql_update_query($table)
 		{
-			require("../config.php");
-			$link = mysql_connect($db_host, $db_username, $db_password)
-			   or die('Could not connect: ' . mysql_error());
-			mysql_select_db($db_name) or die('Could not select database');
-			$feild = mysql_real_escape_string($feild);
-			$value = mysql_real_escape_string($value);
-			$query = "SELECT * FROM ${db_prefix}users WHERE ${feild}='${value}'";
-			$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-			$list = Array();
-			while($line = mysql_fetch_array($result, MYSQL_ASSOC))
-			{
-				$p = new User();
-				$p->id = $line['ID'];
-				$p->username = $line['username'];
-				$p->logged = $line['logged'];
-				$p->password = $line['password'];
-				$p->email = $line['email'];
-				$p->level = $line['level'];
-				$list.push($p);
-			}
-			mysql_free_result($result);
-			mysql_close($link);
-			if(!isset($line)) { return false; }
-			else { return $list; }
+			$id=$this->id;
+			$username = mysql_real_escape_string($this->username);
+			$password = mysql_real_escape_string($this->password);
+			$level = mysql_real_escape_string($this->level);
+			$logged = $this->logged;
+			$email = mysql_real_escape_string($this->email);
+			return "UPDATE ${table} SET username='${username}', email='${email}', password = '${password}', level='${level}', logged=${logged} WHERE ID=${id} LIMIT 1";
+		}
+		function _make_mysql_insert_query($table)
+		{
+			$username = mysql_real_escape_string($this->username);
+			$password = mysql_real_escape_string($this->password);
+			$level = mysql_real_escape_string($this->level);
+			$logged = $this->logged;
+			$email = mysql_real_escape_string($this->email);
+			return "INSERT INTO ${table} SET username='${username}', email='${email}', password = '${password}', level='${level}', logged=${logged}";
 		}
 		function get_current()
 		{
@@ -72,69 +47,28 @@
 			}
 			else
 			{
-				return False;
+				return FALSE;
 			}
-		}
-		function save()
-		{
-			require("../config.php");
-			$link = mysql_connect($db_host, $db_username, $db_password)
-			   or die('Could not connect: ' . mysql_error());
-			mysql_select_db($db_name) or die('Could not select database');
-			if(isset($this->id))
-			{
-				$id=$this->id;
-				$username = mysql_real_escape_string($this->username);
-				$password = mysql_real_escape_string($this->password);
-				$level = mysql_real_escape_string($this->level);
-				$logged = $this->logged;
-				$email = mysql_real_escape_string($this->email);
-				$query = "UPDATE ${db_prefix}users SET username='${username}', email='${email}', password = '${password}', level='${level}', logged=${logged} WHERE ID=${id} LIMIT 1";
-				mysql_query($query) or die('Query failed: ' . mysql_error());
-			}
-			else
-			{
-				$username = mysql_real_escape_string($this->username);
-				$password = mysql_real_escape_string($this->password);
-				$level = mysql_real_escape_string($this->level);
-				$logged = $this->logged;
-				$email = mysql_real_escape_string($this->email);
-				$query = "INSERT INTO ${db_prefix}users SET username='${username}', email='${email}', password = '${password}', level='${level}', logged=${logged}";
-				mysql_query($query) or die('Query failed: ' . mysql_error());
-			}
-			mysql_close($link);
 		}
 		function authenticate($user, $pass)
 		{
-			require("../config.php");
-			$link2 = mysql_connect($db_host, $db_username, $db_password)
-			   or die('Could not connect: ' . mysql_error());
-			mysql_select_db($db_name) or die('Could not select database');
-			$query = "SELECT * FROM ${db_prefix}users WHERE username='${user}' LIMIT 1";
-			$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
-			if($line)
+			$line = $this->filter("username", $user);
+			if($line != FALSE)
 			{
+				require("../config.php");
 				$pass = crypt($pass, $conf_secretword);
-				if($line["password"] == $pass)
+				if($line[0]->password == $pass)
 				{
-					$p = $this->get($line['ID']);
-					mysql_free_result($result);
-					//mysql_close($link2);
-					return $p;
+					return $line[0];
 				}
 				else
 				{
-					mysql_free_result($result);
-					//mysql_close($link2);
-					return false;
+					return FALSE;
 				}
 			}
 			else
 			{
-				mysql_free_result($result);
-				//mysql_close($link2);
-				return false;
+				return FALSE;
 			}
 		}
 		function login()
