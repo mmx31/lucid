@@ -12,20 +12,6 @@
 		var $category;
 		var $_tablename = "apps";
 		
-		function _makeModel($line)
-		{
-			$p = new App();
-			$p->id = $line['ID'];
-			$p->name = $line['name'];
-			$p->author = $line['author'];
-			$p->email = $line['email'];
-			$p->code = $line['code'];
-			$p->version = $line['version'];
-			$p->maturity = $line['maturity'];
-			$p->category = $line['category'];
-			return $p;
-		}
-		
 		function _make_mysql_update_query($table)
 		{
 			$id=$this->id;

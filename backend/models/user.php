@@ -9,17 +9,6 @@
 		var $email;
 		var $level;
 		var $_tablename = "users";
-		function _makeModel($line)
-		{
-			$p = new User();
-			$p->id = $line['ID'];
-			$p->username = $line['username'];
-			$p->logged = $line['logged'];
-			$p->password = $line['password'];
-			$p->email = $line['email'];
-			$p->level = $line['level'];
-			return $p;
-		}
 		function _make_mysql_update_query($table)
 		{
 			$id=$this->id;
@@ -52,7 +41,7 @@
 		}
 		function authenticate($user, $pass)
 		{
-			$line = $this->filter("username", $user);
+			$line = self::filter("username", $user);
 			if($line != FALSE)
 			{
 				require("../config.php");

@@ -42,8 +42,8 @@
 		if($_GET['action'] == "login")
 		{
 			$p = $User->authenticate($_POST['username'], $_POST['password']);
-			if($p == FALSE) { echo "1"; }
-			else { $p->login(); echo "0"; }
+			if($p != FALSE) { $p->login(); echo "0"; }
+			else { echo "1"; }
 		}
 		if($_GET['action'] == "logout")
 		{

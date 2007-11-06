@@ -78,5 +78,19 @@
 			}
 			return $db_prefix . $tablename;
 		}
+		function _makeModel($line)
+		{
+			$p = new $this;
+			foreach ($line as $key => $value)
+			{
+				$p->$key = $value;
+			}
+			if(isset($line['ID']))
+			{
+				$p->id = $line['ID'];
+				unset($p->ID);
+			}
+			return $p;
+		}
 	}
 ?>
