@@ -4,7 +4,7 @@
 		var $id;
 		function get($id)
 		{
-			require("../config.php");
+			require("./../config.php");
 			$tablename = $this->_get_tablename();
 			$link = mysql_connect($db_host, $db_username, $db_password)
 			   or die('Could not connect: ' . mysql_error());
@@ -28,7 +28,7 @@
 		}
 		function filter($feild, $value)
 		{
-			require("../config.php");
+			require("./../config.php");
 			$tablename = $this->_get_tablename();
 			$link = mysql_connect($db_host, $db_username, $db_password)
 			   or die('Could not connect: ' . mysql_error());
@@ -51,7 +51,7 @@
 		}
 		function save()
 		{
-			require("../config.php");
+			require("./../config.php");
 			$link = mysql_connect($db_host, $db_username, $db_password)
 			   or die('Could not connect: ' . mysql_error());
 			mysql_select_db($db_name) or die('Could not select database');
@@ -67,7 +67,7 @@
 		}		
 		function _get_tablename()
 		{
-			require("../config.php");
+			require("./../config.php");
 			if(isset($this->_tablename))
 			{
 				$tablename=$this->_tablename;
@@ -96,14 +96,7 @@
 		{
 			$i = 0;
 			//for some reason count($this) returns 0 so...
-			$length = -1;
-			foreach($this as $key => $value)
-			{
-				if($key != "_tablename")
-				{
-					$length++;
-				}
-			}
+			$length = $this->count()-1;
 			if($type == "update") { $sql = "UPDATE ${table} SET "; }
 			else { $sql = "INSERT INTO ${table} SET "; }
 			foreach($this as $key => $value)
@@ -137,6 +130,19 @@
 			$id=$this->id;
 			if($type == "update") { $sql .= " WHERE ID=${id} LIMIT 1"; }
 			return $sql;
+		}
+		function count()
+		{
+			//for some reason count($this) returns 0 so...
+			$length = 0;
+			foreach($this as $key => $value)
+			{
+				if($key != "_tablename")
+				{
+					$length++;
+				}
+			}
+			return $length;
 		}
 	}
 ?>
