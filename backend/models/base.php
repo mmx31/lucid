@@ -57,11 +57,11 @@
 			mysql_select_db($db_name) or die('Could not select database');
 			if(isset($this->id))
 			{
-				mysql_query($this->_make_mysql_update_query($this->_get_tablename())) or die('Query failed: ' . mysql_error());
+				mysql_query($this->_make_mysql_query($this->_get_tablename(), "update")) or die('Query failed: ' . mysql_error());
 			}
 			else
 			{
-				mysql_query($this->_make_mysql_insert_query($this->_get_tablename())) or die('Query failed: ' . mysql_error());
+				mysql_query($this->_make_mysql_query($this->_get_tablename(), "insert")) or die('Query failed: ' . mysql_error());
 			}
 			mysql_close($link);
 		}		
@@ -91,6 +91,52 @@
 				unset($p->ID);
 			}
 			return $p;
+		}
+		function _make_mysql_query($table, $type)
+		{
+			$i = 0;
+			//for some reason count($this) returns 0 so...
+			$length = -1;
+			foreach($this as $key => $value)
+			{
+				if($key != "_tablename")
+				{
+					$length++;
+				}
+			}
+			if($type == "update") { $sql = "UPDATE ${table} SET "; }
+			else { $sql = "INSERT INTO ${table} SET "; }
+			foreach($this as $key => $value)
+			{
+				if($key != "_tablename")
+				{
+					if($key == "id")
+					{
+						$key = "ID";
+					}
+					if(is_int($value))
+					{
+						$sql .= mysql_real_escape_string($key) . "=" . $value;
+					}
+					else
+					{
+						//when all else fails, make it a string
+						$sql .= mysql_real_escape_string($key) . "=\"" . mysql_real_escape_string($value) ."\"";
+					}
+					if($i != $length)
+					{
+						$sql .= ", ";
+					}
+					else
+					{
+						$sql .= " ";
+					}
+				}
+				$i++;
+			}
+			$id=$this->id;
+			if($type == "update") { $sql .= " WHERE ID=${id} LIMIT 1"; }
+			return $sql;
 		}
 	}
 ?>
