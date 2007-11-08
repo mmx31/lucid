@@ -41,10 +41,7 @@ else qback::query("UPDATE #__apps SET name=\"${_POST['name']}\", author=\"${_POS
 
 if($_POST['appid'] == -1)
 {
-    $result = qback::query("SELECT * FROM #__apps WHERE code=\"${_POST['code']}\" HAVING library=\"${_POST['library']}\" ORDER BY ID DESC LIMIT 1");
-    $line = mysql_fetch_array($result, MYSQL_ASSOC);
-    echo $line['id'];
-	qback::close($link, $result);
+	echo mysql_insert_id();
 }
 else
 {
