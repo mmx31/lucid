@@ -73,6 +73,7 @@ desktop.taskbar = new function()
 						dijit.byId("taskbar").startup();
 						dijit.byId("desktop_main").resize();
 						//dojo.byId("taskbarhider").innerHTML='<img src="./themes/default/images/icons/showtask.gif">';
+						dojo.toggleClass(dijit.byId("taskbarhider").domNode, "taskbarhider-hidden");
 					}));
 					anim.play();
 				}
@@ -80,7 +81,7 @@ desktop.taskbar = new function()
 				{
 					dojo.toggleClass(dijit.byId("taskbar").domNode, "hidetaskbar");
 					dojo.style("taskbar", "opacity", 1);
-					//dojo.byId("taskbarhider").innerHTML='<img src="./themes/default/images/icons/showtask.gif">';
+					dojo.toggleClass(dijit.byId("taskbarhider").domNode, "taskbarhider-hidden");
 				}
 			}
 			else if(desktop.config.taskbar.isShown == false)
@@ -156,9 +157,9 @@ desktop.taskbar = new function()
 			
 			div = document.createElement("div");
 			div.id="taskbarhider";
-			div.innerHTML = "<img src='./themes/default/images/icons/hidetask.gif'>";
+			dojo.addClass(div, "taskbarhider");
 			document.body.appendChild(div);
-			div.setAttribute("onclick", "desktop.taskbar.hider();");
+			dojo.connect(div, "onclick", this, this.hider);
 			
 			div = document.createElement("td");
 			div.innerHTML = "<div class='icon-22-status-network-idle' id='networkStatus'></div>";
