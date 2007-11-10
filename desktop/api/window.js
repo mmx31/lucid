@@ -306,6 +306,23 @@ api.window = function(params)
 			dojo.style(winbottom, "bottom", "0px");
 			dojo.style(winbottom, "left", "0px");
 			dojo.style(winbottom, "width", "100%");
+				var winbottomleft = document.createElement("div");
+				dojo.addClass(winbottomleft, "winbottomleft");
+				dojo.style(winbottomleft, "bottom", "0px");
+				dojo.style(winbottomleft, "left", "0px");
+				dojo.style(winbottomleft, "position", "absolute");
+				winbottom.appendChild(winbottomleft);
+				
+				var winbottomcenter = document.createElement("div");
+				dojo.addClass(winbottomcenter, "winbottomcenter");
+				winbottom.appendChild(winbottomcenter);
+				
+				var winbottomright = document.createElement("div");
+				dojo.addClass(winbottomright, "winbottomright");
+				dojo.style(winbottomright, "position", "absolute");
+				dojo.style(winbottomright, "bottom", "0px");
+				dojo.style(winbottomright, "right", "0px");
+				winbottom.appendChild(winbottomright);
 			windiv.appendChild(winbottom);
 			
 			if(this.resizable == true)
