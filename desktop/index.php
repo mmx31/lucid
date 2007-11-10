@@ -34,7 +34,6 @@ if($_SESSION['userloggedin'] == true)
 <head>
 <script type="text/javascript" src="./dojo/dojo/dojo.js"></script>
 <script type="text/javascript" src="./dojo/dijit/dijit.js"></script>
-<script type="text/javascript" src="./AFLAX/aflax.js"></script>
 <script type="text/javascript" src="bootstrap.js"></script>
 </head>
 <body>

@@ -88,14 +88,14 @@ desktop.core = new function()
 						{
 							var anim = dojo.fadeOut({node: document.body, duration: 1000});
 							dojo.connect(anim, "onEnd", null, function(){
-								document.body.innerHTML = "";
+								dojo.style(document.body, "opacity", 0);
 								window.close();
 							});
 							anim.play();
 						}
 						else
 						{
-							document.body.innerHTML = "";
+							dojo.style(document.body, "opacity", 0);
 							window.close();
 						}
 					}

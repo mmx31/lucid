@@ -17,7 +17,6 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
 var desktop = {};
-var aflax = new AFLAX("./AFLAX/aflax.swf"); 
 desktop.modules = {};
 dojo.require("dojo.io.script");
 if(navigator.appName == "Microsoft Internet Explorer")
@@ -194,8 +193,8 @@ numberOfModulesLoaded: 0,
 	  
  bootstrap.link("./dojo/dijit/themes/dijit.css", "dijit");
  bootstrap.link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
- bootstrap.link("./dojo/dijit/themes/tundra/tundra.css", "tundra");
- bootstrap.link("./dojo/dijit/themes/tundra/tundra_rtl.css", "tundra_rtl");
+// bootstrap.link("./dojo/dijit/themes/tundra/tundra.css", "tundra");
+// bootstrap.link("./dojo/dijit/themes/tundra/tundra_rtl.css", "tundra_rtl");
  bootstrap.link("desktop.css", "corestyle");
  dojo.require("dijit.layout.LayoutContainer");
  dojo.require("dijit.layout.ContentPane");

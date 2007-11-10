@@ -18,10 +18,10 @@
 
 desktop.theme = new function()
 {
-	this.fileList = ["theme", "window", "icons"];
-	this.init = function()
+	this.fileList = ["theme", "window", "icons", "dijit"];
+	this.draw = function()
 	{
-		dojo.addClass(document.body, "tundra");
+		dojo.addClass(document.body, "dijit");
 		dojo.forEach(this.fileList, function(e)
 		{
 			var element = document.createElement("link");
