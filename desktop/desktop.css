@@ -113,3 +113,7 @@ height: 100%;
 #menubutton .dijitA11yDownArrow {
 	display: none;
 }
+.hidetaskbar {
+	display: none;
+	height: 0px;
+}

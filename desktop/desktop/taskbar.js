@@ -38,7 +38,7 @@ desktop.taskbar = new function()
 			if(value == false)
 			{
 				desktop.config.taskbar.isShown = false;
-				document.getElementById("taskbarhider").innerHTML='<img src="./icons/showtask.gif">';
+				//document.getElementById("taskbarhider").innerHTML='<img src="./icons/showtask.gif">';
 				dojo.style("taskbar", "opacity", 0);
 				dojo.byId("taskbar").style.display="none";
 			}
@@ -69,26 +69,24 @@ desktop.taskbar = new function()
 				{
 					var anim = dojo.fadeOut({ node: "taskbar", duration: 200 });
 					dojo.connect(anim, "onEnd", null, dojo.hitch(this, function() {
-						//dojo.byId("taskbar").style.display="none";
-						dijit.byId("taskbar").domNode.style.height="0px";
+						dojo.toggleClass(dijit.byId("taskbar").domNode, "hidetaskbar");
 						dijit.byId("taskbar").startup();
 						dijit.byId("desktop_main").resize();
-						dojo.byId("taskbarhider").innerHTML='<img src="./themes/default/images/icons/showtask.gif">';
+						//dojo.byId("taskbarhider").innerHTML='<img src="./themes/default/images/icons/showtask.gif">';
 					}));
 					anim.play();
 				}
 				else
 				{
-					dojo.byId("taskbar").style.display="none";
+					dojo.toggleClass(dijit.byId("taskbar").domNode, "hidetaskbar");
 					dojo.style("taskbar", "opacity", 1);
-					dojo.byId("taskbarhider").innerHTML='<img src="./themes/default/images/icons/showtask.gif">';
+					//dojo.byId("taskbarhider").innerHTML='<img src="./themes/default/images/icons/showtask.gif">';
 				}
 			}
 			else if(desktop.config.taskbar.isShown == false)
 			{
 				desktop.config.taskbar.isShown = true;
-				//dojo.byId("taskbar").style.display="block";
-				dijit.byId("taskbar").domNode.style.height="35px";
+				dojo.toggleClass(dijit.byId("taskbar").domNode, "hidetaskbar");
 				dijit.byId("taskbar").startup();
 				dijit.byId("desktop_main").resize();
 				dojo.byId("taskbarhider").innerHTML='<img src="./themes/default/images/icons/hidetask.gif">';
@@ -145,7 +143,7 @@ desktop.taskbar = new function()
 		this.draw = function()
 		{
 			tasktray = '<table id="tasktray"><tr id="tasklist"><td id="taskclock">&nbsp;</td><td><div id="trayclock"></div></td></tr></table>';
-			html='<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td width="30"><div id="menubutton"></div></td><td width="1%"><div class="seperator"></div></td><td width="80%"><div id="appbar"></div></td><td width="1%"><div class="seperator"></div></td><td width="15%">'+tasktray+'</td></tr></table>';
+			html='<table border="0" cellpadding="0" cellspacing="0" width="100%" class="taskbartable"><tr><td width="30"><div id="menubutton"></div></td><td width="1%"><div class="seperator"></div></td><td width="80%"><div id="appbar"></div></td><td width="1%"><div class="seperator"></div></td><td width="15%">'+tasktray+'</td></tr></table>';
 			
 			div = new dijit.layout.ContentPane({
 				id: "taskbar",
