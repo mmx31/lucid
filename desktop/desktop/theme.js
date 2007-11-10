@@ -39,6 +39,7 @@ desktop.theme = new function()
 		dojo.forEach(this.fileList, function(e) {
 			dojo.byId("desktop_theme_"+e).href ="./themes/"+desktop.config.theme+"/"+e+".css";
 		});
+		setTimeout('dijit.byId("desktop_main").resize()', 1000);
 	}
 	this.list = function(callback)
 	{

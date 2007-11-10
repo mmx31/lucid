@@ -38,18 +38,16 @@ desktop.taskbar = new function()
 			if(value == false)
 			{
 				desktop.config.taskbar.isShown = false;
-				//document.getElementById("taskbarhider").innerHTML='<img src="./icons/showtask.gif">';
-				dojo.style("taskbar", "opacity", 0);
-				dojo.byId("taskbar").style.display="none";
+				dojo.addClass(dojo.byId("taskbarhider"), "taskbarhider-hidden");
+				dojo.addClass(dijit.byId("taskbar").domNode, "hidetaskbar");
 			}
 			else
 			{
 				if(value == true)
 				{
-					dojo.byId("taskbar").style.display="block";
-					dojo.style("taskbar", "opacity", 90);
+					dojo.removeClass(dojo.byId("taskbarhider"), "taskbarhider-hidden");
+					dojo.removeClass(dijit.byId("taskbar").domNode, "hidetaskbar");
 					desktop.config.taskbar.isShown = true;
-					document.getElementById("taskbarhider").innerHTML='<img src="./icons/hidetask.gif">';
 				}
 			}
 		}
@@ -69,28 +67,26 @@ desktop.taskbar = new function()
 				{
 					var anim = dojo.fadeOut({ node: "taskbar", duration: 200 });
 					dojo.connect(anim, "onEnd", null, dojo.hitch(this, function() {
-						dojo.toggleClass(dijit.byId("taskbar").domNode, "hidetaskbar");
+						dojo.addClass(dijit.byId("taskbar").domNode, "hidetaskbar");
 						dijit.byId("taskbar").startup();
 						dijit.byId("desktop_main").resize();
-						//dojo.byId("taskbarhider").innerHTML='<img src="./themes/default/images/icons/showtask.gif">';
-						dojo.toggleClass(dijit.byId("taskbarhider").domNode, "taskbarhider-hidden");
+						dojo.addClass(dojo.byId("taskbarhider"), "taskbarhider-hidden");
 					}));
 					anim.play();
 				}
 				else
 				{
-					dojo.toggleClass(dijit.byId("taskbar").domNode, "hidetaskbar");
-					dojo.style("taskbar", "opacity", 1);
-					dojo.toggleClass(dijit.byId("taskbarhider").domNode, "taskbarhider-hidden");
+					dojo.addClass(dijit.byId("taskbar").domNode, "hidetaskbar");
+					dojo.addClass(dojo.byId("taskbarhider"), "taskbarhider-hidden");
 				}
 			}
 			else if(desktop.config.taskbar.isShown == false)
 			{
 				desktop.config.taskbar.isShown = true;
-				dojo.toggleClass(dijit.byId("taskbar").domNode, "hidetaskbar");
+				dojo.removeClass(dijit.byId("taskbar").domNode, "hidetaskbar");
+				dojo.removeClass(dojo.byId("taskbarhider"), "taskbarhider-hidden");
 				dijit.byId("taskbar").startup();
 				dijit.byId("desktop_main").resize();
-				dojo.byId("taskbarhider").innerHTML='<img src="./themes/default/images/icons/hidetask.gif">';
 				if(desktop.config.fx == true) dojo.fadeIn({ node: "taskbar", duration: 200 }).play();
 				else dojo.style("taskbar", "opacity", 1);
 			}
