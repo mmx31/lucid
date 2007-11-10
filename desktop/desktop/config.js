@@ -116,5 +116,8 @@ desktop.config = {
 		color: "#eeeeee"
 	},
 	theme: "green",
-	startupapps: []
+	startupapps: [],
+	window: {
+		constrain: false
+	}
 }

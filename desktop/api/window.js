@@ -219,21 +219,21 @@ api.window = function(params)
 	 */
 	this.show = function()
 	{
-		if(document.getElementById(this._id) == null) //dojo.byId allways seems to return an objecct...
+		if (document.getElementById(this._id) == null) //dojo.byId allways seems to return an objecct...
 		{
-			windiv=document.createElement("div");
-			windiv.id=this._id;
-			windiv.style.width=this.width;
-			windiv.style.height=this.height;
-			windiv.style.top="50px";
-			windiv.style.left="50px";
-			windiv.style.zIndex=api.windowcounter+100;
-			dojo.addClass(windiv, "win");			
-
+			windiv = document.createElement("div");
+			windiv.id = this._id;
+			windiv.style.width = this.width;
+			windiv.style.height = this.height;
+			windiv.style.top = "50px";
+			windiv.style.left = "50px";
+			windiv.style.zIndex = api.windowcounter + 100;
+			dojo.addClass(windiv, "win");
+			
 			wintitlebar = document.createElement("div");
-			wintitlebar.id = this._id+"titlebar";
-			dojo.addClass(wintitlebar, "wintitlebar");			
-
+			wintitlebar.id = this._id + "titlebar";
+			dojo.addClass(wintitlebar, "wintitlebar");
+			
 			winrightcorner = document.createElement("div");
 			dojo.addClass(winrightcorner, "winrightcorner");
 			wintitlebar.appendChild(winrightcorner);
@@ -243,34 +243,34 @@ api.window = function(params)
 			wintitlebar.appendChild(winleftcorner);
 			
 			winhandle = document.createElement("div");
-			winhandle.id = this._id+"handle";
+			winhandle.id = this._id + "handle";
 			winhandle.innerHTML = this.title;
 			dojo.addClass(winhandle, "winhandle");
 			wintitlebar.appendChild(winhandle);
-	
+			
 			winbuttons = document.createElement("div");
-			winbuttons.id = this._id+"buttons";
-			winbuttons.style.position="absolute";
+			winbuttons.id = this._id + "buttons";
+			winbuttons.style.position = "absolute";
 			dojo.addClass(winbuttons, "winbuttons");
-				
-				closebutton = document.createElement("div");
-				closebutton.id = this._id+"closebutton";
-				dojo.addClass(closebutton, "winbuttonclose");
-				if(this.showClose) {
+			
+			closebutton = document.createElement("div");
+			closebutton.id = this._id + "closebutton";
+			dojo.addClass(closebutton, "winbuttonclose");
+			if (this.showClose) {
 				winbuttons.appendChild(closebutton);
-				}
-				maximizebutton = document.createElement("div");
-				maximizebutton.id = this._id+"maximizebutton";
-				dojo.addClass(maximizebutton, "winbuttonmaximize");
-				if(this.showMaximize) {
+			}
+			maximizebutton = document.createElement("div");
+			maximizebutton.id = this._id + "maximizebutton";
+			dojo.addClass(maximizebutton, "winbuttonmaximize");
+			if (this.showMaximize) {
 				winbuttons.appendChild(maximizebutton);
-				}
-				minimizebutton = document.createElement("div");
-				minimizebutton.id = this._id+"minimizebutton";
-				dojo.addClass(minimizebutton, "winbuttonminimize");
-				if(this.showMinimize) {
+			}
+			minimizebutton = document.createElement("div");
+			minimizebutton.id = this._id + "minimizebutton";
+			dojo.addClass(minimizebutton, "winbuttonminimize");
+			if (this.showMinimize) {
 				winbuttons.appendChild(minimizebutton);
-				}
+			}
 			wintitlebar.appendChild(winbuttons);
 			
 			windiv.appendChild(wintitlebar);
@@ -278,26 +278,27 @@ api.window = function(params)
 			var winbody = document.createElement("div");
 			dojo.addClass(winbody, "winbody");
 			
-				var winleft = document.createElement("div");
-				dojo.addClass(winleft, "winleftborder");
-				dojo.style(winleft, "position", "absolute");
-				dojo.style(winleft, "top", "0px");
-				dojo.style(winleft, "left", "0px");
-				winbody.appendChild(winleft);
-				
-				this.body.id=this._id+"body";
-				if(this.bodyWidget == "ContentPane") this.body.setContent(this._innerHTML);
+			var winleft = document.createElement("div");
+			dojo.addClass(winleft, "winleftborder");
+			dojo.style(winleft, "position", "absolute");
+			dojo.style(winleft, "top", "0px");
+			dojo.style(winleft, "left", "0px");
+			winbody.appendChild(winleft);
 			
-				dojo.addClass(this.body.domNode, "wininnerbody");
-				winbody.appendChild(this.body.domNode);
-				
-				var winright = document.createElement("div");
-				dojo.addClass(winright, "winrightborder");
-				dojo.style(winright, "position", "absolute");
-				dojo.style(winright, "top", "0px");
-				dojo.style(winright, "right", "0px");
-				winbody.appendChild(winright);
-				
+			this.body.id = this._id + "body";
+			if (this.bodyWidget == "ContentPane") 
+				this.body.setContent(this._innerHTML);
+			
+			dojo.addClass(this.body.domNode, "wininnerbody");
+			winbody.appendChild(this.body.domNode);
+			
+			var winright = document.createElement("div");
+			dojo.addClass(winright, "winrightborder");
+			dojo.style(winright, "position", "absolute");
+			dojo.style(winright, "top", "0px");
+			dojo.style(winright, "right", "0px");
+			winbody.appendChild(winright);
+			
 			windiv.appendChild(winbody);
 			
 			var winbottom = document.createElement("div");
@@ -306,29 +307,28 @@ api.window = function(params)
 			dojo.style(winbottom, "bottom", "0px");
 			dojo.style(winbottom, "left", "0px");
 			dojo.style(winbottom, "width", "100%");
-				var winbottomleft = document.createElement("div");
-				dojo.addClass(winbottomleft, "winbottomleft");
-				dojo.style(winbottomleft, "bottom", "0px");
-				dojo.style(winbottomleft, "left", "0px");
-				dojo.style(winbottomleft, "position", "absolute");
-				winbottom.appendChild(winbottomleft);
-				
-				var winbottomcenter = document.createElement("div");
-				dojo.addClass(winbottomcenter, "winbottomcenter");
-				winbottom.appendChild(winbottomcenter);
-				
-				var winbottomright = document.createElement("div");
-				dojo.addClass(winbottomright, "winbottomright");
-				dojo.style(winbottomright, "position", "absolute");
-				dojo.style(winbottomright, "bottom", "0px");
-				dojo.style(winbottomright, "right", "0px");
-				winbottom.appendChild(winbottomright);
+			var winbottomleft = document.createElement("div");
+			dojo.addClass(winbottomleft, "winbottomleft");
+			dojo.style(winbottomleft, "bottom", "0px");
+			dojo.style(winbottomleft, "left", "0px");
+			dojo.style(winbottomleft, "position", "absolute");
+			winbottom.appendChild(winbottomleft);
+			
+			var winbottomcenter = document.createElement("div");
+			dojo.addClass(winbottomcenter, "winbottomcenter");
+			winbottom.appendChild(winbottomcenter);
+			
+			var winbottomright = document.createElement("div");
+			dojo.addClass(winbottomright, "winbottomright");
+			dojo.style(winbottomright, "position", "absolute");
+			dojo.style(winbottomright, "bottom", "0px");
+			dojo.style(winbottomright, "right", "0px");
+			winbottom.appendChild(winbottomright);
 			windiv.appendChild(winbottom);
 			
-			if(this.resizable == true)
-			{
+			if (this.resizable == true) {
 				winresize = document.createElement("div");
-				winresize.id=this._id+"resize";
+				winresize.id = this._id + "resize";
 				dojo.addClass(winresize, "winresize");
 				windiv.appendChild(winresize);
 			}
@@ -338,10 +338,7 @@ api.window = function(params)
 			//this.bodyWidgetParams.id = this._id+"body";
 			//this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.winbody);
 			
-			this._drag = new dojo.dnd.Moveable(this._id, {
-				handle: this._id+"handle",
-				mover: dojo.dnd.parentConstrainedMover("border", true)
-			});
+			this.makeDragger();
 			if(this.resizable == true)
 			{
 				this.makeResizer();
@@ -622,6 +619,21 @@ api.window = function(params)
 			this._resizeBody();
 		}
 	}
+	this.makeDragger = function()
+	{
+		if(desktop.config.window.constrain) 
+		{
+			this._drag = new dojo.dnd.move.parentConstrainedMoveable(this._id, {
+				handle: this._id + "handle"
+			});
+		}
+		else
+		{
+			this._drag = new dojo.dnd.Moveable(this._id, {
+				handle: this._id + "handle"
+			});
+		}
+	}
 	/*
 	 * Method: unmaximize
 	 * Summary:
@@ -629,10 +641,7 @@ api.window = function(params)
 	 */
 	this.unmaximize = function()
 	{
-		this._drag = new dojo.dnd.Moveable(this._id, {
-			handle: this._id+"handle",
-			mover: dojo.dnd.parentConstrainedMover("border", true)
-		});
+		this.makeDragger();
 		if(this.resizable == true)
 		{		
 			this.makeResizer();
