@@ -72,17 +72,6 @@ CREATE TABLE `#__users` (
   `level` mediumtext NOT NULL
 ) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1 ;
 
--- Database
-DROP TABLE IF EXISTS `#__database`;
-CREATE TABLE `#__database` (
-  `ID` int(11) NOT NULL auto_increment PRIMARY KEY,
-  `userid` int(11) NOT NULL,
-  `appid` int(20) NOT NULL,
-  `public` int(1) NOT NULL,
-  `tablename` mediumtext NOT NULL,
-  `data` mediumtext NOT NULL
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1 ;
-
 
 -- Registry
 DROP TABLE IF EXISTS `#__registry`;
@@ -90,7 +79,15 @@ CREATE TABLE `#__registry` (
   `ID` int(11) NOT NULL auto_increment PRIMARY KEY,
   `userid` int(11) NOT NULL,
   `appid` int(20) NOT NULL,
-  `varname` mediumtext NOT NULL,
+  `name` mediumtext NOT NULL,
+  `value` mediumtext NOT NULL
+) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1 ;
+
+-- Config
+DROP TABLE IF EXISTS `#__config`;
+CREATE TABLE `#__config` (
+  `ID` int(11) NOT NULL auto_increment PRIMARY KEY,
+  `userid` int(11) NOT NULL,
   `value` mediumtext NOT NULL
 ) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1 ;
 

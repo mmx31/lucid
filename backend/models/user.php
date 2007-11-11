@@ -1,5 +1,5 @@
 <?php 
-	require("base.php");
+	if(!$Base) require("base.php");
 	class User extends Base
 	{
 		var $id;

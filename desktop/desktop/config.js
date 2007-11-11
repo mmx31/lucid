@@ -31,9 +31,8 @@ desktop.config = {
 		setInterval(desktop.config.save, 1000*60);
 	},
 	load: function(cback) {
-		//TODO: give this it's own mySQL table. jaymacdonald: is this really required? it would work fine under the registry...
 		dojo.xhrGet({
-        url: "../backend/api/registry.php?registry=load&appid=0&varname=config",
+        url: desktop.core.backend("core.config.stream.load"),
         load: function(data, ioArgs) {
 			if(data != "")
 			{
@@ -59,7 +58,7 @@ desktop.config = {
 		var conf = desktop.config;
 		conf = dojo.toJson(conf);
 		dojo.xhrPost({
-            url: "../backend/api/registry.php?registry=save&appid=0&varname=config",
+            url: desktop.core.backend("core.config.stream.save"),
 			sync: sync,
             content: {value: conf},
 			error: function(error, ioArgs) { api.console("Error saving the config: "+error.message); },
@@ -119,5 +118,6 @@ desktop.config = {
 	startupapps: [],
 	window: {
 		constrain: false
-	}
+	},
+	crosstalkPing: 500
 }
