@@ -64,7 +64,7 @@ var api = new function() {
 	this.init = function()
 	{
 		api.require("crosstalk");
-		api.require("database");
+		api.require("registry");
 		api.require("fs");
 		api.require("ide");
 		api.require("instances");
