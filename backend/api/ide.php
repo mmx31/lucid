@@ -32,7 +32,7 @@ qback::esc($_POST);
 $_POST['name'] = mysql_real_escape_string ($_POST['name'], $link);
 $_POST['author'] = mysql_real_escape_string ($_POST['author'], $link);
 $_POST['email'] = mysql_real_escape_string ($_POST['email'], $link);
-$_POST['code'] = mysql_real_escape_string ($_POST['code'], $link);
+$_POST['code'] = addslashes(mysql_real_escape_string ($_POST['code'], $link)); // for some reason the apps are escaped twice in the DB. This is not right. Fix it later though.
 $_POST['version'] = mysql_real_escape_string ($_POST['version'], $link);
 $_POST['maturity'] = mysql_real_escape_string ($_POST['maturity'], $link);
 $_POST['category'] = mysql_real_escape_string ($_POST['category'], $link);
