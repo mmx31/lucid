@@ -63,7 +63,6 @@ var api = new function() {
 	}
 	this.init = function()
 	{
-		api.require("crosssite");
 		api.require("crosstalk");
 		api.require("registry");
 		api.require("fs");
@@ -76,6 +75,7 @@ var api = new function() {
 		api.require("ui");
 		api.require("user");
 		api.require("window");
+		api.require("xsite");
 		this.checkifloaded();
 	}
 	this.checkifloaded = function()
