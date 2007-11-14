@@ -117,3 +117,11 @@ height: 100%;
 	display: none;
 	height: 0px;
 }
+/* Hide that damn dojo.io.iframe */
+#dojoIoIframe {
+	display: none;
+	opacity: 0;
+	width: 0px;
+	height: 0px;
+	border: 0px;
+}
