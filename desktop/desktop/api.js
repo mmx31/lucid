@@ -63,6 +63,7 @@ var api = new function() {
 	}
 	this.init = function()
 	{
+		api.require("crosssite");
 		api.require("crosstalk");
 		api.require("registry");
 		api.require("fs");
