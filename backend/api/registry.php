@@ -18,8 +18,15 @@
 		{
 			$p = $User->get_current();
 			$result = $Registry->filter(array("userid", "appid", "name"), array($p->id, $_GET['appid'], $_GET['name']));
-			$result = $result[0];
-			echo $result->value;
+			if(isset($result[0]))
+			{
+				$result = $result[0];
+				echo $result->value;
+			}
+			else
+			{
+				echo "{\"identifier\":true,\"items\":[]}";
+			}
 		}
 	}
 ?>
