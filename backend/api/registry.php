@@ -5,8 +5,7 @@
 		if($_GET['action'] == "save")
 		{
 			$p = $User->get_current();
-			$result = $Registry->filter("userid", $p->id); //TODO: here's where we need to be able to chain filters somehow.
-			//select using $_POST['appid'] and $_POST['name']
+			$result = $Registry->filter(["userid", "appid", "name"], [$p->id, $_POST['appid'], $_POST['name']]);
 			if(!isset($result[0])) { $u = new $Registry(); $u->userid = $p->id; }
 			else { $u = $result[0]; }
 			$u->value = stripslashes($_POST['value']);
@@ -16,8 +15,7 @@
 		if($_GET['action'] == "load")
 		{
 			$p = $User->get_current();
-			$result = $Config->filter("userid", $p->id); //TODO: here's where we need to be able to chain filters somehow.
-			//The app id will be $_GET['appid'] and the name will be $_GET['name']
+			$result = $Config->filter(["userid", "appid", "name"], [$p->id, $_GET['appid'], $_GET['name']]);
 			$result = $result[0];
 			echo $result->value;
 		}

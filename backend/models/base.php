@@ -38,7 +38,16 @@
 				$feild = mysql_real_escape_string($feild);
 				//TODO: format value's datatype accordingly
 				$value = mysql_real_escape_string($value);
-				$query = "SELECT * FROM ${tablename} WHERE ${feild}=\"${value}\"";
+				if(is_array($feild) && is_array($value))
+				{
+					$query = "SELECT * FROM ${tablename} WHERE ";
+					for($i=0; $i < count($field); $i++)
+					{
+						$query .= $field[$i] . "=\"" . $value[$i] . "\"";
+						if($i != count($field)) { $i .= ", "; }
+					}
+				}
+				else { $query = "SELECT * FROM ${tablename} WHERE ${feild}=\"${value}\""; }
 				$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 				$list = Array();
 				while($line = mysql_fetch_array($result, MYSQL_ASSOC))
