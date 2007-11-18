@@ -74,6 +74,7 @@
 				{
 					mysql_query($this->_make_mysql_query($this->_get_tablename(), "insert")) or die('Query failed: ' . mysql_error());
 				}
+				if(!isset($this->id)) { $this->id = mysql_insert_id(); }
 				mysql_close($link);
 			}		
 			function _get_tablename()
