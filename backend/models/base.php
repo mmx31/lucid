@@ -44,7 +44,6 @@
 						$query .= mysql_real_escape_string($feild[$i]) . "=\"" . mysql_real_escape_string($value[$i]) . "\"";
 						if($i != count($feild)-1) { $query .= " AND "; }
 					}
-					echo $query;
 				}
 				else {
 					$feild = mysql_real_escape_string($feild);
