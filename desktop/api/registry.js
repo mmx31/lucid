@@ -13,8 +13,7 @@ dojo.require("dojo.data.ItemFileWriteStore");
 api.registry = function(args)
 {
 	var finalargs = {
-		url: 
-desktop.core.backend("api.registry.stream.load")+"&appid="+encodeURIComponent(args.appid)+"&name="+encodeURIComponent(args.name)
+		url: desktop.core.backend("api.registry.stream.load")+"&appid="+encodeURIComponent(args.appid)+"&name="+encodeURIComponent(args.name)
 	}
 	if(args.data) finalargs.data = args.data;
 	if(args.typeMap) finalargs.typeMap = args.typeMap;
@@ -49,6 +48,23 @@ desktop.core.backend("api.registry.stream.load")+"&appid="+encodeURIComponent(ar
 					if(data == "0") callback(true);
 					else callback(false);
 				}
+			});
+		},
+		delete: function(callback)
+		{
+			dojo.xhrPost({
+                             url: desktop.core.backend("api.registry.stream.delete"),
+                                content: {
+                                        name: this.__desktop_name,
+                                        appid: this.__desktop_appid
+                                },
+                                load: function(data, ioArgs) {
+					if(callback)
+					{
+                                        	if(data == "0") callback(true);
+                                        	else callback(false);
+					}
+                                }
 			});
 		}
 	});

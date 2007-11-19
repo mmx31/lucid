@@ -30,7 +30,10 @@
 		}
 		if($_GET['action'] == "delete")
 		{
-			//TODO: do this
+			$p = $User->get_current();
+			$result = $Registry->filter(array("userid", "appid", "name"), array($p->id, $_POST['appid'], $_POST['name']));			
+			if(isset($result[0])) { $result[0]->delete(); echo "0"; }
+			else { echo "1"; }
 		}
 	}
 	if($_GET['section'] == "info")
