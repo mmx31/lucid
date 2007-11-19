@@ -28,15 +28,19 @@
 				echo "{\"identifier\":true,\"items\":[]}";
 			}
 		}
+		if($_GET['action'] == "delete")
+		{
+			//TODO: do this
+		}
 	}
-	if($_POST['section'] == "info")
+	if($_GET['section'] == "info")
 	{
-		if($_POST['action'] == "exists")
+		if($_GET['action'] == "exists")
 		{
 			$p = $User->get_current();
 			$result = $Registry->filter(array("userid", "appid", "name"), array($p->id, $_POST['appid'], $_POST['name']));
 			if(isset($result[0])) { echo "0"; }
-			else { echo "1"; }	
+			else { echo "1"; }
 		}
 	}
 ?>
