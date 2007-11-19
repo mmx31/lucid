@@ -161,7 +161,7 @@
 			}
 			function delete()
 			{
-				if(isset($this->id)
+				if(isset($this->id))
 				{
 					require("./../config.php");
                                 	$link = mysql_connect($db_host, $db_username, $db_password)
