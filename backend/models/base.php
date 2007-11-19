@@ -167,7 +167,7 @@
                                 	$link = mysql_connect($db_host, $db_username, $db_password)
                                 	   or die('Could not connect: ' . mysql_error());
                                 	mysql_select_db($db_name) or die('Could not select database');
-					mysql_query("DELETE FROM " . $this->_get_tablename() . "WHERE ID=" . $this->id . " LIMIT 1") or die('Query failed');
+					mysql_query("DELETE FROM " . $this->_get_tablename() . " WHERE ID=" . $this->id . " LIMIT 1") or die('Query failed: ' . mysql_error());
                                 	mysql_close($link);
 				}
 			}
