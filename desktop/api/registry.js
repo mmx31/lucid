@@ -13,7 +13,8 @@ dojo.require("dojo.data.ItemFileWriteStore");
 api.registry = function(args)
 {
 	var finalargs = {
-		url: desktop.core.backend("api.registry.stream.load")+"&appid="+encodeURIComponent(appID)+"&name="+encodeURIComponent(name)
+		url: 
+desktop.core.backend("api.registry.stream.load")+"&appid="+encodeURIComponent(args.appid)+"&name="+encodeURIComponent(name)
 	}
 	if(args.data) finalargs.data = args.data;
 	if(args.typeMap) finalargs.typeMap = args.typeMap;
