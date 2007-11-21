@@ -88,16 +88,8 @@ desktop.app = new function()
 			this.apps[app.id] = new Function("\tthis.id = "+app.id+";\n\tthis.name = \""+app.name+"\";\n\tthis.version = \""+app.version+"\";\n\tthis.instance = -1;\n"+app.code);
 			if(callback)
 			{
-				if(args != undefined)
-				{
 					api.console("Executing callback with args...");
-					callback(parseInt(app.id), args);
-				}
-				else
-				{
-					api.console("Executing callback...");
-					callback(parseInt(app.id));
-				}
+					callback(parseInt(app.id), (args || {}));
 			}
 		}
 		/** 
