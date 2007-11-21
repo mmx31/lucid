@@ -117,12 +117,24 @@ desktop.app = new function()
 					api.console("constructing new instance...");
 					this.instances[this.instanceCount] = new this.apps[id];
 					this.instances[this.instanceCount].instance = this.instances.length-1;
-					this.instances[this.instanceCount].status = "unknown";
+					instance = this.instances.length-1;
+					this.instances[this.instanceCount].status = "init";
 					api.console("Executing app...");
 					this.instances[this.instanceCount].init((args ? args : null));
 				}
 				catch(e) {
-					api.ui.alert({title: "Psych Desktop", message: "Application ID:"+id+" encountered an error.<br><br>Technical Details: "+e});
+					if(typeof this.instances[instance].debug == "function") { //Program has it's own error handling system.
+						this.instances[instance].debug(e);
+					}
+					else { // Use psych desktop error handler
+						if(api.instances.kill(instance) == false) {
+							api.ui.alert({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: "+e+"<br><br>Extra Details: The program failed to respond to a kill request. <br><br><br>You can help by copying this and posting it to the Psych Desktop forums."});
+							this.instances[instance].status = "error";
+						}
+						else {
+							api.ui.alert({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: "+e+"<br><br><br>You can help by copying this and posting it to the Psych Desktop forums."});
+						}
+					}
 				}
 			}
 		}

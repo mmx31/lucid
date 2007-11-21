@@ -54,10 +54,10 @@
 	this.kill = function(instance) {
 		try {
 			desktop.app.instances[instance].kill();
-			return 1;
+			return true;
 		}
 		catch(err) {
-			return 0;
+			return false;
 		}
 	}
 	/** 
