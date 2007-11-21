@@ -50,7 +50,7 @@ api.registry = function(args)
 				}
 			});
 		},
-		delete: function(callback)
+		drop: function(callback)
 		{
 			dojo.xhrPost({
                              url: desktop.core.backend("api.registry.stream.delete"),
