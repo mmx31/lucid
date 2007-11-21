@@ -171,6 +171,20 @@
                                 	mysql_close($link);
 				}
 			}
+			function from_postdata($postdata, $list)
+			{
+				if (get_magic_quotes_gpc())
+				{
+					foreach($list as $key)
+					{
+						$postdata[$key] = stripslashes($postdata[$key]);
+					}
+				}
+				foreach($list as $key)
+				{
+					$this->$key = $postdata[$key];
+				}
+			}
 		}
 		$Base = new Base();
 	}

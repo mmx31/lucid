@@ -14,7 +14,7 @@ api.registry = function(args)
 {
 	var finalargs = {
 		url: desktop.core.backend("api.registry.stream.load")+"&appid="+encodeURIComponent(args.appid)+"&name="+encodeURIComponent(args.name)
-	}
+	};
 	if(args.data) finalargs.data = args.data;
 	if(args.typeMap) finalargs.typeMap = args.typeMap;
 	return dojo.mixin(new dojo.data.ItemFileWriteStore(finalargs), {

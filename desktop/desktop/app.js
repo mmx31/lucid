@@ -69,8 +69,11 @@ desktop.app = new function()
 		this.fetchApp = function(appID, callback, args)
 		{
 			//fetch an app, put it into the cache
-			dojo.xhrGet({
-			    url: "../backend/app.php?id="+appID,
+			dojo.xhrPost({
+			    url: desktop.core.backend("core.app.fetch.full"),
+				content: {
+					id: appID
+				},
 			    load: dojo.hitch(this, function(data, ioArgs)
 				{
 					this._fetchApp(data, callback, args);
@@ -82,18 +85,18 @@ desktop.app = new function()
 		{
 			var app = dojo.fromJson(data);
 			api.console("creating app constructor...");
-			this.apps[app[0].ID] = new Function("\tthis.id = "+app[0].ID+";\n\tthis.name = \""+app[0].name+"\";\n\tthis.version = \""+app[0].version+"\";\n\tthis.instance = -1;\n"+app[0].code);
+			this.apps[app.id] = new Function("\tthis.id = "+app.id+";\n\tthis.name = \""+app.name+"\";\n\tthis.version = \""+app.version+"\";\n\tthis.instance = -1;\n"+app.code);
 			if(callback)
 			{
 				if(args != undefined)
 				{
 					api.console("Executing callback with args...");
-					callback(app[0].ID, args);
+					callback(parseInt(app.id), args);
 				}
 				else
 				{
 					api.console("Executing callback...");
-					callback(app[0].ID);
+					callback(parseInt(app.id));
 				}
 			}
 		}
@@ -117,8 +120,9 @@ desktop.app = new function()
 					api.console("constructing new instance...");
 					this.instances[this.instanceCount] = new this.apps[id];
 					this.instances[this.instanceCount].instance = this.instances.length-1;
-					instance = this.instances.length-1;
-					this.instances[this.instanceCount].status = "init";
+                                        var instance = this.instances.length-1;
+                                        this.instances[this.instanceCount].status = "init";
+
 					api.console("Executing app...");
 					this.instances[this.instanceCount].init((args ? args : null));
 				}
@@ -132,10 +136,11 @@ desktop.app = new function()
 							this.instances[instance].status = "error";
 						}
 						else {
-							api.ui.alert({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: "+e+"<br><br><br>You can help by copying this and posting it to the Psych Desktop forums."});
+					            api.ui.alert({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: "+e+"<br><br><br>You can help by copying this and posting it to the Psych Desktop forums."});
 						}
 					}
 				}
 			}
 		}
 	}
+

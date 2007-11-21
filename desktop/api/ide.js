@@ -35,7 +35,7 @@ api.ide = new function()
 	}
 	this.save = function(app)
 	{
-		if(typeof app.ID != "undefined" &&
+		if(typeof app.id != "undefined" &&
 	        typeof app.name != "undefined" &&
 	        typeof app.author != "undefined" &&
 	        typeof app.email != "undefined" &&
@@ -49,7 +49,7 @@ api.ide = new function()
 	               url: "../backend/api/ide.php",
 	               method: "POST",
 	               content : {
-	                    appid: app.ID,
+	                    appid: app.id,
 	                    name: app.name,
 	                    author: app.author,
 	                    email: app.email,
@@ -73,11 +73,14 @@ api.ide = new function()
 	}
 	this.load = function(appID, callback)
 	{
-		dojo.xhrGet({
-			url: "../backend/app.php?id="+appID,
+		dojo.xhrPost({
+			url: desktop.core.backend("core.app.fetch.full"),
+			content: {
+				id: appID
+			},
 			load: function(data, ioArgs)
 			{
-				data = dojo.fromJson(data)[0];
+				data = dojo.fromJson(data);
 				if(callback) callback(data);
 			}
 		});
