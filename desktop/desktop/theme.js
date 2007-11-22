@@ -44,7 +44,7 @@ desktop.theme = new function()
 	this.list = function(callback)
 	{
 		dojo.xhrGet({
-			url: "../backend/theme.php",
+			url: desktop.core.backend("core.theme.get.list"),
 			load: function(data, ioArgs)
 			{
 				data = data.split("\n");

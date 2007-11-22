@@ -20,7 +20,7 @@
 //TODO: In the future we should make the filename a random name, and then check if it exists. If it does, generate a new name and go back to the begining
 //TODO: make this for dojo.io.iframe
 session_start();
-	require("backend/config.php");
+	require("config.php");
 if(!isset($_SESSION['userid'])) {
 die("Access denied. You must login first.");
 }
