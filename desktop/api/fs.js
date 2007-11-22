@@ -9,8 +9,11 @@ api.fs = new function()
 { 
    this.ls = function(object)
     {
-        dojo.xhrGet({
-        url: "../backend/api.php?fs=getFolder&path="+object.path,
+        dojo.xhrPost({
+        url: desktop.core.backend("api.fs.io.getFolder"),
+		content: {
+			path: object.path
+		},
 		handleAs: "xml",
         load: function(data, ioArgs) {
 			var results = data.getElementsByTagName('file');
@@ -40,8 +43,11 @@ api.fs = new function()
     }
    this.read = function(object)
     {
-        dojo.xhrGet({
-        url: "../backend/api.php?fs=getFile&path="+object.path,
+        dojo.xhrPost({
+        url: desktop.core.backend("api.fs.io.getFile"),
+		content: {
+			path: object.path
+		},
 		handleAs: "xml",
         load: function(data, ioArgs) {
 			var results = data.getElementsByTagName('file');
@@ -58,32 +64,45 @@ api.fs = new function()
     }
    this.write = function(object)
    {
-        dojo.xhrGet({
-        url: "../backend/api.php?fs=writeFile&path="+object.path+"&content="+object.content,
+        dojo.xhrPost({
+        url: desktop.core.backend("api.fs.io.writeFile"),
+		content: {
+			path: object.path,
+			content: object.content
+		},
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
     }
    this.mkdir = function(object)
     {
-        dojo.xhrGet({
-        url: "../backend/api.php?fs=createDirectory&path="+object.path,
+        dojo.xhrPost({
+        url: desktop.core.backend("api.fs.io.createDirectory"),
+		content: {
+			path: object.path
+		},
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
     }
    this.rm = function(object)
     {
-        dojo.xhrGet({
-        url: "../backend/api.php?fs=removeFile&path="+object.path,
+        dojo.xhrPost({
+        url: desktop.core.backend("api.fs.io.removeFile"),
+		content: {
+			path: object.path
+		},
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
     }
    this.rmdir = function(object)
     {
-        dojo.xhrGet({
-        url: "../backend/api.php?fs=removeDir&path="+object.path,
+        dojo.xhrPost({
+        url: desktop.core.backend("api.fs.io.removeDir"),
+		content: {
+			path: object.path
+		},
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
