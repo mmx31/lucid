@@ -29,7 +29,7 @@
 				$pass = crypt($pass, $conf_secretword);
 				if($line[0]->password == $pass)
 				{
-					return $line[0];
+					return $this->_make_model($line[0]);
 				}
 				else
 				{
