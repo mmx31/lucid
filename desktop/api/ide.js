@@ -46,8 +46,7 @@ api.ide = new function()
 		{
 			  api.console("IDE API: Saving application...");
 	          dojo.xhrPost({
-	               url: "../backend/api/ide.php",
-	               method: "POST",
+	               url: desktop.core.backend("api.ide.io.save"),
 	               content : {
 	                    appid: app.id,
 	                    name: app.name,
