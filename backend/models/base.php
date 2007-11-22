@@ -63,6 +63,23 @@
 				if(!isset($results)) { return false; }
 				else { return $list; }
 			}
+			function all()
+			{
+				require("./../config.php");
+				$tablename = $this->_get_tablename();
+				$link = mysql_connect($db_host, $db_username, $db_password)
+				   or die('Could not connect: ' . mysql_error());
+				mysql_select_db($db_name) or die('Could not select database');
+				$result = mysql_query("SELECT * FROM ${tablename}") or die('Query failed: ' . mysql_error());
+				$list = Array();
+				while($line = mysql_fetch_array($result, MYSQL_ASSOC))
+				{
+					array_push($list, $this->_makeModel($line));
+				}
+				mysql_free_result($result);
+				mysql_close($link);
+				return $list;
+			}
 			function save()
 			{
 				require("./../config.php");

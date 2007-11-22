@@ -22,14 +22,14 @@
 		}
 		function authenticate($user, $pass)
 		{
-			$line = self::filter("username", $user);
+			$line = $this->filter("username", $user);
 			if($line != FALSE)
 			{
 				require("../config.php");
 				$pass = crypt($pass, $conf_secretword);
 				if($line[0]->password == $pass)
 				{
-					return $this->_make_model($line[0]);
+					return $line[0];
 				}
 				else
 				{

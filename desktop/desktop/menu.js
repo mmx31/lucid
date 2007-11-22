@@ -131,9 +131,8 @@ desktop.menu = new function()
 		*/
 		this.getApplications = function() {
 		desktop.core.loadingIndicator(0);
-		var url = "../backend/app.php?action=getPrograms";
 		dojo.xhrGet({
-			url: url,
+			url: desktop.core.backend("core.app.fetch.list"),
 			load: dojo.hitch(this, function(data, ioArgs){
 				data = dojo.fromJson(data);
 				var menu = new dijit.Menu({
@@ -160,7 +159,7 @@ desktop.menu = new function()
 								label: data[app].name
 							});
 							dojo.connect(item, "onClick", desktop.app, 
-							new Function("desktop.app.launch("+data[app].ID+")") );
+							new Function("desktop.app.launch("+data[app].id+")") );
 							catMenu.addChild(item);
 						}
 					}
