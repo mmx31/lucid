@@ -86,7 +86,7 @@ api.ide = new function()
 	}
 	this.getAppList = function(callback) {
 	dojo.xhrGet({
-		url: "../backend/app.php?action=getPrograms",
+		url: desktop.core.backend("core.app.fetch.list"),
 		load: function(data, ioArgs)
 		{
 			var apps = dojo.fromJson(data);
