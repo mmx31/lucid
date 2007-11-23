@@ -37,7 +37,7 @@ desktop.config = {
 			if(data != "")
 			{
 				var config = dojo.fromJson(data);
-				config = dojo.mixin(config, desktop.config);
+				config = dojo.mixin(desktop.config, config);
 				desktop.config = config;
 				delete config;
 				for(var a=0;a<desktop.config.startupapps.length;a++) {
