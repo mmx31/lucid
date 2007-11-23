@@ -604,8 +604,8 @@ api.window = function(params)
 				duration: 150
 			});
 			dojo.connect(anim, "onEnd", this, function() {
-				this._resizeBody();
 				dojo.style(this.body.domNode, "display", "block");
+				this._resizeBody();
 			});
 			anim.play();
 		}
@@ -669,8 +669,8 @@ api.window = function(params)
 				duration: 150
 			});
 			dojo.connect(anim, "onEnd", this, function() {
-				this._resizeBody();
 				dojo.style(this.body.domNode, "display", "block");
+				this._resizeBody();
 			});
 			anim.play();
 		}
