@@ -20,6 +20,7 @@
 	require("config.php");
 	$userid = $_SESSION['userid'];
 	if($_POST['section'] == "io")
+	{
 	    if ($_POST['action'] == "removeEvent")
 		   {
 			$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
