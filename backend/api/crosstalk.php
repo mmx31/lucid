@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 	session_start();
-	require("config.php");
+	require("../config.php");
 	$userid = $_SESSION['userid'];
 	if($_POST['section'] == "io")
 	{
@@ -47,9 +47,9 @@
 				//$query = "DELETE FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\" AND appID=\"${appid}\" AND message=\"${message}\"";
 				//mysql_query($query) or die('Query failed: ' . mysql_error());
 				//}
-				}		
+			}		
 			$output .=  "\r\n" . "</crosstalkEvents>";	
-			echo($output);
+			echo $output;
 		}
 	    if ($_POST['action'] == "SendEvent")
 	    {
