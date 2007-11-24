@@ -19,9 +19,9 @@
 	session_start();
 	require("../config.php");
 	$userid = $_SESSION['userid'];
-	if($_POST['section'] == "io")
+	if($_GET['section'] == "io")
 	{
-	    if ($_POST['action'] == "removeEvent")
+	    if ($_GET['action'] == "removeEvent")
 		   {
 			$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
 			mysql_select_db($db_name) or die('Could not select database');
@@ -30,7 +30,7 @@
 		    $result = mysql_query($query) or die('Query failed: ' . mysql_error());
 			echo("OK.");
 		}
-		if ($_POST['action'] == "checkForEvents")
+		if ($_GET['action'] == "checkForEvents")
 	    {
 		    header('Content-type: text/xml');
 			$query = "SELECT * FROM ${db_prefix}crosstalk WHERE userid=\"${userid}\"";
@@ -51,7 +51,7 @@
 			$output .=  "\r\n" . "</crosstalkEvents>";	
 			echo $output;
 		}
-	    if ($_POST['action'] == "SendEvent")
+	    if ($_GET['action'] == "SendEvent")
 	    {
 			    $message = $_POST["message"];
 			    $sender = $userid;
