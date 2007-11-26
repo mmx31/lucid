@@ -215,7 +215,7 @@
 						$value = str_replace("\r", "\\r", $value);
 						$value = str_replace("\n", "\\n", $value);
 						$p .= "\"". addslashes($key) . "\":";
-                                                if(is_int($value)) {$p .= $value;}
+                                                if(is_int($value) || $key == "id") {$p .= $value;}
                                                 else {$p .= "\"" . $value . "\"";}
 						if($i != $length)
 						{
