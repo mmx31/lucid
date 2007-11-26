@@ -214,7 +214,9 @@
 						$value = addslashes($value);
 						$value = str_replace("\r", "\\r", $value);
 						$value = str_replace("\n", "\\n", $value);
-						$p .= "\"". addslashes($key) . "\":\"" . $value . "\"";
+						$p .= "\"". addslashes($key) . "\":";
+                                                if(is_int($value)) {$p .= $value;}
+                                                else {$p .= "\"" . $value . "\"";}
 						if($i != $length)
 						{
 							$p .= ",";
