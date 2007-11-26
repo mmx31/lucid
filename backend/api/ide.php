@@ -18,12 +18,13 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 session_start();
+require("../models/app.php");
 if($_GET['section'] == "io")
 {
 	if($_GET['action'] == "save")
 	{
 		if($_POST['appid'] == -1) { $app = new App(); }
-		else { $app = $App->get((int)$_POST['appid']); }
+		else { $app = $App->get($_POST['appid']); }
 		$app->from_postdata($_POST, array('name', 'author', 'email', 'code', 'version', 'maturity', 'category'));
 		$app->save();
 		echo $app->id;
