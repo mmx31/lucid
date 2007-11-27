@@ -15,8 +15,8 @@
                                 {
                                     $id = "'" . mysql_real_escape_string($id) . "'"; 
                                 }
-				$query = "SELECT * FROM ${tablename} WHERE ID=${id} LIMIT 1";
-				$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+				$query = "SELECT * FROM ${tablename} WHERE 'ID'=${id} LIMIT 1";
+				$result = mysql_query($query) or die($query . '<br />Query failed: ' . mysql_error());
 				$line = mysql_fetch_array($result, MYSQL_ASSOC);
 				if($line)
 				{
