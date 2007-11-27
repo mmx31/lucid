@@ -15,7 +15,7 @@
                                 {
                                     $id = "'" . mysql_real_escape_string($id) . "'"; 
                                 }
-				$query = "SELECT * FROM ${tablename} WHERE 'ID'=${id} LIMIT 1";
+				$query = "SELECT * FROM ${tablename} WHERE `ID`=${id} LIMIT 1";
 				$result = mysql_query($query) or die($query . '<br />Query failed: ' . mysql_error());
 				$line = mysql_fetch_array($result, MYSQL_ASSOC);
 				if($line)
@@ -132,7 +132,7 @@
 			{
 				$i = 0;
 				//for some reason count($this) returns 0 so...
-				$length = $this->count()-1;
+				$length = $this->count();
 				if($type == "update") { $sql = "UPDATE ${table} SET "; }
 				else { $sql = "INSERT INTO ${table} SET "; }
 				foreach($this as $key => $value)
@@ -164,7 +164,7 @@
 					$i++;
 				}
 				$id=$this->id;
-				if($type == "update") { $sql .= " WHERE ID=${id} LIMIT 1"; }
+				if($type == "update") { $sql .= " WHERE `ID`=${id} LIMIT 1"; }
 				return $sql;
 			}
 			function count()
