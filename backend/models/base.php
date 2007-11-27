@@ -11,7 +11,11 @@
 				$link = mysql_connect($db_host, $db_username, $db_password)
 				   or die('Could not connect: ' . mysql_error());
 				mysql_select_db($db_name) or die('Could not select database');
-				$query = "SELECT * FROM ${tablename} WHERE ID='${id}' LIMIT 1";
+                                if(!is_numeric($id))
+                                {
+                                    $id = "'" . mysql_real_escape_string($id) . "'"; 
+                                }
+				$query = "SELECT * FROM ${tablename} WHERE ID=${id} LIMIT 1";
 				$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 				$line = mysql_fetch_array($result, MYSQL_ASSOC);
 				if($line)
