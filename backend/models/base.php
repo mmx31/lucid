@@ -124,41 +124,31 @@
 			}
 			function _make_mysql_query($table, $type)
 			{
-				//FIXME: ok, so this only seems to work if the last thing in the foreach is _tablename.
-				$i = 0;
 				//for some reason count($this) returns 0 so...
+				$length = $this->count()-1;
 				if($type == "update") { $sql = "UPDATE ${table} SET "; }
 				else { $sql = "INSERT INTO ${table} SET "; }
-				$new = Array();
-                                foreach($this as $key => $value)
-                                {
-                                     if($key{0} != "_") { $new[$key] = $value; }
-                                }
-                                $length = count($new);
-                                foreach($new as $key => $value)
+				$arr = array();
+				foreach($this as $key => $value)
 				{
-					if(substr($key, 0, 1) != "_" && $key != "id")
+					if($key != "_tablename")
 					{
+						if($key == "id")
+						{
+							$key = "ID";
+						}
 						if(is_int($value))
 						{
-							$sql .= mysql_real_escape_string($key) . "=" . $value;
+							array_push($arr, mysql_real_escape_string($key) . "=" . $value);
 						}
 						else
 						{
 							//when all else fails, make it a string
-							$sql .= mysql_real_escape_string($key) . "=\"" . mysql_real_escape_string($value) ."\"";
-						}
-						if($i != $length-1)
-						{
-							$sql .= ", ";
-						}
-						else
-						{
-							$sql .= " ";
+							array_push($arr, mysql_real_escape_string($key) . "=\"" . mysql_real_escape_string($value) ."\"");
 						}
 					}
-					$i++;
 				}
+				$sql .= implode(', ',$arr);
 				$id=$this->id;
 				if($type == "update") { $sql .= " WHERE `ID`=${id} LIMIT 1"; }
 				return $sql;
