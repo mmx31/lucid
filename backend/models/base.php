@@ -133,7 +133,7 @@
 				//FIXME: ok, so this only seems to work if the last thing in the foreach is _tablename.
 				$i = 0;
 				//for some reason count($this) returns 0 so...
-				$length = $this->count();
+				$length = $this->count()-1;
 				if($type == "update") { $sql = "UPDATE ${table} SET "; }
 				else { $sql = "INSERT INTO ${table} SET "; }
 				foreach($this as $key => $value)
