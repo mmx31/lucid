@@ -48,7 +48,7 @@ api.ide = new function()
 	          dojo.xhrPost({
 	               url: desktop.core.backend("api.ide.io.save"),
 	               content : {
-	                    appid: app.id,
+	                    id: app.id,
 	                    name: app.name,
 	                    author: app.author,
 	                    email: app.email,
