@@ -90,14 +90,8 @@
 				$link = mysql_connect($db_host, $db_username, $db_password)
 				   or die('Could not connect: ' . mysql_error());
 				mysql_select_db($db_name) or die('Could not select database');
-				if(isset($this->id))
-				{
-					mysql_query($this->_make_mysql_query($this->_get_tablename(), "update")) or die('Query failed: ' . mysql_error());
-				}
-				else
-				{
-					mysql_query($this->_make_mysql_query($this->_get_tablename(), "insert")) or die('Query failed: ' . mysql_error());
-				}
+                                $query = $this->_make_mysql_query($this->_get_tablename(), ($this->id ? "update" : "insert"));
+				mysql_query($query) or die($query . '\nQuery failed: ' . mysql_error());
 				if(!isset($this->id)) { $this->id = mysql_insert_id(); }
 				mysql_close($link);
 			}		
@@ -133,17 +127,18 @@
 				//FIXME: ok, so this only seems to work if the last thing in the foreach is _tablename.
 				$i = 0;
 				//for some reason count($this) returns 0 so...
-				$length = $this->count()-1;
 				if($type == "update") { $sql = "UPDATE ${table} SET "; }
 				else { $sql = "INSERT INTO ${table} SET "; }
-				foreach($this as $key => $value)
+				$new = Array();
+                                foreach($this as $key => $value)
+                                {
+                                     if($key{0} != "_") { $new[$key] = $value; }
+                                }
+                                $length = count($new);
+                                foreach($new as $key => $value)
 				{
-					if($key != "_tablename")
+					if(substr($key, 0, 1) != "_" && $key != "id")
 					{
-						if($key == "id")
-						{
-							$key = "ID";
-						}
 						if(is_int($value))
 						{
 							$sql .= mysql_real_escape_string($key) . "=" . $value;
@@ -153,7 +148,7 @@
 							//when all else fails, make it a string
 							$sql .= mysql_real_escape_string($key) . "=\"" . mysql_real_escape_string($value) ."\"";
 						}
-						if($i != $length)
+						if($i != $length-1)
 						{
 							$sql .= ", ";
 						}
@@ -174,7 +169,7 @@
 				$length = 0;
 				foreach($this as $key => $value)
 				{
-					if($key != "_tablename")
+					if(substr($key, 0, 1) != "_")
 					{
 						$length++;
 					}
@@ -214,7 +209,7 @@
 				$i=0;
 				foreach($this as $key => $value)
 				{
-					if($key != "_tablename")
+					if(substr($key, 0, 1) != "_")
 					{
 						$value = addslashes($value);
 						$value = str_replace("\r", "\\r", $value);
