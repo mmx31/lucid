@@ -23,8 +23,8 @@ if($_GET['section'] == "io")
 {
 	if($_GET['action'] == "save")
 	{
-		if($_POST['appid'] == -1) { $app = new App(); }
-		else { $app = $App->get($_POST['appid']); }
+		if($_POST['id'] == -1) { $app = new App(); }
+		else { $app = $App->get($_POST['id']); }
 		$app->from_postdata($_POST, array('name', 'author', 'email', 'code', 'version', 'maturity', 'category'));
 		$app->save();
 		echo $app->id;
