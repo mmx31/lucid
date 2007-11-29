@@ -743,6 +743,7 @@ api.window = function(params)
 		if(this.onDestroy) {
 		this.onDestroy();
 		}
+		this._task.destroy();
 		if (desktop.config.fx) {
 			var anim = dojo.fadeOut({
 				node: this._id,
@@ -757,7 +758,6 @@ api.window = function(params)
 					api.console("Warning in app: No window shown.");
 				}
 			}));
-			this._task.destroy();
 			anim.play();
 		}
 		else
