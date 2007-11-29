@@ -1,4 +1,4 @@
-api.windowcounter = 0;
+ api.windowcounter = 0;
 /*
  * Package: window
  * 
@@ -53,7 +53,7 @@ api.window = function(params)
 	 * Summary:
 	 * 		What to do upon destroy of window
 	 */
-	this.onDestroy = "NONE";
+	this.onDestroy = null;
 	/*
 	 * Property: onMinimize
 	 * 
@@ -740,17 +740,33 @@ api.window = function(params)
 	{
 		dojo.style(this.body.domNode, "display", "none");
 		this.destroyed = true;
-		if(this.onDestroy != "NONE") {
+		if(this.onDestroy) {
 		this.onDestroy();
 		}
-		var anim = dojo.fadeOut({ node: this._id, duration: 200 });
-		dojo.connect(anim, "onEnd", null, dojo.hitch(this, function() {
+		if (desktop.config.fx) {
+			var anim = dojo.fadeOut({
+				node: this._id,
+				duration: 200
+			});
+			dojo.connect(anim, "onEnd", null, dojo.hitch(this, function(){
+				this._drag.destroy();
+				if (dojo.byId(this._id)) {
+					dojo.byId(this._id).parentNode.removeChild(dojo.byId(this._id));
+				}
+				else {
+					api.console("Warning in app: No window shown.");
+				}
+			}));
+			this._task.destroy();
+			anim.play();
+		}
+		else
+		{
 			this._drag.destroy();
-			if(dojo.byId(this._id)) { dojo.byId(this._id).parentNode.removeChild(dojo.byId(this._id)); }
-			else { api.console("Warning in app: No window shown."); }
-		}));
-		this._task.destroy();
-		anim.play();
+			if (dojo.byId(this._id)) {
+				dojo.byId(this._id).parentNode.removeChild(dojo.byId(this._id));
+			}
+		}
 	}
 	/*
 	 * Adds a dojo widget or HTML element to the window.
