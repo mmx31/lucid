@@ -583,31 +583,32 @@ dojo.declare(
 		this.domNode.style.position = "relative";
 		this._highlightNodes = [];	
 		this.colorNames = dojo.i18n.getLocalization("dojo", "colors", this.lang);
-
+		var url= dojo.moduleUrl("dijit", "templates/blank.gif");
+		var colorObject = new dojo.Color(),
+		    coords = this._paletteCoords;
 		for(var row=0; row < choices.length; row++){
-			for(var col=0; col < choices[row].length; col++){
-				var highlightNode = document.createElement("img");
-				highlightNode.src = dojo.moduleUrl("dijit", "templates/blank.gif");
-				dojo.addClass(highlightNode, "dijitPaletteImg");
-				var color = choices[row][col];
-				var colorValue = new dojo.Color(dojo.Color.named[color]);
-				highlightNode.alt = this.colorNames[color];
-				highlightNode.color = colorValue.toHex();
-				var highlightStyle = highlightNode.style;
-				highlightStyle.color = highlightStyle.backgroundColor = highlightNode.color;
-				dojo.forEach(["Dijitclick", "MouseOut", "MouseOver", "Blur", "Focus"], function(handler){
-					this.connect(highlightNode, "on"+handler.toLowerCase(), "_onColor"+handler);
-				}, this);
-				this.divNode.appendChild(highlightNode);
-				var coords = this._paletteCoords;
-				highlightStyle.top = coords.topOffset + (row * coords.cHeight) + "px";
-				highlightStyle.left = coords.leftOffset + (col * coords.cWidth) + "px";
-				highlightNode.setAttribute("tabIndex","-1");
-				highlightNode.title = this.colorNames[color];
-				dijit.setWaiRole(highlightNode, "gridcell");
-				highlightNode.index = this._highlightNodes.length;
-				this._highlightNodes.push(highlightNode);
-			}
+			for(var col=0; col < choices[row].length; col++) {
+                var highlightNode = document.createElement("img");
+                highlightNode.src = url;
+                dojo.addClass(highlightNode, "dijitPaletteImg");
+                var color = choices[row][col],
+                        colorValue = colorObject.setColor(dojo.Color.named[color]);
+                highlightNode.alt = this.colorNames[color];
+                highlightNode.color = colorValue.toHex();
+                var highlightStyle = highlightNode.style;
+                highlightStyle.color = highlightStyle.backgroundColor = highlightNode.color;
+                dojo.forEach(["Dijitclick", "MouseOut", "MouseOver", "Blur", "Focus"], function(handler) {
+                    this.connect(highlightNode, "on" + handler.toLowerCase(), "_onColor" + handler);
+                }, this);
+                this.divNode.appendChild(highlightNode);
+                highlightStyle.top = coords.topOffset + (row * coords.cHeight) + "px";
+                highlightStyle.left = coords.leftOffset + (col * coords.cWidth) + "px";
+                highlightNode.setAttribute("tabIndex", "-1");
+                highlightNode.title = this.colorNames[color];
+                dijit.setWaiRole(highlightNode, "gridcell");
+                highlightNode.index = this._highlightNodes.length;
+                this._highlightNodes.push(highlightNode);
+            }
 		}
 		this._highlightNodes[this._currentFocus].tabIndex = 0;
 		this._xDim = choices[0].length;
@@ -628,14 +629,14 @@ dojo.declare(
 			LEFT_ARROW: -1
 		};
 		for(var key in keyIncrementMap){
-			dijit.typematic.addKeyListener(this.domNode,
+			this._connects.push(dijit.typematic.addKeyListener(this.domNode,
 				{keyCode:dojo.keys[key], ctrlKey:false, altKey:false, shiftKey:false},
 				this,
 				function(){
 					var increment = keyIncrementMap[key];
 					return function(count){ this._navigateByKey(increment, count); };
 				}(),
-				this.timeoutChangeRate, this.defaultTimeout);
+				this.timeoutChangeRate, this.defaultTimeout));
 		}
 	},
 
@@ -780,6 +781,23 @@ dojo.declare(
 				// we only support one preamble. So be it.
 				propList.preamble = dojo.parser._functionFromScript(preambles[0]);
 			}
+
+			var parsedScripts = dojo.map(scripts, function(s){
+				var evt = s.getAttribute("event")||"postscript";
+				return {
+					event: evt,
+					func: dojo.parser._functionFromScript(s)
+				};
+			});
+
+			// do the connects for each <script type="dojo/connect" event="foo"> block and make
+			// all <script type="dojo/method"> tags execute right after construction
+			this.mixins.push(function(){
+				parsedScripts.forEach(function(s){
+					dojo.connect(this, s.event, this, s.func);
+				}, this);
+			});
+
 			propList.widgetsInTemplate = true;
 			propList._skipNodeCache = true;
 			propList.templateString = "<"+srcType+" class='"+src.className+"' dojoAttachPoint='"+(src.getAttribute("dojoAttachPoint")||'')+"' dojoAttachEvent='"+(src.getAttribute("dojoAttachEvent")||'')+"' >"+src.innerHTML.replace(/\%7B/g,"{").replace(/\%7D/g,"}")+"</"+srcType+">";
@@ -796,14 +814,6 @@ dojo.declare(
 				this.mixins,
 				propList
 			);
-
-			// do the connects for each <script type="dojo/connect" event="foo"> block and make
-			// all <script type="dojo/method"> tags execute right after construction
-			var wcp = dojo.getObject(this.widgetClass).prototype;
-			scripts.forEach(function(s){
-				var event = s.getAttribute("event");
-				dojo.connect(wcp, event || "postscript", null, dojo.parser._functionFromScript(s));
-			});
 		}
 	}
 );
@@ -1044,8 +1054,8 @@ dojo.declare("dojo.dnd.Moveable", null, {
 		this.events = [
 			dojo.connect(this.handle, "onmousedown", this, "onMouseDown"),
 			// cancel text selection and text dragging
-			dojo.connect(this.node, "ondragstart",   this, "onSelectStart"),
-			dojo.connect(this.node, "onselectstart", this, "onSelectStart")
+			dojo.connect(this.handle, "ondragstart",   this, "onSelectStart"),
+			dojo.connect(this.handle, "onselectstart", this, "onSelectStart")
 		];
 	},
 
@@ -4406,7 +4416,7 @@ dojo.declare("dijit.form.Button", dijit.form._FormWidget, {
 					break;
 				}
 				if(node.tagName.toLowerCase() == "form"){
-					node.submit();
+					if(!node.onsubmit || node.onsubmit()){ node.submit(); }
 					break;
 				}
 			}
@@ -4986,7 +4996,7 @@ dojo.declare(
 							accel = {cut:'X', copy:'C', paste:'V'},
 							isMac = navigator.userAgent.indexOf("Macintosh") != -1;
 						alert(sub(this.commands.systemShortcutFF,
-							[cmd, sub(this.commands[isMac ? 'appleKey' : 'ctrlKey'], [accel[cmd]])]));
+							[this.commands[cmd], sub(this.commands[isMac ? 'appleKey' : 'ctrlKey'], [accel[cmd]])]));
 					}
 					return false;
 				}
@@ -6283,7 +6293,7 @@ dojo.declare("dijit.ProgressBar", [dijit._Widget, dijit._Templated], {
 	// true: show that a process is underway but that the progress is unknown
 	indeterminate: false,
 
-	templateString:"<div class=\"dijitProgressBar dijitProgressBarEmpty\"\n\t><div waiRole=\"progressbar\" tabindex=\"0\" dojoAttachPoint=\"internalProgress\" class=\"dijitProgressBarFull\"\n\t\t><div class=\"dijitProgressBarTile\"></div\n\t\t><span style=\"visibility:hidden\">&nbsp;</span\n\t></div\n\t><div dojoAttachPoint=\"label\" class=\"dijitProgressBarLabel\">&nbsp;</div\n\t><img dojoAttachPoint=\"inteterminateHighContrastImage\" class=\"dijitProgressBarIndeterminateHighContrastImage\"\n\t></img\n></div>\n",
+	templateString:"<div class=\"dijitProgressBar dijitProgressBarEmpty\"\n\t><div waiRole=\"progressbar\" tabindex=\"0\" dojoAttachPoint=\"internalProgress\" class=\"dijitProgressBarFull\"\n\t\t><div class=\"dijitProgressBarTile\"></div\n\t\t><span style=\"visibility:hidden\">&nbsp;</span\n\t></div\n\t><div dojoAttachPoint=\"label\" class=\"dijitProgressBarLabel\" id=\"${id}_label\">&nbsp;</div\n\t><img dojoAttachPoint=\"inteterminateHighContrastImage\" class=\"dijitProgressBarIndeterminateHighContrastImage\"\n\t></img\n></div>\n",
 
 	_indeterminateHighContrastImagePath:
 		dojo.moduleUrl("dijit", "themes/a11y/indeterminate_progress.gif"),
@@ -6319,6 +6329,7 @@ dojo.declare("dijit.ProgressBar", [dijit._Widget, dijit._Templated], {
 			}
 			var text = this.report(percent);
 			this.label.firstChild.nodeValue = text;
+			dijit.setWaiState(this.internalProgress, "describedby", this.label.id);
 			dijit.setWaiState(this.internalProgress, "valuenow", this.progress);
 			dijit.setWaiState(this.internalProgress, "valuemin", 0);
 			dijit.setWaiState(this.internalProgress, "valuemax", this.maximum);
@@ -7551,10 +7562,10 @@ dojo.declare(
 				// need to load all the children, and then expand
 				node.markProcessing();
 				var _this = this;
-				function onComplete(childItems){
+				var onComplete = function(childItems){
 					node.unmarkProcessing();
 					_this._onLoadAllItems(node, childItems);
-				}
+				};
 				this.getItemChildren(node.item, onComplete);
 				break;
 
@@ -7792,14 +7803,12 @@ dojo.declare(
 		_layoutHack: function(){
 			// summary: work around table sizing bugs on FF2 by forcing redraw
 			if(dojo.isFF == 2 && this.domNode.tagName=="TABLE"){
-				var node=this.domNode, _this = this;
+				var node=this.domNode;
+				var old = node.style.opacity;
+				node.style.opacity = "0.999";
 				setTimeout(function(){
-					var oldWidth = node.style.width;
-					node.style.width = "0";
-					setTimeout(function(){
-						node.style.width = oldWidth;
-					}, 0);
-				 }, 0);
+					node.style.opacity = old;
+				}, 0);
 			}			
 		},
 
@@ -9373,7 +9382,7 @@ dojo.declare(
 		promptMessage: "",
 		// invalidMessage: String
 		// 		The message to display if value is invalid.
-		invalidMessage: "\x00", // read from the message file if not overridden
+		invalidMessage: "$_unset_$", // read from the message file if not overridden
 		// constraints: Object
 		//		user-defined object needed to pass parameters to the validator functions
 		constraints: {},
@@ -9491,7 +9500,7 @@ dojo.declare(
 			this.inherited('postMixInProperties', arguments);
 			this.constraints.locale=this.lang;
 			this.messages = dojo.i18n.getLocalization("dijit.form", "validate", this.lang);
-			if(this.invalidMessage == "\x00"){ this.invalidMessage = this.messages.invalidMessage; }
+			if(this.invalidMessage == "$_unset_$"){ this.invalidMessage = this.messages.invalidMessage; }
 			var p = this.regExpGen(this.constraints);
 			this.regExp = p;
 			// make value a string for all types so that form reset works well
@@ -9685,7 +9694,7 @@ dojo.declare(
 		// TODO: get rid of this; it's unnecessary (but currently referenced in FilteringSelect)
 		_hasFocus:false,
 
-		templateString:"<table style=\"display: -moz-inline-stack;\" class=\"dijit dijitReset dijitInlineTable dijitLeft\" cellspacing=\"0\" cellpadding=\"0\"\n\tid=\"widget_${id}\" name=\"${name}\" dojoAttachEvent=\"onmouseenter:_onMouse,onmouseleave:_onMouse\" waiRole=\"presentation\"\n\t><tr class=\"dijitReset\"\n\t\t><td class='dijitReset dijitStretch dijitInputField' width=\"100%\"\n\t\t\t><input type=\"text\" autocomplete=\"off\" name=\"${name}\"\n\t\t\tdojoAttachEvent=\"onkeypress, onkeyup, onfocus, onblur, compositionend\"\n\t\t\tdojoAttachPoint=\"textbox,focusNode\" waiRole=\"combobox\"\n\t\t/></td\n\t\t><td class=\"dijitReset dijitValidationIconField\" width=\"0%\"\n\t\t\t><div dojoAttachPoint='iconNode' class='dijitValidationIcon'></div><div class='dijitInline dijitValidationIconText'>&Chi;</div\n\t\t></td\n\t\t><td class='dijitReset dijitRight dijitButtonNode dijitDownArrowButton' width=\"0%\"\n\t\t\tdojoAttachPoint=\"downArrowNode\"\n\t\t\tdojoAttachEvent=\"ondijitclick:_onArrowClick,onmousedown:_onArrowMouseDown,onmouseup:_onMouse,onmouseenter:_onMouse,onmouseleave:_onMouse\"\n\t\t\t><div class=\"dijitDownArrowButtonInner\" waiRole=\"presentation\" tabIndex=\"-1\"\n\t\t\t\t><div class=\"dijitDownArrowButtonChar\">&#9660;</div\n\t\t\t></div\n\t\t></td\t\n\t></tr\n></table>\n",
+		templateString:"<table class=\"dijit dijitReset dijitInlineTable dijitLeft\" cellspacing=\"0\" cellpadding=\"0\"\n\tid=\"widget_${id}\" name=\"${name}\" dojoAttachEvent=\"onmouseenter:_onMouse,onmouseleave:_onMouse\" waiRole=\"presentation\"\n\t><tr class=\"dijitReset\"\n\t\t><td class='dijitReset dijitStretch dijitInputField' width=\"100%\"\n\t\t\t><input type=\"text\" autocomplete=\"off\" name=\"${name}\"\n\t\t\tdojoAttachEvent=\"onkeypress, onkeyup, onfocus, compositionend\"\n\t\t\tdojoAttachPoint=\"textbox,focusNode\" waiRole=\"combobox\"\n\t\t/></td\n\t\t><td class=\"dijitReset dijitValidationIconField\" width=\"0%\"\n\t\t\t><div dojoAttachPoint='iconNode' class='dijitValidationIcon'></div\n\t\t\t><div class='dijitValidationIconText'>&Chi;</div\n\t\t></td\n\t\t><td class='dijitReset dijitRight dijitButtonNode dijitDownArrowButton' width=\"0%\"\n\t\t\tdojoAttachPoint=\"downArrowNode\"\n\t\t\tdojoAttachEvent=\"onmousedown:_onArrowMouseDown,onmouseup:_onMouse,onmouseenter:_onMouse,onmouseleave:_onMouse\"\n\t\t\t><div class=\"dijitDownArrowButtonInner\" waiRole=\"presentation\"\n\t\t\t\t><div class=\"dijitDownArrowButtonChar\">&#9660;</div\n\t\t\t></div\n\t\t></td\t\n\t></tr\n></table>\n",
 
 		baseClass:"dijitComboBox",
 
@@ -9862,7 +9871,7 @@ dojo.declare(
 						this.setDisplayedValue(this._lastDisplayedValue);
 						dojo.stopEvent(evt);
 					}else{
-						this.setValue(this.getValue());
+						this.setValue(this.getValue(), false);
 					}
 					break;
 
@@ -10012,11 +10021,12 @@ dojo.declare(
 			this._hasFocus=false;
 			this._hasBeenBlurred = true;
 			this._hideResultList();
+			this._arrowIdle();
 			// if the user clicks away from the textbox OR tabs away, set the value to the textbox value
 			// #4617: if value is now more choices or previous choices, revert the value
 			var newvalue=this.getDisplayedValue();
 			if(this._popupWidget&&(newvalue==this._popupWidget._messages["previousMessage"]||newvalue==this._popupWidget._messages["nextMessage"])){
-				this.setValue(this._lastValueReported);
+				this.setValue(this._lastValueReported, true);
 			}else{
 				this.setDisplayedValue(newvalue);
 			}
@@ -10026,22 +10036,6 @@ dojo.declare(
 			this._hasFocus=true;
 			
 			// update styling to reflect that we are focused
-			this._onMouse(evt);
-		},
-
-		onblur:function(/*Event*/ evt){ /* not _onBlur! */
-			this._arrowIdle();
-
-			// hide the Tooltip
-			// TODO: isn't this handled by ValidationTextBox?
-			this.validate(false);
-
-			// don't call this since the TextBox setValue is asynchronous
-			// if you uncomment this line, when you click away from the textbox,
-			// the value in the textbox reverts to match the hidden value
-			//this.parentClass.onblur.apply(this, arguments);
-			
-			// update styling since we are no longer focused
 			this._onMouse(evt);
 		},
 
@@ -10090,11 +10084,12 @@ dojo.declare(
 			this.setValue(this.store.getValue(tgt.item, this.searchAttr), true);
 		},
 
-		_onArrowClick: function(){
+		_onArrowMouseDown: function(evt){
 			// summary: callback when arrow is clicked
 			if(this.disabled){
 				return;
 			}
+			dojo.stopEvent(evt);
 			this.focus();
 			if(this._isShowingNow){
 				this._hideResultList();
@@ -10103,11 +10098,6 @@ dojo.declare(
 				// on the arrow it means they want to see more options
 				this._startSearch("");
 			}
-		},
-
-		_onArrowMouseDown: function(evt){
-			this._layoutHack();		// hack for FF2, see http://trac.dojotoolkit.org/ticket/5007
-			this._onMouse(evt);
 		},
 
 		_startSearchFromInput: function(){
@@ -10216,7 +10206,7 @@ dojo.declare(
 		// summary:
 		//	Focus-less div based menu for internal use in ComboBox
 
-		templateString:"<div class='dijitMenu' dojoAttachEvent='onclick,onmouseover,onmouseout' tabIndex='-1' style='overflow:\"auto\";'>"
+		templateString:"<div class='dijitMenu' dojoAttachEvent='onmousedown,onmouseup,onmouseover,onmouseout' tabIndex='-1' style='overflow:\"auto\";'>"
 				+"<div class='dijitMenuItem dijitMenuPreviousButton' dojoAttachPoint='previousButton'></div>"
 				+"<div class='dijitMenuItem dijitMenuNextButton' dojoAttachPoint='nextButton'></div>"
 			+"</div>",
@@ -10295,7 +10285,11 @@ dojo.declare(
 			return this.domNode.childNodes.length-2;
 		},
 
-		onclick:function(/*Event*/ evt){
+		onmousedown:function(/*Event*/ evt){
+			dojo.stopEvent(evt);
+		},
+
+		onmouseup:function(/*Event*/ evt){
 			if(evt.target === this.domNode){
 				return;
 			}else if(evt.target==this.previousButton){
@@ -10871,7 +10865,6 @@ dojo.date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
 			break;
 		case "weekday":
 			//i18n FIXME: assumes Saturday/Sunday weekend, but even this is not standard.  There are CLDR entries to localize this.
-			var dayOfMonth = date.getDate();
 			var days, weeks;
 			var adj = 0;
 			// Divide the increment time span into weekspans plus leftover days
@@ -10905,7 +10898,7 @@ dojo.date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
 			}
 			// Increment by number of weeks plus leftover days plus
 			// weekend adjustments
-			amount = dayOfMonth + 7 * weeks + days + adj;
+			amount = 7 * weeks + days + adj;
 			break;
 		case "year":
 			property = "FullYear";
@@ -10932,7 +10925,7 @@ dojo.date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
 	}
 
 	if(property){
-		sum["set"+property](sum["get"+property]()+amount);
+		sum["setUTC"+property](sum["getUTC"+property]()+amount);
 	}
 
 	if(fixOvershoot && (sum.getDate() < date.getDate())){
@@ -12355,7 +12348,7 @@ dojo.declare(
 			return this._isvalid;
 		},
 
-		_callbackSetLabel: function(/*Array*/ result, /*Object*/ dataObject){
+		_callbackSetLabel: function(/*Array*/ result, /*Object*/ dataObject, /*Boolean, optional*/ priorityChange){
 			// summary
 			//	Callback function that dynamically sets the label of the ComboBox
 
@@ -12373,7 +12366,7 @@ dojo.declare(
 				this._isvalid=false;
 				this.validate(this._hasFocus);
 			}else{
-				this._setValueFromItem(result[0]);
+				this._setValueFromItem(result[0], priorityChange);
 			}
 		},
 
@@ -12395,25 +12388,25 @@ dojo.declare(
 			return "value";
 		},
 
-		_setValue:function(/*String*/ value, /*String*/ displayedValue){
+		_setValue:function(/*String*/ value, /*String*/ displayedValue, /*Boolean, optional*/ priorityChange){
 			this.valueNode.value = value;
-			dijit.form.FilteringSelect.superclass.setValue.call(this, value, true, displayedValue);
+			dijit.form.FilteringSelect.superclass.setValue.call(this, value, priorityChange, displayedValue);
 			this._lastDisplayedValue = displayedValue;
 		},
 
-		setValue: function(/*String*/ value){
+		setValue: function(/*String*/ value, /*Boolean, optional*/ priorityChange){
 			// summary
 			//	Sets the value of the select.
 			//	Also sets the label to the corresponding value by reverse lookup.
 
 			//#3347: fetchItemByIdentity if no keyAttr specified
 			var self=this;
-			var handleFetchByIdentity = function(item){
+			var handleFetchByIdentity = function(item, priorityChange){
 				if(item){
 					if(self.store.isItemLoaded(item)){
-						self._callbackSetLabel([item]);
+						self._callbackSetLabel([item], undefined, priorityChange);
 					}else{
-						self.store.loadItem({item:item, onItem: self._callbackSetLabel});
+						self.store.loadItem({item:item, onItem: function(result, dataObject){self._callbackSetLabel(result, dataObject, priorityChange)}});
 					}
 				}else{
 					self._isvalid=false;
@@ -12421,15 +12414,15 @@ dojo.declare(
 					self.validate(false);
 				}
 			}
-			this.store.fetchItemByIdentity({identity: value, onItem: handleFetchByIdentity});
+			this.store.fetchItemByIdentity({identity: value, onItem: function(item){handleFetchByIdentity(item, priorityChange)}});
 		},
 
-		_setValueFromItem: function(/*item*/ item){
+		_setValueFromItem: function(/*item*/ item, /*Boolean, optional*/ priorityChange){
 			// summary
 			//	Set the displayed valued in the input box, based on a selected item.
 			//	Users shouldn't call this function; they should be calling setDisplayedValue() instead
 			this._isvalid=true;
-			this._setValue(this.store.getIdentity(item), this.labelFunc(item, this.store));
+			this._setValue(this.store.getIdentity(item), this.labelFunc(item, this.store), priorityChange);
 		},
 
 		labelFunc: function(/*item*/ item, /*dojo.data.store*/ store){
@@ -12449,7 +12442,7 @@ dojo.declare(
 			//	ComboBox's menu callback function
 			//	FilteringSelect overrides this to set both the visible and hidden value from the information stored in the menu
 			this.item = tgt.item;
-			this._setValueFromItem(tgt.item);
+			this._setValueFromItem(tgt.item, true);
 		},
 
 		setDisplayedValue:function(/*String*/ label){
@@ -12520,7 +12513,7 @@ dojo.declare(
 		//	  adjust the value by this much when spinning using the PgUp/Dn keys
 		largeDelta: 10,
 
-		templateString:"<table style=\"-moz-inline-stack;\" class=\"dijit dijitReset dijitInlineTable dijitLeft\" cellspacing=\"0\"  cellpadding=\"0\"\n\tid=\"widget_${id}\" name=\"${name}\"\n\tdojoAttachEvent=\"onmouseenter:_onMouse,onmouseleave:_onMouse,onkeypress:_onKeyPress\"\n\twaiRole=\"presentation\"\n\t><tr class=\"dijitReset\"\n\t\t><td rowspan=\"2\" class=\"dijitReset dijitStretch dijitInputField\" width=\"100%\"\n\t\t\t><input dojoAttachPoint=\"textbox,focusNode\" type=\"${type}\" dojoAttachEvent=\"onfocus,onkeyup\"\n\t\t\t\twaiRole=\"spinbutton\" autocomplete=\"off\" name=\"${name}\"\n\t\t></td\n\t\t><td rowspan=\"2\" class=\"dijitReset dijitValidationIconField\" width=\"0%\" \n\t\t\t><div dojoAttachPoint='iconNode' class='dijitInline dijitValidationIcon'></div\n\t\t></td\n\t\t><td class=\"dijitReset dijitRight dijitButtonNode dijitUpArrowButton\" width=\"0%\"\n\t\t\t\tdojoAttachPoint=\"upArrowNode\"\n\t\t\t\tdojoAttachEvent=\"onmousedown:_handleUpArrowEvent,onmouseup:_handleUpArrowEvent,onmouseover:_handleUpArrowEvent,onmouseout:_handleUpArrowEvent\"\n\t\t\t\tstateModifier=\"UpArrow\"\n\t\t\t><div class=\"dijitA11yUpArrow\">&#9650;</div\n\t\t></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset dijitRight dijitButtonNode dijitDownArrowButton\" width=\"0%\"\n\t\t\t\tdojoAttachPoint=\"downArrowNode\"\n\t\t\t\tdojoAttachEvent=\"onmousedown:_handleDownArrowEvent,onmouseup:_handleDownArrowEvent,onmouseover:_handleDownArrowEvent,onmouseout:_handleDownArrowEvent\"\n\t\t\t\tstateModifier=\"DownArrow\"\n\t\t\t><div class=\"dijitA11yDownArrow\">&#9660;</div\n\t\t></td\n\t></tr\n></table>\n\n",
+		templateString:"<table class=\"dijit dijitReset dijitInlineTable dijitLeft\" cellspacing=\"0\" cellpadding=\"0\"\n\tid=\"widget_${id}\" name=\"${name}\"\n\tdojoAttachEvent=\"onmouseenter:_onMouse,onmouseleave:_onMouse,onkeypress:_onKeyPress\"\n\twaiRole=\"presentation\"\n\t><tr class=\"dijitReset\"\n\t\t><td rowspan=\"2\" class=\"dijitReset dijitStretch dijitInputField\" width=\"100%\"\n\t\t\t><input dojoAttachPoint=\"textbox,focusNode\" type=\"${type}\" dojoAttachEvent=\"onfocus,onkeyup\"\n\t\t\t\twaiRole=\"spinbutton\" autocomplete=\"off\" name=\"${name}\"\n\t\t></td\n\t\t><td rowspan=\"2\" class=\"dijitReset dijitValidationIconField\" width=\"0%\" \n\t\t\t><div dojoAttachPoint='iconNode' class='dijitValidationIcon'></div\n\t\t></td\n\t\t><td class=\"dijitReset dijitRight dijitButtonNode dijitUpArrowButton\" width=\"0%\"\n\t\t\t\tdojoAttachPoint=\"upArrowNode\"\n\t\t\t\tdojoAttachEvent=\"onmousedown:_handleUpArrowEvent,onmouseup:_handleUpArrowEvent,onmouseover:_handleUpArrowEvent,onmouseout:_handleUpArrowEvent\"\n\t\t\t\tstateModifier=\"UpArrow\"\n\t\t\t><div class=\"dijitA11yUpArrow\">&#9650;</div\n\t\t></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset dijitRight dijitButtonNode dijitDownArrowButton\" width=\"0%\"\n\t\t\t\tdojoAttachPoint=\"downArrowNode\"\n\t\t\t\tdojoAttachEvent=\"onmousedown:_handleDownArrowEvent,onmouseup:_handleDownArrowEvent,onmouseover:_handleDownArrowEvent,onmouseout:_handleDownArrowEvent\"\n\t\t\t\tstateModifier=\"DownArrow\"\n\t\t\t><div class=\"dijitA11yDownArrow\">&#9660;</div\n\t\t></td\n\t></tr\n></table>\n\n",
 		baseClass: "dijitSpinner",
 
 		adjust: function(/* Object */ val, /*Number*/ delta){
@@ -12541,7 +12534,7 @@ dojo.declare(
 		_arrowPressed: function(/*Node*/ nodePressed, /*Number*/ direction){
 			if(this.disabled){ return; }
 			dojo.addClass(nodePressed, "dijitSpinnerButtonActive");
-			this.setValue(this.adjust(this.getValue(), direction*this.smallDelta));
+			this.setValue(this.adjust(this.getValue(), direction*this.smallDelta), false);
 		},
 
 		_arrowReleased: function(/*Node*/ node){
@@ -12688,10 +12681,10 @@ dojo.declare(
 		if(this.disabled || e.altKey || e.ctrlKey){ return; }
 		switch(e.keyCode){
 			case dojo.keys.HOME:
-				this.setValue(this.minimum);
+				this.setValue(this.minimum, false);
 				break;
 			case dojo.keys.END:
-				this.setValue(this.maximum);
+				this.setValue(this.maximum, false);
 				break;
 			case dojo.keys.UP_ARROW:
 			case (this._isReversed() ? dojo.keys.LEFT_ARROW : dojo.keys.RIGHT_ARROW):

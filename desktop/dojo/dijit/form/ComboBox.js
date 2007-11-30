@@ -72,7 +72,7 @@ dojo.declare(
 		// TODO: get rid of this; it's unnecessary (but currently referenced in FilteringSelect)
 		_hasFocus:false,
 
-		templateString:"<table style=\"display: -moz-inline-stack;\" class=\"dijit dijitReset dijitInlineTable dijitLeft\" cellspacing=\"0\" cellpadding=\"0\"\n\tid=\"widget_${id}\" name=\"${name}\" dojoAttachEvent=\"onmouseenter:_onMouse,onmouseleave:_onMouse\" waiRole=\"presentation\"\n\t><tr class=\"dijitReset\"\n\t\t><td class='dijitReset dijitStretch dijitInputField' width=\"100%\"\n\t\t\t><input type=\"text\" autocomplete=\"off\" name=\"${name}\"\n\t\t\tdojoAttachEvent=\"onkeypress, onkeyup, onfocus, onblur, compositionend\"\n\t\t\tdojoAttachPoint=\"textbox,focusNode\" waiRole=\"combobox\"\n\t\t/></td\n\t\t><td class=\"dijitReset dijitValidationIconField\" width=\"0%\"\n\t\t\t><div dojoAttachPoint='iconNode' class='dijitValidationIcon'></div><div class='dijitInline dijitValidationIconText'>&Chi;</div\n\t\t></td\n\t\t><td class='dijitReset dijitRight dijitButtonNode dijitDownArrowButton' width=\"0%\"\n\t\t\tdojoAttachPoint=\"downArrowNode\"\n\t\t\tdojoAttachEvent=\"ondijitclick:_onArrowClick,onmousedown:_onArrowMouseDown,onmouseup:_onMouse,onmouseenter:_onMouse,onmouseleave:_onMouse\"\n\t\t\t><div class=\"dijitDownArrowButtonInner\" waiRole=\"presentation\" tabIndex=\"-1\"\n\t\t\t\t><div class=\"dijitDownArrowButtonChar\">&#9660;</div\n\t\t\t></div\n\t\t></td\t\n\t></tr\n></table>\n",
+		templateString:"<table class=\"dijit dijitReset dijitInlineTable dijitLeft\" cellspacing=\"0\" cellpadding=\"0\"\n\tid=\"widget_${id}\" name=\"${name}\" dojoAttachEvent=\"onmouseenter:_onMouse,onmouseleave:_onMouse\" waiRole=\"presentation\"\n\t><tr class=\"dijitReset\"\n\t\t><td class='dijitReset dijitStretch dijitInputField' width=\"100%\"\n\t\t\t><input type=\"text\" autocomplete=\"off\" name=\"${name}\"\n\t\t\tdojoAttachEvent=\"onkeypress, onkeyup, onfocus, compositionend\"\n\t\t\tdojoAttachPoint=\"textbox,focusNode\" waiRole=\"combobox\"\n\t\t/></td\n\t\t><td class=\"dijitReset dijitValidationIconField\" width=\"0%\"\n\t\t\t><div dojoAttachPoint='iconNode' class='dijitValidationIcon'></div\n\t\t\t><div class='dijitValidationIconText'>&Chi;</div\n\t\t></td\n\t\t><td class='dijitReset dijitRight dijitButtonNode dijitDownArrowButton' width=\"0%\"\n\t\t\tdojoAttachPoint=\"downArrowNode\"\n\t\t\tdojoAttachEvent=\"onmousedown:_onArrowMouseDown,onmouseup:_onMouse,onmouseenter:_onMouse,onmouseleave:_onMouse\"\n\t\t\t><div class=\"dijitDownArrowButtonInner\" waiRole=\"presentation\"\n\t\t\t\t><div class=\"dijitDownArrowButtonChar\">&#9660;</div\n\t\t\t></div\n\t\t></td\t\n\t></tr\n></table>\n",
 
 		baseClass:"dijitComboBox",
 
@@ -249,7 +249,7 @@ dojo.declare(
 						this.setDisplayedValue(this._lastDisplayedValue);
 						dojo.stopEvent(evt);
 					}else{
-						this.setValue(this.getValue());
+						this.setValue(this.getValue(), false);
 					}
 					break;
 
@@ -399,11 +399,12 @@ dojo.declare(
 			this._hasFocus=false;
 			this._hasBeenBlurred = true;
 			this._hideResultList();
+			this._arrowIdle();
 			// if the user clicks away from the textbox OR tabs away, set the value to the textbox value
 			// #4617: if value is now more choices or previous choices, revert the value
 			var newvalue=this.getDisplayedValue();
 			if(this._popupWidget&&(newvalue==this._popupWidget._messages["previousMessage"]||newvalue==this._popupWidget._messages["nextMessage"])){
-				this.setValue(this._lastValueReported);
+				this.setValue(this._lastValueReported, true);
 			}else{
 				this.setDisplayedValue(newvalue);
 			}
@@ -413,22 +414,6 @@ dojo.declare(
 			this._hasFocus=true;
 			
 			// update styling to reflect that we are focused
-			this._onMouse(evt);
-		},
-
-		onblur:function(/*Event*/ evt){ /* not _onBlur! */
-			this._arrowIdle();
-
-			// hide the Tooltip
-			// TODO: isn't this handled by ValidationTextBox?
-			this.validate(false);
-
-			// don't call this since the TextBox setValue is asynchronous
-			// if you uncomment this line, when you click away from the textbox,
-			// the value in the textbox reverts to match the hidden value
-			//this.parentClass.onblur.apply(this, arguments);
-			
-			// update styling since we are no longer focused
 			this._onMouse(evt);
 		},
 
@@ -477,11 +462,12 @@ dojo.declare(
 			this.setValue(this.store.getValue(tgt.item, this.searchAttr), true);
 		},
 
-		_onArrowClick: function(){
+		_onArrowMouseDown: function(evt){
 			// summary: callback when arrow is clicked
 			if(this.disabled){
 				return;
 			}
+			dojo.stopEvent(evt);
 			this.focus();
 			if(this._isShowingNow){
 				this._hideResultList();
@@ -490,11 +476,6 @@ dojo.declare(
 				// on the arrow it means they want to see more options
 				this._startSearch("");
 			}
-		},
-
-		_onArrowMouseDown: function(evt){
-			this._layoutHack();		// hack for FF2, see http://trac.dojotoolkit.org/ticket/5007
-			this._onMouse(evt);
 		},
 
 		_startSearchFromInput: function(){
@@ -603,7 +584,7 @@ dojo.declare(
 		// summary:
 		//	Focus-less div based menu for internal use in ComboBox
 
-		templateString:"<div class='dijitMenu' dojoAttachEvent='onclick,onmouseover,onmouseout' tabIndex='-1' style='overflow:\"auto\";'>"
+		templateString:"<div class='dijitMenu' dojoAttachEvent='onmousedown,onmouseup,onmouseover,onmouseout' tabIndex='-1' style='overflow:\"auto\";'>"
 				+"<div class='dijitMenuItem dijitMenuPreviousButton' dojoAttachPoint='previousButton'></div>"
 				+"<div class='dijitMenuItem dijitMenuNextButton' dojoAttachPoint='nextButton'></div>"
 			+"</div>",
@@ -682,7 +663,11 @@ dojo.declare(
 			return this.domNode.childNodes.length-2;
 		},
 
-		onclick:function(/*Event*/ evt){
+		onmousedown:function(/*Event*/ evt){
+			dojo.stopEvent(evt);
+		},
+
+		onmouseup:function(/*Event*/ evt){
 			if(evt.target === this.domNode){
 				return;
 			}else if(evt.target==this.previousButton){

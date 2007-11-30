@@ -128,7 +128,6 @@ dojo.date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
 			break;
 		case "weekday":
 			//i18n FIXME: assumes Saturday/Sunday weekend, but even this is not standard.  There are CLDR entries to localize this.
-			var dayOfMonth = date.getDate();
 			var days, weeks;
 			var adj = 0;
 			// Divide the increment time span into weekspans plus leftover days
@@ -162,7 +161,7 @@ dojo.date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
 			}
 			// Increment by number of weeks plus leftover days plus
 			// weekend adjustments
-			amount = dayOfMonth + 7 * weeks + days + adj;
+			amount = 7 * weeks + days + adj;
 			break;
 		case "year":
 			property = "FullYear";
@@ -189,7 +188,7 @@ dojo.date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
 	}
 
 	if(property){
-		sum["set"+property](sum["get"+property]()+amount);
+		sum["setUTC"+property](sum["getUTC"+property]()+amount);
 	}
 
 	if(fixOvershoot && (sum.getDate() < date.getDate())){

@@ -55,7 +55,7 @@ dojo.declare("dijit.form.Button", dijit.form._FormWidget, {
 					break;
 				}
 				if(node.tagName.toLowerCase() == "form"){
-					node.submit();
+					if(!node.onsubmit || node.onsubmit()){ node.submit(); }
 					break;
 				}
 			}

@@ -506,10 +506,9 @@ dojo.declare("dojox.data.XmlStore", null, {
 			}
 			items.push(item);
 		}
-		for(var i in items){
-			var element = items[i].element;
-			element.parentNode.removeChild(element); // make it root
-		}
+		dojo.forEach(items,function(item){ 
+			item.element.parentNode.removeChild(item.element); // make it root
+		},this); 
 		return items;
 	},
 
@@ -805,7 +804,7 @@ dojo.declare("dojox.data.XmlStore", null, {
 		if(!keywordArgs){
 			keywordArgs = {};
 		}
-		for(var i in this._modifiedItems){
+		for(var i = 0; i < this._modifiedItems.length; i++){
 			this._saveItem(this._modifiedItems[i], keywordArgs, "PUT");
 		}
 		for(var i = 0; i < this._newItems.length; i++){
@@ -817,7 +816,7 @@ dojo.declare("dojox.data.XmlStore", null, {
 			}
 			this._saveItem(this._newItems[i], keywordArgs, "POST");
 		}
-		for(var i in this._deletedItems){
+		for(var i = 0; i < this._deletedItems.length; i++){
 			this._saveItem(this._deletedItems[i], keywordArgs, "DELETE");
 		}
 	},
@@ -1018,7 +1017,7 @@ dojo.declare("dojox.data.XmlStore", null, {
 	},
 
 	_getItemIndex: function(items, element){
-		for(var i in items){
+		for(var i = 0; i < items.length; i++){
 			if(items[i].element === element){
 				return i; //int
 			}
@@ -1040,13 +1039,13 @@ dojo.declare("dojox.data.XmlStore", null, {
 	},
 
 	_restoreItems: function(items){
-		for(var i in items){
-			var item = items[i];
+
+		dojo.forEach(items,function(item){ 
 			if(item._backup){
 				item.element = item._backup;
 				item._backup = null;
 			}
-		}
+		},this); 
 	},
 
 	_forgetItem: function(item){

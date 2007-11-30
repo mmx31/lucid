@@ -101,8 +101,8 @@ if(typeof dojo == "undefined"){
 	//TODOC:  HOW TO DOC THIS?
 	dojo.version = {
 		// summary: version number of this instance of dojo.
-		major: 1, minor: 0, patch: 0, flag: "",
-		revision: Number("$Rev: 11363 $".match(/[0-9]+/)[0]),
+		major: 1, minor: 0, patch: 1, flag: "",
+		revision: Number("$Rev: 11616 $".match(/[0-9]+/)[0]),
 		toString: function(){
 			with(d.version){
 				return major + "." + minor + "." + patch + flag + " (" + revision + ")";	// String
@@ -4394,7 +4394,7 @@ if(dojo.isIE || dojo.isOpera){
 				}
 				if(node.parentNode != db){
 					var nd = node;
-					if(dojo.isOpera || (dojo.isSafari >= 5)){ nd = db; }
+					if(dojo.isOpera || (dojo.isSafari >= 3)){ nd = db; }
 					ret.x -= _sumAncestorProperties(nd, "scrollLeft");
 					ret.y -= _sumAncestorProperties(nd, "scrollTop");
 				}
@@ -6934,7 +6934,7 @@ dojo.declare("dojo._Animation", null, {
 		//		If true, play the animation after setting the progress.
 		this._stopTimer();
 		this._active = this._paused = true;
-		this._percent = percent * 100;
+		this._percent = percent;
 		if(andPlay){ this.play(); }
 		return this; // dojo._Animation
 	},

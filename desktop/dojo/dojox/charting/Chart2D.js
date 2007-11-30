@@ -15,6 +15,7 @@ dojo.require("dojox.charting.plot2d.Lines");
 dojo.require("dojox.charting.plot2d.Areas");
 dojo.require("dojox.charting.plot2d.Markers");
 dojo.require("dojox.charting.plot2d.MarkersOnly");
+dojo.require("dojox.charting.plot2d.Scatter");
 dojo.require("dojox.charting.plot2d.Stacked");
 dojo.require("dojox.charting.plot2d.StackedLines");
 dojo.require("dojox.charting.plot2d.StackedAreas");
@@ -109,6 +110,9 @@ dojo.require("dojox.charting.plot2d.Pie");
 				this.series.push(run);
 			}
 			this.dirty = true;
+			// fix min/max
+			if(!("ymin" in run) && "min" in run){ run.ymin = run.min; }
+			if(!("ymax" in run) && "max" in run){ run.ymax = run.max; }
 			return this;
 		},
 		updateSeries: function(name, data){
@@ -200,8 +204,8 @@ dojo.require("dojox.charting.plot2d.Pie");
 			
 			// clear old values
 			dojo.forEach(this.stack,  clear);
-			dojo.forEach(this.axes,   purge);
 			dojo.forEach(this.series, purge);
+			df.forIn(this.axes, purge);
 			dojo.forEach(this.stack,  purge);
 			this.surface.clear();
 			
@@ -298,10 +302,6 @@ dojo.require("dojox.charting.plot2d.Pie");
 			df.forIn(this.axes, function(axis){ axis.render(dim, offsets); });
 			
 			this._makeClean();
-			
-			// BEGIN FOR HTML CANVAS 
-			if(this.surface.render){ this.surface.render(); };	
-			// END FOR HTML CANVAS
 			
 			return this;
 		},
