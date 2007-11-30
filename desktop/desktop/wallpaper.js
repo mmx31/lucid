@@ -47,14 +47,7 @@ desktop.wallpaper = new function()
 		*/		
 		this.set = function(image)
 		{
-			if(image)
-			{
-				document.getElementById("wallpaper").innerHTML="<img width='100%' height='100%' src='"+image+"'>";
-			}
-			else
-			{
-				document.getElementById("wallpaper").innerHTML="&nbsp;";
-			}
+			dojo.style("wallpaper", "backgroundImage", (image ? "url("+image+")" : "none"));
 		}
 		/** 
 		* Sets the wallpaper background color
