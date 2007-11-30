@@ -51,23 +51,30 @@ api.window = function(params)
 	 * Property: onDestroy
 	 * 
 	 * Summary:
-	 * 		What to do upon destroy of window
+	 * 		What to do on destroying of the window
 	 */
-	this.onDestroy = null;
+	this.onDestroy = function(){};
+	/*
+	 * Property: onResize
+	 * 
+	 * Summary:
+	 * 		What to do on the resizing of the window
+	 */
+	this.onResize = function(){};
 	/*
 	 * Property: onMinimize
 	 * 
 	 * Summary:
-	 * 		What to do upon minimize of window
+	 * 		What to do on the minimizing of the window
 	 */
-	this.onMinimize = "NONE";
+	this.onMinimize = function(){};
 	/*
 	 * Property: onMaximize
 	 * 
 	 * Summary:
 	 * 		What to do upon maximize of window
 	 */
-	this.onMaximize = "NONE";
+	this.onMaximize = function(){};
 	/*
 	 * Property: showMaximize
 	 * 
@@ -482,9 +489,7 @@ api.window = function(params)
 	 */
 	this.minimize = function()
 	{
-		if(this.onMinimize != "NONE") {
 		this.onMinimize();
-		}
 		if(desktop.config.fx == true)
 		{
 			dojo.style(this.body.domNode, "display", "none");
@@ -569,9 +574,7 @@ api.window = function(params)
 	 */
 	this.maximize = function()
 	{
-		if(this.onMaximize != "NONE") {
 		this.onMaximize();
-		}
 		this.maximized = true;
 		this._drag.destroy();
 		if(this.resizable == true)
@@ -695,6 +698,7 @@ api.window = function(params)
 	{
 		if(this.body.resize) this.body.resize();
 		if(this.body.layout) this.body.layout();
+		this.onResize();
 	}
 	/*
 	 * Method: bringToFront
@@ -740,9 +744,7 @@ api.window = function(params)
 	{
 		dojo.style(this.body.domNode, "display", "none");
 		this.destroyed = true;
-		if(this.onDestroy) {
 		this.onDestroy();
-		}
 		this._task.destroy();
 		if (desktop.config.fx) {
 			var anim = dojo.fadeOut({
