@@ -14,7 +14,7 @@ mysql_close($link);
 echo "<script type='text/javascript'>window.location='index2.php?backend=app&opmessage=App+Deleted'</script>";
 exit();
 }
-echo "<form action='index2.php?backend=editapp' method='post'><b>Edit app ID:</b><input name='appid' type='inputbox'><input type='submit' value='edit'></form> <form action='index2.php?backend=app' method='post'><b>Delete app ID:</b><input name='deleteid' type='inputbox'><input type='submit' value='delete'></form> <a href='index2.php?backend=editapp'>new app</a> <a href='index2.php?backend=uploadapp'>Upload appPackage</a>";
+echo "<form action='index2.php?backend=app' method='post'><b>Delete app ID:</b><input name='deleteid' type='inputbox'><input type='submit' value='delete'></form> <a href='index2.php?backend=editapp'>new app</a> <a href='index2.php?backend=uploadapp'>Upload appPackage</a>";
 $link = mysql_connect($db_host, $db_username, $db_password)
    or die('Could not connect: ' . mysql_error());
 mysql_select_db($db_name) or die('Could not select database');
