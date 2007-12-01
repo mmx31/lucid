@@ -65,6 +65,7 @@ var api = new function() {
 	{
 		api.require("crosstalk");
 		api.require("registry");
+		api.require("filearea");
 		api.require("fs");
 		api.require("ide");
 		api.require("instances");
