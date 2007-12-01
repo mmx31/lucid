@@ -17,12 +17,17 @@ dojo.declare(
 {
 	path: "/",
 	iconStyle: "list",
-	templateString: "<div class='desktopFileArea' dojoAttachPoint='focusNode,containerNode' style='overflow-x: hidden; overflow-y: scroll;'></div>",
+	overflow: "scroll",
+	subdirs: true,
+	templateString: "<div class='desktopFileArea' dojoAttachPoint='focusNode,containerNode' style='overflow-x: hidden; overflow-y: ${overflow};'></div>",
 	postCreate: function() {
 		
 	},
 	refresh: function()
 	{
+		dojo.forEach(this.getChildren(), dojo.hitch(this, function(item){
+			item.destroy();
+		}));
 		api.fs.ls({
 			path: this.path,
 			callback: dojo.hitch(this, function(array)
@@ -30,7 +35,8 @@ dojo.declare(
 				dojo.forEach(array, dojo.hitch(this, function(item) {
 					this.addChild(new api.filearea._item({
 						label: item.file,
-						iconClass: (item.isDir == true ? "icon-32-places-folder" : "icon-32-mimetypes-text-x-generic")
+						iconClass: (item.isDir ? "icon-32-places-folder" : "icon-32-mimetypes-text-x-generic"),
+						isDir: item.isDir
 					}));
 				}));
 			})
@@ -41,6 +47,25 @@ dojo.declare(
 		dojo.forEach(this.getChildren(), dojo.hitch(this, function(item){
 			item.unhighlight();
 		}));
+	},
+	up: function()
+	{
+		if (this.path != "/") {
+			dirs = this.path.split("/");
+			if(this.path.charAt(this.path.length-1) == "/") dirs.pop();
+			if(this.path.charAt(0) == "/") dirs.shift();
+			dirs.pop();
+			if(dirs.length == 0) this.path = "/";
+			else this.path = "/"+dirs.join("/")+"/";
+			this.refresh();
+		}
+	},
+	setPath: function(path)
+	{
+		if (this.subdirs) {
+			this.path = path;
+			this.refresh();
+		}
 	}
 });
 
@@ -51,7 +76,8 @@ dojo.declare(
 	iconClass: "",
 	label: "file",
 	highlighted: false,
-	templateString: "<div class='desktopFileItem' style='float: left; padding: 10px;' dojoAttachPoint='focusNode'><center><div class='desktopFileItemIcon ${iconClass}' dojoAttachEvent='onclick:_onIconClick'></div></center><div class='desktopFileItemText' dojoAttachEvent='onclick:_onTextClick' style='text-align: center;'>${label}</div></div>",
+	isDir: false,
+	templateString: "<div class='desktopFileItem' style='float: left; padding: 10px;' dojoAttachPoint='focusNode'><center><div class='desktopFileItemIcon ${iconClass}' dojoAttachEvent='onclick:_onIconClick'></div></center><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px;' dojoAttachEvent='onclick:_onTextClick' style='text-align: center;'>${label}</div></div>",
 	onClick: function(e)
 	{
 		
@@ -64,7 +90,9 @@ dojo.declare(
 		}
 		else
 		{
-			
+			if (this.isDir) {
+				this.getParent().setPath(this.label + "/");
+			}
 		}
 	},
 	_onTextClick: function(e) {

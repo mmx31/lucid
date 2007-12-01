@@ -80,8 +80,11 @@ desktop.windows = new function()
 		div = document.createElement("div");
 		div.id="windowcontainer";
 		div.style.overflow="hidden";
-		new dijit.layout.ContentPane({id: "windowcontainer"}, div);
+		var winc=new dijit.layout.ContentPane({id: "windowcontainer"}, div);
 		//dojo.widget.createWidget("ContentPane", {id: "windowcontainer"}, div);
+		var filearea = new api.filearea({path: "/Desktop/", subdirs: false, style: "width: 100%; height: 100%;", overflow: "hidden"});
+		filearea.refresh();
+		winc.domNode.appendChild(filearea.domNode);
 		document.body.appendChild(div);
 	}
 	this.init = this.desktopResize;

@@ -17,13 +17,10 @@ api.fs = new function()
 		handleAs: "xml",
         load: function(data, ioArgs) {
 			var results = data.getElementsByTagName('file');
-			if(api.fs.lsArray) {
-			delete api.fs.lsArray;
-			api.fs.lsArray = new Array(99,99);
+			if (api.fs.lsArray) {
+				delete api.fs.lsArray;
 			}
-			else {
-			api.fs.lsArray = new Array(99,99);
-			}
+			api.fs.lsArray = [];
 			for(var i = 0; i<results.length; i++){
 			api.fs.lsArray[i] = new Object();
 			if(results[i].getAttribute("type") == "folder") {

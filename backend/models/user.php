@@ -66,7 +66,8 @@
 				//Create user environment for first time
 				mkdir("../../files/".$this->username);
 				mkdir("../../files/".$this->username."/Documents");
-				$ourFileName = "../../files/".$this->username."/welcome.txt";
+				mkdir("../../files/".$this->username."/Desktop");
+				$ourFileName = "../../files/".$this->username."/Desktop/welcome.txt";
 				$ourFileHandle = fopen($ourFileName, 'w') or die("1");
 				fwrite($ourFileHandle, "Welcome to Psych Desktop, ".$this->username."\r\n Your new account is installed and ready.");
 				fclose($ourFileHandle);
