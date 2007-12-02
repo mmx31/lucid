@@ -34,14 +34,16 @@ dojo.declare(
 				dojo.forEach(array, dojo.hitch(this, function(item) {
 					if(desktop.config.filesystem.hideExt && !item.isDir)
 					{
+						item.fullFile = item.file;
 						var p = item.file.lastIndexOf(".");
 						item.file = item.file.substring(0, p);
 					}
+					else { item.fullFile = item.file; }
 					this.addChild(new api.filearea._item({
 						label: item.file,
 						iconClass: (item.isDir ? "icon-32-places-folder" : "icon-32-mimetypes-text-x-generic"),
 						isDir: item.isDir,
-						path: this.path+item.file,
+						path: this.path+item.fullFile,
 						textshadow: this.textShadow
 					}));
 				}));
