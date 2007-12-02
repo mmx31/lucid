@@ -81,12 +81,17 @@ dojo.declare(
 	},
 	_onClick: function(e)
 	{
+		console.log(e);
 		var w = dijit.getEnclosingWidget(e.target);
 		if (w.declaredClass == "api.filearea._item") {
-			if (dojo.hasClass(e.target, "desktopFileItemText")) 
-				w._onTextClick();
-			else 
+			if (dojo.hasClass(e.target, "desktopFileItemIcon")) 
 				w._onIconClick();
+			else if(dojo.hasClass(e.target, "desktopFileItemTextFront")
+					|| dojo.hasClass(e.target, "desktopFileItemTextBack")
+					|| dojo.hasClass(e.target, "desktopFileItemText"))
+				w._onTextClick();
+			else
+				this.clearSelection();
 		}
 		else this.clearSelection();
 	},
@@ -112,7 +117,7 @@ dojo.declare(
 		if(!this.textshadow)
 		{
 			dojo.query(".desktopFileItemTextBack", this.domNode).style("display", "none");
-			dojo.query(".desktopFileItemTextFront", this.domNode).removeClass("desktopFileItemTextFront");
+			dojo.query(".desktopFileItemTextFront", this.domNode).removeClass("desktopFileItemTextFront").addClass("desktopFileItemText");
 		}
 	},
 	onClick: function()
