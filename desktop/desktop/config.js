@@ -118,6 +118,9 @@ desktop.config = {
 	},
 	crosstalkPing: 500,
 	filesystem: {
-		hideExt: true
+		hideExt: true,
+		handlers: {
+			txt: null
+		}
 	}
 }

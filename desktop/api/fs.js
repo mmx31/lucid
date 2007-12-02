@@ -48,12 +48,11 @@ api.fs = new function()
 		handleAs: "xml",
         load: function(data, ioArgs) {
 			var results = data.getElementsByTagName('file');
-			api.fs.fileArray = new Array(99,99);
-			api.fs.fileArray[0] = new Object();
-			api.fs.fileArray[0].path = object.path;
-			api.fs.fileArray[0].contents = results[0].firstChild.nodeValue;
-	        if(object.callback) { object.callback(api.fs.fileArray); }
-	        desktop.core.loadingIndicator(1);
+			var file = {
+				path: object.path,
+				contents: results[0].firstChild.nodeValue
+			};
+	        if(object.callback) { object.callback(file); }
 		},
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/xml"
@@ -104,4 +103,23 @@ api.fs = new function()
         mimetype: "text/html"
         });
     }
+	this.launchApp = function(path)
+	{
+		var l = path.lastIndexOf(".");
+		var ext = path.substr(l, -1);
+		if(ext == "desktop")
+		{
+			this.read({
+				path: path,
+				callback: dojo.hitch(this, function(file) {
+					var c = file.contents.split("\n");
+					desktop.app.launch(c[0], dojo.fromJson(c[1]));
+				})
+			});
+		}
+		else if(typeof desktop.config.filesystem.handlers[ext] == "number")
+		{
+			desktop.app.launch(desktop.config.filesystem.handlers[ext], {file: path});
+		}
+	}
 }
