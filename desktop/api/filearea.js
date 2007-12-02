@@ -101,7 +101,7 @@ dojo.declare(
 	{
 		var w = dijit.getEnclosingWidget(e.target);
 		if (w.declaredClass == "api.filearea._item") {
-			if (dojo.hasClass(e, "desktopFileItemText")) 
+			if (dojo.hasClass(e.target, "desktopFileItemText")) 
 				w._onTextClick();
 			else 
 				w._onIconClick();
