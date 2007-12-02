@@ -68,10 +68,6 @@ dojo.declare(
 			this.refresh();
 		}
 	},
-	setExtension: function(type, parameter, extension)
-	{
-		this.extensions[this.extensions.length] = {type: type, parameter: parameter, extension: extension};
-	},
 	setPath: function(path)
 	{
 		if (this.subdirs) {
