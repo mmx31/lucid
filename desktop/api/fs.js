@@ -121,5 +121,9 @@ api.fs = new function()
 		{
 			desktop.app.launch(desktop.config.filesystem.handlers[ext], {file: path});
 		}
+		else
+		{
+			api.ui.alert({title: "Error", message: "Cannot open "+path+", no app associated with that extention"});
+		}
 	}
 }

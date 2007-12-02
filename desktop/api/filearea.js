@@ -81,7 +81,6 @@ dojo.declare(
 	},
 	_onClick: function(e)
 	{
-		console.log(e);
 		var w = dijit.getEnclosingWidget(e.target);
 		if (w.declaredClass == "api.filearea._item") {
 			if (dojo.hasClass(e.target, "desktopFileItemIcon")) 
