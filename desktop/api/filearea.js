@@ -78,6 +78,7 @@ dojo.declare(
 			this.path = path;
 			this.refresh();
 		}
+		else api.fs.launchApp(path, true);
 	},
 	_onClick: function(e)
 	{

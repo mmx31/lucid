@@ -116,7 +116,7 @@ desktop.app = new function()
                                         this.instances[this.instanceCount].status = "init";
 
 					api.console("Executing app...");
-					this.instances[this.instanceCount].init((args ? args : null));
+					this.instances[this.instanceCount].init((args || {}));
 				}
 				catch(e) {
 					if(typeof this.instances[instance].debug == "function") { //Program has it's own error handling system.

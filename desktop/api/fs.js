@@ -103,27 +103,35 @@ api.fs = new function()
         mimetype: "text/html"
         });
     }
-	this.launchApp = function(path)
+	this.launchApp = function(path, dir)
 	{
-		var l = path.lastIndexOf(".");
-		var ext = path.substring(l+1, path.length);
-		if(ext == "desktop")
-		{
-			this.read({
-				path: path,
-				callback: dojo.hitch(this, function(file) {
-					var c = file.contents.split("\n");
-					desktop.app.launch(c[0], dojo.fromJson(c[1]));
-				})
-			});
+		if (dir) {
+			desktop.app.launch(desktop.config.filesystem.handlers.folder, {path: path})
 		}
-		else if(typeof desktop.config.filesystem.handlers[ext] == "number")
-		{
-			desktop.app.launch(desktop.config.filesystem.handlers[ext], {file: path});
-		}
-		else
-		{
-			api.ui.alert({title: "Error", message: "Cannot open "+path+", no app associated with that extention"});
+		else {
+			var l = path.lastIndexOf(".");
+			var ext = path.substring(l + 1, path.length);
+			if (ext == "desktop") {
+				this.read({
+					path: path,
+					callback: dojo.hitch(this, function(file){
+						var c = file.contents.split("\n");
+						desktop.app.launch(c[0], dojo.fromJson(c[1]));
+					})
+				});
+			}
+			else 
+				if (typeof desktop.config.filesystem.handlers[ext] == "number") {
+					desktop.app.launch(desktop.config.filesystem.handlers[ext], {
+						file: path
+					});
+				}
+				else {
+					api.ui.alert({
+						title: "Error",
+						message: "Cannot open " + path + ", no app associated with that extention"
+					});
+				}
 		}
 	}
 }
