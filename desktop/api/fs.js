@@ -50,7 +50,7 @@ api.fs = new function()
 			var results = data.getElementsByTagName('file');
 			api.fs.fileArray = new Array(99,99);
 			api.fs.fileArray[0] = new Object();
-			api.fs.fileArray[0].path = path;
+			api.fs.fileArray[0].path = object.path;
 			api.fs.fileArray[0].contents = results[0].firstChild.nodeValue;
 	        if(object.callback) { object.callback(api.fs.fileArray); }
 	        desktop.core.loadingIndicator(1);

@@ -16,6 +16,7 @@ dojo.declare(
 	[dijit._Widget, dijit._Templated, dijit._Container, dijit._Contained],
 {
 	path: "/",
+	extensions: [],
 	iconStyle: "list",
 	overflow: "scroll",
 	subdirs: true,
@@ -63,6 +64,28 @@ dojo.declare(
 			if(dirs.length == 0) this.path = "/";
 			else this.path = "/"+dirs.join("/")+"/";
 			this.refresh();
+		}
+	},
+	setExtension: function(type, parameter, extension)
+	{
+		this.extensions[this.extensions.length] = {type: type, parameter: parameter, extension: extension};
+	},
+	handleExtension: function(path)
+	{
+		api.console("filearea: extension handling...");
+		for(a=0;a<this.extensions.length;a++) {
+			var p = path.lastIndexOf(".");
+			p = path.slice(p);
+			api.console("extension: "+this.extensions[a].extension+"; p: "+p);
+			if(this.extensions[a].extension == p) {
+				api.console("filearea: found extension handler, calling it");
+				if(this.extensions[a].type == "function") {
+					this.extensions[a].parameter(path);
+				}
+				if(this.extensions[a].type == "application") {
+					desktop.app.launch(this.extensions[a].parameter, { path: path });
+				}
+			}
 		}
 	},
 	setPath: function(path)
@@ -121,6 +144,9 @@ dojo.declare(
 		{
 			if (this.isDir) {
 				this.getParent().setPath(this.label + "/");
+			}
+			else {
+				this.getParent().handleExtension(this.path);
 			}
 		}
 	},
