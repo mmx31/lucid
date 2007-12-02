@@ -19,10 +19,8 @@ dojo.declare(
 	iconStyle: "list",
 	overflow: "scroll",
 	subdirs: true,
+	textShadow: false,
 	templateString: "<div class='desktopFileArea' dojoAttachEvent='onclick:_onClick' dojoAttachPoint='focusNode,containerNode' style='overflow-x: hidden; overflow-y: ${overflow};'></div></div>",
-	postCreate: function() {
-		
-	},
 	refresh: function()
 	{
 		dojo.forEach(this.getChildren(), dojo.hitch(this, function(item){
@@ -33,11 +31,17 @@ dojo.declare(
 			callback: dojo.hitch(this, function(array)
 			{
 				dojo.forEach(array, dojo.hitch(this, function(item) {
+					if(desktop.config.filesystem.hideExt && !item.isDir)
+					{
+						var p = item.file.lastIndexOf(".");
+						item.file = item.file.substring(0, p);
+					}
 					this.addChild(new api.filearea._item({
 						label: item.file,
 						iconClass: (item.isDir ? "icon-32-places-folder" : "icon-32-mimetypes-text-x-generic"),
 						isDir: item.isDir,
-						path: this.path+item.file
+						path: this.path+item.file,
+						textshadow: this.textShadow
 					}));
 				}));
 			})
@@ -94,7 +98,15 @@ dojo.declare(
 	label: "file",
 	highlighted: false,
 	isDir: false,
+	textShadow: false,
 	templateString: "<div class='desktopFileItem' style='float: left; padding: 10px;' dojoAttachPoint='focusNode'><div class='desktopFileItemIcon ${iconClass}'></div><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px;' style='text-align: center;'><div class='desktopFileItemTextFront'>${label}</div><div class='desktopFileItemTextBack'>${label}</div></div></div>",
+	postCreate: function() {
+		if(!this.textshadow)
+		{
+			dojo.query(".desktopFileItemTextBack", this.domNode).style("display", "none");
+			dojo.query(".desktopFileItemTextFront", this.domNode).removeClass("desktopFileItemTextFront");
+		}
+	},
 	onClick: function()
 	{
 		this.getParent().onItem(this.path);

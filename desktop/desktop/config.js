@@ -116,5 +116,8 @@ desktop.config = {
 	window: {
 		constrain: false
 	},
-	crosstalkPing: 500
+	crosstalkPing: 500,
+	filesystem: {
+		hideExt: true
+	}
 }
