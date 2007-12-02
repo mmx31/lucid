@@ -92,6 +92,7 @@ if (isset($_POST['submit'])) {
     $writebuffer = $writebuffer."//database username\n\$db_username=\"${_POST['db_username']}\";\n";
     $writebuffer = $writebuffer."//database password\n\$db_password=\"${_POST['db_password']}\";\n";
     $writebuffer = $writebuffer."//database prefix\n\$db_prefix=\"${_POST['db_prefix']}\";\n";
+	$writebuffer = $writebuffer."//xsite enabled?(yes/no)\n\$xsite_status=\"${_POST['xsite']}\";\n";
     $writebuffer = $writebuffer."//Public registration enabled?(yes/no)\n\$conf_public=\"${_POST['public']}\";\n";
     $writebuffer = $writebuffer."//the secret word for encryption of passwords\n//NOTE: DO NOT CHANGE AFTER INSTALL! THIS WILL BREAK THE USER LOGIN PROCESS!!!\n";
     $writebuffer = $writebuffer."\$conf_secretword=\"$conf_secretword\";\n?>";
@@ -168,6 +169,7 @@ if (isset($_POST['submit'])) {
         $writebuffer = $writebuffer."//database username<br />\$db_username=\"${_POST['db_username']}\";<br />";
         $writebuffer = $writebuffer."//database password<br />\$db_password=\"${_POST['db_password']}\";<br />";
         $writebuffer = $writebuffer."//database prefix<br />\$db_prefix=\"${_POST['db_prefix']}\";<br />";
+		$writebuffer = $writebuffer."//xsite enabled?(yes/no)\n\$xsite_status=\"${_POST['xsite']}\";\n";
         $writebuffer = $writebuffer."//Public registration enabled?(yes/no)<br />\$conf_public=\"${_POST['public']}\";<br />";
         $writebuffer = $writebuffer."//the secret word for encryption of passwords<br />//NOTE: DO NOT CHANGE AFTER INSTALL! THIS WILL BREAK THE USER LOGIN PROCESS!!!<br />";
         $writebuffer = $writebuffer."\$conf_secretword=\"$conf_secretword\";<br />?>";     
@@ -215,19 +217,20 @@ if (isset($_POST['submit'])) {
         <center>
             <div style="width: 40%; border-width: 1px; border-color: black; border-style: solid; background: #FFFFFF; padding: 10px;">
                 <?php
-$ourFileName = "./backend/config.php";
-$ourFileHandle = fopen($ourFileName, 'w');
-fclose($ourFileHandle);
                     if(!is_writable("./backend/config.php")) {
                     echo "<span style='text-align: center; color: red;'>/backend/config.php is not writable. If you can't change it's permissions, you will need to copy and paste generated code into the file.</span>";
                     }
+					if (!function_exists('curl_init')) {
+					echo "<span style='text-align: center; color: red;'>cURL is not installed - crosssite communications have been disabled. Programs like the RSS Reader will be unable to function.</span>";
+					}
+
                 ?>
                 <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
                     <table style="border: 1px; border-style: dashed; border-color: #DDDDDD;" cellpadding="10">
 					       <tr>
                             <td class="table">Database Type:</td>
-                            <td class="table">MySQL<input type="radio" name="database" value="mysql" checked>&nbsp;&nbsp;TextDB:<input type="radio" name="database" value="textdb"></td>
-                            <td width="150" class="table"><p class="info">Choose to use MySQL or TextDB. We recommend MySQL for end-user environments.</p></td>
+                            <td class="table">MySQL<input type="radio" name="database" value="mysql" checked></td>
+                            <td width="150" class="table"><p class="info">Choose to use MySQL. We hope to support more databases soon.</p></td>
                       </tr>  
                         <tr>
                             <td class="table">Database prefix:</td>
@@ -274,7 +277,12 @@ fclose($ourFileHandle);
                               <td class="table">Yes:<input type="radio" name="public" value="yes" checked>&nbsp;&nbsp;No:<input type="radio" name="public" value="no"></td>
                               <td width="150" class="table"><p class="info">If set to 'no', users will not be able to register, and new accounts have to be made from the administrator panel. Usefull for busnesses or organizations.</p></td>
                         </tr>                         
-                        <tr>
+                          <tr>
+                              <td class="table">Allow crosssite communications:</td>
+                              <td class="table">Yes:<input type="radio" name="xsite" value="yes" <?php if (!function_exists('curl_init')) { echo("disabled=\"true\""); } else { echo("checked"); } ?>>&nbsp;&nbsp;No:<input type="radio" name="xsite" value="no" <?php if (!function_exists('curl_init')) { echo("checked"); } ?>></td>
+                              <td width="150" class="table"><p class="info">If set to 'no', users will not be able to use 3rd-party web services. Recommended to be set to yes. (requires cURL)</p></td>
+                        </tr>                         
+						<tr>
                             <td class="table">Fresh installation:</td>
                             <td class="table">Yes:<input type="radio" name="fresh" value="yes" checked>&nbsp;&nbsp;No:<input type="radio" name="fresh" value="no"></td>
                             <td width="150" class="table"><p class="info">If set to 'no', the script will not insert data into the database, or modify your existing crypt salt</p></td>

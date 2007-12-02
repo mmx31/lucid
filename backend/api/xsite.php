@@ -17,6 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+require("../config.php");
+if($xsite_status == "no") { die("<b>External Access is forbidden."); }
 session_start();
 if($_SESSION['userloggedin'] == TRUE)	//very important, make sure the user is logged in
 {										//maybe in the future add this in the permissions system
