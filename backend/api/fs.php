@@ -58,5 +58,19 @@ if($_GET['section'] == "io")
 				    	$dir = "../../files/".$_SESSION['username']."/$odir";
 					$file = file_put_contents($dir, $content);
 	}
+	if($_GET['action'] == "upload") {
+		if(!isset($_SESSION['userid'])) {
+			die("Access denied. Your session has expired.");
+		}
+		if(isset($_FILES['uploadedfile']['name'])) {
+			$target_path = '../../files/'.$_SESSION['username'].'/'.($_POST['uploadedir'] || "");
+			$target_path = $target_path . basename( $_FILES['uploadedfile']['name']); 
+			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
+			    echo "<textarea>{status: 'success', details: '" . $_FILES['uploadedfile']['name'] . "'}</textarea>";
+			} else{
+			    echo "<textarea>{status: 'failed', details: ''}</textarea>";
+			}
+		}
+	}
 }
 ?>
