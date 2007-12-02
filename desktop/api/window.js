@@ -742,6 +742,7 @@ api.window = function(params)
 	 */
 	this.destroy = function()
 	{
+		if(this.destroyed == true) return false;
 		dojo.style(this.body.domNode, "display", "none");
 		this.destroyed = true;
 		this.onDestroy();
