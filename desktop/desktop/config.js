@@ -120,7 +120,8 @@ desktop.config = {
 	filesystem: {
 		hideExt: true,
 		handlers: {
-			txt: null
+			txt: null,
+			folder: 10
 		}
 	}
 }
