@@ -106,7 +106,7 @@ api.fs = new function()
 	this.launchApp = function(path)
 	{
 		var l = path.lastIndexOf(".");
-		var ext = path.substr(l, -1);
+		var ext = path.substring(l+1, path.length);
 		if(ext == "desktop")
 		{
 			this.read({
