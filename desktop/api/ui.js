@@ -78,5 +78,6 @@ api.ui = new function() {
 		this.dialog.addChild(this.client);
 		
 		this.dialog.show();
+		this.dialog.startup();
 	}
 }
