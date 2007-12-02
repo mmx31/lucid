@@ -36,7 +36,8 @@ dojo.declare(
 					this.addChild(new api.filearea._item({
 						label: item.file,
 						iconClass: (item.isDir ? "icon-32-places-folder" : "icon-32-mimetypes-text-x-generic"),
-						isDir: item.isDir
+						isDir: item.isDir,
+						path: this.path+item.file
 					}));
 				}));
 			})
@@ -77,6 +78,11 @@ dojo.declare(
 				w._onIconClick();
 		}
 		else this.clearSelection();
+	},
+	onItem: function(path)
+	{
+		//this is a hook to use when an item is opened
+		alert("test")
 	}
 });
 
@@ -88,10 +94,10 @@ dojo.declare(
 	label: "file",
 	highlighted: false,
 	isDir: false,
-	templateString: "<div class='desktopFileItem' style='float: left; padding: 10px;' dojoAttachPoint='focusNode'><center><div class='desktopFileItemIcon ${iconClass}'></div></center><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px;' style='text-align: center;'>${label}</div></div>",
-	onClick: function(e)
+	templateString: "<div class='desktopFileItem' style='float: left; padding: 10px;' dojoAttachPoint='focusNode'><div class='desktopFileItemIcon ${iconClass}'></div><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px;' style='text-align: center;'><div class='desktopFileItemTextFront'>${label}</div><div class='desktopFileItemTextBack'>${label}</div></div></div>",
+	onClick: function()
 	{
-		
+		this.getParent().onItem(this.path);
 	},
 	_onIconClick: function(e) {
 		if(this.highlighted == false)
@@ -117,15 +123,13 @@ dojo.declare(
 		}
 	},
 	highlight: function() {
-		dojo.addClass(this.domNode, "desktopFileItemHighlight");
-		//this is temporary
-		dojo.style(this.domNode, "backgroundColor", desktop.config.wallpaper.color);
+		dojo.query(".desktopFileItemIcon", this.domNode).style("opacity", "0.8").addClass("desktopFileItemHighlight");
+		dojo.query(".desktopFileItemText", this.domNode).style("backgroundColor", desktop.config.wallpaper.color).addClass("desktopFileItemHighlight");
 		this.highlighted = true;
 	},
 	unhighlight: function() {
-		dojo.removeClass(this.domNode, "desktopFileItemHighlight");
-		//this is temporary
-		dojo.style(this.domNode, "backgroundColor", "transparent");
+		dojo.query(".desktopFileItemIcon", this.domNode).style("opacity", "1").removeClass("desktopFileItemHighlight");
+		dojo.query(".desktopFileItemText", this.domNode).style("backgroundColor", "transparent").removeClass("desktopFileItemHighlight");
 		this.highlighted = false;
 	}
 });

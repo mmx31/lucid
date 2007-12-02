@@ -127,3 +127,27 @@ height: 100%;
 .winhandle {
 	cursor: hand;
 }
+
+.desktopFileItemText { 
+	position: relative;
+	left: 0px;
+	top: 0px;
+	color: #666;
+}
+
+.desktopFileItemTextFront {
+	color: white;
+}
+.desktopFileItemTextBack {
+	z-index: -1;
+	color: black;
+	position: absolute;
+	left: 3px;
+	top: 1px;
+	color: #000;
+}
+
+.desktopFileItemIcon {
+	margin-left: auto;
+	margin-right: auto;
+}
