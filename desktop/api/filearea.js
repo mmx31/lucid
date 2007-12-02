@@ -19,7 +19,7 @@ dojo.declare(
 	iconStyle: "list",
 	overflow: "scroll",
 	subdirs: true,
-	templateString: "<div class='desktopFileArea' dojoAttachPoint='focusNode,containerNode' style='overflow-x: hidden; overflow-y: ${overflow};'></div>",
+	templateString: "<div class='desktopFileArea' dojoAttachEvent='onclick:_onClick' dojoAttachPoint='focusNode,containerNode' style='overflow-x: hidden; overflow-y: ${overflow};'></div></div>",
 	postCreate: function() {
 		
 	},
@@ -66,6 +66,17 @@ dojo.declare(
 			this.path = path;
 			this.refresh();
 		}
+	},
+	_onClick: function(e)
+	{
+		var w = dijit.getEnclosingWidget(e.target);
+		if (w.declaredClass == "api.filearea._item") {
+			if (dojo.hasClass(e, "desktopFileItemText")) 
+				w._onTextClick();
+			else 
+				w._onIconClick();
+		}
+		else this.clearSelection();
 	}
 });
 
@@ -77,7 +88,7 @@ dojo.declare(
 	label: "file",
 	highlighted: false,
 	isDir: false,
-	templateString: "<div class='desktopFileItem' style='float: left; padding: 10px;' dojoAttachPoint='focusNode'><center><div class='desktopFileItemIcon ${iconClass}' dojoAttachEvent='onclick:_onIconClick'></div></center><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px;' dojoAttachEvent='onclick:_onTextClick' style='text-align: center;'>${label}</div></div>",
+	templateString: "<div class='desktopFileItem' style='float: left; padding: 10px;' dojoAttachPoint='focusNode'><center><div class='desktopFileItemIcon ${iconClass}'></div></center><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px;' style='text-align: center;'>${label}</div></div>",
 	onClick: function(e)
 	{
 		
