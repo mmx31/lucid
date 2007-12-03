@@ -63,9 +63,8 @@ dojo.declare(
 			if(this.path.charAt(this.path.length-1) == "/") dirs.pop();
 			if(this.path.charAt(0) == "/") dirs.shift();
 			dirs.pop();
-			if(dirs.length == 0) this.path = "/";
-			else this.path = "/"+dirs.join("/")+"/";
-			this.refresh();
+			if(dirs.length == 0) this.setPath("/");
+			else this.setPath("/"+dirs.join("/")+"/");
 		}
 	},
 	setPath: function(path)
@@ -73,6 +72,7 @@ dojo.declare(
 		if (this.subdirs) {
 			this.path = path;
 			this.refresh();
+			this.onPathChange(path);
 		}
 		else api.fs.launchApp(path, true);
 	},
@@ -96,6 +96,10 @@ dojo.declare(
 		//this is a hook to use when an item is opened
 		//this defaults to opening the file
 		api.fs.launchApp(path);
+	},
+	onPathChange: function(path)
+	{
+		//this is a hook to use when the path changes.
 	}
 });
 
