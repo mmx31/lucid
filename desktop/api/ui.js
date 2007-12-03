@@ -24,7 +24,7 @@ api.ui = new function() {
 		this.dialog.width = "300px";
 		this.dialog.height = "200px";
 		this.dialog.setBodyWidget("LayoutContainer", {sizerWidth: 7, orientation: "horizontal"});		
-		
+		this.file = new api.filearea({onItem: dojo.hitch(this, function(path) { object.callback(path); this.dialog.destroy(); })}); //Make the fileArea
 		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
 		var layout = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
 		var button = new dijit.form.Button({
@@ -47,7 +47,7 @@ api.ui = new function() {
 			label: "Refresh"
 		});
 		this.toolbar.addChild(button);
-		layout.addChild(this.toolbar);
+		this.dialog.addChild(this.toolbar);
 		
 		
 		this.client = new dijit.layout.SplitContainer({sizeMin: 10, sizeShare: 20, layoutAlign: "client"});
@@ -71,7 +71,6 @@ api.ui = new function() {
 		
 		this.client.addChild(this.pane);
 		
-		this.file = new api.filearea({onItem: object.callback}); //Make the fileArea
 		layout.addChild(this.file);
 		this.client.addChild(layout);
 		
