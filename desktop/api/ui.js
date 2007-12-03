@@ -21,8 +21,8 @@ api.ui = new function() {
 		dojo.require("dijit.Menu");
 		this.dialog = new api.window(); //Make the window
 		this.dialog.title = object.title;
-		this.dialog.width = "300px";
-		this.dialog.height = "200px";
+		this.dialog.width = "500px";
+		this.dialog.height = "300px";
 		this.dialog.setBodyWidget("LayoutContainer", {sizerWidth: 7, orientation: "horizontal"});		
 		this.file = new api.filearea({onItem: dojo.hitch(this, function(path) { object.callback(path); this.dialog.destroy(); })}); //Make the fileArea
 		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
@@ -53,6 +53,8 @@ api.ui = new function() {
 		this.client = new dijit.layout.SplitContainer({sizeMin: 10, sizeShare: 20, layoutAlign: "client"});
 		
 		this.pane = new dijit.layout.ContentPane({}, document.createElement("div"));
+		this.details = new dijit.layout.ContentPane({layoutAlign: "bottom"}, document.createElement("div"));
+		
 		var menu = new dijit.Menu({});
 		menu.domNode.style.width="100%";
 		var item = new dijit.MenuItem({label: "Home",
@@ -68,15 +70,18 @@ api.ui = new function() {
 			onClick: dojo.hitch(this.file, function() { this.setPath("/Desktop/"); })});
 		menu.addChild(item);
 		this.pane.setContent(menu.domNode);
-		
+		this.details.setContent("Viewing \"/\"");
+		this.file.onPathChange = dojo.hitch(this, function(path) { this.details.setContent("Viewing \""+path+"\""); });
+		this.file.onHighlight = dojo.hitch(this, function(path) { this.details.setContent("Viewing \""+path+"\""); });
 		this.client.addChild(this.pane);
 		
 		layout.addChild(this.file);
 		this.client.addChild(layout);
 		
 		this.dialog.addChild(this.client);
-		
+		this.dialog.addChild(this.details);
 		this.dialog.show();
+		this.file.refresh();
 		this.dialog.startup();
 	}
 }

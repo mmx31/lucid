@@ -97,6 +97,10 @@ dojo.declare(
 		//this defaults to opening the file
 		api.fs.launchApp(path);
 	},
+	onHighlight: function(path)
+	{
+		//hook for highlight
+	},
 	onPathChange: function(path)
 	{
 		//this is a hook to use when the path changes.
@@ -129,6 +133,7 @@ dojo.declare(
 		{
 			this.getParent().clearSelection();
 			this.highlight();
+			this.getParent().onHighlight(this.path);
 		}
 		else
 		{
