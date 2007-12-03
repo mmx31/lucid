@@ -74,3 +74,13 @@ api.toaster = function(message)
 {
 	dojo.event.topic.publish("psychdesktop", message);
 }
+
+api.addDojoCss = function(path)
+{
+	var element = document.createElement("link");
+	element.rel = "stylesheet";
+	element.type = "text/css";
+	element.media = "screen";
+	element.href = "./dojo/"+path;
+	document.getElementsByTagName("head")[0].appendChild(element);
+}
