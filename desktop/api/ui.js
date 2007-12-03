@@ -72,7 +72,7 @@ api.ui = new function() {
 		this.pane.setContent(menu.domNode);
 		this.details.setContent("Viewing \"/\"");
 		this.file.onPathChange = dojo.hitch(this, function(path) { this.details.setContent("Viewing \""+path+"\""); });
-		this.file.onHighlight = dojo.hitch(this, function(path) { this.details.setContent("Viewing \""+path+"\""); });
+		this.file.onHighlight = dojo.hitch(this, function(path) { this.details.setContent("Selected \""+path+"\""); });
 		this.client.addChild(this.pane);
 		
 		layout.addChild(this.file);
