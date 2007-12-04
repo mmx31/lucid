@@ -60,7 +60,7 @@ if($_GET['section'] == "io")
 	}
 	if($_GET['action'] == "upload") {
 		if(!isset($_SESSION['userid'])) {
-			die("Access denied. Your session has expired.");
+			die("<textarea>{status: 'failed', details: 'Session is dead.'}</textarea>");
 		}
 		if(isset($_FILES['uploadedfile']['name'])) {
 			$target_path = '../../files/'.$_SESSION['username'].'/'.$_GET['path'];
@@ -70,6 +70,15 @@ if($_GET['section'] == "io")
 			} else{
 			    echo "<textarea>{status: 'failed', details: ''}</textarea>";
 			}
+		}
+		else {
+			echo "/*";
+			foreach($_FILES as $file)
+			{
+				echo $file['name'] . "\n";
+			}
+			echo "*/";
+			die("<textarea>{status: 'failed', details: 'File not uploaded'}</textarea>");
 		}
 	}
 }
