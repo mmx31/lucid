@@ -48,9 +48,15 @@ api.fs = new function()
 		handleAs: "xml",
         load: function(data, ioArgs) {
 			var results = data.getElementsByTagName('file');
+			try {
+			content = results[0].firstChild.nodeValue;
+			}
+			catch(e) {
+			content = "";
+			}
 			var file = {
 				path: object.path,
-				contents: results[0].firstChild.nodeValue
+				contents: content
 			};
 	        if(object.callback) { object.callback(file); }
 		},
