@@ -21,7 +21,12 @@ dojo.declare(
 	overflow: "scroll",
 	subdirs: true,
 	textShadow: false,
-	templateString: "<div class='desktopFileArea' dojoAttachEvent='onclick:_onClick' dojoAttachPoint='focusNode,containerNode' style='overflow-x: hidden; overflow-y: ${overflow};'></div></div>",
+	templateString: "<div class='desktopFileArea' dojoAttachEvent='onclick:_onClick, oncontextmenu:_onRightClick' dojoAttachPoint='focusNode,containerNode' style='overflow-x: hidden; overflow-y: ${overflow};'></div></div>",
+	postCreate: function() {
+		this.menu = new dijit.Menu({});
+		this.menu.addChild(new dijit.MenuItem({label: "Create Folder", iconClass: "icon-16-actions-folder-new", onClick: dojo.hitch(this, this._makeFolder)}));
+		this.menu.addChild(new dijit.MenuItem({label: "Create File", iconClass: "icon-16-actions-folder-new", onClick: dojo.hitch(this, this._makeFile)}));
+	},
 	refresh: function()
 	{
 		dojo.forEach(this.getChildren(), dojo.hitch(this, function(item){
@@ -51,6 +56,20 @@ dojo.declare(
 				}));
 			})
 		});
+	},
+	_makeFolder: function() {
+		api.fs.mkdir({
+			path: this.path+"/New Folder",
+			callback: dojo.hitch(this, this.refresh)
+		});
+		//TODO: this should numerate them if it exists allready, for example New Folder 1, New Folder 2, etc.
+	},
+	_makeFile: function() {
+		api.fs.write({
+			path: this.path+"/New File.txt",
+			callback: dojo.hitch(this, this.refresh)
+		});
+		//TODO: this should numerate them if it exists allready, for example New File 1, New File 2, etc.
 	},
 	clearSelection: function()
 	{
@@ -92,6 +111,18 @@ dojo.declare(
 				this.clearSelection();
 		}
 		else this.clearSelection();
+	},
+	_onRightClick: function(e)
+	{
+		var w = dijit.getEnclosingWidget(e.target);
+		if(w.declaredClass == "api.filearea._item")
+		{
+			w.menu._openMyself(e);
+		}
+		else
+		{
+			this.menu._openMyself(e);
+		}
 	},
 	onItem: function(path)
 	{
@@ -183,7 +214,7 @@ dojo.declare(
 		this.highlighted = false;
 	},
 	startup: function() {
-		this.menu = new dijit.Menu({targetNodeIds:[this.id]});
+		this.menu = new dijit.Menu({});
        	this.menu.addChild(new dijit.MenuItem({label: "Open", iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
        	this.menu.addChild(new dijit.MenuItem({label: "Delete", iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, this._delete_file)}));
 	}

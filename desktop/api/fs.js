@@ -66,6 +66,11 @@ api.fs = new function()
 			path: object.path,
 			content: object.content
 		},
+		dsktp_callback: object.callback,
+		load: function(data, ioArgs)
+		{
+			ioArgs.args.dsktp_callback(data);
+		},
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
@@ -76,6 +81,11 @@ api.fs = new function()
         url: desktop.core.backend("api.fs.io.createDirectory"),
 		content: {
 			path: object.path
+		},
+		dsktp_callback: object.callback,
+		load: function(data, ioArgs)
+		{
+			ioArgs.args.dsktp_callback(data);
 		},
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
