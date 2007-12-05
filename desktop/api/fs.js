@@ -88,6 +88,10 @@ api.fs = new function()
 		content: {
 			path: object.path
 		},
+		dsktp_callback: object.callback,
+		load: function(data, ioArgs) {
+			ioArgs.args.dsktp_callback(data);
+		},
         error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
@@ -95,12 +99,16 @@ api.fs = new function()
    this.rmdir = function(object)
     {
         dojo.xhrPost({
-        url: desktop.core.backend("api.fs.io.removeDir"),
-		content: {
-			path: object.path
-		},
-        error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
-        mimetype: "text/html"
+	        url: desktop.core.backend("api.fs.io.removeDir"),
+			content: {
+				path: object.path
+			},
+			dsktp_callback: object.callback,
+			load: function(data, ioArgs) {
+				ioArgs.args.dsktp_callback(data);
+			},
+	        error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
+	        mimetype: "text/html"
         });
     }
 	this.launchApp = function(path, dir)

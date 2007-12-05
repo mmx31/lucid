@@ -6,16 +6,19 @@ if($_GET['section'] == "io")
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$_SESSION['username']."/$odir";
 					mkdir($dir);
+					echo "0";
 	}
 		if ($_GET['action'] == "removeFile") {
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$_SESSION['username']."/$odir";
 					unlink($dir);
+					echo "0";
 	}
 		if ($_GET['action'] == "removeDir") {
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$_SESSION['username']."/$odir";
 					rmdir($dir);
+					echo "0";
 	}
 		if ($_GET['action'] == "getFolder") {
 					$odir = $_POST['path'];
@@ -57,6 +60,7 @@ if($_GET['section'] == "io")
 					$odir = $_POST['path'];
 				    	$dir = "../../files/".$_SESSION['username']."/$odir";
 					$file = file_put_contents($dir, $content);
+					echo "0";
 	}
 	if($_GET['action'] == "upload") {
 		if(!isset($_SESSION['userid'])) {
@@ -68,7 +72,7 @@ if($_GET['section'] == "io")
 			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
 			    echo "<textarea>{status: 'success', details: '" . $_FILES['uploadedfile']['name'] . "'}</textarea>";
 			} else{
-			    echo "<textarea>{status: 'failed', details: ''}</textarea>";
+			    echo "<textarea>{status: 'failed', details: 'Contact administrator; could not write to disk'}</textarea>";
 			}
 		}
 		else {

@@ -39,13 +39,15 @@ dojo.declare(
 						item.file = item.file.substring(0, p);
 					}
 					else { item.fullFile = item.file; }
-					this.addChild(new api.filearea._item({
+					var wid = new api.filearea._item({
 						label: item.file,
 						iconClass: (item.isDir ? "icon-32-places-folder" : "icon-32-mimetypes-text-x-generic"),
 						isDir: item.isDir,
 						path: this.path+item.fullFile,
 						textshadow: this.textShadow
-					}));
+					});
+					this.addChild(wid);
+					wid.startup();
 				}));
 			})
 		});
@@ -104,6 +106,12 @@ dojo.declare(
 	onPathChange: function(path)
 	{
 		//this is a hook to use when the path changes.
+	},
+	startup: function()
+	{
+		dojo.forEach(this.getChildren(), function(item){
+			item.startup(); console.log(item);
+		});
 	}
 });
 
@@ -124,6 +132,12 @@ dojo.declare(
 			dojo.query(".desktopFileItemTextFront", this.domNode).removeClass("desktopFileItemTextFront").addClass("desktopFileItemText");
 		}
 	},
+	_delete_file: function(e)
+	{
+		var parent = this.getParent();
+		if(this.isDir === true) api.fs.rmdir({path: this.path, callback: dojo.hitch(parent, parent.refresh)});
+		else api.fs.rm({path: this.path, callback: dojo.hitch(parent, parent.refresh)});
+	},
 	onClick: function()
 	{
 		this.getParent().onItem(this.path);
@@ -137,12 +151,15 @@ dojo.declare(
 		}
 		else
 		{
-			if (this.isDir) {
-				this.getParent().setPath(this.label + "/");
-			}
-			else {
-				this.getParent().onItem(this.path);
-			}
+			this._onOpen();
+		}
+	},
+	_onOpen: function() {
+		if (this.isDir) {
+			this.getParent().setPath(this.label + "/");
+		}
+		else {
+			this.getParent().onItem(this.path);
 		}
 	},
 	_onTextClick: function(e) {
@@ -164,5 +181,10 @@ dojo.declare(
 		dojo.query(".desktopFileItemIcon", this.domNode).style("opacity", "1").removeClass("desktopFileItemHighlight");
 		dojo.query(".desktopFileItemText", this.domNode).style("backgroundColor", "transparent").removeClass("desktopFileItemHighlight");
 		this.highlighted = false;
+	},
+	startup: function() {
+		this.menu = new dijit.Menu({targetNodeIds:[this.id]});
+       	this.menu.addChild(new dijit.MenuItem({label: "Open", iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
+       	this.menu.addChild(new dijit.MenuItem({label: "Delete", iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, this._delete_file)}));
 	}
 });
