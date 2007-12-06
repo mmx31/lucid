@@ -189,7 +189,7 @@ dojo.declare(
 	},
 	_onOpen: function() {
 		if (this.isDir) {
-			this.getParent().setPath(this.label + "/");
+			this.getParent().setPath(this.path + "/");
 		}
 		else {
 			this.getParent().onItem(this.path);
