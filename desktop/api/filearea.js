@@ -117,7 +117,7 @@ dojo.declare(
 		var w = dijit.getEnclosingWidget(e.target);
 		if(w.declaredClass == "api.filearea._item")
 		{
-			w._contextMouse();
+			w.menu._contextMouse();
 			w.menu._openMyself(e);
 		}
 		else
