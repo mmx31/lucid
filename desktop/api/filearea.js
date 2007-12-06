@@ -25,7 +25,7 @@ dojo.declare(
 	postCreate: function() {
 		this.menu = new dijit.Menu({});
 		this.menu.addChild(new dijit.MenuItem({label: "Create Folder", iconClass: "icon-16-actions-folder-new", onClick: dojo.hitch(this, this._makeFolder)}));
-		this.menu.addChild(new dijit.MenuItem({label: "Create File", iconClass: "icon-16-actions-folder-new", onClick: dojo.hitch(this, this._makeFile)}));
+		this.menu.addChild(new dijit.MenuItem({label: "Create File", iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, this._makeFile)}));
 	},
 	refresh: function()
 	{
@@ -117,10 +117,12 @@ dojo.declare(
 		var w = dijit.getEnclosingWidget(e.target);
 		if(w.declaredClass == "api.filearea._item")
 		{
+			w._contextMouse();
 			w.menu._openMyself(e);
 		}
 		else
 		{
+			this.menu._contextMouse();
 			this.menu._openMyself(e);
 		}
 	},
