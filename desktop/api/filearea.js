@@ -28,6 +28,7 @@ dojo.declare(
 		this.menu = new dijit.Menu({});
 		this.menu.addChild(new dijit.MenuItem({label: "Create Folder", iconClass: "icon-16-actions-folder-new", onClick: dojo.hitch(this, this._makeFolder)}));
 		this.menu.addChild(new dijit.MenuItem({label: "Create File", iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, this._makeFile)}));
+		this.menu.addChild(new dijit.MenuItem({label: "Refresh", iconClass: "icon-16-actions-view-refresh", onClick: dojo.hitch(this, this.refresh)}));
 	},
 	refresh: function()
 	{
