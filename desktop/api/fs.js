@@ -54,6 +54,8 @@ api.fs = new function()
 			content = content.replace(/&lt;/gi, "<");
 			content = content.replace(/&gt;/gi, ">");
 			content = content.replace(/&amp;/gi, "&");
+			content = content.replace(/&apos;/gi, "'");
+			content = content.replace(/&quot;/gi, "\"");
 			}
 			catch(e) {
 			content = "";
@@ -74,6 +76,8 @@ api.fs = new function()
 		object.content = object.content.replace(/</gi, "&lt;");
 		object.content = object.content.replace(/>/gi, "&gt;");
 		object.content = object.content.replace(/&/gi, "&amp;");
+		object.content = object.content.replace(/'/gi, "&apos;");
+		object.content = object.content.replace(/"/gi, "&quot;");
 		}
 		catch(e) {
 		object.content = "";

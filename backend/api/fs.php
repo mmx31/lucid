@@ -61,6 +61,8 @@ $_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop "l33t" ha
 					$file = str_replace("<", "&lt;", $file);
 					$file = str_replace(">", "&gt;", $file);
 					$file = str_replace("&", "&amp;", $file);
+					$file = str_replace("'", "&apos;", $file);
+					$file = str_replace("\"", "&quot;", $file);
 					$output = "<" . "?xml version='1.0' encoding='utf-8' ?" .">\r\n" . "<getFileResponse path=\"" . $_REQUEST['path'] . "\">";
 					$output .=  "\r\n" . '<file>' . $file . '</file>';
 					$output .= '</getFileResponse>';
@@ -72,6 +74,8 @@ $_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop "l33t" ha
 					$content = str_replace("&lt;", "<", $content);
 					$content = str_replace("&gt;", ">", $content);
 					$content = str_replace("&amp;", "&", $content);
+					$content = str_replace("&apos;", "'", $content);
+					$content = str_replace("&quot;", "\"", $content);
 					$odir = $_POST['path'];
 				    	$dir = "../../files/".$_SESSION['username']."/$odir";
 					$file = file_put_contents($dir, $content);
