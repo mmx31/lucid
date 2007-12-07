@@ -66,7 +66,8 @@ var bootstrap = {
         if (ready) bootstrap.startup();
         else bootstrap._indicator.update({
             indeterminate: false,
-            progress: modCount
+            progress: modCount,
+			maximum: bootstrap.modules.length
         });
 
     },
@@ -100,9 +101,9 @@ var bootstrap = {
         dojo.require("dijit.ProgressBar");
         bootstrap._loading = dojo.doc.createElement("div");
         bootstrap._loading.innerHTML = "Loading...";
-        bootstrap._loading.style.position = "absolute";
         var d = dijit.getViewport();
 		var style = {
+			position: "absolute",
 			top: (d.h / 3) + "px",
 	        left: (d.w / 3) + "px",
 	        height: (d.h / 3) + "px",
