@@ -32,6 +32,7 @@ dojo.require("dojo.io.script");
 */
 var bootstrap = {
     modules: [],
+	loaded: false,
     require: function(libraryName) {
         var path = libraryName.split(".").join("/");
 		var base = libraryName.split(".")[0];
@@ -63,12 +64,17 @@ var bootstrap = {
             else modCount++;
 
         }
-        if (ready) bootstrap.startup();
-        else bootstrap._indicator.update({
-            indeterminate: false,
-            progress: modCount,
-			maximum: bootstrap.modules.length
-        });
+        if (ready && !bootstrap.loaded) {
+			bootstrap.loaded = true;
+			bootstrap.startup();
+		}
+		else {
+			bootstrap._indicator.update({
+				indeterminate: false,
+				progress: modCount,
+				maximum: bootstrap.modules.length
+			});
+		}
 
     },
     startup: function()
