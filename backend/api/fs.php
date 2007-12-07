@@ -57,6 +57,9 @@ if($_GET['section'] == "io")
 					$odir = $_POST['path'];
 				    	$dir = "../../files/".$_SESSION['username']."/$odir";
 					$file = file_get_contents($dir);
+					$file = str_replace("<", "&lt;", $file);
+					$file = str_replace(">", "&gt;", $file);
+					$file = str_replace("&", "&amp;", $file);
 					$output = "<" . "?xml version='1.0' encoding='utf-8' ?" .">\r\n" . "<getFileResponse path=\"" . $_REQUEST['path'] . "\">";
 					$output .=  "\r\n" . '<file>' . $file . '</file>';
 					$output .= '</getFileResponse>';
@@ -65,6 +68,9 @@ if($_GET['section'] == "io")
 	}
 		if ($_GET['action'] == "writeFile") {
 					$content = $_POST['content'];
+					$content = str_replace("&lt;", "<", $content);
+					$content = str_replace("&gt;", ">", $content);
+					$content = str_replace("&amp;", "&", $content);
 					$odir = $_POST['path'];
 				    	$dir = "../../files/".$_SESSION['username']."/$odir";
 					$file = file_put_contents($dir, $content);

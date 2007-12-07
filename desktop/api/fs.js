@@ -50,6 +50,9 @@ api.fs = new function()
 			var results = data.getElementsByTagName('file');
 			try {
 			content = results[0].firstChild.nodeValue;
+			content = content.replace(/&lt;/gi, "<");
+			content = content.replace(/&gt;/gi, ">");
+			content = content.replace(/&amp;/gi, "&");
 			}
 			catch(e) {
 			content = "";
@@ -66,6 +69,9 @@ api.fs = new function()
     }
    this.write = function(object)
    {
+		object.content = object.content.replace(/</gi, "&lt;");
+		object.content = object.content.replace(/>/gi, "&gt;");
+		object.content = object.content.replace(/&/gi, "&amp;");
         dojo.xhrPost({
         url: desktop.core.backend("api.fs.io.writeFile"),
 		content: {
