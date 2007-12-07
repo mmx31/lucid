@@ -60,13 +60,9 @@ api.ui = new function() {
 		});
 		this.toolbar.addChild(button);
 		this.dialog.addChild(this.toolbar);
-		
-		
-		this.client = new dijit.layout.SplitContainer({sizeMin: 30, sizeShare: 40, layoutAlign: "client"});
-		
+		this.client = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 70, layoutAlign: "client"});
 		this.pane = new dijit.layout.ContentPane({}, document.createElement("div"));
 		this.details = new dijit.layout.ContentPane({layoutAlign: "bottom"}, document.createElement("div"));
-		
 		var menu = new dijit.Menu({});
 		menu.domNode.style.width="100%";
 		var item = new dijit.MenuItem({label: "Home",
@@ -82,14 +78,22 @@ api.ui = new function() {
 			onClick: dojo.hitch(this.file, function() { this.setPath("/Desktop/"); })});
 		menu.addChild(item);
 		this.pane.setContent(menu.domNode);
-		this.details.setContent("Viewing \"psychfs:/home/\"");
-		this.file.onPathChange = dojo.hitch(this, function(path) { this.details.setContent("Viewing \"psychfs:/home"+path+"\""); });
-		this.file.onHighlight = dojo.hitch(this, function(path) { this.details.setContent("Selected \"psychfs:/home"+path+"\""); });
+        this.address = new dijit.form.TextBox({value: "/"});
+		this.button = new dijit.form.Button({label: "Load/Save", onClick: dojo.hitch(this, function() { p = this.address.getValue(); object.callback(p); this.dialog.destroy(); })});
+		var all = document.createElement("div");
+		var line = document.createElement("div");
+        var p = document.createElement("span");
+		p.innerHTML = "Address:";
+		line.appendChild(p);
+		line.appendChild(this.address.domNode);
+		line.appendChild(this.button.domNode);
+		all.appendChild(line);
+		this.details.setContent(all);
+		this.file.onPathChange = dojo.hitch(this, function(path) { this.address.setValue(path); });
+		this.file.onHighlight = dojo.hitch(this, function(path) { this.address.setValue(path); });
 		this.client.addChild(this.pane);
-		
 		layout.addChild(this.file);
 		this.client.addChild(layout);
-		
 		this.dialog.addChild(this.client);
 		this.dialog.addChild(this.details);
 		this.dialog.show();
