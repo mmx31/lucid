@@ -140,7 +140,6 @@ var bootstrap = {
 		bootstrap.require("api.window");
 		bootstrap.require("api.xsite");
         bootstrap.require('desktop.admin');
-        bootstrap.require('desktop.api');
         bootstrap.require('desktop.app');
         bootstrap.require('desktop.config');
         bootstrap.require('desktop.console');
