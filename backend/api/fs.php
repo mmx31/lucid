@@ -2,7 +2,6 @@
 session_start();
 if($_GET['section'] == "io")
 {
-if($_POST
 	if ($_GET['action'] == "createDirectory") {
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$_SESSION['username']."/$odir";
