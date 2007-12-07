@@ -2,6 +2,7 @@
 session_start();
 if($_GET['section'] == "io")
 {
+$_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop "l33t" hax.
 	if ($_GET['action'] == "createDirectory") {
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$_SESSION['username']."/$odir";
