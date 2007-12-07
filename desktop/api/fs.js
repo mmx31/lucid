@@ -81,7 +81,36 @@ api.fs = new function()
         mimetype: "text/html"
         });
     }
-   this.mkdir = function(object)
+	this.move = function(object)
+    {
+		if(object.newname) {
+		newpath_ = object.path.lastIndexOf("/");
+		newpath = object.path.substring(0, newpath_);
+		}
+		else {
+		newpath = object.newpath;
+		}
+        dojo.xhrPost({
+        url: desktop.core.backend("api.fs.io.renameFile"),
+		content: {
+			path: object.path,
+			newpath: newpath
+		},
+		dsktp_callback: object.callback,
+		load: function(data, ioArgs)
+		{
+			ioArgs.args.dsktp_callback(data);
+		},
+        error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
+        mimetype: "text/html"
+        });
+    }
+	this.rename = function(object)
+	{
+		api.console("renaming a file is the same as moving it, technically. - try not to use api.fs.rename.");
+		this.move(object);
+	}
+    this.mkdir = function(object)
     {
         dojo.xhrPost({
         url: desktop.core.backend("api.fs.io.createDirectory"),

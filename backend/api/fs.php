@@ -2,6 +2,7 @@
 session_start();
 if($_GET['section'] == "io")
 {
+if($_POST
 	if ($_GET['action'] == "createDirectory") {
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$_SESSION['username']."/$odir";
@@ -18,6 +19,14 @@ if($_GET['section'] == "io")
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$_SESSION['username']."/$odir";
 					rmdir($dir);
+					echo "0";
+	}
+		if ($_GET['action'] == "renameFile") {
+					$file = $_POST['path'];
+					$newfile = $_POST['newpath'];
+				    $dir = "../../files/".$_SESSION['username']."/$file";
+					$dir2 = "../../files/".$_SESSION['username']."/$newfile";
+					rename($dir, $dir2);
 					echo "0";
 	}
 		if ($_GET['action'] == "getFolder") {
