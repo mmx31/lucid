@@ -16,8 +16,6 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-var desktop = {};
-desktop.modules = {};
 dojo.require("dojo.io.script");
 /* 
 * Package: bootstrap
@@ -36,6 +34,9 @@ var bootstrap = {
     modules: [],
     require: function(libraryName) {
         var path = libraryName.split(".").join("/");
+		var base = libraryName.split(".")[0];
+		if(typeof window[base] == "undefined")
+			window[base] = {}; //make the root object
         dojo.io.script.get({
             url: "./" + path + ".js",
             preventCache: false,
