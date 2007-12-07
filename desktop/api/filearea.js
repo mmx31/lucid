@@ -8,6 +8,8 @@
 dojo.provide("api.filearea");
 dojo.provide("api.filearea._item");
 dojo.require("dijit._Widget");
+dojo.require("dijit.form.TextBox");
+dojo.require("dijit.form.Button");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
 
@@ -171,6 +173,51 @@ dojo.declare(
 		if(this.isDir === true) api.fs.rmdir({path: this.path, callback: dojo.hitch(parent, parent.refresh)});
 		else api.fs.rm({path: this.path, callback: dojo.hitch(parent, parent.refresh)});
 	},
+	_replace_file: function(e)
+	{
+		this.parent = this.getParent();
+        this.window = new api.window({
+            title: "Move File",
+              width: "300px",
+         height: "200px"
+		});
+		this.form = {
+            currentname: new dijit.form.TextBox({value: this.path, disabled: true, enabled: false}),
+            newname: new dijit.form.TextBox({value: this.path})
+		};
+		var line = document.createElement("div");
+        var p = document.createElement("span");
+		p.innerHTML = "Current Location:";
+		line.appendChild(p);
+		line.appendChild(this.form.currentname.domNode);
+		var line2 = document.createElement("div");
+        var p = document.createElement("span");
+		p.innerHTML = "New Location:";
+		line2.appendChild(p);
+		line2.appendChild(this.form.newname.domNode);
+		var button = new dijit.form.Button({
+          label: "Move",
+		  onClick: dojo.hitch(this, function() {
+			this.window.destroy();
+			blah = this.form.newname.getValue();
+			api.fs.move({path: this.path, newpath: blah});
+			this.parent.refresh();
+		  })
+		});
+		var button2 = new dijit.form.Button({
+          label: "Cancel",
+		  onClick: dojo.hitch(this, function() {
+			this.window.destroy();
+		  })
+		});
+		this.window.showClose = false;
+		this.window.show();
+		this.window.body.domNode.appendChild(line);
+		this.window.body.domNode.appendChild(line2);
+		this.window.body.domNode.appendChild(button.domNode);
+		this.window.body.domNode.appendChild(button2.domNode);
+		this.window.startup();
+		},
 	onClick: function()
 	{
 		this.getParent().onItem(this.path);
@@ -218,6 +265,7 @@ dojo.declare(
 	startup: function() {
 		this.menu = new dijit.Menu({});
        	this.menu.addChild(new dijit.MenuItem({label: "Open", iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
-       	this.menu.addChild(new dijit.MenuItem({label: "Delete", iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, this._delete_file)}));
+       	this.menu.addChild(new dijit.MenuItem({label: "Move", iconClass: "icon-16-actions-edit-find-replace", onClick: dojo.hitch(this, this._replace_file)}));
+		this.menu.addChild(new dijit.MenuItem({label: "Delete", iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, this._delete_file)}));
 	}
 });

@@ -7,11 +7,23 @@
 api.ui = new function() {
 	this.alert = function(object)
 	{
+		this.alertDialog(object);
+		api.console("api.ui.alert is depreciated and will expire in v1.0! use api.ui.alertDialog instead!");
+	}
+	this.alertDialog = function(object)
+	{
 		dojo.require("dijit.Dialog");
 		var div = dojo.doc.createElement("div");
 		div.innerHTML = "<center> "+object.message+" </center>";
 		var box = new dijit.Dialog({title: object.title}, div);
 		box.show();
+		if(object.callback) {
+			dojo.connect(box, 'onUnload', object.callback);
+		}
+	}
+	this.inputDialog = function(object)
+	{
+		api.console("api.ui.inputDialog is not implamented yet.");
 	}
 	this.fileDialog = function(object)
 	{
@@ -50,7 +62,7 @@ api.ui = new function() {
 		this.dialog.addChild(this.toolbar);
 		
 		
-		this.client = new dijit.layout.SplitContainer({sizeMin: 10, sizeShare: 20, layoutAlign: "client"});
+		this.client = new dijit.layout.SplitContainer({sizeMin: 30, sizeShare: 40, layoutAlign: "client"});
 		
 		this.pane = new dijit.layout.ContentPane({}, document.createElement("div"));
 		this.details = new dijit.layout.ContentPane({layoutAlign: "bottom"}, document.createElement("div"));
@@ -70,9 +82,9 @@ api.ui = new function() {
 			onClick: dojo.hitch(this.file, function() { this.setPath("/Desktop/"); })});
 		menu.addChild(item);
 		this.pane.setContent(menu.domNode);
-		this.details.setContent("Viewing \"/\"");
-		this.file.onPathChange = dojo.hitch(this, function(path) { this.details.setContent("Viewing \""+path+"\""); });
-		this.file.onHighlight = dojo.hitch(this, function(path) { this.details.setContent("Selected \""+path+"\""); });
+		this.details.setContent("Viewing \"psychfs:/home/\"");
+		this.file.onPathChange = dojo.hitch(this, function(path) { this.details.setContent("Viewing \"psychfs:/home"+path+"\""); });
+		this.file.onHighlight = dojo.hitch(this, function(path) { this.details.setContent("Selected \"psychfs:/home"+path+"\""); });
 		this.client.addChild(this.pane);
 		
 		layout.addChild(this.file);
