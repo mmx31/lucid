@@ -73,6 +73,7 @@ var bootstrap = {
     },
     startup: function()
     {
+		bootstrap._loading.parentNode.removeChild(bootstrap._loading);
         dojo.forEach(bootstrap.modules, function(module) {
 			if(eval("typeof(" + module + ".draw) == 'function'"))
 			{
