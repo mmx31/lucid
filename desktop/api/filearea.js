@@ -41,17 +41,19 @@ dojo.declare(
 			callback: dojo.hitch(this, function(array)
 			{
 				dojo.forEach(array, dojo.hitch(this, function(item) {
+					var p = item.file.lastIndexOf(".");
+					item.ext = item.file.substring(p+1, item.file.length);
 					if(desktop.config.filesystem.hideExt && !item.isDir)
 					{
 						item.fullFile = item.file;
-						var p = item.file.lastIndexOf(".");
 						item.file = item.file.substring(0, p);
 					}
 					else { item.fullFile = item.file; }
+					var icon = desktop.config.filesystem.icons[item.ext.toLowerCase()];
 					var wid = new api.filearea._item({
 						label: item.file,
 						fileName: item.fullFile,
-						iconClass: (item.isDir ? "icon-32-places-folder" : "icon-32-mimetypes-text-x-generic"),
+						iconClass: (item.isDir ? "icon-32-places-folder" : (icon || "icon-32-mimetypes-text-x-generic")),
 						isDir: item.isDir,
 						path: this.path+item.fullFile,
 						textshadow: this.textShadow

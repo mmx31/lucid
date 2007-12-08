@@ -123,6 +123,29 @@ desktop.config = {
 		handlers: {
 			txt: 4,
 			folder: 10
+		},
+		icons: {
+			txt: "icon-32-mimetypes-text-x-generic",
+			desktop: "icon-32-mimetypes-application-x-executable",
+			mp3: "icon-32-mimetypes-audio-x-generic",
+			wav: "icon-32-mimetypes-audio-x-generic",
+			wma: "icon-32-mimetypes-audio-x-generic",
+			jpg: "icon-32-mimetypes-image-x-generic",
+			png: "icon-32-mimetypes-image-x-generic",
+			gif: "icon-32-mimetypes-image-x-generic",
+			xcf: "icon-32-mimetypes-image-x-generic",
+			zip: "icon-32-mimetypes-package-x-generic",
+			gz: "icon-32-mimetypes-package-x-generic",
+			tar: "icon-32-mimetypes-package-x-generic",
+			rar: "icon-32-mimetypes-package-x-generic",
+			sh: "icon-32-mimetypes-text-x-script",
+			js: "icon-32-mimetypes-text-x-script",
+			bin: "icon-32-mimetypes-text-x-script",
+			mpg: "icon-32-mimetypes-video-x-generic",
+			wmv: "icon-32-mimetypes-video-x-generic",
+			mpeg: "icon-32-mimetypes-video-x-generic",
+			avi: "icon-32-mimetypes-video-x-generic",
+			mpg: "icon-32-mimetypes-video-x-generic"
 		}
 	}
 }
