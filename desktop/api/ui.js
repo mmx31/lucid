@@ -33,6 +33,7 @@ api.ui = new function() {
 		this.text = new dijit.form.TextBox({value: ""});
 		all = document.createElement("div");
 		this.blah = new dijit.form.Button({label: "OK", onClick: dojo.hitch(this, function() { a = this.text.getValue(); object.callback(a); this.dialog.destroy(); })});
+		this.ablah = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(this, function() { this.dialog.destroy(); })});
 		var line = document.createElement("div");
         var p = document.createElement("span");
 		var q = document.createElement("span");
@@ -42,6 +43,7 @@ api.ui = new function() {
 		all.style.textAlign = "center";
 		all.appendChild(this.text.domNode);
 		all.appendChild(this.blah.domNode);
+		all.appendChild(this.ablah.domNode);
 		this.details.setContent(all);
 		this.dialog.addChild(this.details);
 		this.dialog.showClose = false;
