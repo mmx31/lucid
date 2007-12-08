@@ -23,7 +23,30 @@ api.ui = new function() {
 	}
 	this.inputDialog = function(object)
 	{
-		api.console("api.ui.inputDialog is not implamented yet.");
+		//api.ui.inputDialog({title: "UI Test", message: "What is your name?", callback: api.console});
+		this.dialog = new api.window();
+		this.dialog.title = object.title;	
+		this.dialog.setBodyWidget("LayoutContainer", {sizerWidth: 7, orientation: "horizontal"});		
+		this.dialog.width = "400px";
+		this.dialog.height = "150px";
+		this.details = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
+		this.text = new dijit.form.TextBox({value: ""});
+		all = document.createElement("div");
+		this.blah = new dijit.form.Button({label: "OK", onClick: dojo.hitch(this, function() { a = this.text.getValue(); object.callback(a); this.dialog.destroy(); })});
+		var line = document.createElement("div");
+        var p = document.createElement("span");
+		var q = document.createElement("span");
+		p.innerHTML = "<center>"+object.message+"</center>";
+		line.appendChild(p);
+		all.appendChild(line);
+		all.style.textAlign = "center";
+		all.appendChild(this.text.domNode);
+		all.appendChild(this.blah.domNode);
+		this.details.setContent(all);
+		this.dialog.addChild(this.details);
+		this.dialog.showClose = false;
+		this.dialog.show();
+		this.dialog.startup();
 	}
 	this.fileDialog = function(object)
 	{
@@ -96,6 +119,7 @@ api.ui = new function() {
 		this.client.addChild(layout);
 		this.dialog.addChild(this.client);
 		this.dialog.addChild(this.details);
+		this.dialog.showClose = false;
 		this.dialog.show();
 		this.file.refresh();
 		this.dialog.startup();
