@@ -2,36 +2,38 @@
 session_start();
 if($_GET['section'] == "io")
 {
+require("../config.php");
 $_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop "l33t" hax.
+$blah = crypt($_SESSION['username'], $conf_secretword);
 	if ($_GET['action'] == "createDirectory") {
 					$odir = $_POST['path'];
-				    $dir = "../../files/".$_SESSION['username']."/$odir";
+				    $dir = "../../files/".$blah."/$odir";
 					mkdir($dir);
 					echo "0";
 	}
 		if ($_GET['action'] == "removeFile") {
 					$odir = $_POST['path'];
-				    $dir = "../../files/".$_SESSION['username']."/$odir";
+				    $dir = "../../files/".$blah."/$odir";
 					unlink($dir);
 					echo "0";
 	}
 		if ($_GET['action'] == "removeDir") {
 					$odir = $_POST['path'];
-				    $dir = "../../files/".$_SESSION['username']."/$odir";
+				    $dir = "../../files/".$blah."/$odir";
 					rmdir($dir);
 					echo "0";
 	}
 		if ($_GET['action'] == "renameFile") {
 					$file = $_POST['path'];
 					$newfile = $_POST['newpath'];
-				    $dir = "../../files/".$_SESSION['username']."/$file";
-					$dir2 = "../../files/".$_SESSION['username']."/$newfile";
+				    $dir = "../../files/".$blah."/$file";
+					$dir2 = "../../files/".$blah."/$newfile";
 					rename($dir, $dir2);
 					echo "0";
 	}
 		if ($_GET['action'] == "getFolder") {
 					$odir = $_POST['path'];
-				    $dir = opendir("../../files/".$_SESSION['username']."/$odir");
+				    $dir = opendir("../../files/".$blah."/$odir");
 					if(!$dir){
 								die();
 					} else {
@@ -41,7 +43,7 @@ $_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop "l33t" ha
 								continue;
 							} else {
 								$t = strtolower($file);
-								if(is_dir("../../files/".$_SESSION['username']."/$odir" . $file)){
+								if(is_dir("../../files/".$blah."/$odir" . $file)){
 									$type = 'folder';
 								} else {
 									$type = 'file';
@@ -56,7 +58,7 @@ $_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop "l33t" ha
 	}
 		if ($_GET['action'] == "getFile") {
 					$odir = $_POST['path'];
-				    	$dir = "../../files/".$_SESSION['username']."/$odir";
+				    	$dir = "../../files/".$blah."/$odir";
 					$file = file_get_contents($dir);
 					$file = str_replace("<", "&lt;", $file);
 					$file = str_replace(">", "&gt;", $file);
@@ -77,7 +79,7 @@ $_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop "l33t" ha
 					$content = str_replace("&apos;", "'", $content);
 					$content = str_replace("&quot;", "\"", $content);
 					$odir = $_POST['path'];
-				    	$dir = "../../files/".$_SESSION['username']."/$odir";
+				    	$dir = "../../files/".$blah."/$odir";
 					$file = file_put_contents($dir, $content);
 					echo "0";
 	}
@@ -86,7 +88,7 @@ $_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop "l33t" ha
 			die("<textarea>{status: 'failed', details: 'Session is dead.'}</textarea>");
 		}
 		if(isset($_FILES['uploadedfile']['name'])) {
-			$target_path = '../../files/'.$_SESSION['username'].'/'.$_GET['path'];
+			$target_path = '../../files/'.$blah.'/'.$_GET['path'];
 			$target_path = $target_path . basename( $_FILES['uploadedfile']['name']); 
 			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
 			    echo "<textarea>{status: 'success', details: '" . $_FILES['uploadedfile']['name'] . "'}</textarea>";

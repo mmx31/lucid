@@ -62,12 +62,14 @@
 		}
 		function make_userdir()
 		{
-			if(!is_dir("../../files/".$_SESSION['username'])){
+			require("../config.php");
+			$blah = crypt($_SESSION['username'], $conf_secretword);
+			if(!is_dir("../../files/".$blah)){
 				//Create user environment for first time
-				mkdir("../../files/".$this->username);
-				mkdir("../../files/".$this->username."/Documents");
-				mkdir("../../files/".$this->username."/Desktop");
-				$ourFileName = "../../files/".$this->username."/Desktop/welcome.txt";
+				mkdir("../../files/".$blah);
+				mkdir("../../files/".$blah."/Documents");
+				mkdir("../../files/".$blah."/Desktop");
+				$ourFileName = "../../files/".$blah."/Desktop/welcome.txt";
 				$ourFileHandle = fopen($ourFileName, 'w') or die("1");
 				fwrite($ourFileHandle, "Welcome to Psych Desktop, ".$this->username."\r\n Your new account is installed and ready.");
 				fclose($ourFileHandle);
