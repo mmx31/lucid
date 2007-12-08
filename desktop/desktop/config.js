@@ -43,6 +43,7 @@ desktop.config = {
 				for(var a=0;a<desktop.config.startupapps.length;a++) {
 					desktop.app.launch(desktop.config.startupapps[a]);
 				}
+				desktop.theme.set(desktop.config.theme);
 			}
 			if(cback) cback();
 		},
