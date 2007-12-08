@@ -33,7 +33,7 @@ api.ui = new function() {
 		this.text = new dijit.form.TextBox({value: ""});
 		all = document.createElement("div");
 		this.blah = new dijit.form.Button({label: "OK", onClick: dojo.hitch(this, function() { a = this.text.getValue(); object.callback(a); this.dialog.destroy(); })});
-		this.ablah = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(this, function() { this.dialog.destroy(); })});
+		this.ablah = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(this, function() { object.callback(false); this.dialog.destroy(); })});
 		var line = document.createElement("div");
         var p = document.createElement("span");
 		var q = document.createElement("span");
@@ -105,6 +105,7 @@ api.ui = new function() {
 		this.pane.setContent(menu.domNode);
         this.address = new dijit.form.TextBox({value: "/"});
 		this.button = new dijit.form.Button({label: "Load/Save", onClick: dojo.hitch(this, function() { p = this.address.getValue(); object.callback(p); this.dialog.destroy(); })});
+		this.ablah = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(this, function() { object.callback(false); this.dialog.destroy(); })});
 		var all = document.createElement("div");
 		var line = document.createElement("div");
         var p = document.createElement("span");
@@ -112,6 +113,7 @@ api.ui = new function() {
 		line.appendChild(p);
 		line.appendChild(this.address.domNode);
 		line.appendChild(this.button.domNode);
+		line.appendChild(this.ablah.domNode);
 		all.appendChild(line);
 		this.details.setContent(all);
 		this.file.onPathChange = dojo.hitch(this, function(path) { this.address.setValue(path); });
