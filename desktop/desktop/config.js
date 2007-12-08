@@ -104,7 +104,9 @@ desktop.config = {
 		hideExt: true,
 		handlers: {
 			txt: 4,
-			folder: 10
+			folder: 10,
+			htm: 6,
+			html: 6
 		},
 		icons: {
 			txt: "icon-32-mimetypes-text-x-generic",
