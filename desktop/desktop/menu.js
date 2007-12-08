@@ -139,6 +139,7 @@ desktop.menu = new function()
 					id: "sysmenu"
 				}, dojo.byId("sysmenu"));
 				this._menu = menu;
+				menu.addChild(new dijit.MenuItem({label:"Programs", disabled:true}));
 				//menu.domNode.id="sysmenu";
 				var cats = new Object();
 				for(item in data)
@@ -168,6 +169,7 @@ desktop.menu = new function()
 					category.popup = catMenu;
 					menu.addChild(category);
 				}
+				menu.addChild(new dijit.MenuItem({label:"System", disabled:true}));
 				menu.addChild(new dijit.MenuItem({
 					label: "Log Out", 
 					iconClass: "icon-16-actions-system-log-out",

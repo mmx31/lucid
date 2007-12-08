@@ -16,6 +16,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+desktop.reload = false;
 desktop.isLoaded = false;
 /*
  * Package: core
@@ -74,6 +75,7 @@ desktop.core = new function()
 		*/
 		this.logout = function(sync)
 		{
+			if(desktop.reload) { return false; }
 			dojo.disconnect(this.beforeUnloadEvent);
 			if(typeof sync == "undefined") sync=false;
 			desktop.config.save(sync);

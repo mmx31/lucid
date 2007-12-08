@@ -18,7 +18,7 @@ dojo.declare(
 	[dijit._Widget, dijit._Templated, dijit._Container, dijit._Contained],
 {
 	path: "/",
-	extensions: [],
+	operation: [],
 	iconStyle: "list",
 	overflow: "scroll",
 	subdirs: true,
@@ -26,6 +26,7 @@ dojo.declare(
 	templateString: "<div class='desktopFileArea' dojoAttachEvent='onclick:_onClick, oncontextmenu:_onRightClick' dojoAttachPoint='focusNode,containerNode' style='overflow-x: hidden; overflow-y: ${overflow};'></div></div>",
 	postCreate: function() {
 		this.menu = new dijit.Menu({});
+		this.menu.addChild(new dijit.MenuItem({label: "File Operations", disabled:true}));
 		this.menu.addChild(new dijit.MenuItem({label: "Create Folder", iconClass: "icon-16-actions-folder-new", onClick: dojo.hitch(this, this._makeFolder)}));
 		this.menu.addChild(new dijit.MenuItem({label: "Create File", iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, this._makeFile)}));
 		this.menu.addChild(new dijit.MenuItem({label: "Refresh", iconClass: "icon-16-actions-view-refresh", onClick: dojo.hitch(this, this.refresh)}));

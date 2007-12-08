@@ -108,6 +108,7 @@ desktop.console = new function()
 		},
 		reload: function(params)
 		{
+			desktop.reload = true;
 			window.onbeforeunload = null;
 			window.location = window.location;
 		},
