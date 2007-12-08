@@ -49,6 +49,7 @@ dojo.declare(
 					else { item.fullFile = item.file; }
 					var wid = new api.filearea._item({
 						label: item.file,
+						fileName: item.fullFile,
 						iconClass: (item.isDir ? "icon-32-places-folder" : "icon-32-mimetypes-text-x-generic"),
 						isDir: item.isDir,
 						path: this.path+item.fullFile,
@@ -174,6 +175,11 @@ dojo.declare(
 		if(this.isDir === true) api.fs.rmdir({path: this.path, callback: dojo.hitch(parent, parent.refresh)});
 		else api.fs.rm({path: this.path, callback: dojo.hitch(parent, parent.refresh)});
 	},
+	_rename_file: function(e)
+	{
+		this.parent = this.getParent();
+		api.ui.inputDialog({title: "Rename File/Folder", message: "Rename file/folder (currently \""+this.fileName+"\") to:", callback: dojo.hitch(this, function(newv) { api.fs.rename({path: this.path, newname: newv}); this.parent.refresh(); })});
+	},
 	_replace_file: function(e)
 	{
 		this.parent = this.getParent();
@@ -267,6 +273,7 @@ dojo.declare(
 		this.menu = new dijit.Menu({});
        	this.menu.addChild(new dijit.MenuItem({label: "Open", iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
        	this.menu.addChild(new dijit.MenuItem({label: "Move", iconClass: "icon-16-actions-edit-find-replace", onClick: dojo.hitch(this, this._replace_file)}));
+		this.menu.addChild(new dijit.MenuItem({label: "Rename", iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, this._rename_file)}));
 		this.menu.addChild(new dijit.MenuItem({label: "Delete", iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, this._delete_file)}));
 	}
 });

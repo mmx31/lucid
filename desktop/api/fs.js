@@ -102,6 +102,7 @@ api.fs = new function()
 		if(object.newname) {
 		newpath_ = object.path.lastIndexOf("/");
 		newpath = object.path.substring(0, newpath_);
+		newpath = newpath + "/" + object.newname;
 		}
 		else {
 		newpath = object.newpath;
