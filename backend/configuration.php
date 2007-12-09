@@ -8,7 +8,7 @@
 		"host" => "localhost"
 	);
 	$GLOBALS['conf'] = Array(
-		"salt" => "25735449d4c6aefa4119e32afebd47af",
+		"salt" => "c6fef296483fd326eb21182c87854f80",
 		"public" => "yes"
 	);
 ?>
