@@ -1,11 +1,12 @@
 <?php
+	error_reporting(0);
     $act = $_GET['action'];
 	if($act == "installadmin")
 	{
 		require("../backend/config.php");
 		echo("{");
 		echo("\"Establishing connection to database...\":");
-		mysql_connect($db_host, $db_username, $db_password) or die('<span style="color: red;">Error connecting to MySQL server: ' . mysql_error() . '</span></div></center></body></html>');
+		mysql_connect($db_host, $db_username, $db_password) or die("\"...fail: Error connecting to MySQL server. Check username and password correct.\"}");	
 		mysql_select_db($db_name) or die('<span style="color: red;">Error selecting MySQL database: ' . mysql_error() . '</span></div></center></body></html>');
 		mysql_query("TRUNCATE TABLE `${db_prefix}users`;");
 		mysql_query("ALTER TABLE `${db_prefix}users` AUTO_INCREMENT = 1;");
@@ -69,11 +70,11 @@
 		echo("{");
 		require("../backend/config.php");	
 		echo("\"Establishing connection to database...\":");
-		echo("\"...done\",");
-		mysql_connect($db_host, $db_username, $db_password) or die('<span style="color: red;">Error connecting to MySQL server: ' . mysql_error() . '</span></div></center></body></html>');
+		mysql_connect($db_host, $db_username, $db_password) or die("\"...fail: Error connecting to MySQL server. Check username and password correct.\"}");	
 		mysql_select_db($db_name) or die('<span style="color: red;">Error selecting MySQL database: ' . mysql_error() . '</span></div></center></body></html>');
 		mysql_query("TRUNCATE TABLE `${db_prefix}apps`;");
 		mysql_query("ALTER TABLE `${db_prefix}apps` AUTO_INCREMENT = 1;");
+		echo("\"...done\",");
 		echo("\"Initalizing application installer...\":");
 		require("../backend/lib.xml.php");
 		$xml = new Xml; 

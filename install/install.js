@@ -106,9 +106,15 @@ install = new function() {
 	{
 		form = dijit.byId("form").getValues();
 		if (form.type == "reset") {
-			this.tasks.apps(function(){
+			this.tasks.apps(function(umm){
+				if(umm) {
 				dijit.byId("next").setDisabled(false);
 				install.updateBar(100);
+				}
+				else {
+				dijit.byId("next").setDisabled(true);
+				install.updateBar(0);
+				}
 			});
 		}
 		else {
@@ -116,9 +122,15 @@ install = new function() {
 				install.updateBar(33);
 				install.tasks.apps(function(){
 					install.updateBar(66);
-					install.tasks.admin(form, function(){
+					install.tasks.admin(form, function(umm){
+						if(umm) {
 						dijit.byId("next").setDisabled(false);
 						install.updateBar(100);
+						}
+						else {
+						dijit.byId("next").setDisabled(true);
+						install.updateBar(0);
+						}
 					});
 				});
 			});
