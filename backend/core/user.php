@@ -94,8 +94,8 @@
 		}
 		if($_GET['action'] == "public")
 		{
-			require("../config.php");
-			echo $conf_public;
+			require("../configuration.php");
+			echo $GLOBALS['conf']['public'];
 		}
 	}
 ?>

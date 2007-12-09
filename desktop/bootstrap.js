@@ -16,7 +16,6 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-dojo.require("dojo.io.script");
 /* 
 * Package: bootstrap
 * 
@@ -105,6 +104,7 @@ var bootstrap = {
 
     },
     load: function() {
+		dojo.require("dojo.io.script");
         dojo.require("dijit.ProgressBar");
         bootstrap._loading = dojo.doc.createElement("div");
         bootstrap._loading.innerHTML = "Loading...";
@@ -170,7 +170,24 @@ var bootstrap = {
             progress: 0
         });
 
-    }
-
+    },
+	checkLoggedIn: function()
+	{
+		dojo.xhrGet({
+			url: "../backend/core/bootstrap.php?section=check&action=loggedin",
+			load: function(data, ioArgs) {
+				if(data == "0")
+				{
+					bootstrap.load();
+				}
+				else
+				{
+					window.close();
+					document.body.innerHTML = "Not Logged In";
+					//Maybe one day we should implement a login form
+				}
+			}
+		});
+	}
 };
-dojo.addOnLoad(bootstrap.load);
+dojo.addOnLoad(bootstrap.checkLoggedIn);

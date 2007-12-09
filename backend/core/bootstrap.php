@@ -16,26 +16,20 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	*/
-	session_start();
-	require("../configuration.php");
-	require("../models/user.php");
-	if($_SESSION['userlevel'] == "admin")
+*/
+if (session_id() == "") session_start(); // if no active session we start a new one
+if($_GET['section'] == "check")
+{
+	if($_GET['action'] == "loggedin")
 	{
-		if($_GET['section'] == "users")
+		if($_SESSION['userloggedin'] == true)
 		{
-			if($_GET['action'] == "list")
-			{
-				$p = $User->all();
-				$pl = count($p)-1;
-				echo "[";
-				foreach($p as $d => $v)
-				{
-					echo $v->make_json();
-					if($d < $pl) { echo ",\n"; }
-				}
-				echo "]";
-			}
+			echo "0";
+		}
+		else
+		{
+			echo "1";
 		}
 	}
+}
 ?>
