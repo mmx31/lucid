@@ -1,6 +1,6 @@
 <?php
 	require("../backend/configuration.php");
-	error_reporting(0);
+	//error_reporting(0);
     $act = $_GET['action'];
 	if($act == "installadmin")
 	{
@@ -41,7 +41,7 @@
 		echo("\"...done\",");
 		echo("\"Saving new configuration...\":");
 		$writebuffer  = "<" . "?php\n";
-		$writebuffer .= "\t$" . "_GLOBALS['db'] = Array(\n";
+		$writebuffer .= "\t$" . "GLOBALS['db'] = Array(\n";
 		$writebuffer .= "\t\t\"type\" => \"" . $db_type . "\",\n";
 		$writebuffer .= "\t\t\"username\" => \"". $db_username . "\",\n";
 		$writebuffer .= "\t\t\"password\" => \"". $db_password . "\",\n";
@@ -49,7 +49,7 @@
 		$writebuffer .= "\t\t\"prefix\" => \"". $db_prefix . "\",\n";
 		$writebuffer .= "\t\t\"host\" => \"". $db_host . "\"\n";
 		$writebuffer .= "\t);\n";
-		$writebuffer .= "\t$" . "_GLOBALS['conf'] = Array(\n";
+		$writebuffer .= "\t$" . "GLOBALS['conf'] = Array(\n";
 		$writebuffer .= "\t\t\"salt\" => \"" . $conf_secretword . "\",\n";
 		$writebuffer .= "\t\t\"public\" => \"yes\"\n";
 		$writebuffer .= "\t);\n";

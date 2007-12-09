@@ -1,6 +1,6 @@
 <?php
 	$GLOBALS['db'] = Array(
-		"type" => "mysql",
+		"type" => "mySQL",
 		"username" => "mysql",
 		"password" => "mysql",
 		"database" => "desktop",
@@ -8,7 +8,7 @@
 		"host" => "localhost"
 	);
 	$GLOBALS['conf'] = Array(
-		"salt" => "89d87958a43efcc3584704b3f3a93d09",
+		"salt" => "25735449d4c6aefa4119e32afebd47af",
 		"public" => "yes"
 	);
 ?>
