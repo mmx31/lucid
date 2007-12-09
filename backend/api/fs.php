@@ -2,9 +2,8 @@
 session_start();
 if($_GET['section'] == "io")
 {
-require("../config.php");
-$_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop "l33t" hax.
-$blah = $_SESSION['username'];
+	$_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop "l33t" hax.
+	$blah = $_SESSION['username'];
 	if ($_GET['action'] == "createDirectory") {
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$blah."/$odir";
