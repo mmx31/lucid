@@ -84,31 +84,6 @@ install = new function() {
 			});
 		}
 	}
-	this.appInstall = function()
-	{
-			dojo.xhrGet({
-				url: "./backend.php?action=installprograms",
-				load: function(data, args){
-					var html = "<ul>";
-					var ready = true;
-					for (key in data) {
-						html += "<li>" + key.replace("../", "") + ": ";
-						if (data[key] == "...done") 
-							html += "<span style='color: green'>";
-						else {
-							html += "<span style='color: red'>";
-							ready = false;
-						}
-						html += data[key] + "</span></li>";
-					}
-					html += "</ul>";
-					dojo.byId("installStatus").innerHTML = html;
-					dojo.byId("taskList").innerHTML = "Finished install";
-					dijit.byId("next").setDisabled(!ready);
-				},
-				handleAs: "json"
-			});
-	}
 	this.onTypeRadioClick = function(e) {
 		if(!this.checked) {
 			this.setChecked(true);
@@ -131,8 +106,23 @@ install = new function() {
 	this.doInstall = function()
 	{
 		form = dijit.byId("form").getValues();
-		if(form.type=="reset") this.tasks.apps(function() {
-			dijit.byId("next").setDisabled(false);
+		if (form.type == "reset") {
+			this.updateBar(0);
+			this.tasks.apps(function(){
+				dijit.byId("next").setDisabled(false);
+				install.updateBar(100);
+			});
+		}
+		else {
+			//TODO: install
+		}
+	},
+	this.updateBar = function(percent)
+	{
+		dijit.byId("progressBar").update({
+			indeterminate: false,
+			maximum: 100,
+			progress: percent
 		});
 	}
 	this.tasks = {
@@ -154,11 +144,14 @@ install = new function() {
 						html += data[key] + "</span></li>";
 					}
 					html += "</ul>";
-					dojo.byId("installStatus").innerHTML = html;
+					dojo.byId("taskList").innerHTML = html;
 					args.callback();
 				},
 				handleAs: "json"
 			});
+		},
+		database: function(callback) {
+			
 		}
 	}
 }
