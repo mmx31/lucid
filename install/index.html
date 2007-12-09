@@ -20,31 +20,58 @@
 				<div dojoType="dijit.layout.ContentPane" title="installation type">
 					<div class="title">What type of installation do you want?</div>
 					<input dojoType="dijit.form.RadioButton" id="installtype-new" type="radio" name="type" value="clean" />
-					<b>I want to do a clean installation</b>
+					<label for="installtype-new"><b>I want to do a clean installation</b></label>
 					<p>Do a new installation, and create a new admin user</p>
 					
 					<input dojoType="dijit.form.RadioButton" id="installtype-cms" type="radio" name="type" value="CMS" disabled="true" />
-					<b>I want to do a clean installation, but intergrate it with a CMS</b>
+					<label for="installtype-cms"><b>I want to do a clean installation, but intergrate it with a CMS</b></label>
 					<p>Do a new installation, then configure it to intergrate with a user table from a CMS</p>
 					<!-- We should support drupal, joomla/mambo, phpnuke, and some others -->
 					
 					<input dojoType="dijit.form.RadioButton" id="installtype-reset" type="radio" name="type" value="reset" />
-					<b>I want to update my existing installation</b>
+					<label for="installtype-reset"><b>I want to update my existing installation</b></label>
 					<p>Keeps your settings and users, but re-installs apps and other things</p>
 				</div>
 				<div dojoType="dijit.layout.ContentPane" title="Database">
 					<div class="title">Database Settings</div>
 					<br />
 					Database Backend:
-					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="mySQL" /> mySQL</div>
-					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="mySQL" disabled="true" /> mySQLi</div>
-					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="SQLite" disabled="true" /> SQLite</div>
-					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="msSQL" disabled="true" /> Microsoft SQL Server</div>
-					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="pgSQL" disabled="true" /> PostgreSQL</div>
-					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="ibase" disabled="true" /> iBase</div>
-					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="fbSQL" disabled="true" /> FastBase SQL</div>
-					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="oci8" disabled="true" /> Oracle DB (versions 7-10)</div>
-					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="querysim" disabled="true" /> QuerySim</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" id="db_type_mysql" value="mySQL" /> 
+						<label for="db_type_mysql"> mySQL</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="mySQLi" id="db_type_mysqli" disabled="true" />
+						<label for="db_type_mysqli"> mySQLi</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="SQLite" id="db_type_sqlite" disabled="true" />
+						<label for="db_type_sqlite"> SQLite</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="msSQL" id="db_type_mssql" disabled="true" />
+						<label for="db_type_mssql"> Microsoft SQL Server</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="pgSQL" id="db_type_pgsql" disabled="true" />
+						<label for="db_type_pgsql"> PostgreSQL</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="ibase" id="db_type_ibase" disabled="true" />
+						<label for="db_type_ibase"> iBase</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="fbSQL" id="db_type_fbsql" disabled="true" />
+						<label for="db_type_fbsql"> FastBase SQL</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="oci8" id="db_type_oci8" disabled="true" />
+						<label for="db_type_oci8"> Oracle DB (versions 7-10)</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="querysim" id="db_type_querysim" disabled="true" />
+						<label for="db_type_querysim"> QuerySim</label>
+					</div>
 					<br />
 					Database Name:&nbsp;
 					<input dojoType="dijit.form.TextBox" name="db_name" type="text" />
