@@ -27,11 +27,7 @@ install = new function() {
 		if(page.title == "Installing")
 		{
 			dijit.byId("previous").setDisabled(true);
-<<<<<<< .mine
 			install.doInstall();
-=======
-			install.appInstall();
->>>>>>> .r651
 		}
 	}
 	this.onLoad = function() {
