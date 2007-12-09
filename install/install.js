@@ -147,6 +147,7 @@ install = new function() {
 					dojo.byId("taskList").innerHTML = html;
 					args.callback();
 				},
+				callback: callback,
 				handleAs: "json"
 			});
 		},
