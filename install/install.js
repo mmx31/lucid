@@ -144,7 +144,7 @@ install = new function() {
 						html += data[key] + "</span></li>";
 					}
 					html += "</ul>";
-					dojo.byId("taskList").innerHTML = html;
+					dojo.byId("taskList").innerHTML += html;
 					args.callback();
 				},
 				callback: callback,
