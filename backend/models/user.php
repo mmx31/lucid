@@ -25,8 +25,7 @@
 			$line = $this->filter("username", $user);
 			if($line != FALSE)
 			{
-				require("../config.php");
-				$pass = crypt($pass, $conf_secretword);
+				$pass = crypt($pass, $GLOBALS['conf']['salt']);
 				if($line[0]->password == $pass)
 				{
 					return $line[0];
@@ -62,8 +61,7 @@
 		}
 		function make_userdir()
 		{
-			require("../config.php");
-			$blah = crypt($_SESSION['username'], $conf_secretword);
+			$blah = $_SESSION['username'];
 			if(!is_dir("../../files/".$blah)){
 				//Create user environment for first time
 				mkdir("../../files/".$blah);
@@ -77,8 +75,11 @@
 		}
 		function set_password($pass)
 		{
-			require("../config.php");
-			$this->password = crypt($pass, $conf_secretword);
+			$this->password = crypt($pass, $GLOBALS['conf']['salt']);
+		}
+		function crypt_password()
+		{
+			$this->password = crypt($this->password, $GLOBALS['conf']['salt']);
 		}
 		function generate_password()
 		{

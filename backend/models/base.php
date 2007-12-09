@@ -6,11 +6,10 @@
 			var $id;
 			function get($id)
 			{
-				require("./../config.php");
 				$tablename = $this->_get_tablename();
-				$link = mysql_connect($db_host, $db_username, $db_password)
+				$link = mysql_connect($_GLOBALS['db']['host'], $_GLOBALS['db']['username'], $_GLOBALS['db']['password'])
 				   or die('Could not connect: ' . mysql_error());
-				mysql_select_db($db_name) or die('Could not select database');
+				mysql_select_db($_GLOBALS['db']['database']) or die('Could not select database');
                                 if(!is_numeric($id))
                                 {
                                     $id = "'" . mysql_real_escape_string($id) . "'"; 
@@ -34,11 +33,10 @@
 			}
 			function filter($feild, $value)
 			{
-				require("./../config.php");
 				$tablename = $this->_get_tablename();
-				$link = mysql_connect($db_host, $db_username, $db_password)
+				$link = mysql_connect($_GLOBALS['db']['host'], $_GLOBALS['db']['username'], $_GLOBALS['db']['password'])
 				   or die('Could not connect: ' . mysql_error());
-				mysql_select_db($db_name) or die('Could not select database');
+				mysql_select_db($_GLOBALS['db']['database']) or die('Could not select database');
 				if(is_array($feild) && is_array($value))
 				{
 					$query = "SELECT * FROM ${tablename} WHERE ";
@@ -69,11 +67,10 @@
 			}
 			function all()
 			{
-				require("./../config.php");
 				$tablename = $this->_get_tablename();
-				$link = mysql_connect($db_host, $db_username, $db_password)
+				$link = mysql_connect($_GLOBALS['db']['host'], $_GLOBALS['db']['username'], $_GLOBALS['db']['password'])
 				   or die('Could not connect: ' . mysql_error());
-				mysql_select_db($db_name) or die('Could not select database');
+				mysql_select_db($_GLOBALS['db']['database']) or die('Could not select database');
 				$result = mysql_query("SELECT * FROM ${tablename}") or die('Query failed: ' . mysql_error());
 				$list = Array();
 				while($line = mysql_fetch_array($result, MYSQL_ASSOC))
@@ -86,10 +83,9 @@
 			}
 			function save()
 			{
-				require("./../config.php");
-				$link = mysql_connect($db_host, $db_username, $db_password)
+				$link = mysql_connect($_GLOBALS['db']['host'], $_GLOBALS['db']['username'], $_GLOBALS['db']['password'])
 				   or die('Could not connect: ' . mysql_error());
-				mysql_select_db($db_name) or die('Could not select database');
+				mysql_select_db($_GLOBALS['db']['database']) or die('Could not select database');
                                 $query = $this->_make_mysql_query($this->_get_tablename(), ($this->id ? "update" : "insert"));
 				mysql_query($query) or die($query . '\nQuery failed: ' . mysql_error());
 				if(!isset($this->id)) { $this->id = mysql_insert_id(); }
@@ -97,7 +93,6 @@
 			}		
 			function _get_tablename()
 			{
-				require("./../config.php");
 				if(isset($this->_tablename))
 				{
 					$tablename=$this->_tablename;
@@ -106,6 +101,7 @@
 				{
 					$tablename=strtolower(get_class($this));
 				}
+				$db_prefix = $_GLOBALS['db']['prefix'];
 				return $db_prefix . $tablename;
 			}
 			function _makeModel($line)
@@ -170,10 +166,9 @@
 			{
 				if(isset($this->id))
 				{
-					require("./../config.php");
-                	$link = mysql_connect($db_host, $db_username, $db_password)
+                	$link = mysql_connect($_GLOBALS['db']['host'], $_GLOBALS['db']['username'], $_GLOBALS['db']['password'])
                 	   or die('Could not connect: ' . mysql_error());
-                	mysql_select_db($db_name) or die('Could not select database');
+                	mysql_select_db($_GLOBALS['db']['database']) or die('Could not select database');
 					mysql_query("DELETE FROM " . $this->_get_tablename() . " WHERE ID=" . $this->id . " LIMIT 1") or die('Query failed: ' . mysql_error());
                 	mysql_close($link);
 				}
@@ -217,14 +212,13 @@
 				$p .= "})";
 				return $p;
 			}
-			function truncate() {
-				require("./../config.php");
-				$link = mysql_connect($db_host, $db_username, $db_password)
+			function truncate() {print_r($_GLOBALS);
+				$link = mysql_connect($_GLOBALS['db']['host'], $_GLOBALS['db']['username'], $_GLOBALS['db']['password'])
             	   or die('Could not connect: ' . mysql_error());
 				$table = $this->_get_tablename();
-            	mysql_select_db($db_name) or die('Could not select database');
-				mysql_query("TRUNCATE TABLE `${db_prefix}${table}`;");
-				mysql_query("ALTER TABLE `${db_prefix}${table}` AUTO_INCREMENT = 1;");
+            	mysql_select_db($_GLOBALS['db']['database']) or die('Could not select database');
+				mysql_query("TRUNCATE TABLE `${table}`;");
+				mysql_query("ALTER TABLE `${table}` AUTO_INCREMENT = 1;");
 				mysql_close($link);
 			}
 		}

@@ -4,7 +4,7 @@ if($_GET['section'] == "io")
 {
 require("../config.php");
 $_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop "l33t" hax.
-$blah = crypt($_SESSION['username'], $conf_secretword);
+$blah = $_SESSION['username'];
 	if ($_GET['action'] == "createDirectory") {
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$blah."/$odir";
