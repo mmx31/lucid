@@ -117,37 +117,32 @@ $xml = new Xml;
 echo("OK!<br>Parsing appMeta...");
 if(!file_exists("../apps/tmp/unzipped/appmeta.xml")) { die("ERROR! Invalid Application Package"); } 
 $out = $xml->parse('../apps/tmp/unzipped/appmeta.xml', 'FILE'); 
+$name = $out[name];
+$author = $out[author];
+$email = $out[email];
+$version = $out[version];
+$maturity = $out[maturity];
+$category = $out[category];
 $installfile = $out[installFile];
 $message = $out[installMessage];
 $fr = $out[filesRequired];
 $frt = $out[filesCopyTo];
 $frf = $out[filesCopyFrom];
-echo("OK!<br>$message<br>Importing and checking for database file...");
+
+echo("OK!<br>$message<br>Importing and checking for application file...");
 if(!file_exists("../apps/tmp/unzipped/$installfile")) { die("ERROR! Application package is damaged."); }
         mysql_connect($db_host, $db_username, $db_password) or die('<span style="color: red;">Error connecting to MySQL server: ' . mysql_error() . '</span></div></center></body></html>');
         mysql_select_db($db_name) or die('<span style="color: red;">Error selecting MySQL database: ' . mysql_error() . '</span></div></center></body></html>');
 		$templine = '';
-		$lines = file("../apps/tmp/unzipped/$installfile") or die("<span style='color: red;'>Error, could not read database file!</span></div></center></body></html>");
-        foreach ($lines as $line_num => $line) {
-            // Only continue if it's not a comment
-            if (substr($line, 0, 2) != '--' && $line != '') {
-                //look for #__, and replace it with the prefix
-                $pos = strpos($line, "#__");
-                if($pos !== false)
-                {
-                    $line = str_replace("#__", $db_prefix, $line);
-                }
-                // Add this line to the current segment
-                $templine .= $line;
-                // If it has a semicolon at the end, it's the end of the query
-                if (substr(trim($line), -1, 1) == ';') {
-                    // Perform the query
-                    mysql_query($templine) or print('<span style="color: red;">Error performing query: ' . mysql_error() . '</span><br/>');
-                    // Reset temp variable to empty
-                    $templine = '';
-                }
-            }
-        }
+		$file = fopen("../apps/tmp/unzipped/$installfile", "r");
+		while(!feof($file)) {
+			$templine = $templine . fgets($file, 4096);
+		}
+		fclose ($file); 
+		$templine = mysql_real_escape_string($templine);
+		$code = $templine;
+		$blah = "INSERT INTO `${db_prefix}apps` (`name`, `author`, `email`, `code`, `version`, `maturity`, `category`) VALUES ('${name}', '${author}', '${email}', '${code}', '${version}', '${maturity}', '${category}');"; 
+        mysql_query($blah) or die("fail - ". mysql_error());
 		echo("OK!<br>Importing any required files...");
 		if($fr != true) { 
 		echo("OK!<br>Cleaning up...");
