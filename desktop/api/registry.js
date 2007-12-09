@@ -12,12 +12,10 @@ dojo.require("dojo.data.ItemFileWriteStore");
 //desktop.core.backend("api.registry.stream.save")
 api.registry = function(args)
 {
-	var finalargs = {
-		url: desktop.core.backend("api.registry.stream.load")+"&appid="+encodeURIComponent(args.appid)+"&name="+encodeURIComponent(args.name)
-	};
-	if(args.data) finalargs.data = args.data;
+	var finalargs = {};
+	finalargs.url = desktop.core.backend("api.registry.stream.load") + "&appid=" + encodeURIComponent(args.appid) + "&name=" + encodeURIComponent(args.name) + "&data=" + encodeURIComponent(dojo.toJson(args.data));
 	if(args.typeMap) finalargs.typeMap = args.typeMap;
-	return dojo.mixin(new dojo.data.ItemFileWriteStore(finalargs), {
+	var store = dojo.mixin(new dojo.data.ItemFileWriteStore(finalargs), {
 		__desktop_name: args.name,
 		__desktop_appid: args.appid,
 		_saveEverything: function(saveCompleteCallback, saveFailedCallback, newFileContentString) {
@@ -68,5 +66,7 @@ api.registry = function(args)
 			});
 		}
 	});
+	store.fetch();
+	return store;
 }
 api.reg = api.registry;

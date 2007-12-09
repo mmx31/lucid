@@ -18,14 +18,18 @@
 		{
 			$p = $User->get_current();
 			$result = $Registry->filter(array("userid", "appid", "name"), array($p->id, $_GET['appid'], $_GET['name']));
-			if(isset($result[0]))
+			if($result != false)
 			{
 				$result = $result[0];
 				echo $result->value;
 			}
 			else
 			{
-				echo "{\"identifier\":true,\"items\":[]}";
+				if (get_magic_quotes_gpc())
+				{
+					$_GET['data'] = stripslashes($_GET['data']);
+				}
+				echo $_GET['data'];
 			}
 		}
 		if($_GET['action'] == "delete")
