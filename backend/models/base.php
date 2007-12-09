@@ -131,7 +131,7 @@
 				$arr = array();
 				foreach($this as $key => $value)
 				{
-					if($key != "_tablename")
+					if($key{0} != "_")
 					{
 						if($key == "id")
 						{
@@ -171,11 +171,11 @@
 				if(isset($this->id))
 				{
 					require("./../config.php");
-                                	$link = mysql_connect($db_host, $db_username, $db_password)
-                                	   or die('Could not connect: ' . mysql_error());
-                                	mysql_select_db($db_name) or die('Could not select database');
+                	$link = mysql_connect($db_host, $db_username, $db_password)
+                	   or die('Could not connect: ' . mysql_error());
+                	mysql_select_db($db_name) or die('Could not select database');
 					mysql_query("DELETE FROM " . $this->_get_tablename() . " WHERE ID=" . $this->id . " LIMIT 1") or die('Query failed: ' . mysql_error());
-                                	mysql_close($link);
+                	mysql_close($link);
 				}
 			}
 			function from_postdata($postdata, $list)
@@ -216,6 +216,16 @@
 				}
 				$p .= "})";
 				return $p;
+			}
+			function truncate() {
+				require("./../config.php");
+				$link = mysql_connect($db_host, $db_username, $db_password)
+            	   or die('Could not connect: ' . mysql_error());
+				$table = $this->_get_tablename();
+            	mysql_select_db($db_name) or die('Could not select database');
+				mysql_query("TRUNCATE TABLE `${db_prefix}${table}`;");
+				mysql_query("ALTER TABLE `${db_prefix}${table}` AUTO_INCREMENT = 1;");
+				mysql_close($link);
 			}
 		}
 		$Base = new Base();
