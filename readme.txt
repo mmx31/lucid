@@ -1,5 +1,5 @@
 To install:
-	*Open install.php in a browser, and install.
+	*Open /install/ in a browser, and install.
 	 Follow the installer's instructions.
 
 Customizing:

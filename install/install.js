@@ -145,7 +145,7 @@ install = new function() {
 					}
 					html += "</ul>";
 					dojo.byId("taskList").innerHTML += html;
-					args.callback();
+					args.callback(ready);
 				},
 				callback: callback,
 				handleAs: "json"
