@@ -5,7 +5,7 @@ if($_GET['section'] == "get")
 	{
 	    $dir = opendir("../../desktop/themes/");
 		while(($file = readdir($dir)) !== false) {
-			if($file == '..' || $file == '.' || $file == '.svn'){
+			if($file == '..' || $file == '.' || $file{0} == '.'){
 					continue;
 			} else {
 				$t = strtolower($file);
