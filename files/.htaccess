@@ -1,11 +1,1 @@
-# Don't list contents, that would be bad :D
-IndexIgnore *
-Options All -Indexes
-# Secure directory by disabling script execution
-AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
-Options -ExecCGI
-# Don't show this file, that would be bad as well!
-<Files .htaccess>
- order allow,deny
- deny from all
-</Files>
+Order allow,deny
