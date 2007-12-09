@@ -212,7 +212,7 @@
 				$p .= "})";
 				return $p;
 			}
-			function truncate() {print_r($_GLOBALS);
+			function truncate() {
 				$link = mysql_connect($_GLOBALS['db']['host'], $_GLOBALS['db']['username'], $_GLOBALS['db']['password'])
             	   or die('Could not connect: ' . mysql_error());
 				$table = $this->_get_tablename();
