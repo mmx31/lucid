@@ -42,6 +42,7 @@
 				$code = $templine;
 				$blah = "INSERT INTO `${db_prefix}apps` (`name`, `author`, `email`, `code`, `version`, `maturity`, `category`) VALUES ('${name}', '${author}', '${email}', '${code}', '${version}', '${maturity}', '${category}');"; 
 				mysql_query($blah) or die("fail - ". mysql_error());
+				echo($message2 . "\n");
 				}
 			}
 		}
