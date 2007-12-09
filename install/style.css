@@ -1,8 +1,9 @@
-@import "../desktop/dojo/dijit/themes/tundra/tundra.css";
 body {
 	background:#fff url("gradient.gif") repeat-x top left;
 	padding:2em 2em 2em 2em;
 	overflow: hidden;
+	font-family:Verdana,Helvetica,Tahoma,Arial,sans-serif;
+	font-size:76%;
 }
 
 #wizard {

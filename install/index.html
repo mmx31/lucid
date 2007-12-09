@@ -5,52 +5,58 @@
 		<script type="text/javascript" src="install.js"></script>
 		<link href="style.css" rel="stylesheet" media="screen" />
 		<link href="../desktop/dojo/dijit/themes/dijit.css" rel="stylesheet" media="screen" />
+		<link href="../desktop/dojo/dijit/themes/tundra/tundra.css" rel="stylesheet" media="screen" />
+		<link href="../desktop/dojo/dijit/themes/tundra/tundra_rtl.css" rel="stylesheet" media="screen" />
 	</head>
 	<body class="tundra">
 		<div style="position: absolute; top: 0px; left: 0px;"><h3>NOTE: this does not do anything yet. If you're installing, use /install.php</h3></div>
-		<form dojoType="dijit.form.Form">
+		<form dojoType="dijit.form.Form" id="form">
 			<div dojoType="dijit.layout.StackContainer" id="wizard" widgetid="wizard">
 				<div dojoType="dijit.layout.ContentPane" title="Start" id="start">
 					<div class="title">Welcome to the Psych Desktop installer!</div>
-					Before you start the installation, you need to modify some files first:<br /> 
+					Before you start the installation, you need to change some file permissions:<br /> 
 					<div id="perms">please wait...</div>
 				</div>
-				<div dojoType="dijit.layout.ContentPane" title="Todo">
-					<div class="title">What do you want to do?</div>
-					<input dojoType="dijit.form.RadioButton" type="radio" name="type" value="clean" />
+				<div dojoType="dijit.layout.ContentPane" title="installation type">
+					<div class="title">What type of installation do you want?</div>
+					<input dojoType="dijit.form.RadioButton" id="installtype-new" type="radio" name="type" value="clean" />
 					<b>I want to do a clean installation</b>
 					<p>Do a new installation, and create a new admin user</p>
 					
-					<input dojoType="dijit.form.RadioButton" type="radio" name="type" value="CMS" disabled="true" />
+					<input dojoType="dijit.form.RadioButton" id="installtype-cms" type="radio" name="type" value="CMS" disabled="true" />
 					<b>I want to do a clean installation, but intergrate it with a CMS</b>
 					<p>Do a new installation, then configure it to intergrate with a user table from a CMS</p>
 					<!-- We should support drupal, joomla/mambo, phpnuke, and some others -->
 					
-					<input dojoType="dijit.form.RadioButton" type="radio" name="type" value="reset" />
+					<input dojoType="dijit.form.RadioButton" id="installtype-reset" type="radio" name="type" value="reset" />
 					<b>I want to update my existing installation</b>
 					<p>Keeps your settings and users, but re-installs apps and other things</p>
-					<!--TODO: make these do something -->
-					</ul>
 				</div>
 				<div dojoType="dijit.layout.ContentPane" title="Database">
 					<div class="title">Database Settings</div>
 					<br />
-					<!--Database Type:&nbsp;
-					<select name="db_type">
-						<option>mySQL</option>
-					</select>
-					<br />-->
+					Database Backend:
+					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="mySQL" /> mySQL</div>
+					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="mySQL" disabled="true" /> mySQLi</div>
+					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="SQLite" disabled="true" /> SQLite</div>
+					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="msSQL" disabled="true" /> Microsoft SQL Server</div>
+					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="pgSQL" disabled="true" /> PostgreSQL</div>
+					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="ibase" disabled="true" /> iBase</div>
+					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="fbSQL" disabled="true" /> FastBase SQL</div>
+					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="oci8" disabled="true" /> Oracle DB (versions 7-10)</div>
+					<div><input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="querysim" disabled="true" /> QuerySim</div>
+					<br />
 					Database Name:&nbsp;
-					<input name="db_name" type="text" />
+					<input dojoType="dijit.form.TextBox" name="db_name" type="text" />
 					<br />
 					Table Prefix:&nbsp;
-					<input name="db_prefix" type="text" />
+					<input dojoType="dijit.form.TextBox" name="db_prefix" type="text" />
 					<br />
 					Username:&nbsp;
-					<input name="db_username" type="text" />
+					<input dojoType="dijit.form.TextBox" name="db_username" type="text" />
 					<br />
 					Password:&nbsp;
-					<input name="db_password" type="text" />
+					<input dojoType="dijit.form.TextBox" name="db_password" type="text" />
 				</div>
 				<div dojoType="dijit.layout.ContentPane" title="Finish">
 					<div class="title">Installation</div>
