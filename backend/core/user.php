@@ -18,6 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
 	session_start();
+	require("../configuration.php");
 	require("../models/user.php");
 	$user = $User->get_current();
 	if($_GET['section'] == "info")

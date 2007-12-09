@@ -1,4 +1,5 @@
 <?php
+	require("../configuration.php");
 	require("./../models/app.php");
     if($_GET['section'] == "fetch")
 	{
