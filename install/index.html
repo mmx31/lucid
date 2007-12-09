@@ -72,6 +72,9 @@
 						<label for="db_type_querysim"> QuerySim</label>
 					</div>
 					<br />
+					Database Host:&nbsp;
+					<input dojoType="dijit.form.TextBox" name="db_host" type="text" />
+					<br />
 					Database Name:&nbsp;
 					<input dojoType="dijit.form.TextBox" name="db_name" type="text" />
 					<br />
@@ -84,9 +87,21 @@
 					Password:&nbsp;
 					<input dojoType="dijit.form.TextBox" name="db_password" type="text" />
 				</div>
+				<div dojoType="dijit.layout.ContentPane" title="Admin Setup">
+					<div class="title">Adminstrative User Settings</div>
+					Admin User:&nbsp;
+					<input dojoType="dijit.form.TextBox" name="admin_user" type="text" />
+					<br />
+					Admin Pass:&nbsp;
+					<input dojoType="dijit.form.TextBox" name="admin_pass" type="text" />
+					<br />
+					Admin E-mail:&nbsp;
+					<input dojoType="dijit.form.TextBox" name="admin_email" type="text" />
+					<br />
+				</div>
 				<div dojoType="dijit.layout.ContentPane" id="install-page" title="Installing">
-					<div class="title">Installing Applications...</div>
-					<div id="installStatus">please wait...</div>
+					<div class="title">Installing...</div>
+					<div id="installStatus">starting installation...</div>
 					<div id="progressContainer">
 						<div id="progressBarContainer">
 							<div dojoType="dijit.ProgressBar" id="progressBar" indeterminate="true"></div>

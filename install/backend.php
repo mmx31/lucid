@@ -1,15 +1,80 @@
 <?php
     $act = $_GET['action'];
+	if($act == "installadmin")
+	{
+		require("../backend/config.php");
+		echo("{");
+		echo("\"Establishing connection to database...\":");
+		mysql_connect($db_host, $db_username, $db_password) or die('<span style="color: red;">Error connecting to MySQL server: ' . mysql_error() . '</span></div></center></body></html>');
+		mysql_select_db($db_name) or die('<span style="color: red;">Error selecting MySQL database: ' . mysql_error() . '</span></div></center></body></html>');
+		mysql_query("TRUNCATE TABLE `${db_prefix}users`;");
+		mysql_query("ALTER TABLE `${db_prefix}users` AUTO_INCREMENT = 1;");
+		echo("\"...done\",");
+	    echo("\"Writing admin username, password, and e-mail to database...\":");
+		$username = $_GET['admin_user'];
+		$password = crypt($_GET['admin_pass'], $conf_secretword);
+		$email = $_GET['admin_email'];
+		mysql_query("REPLACE INTO `${db_prefix}users` VALUES ('".$username."', '".$email."', '".$password."', 0, 1, 'admin');") or print('<span style="color: red;">Error performing query: ' . mysql_error() . "</span>");
+		echo("\"...done\"");
+		echo("}");
+	}
+	if($act == "installdatabase")
+	{
+		echo("{");
+		echo("\"Parsing form values...\":");
+		$db_name = $_GET['db_name'];
+		$db_type = $_GET['db_type'];
+		$db_host = $_GET['db_host'];
+		$db_username = $_GET['db_username'];
+		$db_password = $_GET['db_password'];
+		$db_prefix = $_GET['db_prefix'];
+		echo("\"...done\",");
+		echo("\"Generating encryption hash...\":");
+		$characters = 10;
+		$possible = '23456789bcdfghjkmnpqrstvwxyz'; 
+		$code = '';
+		$i = 0;
+		while ($i < $characters) { 
+			$code .= substr($possible, mt_rand(0, strlen($possible)-1), 1);
+			$i++;
+		}    
+		$conf_secretword = bin2hex( md5($code, TRUE) );
+		echo("\"...done\",");
+		echo("\"Saving new configuration...\":");
+		$writebuffer = "<?php\n//database type (mysql and ini) ini coming soon!\n\$db_type=\"${db_type}\";\n";
+		$writebuffer = $writebuffer."//database name\n\$db_name=\"${db_name}\";\n";
+		$writebuffer = $writebuffer."//database host\n\$db_host=\"${db_host}\";\n";
+		$writebuffer = $writebuffer."//database username\n\$db_username=\"${db_username}\";\n";
+		$writebuffer = $writebuffer."//database password\n\$db_password=\"${db_password}\";\n";
+		$writebuffer = $writebuffer."//database prefix\n\$db_prefix=\"${db_prefix}\";\n";
+		$writebuffer = $writebuffer."//xsite enabled?(yes/no)\n\$xsite_status=\"yes\";\n";
+		$writebuffer = $writebuffer."//Public registration enabled?(yes/no)\n\$conf_public=\"yes\";\n";
+		$writebuffer = $writebuffer."//the secret word for encryption of passwords\n//NOTE: DO NOT CHANGE AFTER INSTALL! THIS WILL BREAK THE USER LOGIN PROCESS!!!\n";
+		$writebuffer = $writebuffer."\$conf_secretword=\"$conf_secretword\";\n?>";
+		if (is_writable("../backend/config.php")) {
+        $handle = fopen("../backend/config.php", 'w');
+        fwrite($handle, $writebuffer);
+        fclose($handle);
+		echo("\"...done\"");
+		echo("}");
+		}
+		else {
+		echo("\"...fail\"");
+		echo("}");
+		}
+	}
 	if($act == "installprograms")
 	{
 		//TODO: this should use the models!
 		echo("{");
-		echo("\"Initalizing application installer...\":");
-		require("../backend/config.php");
+		require("../backend/config.php");	
+		echo("\"Establishing connection to database...\":");
+		echo("\"...done\",");
 		mysql_connect($db_host, $db_username, $db_password) or die('<span style="color: red;">Error connecting to MySQL server: ' . mysql_error() . '</span></div></center></body></html>');
 		mysql_select_db($db_name) or die('<span style="color: red;">Error selecting MySQL database: ' . mysql_error() . '</span></div></center></body></html>');
 		mysql_query("TRUNCATE TABLE `${db_prefix}apps`;");
 		mysql_query("ALTER TABLE `${db_prefix}apps` AUTO_INCREMENT = 1;");
+		echo("\"Initalizing application installer...\":");
 		require("../backend/lib.xml.php");
 		$xml = new Xml; 
 		echo("\"...done\"");

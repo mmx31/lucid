@@ -45,10 +45,9 @@ install = new function() {
 	}
 	this.checkDbInput = function() {
 		if (install.currentPage.title == "Database") {
-			var form = dijit.byId("form").getValues();
+			this.form = dijit.byId("form").getValues();
 			if(form.db_type != "" &&
 			   form.db_name != "" &&
-			   form.db_prefix != "" &&
 			   form.db_username != "" &&
 			   form.db_password != "")
 			{
@@ -107,14 +106,22 @@ install = new function() {
 	{
 		form = dijit.byId("form").getValues();
 		if (form.type == "reset") {
-			this.updateBar(0);
 			this.tasks.apps(function(){
 				dijit.byId("next").setDisabled(false);
 				install.updateBar(100);
 			});
 		}
 		else {
-			//TODO: install
+			this.tasks.database(form, function(){
+				install.updateBar(33);
+				install.tasks.apps(function(){
+					install.updateBar(66);
+					install.tasks.admin(form, function(){
+						dijit.byId("next").setDisabled(false);
+						install.updateBar(100);
+					});
+				});
+			});
 		}
 	},
 	this.updateBar = function(percent)
@@ -145,14 +152,72 @@ install = new function() {
 					}
 					html += "</ul>";
 					dojo.byId("taskList").innerHTML += html;
-					args.callback(ready);
+					callback(ready);
 				},
 				callback: callback,
 				handleAs: "json"
 			});
 		},
-		database: function(callback) {
-			
+		admin: function(form, callback) {
+			dojo.xhrGet({
+				url: "./backend.php?action=installadmin",
+				content: {
+					admin_user: form.admin_user,
+					admin_pass: form.admin_pass,
+					admin_email: form.admin_email
+				},
+				load: function(data, args){
+					var html = "<ul>";
+					var ready = true;
+					for (key in data) {
+						html += "<li>" + key.replace("../", "") + ": ";
+						if (data[key] == "...done") 
+							html += "<span style='color: green'>";
+						else {
+							html += "<span style='color: red'>";
+							ready = false;
+						}
+						html += data[key] + "</span></li>";
+					}
+					html += "</ul>";
+					dojo.byId("taskList").innerHTML += html;
+					callback(ready);
+				},
+				callback: callback,
+				handleAs: "json"
+			});
+		},
+		database: function(form, callback) {
+		dojo.xhrGet({
+				url: "./backend.php?action=installdatabase",
+				content: {
+					db_type: form.db_type,
+					db_host: form.db_host,
+					db_name: form.db_name,
+					db_prefix: form.db_prefix,
+					db_username: form.db_username,
+					db_password: form.db_password
+				},
+				load: function(data, args){
+					var html = "<ul>";
+					var ready = true;
+					for (key in data) {
+						html += "<li>" + key.replace("../", "") + ": ";
+						if (data[key] == "...done") 
+							html += "<span style='color: green'>";
+						else {
+							html += "<span style='color: red'>";
+							ready = false;
+						}
+						html += data[key] + "</span></li>";
+					}
+					html += "</ul>";
+					dojo.byId("taskList").innerHTML += html;
+					callback(ready);
+				},
+				callback: callback,
+				handleAs: "json"
+			});
 		}
 	}
 }
