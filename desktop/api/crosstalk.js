@@ -78,7 +78,7 @@ api.crosstalk = new function()
         	dojo.xhrPost({
         	url: desktop.core.backend("api.crosstalk.io.sendEvent"),
 			content: {
-				userid: params.userid,
+				destination: params.userid,
 				message: params.message,
 				appid: params.appid,
 				instance: params.instance
