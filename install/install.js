@@ -88,7 +88,7 @@ install = new function() {
 			this.setChecked(true);
 			dijit.byId("next").setDisabled(false);
 			dijit.byId("next").onClick = function(e) {
-				this.onClick = function(e) { dijit.byId('wizard').forward(); }
+				dijit.byId('wizard').forward();
 			};
 		}
 	}
@@ -171,12 +171,12 @@ install = new function() {
 			});
 		},
 		admin: function(form, callback) {
-			dojo.xhrGet({
+			dojo.xhrPost({
 				url: "./backend.php?action=installadmin",
 				content: {
-					admin_user: form.admin_user,
-					admin_pass: form.admin_pass,
-					admin_email: form.admin_email
+					username: form.admin_user,
+					password: form.admin_pass,
+					email: form.admin_email
 				},
 				load: function(data, args){
 					var html = "<ul>";
