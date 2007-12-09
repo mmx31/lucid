@@ -122,7 +122,7 @@
 	{
 		$dirs = array(
 			"../files/",
-			"../backend/config.php"
+			"../backend/configuration.php"
 		);
 		$ok = array("error", "error");
 		$a = 0;
