@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 session_start();
-require("../config.php");
+require("../configuration.php");
 if (isset($_GET['action'])) {
 	// get password will NEVER be implamented
 	if ($_GET['action'] == "getStatus") {
@@ -33,9 +33,10 @@ if (isset($_GET['action'])) {
 	}
 	if ($_GET['action'] == "getUserNameFromID") {
 		$userid = $_GET["userid"]; 
+		$db_prefix = $GLOBALS['db']['prefix'];
 		$query = "SELECT * FROM ${db_prefix}users WHERE ID=\"${userid}\"";
-		$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
-		mysql_select_db($db_name) or die('Could not select database');
+		$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password']) or die('Could not connect: ' . mysql_error());
+		mysql_select_db($GLOBALS['db']['database']) or die('Could not select database');
 		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
 			echo($row["username"]);
@@ -46,9 +47,10 @@ if (isset($_GET['action'])) {
 		$username = $_SESSION['username'];
 		$old = crypt($_GET['old'], $conf_secretword);
 		$new = crypt($_GET['new'], $conf_secretword);
+		$db_prefix = $GLOBALS['db']['prefix'];
 		$query = "SELECT * FROM ${db_prefix}users WHERE username=\"${username}\"";
-		$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
-		mysql_select_db($db_name) or die('Could not select database');
+		$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password']) or die('Could not connect: ' . mysql_error());
+		mysql_select_db($GLOBALS['db']['database']) or die('Could not select database');
 		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
 			if($row["password"] == $old) {
@@ -66,9 +68,10 @@ if (isset($_GET['action'])) {
 		$username = $_SESSION['username'];
 		$password = crypt($_GET['pass'], $conf_secretword);
 		$email = $_GET['email'];
+		$db_prefix = $GLOBALS['db']['prefix'];
 		$query = "SELECT * FROM ${db_prefix}users WHERE username=\"${username}\"";
-		$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
-		mysql_select_db($db_name) or die('Could not select database');
+		$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password']) or die('Could not connect: ' . mysql_error());
+		mysql_select_db($GLOBALS['db']['database']) or die('Could not select database');
 		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
 			if($row["password"] == $password) {
@@ -82,10 +85,11 @@ if (isset($_GET['action'])) {
 		}
 	}
 	if ($_GET['action'] == "getUserIDFromName") {
-		$username = $_GET["username"]; 
+		$username = $_GET["username"];
+		$db_prefix = $GLOBALS['db']['prefix'];
 		$query = "SELECT * FROM ${db_prefix}users WHERE username=\"${username}\"";
-		$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
-		mysql_select_db($db_name) or die('Could not select database');
+		$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password']) or die('Could not connect: ' . mysql_error());
+		mysql_select_db($GLOBALS['db']['database']) or die('Could not select database');
 		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
 			echo($row["ID"]);
@@ -93,9 +97,10 @@ if (isset($_GET['action'])) {
 	}
 	if ($_GET['action'] == "getUserEmail") {
 		$username = $_SESSION['username'];
+		$db_prefix = $GLOBALS['db']['prefix'];
 		$query = "SELECT * FROM ${db_prefix}users WHERE username=\"${username}\"";
-		$link = mysql_connect($db_host, $db_username, $db_password) or die('Could not connect: ' . mysql_error());
-		mysql_select_db($db_name) or die('Could not select database');
+		$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password']) or die('Could not connect: ' . mysql_error());
+		mysql_select_db($GLOBALS['db']['database']) or die('Could not select database');
 		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
 			echo($row["email"]);
