@@ -1,6 +1,8 @@
 dojo.require("dijit.layout.ContentPane");
 dojo.require("dijit.layout.StackContainer");
 dojo.require("dijit.form.Button");
+dojo.require("dijit.form.CheckBox");
+dojo.require("dijit.form.Form");
 install = new function() {
 this.selected = function(page){
 	dijit.byId("previous").setDisabled(page.isFirstChild);
@@ -12,6 +14,7 @@ this.onLoad = function() {
 	install.selected(dijit.byId("start"));
 	dijit.byId("next").setDisabled(install.currentPage);
 	install.getPerms();
+	setInterval(install.getPerms, 5000)
 }
 
 this.getPerms = function()
@@ -20,20 +23,23 @@ this.getPerms = function()
 		url: "./backend.php?action=checkpermissions",
 		load: function(data, args)
 		{
-			var d = data.split("\n");
-			delete d[d.length-1];
-			var html = "";
-			for(p in d)
-			{
-				q = d[p].split(":");
-				html += "<b>"+q[0]+":</b>";
-				if(q[1] == "ok") html += "<span style='color: green'>";
-				else html += "<span style='color: red'>";
-				html += q[1] + "</span>";
+			var html = "<ul>";
+			var ready=true;
+			for (key in data) {
+				html += "<li>" + key.replace("../", "") + ": ";
+				if (data[key] == "ok") 
+					html += "<span style='color: green'>";
+				else {
+					html += "<span style='color: red'>";
+					ready = false;
+				}
+				html += data[key] + "</span></li>";
 			}
+			html += "</ul>";
 			dojo.byId("perms").innerHTML = html;
-			dojo.byId("next").setEnabled(install.currentPage);
-		}
+			dijit.byId("next").setDisabled(!ready);
+		},
+		handleAs: "json"
 	});
 }
 }
