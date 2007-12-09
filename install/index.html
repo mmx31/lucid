@@ -87,6 +87,14 @@
 				</div>
 				<div dojoType="dijit.layout.ContentPane" id="install-page" title="Installing">
 					<div class="title">Installing...</div>
+					<div id="progressContainer">
+						<div id="progressBarContainer">
+							<div dojoType="dijit.ProgressBar" id="progressBar" indeterminate="true"></div>
+						</div>
+						<div id="taskList">
+							Starting installation...
+						</div>
+					</div>
 				</div>
 				<div dojoType="dijit.layout.ContentPane" title="Finish">
 					<div class="title">Installation Completed</div>

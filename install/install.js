@@ -4,6 +4,7 @@ dojo.require("dijit.form.Button");
 dojo.require("dijit.form.CheckBox");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.form.Form");
+dojo.require("dijit.ProgressBar");
 install = new function() {
 	this.selected = function(page){
 		dijit.byId("previous").setDisabled(page.isFirstChild);

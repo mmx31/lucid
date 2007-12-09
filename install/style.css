@@ -26,3 +26,20 @@ body {
 	font-weight: bold;
 	margin-bottom: 20px;
 }
+
+#progressBarContainer {
+	width: 300px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#progressContainer {
+	width: 500px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#taskList {
+	border: 1px solid gray;
+	padding: 5px;
+}
