@@ -148,7 +148,7 @@ var desktop = {
 	},
 	popUp: function()
 	{
-		var URL=desktop.path+"/desktop/";
+		var URL=desktop.path+"/desktop/index.html";
 		var day=new Date();
 		var id=day.getTime();
 		desktop.elements.popup=window.open(URL,id,"toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=1,width=1000000,height=1000000,left = 0,top = 0");
