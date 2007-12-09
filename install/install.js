@@ -27,6 +27,7 @@ install = new function() {
 		if(page.title == "Installing")
 		{
 			dijit.byId("previous").setDisabled(true);
+			install.appInstall();
 		}
 	}
 	this.onLoad = function() {
@@ -82,6 +83,31 @@ install = new function() {
 				handleAs: "json"
 			});
 		}
+	}
+	this.appInstall = function()
+	{
+			dojo.xhrGet({
+				url: "./backend.php?action=installprograms",
+				load: function(data, args){
+					var html = "<ul>";
+					var ready = true;
+					for (key in data) {
+						html += "<li>" + key.replace("../", "") + ": ";
+						if (data[key] == "...done") 
+							html += "<span style='color: green'>";
+						else {
+							html += "<span style='color: red'>";
+							ready = false;
+						}
+						html += data[key] + "</span></li>";
+					}
+					html += "</ul>";
+					dojo.byId("installStatus").innerHTML = html;
+					dojo.byId("taskList").innerHTML = "Finished install";
+					dijit.byId("next").setDisabled(!ready);
+				},
+				handleAs: "json"
+			});
 	}
 	this.onTypeRadioClick = function(e) {
 		if(!this.checked) {
