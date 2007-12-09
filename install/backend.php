@@ -2,6 +2,7 @@
     $act = $_GET['action'];
 	if($act == "installprograms")
 	{
+		//TODO: this should use the models!
 		echo("{");
 		echo("\"Initalizing application installer...\":");
 		require("../backend/config.php");
