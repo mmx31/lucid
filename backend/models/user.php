@@ -79,7 +79,6 @@
 			if(is_dir("../../files/".$user)) {
 				$this->_deltree("../../files/".$user);
 			}
-			echo "0";
 		}
 		function _deltree($f)
 		{
