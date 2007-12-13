@@ -13,7 +13,7 @@ desktop.admin = new function()
 		delete: function(id, callback)
 		{
 			dojo.xhrPost({
-				url: desktop.core.backend("core.administration.users.delete",
+				url: desktop.core.backend("core.administration.users.delete"),
 				content: {
 					id: id
 				},
