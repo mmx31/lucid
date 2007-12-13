@@ -61,7 +61,7 @@
 		}
 		function make_userdir()
 		{
-			$blah = $_SESSION['username'];
+			$blah = $this->username;
 			if(!is_dir("../../files/".$blah)){
 				//Create user environment for first time
 				mkdir("../../files/".$blah);
@@ -71,6 +71,28 @@
 				$ourFileHandle = fopen($ourFileName, 'w') or die("1");
 				fwrite($ourFileHandle, "Welcome to Psych Desktop, ".$this->username."\r\n Your new account is installed and ready.");
 				fclose($ourFileHandle);
+			}
+		}
+		function delete_userdir()
+		{
+			$user = $this->username;
+			if(is_dir("../../files/".$user)) {
+				$this->_deltree("../../files/".$user);
+			}
+			echo "0";
+		}
+		function _deltree($f)
+		{
+			if( is_dir( $f ) ){
+				foreach( scandir( $f ) as $item ){
+					if( !strcmp( $item, '.' ) || !strcmp( $item, '..' ) )
+						continue;       
+					$this->_deltree( $f . "/" . $item );
+				}   
+				rmdir( $f );
+			}
+			else{
+				unlink( $f );
 			}
 		}
 		function set_password($pass)
