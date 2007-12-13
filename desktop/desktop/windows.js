@@ -65,9 +65,6 @@ desktop.windows = new function()
 		var winc=new dijit.layout.ContentPane({id: "windowcontainer"}, div);
 		//dojo.widget.createWidget("ContentPane", {id: "windowcontainer"}, div);
 		var filearea = new api.filearea({path: "/Desktop/", textShadow: true, subdirs: false, style: "width: 100%; height: 100%;", overflow: "hidden"});
-		filearea.menu.addChild(new dijit.MenuItem({label:"Desktop Options", disabled:true}));
-		filearea.menu.addChild(new dijit.MenuItem({label:"Customize Settings", onClick: function() { desktop.app.launch(3) }}));
-		filearea.menu.addChild(new dijit.MenuItem({label: "Log Out", iconClass: "icon-16-actions-system-log-out",onClick: desktop.core.logout}));
 		filearea.refresh();
 		winc.domNode.appendChild(filearea.domNode);
 		document.body.appendChild(div);
