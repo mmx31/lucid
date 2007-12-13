@@ -123,13 +123,20 @@ desktop.menu = new function()
 				this._menu = menu;
 				//menu.addChild(new dijit.MenuItem({label:"Programs", disabled:true}));
 				//menu.domNode.id="sysmenu";
-				var cats = new Object();
+				var cats = {};
 				for(item in data)
 				{
 					cats[data[item].category] = true;
 				}
+				list = [];
 				for(cat in cats)
 				{
+					list.push(cat);
+				}
+				list.sort();
+				for(cat in list)
+				{
+					var cat = list[cat];
 					//cat.meow();
 					var category = new dijit.PopupMenuItem({iconClass: "icon-16-categories-applications-"+cat.toLowerCase(), label: cat});
 					//category.addChild(dojo.doc.createElement("span"));
