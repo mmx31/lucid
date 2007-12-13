@@ -19,7 +19,7 @@ if($_GET['section'] == "io")
 		if ($_GET['action'] == "removeDir") {
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$blah."/$odir";
-					rmdir($dir);
+					deltree($dir);
 					echo "0";
 	}
 		if ($_GET['action'] == "renameFile") {
@@ -105,5 +105,20 @@ if($_GET['section'] == "io")
 			die("<textarea>{status: 'failed', details: 'File not uploaded'}</textarea>");
 		}
 	}
+}
+
+function deltree( $f ){
+
+    if( is_dir( $f ) ){
+        foreach( scandir( $f ) as $item ){
+            if( !strcmp( $item, '.' ) || !strcmp( $item, '..' ) )
+                continue;       
+            deltree( $f . "/" . $item );
+        }   
+        rmdir( $f );
+    }
+    else{
+        unlink( $f );
+    }
 }
 ?>
