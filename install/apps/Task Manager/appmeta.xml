@@ -5,7 +5,7 @@
 <email>Jaymac407@gmail.com</email>
 <version>1.0.1.1</version>
 <maturity>Stable</maturity>
-<category>Accessories</category>
+<category>System</category>
 <installFile>app.js</installFile>
 <filesRequired>false</filesRequired>
 <installMessage>Task Manager is being installed...</installMessage>
