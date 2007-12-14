@@ -51,28 +51,29 @@ var bootstrap = {
     },
     check: function()
     {
-        var ready = true;
-        var modCount = 0;
-        for (key in bootstrap.modules)
-        {
-            if (eval('typeof(' + bootstrap.modules[key] + ')') == "undefined") {
-                ready = false;
-            }
-            else modCount++;
-
-        }
-        if (ready && !bootstrap.loaded) {
-			bootstrap.loaded = true;
-			bootstrap.startup();
+		if (!bootstrap.loaded) {
+			var ready = true;
+			var modCount = 0;
+			for (key in bootstrap.modules) {
+				if (eval('typeof(' + bootstrap.modules[key] + ')') == "undefined") {
+					ready = false;
+				}
+				else 
+					modCount++;
+				
+			}
+			if (ready) {
+				bootstrap.loaded = true;
+				bootstrap.startup();
+			}
+			else {
+				bootstrap._indicator.update({
+					indeterminate: false,
+					progress: modCount,
+					maximum: bootstrap.modules.length
+				});
+			}
 		}
-		else {
-			bootstrap._indicator.update({
-				indeterminate: false,
-				progress: modCount,
-				maximum: bootstrap.modules.length
-			});
-		}
-
     },
     startup: function()
     {
