@@ -32,8 +32,11 @@
 		    header('Content-type: text/xml');
 			$result = $Crosstalk->filter("userid", $_SESSION['userid']);
 			$output = "<" . "?xml version='1.0' encoding='utf-8' ?" . ">\r\n" . "<crosstalkEvents>";
-			foreach($result as $row) {
-				$output .=  "\r\n" . '<event id="'. $row->id .'" sender="'. $row->sender . '" appid="'. $row->appid .'" instance="'. $row->instance .'">'. $row->message .'</event>';
+			if($result != false)
+			{
+				foreach($result as $row) {
+					$output .=  "\r\n" . '<event id="'. $row->id .'" sender="'. $row->sender . '" appid="'. $row->appid .'" instance="'. $row->instance .'">'. $row->message .'</event>';
+				}
 			}		
 			$output .=  "\r\n" . "</crosstalkEvents>";	
 			echo $output;

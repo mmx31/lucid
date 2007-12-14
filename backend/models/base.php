@@ -187,30 +187,36 @@
 					$this->$key = $postdata[$key];
 				}
 			}
-			function make_json()
+			function make_json($columns=false)
 			{
-				$p = "({";
 				$length = $this->count()-1;
 				$i=0;
+				$list = Array();
+				$filter = is_array($columns);
 				foreach($this as $key => $value)
 				{
 					if(substr($key, 0, 1) != "_")
 					{
-						$value = addslashes($value);
-						$value = str_replace("\r", "\\r", $value);
-						$value = str_replace("\n", "\\n", $value);
-						$p .= "\"". addslashes($key) . "\":";
-                                                if(is_int($value) || $key == "id") {$p .= $value;}
-                                                else {$p .= "\"" . $value . "\"";}
-						if($i != $length)
+						$continue = true;
+						if($filter)
 						{
-							$p .= ",";
+							if(array_search($key, $columns)===false) $continue = false;
+						}
+						if($continue)
+						{
+							$value = addslashes($value);
+							$value = str_replace("\r", "\\r", $value);
+							$value = str_replace("\n", "\\n", $value);
+							$p = "\"". addslashes($key) . "\":";
+	                        if(is_int($value) || $key == "id") {$p .= $value;}
+	                        else {$p .= "\"" . $value . "\"";}
+							array_push($list, $p);
 						}
 					}
 					$i++;
 				}
-				$p .= "})";
-				return $p;
+				$final = "({" . join(", ", $list) . "})";
+				return $final;
 			}
 			function truncate() {
 				$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password'])
