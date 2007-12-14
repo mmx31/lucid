@@ -57,8 +57,6 @@ var bootstrap = {
         {
             if (eval('typeof(' + bootstrap.modules[key] + ')') == "undefined") {
                 ready = false;
-                break;
-
             }
             else modCount++;
 
