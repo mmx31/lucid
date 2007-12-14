@@ -1,9 +1,23 @@
 <?php
+	//TODO: make an 'Item' class that will be returned after something like get() is called or you do something like 'new Base($foo="bar");'.
+	//Then make it so Item->save() in the returned will insert/update a row in the DB.
+	//In other words Base is for fetching items and defining fields, while Item is for IO actions.
+	//Then we can do things like sql table creation with the models dynamically
 	if(!isset($Base))
 	{
 		class Base
 		{
 			var $id;
+			
+			function __construct() {
+				
+			}
+			
+			function Base() {
+				$args = func_get_args();
+				call_user_func_array(array(&$this, '__construct'), $args);
+			}
+			
 			function get($id)
 			{
 				$tablename = $this->_get_tablename();
