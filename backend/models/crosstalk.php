@@ -3,7 +3,6 @@
 	class Crosstalk extends Base
 	{
 		var $id;
-		var $message;
 		var $sender;
 		var $appID;
 		var $message;
