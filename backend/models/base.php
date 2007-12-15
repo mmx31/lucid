@@ -114,12 +114,18 @@
 		
 		class Base
 		{
-			var $id;
+			var $id = array(
+				'type' => "int",
+				'length' => 11,
+				'auto_increment' => true,
+				'null' => false,
+				'primary_key' => true
+			);
 			var $_item = Item;
 			
 			
-			function __construct($args=false) {
-				if(isset($args)) return new $this->_item;
+			function __construct() {
+				return new $this->_item(func_get_args());
 			}
 			
 			function get($id)
@@ -254,13 +260,5 @@
 			}
 		}
 		$Base = Base;
-		
-		class Fields {
-			var $type="int";
-			var $length=null;
-			var $name="";
-			var $primary_key = false;
-			var $null = false;
-		}
 	}
 ?>

@@ -1,12 +1,10 @@
 <?php 
-	require("base.php");
 	class Registry extends Base
 	{
-		var $id;
-		var $userid;
-		var $appid;
-		var $name;
-		var $value;
+		var $userid = array('type' => 'int', 'length' => 11);
+		var $appid = array('type' => 'int', 'length' => 11);
+		var $name = array('type' => 'mediumtext');
+		var $value = array('type' => 'longtext');
 	}
 	$Registry = new Registry();
 ?>

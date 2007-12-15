@@ -1,5 +1,4 @@
 <?php 
-	if(!$Base) require("base.php");
 	class User_item extends Item {
 		function login()
 		{
@@ -79,12 +78,11 @@
 	}
 	class User extends Base
 	{
-		var $id;
-		var $username;
-		var $password;
-		var $logged;
-		var $email;
-		var $level;
+		var $username = array('type' => 'mediumtext');
+		var $password = array('type' => 'mediumtext');
+		var $logged = array('type' => 'tinyint', 'length' => 1, 'default' => 0);
+		var $email = array('type' => 'mediumtext');
+		var $level = array('type' => 'mediumtext');
 		var $_tablename = "users";
 		var $_item = User_item;
 		
