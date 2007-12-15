@@ -18,6 +18,7 @@
 */
 	session_start();
 	require("../configuration.php");
+	require("../models/base.php");
 	require("../models/crosstalk.php");
 	if($_GET['section'] == "io")
 	{

@@ -19,6 +19,7 @@
 	*/
 	session_start();
 	require("../configuration.php");
+	require("../models/base.php");
 	require("../models/user.php");
 	$user = $User->get_current();
 	if($_GET['section'] == "info")

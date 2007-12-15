@@ -19,6 +19,7 @@
 */
 session_start();
 require("../configuration.php");
+require("../models/base.php");
 require("../models/app.php");
 if($_GET['section'] == "io")
 {
