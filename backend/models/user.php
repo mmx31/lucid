@@ -1,5 +1,44 @@
 <?php 
-	class User_item extends Item {
+	class User extends Base
+	{
+		var $username = array('type' => 'mediumtext');
+		var $password = array('type' => 'mediumtext');
+		var $logged = array('type' => 'tinyint', 'length' => 1, 'default' => 0);
+		var $email = array('type' => 'mediumtext');
+		var $level = array('type' => 'mediumtext');
+		var $_tablename = "users";
+		
+		function get_current()
+		{
+			if(isset($_SESSION['userid']))
+			{
+				return $this->get($_SESSION['userid']);
+			}
+			else
+			{
+				return FALSE;
+			}
+		}
+		function authenticate($user, $pass)
+		{
+			$line = $this->filter("username", $user);
+			if($line != FALSE)
+			{
+				$pass = crypt($pass, $GLOBALS['conf']['salt']);
+				if($line[0]->password == $pass)
+				{
+					return $line[0];
+				}
+				else
+				{
+					return FALSE;
+				}
+			}
+			else
+			{
+				return FALSE;
+			}
+		}
 		function login()
 		{
 			$_SESSION['userid'] = $this->id;
@@ -74,48 +113,6 @@
 			}
 			$this->set_password($code);
 			return $code;
-		}
-	}
-	class User extends Base
-	{
-		var $username = array('type' => 'mediumtext');
-		var $password = array('type' => 'mediumtext');
-		var $logged = array('type' => 'tinyint', 'length' => 1, 'default' => 0);
-		var $email = array('type' => 'mediumtext');
-		var $level = array('type' => 'mediumtext');
-		var $_tablename = "users";
-		var $_item = User_item;
-		
-		function get_current()
-		{
-			if(isset($_SESSION['userid']))
-			{
-				return $this->get($_SESSION['userid']);
-			}
-			else
-			{
-				return FALSE;
-			}
-		}
-		function authenticate($user, $pass)
-		{
-			$line = $this->filter("username", $user);
-			if($line != FALSE)
-			{
-				$pass = crypt($pass, $GLOBALS['conf']['salt']);
-				if($line[0]->password == $pass)
-				{
-					return $line[0];
-				}
-				else
-				{
-					return FALSE;
-				}
-			}
-			else
-			{
-				return FALSE;
-			}
 		}
 	}
 	$User = new User();

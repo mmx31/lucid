@@ -1,114 +1,18 @@
 <?php
-	//TODO: make an 'Item' class that will be returned after something like get() is called or you do something like 'new Base($foo="bar");'.
-	//Then make it so Item->save() in the returned will insert/update a row in the DB.
-	//In other words Base is for fetching items and defining fields, while Item is for IO actions.
-	//Then we can do things like sql table creation with the models dynamically
 	if(!isset($Base))
 	{
 		class Item {
-			var $_tablename = "";
 			var $_parentModel = null;
 			function __call($method, $arguments)
 			{
 				//map this to the parent model
-				$this->_parentModel;
-				call_user_func_array(array($this->_parentModel, $method), $arguments);
-			}
-			function make_json($columns=false)
-			{
-				$length = $this->count()-1;
-				$i=0;
-				$list = Array();
-				$filter = is_array($columns);
-				foreach($this as $key => $value)
+				$parent = $this->_parentModel;
+				$p = new $parent;
+				foreach($this as $prop => $val)
 				{
-					if(substr($key, 0, 1) != "_")
-					{
-						$continue = true;
-						if($filter)
-						{
-							if(array_search($key, $columns)===false) $continue = false;
-						}
-						if($continue)
-						{
-							$value = addslashes($value);
-							$value = str_replace("\r", "\\r", $value);
-							$value = str_replace("\n", "\\n", $value);
-							$p = "\"". addslashes($key) . "\":";
-	                        if(is_int($value) || $key == "id") {$p .= $value;}
-	                        else {$p .= "\"" . $value . "\"";}
-							array_push($list, $p);
-						}
-					}
-					$i++;
+					$p->$prop = $val;
 				}
-				$final = "({" . join(", ", $list) . "})";
-				return $final;
-			}
-			function save()
-			{
-				$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password'])
-				   or die('Could not connect: ' . mysql_error());
-				mysql_select_db($GLOBALS['db']['database']) or die('Could not select database');
-                                $query = $this->_make_mysql_query($this->_tablename, ($this->id ? "update" : "insert"));
-				mysql_query($query) or die($query . '\nQuery failed: ' . mysql_error());
-				if(!isset($this->id)) { $this->id = mysql_insert_id(); }
-				mysql_close($link);
-			}
-			function count()
-			{
-				//for some reason count($this) returns 0 so...
-				$length = 0;
-				foreach($this as $key => $value)
-				{
-					if(substr($key, 0, 1) != "_")
-					{
-						$length++;
-					}
-				}
-				return $length;
-			}
-			function _make_mysql_query($table, $type)
-			{
-				//for some reason count($this) returns 0 so...
-				$length = $this->count()-1;
-				if($type == "update") { $sql = "UPDATE ${table} SET "; }
-				else { $sql = "INSERT INTO ${table} SET "; }
-				$arr = array();
-				foreach($this as $key => $value)
-				{
-					if($key{0} != "_")
-					{
-						if($key == "id")
-						{
-							$key = "ID";
-						}
-						if(is_int($value))
-						{
-							array_push($arr, mysql_real_escape_string($key) . "=" . $value);
-						}
-						else
-						{
-							//when all else fails, make it a string
-							array_push($arr, mysql_real_escape_string($key) . "=\"" . mysql_real_escape_string($value) ."\"");
-						}
-					}
-				}
-				$sql .= implode(', ',$arr);
-				$id=$this->id;
-				if($type == "update") { $sql .= " WHERE `ID`=${id} LIMIT 1"; }
-				return $sql;
-			}
-			function delete()
-			{
-				if(isset($this->id))
-				{
-                	$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password'])
-                	   or die('Could not connect: ' . mysql_error());
-                	mysql_select_db($GLOBALS['db']['database']) or die('Could not select database');
-					mysql_query("DELETE FROM " . $this->_tablename . " WHERE ID=" . $this->id . " LIMIT 1") or die('Query failed: ' . mysql_error());
-                	mysql_close($link);
-				}
+				return call_user_func_array(array($p, $method), $arguments);
 			}
 		}
 		
@@ -121,11 +25,10 @@
 				'null' => false,
 				'primary_key' => true
 			);
-			var $_item = Item;
 			
 			
 			function __construct() {
-				return new $this->_item(func_get_args());
+				return new Item(func_get_args());
 			}
 			
 			function get($id)
@@ -220,7 +123,7 @@
 			}
 			function _makeModel($line)
 			{
-				$p = new $this->_item;
+				$p = new Item;
 				foreach ($line as $key => $value)
 				{
 					$p->$key = $value;
@@ -230,7 +133,8 @@
 					$p->id = $line['ID'];
 					unset($p->ID);
 				}
-				$p->_tablename = $this->_get_tablename();
+				$p->_parentModel = get_class($this);
+				//echo var_dump($p);
 				return $p;
 			}
 			function from_postdata($postdata, $list)
@@ -242,12 +146,7 @@
 						$postdata[$key] = stripslashes($postdata[$key]);
 					}
 				}
-				$item = new $this->_item;
-				$item->_tablename = $this->_get_tablename();
-				foreach($list as $key)
-				{
-					$item->$key = $postdata[$key];
-				}
+				$this->_makeModel($postdata);
 			}
 			function truncate() {
 				$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password'])
@@ -257,6 +156,96 @@
 				mysql_query("TRUNCATE TABLE `${table}`;");
 				mysql_query("ALTER TABLE `${table}` AUTO_INCREMENT = 1;");
 				mysql_close($link);
+			}
+			function make_json($columns=false)
+			{
+				$list = array();
+				$filter = is_array($columns);
+				foreach($this as $key => $value)
+				{
+					if($key{0} != "_")
+					{
+						$continue = true;
+						if($filter)
+						{
+							if(array_search($key, $columns)===false) $continue = false;
+						}
+						if($continue)
+						{
+							$value = addslashes($value);
+							$value = str_replace("\r", "\\r", $value);
+							$value = str_replace("\n", "\\n", $value);
+							$p = "\"". addslashes($key) . "\":";
+	                        if(is_int($value) || $key == "id") {$p .= $value;}
+	                        else {$p .= "\"" . $value . "\"";}
+							$list[] = $p;
+						}
+					}
+				}
+				$s = join(", ", $list);
+				$a = "({" . $s . "})";
+				return $a;
+			}
+			function save()
+			{
+				$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password'])
+				   or die('Could not connect: ' . mysql_error());
+				mysql_select_db($GLOBALS['db']['database']) or die('Could not select database');
+                $query = $this->_make_mysql_query($this->_get_tablename(), (is_int($this->id) ? "update" : "insert"));
+				mysql_query($query) or die($query . '\nQuery failed: ' . mysql_error());
+				if(!isset($this->id)) { $this->id = mysql_insert_id(); }
+				mysql_close($link);
+			}
+			function count()
+			{
+				//for some reason count($this) returns 0 so...
+				$length = 0;
+				foreach($this as $key => $value)
+				{
+					if(substr($key, 0, 1) != "_")
+					{
+						$length++;
+					}
+				}
+				return $length;
+			}
+			function _make_mysql_query($table, $type)
+			{
+				//for some reason count($this) returns 0 so...
+				$length = $this->count()-1;
+				if($type == "update") { $sql = "UPDATE ${table} SET "; }
+				else { $sql = "INSERT INTO ${table} SET "; }
+				$arr = array();
+				foreach($this as $key => $value)
+				{
+					if($key{0} != "_" && $key != "id")
+					{
+						if(is_int($value))
+						{
+							array_push($arr, mysql_real_escape_string($key) . "=" . $value);
+						}
+						else
+						{
+							//when all else fails, make it a string
+							array_push($arr, mysql_real_escape_string($key) . "=\"" . mysql_real_escape_string($value) ."\"");
+						}
+					}
+				}
+				$sql .= implode(', ',$arr);
+				$id=$this->id;
+				if($type == "update") { $sql .= " WHERE `ID`=${id} LIMIT 1"; }
+				return $sql;
+			}
+			function delete()
+			{
+				if(isset($this->id))
+				{
+                	$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password'])
+                	   or die('Could not connect: ' . mysql_error());
+                	mysql_select_db($GLOBALS['db']['database']) or die('Could not select database');
+					mysql_query("DELETE FROM " . $this->_get_tablename() . " WHERE ID=" . $this->id . " LIMIT 1") or die('Query failed: ' . mysql_error());
+                	mysql_close($link);
+				}
 			}
 		}
 		$Base = Base;
