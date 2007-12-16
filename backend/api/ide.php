@@ -18,6 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 session_start();
+require("../lib/util.php");
 require("../configuration.php");
 require("../models/base.php");
 require("../models/app.php");
@@ -27,7 +28,9 @@ if($_GET['section'] == "io")
 	{
 		if($_POST['id'] == -1) { $app = new App(); }
 		else { $app = $App->get($_POST['id']); }
-		$app->from_postdata($_POST, array('name', 'author', 'email', 'code', 'version', 'maturity', 'category'));
+		foreach(array('name', 'author', 'email', 'code', 'version', 'maturity', 'category') as $item) {
+			$app->$item = $_POST[$item];
+		}
 		$app->save();
 		echo $app->id;
 	}

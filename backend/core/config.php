@@ -1,5 +1,6 @@
 <?php
 session_start();
+require("../lib/util.php");
 require("../configuration.php");
 require("../models/base.php");
 require("../models/config.php");
@@ -12,7 +13,7 @@ if($_GET['section'] == "stream")
 		$result = $Config->filter("userid", $p->id);
 		if(!isset($result[0])) { $u = new $Config(); $u->userid = $p->id; }
 		else { $u = $result[0]; }
-		$u->value = stripslashes($_POST['value']);
+		$u->value = $_POST['value'];
 		$u->save();
 		echo "0";
 	}

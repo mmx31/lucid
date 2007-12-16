@@ -124,29 +124,26 @@
 			function _makeModel($line)
 			{
 				$p = new Item;
+				//mixin current values if we're not a table definition
+				if(!is_array($this->id))
+				{
+					foreach ($this as $key => $value)
+					{
+						$p->$key = $value;
+					}
+				}
+				//then add items provided to us
 				foreach ($line as $key => $value)
 				{
 					$p->$key = $value;
 				}
-				if(isset($line['ID']))
+				if(isset($p->ID))
 				{
 					$p->id = $line['ID'];
 					unset($p->ID);
-				} else unset($p->id);
-				$p->_parentModel = get_class($this);
-				//echo var_dump($p);
-				return $p;
-			}
-			function from_postdata($postdata, $list)
-			{
-				if (get_magic_quotes_gpc())
-				{
-					foreach($list as $key)
-					{
-						$postdata[$key] = stripslashes($postdata[$key]);
-					}
 				}
-				$this->_makeModel($postdata);
+				$p->_parentModel = get_class($this);
+				return $p;
 			}
 			function truncate() {
 				$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password'])

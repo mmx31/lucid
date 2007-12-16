@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 	session_start();
+	require("../lib/util.php");
 	require("../configuration.php");
 	require("../models/base.php");
 	require("../models/crosstalk.php");
@@ -45,7 +46,9 @@
 	    if ($_GET['action'] == "SendEvent")
 	    {
 				$p = new $Crosstalk();
-				$p->from_postdata($_POST, Array("message", "destination", "appid", "instance"));
+				foreach(array("message", "destination", "appid", "instance") as $item) {
+					$p->$item = $_POST[$item];
+				}
 				$p->sender = $_SESSION['userid'];
 				if($p->destination == 0) {
 				$p->destination = $p->sender;
