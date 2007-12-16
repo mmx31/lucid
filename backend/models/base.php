@@ -132,7 +132,7 @@
 				{
 					$p->id = $line['ID'];
 					unset($p->ID);
-				}
+				} else unset($p->id);
 				$p->_parentModel = get_class($this);
 				//echo var_dump($p);
 				return $p;
@@ -191,7 +191,7 @@
 				$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password'])
 				   or die('Could not connect: ' . mysql_error());
 				mysql_select_db($GLOBALS['db']['database']) or die('Could not select database');
-                $query = $this->_make_mysql_query($this->_get_tablename(), (is_int($this->id) ? "update" : "insert"));
+                $query = $this->_make_mysql_query($this->_get_tablename(), (is_numeric($this->id) ? "update" : "insert"));
 				mysql_query($query) or die($query . '\nQuery failed: ' . mysql_error());
 				if(!isset($this->id)) { $this->id = mysql_insert_id(); }
 				mysql_close($link);

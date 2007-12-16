@@ -35,7 +35,7 @@
 			echo "[";
 			foreach($p as $d => $v)
 			{
-				echo $v->make_json(Array("id", "name", "category"));
+				echo $v->make_json(Array("id", "name", "category", "version"));
 				if($d < $pl) { echo ",\n"; }
 			}
 			echo "]";
