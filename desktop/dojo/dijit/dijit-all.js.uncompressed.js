@@ -793,7 +793,7 @@ dojo.declare(
 			// do the connects for each <script type="dojo/connect" event="foo"> block and make
 			// all <script type="dojo/method"> tags execute right after construction
 			this.mixins.push(function(){
-				parsedScripts.forEach(function(s){
+				dojo.forEach(parsedScripts, function(s){
 					dojo.connect(this, s.event, this, s.func);
 				}, this);
 			});
@@ -862,6 +862,8 @@ dojo.provide("dojo.dnd.autoscroll");
 
 dojo.dnd.getViewport = function(){
 	// summary: returns a viewport size (visible part of the window)
+
+	// FIXME: need more docs!!
 	var d = dojo.doc, dd = d.documentElement, w = window, b = dojo.body();
 	if(dojo.isMozilla){
 		return {w: dd.clientWidth, h: w.innerHeight};	// Object
@@ -882,8 +884,13 @@ dojo.dnd.V_AUTOSCROLL_VALUE = 16;
 dojo.dnd.H_AUTOSCROLL_VALUE = 16;
 
 dojo.dnd.autoScroll = function(e){
-	// summary: a handler for onmousemove event, which scrolls the window, if necesary
-	// e: Event: onmousemove event
+	// summary:
+	//		a handler for onmousemove event, which scrolls the window, if
+	//		necesary
+	// e: Event:
+	//		onmousemove event
+
+	// FIXME: needs more docs!
 	var v = dojo.dnd.getViewport(), dx = 0, dy = 0;
 	if(e.clientX < dojo.dnd.H_TRIGGER_AUTOSCROLL){
 		dx = -dojo.dnd.H_AUTOSCROLL_VALUE;
@@ -902,15 +909,19 @@ dojo.dnd._validNodes = {"div": 1, "p": 1, "td": 1};
 dojo.dnd._validOverflow = {"auto": 1, "scroll": 1};
 
 dojo.dnd.autoScrollNodes = function(e){
-	// summary: a handler for onmousemove event, which scrolls the first avaialble Dom element,
-	//	it falls back to dojo.dnd.autoScroll()
-	// e: Event: onmousemove event
+	// summary:
+	//		a handler for onmousemove event, which scrolls the first avaialble
+	//		Dom element, it falls back to dojo.dnd.autoScroll()
+	// e: Event:
+	//		onmousemove event
+
+	// FIXME: needs more docs!
 	for(var n = e.target; n;){
 		if(n.nodeType == 1 && (n.tagName.toLowerCase() in dojo.dnd._validNodes)){
 			var s = dojo.getComputedStyle(n);
 			if(s.overflow.toLowerCase() in dojo.dnd._validOverflow){
 				var b = dojo._getContentBox(n, s), t = dojo._abs(n, true);
-				console.debug(b.l, b.t, t.x, t.y, n.scrollLeft, n.scrollTop);
+				// console.debug(b.l, b.t, t.x, t.y, n.scrollLeft, n.scrollTop);
 				b.l += t.x + n.scrollLeft;
 				b.t += t.y + n.scrollTop;
 				var w = Math.min(dojo.dnd.H_TRIGGER_AUTOSCROLL, b.w / 2), 
@@ -934,7 +945,7 @@ dojo.dnd.autoScrollNodes = function(e){
 				var oldLeft = n.scrollLeft, oldTop = n.scrollTop;
 				n.scrollLeft = n.scrollLeft + dx;
 				n.scrollTop  = n.scrollTop  + dy;
-				if(dx || dy) console.debug(oldLeft + ", " + oldTop + "\n" + dx + ", " + dy + "\n" + n.scrollLeft + ", " + n.scrollTop);
+				// if(dx || dy){ console.debug(oldLeft + ", " + oldTop + "\n" + dx + ", " + dy + "\n" + n.scrollLeft + ", " + n.scrollTop); }
 				if(oldLeft != n.scrollLeft || oldTop != n.scrollTop){ return; }
 			}
 		}
@@ -3306,6 +3317,11 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 			this.editorObject = this.iframe;
 			// get screen reader text for mozilla here, too
 			this._localizedIframeTitles = dojo.i18n.getLocalization("dijit", "Textarea");
+			// need to find any associated label element and update iframe document title
+			var label=dojo.query('label[for="'+this.id+'"]');
+			if(label.length){
+				this._localizedIframeTitles.iframeEditTitle = label[0].innerHTML + " " + this._localizedIframeTitles.iframeEditTitle;
+			}
 		}
 		// opera likes this to be outside the with block
 		//	this.iframe.src = "javascript:void(0)";//dojo.uri.dojoUri("src/widget/templates/richtextframe.html") + ((dojo.doc.domain != currentDomain) ? ("#"+dojo.doc.domain) : "");
@@ -7035,8 +7051,14 @@ dojo.declare(
 	deleteNode: function(/* treeNode */ node){
 		node.destroy();
 
-		dojo.forEach(this.getChildren(), function(child, idx){
-			child._updateLayout();
+		var children = this.getChildren();		
+		if(children.length == 0){
+			this.isExpandable = false;
+			this.collapse();
+		}
+
+		dojo.forEach(children, function(child){
+				child._updateLayout();
 		});
 	},
 
@@ -7862,11 +7884,12 @@ dojo.provide("dijit.InlineEditBox");
 
 
 
-dojo.declare(
-	"dijit.InlineEditBox",
+dojo.declare("dijit.InlineEditBox",
 	dijit._Widget,
-{
-	// summary
+	{
+	// summary: An element with in-line edit capabilitites
+	//
+	// description:
 	//		Behavior for an existing node (<p>, <div>, <span>, etc.) so that
 	// 		when you click it, an editor shows up in place of the original
 	//		text.  Optionally, Save and Cancel button are displayed below the edit widget.
@@ -7879,7 +7902,7 @@ dojo.declare(
 	//		String getDisplayedValue() OR String getValue()
 	//		void setDisplayedValue(String) OR void setValue(String)
 	//		void focus()
-
+	//
 	// editing: Boolean
 	//		Is the node currently in edit mode?
 	editing: false,
@@ -8040,7 +8063,7 @@ dojo.declare(
 	},
 
 	save: function(/*Boolean*/ focus){
-		// summary
+		// summary:
 		//		Save the contents of the editor and revert to display mode.
 		// focus: Boolean
 		//		Focus on the display mode text
@@ -8123,19 +8146,23 @@ dojo.declare(
 			ew.domNode.style.width = this.width + (Number(this.width)==this.width ? "px" : "");			
 		}
 
+		this.connect(this.editWidget, "onChange", "_onChange");
+
+		// setting the value of the edit widget will cause a possibly asynchronous onChange() call.
+		// we need to ignore it, since we are only interested in when the user changes the value.
+		this._ignoreNextOnChange = true;
 		(this.editWidget.setDisplayedValue||this.editWidget.setValue).call(this.editWidget, this.value);
+
 		this._initialText = this.getValue();
 
 		if(this.autoSave){
 			this.buttonContainer.style.display="none";
 		}
-
-		this.connect(this.editWidget, "onChange", "_onChange");
 	},
 
 	destroy: function(){
 		this.editWidget.destroy();
-		this.inherited("destroy", arguments);
+		this.inherited(arguments);
 	},
 
 	getValue: function(){
@@ -8144,8 +8171,8 @@ dojo.declare(
 	},
 
 	_onKeyPress: function(e){
-		// summary:
-		//		Callback when keypress in the edit box (see template).
+		// summary: Callback when keypress in the edit box (see template).
+		// description:
 		//		For autoSave widgets, if Esc/Enter, call cancel/save.
 		//		For non-autoSave widgets, enable save button if the text value is
 		//		different than the original value.
@@ -8194,14 +8221,19 @@ dojo.declare(
 
 	enableSave: function(){
 		// summary: User replacable function returning a Boolean to indicate
-		// if the Save button should be enabled or not - usually due to invalid conditions
-		return this.editWidget.isValid ? this.editWidget.isValid() : true;
+		// 	if the Save button should be enabled or not - usually due to invalid conditions
+		return this.editWidget.isValid ? this.editWidget.isValid() : true; // Boolean
 	},
 
 	_onChange: function(){
 		// summary:
-		//	This is called when the underlying widget fires an onChange event,
+		//	Called when the underlying widget fires an onChange event,
 		//	which means that the user has finished entering the value
+		
+		if(this._ignoreNextOnChange){
+			delete this._ignoreNextOnChange;
+			return;
+		}
 		if(this._exitInProgress){
 			// TODO: the onChange event might happen after the return key for an async widget
 			// like FilteringSelect.  Shouldn't be deleting the edit widget on end-of-edit
@@ -8220,7 +8252,7 @@ dojo.declare(
 	
 	enableSave: function(){
 		// summary: User replacable function returning a Boolean to indicate
-		// if the Save button should be enabled or not - usually due to invalid conditions
+		// 	if the Save button should be enabled or not - usually due to invalid conditions
 		return this.editWidget.isValid ? this.editWidget.isValid() : true;
 	},
 
@@ -8231,7 +8263,9 @@ dojo.declare(
 });
 
 dijit.selectInputText = function(/*DomNode*/element){
-	// summary: select all the text in an input element (TODO: use functions in _editor/selection.js?)
+	// summary: select all the text in an input element 
+
+	// TODO: use functions in _editor/selection.js?
 	var _window = dojo.global;
 	var _document = dojo.doc;
 	element = dojo.byId(element);
@@ -9223,6 +9257,7 @@ dojo.declare("dojo.data.ItemFileReadStore", null,{
 				if(this._loadInProgress){
 					this._queuedFetches.push({args: keywordArgs});
 				}else{
+					this._loadInProgress = true;
 					var getArgs = {
 							url: self._jsonFileUrl, 
 							handleAs: "json-comment-optional"
@@ -10921,11 +10956,11 @@ dojo.date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
 		case "minute":
 		case "second":
 		case "millisecond":
-			property = interval.charAt(0).toUpperCase() + interval.substring(1) + "s";
+			property = "UTC" + interval.charAt(0).toUpperCase() + interval.substring(1) + "s";
 	}
 
 	if(property){
-		sum["setUTC"+property](sum["getUTC"+property]()+amount);
+		sum["set"+property](sum["get"+property]()+amount);
 	}
 
 	if(fixOvershoot && (sum.getDate() < date.getDate())){
@@ -13141,9 +13176,15 @@ dojo.declare(
 			// "edit area".  This will be used as the accessible name which will replace
 			// the cryptic name and will also convey the role information to the user.
 			// Because it is read directly to the user, the string must be localized.
+			// In addition, since a <label> element can not be associated with an iframe, if 
+			// this control has a label, insert the text into the title as well.
 			var _nlsResources = dojo.i18n.getLocalization("dijit", "Textarea");
 			this._iframeEditTitle = _nlsResources.iframeEditTitle;
 			this._iframeFocusTitle = _nlsResources.iframeFocusTitle;
+			var label=dojo.query('label[for="'+this.id+'"]');
+			if(label.length){
+				this._iframeEditTitle = label[0].innerHTML + " " + this._iframeEditTitle;
+			}
 			var body = this.focusNode = this.editNode = document.createElement('BODY');
 			body.style.margin="0px";
 			body.style.padding="0px";

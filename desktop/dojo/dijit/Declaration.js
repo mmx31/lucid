@@ -48,7 +48,7 @@ dojo.declare(
 			// do the connects for each <script type="dojo/connect" event="foo"> block and make
 			// all <script type="dojo/method"> tags execute right after construction
 			this.mixins.push(function(){
-				parsedScripts.forEach(function(s){
+				dojo.forEach(parsedScripts, function(s){
 					dojo.connect(this, s.event, this, s.func);
 				}, this);
 			});

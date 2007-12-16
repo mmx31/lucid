@@ -162,7 +162,10 @@ dojo.declare("dojox.data.QueryReadStore", null, {
 		// >>> store.isItem({name:"me", label:"me too"});
 		// false
 		//
-		return typeof something.r!="undefined" && something.r==this;
+		if(something){
+			return typeof something.r!="undefined" && something.r==this;
+		}
+		return false;
 	},
 	
 	isItemLoaded: function(/* anything */ something) {
@@ -248,9 +251,7 @@ dojo.declare("dojox.data.QueryReadStore", null, {
 	},
 
 	getFeatures: function(){
-		return {
-			'dojo.data.api.Read': true
-		};
+		return this._features;
 	},
 
 	close: function(/*dojo.data.api.Request || keywordArgs || null */ request){
@@ -354,7 +355,7 @@ dojo.declare("dojox.data.QueryReadStore", null, {
 			// Since Math.randon() returns something like: 0.23453463, we just remove the "0."
 			// probably just for esthetic reasons :-).
 			this.lastRequestHash = new Date().getTime()+"-"+String(Math.random()).substring(2);
-			this._lastServerQuery = serverQuery;
+			this._lastServerQuery = dojo.mixin({}, serverQuery);
 		}
 	},
 	
@@ -401,10 +402,10 @@ dojo.declare("dojox.data.QueryReadStore", null, {
 			if(!(item === undefined)){
 				if(keywordArgs.onItem){
 					var scope =  keywordArgs.scope?keywordArgs.scope:dojo.global;
-					keywordArgs.onItem.call(scope, item);
+					keywordArgs.onItem.call(scope, {i:item, r:this});
 				}
 				return;
-			}			
+			}
 		}
 
 		// Otherwise we need to go remote
@@ -466,6 +467,7 @@ dojo.declare("dojox.data.QueryReadStore", null, {
 
 dojo.declare("dojox.data.QueryReadStore.InvalidItemError", Error, {});
 dojo.declare("dojox.data.QueryReadStore.InvalidAttributeError", Error, {});
+
 
 
 

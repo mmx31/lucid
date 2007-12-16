@@ -40,6 +40,9 @@ dojo.declare("dojox.charting.Element", null, {
 	destroyHtmlElements: function(){
 		dojo.forEach(this.htmlElements, dojo._destroyElement);
 		this.htmlElements = [];
+	},
+	destroy: function(){
+		this.purgeGroup();
 	}
 });
 

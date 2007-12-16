@@ -202,7 +202,7 @@ dojo.declare("dojo.dnd.Source", dojo.dnd.Selector, {
 		}
 		var accepted = this.accept && this.checkAcceptance(source, nodes);
 		this._changeState("Target", accepted ? "" : "Disabled");
-		if(accepted){
+		if(accepted && this == source){
 			dojo.dnd.manager().overSource(this);
 		}
 		this.isDragging = true;
@@ -303,6 +303,7 @@ dojo.declare("dojo.dnd.Source", dojo.dnd.Selector, {
 		this.before = true;
 		this.isDragging = false;
 		this.mouseDown = false;
+		delete this.mouseButton;
 		this._changeState("Source", "");
 		this._changeState("Target", "");
 	},

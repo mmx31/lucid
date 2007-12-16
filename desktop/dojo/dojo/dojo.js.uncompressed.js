@@ -101,8 +101,8 @@ if(typeof dojo == "undefined"){
 	//TODOC:  HOW TO DOC THIS?
 	dojo.version = {
 		// summary: version number of this instance of dojo.
-		major: 1, minor: 0, patch: 1, flag: "",
-		revision: Number("$Rev: 11616 $".match(/[0-9]+/)[0]),
+		major: 1, minor: 0, patch: 2, flag: "",
+		revision: Number("$Rev: 11832 $".match(/[0-9]+/)[0]),
 		toString: function(){
 			with(d.version){
 				return major + "." + minor + "." + patch + flag + " (" + revision + ")";	// String
@@ -929,8 +929,7 @@ if(typeof window != 'undefined'){
 		d.isOpera = (dua.indexOf("Opera") >= 0) ? tv : 0;
 		d.isKhtml = (dav.indexOf("Konqueror") >= 0)||(dav.indexOf("Safari") >= 0) ? tv : 0;
 		if(dav.indexOf("Safari") >= 0){
-			var vi = dav.indexOf("Version/");
-			d.isSafari = (vi) ? parseFloat(dav.substring(vi+8)) : 2;
+			d.isSafari = parseFloat(dav.split("Version/")[1]) || 2;
 		}
 		var geckoPos = dua.indexOf("Gecko");
 		d.isMozilla = d.isMoz = ((geckoPos >= 0)&&(!d.isKhtml)) ? tv : 0;
@@ -1407,20 +1406,24 @@ dojo.clone = function(/*anything*/ o){
 			r.push(dojo.clone(o[i]));
 		}
 		return r; // Array
-	}else if(dojo.isObject(o)){
-		if(o.nodeType && o.cloneNode){ // isNode
-			return o.cloneNode(true); // Node
-		}else{
-			var r = new o.constructor(); // specific to dojo.declare()'d classes!
-			for(var i in o){
-				if(!(i in r) || r[i] != o[i]){
-					r[i] = dojo.clone(o[i]);
-				}
-			}
-			return r; // Object
+	}
+	if(!dojo.isObject(o)){
+		return o;	/*anything*/
+	}
+	if(o.nodeType && o.cloneNode){ // isNode
+		return o.cloneNode(true); // Node
+	}
+	if(o instanceof Date){
+		return new Date(o.getTime());	// Date
+	}
+	// Generic objects
+	var r = new o.constructor(); // specific to dojo.declare()'d classes!
+	for(var i in o){
+		if(!(i in r) || r[i] != o[i]){
+			r[i] = dojo.clone(o[i]);
 		}
 	}
-	return o; /*anything*/
+	return r; // Object
 }
 
 dojo.trim = function(/*String*/ str){
