@@ -6,13 +6,31 @@
 			function __call($method, $arguments)
 			{
 				//map this to the parent model
+				$p = $this->_make_parent();
+				return call_user_func_array(array($p, $method), $arguments);
+			}
+			function _make_parent()
+			{
 				$parent = $this->_parentModel;
 				$p = new $parent;
 				foreach($this as $prop => $val)
 				{
 					$p->$prop = $val;
 				}
-				return call_user_func_array(array($p, $method), $arguments);
+				return $p;
+			}
+			function save()
+			{
+				$p = $this->_make_parent();
+				$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password'])
+				   or die('Could not connect: ' . mysql_error());
+				mysql_select_db($GLOBALS['db']['database']) or die('Could not select database');
+                $query = $p->_make_mysql_query($p->_get_tablename(), (is_numeric($this->id) ? "update" : "insert"));
+				mysql_query($query) or die($query . '\nQuery failed: ' . mysql_error());
+				if(!isset($this->id)) {
+					$this->id = mysql_insert_id();
+				}
+				mysql_close($link);
 			}
 		}
 		
@@ -25,7 +43,7 @@
 				'null' => false,
 				'primary_key' => true
 			);
-			
+			var $_parentItem = null;
 			
 			function __construct() {
 				return new Item(func_get_args());
@@ -182,16 +200,6 @@
 				$s = join(", ", $list);
 				$a = "({" . $s . "})";
 				return $a;
-			}
-			function save()
-			{
-				$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password'])
-				   or die('Could not connect: ' . mysql_error());
-				mysql_select_db($GLOBALS['db']['database']) or die('Could not select database');
-                $query = $this->_make_mysql_query($this->_get_tablename(), (is_numeric($this->id) ? "update" : "insert"));
-				mysql_query($query) or die($query . '\nQuery failed: ' . mysql_error());
-				if(!isset($this->id)) { $this->id = mysql_insert_id(); }
-				mysql_close($link);
 			}
 			function count()
 			{
