@@ -1,10 +1,11 @@
-@import url("./icons.css");
-
-@import url("./window.css");
-
 /*
 TODO: there's alot of things in this that should be in /desktop.css instead of here...
 */
+
+
+html, body {
+	font-family: sans-serif;
+}
 /******************** Taskbar ********************/
 #taskbar {
   z-index:100;
@@ -85,7 +86,7 @@ TODO: there's alot of things in this that should be in /desktop.css instead of h
 }
 /******************** Console ********************/
 #console {
-	border: 1px solid grey;
+	border: 1px solid gray;
 	background-color: black;
 	color: white;
 }
