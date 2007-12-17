@@ -49,6 +49,16 @@
 				return new Item(func_get_args());
 			}
 			
+			function save()
+			{
+				$p = new Item;
+				foreach($this as $prop => $val)
+				{
+					$p->$prop = $val;
+				}
+				$p->save();
+			}
+			
 			function get($id)
 			{
 				$tablename = $this->_get_tablename();
