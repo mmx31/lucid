@@ -8,7 +8,7 @@
  * 
  */
 desktop.config = {
-	draw: function(cback) {
+	init: function(cback) {
 		desktop.config.load(cback);
 		setInterval(desktop.config.save, 1000*60);
 	},
