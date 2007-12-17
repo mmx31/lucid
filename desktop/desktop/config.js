@@ -11,6 +11,7 @@ desktop.config = {
 	draw: function(cback) {
 		desktop.config.load(cback);
 		setInterval(desktop.config.save, 1000*60);
+		setTimeout(desktop.config.apply, 3000); //not very clean, but I can't figure out any other way...
 	},
 	load: function(cback) {
 		dojo.xhrGet({

@@ -121,6 +121,7 @@ desktop.taskbar = new function()
 		*/
 		this.draw = function()
 		{
+			dojo.require("dijit.layout.ContentPane");
 			tasktray = '<table id="tasktray"><tr id="tasklist"><td id="taskclock">&nbsp;</td><td><div id="trayclock"></div></td></tr></table>';
 			html='<table border="0" cellpadding="0" cellspacing="0" width="100%" class="taskbartable"><tr><td width="30"><div id="menubutton"></div></td><td width="1%"><div class="seperator"></div></td><td width="80%"><div id="appbar"></div></td><td width="1%"><div class="seperator"></div></td><td width="15%">'+tasktray+'</td></tr></table>';
 			
