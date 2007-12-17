@@ -14,6 +14,7 @@
 		$user = new $User();
 		$user->from_postdata($_POST, array("username", "email", "password"));
 		$user->crypt_password();
+		$user->level = "admin";
 		$user->save();
 		echo("\"...done\"");
 		echo("}");
