@@ -153,8 +153,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 */
 	pos: {},
 	postcreate: function() {
-		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, dojo.doc.createElement('div'), this.body);
-		this.body.id=this.id+"body";
+		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.body);
 	},
 	/*
 	 * Method: setBodyWidget
@@ -170,7 +169,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		this.bodyWidget = widget;
 		this.bodyWidgetParams = widgetParams;
 		this.bodyWidgetParams.id=this.id+"body";
-		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, dojo.doc.createElement('div'));
+		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.body.domNode);
 	},
 	/*
 	 * Method: show
