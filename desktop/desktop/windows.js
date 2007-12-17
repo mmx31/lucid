@@ -59,6 +59,7 @@ desktop.windows = new function()
 	*/
 	this.draw = function()
 	{
+ 		dojo.require("dijit.layout.ContentPane");
 		div = document.createElement("div");
 		div.id="windowcontainer";
 		div.style.overflow="hidden";

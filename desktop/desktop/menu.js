@@ -183,6 +183,7 @@ desktop.menu = new function()
 		*/
 		this.draw = function()
 		{
+			dojo.require("dijit.Menu");
 			html  = "<table><tr><td class='menutop'></td></tr><tr><td class='menubody'>";
 			html += "<div id='menu_name'></div>";
 			html += "<div id='menu'></div>";

@@ -56,6 +56,7 @@ desktop.wallpaper = new function()
 		*/
 		this.draw = function()
 		{
+			dojo.require("dijit.layout.ContentPane");
 			div = document.createElement("div");
 			div.id="wallpaper";
 			div.name="wallpaper";
@@ -66,10 +67,10 @@ desktop.wallpaper = new function()
 			client.setContent(div);
 			dijit.byId("desktop_main").addChild(client);
 			dijit.byId("desktop_main").resize();
+			dojo.subscribe("configApply", this, this.loadPrefs);
 		}
 		this.init = function()
 		{
-			dojo.subscribe("configApply", this, this.loadPrefs);
 			this.loadPrefs();
 		}
 	}

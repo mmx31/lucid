@@ -1,4 +1,5 @@
  api.windowcounter = 0;
+dojo.require("dojo.dnd.move")
 /*
  * Package: window
  * 

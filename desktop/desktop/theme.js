@@ -32,6 +32,9 @@ desktop.theme = new function()
 			element.id = "desktop_theme_"+e;
 			document.getElementsByTagName("head")[0].appendChild(element);
 		});
+		dojo.subscribe("configApply", this, function(conf) {
+			desktop.theme.set(conf.theme);
+		});
 	}
 	this.set = function(theme)
 	{

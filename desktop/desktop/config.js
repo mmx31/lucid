@@ -14,23 +14,17 @@ desktop.config = {
 	},
 	load: function(cback) {
 		dojo.xhrGet({
-        url: desktop.core.backend("core.config.stream.load"),
-        load: function(data, ioArgs) {
-			if(data != "")
-			{
-				var config = dojo.fromJson(data);
-				config = dojo.mixin(desktop.config, config);
-				desktop.config = config;
-				delete config;
+	        url: desktop.core.backend("core.config.stream.load"),
+	        load: function(data, ioArgs) {
+				desktop.config = dojo.mixin(desktop.config, data);
 				for(var a=0;a<desktop.config.startupapps.length;a++) {
 					desktop.app.launch(desktop.config.startupapps[a]);
 				}
-				desktop.theme.set(desktop.config.theme);
-			}
-			if(cback) cback();
-		},
-        error: function(error, ioArgs) { api.console("Error loading the config: "+error.message); },
-		mimetype: "text/plain"
+				desktop.config.apply();
+				if(cback) cback();
+			},
+	        error: function(error, ioArgs) { api.console("Error loading the config: "+error.message); },
+			handleAs: "json"
         });
 	},
 	save: function(sync) {
@@ -47,7 +41,7 @@ desktop.config = {
 	},
 	apply: function()
 	{
-		dojo.publish("configApply", []);
+		dojo.publish("configApply", [desktop.config]);
 	},
 	/**
 	 * Whether or not the desktop's effects should be enabled (fading and such)

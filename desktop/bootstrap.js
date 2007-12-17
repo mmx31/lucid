@@ -131,10 +131,6 @@ var bootstrap = {
         bootstrap.link("./dojo/dijit/themes/dijit.css", "dijit");
         bootstrap.link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
         bootstrap.link("desktop.css", "corestyle");
-		dojo.require("dijit.layout.LayoutContainer");
-		dojo.require("dijit.layout.ContentPane");
-		dojo.require("dijit.Menu");
- 		dojo.require("dojo.dnd.move");
 		bootstrap.require("api.crosstalk");
 		bootstrap.require("api.registry");
 		bootstrap.require("api.filearea");
@@ -156,7 +152,6 @@ var bootstrap = {
         bootstrap.require('desktop.core');
         bootstrap.require('desktop.icon');
         bootstrap.require('desktop.menu');
-        bootstrap.require('desktop.rightclick');
         bootstrap.require('desktop.screensaver');
         bootstrap.require('desktop.taskbar');
         bootstrap.require('desktop.theme');
