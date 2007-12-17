@@ -46,7 +46,9 @@
 			var $_parentItem = null;
 			
 			function __construct() {
-				return new Item(func_get_args());
+				$p = new Item(func_get_args());
+				$p->_parentModel = get_class($this);
+				return $p;
 			}
 			
 			function save()
@@ -56,6 +58,7 @@
 				{
 					$p->$prop = $val;
 				}
+				$p->_parentModel = get_class($this);
 				$p->save();
 			}
 			
