@@ -6,13 +6,16 @@
 	if($act == "installadmin")
 	{
 		require("../backend/models/user.php");
+		require("../backend/lib/util.php");
 		echo("{");
 		echo("\"Establishing connection to database...\":");
 		$User->truncate();
 		echo("\"...done\",");
 	    echo("\"Writing admin username, password, and e-mail to database...\":");
 		$user = new $User();
-		$user->from_postdata($_POST, array("username", "email", "password"));
+		$user->username = $_POST['username'];
+		$user->email = $_POST['email'];
+		$user->password = $_POST['password'];
 		$user->crypt_password();
 		$user->level = "admin";
 		$user->save();

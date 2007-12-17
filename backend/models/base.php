@@ -240,12 +240,12 @@
 					{
 						if(is_int($value))
 						{
-							array_push($arr, mysql_real_escape_string($key) . "=" . $value);
+							@array_push($arr, mysql_real_escape_string($key) . "=" . $value);
 						}
 						else
 						{
 							//when all else fails, make it a string
-							array_push($arr, mysql_real_escape_string($key) . "=\"" . mysql_real_escape_string($value) ."\"");
+							@array_push($arr, mysql_real_escape_string($key) . "=\"" . mysql_real_escape_string($value) ."\"");
 						}
 					}
 				}
