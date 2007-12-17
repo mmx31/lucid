@@ -41,11 +41,7 @@ desktop.wallpaper = new function()
 		*/
 		this.setColor = function(color)
 		{
-			if( document.documentElement && document.documentElement.style ) {
-			    document.documentElement.style.backgroundColor = color; }
-			if( document.body && document.body.style ) {
-			    document.body.style.backgroundColor = color; }
-			    document.bgColor = color;
+			dojo.style(document.body, "backgroundColor", color);
 		}
 		/** 
 		* Draws the wallpaper elements
@@ -60,7 +56,6 @@ desktop.wallpaper = new function()
 			div = document.createElement("div");
 			div.id="wallpaper";
 			div.name="wallpaper";
-			//document.body.appendChild(div);
 			var client = new dijit.layout.ContentPane({
 				layoutAlign: "client"
 			}, document.createElement("div"));
@@ -68,9 +63,5 @@ desktop.wallpaper = new function()
 			dijit.byId("desktop_main").addChild(client);
 			dijit.byId("desktop_main").resize();
 			dojo.subscribe("configApply", this, this.loadPrefs);
-		}
-		this.init = function()
-		{
-			this.loadPrefs();
 		}
 	}
