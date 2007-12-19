@@ -1,4 +1,3 @@
- api.windowcounter = 0;
 dojo.require("dojo.dnd.move")
 /*
  * Package: window
@@ -23,80 +22,72 @@ dojo.require("dojo.dnd.move")
  * 		setTimeout(dojo.hitch(win, win.destroy), 1000*5);
  * 		(end code)
  */
-api.window = function(params)
-{
-	if(typeof params != "object") params = {};
-	/*
-	 * Property: _id
-	 *
-	 * Summary:
-	 * 		A unique ID for the window
-	 */
-	this._id = "win"+api.windowcounter;
-	api.windowcounter++;
-	/*
-	 * Property: _innerHTML
-	 * 
-	 * Summary:
-	 * 		The window's contents. Use <window.write> to write content to a window.
-	 */
-	this._innerHTML = ((typeof params.innerHTML == "string") ? params.innerHTML : "");
+dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
+	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"winrightcorner\"></div><div class=\"winleftcorner\"></div><div class=\"winhandle\" dojoattachpoint=\"handle\" dojoattachevent=\"onmousedown: bringToFront\">${title}</div><div class=\"winbuttons\"><div dojoattachevent=\"onmouseup: destroy\" class=\"winbuttonclose\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"winbuttonmaximize\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"winbuttonminimize\"></div></div><div class=\"winbody\"><div class=\"winleftborder\"></div><div class=\"wininnerbody\" dojoattachpoint=\"body\" title=\"\"></div><div class=\"winrightborder\"></div></div><div class=\"winbottomborder\" style=\"position: absolute; bottom: 0px; left: 0px; width: 100%;\"><div class=\"winbottomleft\"></div><div class=\"winbottomcenter\"></div><div class=\"winbottomright\"></div></div><div dojoattachpoint=\"resize\" class=\"winresize\" style=\"cursor: se-resize;\"></div></div>",
 	/*
 	 * Property: destroyed
 	 * 
 	 * Summary:
 	 * 		Is the window destroyed?
 	 */
-	this.destroyed = false;
+	destroyed: false,
 	/*
 	 * Property: onDestroy
 	 * 
 	 * Summary:
 	 * 		What to do on destroying of the window
 	 */
-	this.onDestroy = function(){};
+	onDestroy: function() {
+		
+	},
 	/*
 	 * Property: onResize
 	 * 
 	 * Summary:
 	 * 		What to do on the resizing of the window
 	 */
-	this.onResize = function(){};
+	onResize: function() {
+		
+	},
 	/*
 	 * Property: onMinimize
 	 * 
 	 * Summary:
 	 * 		What to do on the minimizing of the window
 	 */
-	this.onMinimize = function(){};
+	onMinimize: function() {
+		
+	},
 	/*
 	 * Property: onMaximize
 	 * 
 	 * Summary:
 	 * 		What to do upon maximize of window
 	 */
-	this.onMaximize = function(){};
+	onMaximize: function() {
+		
+	},
 	/*
 	 * Property: showMaximize
 	 * 
 	 * Summary:
 	 * 		Show whether or not to show the maximize button
 	 */
-	this.showMaximize = true;
+	showMaximize: true,
 	/*
 	 * Property: showMinimize
 	 * 
 	 * Summary:
 	 * 		Show whether or not to show the minimize button
 	 */
-	this.showMinimize = true;
+	showMinimize: true,
 	/*
 	 * Property: showClose
 	 * 
 	 * Summary:
 	 * 		Show whether or not to show the close button
 	 */
-	this.showClose = true;
+	showClose: true,
 	/*
 	 * Property: bodyWidget
 	 * 
@@ -110,14 +101,14 @@ api.window = function(params)
 	 * 		This is usefull for things like layout container creation
 	 * 		To set this after window creation, use <window.setBodyWidget>
 	 */
-	this.bodyWidget = ((typeof params.bodyWidget == "string") ? params.bodyWidget : "ContentPane");
+	bodyWidget: "ContentPane",
 	 /*
 	 * Property: bodyWidgetParams
 	 * 
 	 * Summary:
 	 * 		The window body's widget params
 	 */
-	this.bodyWidgetParams = ((typeof params.bodyWidgetParams == "object") ? params.bodyWidgetParams : {});
+	bodyWidgetParams: {},
 	/*
 	 * Property: maximized
 	 * 
@@ -125,54 +116,45 @@ api.window = function(params)
 	 * 		Whether or not the window is maximized
 	 * 		To set this after window creation, use <window.setBodyWidget>
 	 */
-	this.maximized = ((typeof params.maximized == "boolean") ? params.maximized : false);
+	maximized: false,
 	/*
 	 * Property: height
 	 * 
 	 * Summary:
 	 * 		The window's height in px, or %.
 	 */
-	this.height = ((typeof params.height == "string") ? params.height : "400px");
+	height: "400px",
 	/*
 	 * Property: width
 	 * 
 	 * Summary:
 	 * 		The window's width in px, or %.
 	 */
-	this.width = ((typeof params.width == "string") ? params.width : "500px");
+	width: "500px",
 	/*
 	 * Property: title
 	 * 
 	 * Summary:
 	 * 		The window's title
 	 */
-	this.title = ((typeof params.title == "string") ? params.title : "");
+	title: "",
 	/*
 	 * Property: resizable
 	 * 
 	 * Summary:
 	 * 		Weather or not the window is resizable.
 	 */
-	this.resizable = ((typeof params.resizable != "undefined") ? params.resizable : true);
-	for(p in params)
-	{
-		this[p] = params[p];
-	}
+	resizable: true,
 	/*
 	 * Property: pos
 	 * 
 	 * Summary:
 	 * 		Internal variable used by the window maximizer
 	 */
-	this.pos = {};
-	/*
-	 * Property: body
-	 * 
-	 * Summary:
-	 * 		The window's body widget
-	 */
-	this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, dojo.doc.createElement('div'));
-	this.body.id=this._id+"body";
+	pos: {},
+	postCreate: function() {
+		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.body);
+	},
 	/*
 	 * Method: setBodyWidget
 	 * 
@@ -182,185 +164,40 @@ api.window = function(params)
 	 * 		widget - the body widget's name. must be a member of dijit.layout
 	 * 		widgetParams - The body widget params
 	 */
-	this.setBodyWidget = function(widget, widgetParams)
+	setBodyWidget: function(widget, widgetParams)
 	{
 		this.bodyWidget = widget;
 		this.bodyWidgetParams = widgetParams;
-		this.bodyWidgetParams.id=this._id+"body";
-		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, dojo.doc.createElement('div'));
-	};
-	/*
-	 * Method: empty
-	 * 
-	 * Summary:
-	 * 		Emptys the window's contents
-	 */
-	this.empty = function()
-	{
-		this._innerHTML = "";
-		if(document.getElementById(this._id+"body"))
-		{
-			document.getElementById(this._id+"body").innerHTML = "";
-		}
-	}
-	/*
-	 * Method: write
-	 * 
-	 * Summary:
-	 * 		Writes HTML to the window
-	 * 
-	 * Parameters:
-	 * 		string - the HTML to append to the window
-	 */
-	this.write = function(/*String*/string)
-	{
-		//TODO: would this interfere with addChild?
-		this._innerHTML += string;
-		if(this.bodyWidget == "ContentPane") this.body.setContent(this.body.domNode.innerHTML+string);
-		else this.body.domNode.innerHTML += string;
-	}
+		this.bodyWidgetParams.id=this.id+"body";
+		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.body.domNode);
+	},
 	/*
 	 * Method: show
 	 *  
 	 * Summary:
 	 * 		Shows the window
 	 */
-	this.show = function()
+	show: function()
 	{
-		if (document.getElementById(this._id) == null) //dojo.byId allways seems to return an objecct...
+		if (document.getElementById(this.id) == null) //dojo.byId allways seems to return an objecct...
 		{
-			windiv = document.createElement("div");
-			windiv.id = this._id;
-			windiv.style.width = this.width;
-			windiv.style.height = this.height;
-			windiv.style.top = "50px";
-			windiv.style.left = "50px";
-			windiv.style.zIndex = api.windowcounter + 100;
-			dojo.addClass(windiv, "win");
-			
-			winrightcorner = document.createElement("div");
-			dojo.addClass(winrightcorner, "winrightcorner");
-			windiv.appendChild(winrightcorner);
-			
-			winleftcorner = document.createElement("div");
-			dojo.addClass(winleftcorner, "winleftcorner");
-			windiv.appendChild(winleftcorner);
-			
-			winhandle = document.createElement("div");
-			winhandle.id = this._id + "handle";
-			winhandle.innerHTML = this.title;
-			dojo.addClass(winhandle, "winhandle");
-			windiv.appendChild(winhandle);
-			
-			winbuttons = document.createElement("div");
-			winbuttons.id = this._id + "buttons";
-			winbuttons.style.position = "absolute";
-			dojo.addClass(winbuttons, "winbuttons");
-			
-			closebutton = document.createElement("div");
-			closebutton.id = this._id + "closebutton";
-			dojo.addClass(closebutton, "winbuttonclose");
-			if (this.showClose) {
-				winbuttons.appendChild(closebutton);
-			}
-			maximizebutton = document.createElement("div");
-			maximizebutton.id = this._id + "maximizebutton";
-			dojo.addClass(maximizebutton, "winbuttonmaximize");
-			if (this.showMaximize) {
-				winbuttons.appendChild(maximizebutton);
-			}
-			minimizebutton = document.createElement("div");
-			minimizebutton.id = this._id + "minimizebutton";
-			dojo.addClass(minimizebutton, "winbuttonminimize");
-			if (this.showMinimize) {
-				winbuttons.appendChild(minimizebutton);
-			}
-			windiv.appendChild(winbuttons);
-			
-			var winbody = document.createElement("div");
-			dojo.addClass(winbody, "winbody");
-			
-			var winleft = document.createElement("div");
-			dojo.addClass(winleft, "winleftborder");
-			dojo.style(winleft, "position", "absolute");
-			dojo.style(winleft, "top", "0px");
-			dojo.style(winleft, "left", "0px");
-			winbody.appendChild(winleft);
-			
-			this.body.id = this._id + "body";
-			if (this.bodyWidget == "ContentPane") 
-				this.body.setContent(this._innerHTML);
-			
-			dojo.addClass(this.body.domNode, "wininnerbody");
-			winbody.appendChild(this.body.domNode);
-			
-			var winright = document.createElement("div");
-			dojo.addClass(winright, "winrightborder");
-			dojo.style(winright, "position", "absolute");
-			dojo.style(winright, "top", "0px");
-			dojo.style(winright, "right", "0px");
-			winbody.appendChild(winright);
-			
-			windiv.appendChild(winbody);
-			
-			var winbottom = document.createElement("div");
-			dojo.addClass(winbottom, "winbottomborder");
-			dojo.style(winbottom, "position", "absolute");
-			dojo.style(winbottom, "bottom", "0px");
-			dojo.style(winbottom, "left", "0px");
-			dojo.style(winbottom, "width", "100%");
-			var winbottomleft = document.createElement("div");
-			dojo.addClass(winbottomleft, "winbottomleft");
-			dojo.style(winbottomleft, "bottom", "0px");
-			dojo.style(winbottomleft, "left", "0px");
-			dojo.style(winbottomleft, "position", "absolute");
-			winbottom.appendChild(winbottomleft);
-			
-			var winbottomcenter = document.createElement("div");
-			dojo.addClass(winbottomcenter, "winbottomcenter");
-			winbottom.appendChild(winbottomcenter);
-			
-			var winbottomright = document.createElement("div");
-			dojo.addClass(winbottomright, "winbottomright");
-			dojo.style(winbottomright, "position", "absolute");
-			dojo.style(winbottomright, "bottom", "0px");
-			dojo.style(winbottomright, "right", "0px");
-			winbottom.appendChild(winbottomright);
-			windiv.appendChild(winbottom);
-			
-			if (this.resizable == true) {
-				winresize = document.createElement("div");
-				winresize.id = this._id + "resize";
-				dojo.addClass(winresize, "winresize");
-				windiv.appendChild(winresize);
-			}
-			document.getElementById("windowcontainer").appendChild(windiv);
-			
-			//this.body.startup();
-			//this.bodyWidgetParams.id = this._id+"body";
-			//this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.winbody);
+			dojo.style(this.domNode, "width", this.width);
+			dojo.style(this.domNode, "height", this.height);
+			dojo.byId("windowcontainer").appendChild(this.domNode);
 			
 			this.makeDragger();
 			if(this.resizable == true)
 			{
 				this.makeResizer();
 			}
-			dojo.connect(closebutton, "onmouseup", dojo.hitch(this, this.destroy));
-			dojo.connect(minimizebutton, "onmouseup", dojo.hitch(this, this.minimize));
-			dojo.connect(maximizebutton, "onmouseup", dojo.hitch(this, function() {
-				if(this.maximized == true) this.unmaximize();
-				else this.maximize();
-			}));
-			dojo.connect(windiv, "onmousedown", dojo.hitch(this, this.bringToFront));
-			dojo.connect(winhandle, "onmousedown", dojo.hitch(this, this.bringToFront));
 			
 			this._task = new desktop.taskbar.task({
 				label: this.title,
 				icon: this.icon,
-				winid: this._id,
+				winid: this.id,
 				onclick: dojo.hitch(this, function()
 				{
-					var s = dojo.byId(this._id).style.display;
+					var s = this.domNode.style.display;
 					if(s == "none")
 					{
 						this.restore();
@@ -372,13 +209,13 @@ api.window = function(params)
 						var box;
 						var myBox = new Object
 						var overlapping = false;
-						myBox.l = dojo.byId(this._id).style.left;
-						myBox.t = dojo.byId(this._id).style.top;
+						myBox.l = this.domNode.style.left;
+						myBox.t = this.domNode.style.top;
 						myBox.b = myBox.t + myBox.h;
 						myBox.r = myBox.l + myBox.w;
 						for(n = 0; n < ns.length; n++)
 						{
-							if(ns[n].id != this._id && (ns[n].style.display) != "none")
+							if(ns[n].id != this.id && (ns[n].style.display) != "none")
 							{
 								//TODO: overlap detection is really bad. rewrite it.
 								box = new Object();
@@ -411,20 +248,30 @@ api.window = function(params)
 				})
 			});
 			if(this.maximized == true) this.maximize();
+			dojo.style(this.domNode, "display", "block");
+			if(desktop.config.fx) {
+				dojo.style(this.domNode, "opacity", 0);
+				dojo.fadeIn({node: this.domNode, duration: 200}).play();
+			}
+			this._resizeBody();
 		}
-	}
+	},
+	_toggleMaximize: function() {
+		if(this.maximized == true) this.unmaximize();
+		else this.maximize();
+	},
 	/*
 	 * Method: makeResizer
 	 * 
 	 * Summary:
 	 * 		Internal method that makes a resizer for the window.
 	 */
-	this.makeResizer = function() {
-		dojo.byId(this._id+"resize").style.cursor = "se-resize";
-		this._resizeEvent = dojo.connect(dojo.byId(this._id+"resize"), "onmousedown", this, function(e) {
+	makeResizer: function() {
+		this.resize.style.cursor = "se-resize";
+		this._resizeEvent = dojo.connect(this.resize, "onmousedown", this, function(e) {
 			this._dragging = dojo.connect(document, "onmousemove", this, function(f) {
 				//TODO: use the computed style technique instead of this
-				var win = dojo.byId(this._id);
+				var win = this.domNode;
 				var x = f.clientX;
 				var y = f.clientY;
 				var width = win.style.width.replace(/px/g, "");
@@ -468,36 +315,36 @@ api.window = function(params)
 				this._resizeBody();
 			});
 		});
-	}
+	},
 	/*
 	 * Method: killResizer
 	 * 
 	 * Summary:
 	 * 		Internal method that gets rid of the resizer on the window.
 	 */
-	this.killResizer = function()
+	killResizer: function()
 	{
 		dojo.disconnect(this._dragging);
 		dojo.disconnect(this._resizeEvent);
 		dojo.disconnect(this._doconmouseup);
-		dojo.byId(this._id+"resize").style.cursor = "default";
-	}
+		this.resize.style.cursor = "default";
+	},
 	/* 
 	 * Method: minimize
 	 * 
 	 * Summary:
 	 * 		Minimizes the window to the taskbar
 	 */
-	this.minimize = function()
+	minimize: function()
 	{
 		this.onMinimize();
 		if(desktop.config.fx == true)
 		{
 			dojo.style(this.body.domNode, "display", "none");
-			var pos = dojo.coords(this._id, true);
+			var pos = dojo.coords(this.domNode, true);
 			this.left = pos.x;
 			this.top = pos.y;
-			var win = dojo.byId(this._id);
+			var win = this.domNode;
 			var width = win.style.width.replace(/px/g, "");
 			var height = win.style.height.replace(/px/g, "");
 			var t = width.indexOf("%");
@@ -514,12 +361,12 @@ api.window = function(params)
 			}
 			this._width = width;
 			this._height = height;
-			var pos = dojo.coords("task_"+this._id, true);
+			var pos = dojo.coords("task_"+this.id, true);
 			
-			var fade = dojo.fadeOut({ node: this._id, duration: 200 });
-			var slide = dojo.fx.slideTo({ node: this._id, duration: 200, top: pos.y, left: pos.x});
+			var fade = dojo.fadeOut({ node: this.domNode, duration: 200 });
+			var slide = dojo.fx.slideTo({ node: this.domNode, duration: 200, top: pos.y, left: pos.x});
 			var squish = dojo.animateProperty({
-				node: this._id,
+				node: this.domNode,
 				duration: 200,
 				properties: {
 					height: {end: 26}, //TODO: is there a way of detecting this?
@@ -528,30 +375,30 @@ api.window = function(params)
 			});
 			var anim = dojo.fx.combine([fade, slide, squish]);
 			dojo.connect(anim, "onEnd", this, function() {
-				dojo.style(this._id, "display", "none");
+				dojo.style(this.domNode, "display", "none");
 			});
 			anim.play();
 		}
 		else
 		{
-			dojo.style(this._id, "opacity", 100)
-			dojo.style(this._id, "display", "none");
+			dojo.style(this.domNode, "opacity", 100)
+			dojo.style(this.domNode, "display", "none");
 		}
-	}
+	},
 	/*
 	 * Method: restore
 	 * 
 	 * Summary:
 	 * 		Restores the window from the taskbar
 	 */
-	this.restore = function()
+	restore: function()
 	{
-		dojo.byId(this._id).style.display = "inline";
+		this.domNode.style.display = "inline";
 		if(desktop.config.fx == true)
 		{
-			var fade = dojo.fadeIn({ node: this._id, duration: 200 });
+			var fade = dojo.fadeIn({ node: this.domNode, duration: 200 });
 			var slide = dojo.animateProperty({
-				node: this._id,
+				node: this.domNode,
 				duration: 200,
 				properties: {
 					top: {end: this.top},
@@ -566,14 +413,14 @@ api.window = function(params)
 			});
 			anim.play();
 		}
-	}
+	},
 	/*
 	 * Method: maximize
 	 * 
 	 * Summary:
 	 * 		Maximizes the window
 	 */
-	this.maximize = function()
+	maximize: function()
 	{
 		this.onMaximize();
 		this.maximized = true;
@@ -582,13 +429,13 @@ api.window = function(params)
 		{
 			this.killResizer();
 		}
-		this.pos.top = dojo.byId(this._id).style.top.replace(/px/g, "");
-		this.pos.bottom = dojo.byId(this._id).style.bottom.replace(/px/g, "");
-		this.pos.left = dojo.byId(this._id).style.left.replace(/px/g, "");
-		this.pos.right = dojo.byId(this._id).style.right.replace(/px/g, "");
-		this.pos.width = dojo.byId(this._id).style.width.replace(/px/g, "");
-		this.pos.height = dojo.byId(this._id).style.height.replace(/px/g, "");
-		var win = dojo.byId(this._id);
+		this.pos.top = this.domNode.style.top.replace(/px/g, "");
+		this.pos.bottom = this.domNode.style.bottom.replace(/px/g, "");
+		this.pos.left = this.domNode.style.left.replace(/px/g, "");
+		this.pos.right = this.domNode.style.right.replace(/px/g, "");
+		this.pos.width = this.domNode.style.width.replace(/px/g, "");
+		this.pos.height = this.domNode.style.height.replace(/px/g, "");
+		var win = this.domNode;
 		
 		if(desktop.config.fx == true)
 		{
@@ -602,8 +449,8 @@ api.window = function(params)
 				properties: {
 					top: {end: 0},
 					left: {end: 0},
-					width: {end: dojo.byId(this._id).parentNode.style.width.replace(/px/g, "")},
-					height: {end: dojo.byId(this._id).parentNode.style.height.replace(/px/g, "")}
+					width: {end: this.domNode.parentNode.style.width.replace(/px/g, "")},
+					height: {end: this.domNode.parentNode.style.height.replace(/px/g, "")}
 				},
 				duration: 150
 			});
@@ -622,19 +469,19 @@ api.window = function(params)
 			win.style.height = "100%";
 			this._resizeBody();
 		}
-	}
-	this.makeDragger = function()
+	},
+	makeDragger: function()
 	{
 		if(desktop.config.window.constrain) 
 		{
-			this._drag = new dojo.dnd.move.parentConstrainedMoveable(this._id, {
-				handle: this._id + "handle"
+			this._drag = new dojo.dnd.move.parentConstrainedMoveable(this.domNode, {
+				handle: this.handle
 			});
 		}
 		else
 		{
-			this._drag = new dojo.dnd.Moveable(this._id, {
-				handle: this._id + "handle"
+			this._drag = new dojo.dnd.Moveable(this.domNode, {
+				handle: this.handle
 			});
 		}
 		this._dragStartListener = dojo.connect(this._drag, "onMoveStart", dojo.hitch(this, function(mover){
@@ -643,20 +490,20 @@ api.window = function(params)
 		this._dragStopListener = dojo.connect(this._drag, "onMoveStop", dojo.hitch(this, function(mover){
 			dojo.style(this.body.domNode, "display", "block");
 		}));
-	}
+	},
 	/*
 	 * Method: unmaximize
 	 * Summary:
 	 * 		UnMaximizes the window
 	 */
-	this.unmaximize = function()
+	unmaximize: function()
 	{
 		this.makeDragger();
 		if(this.resizable == true)
 		{		
 			this.makeResizer();
 		}
-		var win = dojo.byId(this._id);
+		var win = this.domNode;
 		if(desktop.config.fx == true)
 		{
 			dojo.style(this.body.domNode, "display", "none");
@@ -689,18 +536,18 @@ api.window = function(params)
 			this._resizeBody();
 		}
 		this.maximized = false;
-	}
+	},
 	/*
 	 * Method: unmaximize
 	 * Summary:
 	 * 		UnMaximizes the window
 	 */
-	this._resizeBody = function()
+	_resizeBody: function()
 	{
 		if(this.body.resize) this.body.resize();
 		if(this.body.layout) this.body.layout();
 		this.onResize();
-	}
+	},
 	/*
 	 * Method: bringToFront
 	 * 
@@ -711,7 +558,7 @@ api.window = function(params)
 	 * 		false - it had to be rased
 	 * 		true - it was allready on top.
 	 */
-	this.bringToFront = function()
+	bringToFront: function()
 	{
 		var ns = document.getElementById("windowcontainer").getElementsByTagName("div");
 		var maxZindex = 0;
@@ -725,23 +572,23 @@ api.window = function(params)
 				}
 			}
 		}
-		zindex = dojo.byId(this._id).style.zIndex;
+		zindex = this.domNode.style.zIndex;
 		if(desktop.config.debug == true) { api.console(maxZindex+" != "+zindex); }
 		if(maxZindex != zindex)
 		{
 			maxZindex++;
-			dojo.style(this._id, "zIndex", maxZindex);
+			dojo.style(this.domNode, "zIndex", maxZindex);
 			return false;
 		}
 		else return true;
-	};
+	},
 	/* 
 	 * Method: destroy
 	 * 
 	 * Summary:
 	 * 		Destroys the window (or closes it)
 	 */
-	this.destroy = function()
+	destroy: function()
 	{
 		if(this.destroyed == true) return false;
 		dojo.style(this.body.domNode, "display", "none");
@@ -750,13 +597,13 @@ api.window = function(params)
 		this._task.destroy();
 		if (desktop.config.fx) {
 			var anim = dojo.fadeOut({
-				node: this._id,
+				node: this.domNode,
 				duration: 200
 			});
 			dojo.connect(anim, "onEnd", null, dojo.hitch(this, function(){
 				this._drag.destroy();
-				if (dojo.byId(this._id)) {
-					dojo.byId(this._id).parentNode.removeChild(dojo.byId(this._id));
+				if (this.domNode) {
+					this.domNode.parentNode.removeChild(this.domNode);
 				}
 				else {
 					api.console("Warning in app: No window shown.");
@@ -767,11 +614,9 @@ api.window = function(params)
 		else
 		{
 			this._drag.destroy();
-			if (dojo.byId(this._id)) {
-				dojo.byId(this._id).parentNode.removeChild(dojo.byId(this._id));
-			}
+			this.domNode.parentNode.removeChild(this.domNode);
 		}
-	}
+	},
 	/*
 	 * Adds a dojo widget or HTML element to the window.
 	 * 
@@ -783,12 +628,651 @@ api.window = function(params)
 	 * 		to 'true' untill adding the very last widget, otherwize the UI will
 	 * 		take forever to render
 	 */
-	this.addChild = function(node)
+	addChild: function(node)
 	{
 		this.body.addChild(node);
-	};
-	this.startup = function()
+	},
+	startup: function()
 	{
 		this.body.startup();
-	};
-};
+	}
+});
+dojo.require("dojo.dnd.move")
+/*
+ * Package: window
+ * 
+ * Summary:
+ * 		The window constructor
+ * 
+ * Example:
+ * 		(start code)
+ * 		win = new api.window();
+ * 		win.title = "foo";
+ * 		win.height =  "200px";
+ * 		win.width = "20%";
+ * 		win.bodyWidget = "ContentPane";
+ * 		win.bodyWidgetParams = {parseOnLoad: true};
+ * 		win.write("bar");
+ * 		//you can't use addChild before the window is shown...
+ * 		win.show();
+ * 		widget = new dijit.layout.ContentPane();
+ * 		widget.setContent("baz");
+ * 		win.addChild(widget, true);
+ * 		setTimeout(dojo.hitch(win, win.destroy), 1000*5);
+ * 		(end code)
+ */
+dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
+	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"winrightcorner\"></div><div class=\"winleftcorner\"></div><div class=\"winhandle\" dojoattachpoint=\"handle\" dojoattachevent=\"onmousedown: bringToFront\">${title}</div><div class=\"winbuttons\"><div dojoattachevent=\"onmouseup: destroy\" class=\"winbuttonclose\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"winbuttonmaximize\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"winbuttonminimize\"></div></div><div class=\"winbody\"><div class=\"winleftborder\"></div><div class=\"wininnerbody\" dojoattachpoint=\"body\" title=\"\"></div><div class=\"winrightborder\"></div></div><div class=\"winbottomborder\" style=\"position: absolute; bottom: 0px; left: 0px; width: 100%;\"><div class=\"winbottomleft\"></div><div class=\"winbottomcenter\"></div><div class=\"winbottomright\"></div></div><div dojoattachpoint=\"resize\" class=\"winresize\" style=\"cursor: se-resize;\"></div></div>",
+	/*
+	 * Property: destroyed
+	 * 
+	 * Summary:
+	 * 		Is the window destroyed?
+	 */
+	destroyed: false,
+	/*
+	 * Property: onDestroy
+	 * 
+	 * Summary:
+	 * 		What to do on destroying of the window
+	 */
+	onDestroy: function() {
+		
+	},
+	/*
+	 * Property: onResize
+	 * 
+	 * Summary:
+	 * 		What to do on the resizing of the window
+	 */
+	onResize: function() {
+		
+	},
+	/*
+	 * Property: onMinimize
+	 * 
+	 * Summary:
+	 * 		What to do on the minimizing of the window
+	 */
+	onMinimize: function() {
+		
+	},
+	/*
+	 * Property: onMaximize
+	 * 
+	 * Summary:
+	 * 		What to do upon maximize of window
+	 */
+	onMaximize: function() {
+		
+	},
+	/*
+	 * Property: showMaximize
+	 * 
+	 * Summary:
+	 * 		Show whether or not to show the maximize button
+	 */
+	showMaximize: true,
+	/*
+	 * Property: showMinimize
+	 * 
+	 * Summary:
+	 * 		Show whether or not to show the minimize button
+	 */
+	showMinimize: true,
+	/*
+	 * Property: showClose
+	 * 
+	 * Summary:
+	 * 		Show whether or not to show the close button
+	 */
+	showClose: true,
+	/*
+	 * Property: bodyWidget
+	 * 
+	 * Summary:
+	 * 		The window body's widget type
+	 * 
+	 * Note:
+	 * 		This must be a member of dijit.layout
+	 * 
+	 * Notes:
+	 * 		This is usefull for things like layout container creation
+	 * 		To set this after window creation, use <window.setBodyWidget>
+	 */
+	bodyWidget: "ContentPane",
+	 /*
+	 * Property: bodyWidgetParams
+	 * 
+	 * Summary:
+	 * 		The window body's widget params
+	 */
+	bodyWidgetParams: {},
+	/*
+	 * Property: maximized
+	 * 
+	 * Summary:
+	 * 		Whether or not the window is maximized
+	 * 		To set this after window creation, use <window.setBodyWidget>
+	 */
+	maximized: false,
+	/*
+	 * Property: height
+	 * 
+	 * Summary:
+	 * 		The window's height in px, or %.
+	 */
+	height: "400px",
+	/*
+	 * Property: width
+	 * 
+	 * Summary:
+	 * 		The window's width in px, or %.
+	 */
+	width: "500px",
+	/*
+	 * Property: title
+	 * 
+	 * Summary:
+	 * 		The window's title
+	 */
+	title: "",
+	/*
+	 * Property: resizable
+	 * 
+	 * Summary:
+	 * 		Weather or not the window is resizable.
+	 */
+	resizable: true,
+	/*
+	 * Property: pos
+	 * 
+	 * Summary:
+	 * 		Internal variable used by the window maximizer
+	 */
+	pos: {},
+	postCreate: function() {
+		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.body);
+	},
+	/*
+	 * Method: setBodyWidget
+	 * 
+	 * Summary:
+	 * 		sets the body widget. Cannot use after the window has been shown.
+	 * Parameters:
+	 * 		widget - the body widget's name. must be a member of dijit.layout
+	 * 		widgetParams - The body widget params
+	 */
+	setBodyWidget: function(widget, widgetParams)
+	{
+		this.bodyWidget = widget;
+		this.bodyWidgetParams = widgetParams;
+		this.bodyWidgetParams.id=this.id+"body";
+		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.body.domNode);
+	},
+	/*
+	 * Method: show
+	 *  
+	 * Summary:
+	 * 		Shows the window
+	 */
+	show: function()
+	{
+		if (document.getElementById(this.id) == null) //dojo.byId allways seems to return an objecct...
+		{
+			dojo.style(this.domNode, "width", this.width);
+			dojo.style(this.domNode, "height", this.height);
+			dojo.byId("windowcontainer").appendChild(this.domNode);
+			
+			this.makeDragger();
+			if(this.resizable == true)
+			{
+				this.makeResizer();
+			}
+			
+			this._task = new desktop.taskbar.task({
+				label: this.title,
+				icon: this.icon,
+				winid: this.id,
+				onclick: dojo.hitch(this, function()
+				{
+					var s = this.domNode.style.display;
+					if(s == "none")
+					{
+						this.restore();
+						this.bringToFront();
+					}
+					else
+					{
+						var ns = document.getElementById("windowcontainer").getElementsByTagName("div");
+						var box;
+						var myBox = new Object
+						var overlapping = false;
+						myBox.l = this.domNode.style.left;
+						myBox.t = this.domNode.style.top;
+						myBox.b = myBox.t + myBox.h;
+						myBox.r = myBox.l + myBox.w;
+						for(n = 0; n < ns.length; n++)
+						{
+							if(ns[n].id != this.id && (ns[n].style.display) != "none")
+							{
+								//TODO: overlap detection is really bad. rewrite it.
+								box = new Object();
+								box.l = ns[n].style.left;
+								box.t = ns[n].style.top;
+								box.w = ns[n].style.width;
+								box.h = ns[n].style.height;
+								if(box.l <= myBox.r &&
+								   box.l >= myBox.l &&
+								   box.t <= myBox.b &&
+								   box.t >= myBox.t)
+								{
+									if(desktop.config.debug == true) api.console("windows are overlapping!");
+									overlapping = true;
+									break;
+								}
+							}
+						}
+						var wasontop = this.bringToFront();
+						if(desktop.config.debug == true) api.console("onTop: "+wasontop+" overlap: "+overlapping);
+						if(overlapping == false)
+						{
+							this.minimize();
+						}
+						else if(wasontop == true)
+						{
+							this.minimize();
+						}
+					}
+				})
+			});
+			if(this.maximized == true) this.maximize();
+			dojo.style(this.domNode, "display", "block");
+			if(desktop.config.fx) {
+				dojo.style(this.domNode, "opacity", 0);
+				dojo.fadeIn({node: this.domNode, duration: 200}).play();
+			}
+			this._resizeBody();
+		}
+	},
+	_toggleMaximize: function() {
+		if(this.maximized == true) this.unmaximize();
+		else this.maximize();
+	},
+	/*
+	 * Method: makeResizer
+	 * 
+	 * Summary:
+	 * 		Internal method that makes a resizer for the window.
+	 */
+	makeResizer: function() {
+		this.resize.style.cursor = "se-resize";
+		this._resizeEvent = dojo.connect(this.resize, "onmousedown", this, function(e) {
+			this._dragging = dojo.connect(document, "onmousemove", this, function(f) {
+				//TODO: use the computed style technique instead of this
+				var win = this.domNode;
+				var x = f.clientX;
+				var y = f.clientY;
+				var width = win.style.width.replace(/px/g, "");
+				var height = win.style.height.replace(/px/g, "");
+				var t = width.indexOf("%");
+				var s = height.indexOf("%");
+				if((s != -1 && t != -1) ||
+				   (s != -1 || t != -1))
+				{
+					width = parseInt(width);
+					height = parseInt(height);
+				}
+				if(t != -1){
+					width = width.replace(/%/g, "");
+					width = (parseInt(win.parentNode.style.width.replace(/px/g, ""))/100)*width;
+				}
+				if(s != -1){
+					height = height.replace(/%/g, "");
+					height = (parseInt(win.parentNode.style.height.replace(/px/g, ""))/100)*height;
+				}
+				var top = win.style.top.replace(/px/g, "");
+				var left = win.style.left.replace(/px/g, "");
+				top = parseInt(top);
+				left = parseInt(left);
+				var winx = left+parseInt(width);
+				var winy = top+parseInt(height);
+				if(width >= 30 && height >= 30)
+				{
+					win.style.width = ((winx+(x-winx))-(left-2))+"px";
+					win.style.height = ((winy+(y-winy))-(top-2))+"px";
+				}
+				else {
+					win.style.width = "30px";
+					win.style.height = "30px";
+				}
+			});
+			if(desktop.config.fx === true) this._resizeBody();
+			this._doconmouseup = dojo.connect(document, "onmouseup", this, function(e) {
+				dojo.disconnect(this._dragging);
+				dojo.disconnect(this._doconmouseup);
+				this._resizeBody();
+			});
+		});
+	},
+	/*
+	 * Method: killResizer
+	 * 
+	 * Summary:
+	 * 		Internal method that gets rid of the resizer on the window.
+	 */
+	killResizer: function()
+	{
+		dojo.disconnect(this._dragging);
+		dojo.disconnect(this._resizeEvent);
+		dojo.disconnect(this._doconmouseup);
+		this.resize.style.cursor = "default";
+	},
+	/* 
+	 * Method: minimize
+	 * 
+	 * Summary:
+	 * 		Minimizes the window to the taskbar
+	 */
+	minimize: function()
+	{
+		this.onMinimize();
+		if(desktop.config.fx == true)
+		{
+			dojo.style(this.body.domNode, "display", "none");
+			var pos = dojo.coords(this.domNode, true);
+			this.left = pos.x;
+			this.top = pos.y;
+			var win = this.domNode;
+			var width = win.style.width.replace(/px/g, "");
+			var height = win.style.height.replace(/px/g, "");
+			var t = width.indexOf("%");
+			var s = height.indexOf("%");
+			width = parseInt(width);
+			height = parseInt(height);
+			if(t != -1){
+				width = width.replace(/%/g, "");
+				width = (parseInt(win.parentNode.style.width.replace(/px/g, ""))/100)*width;
+			}
+			if(s != -1){
+				height = height.replace(/%/g, "");
+				height = (parseInt(win.parentNode.style.height.replace(/px/g, ""))/100)*height;
+			}
+			this._width = width;
+			this._height = height;
+			var pos = dojo.coords("task_"+this.id, true);
+			
+			var fade = dojo.fadeOut({ node: this.domNode, duration: 200 });
+			var slide = dojo.fx.slideTo({ node: this.domNode, duration: 200, top: pos.y, left: pos.x});
+			var squish = dojo.animateProperty({
+				node: this.domNode,
+				duration: 200,
+				properties: {
+					height: {end: 26}, //TODO: is there a way of detecting this?
+					width: {end: 191} //and this?
+				}
+			});
+			var anim = dojo.fx.combine([fade, slide, squish]);
+			dojo.connect(anim, "onEnd", this, function() {
+				dojo.style(this.domNode, "display", "none");
+			});
+			anim.play();
+		}
+		else
+		{
+			dojo.style(this.domNode, "opacity", 100)
+			dojo.style(this.domNode, "display", "none");
+		}
+	},
+	/*
+	 * Method: restore
+	 * 
+	 * Summary:
+	 * 		Restores the window from the taskbar
+	 */
+	restore: function()
+	{
+		this.domNode.style.display = "inline";
+		if(desktop.config.fx == true)
+		{
+			var fade = dojo.fadeIn({ node: this.domNode, duration: 200 });
+			var slide = dojo.animateProperty({
+				node: this.domNode,
+				duration: 200,
+				properties: {
+					top: {end: this.top},
+					left: {end: this.left},
+					height: {end: this._height},
+					width: {end: this._width}
+				}
+			});
+			var anim = dojo.fx.combine([fade, slide]);
+			dojo.connect(anim, "onEnd", this, function() {
+				dojo.style(this.body.domNode, "display", "block");
+			});
+			anim.play();
+		}
+	},
+	/*
+	 * Method: maximize
+	 * 
+	 * Summary:
+	 * 		Maximizes the window
+	 */
+	maximize: function()
+	{
+		this.onMaximize();
+		this.maximized = true;
+		this._drag.destroy();
+		if(this.resizable == true)
+		{
+			this.killResizer();
+		}
+		this.pos.top = this.domNode.style.top.replace(/px/g, "");
+		this.pos.bottom = this.domNode.style.bottom.replace(/px/g, "");
+		this.pos.left = this.domNode.style.left.replace(/px/g, "");
+		this.pos.right = this.domNode.style.right.replace(/px/g, "");
+		this.pos.width = this.domNode.style.width.replace(/px/g, "");
+		this.pos.height = this.domNode.style.height.replace(/px/g, "");
+		var win = this.domNode;
+		
+		if(desktop.config.fx == true)
+		{
+			api.console("maximizing... (in style!)");
+			//win.style.height= "auto";
+			//win.style.width= "auto";
+			//this._resizeBody();
+			dojo.style(this.body.domNode, "display", "none");
+			var anim = dojo.animateProperty({
+				node: win,
+				properties: {
+					top: {end: 0},
+					left: {end: 0},
+					width: {end: this.domNode.parentNode.style.width.replace(/px/g, "")},
+					height: {end: this.domNode.parentNode.style.height.replace(/px/g, "")}
+				},
+				duration: 150
+			});
+			dojo.connect(anim, "onEnd", this, function() {
+				dojo.style(this.body.domNode, "display", "block");
+				this._resizeBody();
+			});
+			anim.play();
+		}
+		else
+		{
+			api.console("maximizing...");
+			win.style.top = "0px";
+			win.style.left = "0px";
+			win.style.width = "100%";
+			win.style.height = "100%";
+			this._resizeBody();
+		}
+	},
+	makeDragger: function()
+	{
+		if(desktop.config.window.constrain) 
+		{
+			this._drag = new dojo.dnd.move.parentConstrainedMoveable(this.domNode, {
+				handle: this.handle
+			});
+		}
+		else
+		{
+			this._drag = new dojo.dnd.Moveable(this.domNode, {
+				handle: this.handle
+			});
+		}
+		this._dragStartListener = dojo.connect(this._drag, "onMoveStart", dojo.hitch(this, function(mover){
+			dojo.style(this.body.domNode, "display", "none");
+		}));
+		this._dragStopListener = dojo.connect(this._drag, "onMoveStop", dojo.hitch(this, function(mover){
+			dojo.style(this.body.domNode, "display", "block");
+		}));
+	},
+	/*
+	 * Method: unmaximize
+	 * Summary:
+	 * 		UnMaximizes the window
+	 */
+	unmaximize: function()
+	{
+		this.makeDragger();
+		if(this.resizable == true)
+		{		
+			this.makeResizer();
+		}
+		var win = this.domNode;
+		if(desktop.config.fx == true)
+		{
+			dojo.style(this.body.domNode, "display", "none");
+			var anim = dojo.animateProperty({
+				node: win,
+				properties: {
+					top: {end: this.pos.top},
+					left: {end: this.pos.left},
+					right: {end: this.pos.right},
+					bottom: {end: this.pos.bottom},
+					width: {end: this.pos.width},
+					height: {end: this.pos.height}
+				},
+				duration: 150
+			});
+			dojo.connect(anim, "onEnd", this, function() {
+				dojo.style(this.body.domNode, "display", "block");
+				this._resizeBody();
+			});
+			anim.play();
+		}
+		else
+		{
+			win.style.top = this.pos.top;
+			win.style.bottom = this.pos.bottom;
+			win.style.left = this.pos.left;
+			win.style.right = this.pos.right;
+			win.style.height= this.pos.height;
+			win.style.width= this.pos.width;
+			this._resizeBody();
+		}
+		this.maximized = false;
+	},
+	/*
+	 * Method: unmaximize
+	 * Summary:
+	 * 		UnMaximizes the window
+	 */
+	_resizeBody: function()
+	{
+		if(this.body.resize) this.body.resize();
+		if(this.body.layout) this.body.layout();
+		this.onResize();
+	},
+	/*
+	 * Method: bringToFront
+	 * 
+	 * Summary:
+	 * 		Brings the window to the front of the stack
+	 * 
+	 * Returns:	
+	 * 		false - it had to be rased
+	 * 		true - it was allready on top.
+	 */
+	bringToFront: function()
+	{
+		var ns = document.getElementById("windowcontainer").getElementsByTagName("div");
+		var maxZindex = 0;
+		for(i=0;i<ns.length;i++)
+		{
+			if((ns[i].style.display) != "none")
+			{
+				if((ns[i].style.zIndex) >= maxZindex)
+				{
+					maxZindex = ns[i].style.zIndex;
+				}
+			}
+		}
+		zindex = this.domNode.style.zIndex;
+		if(desktop.config.debug == true) { api.console(maxZindex+" != "+zindex); }
+		if(maxZindex != zindex)
+		{
+			maxZindex++;
+			dojo.style(this.domNode, "zIndex", maxZindex);
+			return false;
+		}
+		else return true;
+	},
+	/* 
+	 * Method: destroy
+	 * 
+	 * Summary:
+	 * 		Destroys the window (or closes it)
+	 */
+	destroy: function()
+	{
+		if(this.destroyed == true) return false;
+		dojo.style(this.body.domNode, "display", "none");
+		this.destroyed = true;
+		this.onDestroy();
+		this._task.destroy();
+		if (desktop.config.fx) {
+			var anim = dojo.fadeOut({
+				node: this.domNode,
+				duration: 200
+			});
+			dojo.connect(anim, "onEnd", null, dojo.hitch(this, function(){
+				this._drag.destroy();
+				if (this.domNode) {
+					this.domNode.parentNode.removeChild(this.domNode);
+				}
+				else {
+					api.console("Warning in app: No window shown.");
+				}
+			}));
+			anim.play();
+		}
+		else
+		{
+			this._drag.destroy();
+			this.domNode.parentNode.removeChild(this.domNode);
+		}
+	},
+	/*
+	 * Adds a dojo widget or HTML element to the window.
+	 * 
+	 * Parameters:
+	 * 		node - A dojo widget or HTML element.
+	 * 
+	 * Note:
+	 * 		If you are adding widgets in bulk, you should not set restartWidget
+	 * 		to 'true' untill adding the very last widget, otherwize the UI will
+	 * 		take forever to render
+	 */
+	addChild: function(node)
+	{
+		this.body.addChild(node);
+	},
+	startup: function()
+	{
+		this.body.startup();
+	}
+});
