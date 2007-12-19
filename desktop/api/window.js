@@ -23,7 +23,7 @@ dojo.require("dojo.dnd.move")
  * 		(end code)
  */
 dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
-	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"winrightcorner\"></div><div class=\"winleftcorner\"></div><div class=\"winhandle\" dojoattachpoint=\"handle\" dojoattachevent=\"onmousedown: bringToFront\">${title}</div><div class=\"winbuttons\"><div dojoattachevent=\"onmouseup: destroy\" class=\"winbuttonclose\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"winbuttonmaximize\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"winbuttonminimize\"></div></div><div class=\"winbody\"><div class=\"winleftborder\"></div><div class=\"wininnerbody\" dojoattachpoint=\"body\" title=\"\"></div><div class=\"winrightborder\"></div></div><div class=\"winbottomborder\" style=\"position: absolute; bottom: 0px; left: 0px; width: 100%;\"><div class=\"winbottomleft\"></div><div class=\"winbottomcenter\"></div><div class=\"winbottomright\"></div></div><div dojoattachpoint=\"resize\" class=\"winresize\" style=\"cursor: se-resize;\"></div></div>",
+	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"winrightcorner\"></div><div class=\"winleftcorner\"></div><div class=\"winhandle\" dojoattachpoint=\"handle\" dojoattachevent=\"onmousedown: bringToFront\">${title}</div><div class=\"winbuttons\"><div dojoattachevent=\"onmouseup: destroy\" class=\"winbuttonclose\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"winbuttonmaximize\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"winbuttonminimize\"></div></div><div class=\"winbody\"><div class=\"winleftborder\"></div><div class=\"wininnerbody\" dojoattachpoint=\"body\" title=\"\"></div><div class=\"winrightborder\"></div></div><div class=\"winbottomborder\" style=\"position: absolute; bottom: 0px; left: 0px; width: 100%;\"><div class=\"winbottomleft\"></div><div class=\"winbottomcenter\"></div><div class=\"winbottomright\"></div></div><div dojoattachpoint=\"resize\" class=\"winresize\"></div></div>",
 	/*
 	 * Property: destroyed
 	 * 
@@ -184,9 +184,9 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			dojo.style(this.domNode, "width", this.width);
 			dojo.style(this.domNode, "height", this.height);
 			dojo.byId("windowcontainer").appendChild(this.domNode);
-			
+			this.handle.innerHTML = this.title;
 			this.makeDragger();
-			if(this.resizable == true)
+			if(this.resizable)
 			{
 				this.makeResizer();
 			}
@@ -268,6 +268,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 */
 	makeResizer: function() {
 		this.resize.style.cursor = "se-resize";
+		dojo.style(this.resize, "zIndex", "1000");
 		this._resizeEvent = dojo.connect(this.resize, "onmousedown", this, function(e) {
 			this._dragging = dojo.connect(document, "onmousemove", this, function(f) {
 				//TODO: use the computed style technique instead of this
