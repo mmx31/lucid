@@ -23,6 +23,7 @@ desktop.console = new function()
 	*/
 	this.toggle = function(e)
 	{
+		dojo.stopEvent(e);
 		if (document.all)
 	    {
 	    	var evnt = window.event;

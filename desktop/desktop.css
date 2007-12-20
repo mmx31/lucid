@@ -167,6 +167,10 @@ height: 100%;
 	background-repeat: no-repeat;
 }
 
+.win-bmw {
+	position: relative;
+}
+
 .win-ml {
 	position: relative;
 	overflow: hidden;
@@ -198,6 +202,11 @@ height: 100%;
 
 .win-bc {
 	background-repeat: repeat-x;
+}
+
+.win-resize {
+	z-index: 10;
+	position: absolute;
 }
 
 /* filearea */
