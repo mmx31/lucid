@@ -1,4 +1,5 @@
-dojo.require("dojo.dnd.move")
+dojo.require("dojox.layout.ResizeHandle");
+dojo.require("dojo.dnd.move");
 /*
  * Package: window
  * 
@@ -23,7 +24,7 @@ dojo.require("dojo.dnd.move")
  * 		(end code)
  */
 dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
-	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"win-tl\"><div class=\"win-tr\"><div class=\"win-tc\" dojoattachpoint=\"handle\" dojoattachevent=\"onmousedown: bringToFront\"><div dojoattachpoint=\"titleNode\" class=\"win-title\">${title}</div><div class=\"win-buttons\"><div dojoattachevent=\"onmouseup: destroy\" class=\"win-close\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"win-max\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"win-min\"></div></div></div></div></div><div class=\"win-ml\"><div class=\"win-mr\"><div class=\"win-mc\" dojoattachpoint=\"body\"></div></div></div><div class=\"win-bl\"><div class=\"win-br\"><div class=\"win-bc\"></div></div></div><div dojoattachpoint=\"resize\" class=\"win-resize\"></div></div>",
+	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"win-tl\"><div class=\"win-tr\"><div class=\"win-tc\" dojoattachpoint=\"handle\" dojoattachevent=\"onmousedown: bringToFront\"><div dojoattachpoint=\"titleNode\" class=\"win-title\">${title}</div><div class=\"win-buttons\"><div dojoattachevent=\"onmouseup: destroy\" class=\"win-close\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"win-max\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"win-min\"></div></div></div></div></div><div class=\"win-ml\"><div class=\"win-mr\"><div class=\"win-mc\" dojoattachpoint=\"body\"></div></div></div><div class=\"win-bl\"><div class=\"win-br\"><div class=\"win-bc\"></div><div dojoattachpoint=\"resize\" class=\"win-resize\"></div></div></div></div>",
 	/*
 	 * Property: destroyed
 	 * 
@@ -187,11 +188,21 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			dojo.byId("windowcontainer").appendChild(this.domNode);
 			this.titleNode.innerHTML = this.title;
 			this.makeDragger();
-			if(this.resizable)
+			this.resize = new dojox.layout.ResizeHandle({
+				targetContainer: this.domNode,
+				activeResize: true,
+			}, this.resize);
+			dojo.addClass(this.resize.domNode, "win-resize");
+			dojo.connect(this.resize.domNode, "onmousedown", this, function(e){
+				this._resizeEnd = dojo.connect(document, "onmouseup", this, function(e){
+					dojo.disconnect(this._resizeEnd);
+					this._resizeBody();
+				});
+			});
+			if(!this.resizable)
 			{
-				this.makeResizer();
+				this.killResizer();
 			}
-			
 			this._task = new desktop.taskbar.task({
 				label: this.title,
 				icon: this.icon,
@@ -268,7 +279,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 * 		Internal method that makes a resizer for the window.
 	 */
 	makeResizer: function() {
-		this.resize.style.cursor = "se-resize";
+		/*this.resize.style.cursor = "se-resize";
 		dojo.style(this.resize, "zIndex", "1000");
 		this._resizeEvent = dojo.connect(this.resize, "onmousedown", this, function(e) {
 			this._dragging = dojo.connect(document, "onmousemove", this, function(f) {
@@ -316,7 +327,8 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				dojo.disconnect(this._doconmouseup);
 				this._resizeBody();
 			});
-		});
+		});*/
+		dojo.style(this.resize.domNode, "display", "block");
 	},
 	/*
 	 * Method: killResizer
@@ -326,10 +338,11 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 */
 	killResizer: function()
 	{
-		dojo.disconnect(this._dragging);
+		/*dojo.disconnect(this._dragging);
 		dojo.disconnect(this._resizeEvent);
 		dojo.disconnect(this._doconmouseup);
-		this.resize.style.cursor = "default";
+		this.resize.style.cursor = "default";*/
+		dojo.style(this.resize.domNode, "display", "none");
 	},
 	/* 
 	 * Method: minimize
@@ -426,11 +439,8 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	{
 		this.onMaximize();
 		this.maximized = true;
-		this._drag.destroy();
-		if(this.resizable == true)
-		{
-			this.killResizer();
-		}
+		//this._drag.destroy();
+		this.killResizer();
 		this.pos.top = this.domNode.style.top.replace(/px/g, "");
 		this.pos.bottom = this.domNode.style.bottom.replace(/px/g, "");
 		this.pos.left = this.domNode.style.left.replace(/px/g, "");
