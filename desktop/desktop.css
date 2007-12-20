@@ -124,10 +124,83 @@ height: 100%;
 	border: 0px;
 }
 /* windows */
-.winhandle {
+.win-handle {
 	cursor: hand;
 }
 
+.win {
+	position: absolute;
+	top: 50px;
+	left: 50px;
+}
+
+.win-tl {
+	position: relative;
+	z-index: 1;
+	background-repeat: no-repeat;
+}
+
+.win-tr {
+	background-repeat: no-repeat;
+	background-position: top right;
+}
+
+.win-tc {
+	overflow: hidden;
+	background-repeat: repeat-x;
+	vertical-align: middle;
+}
+
+.win-title {
+	white-space: nowrap;
+	float: left;
+}
+.win-buttons {
+	background-repeat: no-repeat;
+	float: right;
+}
+
+.win-max,
+.win-min,
+.win-close {
+	float: right;
+	background-repeat: no-repeat;
+}
+
+.win-ml {
+	position: relative;
+	overflow: hidden;
+	z-index: 1;
+	background-repeat: repeat-y;
+}
+
+.win-mr {
+	background-repeat: repeat-y;
+	background-position: top right;
+}
+
+.win-mc {
+	overflow: hidden;
+	height: 100%; /* temporary untill I find a better solution */
+}
+
+.win-bl {
+	position: relative;
+	overflow: hidden;
+	z-index: 1;
+	background-repeat: no-repeat;
+}
+
+.win-br {
+	background-repeat: no-repeat;
+	background-position: top right;
+}
+
+.win-bc {
+	background-repeat: repeat-x;
+}
+
+/* filearea */
 .desktopFileItemText { 
 	position: relative;
 	left: 0px;

@@ -1,21 +1,25 @@
 <div class="win" style="display: none;" dojoattachevent="onmousedown: bringToFront">
-	<div class="winrightcorner"></div>
-	<div class="winleftcorner"></div>
-	<div id="win1handle" class="winhandle" dojoattachpoint="handle" dojoattachevent="onmousedown: bringToFront">${title}</div>
-	<div id="win1buttons" class="winbuttons">
-		<div dojoattachevent="onmouseup: destroy" class="winbuttonclose"></div>
-		<div dojoattachevent="onmouseup: _toggleMaximize" class="winbuttonmaximize"></div>
-		<div dojoattachevent="onmouseup: minimize" class="winbuttonminimize"></div>
+	<div class="win-tl">
+		<div class="win-tr">
+			<div class="win-tc" dojoattachpoint="handle" dojoattachevent="onmousedown: bringToFront">
+				<div dojoattachpoint="titleNode" class="win-title">${title}</div>
+				<div class="win-buttons">
+					<div dojoattachevent="onmouseup: destroy" class="win-close"></div>
+					<div dojoattachevent="onmouseup: _toggleMaximize" class="win-max"></div>
+					<div dojoattachevent="onmouseup: minimize" class="win-min"></div>
+				</div>
+			</div>
+		</div>
 	</div>
-	<div class="winbody">
-		<div class="winleftborder"></div>
-		<div class="wininnerbody" dojoattachpoint="body" title=""></div>
-		<div class="winrightborder"></div>
+	<div class="win-ml">
+		<div class="win-mr">
+			<div class="win-mc" dojoattachpoint="body"></div>
+		</div>
 	</div>
-	<div class="winbottomborder" style="position: absolute; bottom: 0px; left: 0px; width: 100%;">
-		<div class="winbottomleft"></div>
-		<div class="winbottomcenter"></div>
-		<div class="winbottomright"></div>
+	<div class="win-bl">
+		<div class="win-br">
+			<div class="win-bc"></div>
+		</div>
 	</div>
-	<div dojoattachpoint="resize" class="winresize"></div>
+	<div dojoattachpoint="resize" class="win-resize"></div>
 </div>
