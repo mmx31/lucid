@@ -279,55 +279,6 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 * 		Internal method that makes a resizer for the window.
 	 */
 	makeResizer: function() {
-		/*this.resize.style.cursor = "se-resize";
-		dojo.style(this.resize, "zIndex", "1000");
-		this._resizeEvent = dojo.connect(this.resize, "onmousedown", this, function(e) {
-			this._dragging = dojo.connect(document, "onmousemove", this, function(f) {
-				//TODO: use the computed style technique instead of this
-				var win = this.domNode;
-				var x = f.clientX;
-				var y = f.clientY;
-				var width = win.style.width.replace(/px/g, "");
-				var height = win.style.height.replace(/px/g, "");
-				var t = width.indexOf("%");
-				var s = height.indexOf("%");
-				if((s != -1 && t != -1) ||
-				   (s != -1 || t != -1))
-				{
-					width = parseInt(width);
-					height = parseInt(height);
-				}
-				if(t != -1){
-					width = width.replace(/%/g, "");
-					width = (parseInt(win.parentNode.style.width.replace(/px/g, ""))/100)*width;
-				}
-				if(s != -1){
-					height = height.replace(/%/g, "");
-					height = (parseInt(win.parentNode.style.height.replace(/px/g, ""))/100)*height;
-				}
-				var top = win.style.top.replace(/px/g, "");
-				var left = win.style.left.replace(/px/g, "");
-				top = parseInt(top);
-				left = parseInt(left);
-				var winx = left+parseInt(width);
-				var winy = top+parseInt(height);
-				if(width >= 30 && height >= 30)
-				{
-					win.style.width = ((winx+(x-winx))-(left-2))+"px";
-					win.style.height = ((winy+(y-winy))-(top-2))+"px";
-				}
-				else {
-					win.style.width = "30px";
-					win.style.height = "30px";
-				}
-			});
-			if(desktop.config.fx === true) this._resizeBody();
-			this._doconmouseup = dojo.connect(document, "onmouseup", this, function(e) {
-				dojo.disconnect(this._dragging);
-				dojo.disconnect(this._doconmouseup);
-				this._resizeBody();
-			});
-		});*/
 		dojo.style(this.resize.domNode, "display", "block");
 	},
 	/*
@@ -439,30 +390,27 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	{
 		this.onMaximize();
 		this.maximized = true;
-		//this._drag.destroy();
+		if(this._drag) this._drag.destroy();
 		this.killResizer();
-		this.pos.top = this.domNode.style.top.replace(/px/g, "");
-		this.pos.bottom = this.domNode.style.bottom.replace(/px/g, "");
-		this.pos.left = this.domNode.style.left.replace(/px/g, "");
-		this.pos.right = this.domNode.style.right.replace(/px/g, "");
-		this.pos.width = this.domNode.style.width.replace(/px/g, "");
-		this.pos.height = this.domNode.style.height.replace(/px/g, "");
+		this.pos.top = dojo.style(this.domNode, "top");
+		this.pos.bottom = dojo.style(this.domNode, "bottom");
+		this.pos.left = dojo.style(this.domNode, "left");
+		this.pos.right = dojo.style(this.domNode, "right");
+		this.pos.width = dojo.style(this.domNode, "width");
+		this.pos.height = dojo.style(this.domNode, "height");
 		var win = this.domNode;
 		
 		if(desktop.config.fx == true)
 		{
 			api.console("maximizing... (in style!)");
-			//win.style.height= "auto";
-			//win.style.width= "auto";
-			//this._resizeBody();
 			dojo.style(this.body.domNode, "display", "none");
 			var anim = dojo.animateProperty({
-				node: win,
+				node: this.domNode,
 				properties: {
 					top: {end: 0},
 					left: {end: 0},
-					width: {end: this.domNode.parentNode.style.width.replace(/px/g, "")},
-					height: {end: this.domNode.parentNode.style.height.replace(/px/g, "")}
+					width: {end: dojo.style(this.domNode.parentNode, "width")},
+					height: {end: dojo.style(this.domNode.parentNode, "height")}
 				},
 				duration: 150
 			});
@@ -477,8 +425,8 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			api.console("maximizing...");
 			win.style.top = "0px";
 			win.style.left = "0px";
-			win.style.width = "100%";
-			win.style.height = "100%";
+			win.style.width = dojo.style(this.domNode.parentNode, "width");
+			win.style.height = dojo.style(this.domNode.parentNode, "height");
 			this._resizeBody();
 		}
 	},
