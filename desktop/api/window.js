@@ -417,6 +417,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.body.domNode, "display", "block");
 				this._resizeBody();
+				this._hideBorders();
 			});
 			anim.play();
 		}
@@ -428,7 +429,34 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			win.style.width = dojo.style(this.domNode.parentNode, "width");
 			win.style.height = dojo.style(this.domNode.parentNode, "height");
 			this._resizeBody();
+			this._hideBorders();
 		}
+	},
+	_showBorders: function() {
+		dojo.forEach([
+			"win-tr",
+			"win-tl",
+			"win-ml",
+			"win-mr",
+			"win-br",
+			"win-bl",
+			"win-bc"
+		], function(item) {
+			dojo.query("."+item+"-hidden", this.domNode).addClass(item).removeClass(item+"-hidden");
+		});
+	},
+	_hideBorders: function() {
+		dojo.forEach([
+			"win-tr",
+			"win-tl",
+			"win-ml",
+			"win-mr",
+			"win-br",
+			"win-bl",
+			"win-bc"
+		], function(item) {
+			dojo.query("."+item, this.domNode).addClass(item+"-hidden").removeClass(item);
+		});
 	},
 	makeDragger: function()
 	{
@@ -483,6 +511,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.body.domNode, "display", "block");
 				this._resizeBody();
+				this._showBorders();
 			});
 			anim.play();
 		}
@@ -495,6 +524,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			win.style.height= this.pos.height;
 			win.style.width= this.pos.width;
 			this._resizeBody();
+			this._showBorders();
 		}
 		this.maximized = false;
 	},
