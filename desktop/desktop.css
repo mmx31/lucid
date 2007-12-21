@@ -157,7 +157,7 @@ height: 100%;
 	position: absolute;
 	left: 0px;
 	width: 100%;
-	zindex: 1;
+	z-index: 1;
 }
 .win-buttons {
 	background-repeat: no-repeat;
@@ -213,6 +213,21 @@ height: 100%;
 .win-resize {
 	z-index: 10;
 	position: absolute;
+}
+
+/*if not IE we can use the method that works :D */
+
+.win > .win-bmw,
+.win-bmw > .win-ml,
+.win-ml > .win-mr,
+.win-mr > .win-mc {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	height: auto;
+	width: auto;
 }
 
 /* filearea */

@@ -1,14 +1,14 @@
 <?php
 	$GLOBALS['db'] = Array(
 		"type" => "mySQL",
-		"username" => "mysql",
-		"password" => "mysql",
+		"username" => "root",
+		"password" => "toor",
 		"database" => "desktop",
 		"prefix" => "dsktp_",
 		"host" => "localhost"
 	);
 	$GLOBALS['conf'] = Array(
-		"salt" => "c6fef296483fd326eb21182c87854f80",
+		"salt" => "aa824993b7418cbe6264214f8047c430",
 		"public" => "yes"
 	);
 ?>
