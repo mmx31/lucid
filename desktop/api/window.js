@@ -190,7 +190,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			this.makeDragger();
 			this.resize = new dojox.layout.ResizeHandle({
 				targetContainer: this.domNode,
-				activeResize: true,
+				activeResize: true
 			}, this.resize);
 			dojo.addClass(this.resize.domNode, "win-resize");
 			dojo.connect(this.resize.domNode, "onmousedown", this, function(e){
