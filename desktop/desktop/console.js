@@ -23,7 +23,6 @@ desktop.console = new function()
 	*/
 	this.toggle = function(e)
 	{
-		dojo.stopEvent(e);
 		if (document.all)
 	    {
 	    	var evnt = window.event;
@@ -42,6 +41,7 @@ desktop.console = new function()
 		else code="192";
 		if(x == code)
 		{
+			dojo.stopEvent(e);
 			dojo.byId("consolepath").innerHTML = desktop.console.path;
 			if(dojo.byId("console").style.display == "block")
 			{
