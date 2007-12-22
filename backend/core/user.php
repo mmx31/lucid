@@ -36,7 +36,7 @@
 				$user->save();
 			}
 		}
-		else { die("1"); }
+		else { die("user not found"); }
 	}
 	
 	if($_GET['section'] == "auth")

@@ -31,29 +31,30 @@ if($_GET['section'] == "io")
 					echo "0";
 	}
 		if ($_GET['action'] == "getFolder") {
-					$odir = $_POST['path'];
-				    $dir = opendir("../../files/".$username."/$odir");
-					if(!$dir){
-								die();
+			$odir = $_POST['path'];
+		    $dir = opendir("../../files/".$username."/$odir");
+			if(!$dir){
+				$out = new intOutput();
+				$out->set("generic_err", true);
+			} else {
+				$output = "<" . "?xml version='1.0' encoding='utf-8' ?" . ">" . "\r\n" . "<getFolderResponse path=\"" . $_REQUEST['path'] . "\">";
+				while(($file = readdir($dir)) !== false){
+					if($file == '..' || $file == '.'){
+						continue;
 					} else {
-						$output = "<" . "?xml version='1.0' encoding='utf-8' ?" . ">" . "\r\n" . "<getFolderResponse path=\"" . $_REQUEST['path'] . "\">";
-						while(($file = readdir($dir)) !== false){
-							if($file == '..' || $file == '.'){
-								continue;
-							} else {
-								$t = strtolower($file);
-								if(is_dir("../../files/".$username."/$odir" . $file)){
-									$type = 'folder';
-								} else {
-									$type = 'file';
-								}
-								$output .=  "\r\n" . '<file type="' . $type . '">' . $file . '</file>';
-							}
+						$t = strtolower($file);
+						if(is_dir("../../files/".$username."/$odir" . $file)){
+							$type = 'folder';
+						} else {
+							$type = 'file';
 						}
-						$output .=  "\r\n" . '</getFolderResponse>';
-						header('Content-type: text/xml');
-						echo $output;
+						$output .=  "\r\n" . '<file type="' . $type . '">' . $file . '</file>';
 					}
+				}
+				$output .=  "\r\n" . '</getFolderResponse>';
+				header('Content-type: text/xml');
+				echo $output;
+			}
 	}
 		if ($_GET['action'] == "getFile") {
 					$odir = $_POST['path'];

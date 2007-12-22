@@ -67,7 +67,7 @@
 				mkdir("../../files/".$blah."/Documents");
 				mkdir("../../files/".$blah."/Desktop");
 				$ourFileName = "../../files/".$blah."/Desktop/welcome.txt";
-				$ourFileHandle = fopen($ourFileName, 'w') or die("1");
+				$ourFileHandle = fopen($ourFileName, 'w') or die("Could not open file");
 				fwrite($ourFileHandle, "Welcome to Psych Desktop, ".$this->username."\r\n Your new account is installed and ready.");
 				fclose($ourFileHandle);
 			}

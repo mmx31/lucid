@@ -1,7 +1,6 @@
 <?php
 	require("../backend/configuration.php");
 	require("../backend/models/base.php");
-	//error_reporting(0);
     $act = ($_GET['action'] == "" ? "installprograms" : $_GET['action']);
 	if($act == "installadmin")
 	{

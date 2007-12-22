@@ -18,39 +18,41 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 require("../configuration.php");
-if($xsite_status == "no") { die("<b>External Access is forbidden."); }
-session_start();
-if($_SESSION['userloggedin'] == TRUE)	//very important, make sure the user is logged in
-{										//maybe in the future add this in the permissions system
-	// Get the REST call path from the AJAX application
-	// Is it a POST or a GET?
-	$url = ($_POST['path']) ? $_POST['path'] : $_GET['path'];
-	
-	// Open the Curl session
-	$session = curl_init($url);
-	
-	// If it's a POST, put the POST data in the body
-	if ($_POST['path']) {
-		$postvars = '';
-		while ($element = current($_POST)) {
-			$postvars .= key($_POST).'='.$element.'&';
-			next($_POST);
+if($GLOBALS['conf']['xsite']) { die("<b>External Access is forbidden."); }
+else {
+	session_start();
+	if($_SESSION['userloggedin'] == TRUE)	//very important, make sure the user is logged in
+	{										//maybe in the future add this in the permissions system
+		// Get the REST call path from the AJAX application
+		// Is it a POST or a GET?
+		$url = ($_POST['path']) ? $_POST['path'] : $_GET['path'];
+		
+		// Open the Curl session
+		$session = curl_init($url);
+		
+		// If it's a POST, put the POST data in the body
+		if ($_POST['path']) {
+			$postvars = '';
+			while ($element = current($_POST)) {
+				$postvars .= key($_POST).'='.$element.'&';
+				next($_POST);
+			}
+			curl_setopt ($session, CURLOPT_POST, true);
+			curl_setopt ($session, CURLOPT_POSTFIELDS, $postvars);
 		}
-		curl_setopt ($session, CURLOPT_POST, true);
-		curl_setopt ($session, CURLOPT_POSTFIELDS, $postvars);
+		
+		// Don't return HTTP headers. Do return the contents of the call
+		curl_setopt($session, CURLOPT_HEADER, false);
+		curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
+		
+		// Make the call
+		$xml = curl_exec($session);
+		
+		// The web service returns XML. Set the Content-Type appropriately
+		header("Content-Type: text/xml");
+		
+		echo $xml;
+		curl_close($session);
 	}
-	
-	// Don't return HTTP headers. Do return the contents of the call
-	curl_setopt($session, CURLOPT_HEADER, false);
-	curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
-	
-	// Make the call
-	$xml = curl_exec($session);
-	
-	// The web service returns XML. Set the Content-Type appropriately
-	header("Content-Type: text/xml");
-	
-	echo $xml;
-	curl_close($session);
 }
 ?>

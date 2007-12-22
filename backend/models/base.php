@@ -67,7 +67,7 @@
 				$tablename = $this->_get_tablename();
 				$link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password'])
 				   or die('Could not connect: ' . mysql_error());
-				mysql_select_db($GLOBALS['db']['database']) or die('Could not select database');
+				mysql_select_db($GLOBALS['db']['database']) or die("Could not connect to database!");
                                 if(!is_numeric($id))
                                 {
                                     $id = "'" . mysql_real_escape_string($id) . "'"; 

@@ -59,7 +59,7 @@ if (isset($_GET['action'])) {
 				echo("0");
 			}
 			else {
-				die("1");
+				die("Wrong password provided");
 			}
 		}
 	}
@@ -80,7 +80,7 @@ if (isset($_GET['action'])) {
 				echo("0");
 			}
 			else {
-				die("1");
+				die("bad password provided");
 			}
 		}
 	}
