@@ -11,7 +11,8 @@
 			}
 			function _make_parent()
 			{
-				$parent = new $this->_parentModel();
+				$parent = $this->_parentModel;
+				$p = new $parent;
 				foreach($this as $prop => $val)
 				{
 					$p->$prop = $val;

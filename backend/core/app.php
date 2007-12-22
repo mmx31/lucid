@@ -22,8 +22,6 @@
 	require("../lib/util.php");
 	require("../models/base.php");
 	require("../models/app.php");
-	$_GET['section'] = "fetch";
-	$_GET['action'] = "list";
     if($_GET['section'] == "fetch")
 	{
 		if($_GET['action'] == "full")
