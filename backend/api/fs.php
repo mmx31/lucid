@@ -120,6 +120,21 @@ if($_GET['section'] == "io")
 			readfile($f);
 		}
 	}
+	if($_GET['action'] == "display")
+	{
+		$f = "../../files/" . $username . "/" . $_GET['path'];
+		if(file_exists($f))
+		{
+			$name = basename($f);
+			$type = mime_content_type($f);
+			$size = filesize($f);
+			header("Content-type: $type");
+			header('Pragma: no-cache');
+			header('Expires: 0');
+			header("Content-length: $size");
+			readfile($f);
+		}
+	}
 }
 
 function deltree( $f ){
