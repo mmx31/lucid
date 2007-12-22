@@ -275,6 +275,9 @@ dojo.declare(
 	startup: function() {
 		this.menu = new dijit.Menu({});
 	       	this.menu.addChild(new dijit.MenuItem({label: "Open", iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
+			this.menu.addChild(new dijit.MenuItem({label: "Download", iconClass: "icon-16-actions-document-save-as", onClick: dojo.hitch(this, function(e) {
+				api.fs.download(this.path);
+			})}));
 		this.menu.addChild(new dijit.MenuSeparator({}));
 	       	this.menu.addChild(new dijit.MenuItem({label: "Move", iconClass: "icon-16-actions-edit-find-replace", onClick: dojo.hitch(this, this._replace_file)}));
 		this.menu.addChild(new dijit.MenuItem({label: "Rename", iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, this._rename_file)}));
