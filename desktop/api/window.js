@@ -416,8 +416,8 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			});
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.body.domNode, "display", "block");
-				this._resizeBody();
 				this._hideBorders();
+				this._resizeBody();
 			});
 			anim.play();
 		}
@@ -428,8 +428,8 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			win.style.left = "0px";
 			win.style.width = dojo.style(this.domNode.parentNode, "width");
 			win.style.height = dojo.style(this.domNode.parentNode, "height");
-			this._resizeBody();
 			this._hideBorders();
+			this._resizeBody();
 		}
 	},
 	_showBorders: function() {
@@ -495,6 +495,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		var win = this.domNode;
 		if(desktop.config.fx == true)
 		{
+			this._showBorders();
 			dojo.style(this.body.domNode, "display", "none");
 			var anim = dojo.animateProperty({
 				node: win,
@@ -511,7 +512,6 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.body.domNode, "display", "block");
 				this._resizeBody();
-				this._showBorders();
 			});
 			anim.play();
 		}
@@ -523,8 +523,8 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			win.style.right = this.pos.right;
 			win.style.height= this.pos.height;
 			win.style.width= this.pos.width;
-			this._resizeBody();
 			this._showBorders();
+			this._resizeBody();
 		}
 		this.maximized = false;
 	},
