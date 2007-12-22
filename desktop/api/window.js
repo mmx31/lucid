@@ -263,7 +263,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			dojo.style(this.domNode, "display", "block");
 			if(desktop.config.fx) {
 				dojo.style(this.domNode, "opacity", 0);
-				dojo.fadeIn({node: this.domNode, duration: 200}).play();
+				dojo.fadeIn({node: this.domNode, duration: desktop.config.window.animSpeed}).play();
 			}
 			this._resizeBody();
 		}
@@ -329,11 +329,11 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			this._height = height;
 			var pos = dojo.coords("task_"+this.id, true);
 			
-			var fade = dojo.fadeOut({ node: this.domNode, duration: 200 });
-			var slide = dojo.fx.slideTo({ node: this.domNode, duration: 200, top: pos.y, left: pos.x});
+			var fade = dojo.fadeOut({ node: this.domNode, duration: desktop.config.window.animSpeed });
+			var slide = dojo.fx.slideTo({ node: this.domNode, duration: desktop.config.window.animSpeed, top: pos.y, left: pos.x});
 			var squish = dojo.animateProperty({
 				node: this.domNode,
-				duration: 200,
+				duration: desktop.config.window.animSpeed,
 				properties: {
 					height: {end: 26}, //TODO: is there a way of detecting this?
 					width: {end: 191} //and this?
@@ -362,10 +362,10 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		this.domNode.style.display = "inline";
 		if(desktop.config.fx == true)
 		{
-			var fade = dojo.fadeIn({ node: this.domNode, duration: 200 });
+			var fade = dojo.fadeIn({ node: this.domNode, duration: desktop.config.window.animSpeed });
 			var slide = dojo.animateProperty({
 				node: this.domNode,
-				duration: 200,
+				duration: desktop.config.window.animSpeed,
 				properties: {
 					top: {end: this.top},
 					left: {end: this.left},
@@ -412,7 +412,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 					width: {end: dojo.style(this.domNode.parentNode, "width")},
 					height: {end: dojo.style(this.domNode.parentNode, "height")}
 				},
-				duration: 150
+				duration: desktop.config.window.animSpeed
 			});
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.body.domNode, "display", "block");
@@ -507,7 +507,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 					width: {end: this.pos.width},
 					height: {end: this.pos.height}
 				},
-				duration: 150
+				duration: desktop.config.window.animSpeed
 			});
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.body.domNode, "display", "block");
@@ -589,7 +589,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		if (desktop.config.fx) {
 			var anim = dojo.fadeOut({
 				node: this.domNode,
-				duration: 200
+				duration: desktop.config.window.animSpeed
 			});
 			dojo.connect(anim, "onEnd", null, dojo.hitch(this, function(){
 				this._drag.destroy();

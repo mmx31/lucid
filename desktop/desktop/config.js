@@ -91,7 +91,8 @@ desktop.config = {
 	theme: "green",
 	startupapps: [],
 	window: {
-		constrain: false
+		constrain: false,
+		animSpeed: 350
 	},
 	crosstalkPing: 500,
 	filesystem: {
