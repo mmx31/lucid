@@ -92,7 +92,7 @@ desktop.config = {
 	startupapps: [],
 	window: {
 		constrain: false,
-		animSpeed: 350
+		animSpeed: 275
 	},
 	crosstalkPing: 500,
 	filesystem: {
