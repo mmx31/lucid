@@ -1,5 +1,5 @@
 <?php
-error_reporting(1);
+error_reporting(0);
 //get rid of magicquotes
 if (get_magic_quotes_gpc())
 {

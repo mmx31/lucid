@@ -40,7 +40,6 @@
 		}
 		else { die("user not found"); }
 	}
-	
 	if($_GET['section'] == "auth")
 	{
 		if($_GET['action'] == "login")

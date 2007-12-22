@@ -69,6 +69,7 @@
 			
 			function save()
 			{
+				$table = $this->_get_tablename();
 				if(is_numeric($this->id)) { $sql = "UPDATE ${table} SET "; }
 				else { $sql = "INSERT INTO ${table} SET "; }
 				$arr = array();
@@ -88,7 +89,8 @@
 					}
 				}
 				$sql .= implode(', ',$arr);
-				if($type == "update") { $sql .= " WHERE `ID`=${id} LIMIT 1"; }
+				$id = $this->id;
+				if(is_numeric($this->id)) { $sql .= " WHERE `ID`=${id} LIMIT 1"; }
 				$this->_query($sql);
 			}
 			
@@ -118,7 +120,7 @@
 			function _escape($str)
 			{
 				$this->_connect();
-				return $this->_escape($str, $this->_link);
+				return mysql_real_escape_string($str, $this->_link);
 			}
 			function filter($feild, $value=false)
 			{
@@ -139,7 +141,7 @@
 					$value = $this->_escape($value);
 					$query = "SELECT * FROM ${tablename} WHERE ${feild}=\"${value}\"";
 				}
-				$this->_query($query);
+				$this->_query($query); 
 				$list = Array();
 				while($line = mysql_fetch_array($this->_result, MYSQL_ASSOC))
 				{

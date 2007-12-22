@@ -1,7 +1,7 @@
 <?php
 class objOutput {
 	var $output = Array();
-	function __deconstruct() {
+	function __destruct() {
 		print_r($output);
 	}
 	function append($name, $item)
@@ -24,26 +24,21 @@ class intOutput {
 		"db_select_err" => 5,
 		"db_query_err" => 6
 	);	
-	function __deconstruct() {
+	function __destruct() {
 		echo $output;
-		if($php_errormsg)
-		{
-			echo "\n" . $php_errormsg;
-		}
 	}
-	function set($val, $die=false)
+	function set($val)
 	{
 		if(is_string($val))
 		{
 			$val = $this->types[$val];
 		}
 		$this->output = $val;
-		if($die) die();
 	}
 }
 
 class jsonOutput extends objOutput {
-	function __deconstruct() {
+	function __destruct() {
 		if($php_errormsg)
 		{
 			$this->append("sqlerror", $php_errormsg);
@@ -53,7 +48,7 @@ class jsonOutput extends objOutput {
 }
 
 class textareaOutput extends jsonOutput {
-	function __deconstruct() {
+	function __destruct() {
 		if($php_errormsg)
 		{
 			$this->append("sqlerror", $php_errormsg);
@@ -63,7 +58,7 @@ class textareaOutput extends jsonOutput {
 }
 
 class xmlOutput extends objOutput{
-	function __deconstruct() {
+	function __destruct() {
 		header('Content-type: text/xml');
 		if($php_errormsg)
 		{
