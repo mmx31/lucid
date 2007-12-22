@@ -111,10 +111,12 @@ if($_GET['section'] == "io")
 		{
 			$name = basename($f);
 			$type = mime_content_type($f);
+			$size = filesize($f);
 			header("Content-type: $type");
 			header("Content-Disposition: attachment;filename=\"$name\"");
 			header('Pragma: no-cache');
 			header('Expires: 0');
+			header("Content-length: $size");
 			readfile($f);
 		}
 	}
