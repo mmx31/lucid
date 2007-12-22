@@ -230,6 +230,13 @@ height: 100%;
 	width: auto;
 }
 
+.win-bmw > .win-bl {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+}
+
 /* filearea */
 .desktopFileItemText { 
 	position: relative;
