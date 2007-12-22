@@ -3,36 +3,36 @@ session_start();
 if($_GET['section'] == "io")
 {
 	$_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop "l33t" hax.
-	$blah = $_SESSION['username'];
+	$username = $_SESSION['username'];
 	if ($_GET['action'] == "createDirectory") {
 					$odir = $_POST['path'];
-				    $dir = "../../files/".$blah."/$odir";
+				    $dir = "../../files/".$username."/$odir";
 					mkdir($dir);
 					echo "0";
 	}
 		if ($_GET['action'] == "removeFile") {
 					$odir = $_POST['path'];
-				    $dir = "../../files/".$blah."/$odir";
+				    $dir = "../../files/".$username."/$odir";
 					unlink($dir);
 					echo "0";
 	}
 		if ($_GET['action'] == "removeDir") {
 					$odir = $_POST['path'];
-				    $dir = "../../files/".$blah."/$odir";
+				    $dir = "../../files/".$username."/$odir";
 					deltree($dir);
 					echo "0";
 	}
 		if ($_GET['action'] == "renameFile") {
 					$file = $_POST['path'];
 					$newfile = $_POST['newpath'];
-				    $dir = "../../files/".$blah."/$file";
-					$dir2 = "../../files/".$blah."/$newfile";
+				    $dir = "../../files/".$username."/$file";
+					$dir2 = "../../files/".$username."/$newfile";
 					rename($dir, $dir2);
 					echo "0";
 	}
 		if ($_GET['action'] == "getFolder") {
 					$odir = $_POST['path'];
-				    $dir = opendir("../../files/".$blah."/$odir");
+				    $dir = opendir("../../files/".$username."/$odir");
 					if(!$dir){
 								die();
 					} else {
@@ -42,7 +42,7 @@ if($_GET['section'] == "io")
 								continue;
 							} else {
 								$t = strtolower($file);
-								if(is_dir("../../files/".$blah."/$odir" . $file)){
+								if(is_dir("../../files/".$username."/$odir" . $file)){
 									$type = 'folder';
 								} else {
 									$type = 'file';
@@ -57,7 +57,7 @@ if($_GET['section'] == "io")
 	}
 		if ($_GET['action'] == "getFile") {
 					$odir = $_POST['path'];
-				    	$dir = "../../files/".$blah."/$odir";
+				    	$dir = "../../files/".$username."/$odir";
 					$file = file_get_contents($dir);
 					$file = str_replace("<", "&lt;", $file);
 					$file = str_replace(">", "&gt;", $file);
@@ -78,7 +78,7 @@ if($_GET['section'] == "io")
 					$content = str_replace("&apos;", "'", $content);
 					$content = str_replace("&quot;", "\"", $content);
 					$odir = $_POST['path'];
-				    	$dir = "../../files/".$blah."/$odir";
+				    	$dir = "../../files/".$username."/$odir";
 					$file = file_put_contents($dir, $content);
 					echo "0";
 	}
@@ -87,7 +87,7 @@ if($_GET['section'] == "io")
 			die("<textarea>{status: 'failed', details: 'Session is dead.'}</textarea>");
 		}
 		if(isset($_FILES['uploadedfile']['name'])) {
-			$target_path = '../../files/'.$blah.'/'.$_GET['path'];
+			$target_path = '../../files/'.$username.'/'.$_GET['path'];
 			$target_path = $target_path . basename( $_FILES['uploadedfile']['name']); 
 			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
 			    echo "<textarea>{status: 'success', details: '" . $_FILES['uploadedfile']['name'] . "'}</textarea>";
@@ -103,6 +103,19 @@ if($_GET['section'] == "io")
 			}
 			echo "*/";
 			die("<textarea>{status: 'failed', details: 'File not uploaded'}</textarea>");
+		}
+	}
+	if($_GET['action'] == "download") {
+		$f = "../../files/" . $username . "/" . $_GET['path'];
+		if(file_exists($f))
+		{
+			$name = basename($f);
+			$type = mime_content_type($f);
+			header("Content-type: $type");
+			header("Content-Disposition: attachment;filename=\"$name\"");
+			header('Pragma: no-cache');
+			header('Expires: 0');
+			readfile($f);
 		}
 	}
 }
