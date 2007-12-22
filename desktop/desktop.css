@@ -175,6 +175,7 @@ height: 100%;
 
 .win-bmw {
 	position: relative;
+	height: 100%;
 }
 
 .win-ml {
@@ -182,11 +183,13 @@ height: 100%;
 	overflow: hidden;
 	z-index: 1;
 	background-repeat: repeat-y;
+	height: 100%;
 }
 
 .win-mr {
 	background-repeat: repeat-y;
 	background-position: top right;
+	height: 100%;
 }
 
 .win-mc {
