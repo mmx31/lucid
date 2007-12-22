@@ -1,3 +1,4 @@
+dojo.require("dojo.io.iframe");
 /** 
 * An API that interacts with the filesystem
 * TODO: document this. Also condense it so all the callbacks are not seperate functions.
@@ -203,5 +204,10 @@ api.fs = new function()
 					});
 				}
 		}
+	}
+	this.download = function(path) {
+		var url = desktop.core.backend("api.fs.io.download") + "&path=" + path;
+		var frame = dojo.io.iframe.create("fs_downloadframe", "");
+		dojo.io.iframe.setSrc(frame, url, true);
 	}
 }
