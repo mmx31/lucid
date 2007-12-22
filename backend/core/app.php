@@ -18,8 +18,12 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
 	require("../configuration.php");
+	require("../lib/output.php");
+	require("../lib/util.php");
 	require("../models/base.php");
-	require("./../models/app.php");
+	require("../models/app.php");
+	$_GET['section'] = "fetch";
+	$_GET['action'] = "list";
     if($_GET['section'] == "fetch")
 	{
 		if($_GET['action'] == "full")
@@ -31,13 +35,13 @@
 		if($_GET['action'] == "list")
 		{
 			$p = $App->all();
-			$pl = count($p)-1;
 			echo "[";
+			$list = array();
 			foreach($p as $d => $v)
 			{
-				echo $v->make_json(Array("id", "name", "category", "version"));
-				if($d < $pl) { echo ",\n"; }
+				array_push($list, $v->make_json(array("id", "name", "category", "version")));
 			}
+			echo implode(",\n", $list);
 			echo "]";
 		}
 	}

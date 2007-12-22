@@ -1,5 +1,5 @@
 <?php
-error_reporting(0);
+error_reporting(1);
 //get rid of magicquotes
 if (get_magic_quotes_gpc())
 {
@@ -14,5 +14,13 @@ if (get_magic_quotes_gpc())
 	{
 		$_GET[$key] = stripslashes($value);
 	}
+}
+
+//util functions
+function internal_error($type)
+{
+	$p = new intOutput();
+	$p->set($type);
+	die();
 }
 ?>

@@ -1,5 +1,4 @@
 <?php
-track_errors(true);
 class objOutput {
 	var $output = Array();
 	function __deconstruct() {
@@ -20,8 +19,10 @@ class intOutput {
 		"ok" => 0,
 		"generic_err" => 1,
 		"not_authed" => 2,
-		"sql_err" => 3,
-		"not_found" => 4
+		"not_found" => 3,
+		"db_connect_err" => 4,
+		"db_select_err" => 5,
+		"db_query_err" => 6
 	);	
 	function __deconstruct() {
 		echo $output;
