@@ -265,15 +265,16 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			if (desktop.config.fx) {
 				if (desktop.config.fx == 1) dojo.style(this.body.domNode, "display", "none");
 				dojo.style(this.domNode, "opacity", 0);
-				dojo.fadeIn({
+				var anim = dojo.fadeIn({
 					node: this.domNode,
 					duration: desktop.config.window.animSpeed
 				});
 				dojo.connect(anim, "onEnd", this, function() {
 					if (desktop.config.fx == 1) dojo.style(this.body.domNode, "display", "block");
+					this._resizeBody();
 				});
-			}
-			this._resizeBody();
+				anim.play();
+			} else this._resizeBody();
 		}
 	},
 	_toggleMaximize: function() {
