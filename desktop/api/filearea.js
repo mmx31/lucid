@@ -275,7 +275,7 @@ dojo.declare(
 	startup: function() {
 		this.menu = new dijit.Menu({});
 	       	this.menu.addChild(new dijit.MenuItem({label: "Open", iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
-			this.menu.addChild(new dijit.MenuItem({label: "Download", iconClass: "icon-16-actions-document-save-as", onClick: dojo.hitch(this, function(e) {
+			if(!this.isDir) this.menu.addChild(new dijit.MenuItem({label: "Download", iconClass: "icon-16-actions-document-save-as", onClick: dojo.hitch(this, function(e) {
 				api.fs.download(this.path);
 			})}));
 		this.menu.addChild(new dijit.MenuSeparator({}));
