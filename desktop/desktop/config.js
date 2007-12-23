@@ -44,13 +44,13 @@ desktop.config = {
 		dojo.publish("configApply", [desktop.config]);
 	},
 	/**
-	 * Whether or not the desktop's effects should be enabled (fading and such)
+	 * Intensity of desktop effects (3 = insane, 0 = none)
 	 * 
-	 * @type {Boolean}
+	 * @type {Int}
 	 * @alias desktop.config.fx
 	 * @memberOf desktop.config
 	 */
-	fx: true,
+	fx: 1,
 	/**
 	 * Whether or not the desktop should do various debugging tasks
 	 * 
