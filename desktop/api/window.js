@@ -1,5 +1,6 @@
 dojo.require("dojox.layout.ResizeHandle");
 dojo.require("dojo.dnd.move");
+dojo.require("dojox.fx.easing");
 /*
  * Package: window
  * 
@@ -217,7 +218,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 					}
 					else
 					{
-						var ns = document.getElementById("windowcontainer").getElementsByTagName("div");
+						var ns = dojo.query("div.win", "windowcontainer");
 						var box;
 						var myBox = new Object
 						var overlapping = false;
@@ -329,17 +330,18 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			this._height = height;
 			var pos = dojo.coords("task_"+this.id, true);
 			
-			var fade = dojo.fadeOut({ node: this.domNode, duration: desktop.config.window.animSpeed });
-			var slide = dojo.fx.slideTo({ node: this.domNode, duration: desktop.config.window.animSpeed, top: pos.y, left: pos.x});
-			var squish = dojo.animateProperty({
+			var anim = dojo.animateProperty({
 				node: this.domNode,
 				duration: desktop.config.window.animSpeed,
 				properties: {
+					opacity: {end: 0},
+					top: {end: pos.y},
+					left: {end: pos.x},
 					height: {end: 26}, //TODO: is there a way of detecting this?
 					width: {end: 191} //and this?
-				}
+				},
+				easing: dojox.fx.easing.easeIn
 			});
-			var anim = dojo.fx.combine([fade, slide, squish]);
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.domNode, "display", "none");
 			});
@@ -362,18 +364,18 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		this.domNode.style.display = "inline";
 		if(desktop.config.fx == true)
 		{
-			var fade = dojo.fadeIn({ node: this.domNode, duration: desktop.config.window.animSpeed });
-			var slide = dojo.animateProperty({
+			var anim = dojo.animateProperty({
 				node: this.domNode,
 				duration: desktop.config.window.animSpeed,
 				properties: {
+					opacity: {end: 100},
 					top: {end: this.top},
 					left: {end: this.left},
 					height: {end: this._height},
 					width: {end: this._width}
-				}
+				},
+				easing: dojox.fx.easing.easeOut
 			});
-			var anim = dojo.fx.combine([fade, slide]);
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.body.domNode, "display", "block");
 				this._resizeBody();
