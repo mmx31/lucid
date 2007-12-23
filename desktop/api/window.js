@@ -376,6 +376,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			var anim = dojo.fx.combine([fade, slide]);
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.body.domNode, "display", "block");
+				this._resizeBody();
 			});
 			anim.play();
 		}
