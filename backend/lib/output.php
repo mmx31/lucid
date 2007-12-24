@@ -1,20 +1,31 @@
 <?php
 class objOutput {
 	var $output = Array();
+	var $dooutput = false;
 	function __destruct() {
-		print_r($output);
+		if($dooutput) {
+			print_r($output);
+		}
 	}
 	function append($name, $item)
 	{
 		$this->output->$name = $item;
+		$this->dooutput = true;
 	}
 	function set($arr)
 	{
 		$this->output = $arr;
+		$this->dooutput = true;
+	}
+	function clear()
+	{
+		$this->output = Array();
+		$this->dooutput = false;
 	}
 }
 class intOutput {
 	var $output = 0;
+	var $dooutput = true;
 	var $types = Array(
 		"ok" => 0,
 		"generic_err" => 1,
@@ -25,7 +36,13 @@ class intOutput {
 		"db_query_err" => 6
 	);	
 	function __destruct() {
-		echo $this->output;
+		if($this->dooutput) {
+			echo $this->output;
+		}
+	}
+	function clear() {
+		$this->output = "";
+		$this->dooutput = false;
 	}
 	function set($val)
 	{
@@ -34,43 +51,50 @@ class intOutput {
 			$val = $this->types[$val];
 		}
 		$this->output = $val;
+		$this->dooutput = true;
 	}
 }
 
 class jsonOutput extends objOutput {
 	function __destruct() {
-		if($php_errormsg)
-		{
-			$this->append("sqlerror", $php_errormsg);
+		if($dooutput) {
+			if($php_errormsg)
+			{
+				$this->append("sqlerror", $php_errormsg);
+			}
+			echo json_encode($this->output);
 		}
-		echo json_encode($this->output);
 	}
 }
 
 class textareaOutput extends jsonOutput {
 	function __destruct() {
-		if($php_errormsg)
-		{
-			$this->append("sqlerror", $php_errormsg);
+		if($dooutput) {
+			if($php_errormsg)
+			{
+				$this->append("sqlerror", $php_errormsg);
+			}
+			echo "<textarea>" . json_encode($this->output) . "</textarea>";
 		}
-		echo "<textarea>" . json_encode($this->output) . "</textarea>";
 	}
 }
 
 class xmlOutput extends objOutput{
 	function __destruct() {
-		header('Content-type: text/xml');
-		if($php_errormsg)
-		{
-			$this->append("sqlerror", $php_errormsg);
+		if($dooutput) {
+			header('Content-type: text/xml');
+			if($php_errormsg)
+			{
+				$this->append("sqlerror", $php_errormsg);
+			}
+			$xml = new XMLWriter;
+			foreach ($this->output as $index => $text){
+            			$xml->startElement($index);
+	        		$xml->text($text);
+	        		$xml->endElement();
+        		}
+			echo $xml->getDocument();
 		}
-		$xml = new XMLWriter;
-		foreach ($this->output as $index => $text){
-            $xml->startElement($index);
-	        $xml->text($text);
-	        $xml->endElement();
-        }
-		echo $xml->getDocument();
 	}
 }
 ?>
