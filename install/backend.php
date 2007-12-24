@@ -1,11 +1,12 @@
 <?php
 	require("../backend/configuration.php");
+	require("../backend/lib/output.php");
+	require("../backend/lib/util.php");
 	require("../backend/models/base.php");
+	require("../backend/models/user.php");
     $act = ($_GET['action'] == "" ? "installprograms" : $_GET['action']);
 	if($act == "installadmin")
 	{
-		require("../backend/models/user.php");
-		require("../backend/lib/util.php");
 		echo("{");
 		echo("\"Establishing connection to database...\":");
 		$User->truncate();

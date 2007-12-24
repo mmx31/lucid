@@ -201,7 +201,8 @@
 			}
 			function truncate() {
 				$table = $this->_get_tablename();
-				$this->_query("TRUNCATE TABLE `${table}`; ALTER TABLE `${table}` AUTO_INCREMENT = 1;");
+				$this->_query("TRUNCATE TABLE `${table}`");
+				$this->_query("ALTER TABLE `${table}` AUTO_INCREMENT = 1");
 			}
 			function make_json($columns=false)
 			{

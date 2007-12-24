@@ -25,7 +25,7 @@ class intOutput {
 		"db_query_err" => 6
 	);	
 	function __destruct() {
-		echo $output;
+		echo $this->output;
 	}
 	function set($val)
 	{
