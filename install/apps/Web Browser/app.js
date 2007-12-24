@@ -1,9 +1,7 @@
 this.kill = function() {
-	if(!this.window.destroyed) { this.window.destroy(); }
-	this.status = "killed";
-}
-this.windowKill = function() {
-	this.kill();
+	if(!this.win.destroyed) { this.win.destroy(); }
+	//clearInterval(this.interval);
+	api.instances.setKilled(this.instance);
 }
 this.init = function(args)
 {
@@ -13,7 +11,8 @@ this.init = function(args)
 	dojo.require("dijit.layout.LayoutContainer");
 	this.win = new api.window({
 		title: "Web Browser",
-		bodyWidget: "LayoutContainer"
+		bodyWidget: "LayoutContainer",
+		onDestroy: dojo.hitch(this, this.kill)
 	});
 	this.Iframe = document.createElement("iframe");
 	dojo.style(this.Iframe, "width", "100%");
@@ -31,6 +30,14 @@ this.init = function(args)
 	this.win.show();
 	if(args.url) this.go(args.url);
 	else this.go("http://www.google.com/");
+	/*this.interval = setInterval(dojo.hitch(this, function() {
+		var loc = this.Iframe.contentWindow.location;
+		this.Iframe.top = {
+			location: loc
+		};
+		if(loc != "about:blank") this.urlbox.setValue(loc);
+	}), 500);*/
+	api.instances.setActive(this.instance);
 }
 
 this.go = function(url)
