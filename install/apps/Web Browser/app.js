@@ -7,50 +7,53 @@ this.windowKill = function() {
 }
 this.init = function(args)
 {
-this.window = new api.window();
-this.window.write('<form name="submitbox" action="#" onSubmit="return desktop.app.instances['+this.instance+'].go()" >');
-this.window.write('<form name="submitbox" action="#" onSubmit="return desktop.app.instances['+this.instance+'].go()" >');
-this.window.write('<input type="text" id="browserUrlBox'+this.instance+'" value="http://www.google.com/" style="width: 94%;" />');
-this.window.write('<input type="button" value="Go" onClick="desktop.app.instances['+this.instance+'].go()" style="width: 6%;"><br />');
-this.window.write('<iframe style="width: 99%; height: 90%; background-color: #FFFFFF;" src="http://www.google.com" id="browserIframe'+this.instance+'" /></form>');
-this.window.title="Web Browser";
-this.window.height="420px";
-this.window.width="500px";
-this.window.show();
-this.status = "active";
-this.window.onDestroy = dojo.hitch(this, this.windowKill);
-if(args.url) this.go(args.url)
+	dojo.require("dijit.Toolbar");
+	dojo.require("dijit.form.Form");
+	dojo.require("dijit.form.Button");
+	dojo.require("dijit.layout.LayoutContainer");
+	this.win = new api.window({
+		title: "Web Browser",
+		bodyWidget: "LayoutContainer"
+	});
+	this.Iframe = document.createElement("iframe");
+	dojo.style(this.Iframe, "width", "100%");
+	dojo.style(this.Iframe, "height", "100%");
+	dojo.style(this.Iframe, "border", "0px");
+	this.urlbox = new dijit.form.TextBox({onExecute: dojo.hitch(this, this.go), style: "width: 90%;"});
+	var form = new dijit.Toolbar({layoutAlign: "top"});
+	form.addChild(this.urlbox);
+	form.addChild(new dijit.form.Button({label: "Go", onClick: dojo.hitch(this, this.go), style: "width: 10%;"}));
+	form.startup();
+	this.win.addChild(form);
+	var client = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
+	client.setContent(this.Iframe);
+	this.win.addChild(client);
+	this.win.show();
+	if(args.url) this.go(args.url);
+	else this.go("http://www.google.com/");
 }
 
 this.go = function(url)
 {
-urlbox = document.getElementById("browserUrlBox"+this.instance);
-URL = (url || urlbox.value);
-if(URL.charAt(4) == ":" && URL.charAt(5) == "/" && URL.charAt(6) == "/")
-{
-}
-else
-{
-//but wait, what if it's an FTP site?
-if(URL.charAt(3) == ":" && URL.charAt(4) == "/" && URL.charAt(5) == "/")
-{
-}
-else
-{
-//if it starts with an "ftp.", it's most likely an FTP site.
-if((URL.charAt(0) == "F" || URL.charAt(0) == "f") && (URL.charAt(1) == "T" || URL.charAt(1) == "t") && (URL.charAt(2) == "P" || URL.charAt(2) == "p") && URL.charAt(3) == ".")
-{
-URL = "ftp://"+URL;
-}
-else
-{
-//ok, it's probably a plain old HTTP site...
-URL = "http://"+URL;
-}
-}
-}
-Iframe = document.getElementById("browserIframe"+this.instance);
-Iframe.src = URL;
-urlbox.value = URL;
-return false;
+	var URL = (typeof url == "string" ? url : this.urlbox.getValue());
+	if(!(URL.charAt(4) == ":" && URL.charAt(5) == "/" && URL.charAt(6) == "/"))
+	{
+		//but wait, what if it's an FTP site?
+		if(!(URL.charAt(3) == ":" && URL.charAt(4) == "/" && URL.charAt(5) == "/"))
+		{
+			//if it starts with an "ftp.", it's most likely an FTP site.
+			if((URL.charAt(0) == "F" || URL.charAt(0) == "f") && (URL.charAt(1) == "T" || URL.charAt(1) == "t") && (URL.charAt(2) == "P" || URL.charAt(2) == "p") && URL.charAt(3) == ".")
+			{
+				URL = "ftp://"+URL;
+			}
+			else
+			{
+				//ok, it's probably a plain old HTTP site...
+				URL = "http://"+URL;
+			}
+		}
+	}
+	this.Iframe.src = URL;
+	this.urlbox.setValue(URL);
+	return;
 }
