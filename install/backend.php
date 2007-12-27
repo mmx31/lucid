@@ -4,10 +4,10 @@
 	require("../backend/lib/util.php");
 	require("../backend/lib/MDB2.php");
 	require("../backend/models/base.php");
-	require("../backend/models/user.php");
     $act = ($_GET['action'] == "" ? "installprograms" : $_GET['action']);
 	if($act == "installadmin")
 	{
+		require("../backend/models/user.php");
 		echo("{");
 		echo("\"Establishing connection to database...\":");
 		$User->truncate();
@@ -56,13 +56,26 @@
         $handle = fopen("../backend/configuration.php", 'w');
         fwrite($handle, $writebuffer);
         fclose($handle);
-		echo("\"...done\"");
-		echo("}");
+		echo("\"...done\",");
+		//echo("}");
 		}
 		else {
 		echo("\"...fail\"");
 		echo("}");
+		die();
 		}
+		$dir = opendir("../backend/models");
+		while(($file = readdir($dir)) !== false){
+			if($file{0} == '.' || $file == "base.php"){
+				continue;
+			}
+			require("../backend/models/" . $file);
+			$class = str_replace(".php", "", $file);
+			$class = ucfirst($class);
+			$class = new $class;
+			$class->_create_table();
+		}
+		echo "'creating database tables...': '...done'}";
 	}
 	if($act == "installprograms")
 	{

@@ -252,12 +252,11 @@
 				foreach($this as $key => $v)
 				{
 					if($key{0} != "_" && is_array($v)) {
-						$list[] = "'" . $key . "' " . ($v['type'] || " int") . ($v['length'] ? "(" . $v['length'] . ")" : "") . ($v['auto_increment'] ? " auto_increment" : "") . ($v['primary_key'] ? " PRIMARY KEY" : "");
+						$list[] = "`" . $key . "` " . ($v['type'] ? $v['type'] : " int") . ($v['length'] ? "(" . $v['length'] . ")" : "") . ($v['auto_increment'] ? " auto_increment" : "") . ($v['primary_key'] ? " PRIMARY KEY" : "");
 					}
 				}
 				$query .= implode(", ", $list);
 				$query .= ") TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1";
-				echo $query;
 				$this->_query($query);
 			}
 		}

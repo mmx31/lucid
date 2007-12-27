@@ -4,7 +4,7 @@
 		"prefix" => "dsktp_"
 	);
 	$GLOBALS['conf'] = Array(
-		"salt" => "bf5556eba50ad35829a83100cfa2d62a",
+		"salt" => "71777be45ec6362e1ad3caa2f7c678d4",
 		"public" => "yes"
 	);
 ?>
