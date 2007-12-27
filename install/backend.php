@@ -2,6 +2,7 @@
 	require("../backend/configuration.php");
 	require("../backend/lib/output.php");
 	require("../backend/lib/util.php");
+	require("../backend/lib/MDB2.php");
 	require("../backend/models/base.php");
 	require("../backend/models/user.php");
     $act = ($_GET['action'] == "" ? "installprograms" : $_GET['action']);
