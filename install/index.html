@@ -35,41 +35,33 @@
 					<div class="title">Database Settings</div>
 					<br />
 					Database Backend:
-					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" id="db_type_mysql" value="mysql" onchange="setTimeout(install.fixPDOStr, 20);" /> 
-						<label for="db_type_mysql"> MySQL 3.x/4.x/5.x</label>
+										<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" id="db_type_mysql" value="mySQL" /> 
+						<label for="db_type_mysql"> mySQL</label>
 					</div>
 					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="pgsql" id="db_type_pgsql" disabled="true" onchange="setTimeout(install.fixPDOStr, 20);" />
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="mySQLi" id="db_type_mysqli" />
+						<label for="db_type_mysqli"> mySQLi</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="SQLite" id="db_type_sqlite" />
+						<label for="db_type_sqlite"> SQLite</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="msSQL" id="db_type_mssql" />
+						<label for="db_type_mssql"> Microsoft SQL Server</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="pgSQL" id="db_type_pgsql" />
 						<label for="db_type_pgsql"> PostgreSQL</label>
 					</div>
 					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="sqlite" id="db_type_sqlite" disabled="true" onchange="setTimeout(install.fixPDOStr, 20);" />
-						<label for="db_type_sqlite"> SQLite 2/3</label>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="ibase" id="db_type_ibase" />
+						<label for="db_type_ibase"> iBase</label>
 					</div>
 					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="oci" id="db_type_oci" disabled="true" onchange="setTimeout(install.fixPDOStr, 20);" />
-						<label for="db_type_oci"> Oracle Call Interface</label>
-					</div>
-					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="dblib" id="db_type_dblib" disabled="true" onchange="setTimeout(install.fixPDOStr, 20);" />
-						<label for="db_type_dblib"> FreeTDS / Microsoft SQL Server / Sybase</label>
-					</div>
-					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="informix" id="db_type_informix" disabled="true" onchange="setTimeout(install.fixPDOStr, 20);" />
-						<label for="db_type_informix"> IBM Informix Dynamic Server</label>
-					</div>
-					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="ibm" id="db_type_ibm" disabled="true" onchange="setTimeout(install.fixPDOStr, 20);" />
-						<label for="db_type_ibm"> IBM DB2</label>
-					</div>
-					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="firebird" id="db_type_firebird" disabled="true" onchange="setTimeout(install.fixPDOStr, 20);" />
-						<label for="db_type_firebird"> Firebird/Interbase 6</label>
-					</div>
-					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="odbc" id="db_type_odbc" disabled="true" onchange="setTimeout(install.fixPDOStr, 20);" />
-						<label for="db_type_odbc"> ODBC v3 (IBM DB2, unixODBC and win32 ODBC)</label>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="oci8" id="db_type_oci8" />
+						<label for="db_type_oci8"> Oracle DB (versions 7-10)</label>
 					</div>
 					<br />
 					Database Host:&nbsp;
