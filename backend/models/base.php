@@ -244,6 +244,22 @@
 					$this->_query("DELETE FROM " . $this->_get_tablename() . " WHERE ID=" . $this->id . " LIMIT 1");
 				}
 			}
+			function _create_table()
+			{
+				$this->_query("DROP TABLE IF EXISTS `" . $this->_get_tablename() . "`");
+				$query = "CREATE TABLE `" . $this->_get_tablename() . "` (";
+				$list = array();
+				foreach($this as $key => $v)
+				{
+					if($key{0} != "_" && is_array($v)) {
+						$list[] = "'" . $key . "' " . ($v['type'] || " int") . ($v['length'] ? "(" . $v['length'] . ")" : "") . ($v['auto_increment'] ? " auto_increment" : "") . ($v['primary_key'] ? " PRIMARY KEY" : "");
+					}
+				}
+				$query .= implode(", ", $list);
+				$query .= ") TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1";
+				echo $query;
+				$this->_query($query);
+			}
 		}
 		$Base = Base;
 	}
