@@ -31,28 +31,28 @@
 					<label for="installtype-reset"><b>I want to reset my existing installation</b></label>
 					<p>Keeps your settings and users, but re-installs apps and other things</p>
 				</div>
-				<div dojoType="dijit.layout.ContentPane" title="Database" onkeyup="install.fixPDOStr(arguments[0]);">
+				<div dojoType="dijit.layout.ContentPane" title="Database" onkeyup="install.fixurlStr(arguments[0]);">
 					<div class="title">Database Settings</div>
 					<br />
 					Database Backend:
 										<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" id="db_type_mysql" value="mySQL" /> 
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" id="db_type_mysql" value="mysql" /> 
 						<label for="db_type_mysql"> mySQL</label>
 					</div>
 					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="mySQLi" id="db_type_mysqli" />
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="mysqli" id="db_type_mysqli" />
 						<label for="db_type_mysqli"> mySQLi</label>
 					</div>
 					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="SQLite" id="db_type_sqlite" />
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="sqlite" id="db_type_sqlite" />
 						<label for="db_type_sqlite"> SQLite</label>
 					</div>
 					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="msSQL" id="db_type_mssql" />
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="mssql" id="db_type_mssql" />
 						<label for="db_type_mssql"> Microsoft SQL Server</label>
 					</div>
 					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="pgSQL" id="db_type_pgsql" />
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="pgsql" id="db_type_pgsql" />
 						<label for="db_type_pgsql"> PostgreSQL</label>
 					</div>
 					<div>
@@ -79,7 +79,7 @@
 					Password:&nbsp;
 					<input dojoType="dijit.form.TextBox" name="db_password" type="text" /> <i style="font-size: 10pt;">(Not used in SQLite)</i>
 					<br /><br />
-					Database connection string: <input dojoType="dijit.form.TextBox" name="db_pdo" id="pdostr" style="width: 400px;" type="text" /><br />
+					Database connection string: <input dojoType="dijit.form.TextBox" name="db_url" id="urlstr" style="width: 400px;" type="text" /><br />
 					 <i style="color: red;">Do not change this unless you know what you're doing</i>
 				</div>
 				<div dojoType="dijit.layout.ContentPane" title="Admin Setup">

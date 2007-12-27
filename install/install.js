@@ -53,18 +53,18 @@ install = new function() {
 			{
 				dijit.byId("next").setDisabled(false);
 			}
-			else if(form.db_pdo != "")
+			else if(form.db_url != "")
 				dijit.byId("next").setDisabled(false);
 			else
 				dijit.byId("next").setDisabled(true);
 		}
 	}
-	this.fixPDOStr = function(e)
+	this.fixurlStr = function(e)
 	{
 		if(typeof e != "object") var e = {target: {id: ""}};
-		if (e.target.id != "pdostr") {
+		if (e.target.id != "urlstr") {
 			var p = dijit.byId("form").getValues();
-			dijit.byId("pdostr").setValue(
+			dijit.byId("urlstr").setValue(
 				p.db_type+"://"+(p.db_username ? p.db_username+(p.db_password ? ":"+p.db_password : "")+"@" : "") + p.db_host + (p.db_name ? "/" + p.db_name : "")
 			);
 		}
@@ -215,12 +215,8 @@ install = new function() {
 		dojo.xhrGet({
 				url: "./backend.php?action=installdatabase",
 				content: {
-					db_type: form.db_type,
-					db_host: form.db_host,
-					db_name: form.db_name,
-					db_prefix: form.db_prefix,
-					db_username: form.db_username,
-					db_password: form.db_password
+					db_url: form.db_url,
+					db_prefix: form.db_prefix
 				},
 				load: function(data, args){
 					var html = "<ul>";

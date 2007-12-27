@@ -27,9 +27,7 @@
 	{
 		echo("{");
 		echo("\"Parsing form values...\":");
-		$db_pdo = $_GET['db_pdo'];
-		$db_username = $_GET['db_username'];
-		$db_password = $_GET['db_password'];
+		$db_url = $_GET['db_url'];
 		$db_prefix = $_GET['db_prefix'];
 		echo("\"...done\",");
 		echo("\"Generating encryption hash...\":");
@@ -46,7 +44,7 @@
 		echo("\"Saving new configuration...\":");
 		$writebuffer  = "<" . "?php\n";
 		$writebuffer .= "\t$" . "GLOBALS['db'] = Array(\n";
-		$writebuffer .= "\t\t\"database\" => \"" . $db_pdo. "\",\n";
+		$writebuffer .= "\t\t\"database\" => \"" . $db_url. "\",\n";
 		$writebuffer .= "\t\t\"prefix\" => \"". $db_prefix . "\"\n";
 		$writebuffer .= "\t);\n";
 		$writebuffer .= "\t$" . "GLOBALS['conf'] = Array(\n";
