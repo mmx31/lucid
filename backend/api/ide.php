@@ -18,9 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 session_start();
-require("../lib/util.php");
-require("../configuration.php");
-require("../models/base.php");
+require("../lib/includes.php");
 require("../models/app.php");
 if($_GET['section'] == "io")
 {

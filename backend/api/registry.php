@@ -1,7 +1,6 @@
 <?php
 	session_start();
-	require("../configuration.php");
-	require("../models/base.php");
+	require("../lib/includes.php");
 	require("../models/registry.php");
 	require("../models/user.php");
     if($_GET['section'] == "stream")

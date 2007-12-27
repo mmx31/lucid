@@ -26,9 +26,7 @@
 	{
 		echo("{");
 		echo("\"Parsing form values...\":");
-		$db_name = $_GET['db_name'];
-		$db_type = $_GET['db_type'];
-		$db_host = $_GET['db_host'];
+		$db_pdo = $_GET['db_pdo'];
 		$db_username = $_GET['db_username'];
 		$db_password = $_GET['db_password'];
 		$db_prefix = $_GET['db_prefix'];
@@ -47,12 +45,8 @@
 		echo("\"Saving new configuration...\":");
 		$writebuffer  = "<" . "?php\n";
 		$writebuffer .= "\t$" . "GLOBALS['db'] = Array(\n";
-		$writebuffer .= "\t\t\"type\" => \"" . $db_type . "\",\n";
-		$writebuffer .= "\t\t\"username\" => \"". $db_username . "\",\n";
-		$writebuffer .= "\t\t\"password\" => \"". $db_password . "\",\n";
-		$writebuffer .= "\t\t\"database\" => \"". $db_name . "\",\n";
-		$writebuffer .= "\t\t\"prefix\" => \"". $db_prefix . "\",\n";
-		$writebuffer .= "\t\t\"host\" => \"". $db_host . "\"\n";
+		$writebuffer .= "\t\t\"database\" => \"" . $db_pdo. "\",\n";
+		$writebuffer .= "\t\t\"prefix\" => \"". $db_prefix . "\"\n";
 		$writebuffer .= "\t);\n";
 		$writebuffer .= "\t$" . "GLOBALS['conf'] = Array(\n";
 		$writebuffer .= "\t\t\"salt\" => \"" . $conf_secretword . "\",\n";

@@ -50,21 +50,38 @@
 			
 			function _connect() {
 				if(!$this->_link) {
-					$this->_link = mysql_connect($GLOBALS['db']['host'], $GLOBALS['db']['username'], $GLOBALS['db']['password']) or internal_error("db_connect_err");
-					mysql_select_db($GLOBALS['db']['database'], $this->_link) or internal_error("db_select_err");
+					$this->_link = MDB2::factory($GLOBALS['db']['database']);
+					if(PEAR::isError($this->_link)){
+						internal_error("db_connect_err");
+					}
 				}
 			}
 			
-			function _query($str) {
+			function _query($sql, $values=array()) {
 				$this->_connect();
-				$this->_result = mysql_query($str, $this->_link) or internal_error("db_query_err");
+			    $this->_result = array();
+			    if(sizeof($values) > 0) {
+			        $statement = $this->_link->prepare($sql, TRUE, MDB2_PREPARE_RESULT);
+			        $resultset = $statement->execute($values);
+			        $statement->free();
+			    }
+			    else {
+			        $resultset= $this->_link->query($sql);
+			    }
+			    if(PEAR::isError($resultset)) {
+			        internal_error("db_query_err");
+			    }
+			
+			    while($row = $resultset->fetchRow(MDB2_FETCHMODE_ASSOC)) {
+			        $this->_result[] = $row;
+			    }
 				return $this->_result;
 			}
 			
 			function __deconstruct()
 			{
-				if($this->_result) mysql_free_result($this->_result);
-				mysql_close($this->_link);
+				if($this->_result) $this->_result->free();
+				$this->_link = null;
 			}
 			
 			function save()
@@ -102,25 +119,20 @@
                     $id = "'" . $this->_escape($id) . "'"; 
                 }
 				$this->_query("SELECT * FROM ${tablename} WHERE `ID`=${id} LIMIT 1");
-				$line = mysql_fetch_array($this->_result, MYSQL_ASSOC);
-				if($line)
+				if($this->_result[0])
 				{
-					$p = $this->_makeModel($line);
-					mysql_free_result($result);
-					mysql_close($link);
+					$p = $this->_makeModel($this->_result[0]);
 					return $p;
 				}
 				else
 				{
-					mysql_free_result($result);
-					mysql_close($link);
 					return false;
 				}
 			}
 			function _escape($str)
 			{
 				$this->_connect();
-				return mysql_real_escape_string($str, $this->_link);
+				return $this->_link->escape($str);
 			}
 			function filter($feild, $value=false)
 			{
@@ -143,7 +155,7 @@
 				}
 				$this->_query($query); 
 				$list = Array();
-				while($line = mysql_fetch_array($this->_result, MYSQL_ASSOC))
+				foreach($this->_result as $line)
 				{
 					array_push($list, $this->_makeModel($line));
 					$results = TRUE;
@@ -156,7 +168,7 @@
 				$tablename = $this->_get_tablename();
 				$this->_query("SELECT * FROM ${tablename}");
 				$list = Array();
-				while($line = mysql_fetch_array($this->_result, MYSQL_ASSOC))
+				foreach($this->_result as $line)
 				{
 					array_push($list, $this->_makeModel($line));
 				}

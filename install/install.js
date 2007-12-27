@@ -45,7 +45,7 @@ install = new function() {
 	}
 	this.checkDbInput = function() {
 		if (install.currentPage.title == "Database") {
-			this.form = dijit.byId("form").getValues();
+			var form = dijit.byId("form").getValues();
 			if(form.db_type != "" &&
 			   form.db_name != "" &&
 			   form.db_username != "" &&
@@ -53,8 +53,20 @@ install = new function() {
 			{
 				dijit.byId("next").setDisabled(false);
 			}
-			else if(dijit.byId("next").disabled == false)
+			else if(form.db_pdo != "")
+				dijit.byId("next").setDisabled(false);
+			else
 				dijit.byId("next").setDisabled(true);
+		}
+	}
+	this.fixPDOStr = function(e)
+	{
+		if(typeof e != "object") var e = {target: {id: ""}};
+		if (e.target.id != "pdostr") {
+			var p = dijit.byId("form").getValues();
+			dijit.byId("pdostr").setValue(
+				p.db_type+"://"+(p.db_username ? p.db_username+(p.db_password ? ":"+p.db_password : "")+"@" : "") + p.db_host + (p.db_name ? "/" + p.db_name : "")
+			);
 		}
 	}
 	this.getPerms = function()

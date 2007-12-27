@@ -17,10 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-	require("../configuration.php");
-	require("../lib/output.php");
-	require("../lib/util.php");
-	require("../models/base.php");
+	require("../lib/includes.php");
 	require("../models/app.php");
     if($_GET['section'] == "fetch")
 	{
