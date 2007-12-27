@@ -7,11 +7,13 @@
  */
 dojo.provide("api.filearea");
 dojo.provide("api.filearea._item");
+dojo.provide("api.filearea._Mover");
 dojo.require("dijit._Widget");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.form.Button");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
+dojo.require("dojo.dnd.Moveable");
 
 dojo.declare(
 	"api.filearea",
@@ -152,6 +154,10 @@ dojo.declare(
 		dojo.forEach(this.getChildren(), function(item){
 			item.startup(); console.log(item);
 		});
+	},
+	moveChild: function(item) {
+		//moves an api.filearea._item from it's folder to our folder.
+		this.addChild(item);
 	}
 });
 
@@ -171,6 +177,9 @@ dojo.declare(
 			dojo.query(".desktopFileItemTextBack", this.domNode).style("display", "none");
 			dojo.query(".desktopFileItemTextFront", this.domNode).removeClass("desktopFileItemTextFront").addClass("desktopFileItemText");
 		}
+		/*this.movable = new api.filearea._movable(this.domNode, {
+			mover: api.filearea._Mover
+		});*/
 	},
 	_delete_file: function(e)
 	{
@@ -283,4 +292,68 @@ dojo.declare(
 		this.menu.addChild(new dijit.MenuItem({label: "Rename", iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, this._rename_file)}));
 		this.menu.addChild(new dijit.MenuItem({label: "Delete", iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, this._delete_file)}));
 	}
+});
+
+dojo.declare("api.filearea._Mover", dojo.dnd.Mover, {
+	onFirstMove: function(){
+		// summary: makes the node absolute; it is meant to be called only once\
+		this._item_parentNode = this.node.parentNode;
+		document.body.appendChild(this.node);
+		dojo.style(this.node, "zIndex", 100000);
+		console.log(this.host);
+		this.node.style.position = "absolute";	// enforcing the absolute mode
+		var m = dojo.marginBox(this.node);
+		m.l -= this.marginBox.l;
+		m.t -= this.marginBox.t;
+		this.marginBox = m;
+		this.host.onFirstMove(this);
+		dojo.disconnect(this.events.pop());
+	},
+	onMouseMove: function(e){
+		// summary: event processor for onmousemove
+		// e: Event: mouse event
+		if (this.node) {
+			dojo.dnd.autoScroll(e);
+			/*var m = this.marginBox;*/
+			this.host.onMove(this, {
+				l: /*m.l +*/ e.pageX+2,
+				t: /*m.t +*/ e.pageY+2
+			});
+		}
+	},
+	_revertToParent: function(e) {
+		this._item_parentNode.appendChild(this.node);
+		this._fixPos(e);
+	},
+	_fixPos: function(e) {
+		var t = e.layerY;
+		var l = e.layerX;
+		console.log([t,l]);
+		dojo.style(this.node, "top", t);
+		dojo.style(this.node, "left", l);
+	},
+	onMouseUp: function(e){
+		if(this.mouseButton == e.button){
+			p = dijit.getEnclosingWidget(e.target);
+			this._fixPos(e);
+			if(p.declaredClass == "api.filearea._item" && p.domNode.id != e.target.id) {
+				if(p.isDir)
+				{
+					//move item
+				}
+				else this._revertToParent(e);
+			}
+			else if(p.declaredClass == "api.filearea") {
+				p.moveChild(dijit.byId(this.node.id));
+				this._fixPos(e);
+			}
+			else this._revertToParent(e);
+			dojo.style(this.node, "zIndex", 1);
+			this.destroy();
+		}
+	}
+});
+
+dojo.declare("api.filearea._mover", dojo.dnd.Moveable, {
+	
 });
