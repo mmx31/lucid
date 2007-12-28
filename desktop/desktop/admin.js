@@ -1,5 +1,11 @@
 desktop.admin = new function()
 {
+	this.diskspace = function(callback) {
+		dojo.xhrGet({
+			url: desktop.core.backend("core.administration.general.diskspace"),
+			load: callback
+		});
+	}
 	this.users = {
 		list: function(callback) {
 			dojo.xhrGet({
