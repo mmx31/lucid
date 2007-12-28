@@ -5,6 +5,7 @@
 		// have 5,000 database connections at once unless we need them
 		class Item {
 			var $_parentModel = null;
+			var $_parentInstance = false;
 			function __call($method, $arguments)
 			{
 				//map this to the parent model
@@ -13,13 +14,16 @@
 			}
 			function _make_parent()
 			{
-				$parent = $this->_parentModel;
-				$p = new $parent;
+				if(!$this->_parentInstance)
+				{
+					$parent = $this->_parentModel;
+					$this->_parentInstance = new $parent;
+				}
 				foreach($this as $prop => $val)
 				{
-					$p->$prop = $val;
+					$this->_parentInstance->$prop = $val;
 				}
-				return $p;
+				return $this->_parentInstance;
 			}
 			function save()
 			{
