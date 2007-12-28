@@ -13,8 +13,9 @@ this.init = function(args)
 	dojo.require("dijit.ProgressBar");
 	dojo.require("dijit.Toolbar");
 	dojo.require("dijit.form.Button");
-	//dojo.require("dijit.layout.AccordionContainer");
+	dojo.require("dojox.grid.Grid");
 	dojo.require("dijit.Menu");
+	api.addDojoCss("dojox/grid/_grid/Grid.css");
 	//make window
 	this.win = new api.window({title: "Administration Panel", width: "500px", height: "400px"});
 	this.win.setBodyWidget("SplitContainer", {sizerWidth: 7, orientation: "horizontal"});
@@ -72,20 +73,34 @@ this.pages = {
 		this.toolbar.addChild(new dijit.form.Button({label: "foo!"}));
 		this.main.setContent("loading...");
 		desktop.admin.users.list(dojo.hitch(this, function(data) {
-			var html = "<table style='width: 100%;'><thead><tr style='background-color: #dddddd;'>";
+			var layout = [{
+				cells: [[]]
+			}];
+			//make headers
+			var i = 0;
 			for(field in data[0]) {
-				if(field != "password") html += "<td>"+field+"</td>";
-			}
-			html += "</tr></thead><tbody>";
+				if(field != "password") layout[0].cells[0][layout[0].cells[0].length] = {name: field, field: i};
+				i++;
+			} console.log(layout);
+			//make values
+			var griddata = [];
 			dojo.forEach(data, function(item) {
-				html += "<tr>";
+				var myitem = [];
+				var i = 0;
 				for(field in item) {
-					if(field != "password")html += "<td>"+item[field]+"</td>";
+					if(field != "password") myitem[i] = item[field];
+					i++;
 				}
-				html += "</tr>";
+				griddata[griddata.length] = myitem;
 			});
-			html += "</tbody></table>";
-			this.main.setContent(html);
+			console.log(griddata);
+			this._userGrid = new dojox.Grid({
+				structure: layout,
+				model: new dojox.grid.data.Table(null, griddata)
+			});
+			this.main.setContent(this._userGrid.domNode);
+			this._userGrid.render();
+			this.win.startup();
 		}));
 	},
 	apps: function() {
