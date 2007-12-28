@@ -30,7 +30,7 @@ if (isset($_GET['action'])) {
 		}
 	}
 	if ($_GET['action'] == "getUserName") {
-		$user = $User->getCurrent();
+		$user = $User->get_current();
 		echo $user->username;
 	}
 	if ($_GET['action'] == "getUserNameFromID") {
@@ -42,7 +42,7 @@ if (isset($_GET['action'])) {
 		$username = $_SESSION['username'];
 		$old = crypt($_GET['old'], $conf_secretword);
 		//$new = crypt($_GET['new'], $conf_secretword);
-		$user = $User->getCurrent();
+		$user = $User->get_current();
 		if($old == $user->password) {
 			$user->set_password($_GET['new']);
 			$user->save();
@@ -52,7 +52,7 @@ if (isset($_GET['action'])) {
 	}
 	if ($_GET['action'] == "changeEmail") {
 		require("../config.php");
-		$user = $User->getCurrent();
+		$user = $User->get_current();
 		$pass = crypt($_GET['pass'], $conf_secretword);
 		if($pass == $user->password) {
 			$user->email = $_GET['email'];
@@ -66,15 +66,15 @@ if (isset($_GET['action'])) {
 		echo $user->id;
 	}
 	if ($_GET['action'] == "getUserEmail") {
-		$user = $User->getCurrent();
+		$user = $User->get_current();
 		echo $user->email;
 	}
 	if ($_GET['action'] == "getUserID") {
-		$user = $User->getCurrent();
+		$user = $User->get_current();
 		echo $user->id;
 	}
 	if ($_GET['action'] == "getUserLevel") {
-		$user = $User->getCurrent();
+		$user = $User->get_current();
 		echo $user->level;
 	}
 }
