@@ -22,6 +22,28 @@
 	require("../models/user.php");
 	if($_SESSION['userlevel'] == "admin")
 	{
+		if($_GET['section'] == "general")
+		{
+			if($_GET['action'] == "diskspace")
+			{
+				if(is_dir("/"))
+				{
+					$free = disk_free_space("/");
+					$total = disk_total_space("/");
+				}
+				else
+				{
+					//windowze?
+					$free = disk_free_space("C:");
+					$total = disk_total_space("C:");
+				}
+				$p = new jsonOutput();
+				$free = str_replace(",", ".", strval($free));
+				$total = str_replace(",", ".", strval($total));
+				$p->append("free", $free);
+				$p->append("total", $total);
+			}
+		}
 		if($_GET['section'] == "users")
 		{
 			if($_GET['action'] == "list")

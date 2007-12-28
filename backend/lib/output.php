@@ -3,13 +3,13 @@ class objOutput {
 	var $output = Array();
 	var $dooutput = false;
 	function __destruct() {
-		if($dooutput) {
+		if($this->dooutput) {
 			print_r($output);
 		}
 	}
 	function append($name, $item)
 	{
-		$this->output->$name = $item;
+		$this->output[$name] = $item;
 		$this->dooutput = true;
 	}
 	function set($arr)
@@ -57,7 +57,7 @@ class intOutput {
 
 class jsonOutput extends objOutput {
 	function __destruct() {
-		if($dooutput) {
+		if($this->dooutput) {
 			if($php_errormsg)
 			{
 				$this->append("sqlerror", $php_errormsg);
@@ -69,7 +69,7 @@ class jsonOutput extends objOutput {
 
 class textareaOutput extends jsonOutput {
 	function __destruct() {
-		if($dooutput) {
+		if($this->dooutput) {
 			if($php_errormsg)
 			{
 				$this->append("sqlerror", $php_errormsg);
@@ -81,7 +81,7 @@ class textareaOutput extends jsonOutput {
 
 class xmlOutput extends objOutput{
 	function __destruct() {
-		if($dooutput) {
+		if($this->dooutput) {
 			header('Content-type: text/xml');
 			if($php_errormsg)
 			{
