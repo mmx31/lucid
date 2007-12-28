@@ -1,6 +1,8 @@
 <?php
 	if(!isset($Base))
 	{
+		// the Item class seems pointless, but it's really so that we don't have to
+		// have 5,000 database connections at once unless we need them
 		class Item {
 			var $_parentModel = null;
 			function __call($method, $arguments)
@@ -24,9 +26,8 @@
 				$p = $this->_make_parent();
 				$p->save();
 				if(!isset($this->id)) {
-					$this->id = mysql_insert_id();
+					$this->id = $p->_link->lastInsertID($p->_get_tablename());
 				}
-				mysql_close($link);
 			}
 		}
 		
