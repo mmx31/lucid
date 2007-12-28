@@ -3,7 +3,8 @@ desktop.admin = new function()
 	this.diskspace = function(callback) {
 		dojo.xhrGet({
 			url: desktop.core.backend("core.administration.general.diskspace"),
-			load: callback
+			load: callback,
+			handleAs: "json"
 		});
 	}
 	this.users = {
@@ -28,6 +29,13 @@ desktop.admin = new function()
 				{
 					ioArgs.args.dsktp_callback(data == "0");
 				}
+			});
+		},
+		online: function(callback) {
+			dojo.xhrGet({
+				url: desktop.core.backend("core.administration.users.online"),
+				load: callback,
+				handleAs: "json"
 			});
 		}
 	}

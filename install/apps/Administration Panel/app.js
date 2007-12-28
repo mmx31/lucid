@@ -64,9 +64,13 @@ this.init = function(args)
 this.pages = {
 	home: function() {
 		this.toolbar.destroyDescendants();
-		var h = "Users online: <div dojoType='dijit.ProgressBar' progress='60' maximum='300'></div>";
-		h += "Disk Usage: <div dojoType='dijit.ProgressBar' progress='1' maximum='1'></div> (oh noes!)"
-		this.main.setContent(h);
+		desktop.admin.users.online(dojo.hitch(this, function(data) {
+			var h = "Users online: <div dojoType='dijit.ProgressBar' progress='"+data.online+"' maximum='"+data.total+"'></div>";
+			desktop.admin.diskspace(dojo.hitch(this, function(data) {
+				h += "Disk Usage: <div dojoType='dijit.ProgressBar' progress='"+(data.total-data.free)+"' maximum='"+data.total+"'></div>"
+				this.main.setContent(h);
+			}));
+		}));
 	},
 	users: function() {
 		this.toolbar.destroyDescendants();

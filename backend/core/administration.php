@@ -58,6 +58,20 @@
 				}
 				echo "]";
 			}
+			if($_GET['action'] == "online")
+			{
+				$online = 0;
+				$total = 0;
+				$p = $User->all();
+				foreach($p as $u)
+				{
+					$total++;
+					if($u->logged == 1) $online++;
+				}
+				$o = new jsonOutput;
+				$o->append("online", $online);
+				$o->append("total", $total);
+			}
 		}
 	}
 ?>
