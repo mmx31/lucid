@@ -20,7 +20,11 @@ desktop.screensaver = new function()
 	], dojo.hitch(this, function(e) {
 		dojo.style(this.box, e.n, e.v);
 	}));
-	this.timeout = setTimeout(dojo.hitch(this, this.run), 1000*60*5);
+	this.timeout = setTimeout(dojo.hitch(this, this.run), 1000*60*1);
+	dojo.connect(document.body, "onmousemove", this, function() {
+		clearTimeout(this.timeout);
+		this.timeout = setTimeout(dojo.hitch(this, this.run), 1000*60*1);
+	})
 	this.run = function() {
 		clearTimeout(this.timeout);
 		document.body.appendChild(this.box);
@@ -41,7 +45,6 @@ desktop.screensaver = new function()
 		});
 		dojo.connect(anim, "onEnd", this, function() {
 			document.body.removeChild(this.box);
-			this.timeout = setTimeout(dojo.hitch(this, this.run), 1000*60*5);
 		});
 		anim.play();
 	}
