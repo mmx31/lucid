@@ -7,24 +7,28 @@
 */
 desktop.screensaver = new function()
 {
-	this.box = document.createElement("div");
-	dojo.forEach([
-		{n: "backgroundColor", v: "black"},
-		{n: "opacity", v: 0},
-		{n: "width", v: "100%"},
-		{n: "height", v: "100%"},
-		{n: "position", v: "absolute"},
-		{n: "top", v: "0px"},
-		{n: "left", v: "0px"},
-		{n: "zIndex", v: 9999*9999}
-	], dojo.hitch(this, function(e) {
-		dojo.style(this.box, e.n, e.v);
-	}));
-	this.timeout = setTimeout(dojo.hitch(this, this.run), 1000*60*1);
-	dojo.connect(document.body, "onmousemove", this, function() {
-		clearTimeout(this.timeout);
-		this.timeout = setTimeout(dojo.hitch(this, this.run), 1000*60*1);
-	})
+	this.draw = function() {
+		this.box = document.createElement("div");
+		dojo.forEach([
+			{n: "backgroundColor", v: "black"},
+			{n: "opacity", v: 0},
+			{n: "width", v: "100%"},
+			{n: "height", v: "100%"},
+			{n: "position", v: "absolute"},
+			{n: "top", v: "0px"},
+			{n: "left", v: "0px"},
+			{n: "zIndex", v: 9999*9999}
+		], dojo.hitch(this, function(e) {
+			dojo.style(this.box, e.n, e.v);
+		}));
+	}
+	this.init = function() {
+		this.timeout = setTimeout(dojo.hitch(this, this.run), 1000 * 60 * 1);
+		dojo.connect(document.body, "onmousemove", this, function() {
+			clearTimeout(this.timeout);
+			this.timeout = setTimeout(dojo.hitch(this, this.run), 1000*60*1);
+		});
+	}
 	this.run = function() {
 		clearTimeout(this.timeout);
 		document.body.appendChild(this.box);
