@@ -608,6 +608,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 					this.domNode.parentNode.removeChild(this.domNode);
 					//allow the garbage collector to free up memory
 					this.domNode = null;
+					this.body = null;
 				}
 				else {
 					api.console("Warning in app: No window shown.");
@@ -621,6 +622,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			this.domNode.parentNode.removeChild(this.domNode);
 			//allow the garbage collector to free up memory
 			this.domNode = null;
+			this.body = null;
 		}
 	},
 	/*
