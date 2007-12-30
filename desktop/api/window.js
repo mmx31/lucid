@@ -590,7 +590,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 * Summary:
 	 * 		Destroys the window (or closes it)
 	 */
-	destroy: function()
+	destroy: function(finalize)
 	{
 		if(this.destroyed == true) return false;
 		dojo.style(this.body.domNode, "display", "none");
@@ -604,15 +604,12 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			});
 			dojo.connect(anim, "onEnd", null, dojo.hitch(this, function(){
 				this._drag.destroy();
-				if (this.domNode) {
-					this.domNode.parentNode.removeChild(this.domNode);
-					//allow the garbage collector to free up memory
-					this.domNode = null;
-					this.body = null;
-				}
-				else {
-					api.console("Warning in app: No window shown.");
-				}
+				this.destroyRecursive();
+				dojo.forEach(this._connects, function(array){
+					dojo.forEach(array, dojo.disconnect);
+				});
+				this.destroyRendering(finalize);
+				dijit.registry.remove(this.id);
 			}));
 			anim.play();
 		}
@@ -620,9 +617,12 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		{
 			this._drag.destroy();
 			this.domNode.parentNode.removeChild(this.domNode);
-			//allow the garbage collector to free up memory
-			this.domNode = null;
-			this.body = null;
+			this.destroyRecursive();
+			dojo.forEach(this._connects, function(array){
+				dojo.forEach(array, dojo.disconnect);
+			});
+			this.destroyRendering(finalize);
+			dijit.registry.remove(this.id);
 		}
 	},
 	/*
