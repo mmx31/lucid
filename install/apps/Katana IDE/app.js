@@ -23,7 +23,7 @@ this.init = function(args)
 	this.win.addChild(client);
 	
 	this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
-		this.toolbar.addChild(new dijit.form.Button({label: "New", iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, this.new)}));
+		this.toolbar.addChild(new dijit.form.Button({label: "New", iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, this.newApp)}));
 		this.toolbar.addChild(new dijit.form.Button({label: "Open", iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this.load)}));
 		this.toolbar.addChild(new dijit.form.Button({label: "Save", iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, this.save)}));
 		this.toolbar.addChild(new dijit.form.Button({label: "Metadata", iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, this.editMetadata)}));
@@ -34,7 +34,7 @@ this.init = function(args)
 	this.win.onDestroy = dojo.hitch(this, this.kill);
 	this.win.show();
 	this.win.startup();
-	this.new();
+	this.newApp();
 }
 
 this.kill = function()
@@ -49,7 +49,7 @@ this.kill = function()
 	api.instances.setKilled(this.instance);
 }
 
-this.new = function()
+this.newApp = function()
 {
 	this.app = {
 		id: -1,
@@ -97,17 +97,21 @@ this.editMetadata = function()
 	this.tempCache  = this.editor.value;
         this.editor.value = "To continue working, close the metadata window.";
         this.editor.disabled = true;
-        this.winn = new api.window();
-        this.winn.title = "Metadata";
-        this.winn.onDestroy = dojo.hitch(this, this._editMetadata);
-        this.winn.write("Application ID(appid): <span id=\"appid"+this.instance+this.blah+"\">"+this.app.id+"</span><br>");
-        this.winn.write("Application Name: <span id=\"appname"+this.instance+this.blah+"\"></span><br>");
-        this.winn.write("Application Author: <span id=\"appauthor"+this.instance+this.blah+"\"></span><br>");
-        this.winn.write("Application E-mail: <span id =\"appemail"+this.instance+this.blah+"\"></span><br>");
-        this.winn.write("Application Version: <span id=\"appversion"+this.instance+this.blah+"\"></span><br>");
-        this.winn.write("Application Maturity: <span id=\"appmaturity"+this.instance+this.blah+"\"></span><br>");
-        this.winn.write("Application Category: <span id=\"appcategory"+this.instance+this.blah+"\"></span><br>");
-	this.winn.write("<p>Closing this window will apply the metadata change.</p>");
+        this.winn = new api.window({
+			title: "Edit Metadata",
+			bodyWidget: "ContentPane",
+			onDestroy: dojo.hitch(this, this._editMetadata)
+		});
+		var content = "";
+        content += "Application ID(appid): <span id=\"appid"+this.instance+this.blah+"\">"+this.app.id+"</span><br>";
+        content += "Application Name: <span id=\"appname"+this.instance+this.blah+"\"></span><br>";
+        content += "Application Author: <span id=\"appauthor"+this.instance+this.blah+"\"></span><br>";
+        content += "Application E-mail: <span id =\"appemail"+this.instance+this.blah+"\"></span><br>";
+        content += "Application Version: <span id=\"appversion"+this.instance+this.blah+"\"></span><br>";
+        content += "Application Maturity: <span id=\"appmaturity"+this.instance+this.blah+"\"></span><br>";
+        content += "Application Category: <span id=\"appcategory"+this.instance+this.blah+"\"></span><br>";
+	content += "<p>Closing this window will apply the metadata change.</p>";
+	this.winn.body.setContent(content);
 	this.winn.show();
 	new dijit.form.TextBox({id: "appname"+this.instance+this.blah, name: "appname"+this.instance+this.blah}, document.getElementById("appname"+this.instance+this.blah));
 	new dijit.form.TextBox({id: "appauthor"+this.instance+this.blah, name: "appauthor"+this.instance+this.blah}, document.getElementById("appauthor"+this.instance+this.blah));
