@@ -34,11 +34,12 @@ winHTML += '<button style="width: 25%; height: 16%;" onClick="document.getElemen
 winHTML += '<button style="width: 25%; height: 16%;" onClick="desktop.app.instances['+this.instance+'].evaluate()">=</button>';
 winHTML += '<button style="width: 25%; height: 16%;" onClick="document.getElementById(\'results'+this.instance+'\').value += \'+\'">+</button>';
 //-------------------
-this.window = new api.window();
-this.window.title="Calculator";
-this.window.write(winHTML);
-this.window.width="200px";
-this.window.height="235px";
+this.window = new api.window({
+	title: "Calculator",
+	width: "200px",
+	height: "235px"
+});
+this.window.body.setContent(winHTML);
 this.window.show();
 this.status = "active";
 this.window.onDestroy = dojo.hitch(this, this.windowKill);
