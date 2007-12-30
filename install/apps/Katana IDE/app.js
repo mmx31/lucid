@@ -64,7 +64,7 @@ this.newApp = function()
 	this.editor.value="";
 }
 this.about = function() {
-	api.ui.alert({title: "Katana IDE", message:"Psych Desktop Katana IDE - Application Creation IDE<br>Version "+this.version});
+	api.ui.alertDialog({title: "Katana IDE", message:"Psych Desktop Katana IDE - Application Creation IDE<br>Version "+this.version});
 }
 this.app = {};
 this.save = function()
@@ -87,7 +87,7 @@ this.saved = function(id)
 		this.editor.selectionStart = startPos+1;
 		this.editor.selectionEnd = endPos+1;
 		this.editor.scrollTop = scroll;
-		//api.ui.alert({title:"Katana IDE", message:"Save Sucessful"});
+		//api.ui.alertDialog({title:"Katana IDE", message:"Save Sucessful"});
 		delete this.app.callback;
 	}));
 }

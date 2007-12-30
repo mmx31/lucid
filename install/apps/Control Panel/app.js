@@ -124,7 +124,7 @@ this.colorChange = function(color) {
 	dijit.byId("colorPick"+this.instance).setValue(color);
 }
 this.about = function() {
-	api.ui.alert({title: "Control Panel", message:"Psych Desktop Control Panel<br>Version "+this.version});
+	api.ui.alertDialog({title: "Control Panel", message:"Psych Desktop Control Panel<br>Version "+this.version});
 }
 this.processSave = function() {
 	var old = dijit.byId("oldPass"+this.instance).getValue();
@@ -133,23 +133,23 @@ this.processSave = function() {
 	var email = dijit.byId("email"+this.instance).getValue();
 	if(old != "") {
 		if(newa != newConfirm) { 
-			api.ui.alert({title: "Error", message:"New password and new confirm password do not match."});
+			api.ui.alertDialog({title: "Error", message:"New password and new confirm password do not match."});
 			return false; 
 		}
 		if(email != "") { desktop.user.changeUserEmail({old: old, newemail: email, callback: function(a) {
 		if(a == 1) {
-		api.ui.alert({title:"E-mail Change Result", message: "E-mail change unsucessful. Check that password is correct."});
+		api.ui.alertDialog({title:"E-mail Change Result", message: "E-mail change unsucessful. Check that password is correct."});
 		}
 		else {
-		api.ui.alert({title:"E-mail Change Result", message: "E-mail changed."});
+		api.ui.alertDialog({title:"E-mail Change Result", message: "E-mail changed."});
 		}
 		}});}
 		if(newa != "") { desktop.user.changeUserPassword({old: old, newpass: newa, callback:function(a) {
 		if(a == 1) {
-		api.ui.alert({title:"Password Change Result", message: "Password change unsuccessful. Check that your old password is correct."});
+		api.ui.alertDialog({title:"Password Change Result", message: "Password change unsuccessful. Check that your old password is correct."});
 		}
 		else {
-		api.ui.alert({title:"Password Change Result", message: "Password change successful."});
+		api.ui.alertDialog({title:"Password Change Result", message: "Password change successful."});
 		}
 		}});}
 		dijit.byId("oldPass"+this.instance).setValue("");
@@ -173,7 +173,7 @@ this.processSave = function() {
 	desktop.config.wallpaper.color = color;
 	desktop.config.fx = fx;
 	desktop.config.save();
-	api.ui.alert({title: "Notice", message: "Changes were applied successfully."});
+	api.ui.alertDialog({title: "Notice", message: "Changes were applied successfully."});
 	api.user.getUserName(dojo.hitch(this, this.processUserName));
 	api.user.getUserID(dojo.hitch(this, this.processUserID));
 	api.user.getUserLevel(dojo.hitch(this, this.processUserLevel));

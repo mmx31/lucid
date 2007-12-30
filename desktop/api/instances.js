@@ -90,6 +90,8 @@
 	*/
 	this.setKilled = function(instance) {
 		desktop.app.instances[instance].status = "killed";
+		//allow the garbage collector to free up memory
+		desktop.app.instances[instance] = null;
 	}
 	/** 
 	* Get all instances

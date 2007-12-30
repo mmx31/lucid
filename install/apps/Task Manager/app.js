@@ -35,16 +35,16 @@ this.init = function(args) {
 }
 
 this.about = function() {
-	api.ui.alert({title: "Task Manager", message:"Psych Desktop Task Manager<br>Version "+this.version});
+	api.ui.alertDialog({title: "Task Manager", message:"Psych Desktop Task Manager<br>Version "+this.version});
 }
 
 this.executeKill = function(id) {
 	if(api.instances.getStatus(id) != "killed") {
 	api.instances.kill(id);
-	api.ui.alert({title: "Task Manager", message:"Instance "+id+" was killed sucessfully."});
+	api.ui.alertDialog({title: "Task Manager", message:"Instance "+id+" was killed sucessfully."});
 	}
 	else {
-	api.ui.alert({title: "Task Manager", message:"This process has already been killed or has exited."});
+	api.ui.alertDialog({title: "Task Manager", message:"This process has already been killed or has exited."});
 	}
 	this.home();
 }

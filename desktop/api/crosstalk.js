@@ -153,7 +153,7 @@ api.crosstalk = new function()
 	* @memberOf api.crosstalk
 	*/
 	this.handleSystemMessage = function(object) {
-	api.ui.alert({title: "Psych Desktop", message: "<center> <b> System Message (senderID: "+object.sender+") </b> <br> "+object.message+" </center>"});
+	api.ui.alertDialog({title: "Psych Desktop", message: "<center> <b> System Message (senderID: "+object.sender+") </b> <br> "+object.message+" </center>"});
 	}
 	/** 
 	* send system messages
@@ -162,7 +162,7 @@ api.crosstalk = new function()
 	* @memberOf api.crosstalk
 	*/
 	this.sendSystemMessage = function(ooo) {
-	//api.ui.alert("<center> <b> System Message </b> <br> "+message" </center>");
+	//api.ui.alertDialog("<center> <b> System Message </b> <br> "+message" </center>");
 	api.crosstalk.sendEvent({ userid: ooo.userid, appid: 0, instance: 0, message: ooo.message });
 	}
 	/** 

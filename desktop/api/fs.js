@@ -48,7 +48,7 @@ api.fs = new function()
 		},
 		handleAs: "xml",
         load: function(data, ioArgs) {
-			if(!data) { if(object.onError) { object.onError(); } else { api.ui.alertDialog({title: "Error", message: "Sorry! We couldn't open \""+object.path+"\". Check the file exists and try again."}); } }
+			if(!data) { if(object.onError) { object.onError(); } else { api.ui.alertDialogDialog({title: "Error", message: "Sorry! We couldn't open \""+object.path+"\". Check the file exists and try again."}); } }
 			var results = data.getElementsByTagName('file');
 			try {
 			content = results[0].firstChild.nodeValue;
@@ -198,7 +198,7 @@ api.fs = new function()
 					});
 				}
 				else {
-					api.ui.alert({
+					api.ui.alertDialog({
 						title: "Error",
 						message: "Cannot open " + path + ", no app associated with that extention"
 					});

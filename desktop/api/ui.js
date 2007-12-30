@@ -8,7 +8,7 @@ api.ui = new function() {
 	this.alert = function(object)
 	{
 		this.alertDialog(object);
-		api.console("api.ui.alert is depreciated and will expire in v1.0! use api.ui.alertDialog instead!");
+		api.console("api.ui.alertDialog is depreciated and will expire in v1.0! use api.ui.alertDialogDialog instead!");
 	}
 	this.alertDialog = function(object)
 	{

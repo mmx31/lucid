@@ -106,11 +106,11 @@ desktop.app = new function()
 					}
 					else { // Use psych desktop error handler
 						if(api.instances.kill(instance) == false) {
-							api.ui.alert({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: "+e+"<br><br>Extra Details: The program failed to respond to a kill request. <br><br><br>You can help by copying this and posting it to the Psych Desktop forums."});
+							api.ui.alertDialog({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: "+e+"<br><br>Extra Details: The program failed to respond to a kill request. <br><br><br>You can help by copying this and posting it to the Psych Desktop forums."});
 							this.instances[instance].status = "error";
 						}
 						else {
-					            api.ui.alert({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: "+e+"<br><br><br>You can help by copying this and posting it to the Psych Desktop forums."});
+					            api.ui.alertDialog({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: "+e+"<br><br><br>You can help by copying this and posting it to the Psych Desktop forums."});
 						}
 					}
 				}
