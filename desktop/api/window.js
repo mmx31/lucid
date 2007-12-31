@@ -589,7 +589,6 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		this._task.destroy();
 		this._drag.destroy();
 		this.resize.destroy();
-		this.hidden = true;
 	},
 	/* 
 	 * Method: hide
@@ -599,19 +598,21 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 */
 	hide: function()
 	{
-		if (desktop.config.fx) {
-			var anim = dojo.fadeOut({
-				node: this.domNode,
-				duration: desktop.config.window.animSpeed
-			});
-			dojo.connect(anim, "onEnd", this, function(){
+		if (!this.hidden) {
+			this.hidden = true;
+			if (desktop.config.fx) {
+				var anim = dojo.fadeOut({
+					node: this.domNode,
+					duration: desktop.config.window.animSpeed
+				});
+				dojo.connect(anim, "onEnd", this, function(){
+					this.destroy();
+				});
+				anim.play();
+			}
+			else {
 				this.destroy();
-			});
-			anim.play();
-		}
-		else
-		{
-			this.destroy();
+			}
 		}
 	},
 	/*
