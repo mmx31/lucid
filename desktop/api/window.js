@@ -411,7 +411,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		
 		if(desktop.config.fx == true)
 		{
-			api.console("maximizing... (in style!)");
+			//api.console("maximizing... (in style!)");
 			dojo.style(this.body.domNode, "display", "none");
 			var anim = dojo.animateProperty({
 				node: this.domNode,
@@ -432,7 +432,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		}
 		else
 		{
-			api.console("maximizing...");
+			//api.console("maximizing...");
 			win.style.top = "0px";
 			win.style.left = "0px";
 			win.style.width = dojo.style(this.domNode.parentNode, "width");

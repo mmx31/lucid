@@ -152,7 +152,7 @@ dojo.declare(
 	startup: function()
 	{
 		dojo.forEach(this.getChildren(), function(item){
-			item.startup(); console.log(item);
+			item.startup();
 		});
 	},
 	moveChild: function(item) {
