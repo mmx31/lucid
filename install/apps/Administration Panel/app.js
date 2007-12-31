@@ -71,7 +71,6 @@ this.pages = {
 	},
 	users: function() {
 		this.toolbar.destroyDescendants();
-		this.toolbar.addChild(new dijit.form.Button({label: "foo!"}));
 		this.main.setContent("loading...");
 		desktop.admin.users.list(dojo.hitch(this, function(data) {
 			var layout = [{

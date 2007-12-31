@@ -3,7 +3,7 @@
 <name>Katana IDE</name>
 <author>Psychcf</author>
 <email>will@psychdesigns.net</email>
-<version>1.1.1</version>
+<version>1.2</version>
 <maturity>Stable</maturity>
 <category>Development</category>
 <installFile>app.js</installFile>

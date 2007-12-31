@@ -28,14 +28,56 @@ this.init = function(args)
 		this.toolbar.addChild(new dijit.form.Button({label: "Open", iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this.load)}));
 		this.toolbar.addChild(new dijit.form.Button({label: "Save", iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, this.save)}));
 		this.toolbar.addChild(new dijit.form.Button({label: "Metadata", iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, this.editMetadata)}));
-
-	        this.toolbar.addChild(new dijit.form.Button({label: "About", onClick: dojo.hitch(this, this.about), iconClass: "icon-16-apps-help-browser"}));
+		this.toolbar.addChild(new dijit.form.Button({label: "Developer Tools", iconClass: "icon-16-apps-utilities-terminal", onClick: dojo.hitch(this, this.devTools)}));
+	    this.toolbar.addChild(new dijit.form.Button({label: "About", onClick: dojo.hitch(this, this.about), iconClass: "icon-16-apps-help-browser"}));
 
 	this.win.addChild(this.toolbar);
 	this.win.show();
 	this.win.startup();
 	this.newApp();
 }
+
+this.devTools = function()
+{
+	this.tempCache  = this.editor.value;
+    this.editor.value = "To continue working, close the Developer Tools.";
+    this.editor.disabled = true;
+	this.winn = new api.window({
+		height: "180px",
+		width: "485px",
+		title: "Developer Tools",
+		bodyWidget: "LayoutContainer",
+		onHide: dojo.hitch(this, this._devTools)
+	});
+	content = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
+	all = document.createElement("div");
+	info = document.createElement("div");
+	status = document.createElement("div");
+	info.innerHTML = "Developer Tools provide some common tools used for Development on Psych Desktop";
+	all.appendChild(info);
+	button = new dijit.form.Button({label: "Clear Application Cache", onClick: dojo.hitch(this, function() { desktop.app.apps = []; status.innerHTML = "Application Cache Cleared"; })});
+	all.appendChild(button.domNode);
+	button = new dijit.form.Button({label: "Rebuild Application Menu", onClick: dojo.hitch(this, function() { desktop.menu.getApplications(); status.innerHTML = "Application Menu Rebuilt"; })});
+	all.appendChild(button.domNode);
+	button = new dijit.form.Button({label: "Return to Katana IDE", onClick: dojo.hitch(this, this._devTools)});
+	all.appendChild(button.domNode);
+	status.innerHTML = "Choose your action.";
+	all.appendChild(status);
+	all.style.textAlign = "center";
+	content.setContent(all);
+	this.winn.addChild(content);
+	this.winn.show();
+	this.winn.startup();
+}
+	
+this._devTools = function()
+{
+	if(!this.winn.hidden) this.winn.hide();
+	this.editor.value = this.tempCache;
+    this.editor.disabled = false;
+}
+	
+	
 
 this.kill = function()
 {
@@ -100,7 +142,7 @@ this.editMetadata = function()
         this.winn = new api.window({
 			title: "Edit Metadata",
 			bodyWidget: "ContentPane",
-			onDestroy: dojo.hitch(this, this._editMetadata)
+			onHide: dojo.hitch(this, this._editMetadata)
 		});
 		var content = "";
         content += "Application ID(appid): <span id=\"appid"+this.instance+this.blah+"\">"+this.app.id+"</span><br>";
