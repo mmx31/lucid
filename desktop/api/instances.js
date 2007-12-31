@@ -38,6 +38,8 @@
 			return true;
 		}
 		catch(err) {
+			console.error(err);
+			desktop.app.instances[instance].status = "zombie";
 			return false;
 		}
 	}
