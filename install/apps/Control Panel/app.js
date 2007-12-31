@@ -8,11 +8,8 @@ dojo.require("dijit.form.Form");
 dojo.require("dijit.form.CheckBox");
 dojo.require("dijit.Toolbar");
 this.kill = function() {
-	if(!this.window.destroyed) { this.window.destroy(); }
-	this.status = "killed";
-}
-this.windowKill = function() {
-	this.kill();
+	if(!this.window.hidden) { this.window.hide(); }
+	api.instances.setKilled(this.instance);
 }
 this.init = function(args) {
 	this.open();
@@ -40,7 +37,9 @@ this.processThemes = function(theme) {
 }
 this.open = function(args)
 {
-	this.window = new api.window();
+	this.window = new api.window({
+		onHide: dojo.hitch(this, this.kill)
+	});
 	this.window.title="Control Panel";
 	this.window.width="620px";
 	this.window.height="410px";

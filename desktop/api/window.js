@@ -25,21 +25,21 @@ dojo.require("dojox.fx.easing");
  * 		(end code)
  */
 dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
-	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"win-tl\"><div class=\"win-tr\"><div class=\"win-tc\" dojoattachevent=\"onmousedown: bringToFront\"><div dojoattachpoint=\"titleNode,handle\" class=\"win-title\">${title}</div><div class=\"win-buttons\"><div dojoattachevent=\"onmouseup: destroy\" class=\"win-close\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"win-max\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"win-min\"></div></div></div></div></div><div class=\"win-bmw\"><div class=\"win-ml\"><div class=\"win-mr\"><div class=\"win-mc\" dojoattachpoint=\"body\"></div></div></div><div class=\"win-bl\"><div class=\"win-br\"><div class=\"win-bc\"></div></div></div><div dojoattachpoint=\"resize\" class=\"win-resize\"></div></div></div>",
+	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"win-tl\"><div class=\"win-tr\"><div class=\"win-tc\" dojoattachevent=\"onmousedown: bringToFront\"><div dojoattachpoint=\"titleNode,handle\" class=\"win-title\">${title}</div><div class=\"win-buttons\"><div dojoattachevent=\"onmouseup: hide\" class=\"win-close\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"win-max\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"win-min\"></div></div></div></div></div><div class=\"win-bmw\"><div class=\"win-ml\"><div class=\"win-mr\"><div class=\"win-mc\" dojoattachpoint=\"body\"></div></div></div><div class=\"win-bl\"><div class=\"win-br\"><div class=\"win-bc\"></div></div></div><div dojoattachpoint=\"resize\" class=\"win-resize\"></div></div></div>",
 	/*
 	 * Property: destroyed
 	 * 
 	 * Summary:
 	 * 		Is the window destroyed?
 	 */
-	destroyed: false,
+	hidden: false,
 	/*
-	 * Property: onDestroy
+	 * Property: onHide
 	 * 
 	 * Summary:
 	 * 		What to do on destroying of the window
 	 */
-	onDestroy: function() {
+	onHide: function() {
 		
 	},
 	/*
@@ -157,6 +157,22 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	postCreate: function() {
 		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.body);
 		this.domNode.title="";
+		this.makeDragger();
+		this.resize = new dojox.layout.ResizeHandle({
+			targetContainer: this.domNode,
+			activeResize: true
+		}, this.resize);
+		if(!this.resizable)
+		{
+			this.killResizer();
+		}
+		dojo.addClass(this.resize.domNode, "win-resize");
+		dojo.connect(this.resize.domNode, "onmousedown", this, function(e){
+			this._resizeEnd = dojo.connect(document, "onmouseup", this, function(e){
+				dojo.disconnect(this._resizeEnd);
+				this._resizeBody();
+			});
+		});
 	},
 	/*
 	 * Method: setBodyWidget
@@ -182,83 +198,15 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 */
 	show: function()
 	{
-		if (document.getElementById(this.id) == null) //dojo.byId allways seems to return an objecct...
-		{
+			dojo.byId("windowcontainer").appendChild(this.domNode);
 			dojo.style(this.domNode, "width", this.width);
 			dojo.style(this.domNode, "height", this.height);
-			dojo.byId("windowcontainer").appendChild(this.domNode);
 			this.titleNode.innerHTML = this.title;
-			this.makeDragger();
-			this.resize = new dojox.layout.ResizeHandle({
-				targetContainer: this.domNode,
-				activeResize: true
-			}, this.resize);
-			dojo.addClass(this.resize.domNode, "win-resize");
-			dojo.connect(this.resize.domNode, "onmousedown", this, function(e){
-				this._resizeEnd = dojo.connect(document, "onmouseup", this, function(e){
-					dojo.disconnect(this._resizeEnd);
-					this._resizeBody();
-				});
-			});
-			if(!this.resizable)
-			{
-				this.killResizer();
-			}
 			this._task = new desktop.taskbar.task({
 				label: this.title,
 				icon: this.icon,
 				winid: this.id,
-				onclick: dojo.hitch(this, function()
-				{
-					var s = this.domNode.style.display;
-					if(s == "none")
-					{
-						this.restore();
-						this.bringToFront();
-					}
-					else
-					{
-						var ns = dojo.query("div.win", "windowcontainer");
-						var box;
-						var myBox = new Object
-						var overlapping = false;
-						myBox.l = this.domNode.style.left;
-						myBox.t = this.domNode.style.top;
-						myBox.b = myBox.t + myBox.h;
-						myBox.r = myBox.l + myBox.w;
-						for(n = 0; n < ns.length; n++)
-						{
-							if(ns[n].id != this.id && (ns[n].style.display) != "none")
-							{
-								//TODO: overlap detection is really bad. rewrite it.
-								box = new Object();
-								box.l = ns[n].style.left;
-								box.t = ns[n].style.top;
-								box.w = ns[n].style.width;
-								box.h = ns[n].style.height;
-								if(box.l <= myBox.r &&
-								   box.l >= myBox.l &&
-								   box.t <= myBox.b &&
-								   box.t >= myBox.t)
-								{
-									if(desktop.config.debug == true) api.console("windows are overlapping!");
-									overlapping = true;
-									break;
-								}
-							}
-						}
-						var wasontop = this.bringToFront();
-						if(desktop.config.debug == true) api.console("onTop: "+wasontop+" overlap: "+overlapping);
-						if(overlapping == false)
-						{
-							this.minimize();
-						}
-						else if(wasontop == true)
-						{
-							this.minimize();
-						}
-					}
-				})
+				onclick: dojo.hitch(this, this._onTaskClick)
 			});
 			if(this.maximized == true) this.maximize();
 			dojo.style(this.domNode, "display", "block");
@@ -275,8 +223,58 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				});
 				anim.play();
 			} else this._resizeBody();
-		}
 	},
+	_onTaskClick: function()
+	{
+		var s = this.domNode.style.display;
+		if(s == "none")
+		{
+			this.restore();
+			this.bringToFront();
+		}
+		else
+		{
+			var ns = dojo.query("div.win", "windowcontainer");
+			var box;
+			var myBox = new Object
+			var overlapping = false;
+			myBox.l = this.domNode.style.left;
+			myBox.t = this.domNode.style.top;
+			myBox.b = myBox.t + myBox.h;
+			myBox.r = myBox.l + myBox.w;
+			for(n = 0; n < ns.length; n++)
+			{
+				if(ns[n].id != this.id && (ns[n].style.display) != "none")
+				{
+					//TODO: overlap detection is really bad. rewrite it.
+					box = new Object();
+					box.l = ns[n].style.left;
+					box.t = ns[n].style.top;
+					box.w = ns[n].style.width;
+					box.h = ns[n].style.height;
+					if(box.l <= myBox.r &&
+					   box.l >= myBox.l &&
+					   box.t <= myBox.b &&
+					   box.t >= myBox.t)
+					{
+						if(desktop.config.debug == true) api.console("windows are overlapping!");
+						overlapping = true;
+						break;
+					}
+				}
+			}
+			var wasontop = this.bringToFront();
+			if(desktop.config.debug == true) api.console("onTop: "+wasontop+" overlap: "+overlapping);
+			if(overlapping == false)
+			{
+				this.minimize();
+			}
+			else if(wasontop == true)
+			{
+				this.minimize();
+				}
+			}
+		},
 	_toggleMaximize: function() {
 		if(this.maximized == true) this.unmaximize();
 		else this.maximize();
@@ -584,46 +582,37 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		}
 		else return true;
 	},
+	uninitialize: function() {
+		dojo.style(this.body.domNode, "display", "none");
+		this.body.destroy();
+		this._task.destroy();
+		this._drag.destroy();
+		this.resize.destroy();
+		this.hidden = true;
+	},
 	/* 
-	 * Method: destroy
+	 * Method: hide
 	 * 
 	 * Summary:
-	 * 		Destroys the window (or closes it)
+	 * 		Hides the window (or closes it)
 	 */
-	destroy: function()
+	hide: function()
 	{
-		if(this.destroyed == true) return false;
-		var finalize = false;
-		dojo.style(this.body.domNode, "display", "none");
-		this.destroyed = true;
-		this.onDestroy();
-		this._task.destroy();
+		this.onHide();
+		this.uninitialize();
 		if (desktop.config.fx) {
 			var anim = dojo.fadeOut({
 				node: this.domNode,
 				duration: desktop.config.window.animSpeed
 			});
-			dojo.connect(anim, "onEnd", null, dojo.hitch(this, function(){
-				this._drag.destroy();
-				this.body.destroy();
-				dojo.forEach(this._connects, function(array){
-					dojo.forEach(array, dojo.disconnect);
-				});
-				this.destroyRendering(finalize);
-				dijit.registry.remove(this.id);
-			}));
+			dojo.connect(anim, "onEnd", this, function(){
+				this.destroy();
+			});
 			anim.play();
 		}
 		else
 		{
-			this._drag.destroy();
-			this.domNode.parentNode.removeChild(this.domNode);
-			this.body.destroy();
-			dojo.forEach(this._connects, function(array){
-				dojo.forEach(array, dojo.disconnect);
-			});
-			this.destroyRendering(finalize);
-			dijit.registry.remove(this.id);
+			this.destroy();
 		}
 	},
 	/*

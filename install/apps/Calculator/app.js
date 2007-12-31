@@ -1,9 +1,6 @@
 this.kill = function() {
-	if(!this.window.destroyed) { this.window.destroy(); }
-	this.status = "killed";
-}
-this.windowKill = function() {
-	this.kill();
+	if(!this.window.hidden) { this.window.hide(); }
+	api.instances.setKilled(this.instance);
 }
 this.init = function(args)
 {
@@ -42,7 +39,7 @@ this.window = new api.window({
 this.window.body.setContent(winHTML);
 this.window.show();
 this.status = "active";
-this.window.onDestroy = dojo.hitch(this, this.windowKill);
+dojo.connect(this.window, "onHide", this, this.kill);
 }
 this.evaluate = function()
 {

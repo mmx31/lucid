@@ -6,7 +6,8 @@ this.init = function(args)
 	dojo.require("dijit.Dialog");
 	this.win = new api.window({
 		title: "File Browser",
-		bodyWidget: "LayoutContainer"
+		bodyWidget: "LayoutContainer",
+		onHide: dojo.hitch(this, this.kill)
 	});
 	this.fileArea = new api.filearea({layoutAlign: "client", path: (args.path || "/")})
 	this.win.addChild(this.fileArea);
@@ -45,7 +46,7 @@ this.init = function(args)
 				widgetRef.setMessage(data.status+": "+data.details);
 				setTimeout(dojo.hitch(this, function(){
 					this.upbutton._closeDropDown();
-					this.uploader.destroy();
+					this.uploader.hide();
 					this.uploader = new dojox.widget.FileInput_fileb_remix(this.uploaderArgs);
 					this.uploadDiv.appendChild(this.uploader.domNode);
 				}),2000);
@@ -78,7 +79,7 @@ this.init = function(args)
 }
 
 this.kill = function() {
-	if(this.win != "undefined") { this.win.destroy(); }
+	if(!this.win.hidden) { this.win.hide(); }
 	api.instances.setKilled(this.instance);
 }
 api.addDojoCss("dojox/widget/FileInput/FileInput.css");

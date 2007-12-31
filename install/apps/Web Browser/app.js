@@ -1,6 +1,5 @@
 this.kill = function() {
-	if(!this.win.destroyed) { this.win.destroy(); }
-	//clearInterval(this.interval);
+	if(!this.win.hidden) { this.win.hide(); }
 	api.instances.setKilled(this.instance);
 }
 this.init = function(args)
@@ -12,7 +11,7 @@ this.init = function(args)
 	this.win = new api.window({
 		title: "Web Browser",
 		bodyWidget: "LayoutContainer",
-		onDestroy: dojo.hitch(this, this.kill)
+		onHide: dojo.hitch(this, this.kill)
 	});
 	this.Iframe = document.createElement("iframe");
 	dojo.style(this.Iframe, "width", "100%");

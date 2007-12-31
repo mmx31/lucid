@@ -5,10 +5,11 @@ this.init = function(args)
 	dojo.require("dijit.layout.LayoutContainer");
 	dojo.require("dijit.form.Textarea");
 	dojo.require("dijit.form.Button");
-        dojo.require("dijit.form.TextBox");
+    dojo.require("dijit.form.TextBox");
 	dojo.require("dijit.Toolbar");
 	this.win = new api.window({
 		title: "Katana IDE",
+		onHide: dojo.hitch(this, this.kill)
 	});
 	this.win.setBodyWidget("LayoutContainer", {});
 	
@@ -31,7 +32,6 @@ this.init = function(args)
 	        this.toolbar.addChild(new dijit.form.Button({label: "About", onClick: dojo.hitch(this, this.about), iconClass: "icon-16-apps-help-browser"}));
 
 	this.win.addChild(this.toolbar);
-	this.win.onDestroy = dojo.hitch(this, this.kill);
 	this.win.show();
 	this.win.startup();
 	this.newApp();
@@ -40,12 +40,12 @@ this.init = function(args)
 this.kill = function()
 {
 	if(typeof this.loadwin != "undefined") {
-		if(!this.loadwin.destroyed) this.loadwin.destroy();
+		if(!this.loadwin.hidden) this.loadwin.hide();
 	}
 	if(typeof this.winn != "undefined") {
-		if(!this.winn.destroyed) this.winn.destroy();
+		if(!this.winn.hidden) this.winn.hide();
 	}
-	if(!this.win.destroyed)this.win.destroy();
+	if(!this.win.hidden)this.win.hide();
 	api.instances.setKilled(this.instance);
 }
 
@@ -160,7 +160,7 @@ this.load = function()
 			l.style.cursor="pointer";
 			dojo.connect(l, "onclick", this, function(e) {
 				console.debug(this);
-				this.loadwin.destroy();
+				this.loadwin.hide();
 				api.ide.load(parseInt(e.target.title), dojo.hitch(this, function(data) {
 					this.editor.value=data.code;
 					this.app = data;

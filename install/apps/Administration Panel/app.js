@@ -1,9 +1,6 @@
 this.kill = function() {
-	if(!this.win.destroyed) { this.win.destroy(); }
-	this.status = "killed";
-}
-this.windowKill = function() {
-	this.kill();
+	if(!this.win.hidden) { this.win.hide(); }
+	api.instances.setKilled(this.instance);
 }
 this.init = function(args)
 {
@@ -17,7 +14,7 @@ this.init = function(args)
 	dojo.require("dijit.Menu");
 	api.addDojoCss("dojox/grid/_grid/Grid.css");
 	//make window
-	this.win = new api.window({title: "Administration Panel", width: "500px", height: "400px"});
+	this.win = new api.window({title: "Administration Panel", width: "500px", height: "400px", onHide: dojo.hitch(this, this.kill)});
 	this.win.setBodyWidget("SplitContainer", {sizerWidth: 7, orientation: "horizontal"});
 	var pane = new dijit.layout.ContentPane({sizeMin: 10, sizeShare: 20}, document.createElement("div"));
 		var menu = new dijit.Menu({});
@@ -49,10 +46,10 @@ this.init = function(args)
 		pane.setContent(menu.domNode);
 	this.win.addChild(pane);
 	var layout = new dijit.layout.LayoutContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
-		this.main = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
-		layout.addChild(this.main);
-		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
-		layout.addChild(this.toolbar);
+	this.main = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
+	layout.addChild(this.main);
+	this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
+	layout.addChild(this.toolbar);
 	this.win.addChild(layout);
 	this.win.show();
 	this.win.startup();

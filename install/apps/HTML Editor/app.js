@@ -16,14 +16,16 @@ this.init = function(args) {
 }
 
 this.kill = function() {
-if(typeof(this.window) != "undefined") {
-this.window.destroy();
+if(!this.window.hidden) {
+this.window.hide();
 }
 api.instances.setKilled(this.instance);
 }
 
 this.start = function() {
-this.window = new api.window();
+this.window = new api.window({
+	onHide: dojo.hitch(this, this.kill)
+});
 this.window.setBodyWidget("LayoutContainer", {});
 var toolbar = new dijit.Toolbar({layoutAlign: "top"});
 toolbar.addChild(new dijit.form.Button({label: "New", onClick: dojo.hitch(this, this.processNew), iconClass: "icon-16-actions-document-open"}));
@@ -45,7 +47,7 @@ this.window.title="HTML Editor";
 this.window.width="320px";
 this.window.height="305px";
 this.window.show();
-this.new = false;
+this._new = false;
 this.window.startup();
 this.editor = new dijit.Editor({id: "text"+this.instance, name:"text"+this.instance}, dojo.byId("text"+this.instance));
 this.editor.replaceValue("<b>Open</b> or <b>Create</b> a file.");
