@@ -52,8 +52,8 @@ this.window.startup();
 this.editor = new dijit.Editor({id: "text"+this.instance, name:"text"+this.instance}, dojo.byId("text"+this.instance));
 this.editor.replaceValue("<b>Open</b> or <b>Create</b> a file.");
 this.editor.setDisabled(true);
-this.status = "active";
-this.window.onDestroy = dojo.hitch(this, this.kill);
+api.instances.setActive(this.instance);
+this.window.onHide = dojo.hitch(this, this.kill);
 }
 this.processNew = function() {
 this.editor.setDisabled(false);

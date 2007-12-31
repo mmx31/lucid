@@ -53,8 +53,8 @@ this.init = function(args)
 	this.win.addChild(layout);
 	this.win.show();
 	this.win.startup();
-	this.status = "active";
-	this.win.onDestroy = dojo.hitch(this, this.windowKill);
+	api.instances.setActive(this.instance);
+	this.win.onHide = dojo.hitch(this, this.kill);
 	setTimeout(dojo.hitch(this, this.pages.home), 100);
 }
 

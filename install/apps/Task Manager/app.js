@@ -46,7 +46,7 @@ this.init = function(args) {
     this.win.show();
     this.win.startup();
     this.win.onHide = dojo.hitch(this, this.kill);
-    this.status = "active";
+    api.instances.setActive(this.instance);
     this.main.setContent("Getting processes...");
     this.timer = setTimeout(dojo.hitch(this, this.home), 1000);
 

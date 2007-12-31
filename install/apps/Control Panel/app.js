@@ -89,8 +89,8 @@ this.open = function(args)
 	this.window.addChild(tabs);
 	this.window.show();
 	this.window.startup();
-	this.status = "active";
-	this.window.onDestroy = dojo.hitch(this, this.windowKill);
+	api.instances.setActive(this.instance);
+	this.window.onHide = dojo.hitch(this, this.Kill);
 	new dijit.form.TextBox({id: "theme"+this.instance, name: "theme"+this.instance}, document.getElementById("theme"+this.instance));
 	new dijit.ColorPalette({palette: "7x10", onChange: dojo.hitch(this, this.colorChange)}, document.getElementById("colorThing"+this.instance));
 	new dijit.form.TextBox({id: "colorPick"+this.instance, name: "colorPick"+this.instance}, document.getElementById("colorPick"+this.instance));
