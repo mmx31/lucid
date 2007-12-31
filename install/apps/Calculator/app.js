@@ -38,8 +38,8 @@ this.window = new api.window({
 });
 this.window.body.setContent(winHTML);
 this.window.show();
-this.status = "active";
 dojo.connect(this.window, "onHide", this, this.kill);
+api.instances.setActive(this.instance);
 }
 this.evaluate = function()
 {
