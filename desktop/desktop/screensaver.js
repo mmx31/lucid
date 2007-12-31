@@ -24,10 +24,12 @@ desktop.screensaver = new function()
 	}
 	this.init = function() {
 		this.timeout = setTimeout(dojo.hitch(this, this.run), 1000 * 60 * 1);
-		dojo.connect(document.body, "onmousemove", this, function() {
-			clearTimeout(this.timeout);
-			this.timeout = setTimeout(dojo.hitch(this, this.run), 1000*60*1);
-		});
+		dojo.connect(document.body, "onmousemove", this, this.setup);
+		dojo.connect(document.body, "onkeydown", this, this.setup);
+	}
+	this.setup = function() {
+		clearTimeout(this.timeout);
+		this.timeout = setTimeout(dojo.hitch(this, this.run), 1000*60*1);
 	}
 	this.run = function() {
 		clearTimeout(this.timeout);
