@@ -103,7 +103,7 @@
 		this.returnObject = new Array();
 		this.count = 0;
 		for(var x = 1; x<desktop.app.instances.length; x++){
-				if (typeof desktop.app.instances[x] != "undefined") {
+				if (desktop.app.instances[x] != null) {
 					this.returnObject[count] = new Object();
 					this.returnObject[count].instance = x;
 					this.returnObject[count].status = desktop.app.instances[x].status;

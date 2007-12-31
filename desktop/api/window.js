@@ -590,9 +590,10 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 * Summary:
 	 * 		Destroys the window (or closes it)
 	 */
-	destroy: function(finalize)
+	destroy: function()
 	{
 		if(this.destroyed == true) return false;
+		var finalize = false;
 		dojo.style(this.body.domNode, "display", "none");
 		this.destroyed = true;
 		this.onDestroy();
@@ -604,7 +605,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			});
 			dojo.connect(anim, "onEnd", null, dojo.hitch(this, function(){
 				this._drag.destroy();
-				this.destroyRecursive();
+				this.body.destroy();
 				dojo.forEach(this._connects, function(array){
 					dojo.forEach(array, dojo.disconnect);
 				});
@@ -617,7 +618,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		{
 			this._drag.destroy();
 			this.domNode.parentNode.removeChild(this.domNode);
-			this.destroyRecursive();
+			this.body.destroy();
 			dojo.forEach(this._connects, function(array){
 				dojo.forEach(array, dojo.disconnect);
 			});
