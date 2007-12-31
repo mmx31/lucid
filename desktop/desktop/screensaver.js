@@ -40,11 +40,13 @@ desktop.screensaver = new function()
 		});
 		dojo.connect(anim, "onEnd", this, function() {
 			this.moveEvent = dojo.connect(document.body, "onmousemove", this, this.stop);
+			this.keyEvent = dojo.connect(document.body, "onkeydown", this, this.stop);
 		});
 		anim.play();
 	}
 	this.stop = function() {
 		dojo.disconnect(this.moveEvent);
+		dojo.disconnect(this.keyEvent);
 		var anim = dojo.fadeOut({
 			node: this.box,
 			duration: 200
