@@ -50,7 +50,10 @@ this.makePiece = function(c)
 	shape.connect("onmousedown", shape, function(e) {
 		this.moveToFront();
 		this.old_shape = this.getShape();
-		this.old_pos = this.getTransform();
+		this.old_pos = (this.getTransform() || {
+			dx: 0,
+			dy: 0
+		});
 	});
 	shape.connect("onmouseup", shape, function(e) {
 		for(var c=0; c <= 400; c+=50)
@@ -61,13 +64,12 @@ this.makePiece = function(c)
 					if(e.layerX <= v && e.layerX >= v-50)
 					{
 						var os=this.old_shape;
-						var pos = this.getTransform();
+						var pos = this.old_pos;
 						var final_oldpos = {
-							x: os.cx+pos.dx,
-							y: os.cy+pos.dy
+							x: os.cx+pos.dx-25,
+							y: os.cy+pos.dy-25
 						}
-						if(!(v % 100 == c % 100) && 
-						   this.checkMove(final_oldpos, v+50, c+50))
+						if(this.checkMove(final_oldpos, v, c, this))
 						{
 							this.setTransform({
 								dx: (v+50)-os.cx-75,
@@ -76,6 +78,7 @@ this.makePiece = function(c)
 						}
 						else
 						{
+							var pos = this.getTransform();
 							this.applyLeftTransform({
 								dx: this.old_pos.dx-pos.dx,
 								dy: this.old_pos.dy-pos.dy
@@ -89,15 +92,34 @@ this.makePiece = function(c)
 	});
 	this.pieces[this.pieces.length] = {
 		circle: shape,
-		movable: move
+		movable: move,
+		color: c.color
 	};
 }
-this.checkMove = function(old_pos, x, y)
+this.checkMove = function(old_pos, x, y, shape)
 {
-	/*if((Math.abs(old_pos.x - x) > 50 && Math.abs(old_pos.y - y) > 50))
+	if(!(x % 100 == y % 100))
 	{
-		//check for jump
+		var board = [];
+		dojo.forEach(this.pieces, function(shape) {
+			var pos = shape.circle.getShape();
+			var trans = (shape.circle.getTransform() || {dx: 0, dy: 0});
+			var c = {
+				x: pos.cx+trans.dx-25,
+				y: pos.cy+trans.dy-25
+			};
+			if(typeof board[x] == "undefined") board[x] = [];
+			board[x][y]=shape.color;
+		});
+		//ok, we regenerated the board. Now let's figure out what the move is
+		//first, let's count how many spaces it is
+		var spaces = {
+			x: Math.abs((old_pos.x/50) - (x/50)+1),
+			y: Math.abs((old_pos.y/50) - (y/50)+1)
+		};
+		console.log(spaces);
+		if((spaces.x == 1 && spaces.y == 1) || (spaces.x == 2 && spaces.y == 2)) return true;
 		return false;
-	}*/
-	return true;
+	}
+	return false;
 }
