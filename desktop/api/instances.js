@@ -9,22 +9,6 @@
  
  api.instances = new function()
  {
- 	/** 
-	* Kill an instance
-	* 
-	* @alias api.instances.kill
-	* @param {Integer} instance	Instance ID to kill
-	* @memberOf api.instances
-	*/
-	this.kill = function(instance) {
-		try {
-			desktop.app.instances[instance].kill();
-			return 1;
-		}
-		catch(err) {
-			return 0;
-		}
-	}
 	 /** 
 	* Kill an instance
 	* 
@@ -91,9 +75,13 @@
 	* @memberOf api.instances
 	*/
 	this.setKilled = function(instance) {
-		desktop.app.instances[instance].status = "killed";
-		//allow the garbage collector to free up memory
-		desktop.app.instances[instance] = null;
+		if (desktop.app.instances[instance] != null) {
+			desktop.app.instances[instance].status = "killed";
+			//allow the garbage collector to free up memory
+			setTimeout(function(){
+				desktop.app.instances[instance] = null;
+			}, desktop.config.window.animSpeed + 50);
+		}
 	}
 	/** 
 	* Get all instances
@@ -103,17 +91,17 @@
 	*/
 	this.getInstances = function() {
 		this.returnObject = new Array();
-		this.count = 0;
 		for(var x = 1; x<desktop.app.instances.length; x++){
 				if (desktop.app.instances[x] != null) {
-					this.returnObject[count] = new Object();
-					this.returnObject[count].instance = x;
-					this.returnObject[count].status = desktop.app.instances[x].status;
-					this.returnObject[count].appid = desktop.app.instances[x].id;
-					this.returnObject[count].name = desktop.app.instances[x].name;
-					this.returnObject[count].version = desktop.app.instances[x].version;
+					var i = desktop.app.instances[x];
+					this.returnObject[x-1] = {
+						instance: x,
+						status: i.status,
+						appid: i.id,
+						name: i.name,
+						version: i.version
+					};
 				}
-			count++;
 		}
 		return this.returnObject;
 	}
