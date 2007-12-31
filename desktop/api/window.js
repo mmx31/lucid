@@ -583,6 +583,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		else return true;
 	},
 	uninitialize: function() {
+		this.onHide();
 		dojo.style(this.body.domNode, "display", "none");
 		this.body.destroy();
 		this._task.destroy();
@@ -598,8 +599,6 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 */
 	hide: function()
 	{
-		this.onHide();
-		this.uninitialize();
 		if (desktop.config.fx) {
 			var anim = dojo.fadeOut({
 				node: this.domNode,
