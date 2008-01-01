@@ -176,7 +176,8 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 			var command = this._input.value.split(" ")[0]
 			if((typeof this.aliases[command]) == "undefined")
 			{
-				this.stdout.innerHTML += dojo.toJson(eval(this._input.value))+"<br />";
+				this.stdout.appendChild(document.createTextNode(dojo.toJson(eval(this._input.value))));
+				this.stdout.innerHTML += "<br />";
 			}
 			else
 			{
