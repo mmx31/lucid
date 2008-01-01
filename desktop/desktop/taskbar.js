@@ -123,7 +123,7 @@ desktop.taskbar = new function()
 		{
 			dojo.require("dijit.layout.ContentPane");
 			tasktray = '<table id="tasktray"><tr id="tasklist"><td id="taskclock">&nbsp;</td><td><div id="trayclock"></div></td></tr></table>';
-			html='<table border="0" cellpadding="0" cellspacing="0" width="100%" class="taskbartable"><tr><td width="30"><div id="menubutton"></div></td><td width="1%"><div class="seperator"></div></td><td width="80%"><div id="appbar"></div></td><td width="1%"><div class="seperator"></div></td><td width="15%">'+tasktray+'</td></tr></table>';
+			html='<table border="0" cellpadding="0" cellspacing="0" width="100%" class="taskbartable"><tr><td width="30" id="menuslot"><div id="menubutton"></div></td><td width="1%"><div class="seperator"></div></td><td width="80%"><div id="appbar"></div></td><td width="1%"><div class="seperator"></div></td><td width="15%">'+tasktray+'</td></tr></table>';
 			
 			div = new dijit.layout.ContentPane({
 				id: "taskbar",
@@ -158,16 +158,22 @@ desktop.taskbar = new function()
 		this.makeButton = function()
 		{
 			dojo.require("dijit.form.Button");
+			if (this._menubutton) {
+				this._menubutton.destroy();
+				var div = document.createElement("div");
+				div.id="menubutton";
+				dojo.byId("menuslot").appendChild(div);
+			}
 			var menubutton = new dijit.form.DropDownButton({
 				iconClass: "menubutton-icon",
 				label: "Apps",
 				showLabel: false,
-				dropDown: dijit.byId("sysmenu")
+				dropDown: desktop.menu._menu
 			}, dojo.byId("menubutton"));
 			menubutton.domNode.style.height="28px";
 			//menubutton.domNode.id="menubutton";
 			menubutton.startup();
-			
+			this._menubutton = menubutton;
 		}
 		this.init = function()
 		{

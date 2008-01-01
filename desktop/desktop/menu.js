@@ -112,17 +112,18 @@ desktop.menu = new function()
 		* @alias desktop.menu.getApplications
 		*/
 		this.getApplications = function() {
-		desktop.core.loadingIndicator(0);
 		dojo.xhrGet({
 			url: desktop.core.backend("core.app.fetch.list"),
 			load: dojo.hitch(this, function(data, ioArgs){
 				data = dojo.fromJson(data);
+				if (this._menu) {
+					this._menu.destroy();
+					this.draw(true);
+				}
 				var menu = new dijit.Menu({
 					id: "sysmenu"
 				}, dojo.byId("sysmenu"));
 				this._menu = menu;
-				//menu.addChild(new dijit.MenuItem({label:"Programs", disabled:true}));
-				//menu.domNode.id="sysmenu";
 				var cats = {};
 				for(item in data)
 				{
@@ -181,18 +182,18 @@ desktop.menu = new function()
 		* @memberOf desktop.menu
 		* @alias desktop.menu.draw
 		*/
-		this.draw = function()
+		this.draw = function(getApps)
 		{
 			dojo.require("dijit.Menu");
-			html  = "<table><tr><td class='menutop'></td></tr><tr><td class='menubody'>";
-			html += "<div id='menu_name'></div>";
-			html += "<div id='menu'></div>";
-			html += "</td></tr></table>";
+			//html  = "<table><tr><td class='menutop'></td></tr><tr><td class='menubody'>";
+			//html += "<div id='menu_name'></div>";
+			//html += "<div id='menu'></div>";
+			//html += "</td></tr></table>";
 			div = document.createElement("div");
 			div.id="sysmenu";
 			//div.innerHTML = html;
 			document.body.appendChild(div);
-			this.getApplications();
+			if(!getApps) this.getApplications();
 		}
 		this.init = function() {
 			dojo.require("dijit.Menu");
