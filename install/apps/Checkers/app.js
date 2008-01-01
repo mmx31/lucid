@@ -126,6 +126,7 @@ this.checkMove = function(old_pos, x, y, shape)
 	if(!(x % 100 == y % 100))
 	{
 		var board = [];
+		for(var i=1;i <= 8; i++) { board[i] = []; }
 		dojo.forEach(this.pieces, function(piece) {
 			if(piece)
 			{
@@ -154,14 +155,14 @@ this.checkMove = function(old_pos, x, y, shape)
 			var ey = (((old_pos.y/50) + (y/50))/2)-0.5;
 			var ex = (((old_pos.x/50) + (x/50))/2)-0.5;
 			if(typeof board[ex][ey] != "undefined" && board[ex][ey].circle.__color != shape.__color) {
-				if(typeof board[(x/50)-1][(y/50)-1] == "undefined") {
+				if(typeof board[(x/50)-1] != "undefined" && typeof board[(x/50)-1][(y/50)-1] == "undefined") {
 					this.surface.remove(board[ex][ey].circle);
 					for(i in this.pieces) {
 						var piece = this.pieces[i];
 						if(piece)
 						{
 							if(piece.id == board[ex][ey].id) {
-								delete this.pieces[i];
+								this.pieces[i] = undefined;
 							}
 						}
 					}
