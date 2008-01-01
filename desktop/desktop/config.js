@@ -23,7 +23,7 @@ desktop.config = {
 				desktop.config.apply();
 				if(cback) cback();
 			},
-	        error: function(error, ioArgs) { api.console("Error loading the config: "+error.message); },
+	        error: function(error, ioArgs) { api.log("Error loading the config: "+error.message); },
 			handleAs: "json"
         });
 	},
@@ -35,7 +35,7 @@ desktop.config = {
             url: desktop.core.backend("core.config.stream.save"),
 			sync: sync,
             content: {value: conf},
-			error: function(error, ioArgs) { api.console("Error saving the config: "+error.message); },
+			error: function(error, ioArgs) { api.log("Error saving the config: "+error.message); },
             mimetype: "text/plain"
         });
 	},

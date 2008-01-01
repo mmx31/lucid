@@ -54,15 +54,15 @@ api.crosstalk = new function()
 	this._internalCheck = function()
 		{
 		if (api.crosstalk.session.length == 0) { // no data in array (no handlers registered)
-		//api.console("Crosstalk API: No events to process...");
+		//api.log("Crosstalk API: No events to process...");
 			}
 		else { // handlers found. ask to obtain any events.
-		//api.console("Crosstalk API: Checking for events...");
+		//api.log("Crosstalk API: Checking for events...");
         	dojo.xhrPost({
 	        	url: desktop.core.backend("api.crosstalk.io.checkForEvents"),
 				handleAs: "xml",
 	        	load: dojo.hitch(this, this._internalCheck2),
-	        	error: function(type, error) { api.console("Error in Crosstalk call: "+error.message); }
+	        	error: function(type, error) { api.log("Error in Crosstalk call: "+error.message); }
         	});
 		}
 		}
@@ -116,7 +116,7 @@ api.crosstalk = new function()
 						{
 							if(results[i].getAttribute("instance") == api.crosstalk.session[x].instance || results[i].getAttribute("instance") == 0)
 							{
-								api.console("Found handler, appid: "+results[i].getAttribute("appid"));
+								api.log("Found handler, appid: "+results[i].getAttribute("appid"));
 								var id = results[i].getAttribute("id"); //id of the event in database.
 								api.crosstalk.session[x].callback({ message: results[i].firstChild.nodeValue, appid: results[i].getAttribute("appid"), instance: results[i].getAttribute("instance"), sender: results[i].getAttribute("sender")});
 								//remove the event, now. it has been handled.
@@ -136,13 +136,13 @@ api.crosstalk = new function()
 				}
 				if(handled != true) {
 					//Found unhandled code. Do NOT remove, it may be useful later on.
-					//api.console("Crosstalk API: Unhandled event, appid: "+results[i].getAttribute("appid")+" instance: "+results[i].getAttribute("instance")+" message: "+results[i].firstChild.nodeValue);
+					//api.log("Crosstalk API: Unhandled event, appid: "+results[i].getAttribute("appid")+" instance: "+results[i].getAttribute("instance")+" message: "+results[i].firstChild.nodeValue);
 				}
 			}
 		}
 		else
 		{
-			api.console("No events for user.");
+			api.log("No events for user.");
 		}
 		this.setup_timer();
 	}
@@ -183,7 +183,7 @@ api.crosstalk = new function()
 			id = api.crosstalk.assignid;
 			api.crosstalk.assignid = api.crosstalk.assignid + 1;
 			this.alreadyDone = true;
-			api.console("Crosstalk API: Init complete.");
+			api.log("Crosstalk API: Init complete.");
 		}
 		// start checking for events
 		this.setup_timer();

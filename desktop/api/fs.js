@@ -35,7 +35,7 @@ api.fs = new function()
 	        if(object.callback) { object.callback(api.fs.lsArray); }
         	desktop.core.loadingIndicator(1);
 		},
-        error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
+        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
         mimetype: "text/xml"
         });
     }
@@ -67,7 +67,7 @@ api.fs = new function()
 			};
 	        if(object.callback) { object.callback(file); }
 		},
-        error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
+        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
         mimetype: "text/xml"
         });
     }
@@ -94,7 +94,7 @@ api.fs = new function()
 		{
 			ioArgs.args.dsktp_callback(data);
 		},
-        error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
+        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
     }
@@ -119,13 +119,13 @@ api.fs = new function()
 		{
 			ioArgs.args.dsktp_callback(data);
 		},
-        error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
+        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
     }
 	this.rename = function(object)
 	{
-		api.console("renaming a file is the same as moving it, technically. - try not to use api.fs.rename.");
+		api.log("renaming a file is the same as moving it, technically. - try not to use api.fs.rename.");
 		this.move(object);
 	}
     this.mkdir = function(object)
@@ -140,7 +140,7 @@ api.fs = new function()
 		{
 			ioArgs.args.dsktp_callback(data);
 		},
-        error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
+        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
     }
@@ -155,7 +155,7 @@ api.fs = new function()
 		load: function(data, ioArgs) {
 			ioArgs.args.dsktp_callback(data);
 		},
-        error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
+        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
     }
@@ -170,7 +170,7 @@ api.fs = new function()
 			load: function(data, ioArgs) {
 				ioArgs.args.dsktp_callback(data);
 			},
-	        error: function(error, ioArgs) { api.console("Error in Crosstalk call: "+error.message); },
+	        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
 	        mimetype: "text/html"
         });
     }

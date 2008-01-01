@@ -26,7 +26,7 @@ api.ide = new function()
 	        typeof app.category != "undefined" &&
 	        typeof app.code != "undefined")
 		{
-			  api.console("IDE API: Saving application...");
+			  api.log("IDE API: Saving application...");
 	          dojo.xhrPost({
 	               url: desktop.core.backend("api.ide.io.save"),
 	               content : {
@@ -41,14 +41,14 @@ api.ide = new function()
 	               },
 	               load: function(data, ioArgs){
 						app.callback(parseInt(data));
-						api.console("IDE API: Save Sucessful");
+						api.log("IDE API: Save Sucessful");
 						delete desktop.app.apps[parseInt(data)];
 				   }
 	          });
 	     }
 		 else
 		 {
-			api.console("IDE API: Error! Could not save. Not all strings in the object are defined.");
+			api.log("IDE API: Error! Could not save. Not all strings in the object are defined.");
 		 	return false;
 		 }
 	}

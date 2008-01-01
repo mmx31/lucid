@@ -8,7 +8,7 @@ api.ui = new function() {
 	this.alert = function(object)
 	{
 		this.alertDialog(object);
-		api.console("api.ui.alertDialog is depreciated and will expire in v1.0! use api.ui.alertDialog instead!");
+		api.log("api.ui.alertDialog is depreciated and will expire in v1.0! use api.ui.alertDialog instead!");
 	}
 	this.alertDialog = function(object)
 	{
@@ -23,7 +23,7 @@ api.ui = new function() {
 	}
 	this.inputDialog = function(object)
 	{
-		//api.ui.inputDialog({title: "UI Test", message: "What is your name?", callback: api.console});
+		//api.ui.inputDialog({title: "UI Test", message: "What is your name?", callback: api.log});
 		this.dialog = new api.window();
 		this.dialog.title = object.title;	
 		this.dialog.setBodyWidget("LayoutContainer", {sizerWidth: 7, orientation: "horizontal"});		

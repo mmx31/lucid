@@ -268,7 +268,7 @@ dojo.declare(
 		}
 		else
 		{
-			api.console("item renaming started");
+			api.log("item renaming started");
 		}
 	},
 	highlight: function() {

@@ -131,6 +131,7 @@ var bootstrap = {
         bootstrap.link("./dojo/dijit/themes/dijit.css", "dijit");
         bootstrap.link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
         bootstrap.link("desktop.css", "corestyle");
+        bootstrap.require('api.console');
 		bootstrap.require("api.crosstalk");
 		bootstrap.require("api.registry");
 		bootstrap.require("api.filearea");
@@ -148,7 +149,6 @@ var bootstrap = {
         bootstrap.require('desktop.admin');
         bootstrap.require('desktop.app');
         bootstrap.require('desktop.config');
-        bootstrap.require('desktop.console');
         bootstrap.require('desktop.core');
         bootstrap.require('desktop.icon');
         bootstrap.require('desktop.menu');

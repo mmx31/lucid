@@ -257,14 +257,14 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 					   box.t <= myBox.b &&
 					   box.t >= myBox.t)
 					{
-						if(desktop.config.debug == true) api.console("windows are overlapping!");
+						if(desktop.config.debug == true) api.log("windows are overlapping!");
 						overlapping = true;
 						break;
 					}
 				}
 			}
 			var wasontop = this.bringToFront();
-			if(desktop.config.debug == true) api.console("onTop: "+wasontop+" overlap: "+overlapping);
+			if(desktop.config.debug == true) api.log("onTop: "+wasontop+" overlap: "+overlapping);
 			if(overlapping == false)
 			{
 				this.minimize();
@@ -411,7 +411,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		
 		if(desktop.config.fx == true)
 		{
-			//api.console("maximizing... (in style!)");
+			//api.log("maximizing... (in style!)");
 			dojo.style(this.body.domNode, "display", "none");
 			var anim = dojo.animateProperty({
 				node: this.domNode,
@@ -432,7 +432,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		}
 		else
 		{
-			//api.console("maximizing...");
+			//api.log("maximizing...");
 			win.style.top = "0px";
 			win.style.left = "0px";
 			win.style.width = dojo.style(this.domNode.parentNode, "width");
@@ -573,7 +573,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			}
 		}
 		zindex = this.domNode.style.zIndex;
-		if(desktop.config.debug == true) { api.console(maxZindex+" != "+zindex); }
+		if(desktop.config.debug == true) { api.log(maxZindex+" != "+zindex); }
 		if(maxZindex != zindex)
 		{
 			maxZindex++;

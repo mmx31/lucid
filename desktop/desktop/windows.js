@@ -25,7 +25,7 @@ desktop.windows = new function()
 	*/
 	this.desktopResize = function()
 	{
-		api.console("resizing desktop...");
+		api.log("resizing desktop...");
 		var x;
 		var y;
 		if(document.body.clientWidth) { x=document.body.clientWidth }
@@ -47,7 +47,7 @@ desktop.windows = new function()
 			dojo.byId("windowcontainer").style.height= y;
 			dojo.byId("windowcontainer").style.width= x;
 		}
-		api.console("x: "+x+", y:"+y)
+		api.log("x: "+x+", y:"+y)
 	}
 	
 	/** 

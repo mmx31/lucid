@@ -16,7 +16,7 @@ api.user = new function()
         	if(callback) { callback(data); }
         	desktop.core.loadingIndicator(1);
 		},
-        error: function(error, ioArgs) { api.console("Error in AJAX call: "+error.message); }
+        error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }
         });
 		}
 		
@@ -29,7 +29,7 @@ api.user = new function()
         	if(callback) { callback(data); }
         	desktop.core.loadingIndicator(1);
 		},
-        error: function(error, ioArgs) { api.console("Error in AJAX call: "+error.message); }
+        error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }
         });
 		}
 
@@ -43,7 +43,7 @@ api.user = new function()
 	        if(callback) { callback(data); }
 	        desktop.core.loadingIndicator(1);
 		},
-        error: function(error, ioArgs) { api.console("Error in AJAX call: "+error.message); }, mimetype: "text/plain"
+        error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }, mimetype: "text/plain"
         });
 	}
 	
@@ -57,7 +57,7 @@ api.user = new function()
         	if(callback) { callback(data); }
         	desktop.core.loadingIndicator(1);
 		},
-        error: function(error, ioArgs) { api.console("Error in AJAX call: "+error.message); }
+        error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }
         });
 	}
 	this.userNameToUserID = function(username, callback)
@@ -70,7 +70,7 @@ api.user = new function()
 	        if(callback) { callback(data); }
 	        desktop.core.loadingIndicator(1);
 		},
-        error: function(error, ioArgs) { api.console("Error in AJAX call: "+error.message); }, mimetype: "text/plain"
+        error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }, mimetype: "text/plain"
         });
 	}
 	this.getUserLevel = function(callback) {
@@ -82,7 +82,7 @@ api.user = new function()
     	    if(callback) { callback(data); }
 	        desktop.core.loadingIndicator(1);
 		},
-        error: function(error, ioArgs) { api.console("Error in AJAX call: "+error.message); }
+        error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }
         });
 	}
 }

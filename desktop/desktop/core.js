@@ -25,13 +25,13 @@ desktop.core = new function()
 			{
 				desktop.core.logout(true);
 			});
-			dojo.connect(document, "onkeydown", desktop.console, desktop.console.toggle);
+			//dojo.connect(document, "onkeydown", desktop.console, desktop.console.toggle);
 			dojo.connect(document, "onmouseup", desktop.menu, desktop.menu.leftclick);
 			if(desktop.config.debug == false)
 			{
 				dojo.connect(window, "onerror", null, function(e)
 				{
-					api.console(e);
+					api.log(e);
 					alert("Psych Desktop encountered an error.\nPlease report this to the developers with the console output.\n(press the '`' key)")
 				});
 			}
@@ -85,7 +85,7 @@ desktop.core = new function()
 					}
 					else
 					{
-						api.console("Error communicating with server, could not log out");
+						api.log("Error communicating with server, could not log out");
 					}
 				},
 					mimetype: "text/plain"
@@ -101,7 +101,7 @@ desktop.core = new function()
 		*/
 		this.loadingIndicator = function(action)
 		{
-			//api.console("desktop.core.loadingIndicator is depricated!");
+			//api.log("desktop.core.loadingIndicator is depricated!");
 		}
 		/*
 		 * This generates a backend to use based on the module given

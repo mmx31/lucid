@@ -66,7 +66,7 @@ desktop.app = new function()
 		this._fetchApp = function(data, callback, args)
 		{
 			var app = dojo.fromJson(data);
-			api.console("creating app constructor...");
+			api.log("creating app constructor...");
 			this.apps[app.id] = new Function("\tthis.id = "+app.id+";\n\tthis.name = \""+app.name+"\";\n\tthis.version = \""+app.version+"\";\n\tthis.instance = -1;\n"+app.code);
 			if(callback)
 			{
@@ -83,21 +83,21 @@ desktop.app = new function()
 		*/
 		this.launch = function(id, args)
 		{
-			api.console("launching app "+id);
+			api.log("launching app "+id);
 			if(typeof this.apps[id] == "undefined")
 			{this.fetchApp(id, dojo.hitch(this, this.launch), args);}
 			else
 			{
-				api.console("preparing to launch app...");
+				api.log("preparing to launch app...");
 				try {
 					this.instanceCount++;
-					api.console("constructing new instance...");
+					api.log("constructing new instance...");
 					this.instances[this.instanceCount] = new this.apps[id];
 					this.instances[this.instanceCount].instance = this.instances.length-1;
                                         var instance = this.instances.length-1;
                                         this.instances[this.instanceCount].status = "init";
 
-					api.console("Executing app...");
+					api.log("Executing app...");
 					this.instances[this.instanceCount].init((args || {}));
 				}
 				catch(e) {
