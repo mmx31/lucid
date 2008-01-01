@@ -173,7 +173,7 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		this.history[this.history.length] = this._input.value;
 		this.hist = this.history.length;
 		try{
-			this.stdout.innerHTML += '<b>'+this.path+'$ </b>'+this._input.value+'<br />';
+			this.stdout.innerHTML += '<b>'+(this.path == "/" ? "~" : this.path)+'$ </b>'+this._input.value+'<br />';
 			var command = this._input.value.split(" ")[0]
 			if((typeof this.aliases[command]) == "undefined")
 			{
