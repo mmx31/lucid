@@ -29,7 +29,7 @@
 			{
 				$p = $this->_make_parent();
 				$p->save();
-				if(!isset($this->id)) {
+				if(is_array($this->id)) {
 					$this->id = $p->_link->lastInsertID($p->_get_tablename());
 				}
 			}
