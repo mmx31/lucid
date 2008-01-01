@@ -188,7 +188,7 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 					params = this._input.value.substring(start);
 				}
 				else params = "";
-				this.aliases[this._input.value.split(" ")[0]](params);
+				dojo.hitch(this, this.aliases[this._input.value.split(" ")[0]])(params);
 			}
 			this._input.value = '';
 			this._input.focus();
