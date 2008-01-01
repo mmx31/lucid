@@ -73,7 +73,7 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		ls: function(params)
 		{
 			if(params == "") params = this.path;
-			api.fs.ls({path: params, callback: function(array)
+			api.fs.ls({path: params, callback: dojo.hitch(this, function(array)
 			{
 				var i = 0;
 				while(i < array.length) {
@@ -86,7 +86,7 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 				i++;
 				}
 			i = 0;
-			}});
+			})});
 		},
 		mkdir: function(params)
 		{
@@ -121,11 +121,10 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 				this.stdout.innerHTML +="cat: need a file!<br />";
 			}
 			else {
-			api.fs.read({path: this.path + params, callback: function(array)
+			api.fs.read({path: this.path + params, callback: dojo.hitch(this, function(array)
 			{
 				this.stdout.innerHTML += array[0].contents.replace("\n", "<br />")+"<br />";
-			}
-			});
+			})});
 		}
 	} },
 	focus: function() {
