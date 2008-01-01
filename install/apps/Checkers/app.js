@@ -48,6 +48,7 @@ this.makePiece = function(c)
 	});
 	var move = new dojox.gfx.Moveable(shape);
 	shape.checkMove = dojo.hitch(this, this.checkMove);
+	shape.checkKing = dojo.hitch(this, this.checkKing);
 	shape.connect("onmousedown", shape, function(e) {
 		this.moveToFront();
 		this.old_shape = this.getShape();
@@ -72,6 +73,7 @@ this.makePiece = function(c)
 						}
 						if(this.checkMove(final_oldpos, v, c, this))
 						{
+							this.checkKing(v, c, this);
 							this.setTransform({
 								dx: (v+50)-os.cx-75,
 								dy: (c+50)-os.cy-75
@@ -93,11 +95,32 @@ this.makePiece = function(c)
 	});
 	shape.__color = c.color,
 	shape.__king = false;
+	shape.__id = this.pieceCount;
 	this.pieces[this.pieces.length] = {
 		circle: shape,
-		movable: move
+		movable: move,
+		id: this.pieceCount
 	};
+	this.pieceCount++;
 }
+this.checkKing = function(x, y, piece)
+{
+	if(piece.__color == "red") {
+		if(y/50 == 8)
+		{
+			piece.__king = true;
+			piece.setStroke("gold");
+		}
+	}
+	if(piece.__color == "black") {
+		if(y/50 == 1)
+		{
+			piece.__king = true;
+			piece.setStroke("gold");
+		}
+	}
+}
+this.pieceCount = 0;
 this.checkMove = function(old_pos, x, y, shape)
 {
 	if(!(x % 100 == y % 100))
@@ -106,7 +129,7 @@ this.checkMove = function(old_pos, x, y, shape)
 		dojo.forEach(this.pieces, function(piece) {
 			if(piece)
 			{
-				if(piece.circle.shape.cx != shape.shape.cx && piece.circle.shape.cy != shape.shape.cy) {
+				if(piece.id != shape.__id) {
 					var pos = piece.circle.getShape();
 					var trans = (piece.circle.getTransform() || {dx: 0, dy: 0});
 					var c = {
@@ -122,10 +145,10 @@ this.checkMove = function(old_pos, x, y, shape)
 			x: Math.abs((old_pos.x/50) - (x/50)+1),
 			y: (old_pos.y/50) - (y/50)+1
 		};
-		if(shape.king) spaces.y = Math.abs(spaces.y);
+		if(shape.__king) spaces.y = Math.abs(spaces.y);
 		else if(shape.__color == "red") spaces.y = -spaces.y;
 		if(spaces.x == 1 && spaces.y == 1) {
-			if(typeof board[(x/50)-1][(y/50)-1] == "undefined") return true;
+			if(typeof board[(x/50)-1] != "undefined" && typeof board[(x/50)-1][(y/50)-1] == "undefined") return true;
 		}
 		else if(spaces.x == 2 && spaces.y == 2) {
 			var ey = (((old_pos.y/50) + (y/50))/2)-0.5;
@@ -137,7 +160,7 @@ this.checkMove = function(old_pos, x, y, shape)
 						var piece = this.pieces[i];
 						if(piece)
 						{
-							if(piece.circle.shape.cx == board[ex][ey].circle.shape.cx && piece.circle.shape.cy == board[ex][ey].circle.shape.cy) {
+							if(piece.id == board[ex][ey].id) {
 								delete this.pieces[i];
 							}
 						}
