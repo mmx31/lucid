@@ -28,8 +28,8 @@
 			function save()
 			{
 				$p = $this->_make_parent();
-				$p->save();
-				if(is_array($this->id)) {
+				$p->save();var_dump($this);
+				if(!is_numeric($this->id)) {
 					$this->id = $p->_link->lastInsertID($p->_get_tablename());
 				}
 			}
@@ -114,6 +114,9 @@
 				$id = $this->id;
 				if(is_numeric($this->id)) { $sql .= " WHERE `ID`=${id} LIMIT 1"; }
 				$this->_query($sql);
+				if(!is_numeric($this->id)) {
+					$this->id = $this->_link->lastInsertID($this->_get_tablename());
+				}
 			}
 			
 			function get($id)
