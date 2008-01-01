@@ -28,7 +28,7 @@
 			function save()
 			{
 				$p = $this->_make_parent();
-				$p->save();var_dump($this);
+				$p->save();
 				if(!is_numeric($this->id)) {
 					$this->id = $p->_link->lastInsertID($p->_get_tablename());
 				}
