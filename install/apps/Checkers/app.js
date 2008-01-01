@@ -15,6 +15,7 @@ this.init = function(args)
 }
 this.kill = function() {
 	if(!this.win.hidden) this.win.hide();
+	api.instances.setKilled(this.instance);
 }
 this.drawBoard = function()
 {
@@ -90,10 +91,11 @@ this.makePiece = function(c)
 			}
 		}
 	});
+	shape.__color = c.color,
+	shape.__king = false;
 	this.pieces[this.pieces.length] = {
 		circle: shape,
-		movable: move,
-		color: c.color
+		movable: move
 	};
 }
 this.checkMove = function(old_pos, x, y, shape)
@@ -101,24 +103,49 @@ this.checkMove = function(old_pos, x, y, shape)
 	if(!(x % 100 == y % 100))
 	{
 		var board = [];
-		dojo.forEach(this.pieces, function(shape) {
-			var pos = shape.circle.getShape();
-			var trans = (shape.circle.getTransform() || {dx: 0, dy: 0});
-			var c = {
-				x: pos.cx+trans.dx-25,
-				y: pos.cy+trans.dy-25
-			};
-			if(typeof board[x] == "undefined") board[x] = [];
-			board[x][y]=shape.color;
+		dojo.forEach(this.pieces, function(piece) {
+			if(piece)
+			{
+				if(piece.circle.shape.cx != shape.shape.cx && piece.circle.shape.cy != shape.shape.cy) {
+					var pos = piece.circle.getShape();
+					var trans = (piece.circle.getTransform() || {dx: 0, dy: 0});
+					var c = {
+						x: pos.cx+trans.dx-25,
+						y: pos.cy+trans.dy-25
+					};
+					if(typeof board[c.x/50] == "undefined") board[c.x/50] = [];
+					board[c.x/50][c.y/50]=piece;
+				}
+			}
 		});
-		//ok, we regenerated the board. Now let's figure out what the move is
-		//first, let's count how many spaces it is
 		var spaces = {
 			x: Math.abs((old_pos.x/50) - (x/50)+1),
-			y: Math.abs((old_pos.y/50) - (y/50)+1)
+			y: (old_pos.y/50) - (y/50)+1
 		};
-		console.log(spaces);
-		if((spaces.x == 1 && spaces.y == 1) || (spaces.x == 2 && spaces.y == 2)) return true;
+		if(shape.king) spaces.y = Math.abs(spaces.y);
+		else if(shape.__color == "red") spaces.y = -spaces.y;
+		if(spaces.x == 1 && spaces.y == 1) {
+			if(typeof board[(x/50)-1][(y/50)-1] == "undefined") return true;
+		}
+		else if(spaces.x == 2 && spaces.y == 2) {
+			var ey = (((old_pos.y/50) + (y/50))/2)-0.5;
+			var ex = (((old_pos.x/50) + (x/50))/2)-0.5;
+			if(typeof board[ex][ey] != "undefined" && board[ex][ey].circle.__color != shape.__color) {
+				if(typeof board[(x/50)-1][(y/50)-1] == "undefined") {
+					this.surface.remove(board[ex][ey].circle);
+					for(i in this.pieces) {
+						var piece = this.pieces[i];
+						if(piece)
+						{
+							if(piece.circle.shape.cx == board[ex][ey].circle.shape.cx && piece.circle.shape.cy == board[ex][ey].circle.shape.cy) {
+								delete this.pieces[i];
+							}
+						}
+					}
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 	return false;
