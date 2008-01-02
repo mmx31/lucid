@@ -140,7 +140,7 @@ var bootstrap = {
 		bootstrap.require("api.ide");
 		bootstrap.require("api.instances");
 		bootstrap.require("api.misc");
-		bootstrap.require("api.soundmanager");
+		bootstrap.require("api.sound");
 		bootstrap.require("api.startup");
 		bootstrap.require("api.tray");
 		bootstrap.require("api.ui");

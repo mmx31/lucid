@@ -15,38 +15,45 @@ dojo.declare("api.sound", dijit._Widget, {
 	position: 0,
 	startTime: 0,
 	timeInterval: 1000,
-	postCreate: function() {
-		var requiredVersion = new com.deconcept.PlayerVersion([8,0,0]);
-		var installedVersion = com.deconcept.FlashObjectUtil.getPlayerVersion();
-		this.flash=installedVersion.versionIsValid(requiredVersion);
-		if(this.flash) {
-			var aflax = new api.aflax();
-			this.flSound = new api.aflax.FlashObject(aflax, this.id+"_Flash");
-			this.flSound.exposeFunction("loadSound", this.flSound);		
-			this.flSound.exposeFunction("start", this.flSound);		
-			this.flSound.exposeFunction("stop", this.flSound);		
-			this.flSound.exposeFunction("setVolume", this);		
-			this.flSound.exposeProperty("position", this);
-		
-			this.flSound.mapFunction("addEventHandler");		
-		
-			this.flSound.addEventHandler("onLoad", dojo.hitch(this, this.ready));
-		
-			this.flSound.loadSound(this.src, true);
-		}
-	},
-	ready: function() {
-		this.flReady = true;
-	},
+	flash: false,
 	_startPos: 0,
 	flReady: false,
+	flSound: {},
+	_aflax: {},
+	postCreate: function() {
+		var r = new com.deconcept.PlayerVersion([8,0,0]);
+		var i = com.deconcept.FlashObjectUtil.getPlayerVersion();
+		this.flash = i.versionIsValid(r);
+		this.domNode.style.position="absolute";
+		this.domNode.style.left="-999px";
+		this.domNode.style.top="-999px";
+		document.body.appendChild(this.domNode);
+		if(this.flash) {
+			this._aflax = new api.aflax();
+			window["flashcallback"+this.id] = dojo.hitch(this, this.flashCallback);
+			this._aflax.addFlashToElement(this.domNode, 1, 1, "#FFFFFF", "flashcallback"+this.id, true);
+		}
+	},
+	flashCallback: function() {
+		this.flSound = new api.aflax.FlashObject(this._aflax, "Sound");
+		this.flSound.exposeFunction("loadSound", this.flSound);		
+		this.flSound.exposeFunction("start", this.flSound);		
+		this.flSound.exposeFunction("stop", this.flSound);		
+		this.flSound.exposeFunction("setVolume", this);		
+		this.flSound.exposeProperty("position", this);
+		this.flSound.mapFunction("addEventHandler");		
+		this.flSound.addEventHandler("onLoad", dojo.hitch(this, this._ready));
+		this.flSound.loadSound(this.src, true);
+	},
+	_ready: function() {
+		this.flReady = true;
+	},
 	play: function() {
 		if (!this.flash) {
 			if (this.domNode.innerHTML != "") 
 				this.stop();
 			this.position = 0;
 			this.domNode.innerHTML = "<embed src=\"" + this.src + "\" hidden=\"true\" autoplay=\"true\" loop=\"" + (this.loop ? "true" : "false") + "\">";
-			api.soundmanager.container.appendChild(this.domNode);
 			this.timer = setInterval(dojo.hitch(this, this.fixtime), this.timeInterval);
 		}
 		else {
@@ -80,26 +87,7 @@ dojo.declare("api.sound", dijit._Widget, {
 		}
 	},
 	uninitialize: function() {
-		api.soundmanager.container.removeChild(this.domNode);
+		document.body.removeChild(this.domNode);
 		if(!this.flash) clearInterval(this.timer);
 	}
 });
-
-/* 
- * Group: api
- * 
- * Package: soundmanager
- * 
- * Summary:
- * 		An API that allows an app to play audio content.
- */
-
- api.soundmanager = new function() {
- 	this.draw = function() {
-		this.container = document.createElement("div");
-		this.container.style.position="absolute";
-		this.container.style.left="-999px";
-		this.container.style.top="-999px";
-		document.body.appendChild(this.container);
-	}
- }

@@ -41,14 +41,15 @@
  * This is the main AFLAX class.
  *
  * @constructor
+ * @param {Boolean} trace Whether or not tracing should be turned on. Default is off.
+ * @param {String} path The path to the aflax.swf file
  *
  * @return {AFLAX} A new AFLAX object.
  */
-function AFLAX(enableFlashSettings, localStoreReadyCallback)
+function AFLAX(path, trace, enableFlashSettings, localStoreReadyCallback)
 {
-	var path = "./api/aflax/aflax.swf";
 	if(path != null) AFLAX.path = path;
-	AFLAX.tracing = desktop.config.debug;
+	if(trace != null) AFLAX.tracing = trace;
 	if(localStoreReadyCallback == undefined || localStoreReadyCallback == null) localStoreReadyCallback = "";
 	
 	this.id = "aflax_obj_" + AFLAX.count++;
@@ -57,7 +58,7 @@ function AFLAX(enableFlashSettings, localStoreReadyCallback)
 	{
 		if(document.getElementById("flashSettings") == null && arguments.length > 0)
 		{
-			var flashSettingsStyle = "width: 215px; height: 138px; position: absolute; z-index: 100000000000;left: -500px; top: -500px";
+			var flashSettingsStyle = "width: 215px; height: 138px; position: absolute; z-index: 100;left: -500px; top: -500px";
 			document.write('<div id="flashSettings" style="' + flashSettingsStyle + '"\>Flash Settings Dialog</div\>\n');
 			AFLAX.settings = new AFLAX();
 			AFLAX.settings.addFlashToElement("flashSettings", 215, 138, "#FFFFFF", localStoreReadyCallback, true);
@@ -112,8 +113,7 @@ AFLAX.prototype.getHTML = function(width, height, bgcolor, callback, transparent
 	if(installedVersion.versionIsValid(requiredVersion) == false)
 	{
 		// TODO: this should set a CSS class, and not use a inline style.
-		//return "<div style='border:2px solid #FF0000'>To see this contents you need to install <a target='_blank' href='http://www.macromedia.com/go/getflashplayer'>Flash Player</a> version 8.0 or higher.</div>";
-		return "";
+		return "<div style='border:2px solid #FF0000'>To see this contents you need to install <a target='_blank' href='http://www.macromedia.com/go/getflashplayer'>Flash Player</a> version 8.0 or higher.</div>";
 	}
 
 	bgcolor = bgcolor || "#FFFFFF";
@@ -192,7 +192,9 @@ AFLAX.prototype.addFlashToElement = function(parentElementOrId, width, height, b
 AFLAX.prototype.insertFlash = function(width, height, bgcolor, callback, transparent, absolutePosition)
 {
 	var content = this.getHTML(width, height, bgcolor, callback, transparent, absolutePosition);
-	document.write(content);
+	var div = document.createElement("div");
+	div.innerHTML = content;
+	document.body.appendChild(div);
 
 	if(AFLAX.tracing)
 		AFLAX.trace("AFLAX Logger initialized.");
