@@ -41,15 +41,14 @@
  * This is the main AFLAX class.
  *
  * @constructor
- * @param {Boolean} trace Whether or not tracing should be turned on. Default is off.
- * @param {String} path The path to the aflax.swf file
  *
  * @return {AFLAX} A new AFLAX object.
  */
-function AFLAX(path, trace, enableFlashSettings, localStoreReadyCallback)
+function AFLAX(enableFlashSettings, localStoreReadyCallback)
 {
+	var path = "./api/aflax/aflax.swf";
 	if(path != null) AFLAX.path = path;
-	if(trace != null) AFLAX.tracing = trace;
+	AFLAX.tracing = desktop.config.debug;
 	if(localStoreReadyCallback == undefined || localStoreReadyCallback == null) localStoreReadyCallback = "";
 	
 	this.id = "aflax_obj_" + AFLAX.count++;
@@ -58,7 +57,7 @@ function AFLAX(path, trace, enableFlashSettings, localStoreReadyCallback)
 	{
 		if(document.getElementById("flashSettings") == null && arguments.length > 0)
 		{
-			var flashSettingsStyle = "width: 215px; height: 138px; position: absolute; z-index: 100;left: -500px; top: -500px";
+			var flashSettingsStyle = "width: 215px; height: 138px; position: absolute; z-index: 100000000000;left: -500px; top: -500px";
 			document.write('<div id="flashSettings" style="' + flashSettingsStyle + '"\>Flash Settings Dialog</div\>\n');
 			AFLAX.settings = new AFLAX();
 			AFLAX.settings.addFlashToElement("flashSettings", 215, 138, "#FFFFFF", localStoreReadyCallback, true);
@@ -81,7 +80,7 @@ AFLAX.count = 0;
 /**
  * @ignore 
  */
-AFLAX.path = "aflax.swf";
+AFLAX.path = "./api/aflax/aflax.swf";
 /**
  * Reference to the AFLAX instance that is used for displaying the Flash settings dialog.
  */
@@ -113,7 +112,8 @@ AFLAX.prototype.getHTML = function(width, height, bgcolor, callback, transparent
 	if(installedVersion.versionIsValid(requiredVersion) == false)
 	{
 		// TODO: this should set a CSS class, and not use a inline style.
-		return "<div style='border:2px solid #FF0000'>To see this contents you need to install <a target='_blank' href='http://www.macromedia.com/go/getflashplayer'>Flash Player</a> version 8.0 or higher.</div>";
+		//return "<div style='border:2px solid #FF0000'>To see this contents you need to install <a target='_blank' href='http://www.macromedia.com/go/getflashplayer'>Flash Player</a> version 8.0 or higher.</div>";
+		return "";
 	}
 
 	bgcolor = bgcolor || "#FFFFFF";
@@ -1158,11 +1158,11 @@ AFLAX.TextField.textFieldFunctions = [
 /*
  * Tracing Functions
  */
-
+/*
 if(AFLAX.tracing == true)
 {
 	window.onerror = AFLAX.windowError;
-}
+}*/
 
 /**
  * @ignore 
@@ -1177,20 +1177,9 @@ AFLAX.windowError = function(message, url, line) {
  */
 AFLAX.trace = function(message)
 {
-	if(AFLAX.tracing == true)
+	if(desktop.config.debug == true)
 	{
-		var div = document.getElementById("aflaxlogger");
-	
-		if(div != null)
-		{
-			var p = document.createElement('p');
-			p.style.margin = 0;
-			p.style.padding = 0;
-			p.style.textAlign = "left";
-			var text = document.createTextNode(message);
-			p.appendChild(text);
-			div.appendChild(p);
-		}
+		api.log(message);
 	}
 }
 
@@ -1280,4 +1269,4 @@ com.deconcept.PlayerVersion.prototype.versionIsValid = function(fv){
 }
 /* ---- end of detection functions ---- */
 
-api.aflax = new AFLAX("./api/aflax/aflax.swf");
+api.aflax = AFLAX;

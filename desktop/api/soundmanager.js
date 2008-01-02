@@ -15,19 +15,43 @@ dojo.declare("api.sound", dijit._Widget, {
 	time: 0,
 	startTime: 0,
 	timeInterval: 1000,
+	postCreate: function() {
+		var requiredVersion = new com.deconcept.PlayerVersion([8,0,0]);
+		var installedVersion = com.deconcept.FlashObjectUtil.getPlayerVersion();
+		this.flash=installedVersion.versionIsValid(requiredVersion);
+	},
 	play: function() {
-		if(this.domNode.innerHTML != "") this.stop();
-		this.time = 0;
-		this.domNode.innerHTML = "<embed src=\""+this.src+"\" hidden=\"true\" autoplay=\"true\" loop=\""+(this.loop ? "true" : "false")+"\">";
-		api.soundmanager.container.appendChild(this.domNode);
-		this.timer = setInterval(dojo.hitch(this, this.fixtime), this.timeInterval);
+		if (!this.flash) {
+			if (this.domNode.innerHTML != "") 
+				this.stop();
+			this.time = 0;
+			this.domNode.innerHTML = "<embed src=\"" + this.src + "\" hidden=\"true\" autoplay=\"true\" loop=\"" + (this.loop ? "true" : "false") + "\">";
+			api.soundmanager.container.appendChild(this.domNode);
+			this.timer = setInterval(dojo.hitch(this, this.fixtime), this.timeInterval);
+		}
+		else {
+			//aflax
+		}
+	},
+	pause: function() {
+		if(!this.flash) {
+			this.stop();
+		}
+		else {
+			//aflax
+		}
 	},
 	fixtime: function() {
 		this.time += this.timeInterval;
 	},
 	stop: function() {
-		clearInterval(this.timer);
-		this.domNode.innerHTML = "";
+		if (!this.flash) {
+			clearInterval(this.timer);
+			this.domNode.innerHTML = "";
+		}
+		else {
+			//aflax
+		}
 	},
 	uninitialize: function() {
 		api.soundmanager.container.removeChild(this.domNode);
