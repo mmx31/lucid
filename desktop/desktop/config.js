@@ -29,14 +29,12 @@ desktop.config = {
 	},
 	save: function(sync) {
 		if(typeof sync == "undefined") sync=false;
-		var conf = desktop.config;
-		conf = dojo.toJson(conf);
+		var conf = dojo.toJson(desktop.config);
 		dojo.xhrPost({
             url: desktop.core.backend("core.config.stream.save"),
 			sync: sync,
             content: {value: conf},
-			error: function(error, ioArgs) { api.log("Error saving the config: "+error.message); },
-            mimetype: "text/plain"
+			error: function(error, ioArgs) { api.log("Error saving the config: "+error.message); }
         });
 	},
 	apply: function()
