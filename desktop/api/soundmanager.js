@@ -6,9 +6,33 @@
  * Summary:
  * 		An API that allows an app to play audio content.
  */
-api.sound = function(object) {
-	
-}
+dojo.require("dijit._Widget");
+dojo.provide("api.sound");
+dojo.declare("api.sound", dijit._Widget, {
+	src: "",
+	loop: false,
+	timer: null,
+	time: 0,
+	startTime: 0,
+	timeInterval: 1000,
+	play: function() {
+		if(this.domNode.innerHTML != "") this.stop();
+		this.time = 0;
+		this.domNode.innerHTML = "<embed src=\""+this.src+"\" hidden=\"true\" autoplay=\"true\" loop=\""+(this.loop ? "true" : "false")+"\">";
+		api.soundmanager.container.appendChild(this.domNode);
+		this.timer = setInterval(dojo.hitch(this, this.fixtime), this.timeInterval);
+	},
+	fixtime: function() {
+		this.time += this.timeInterval;
+	},
+	stop: function() {
+		clearInterval(this.timer);
+		this.domNode.innerHTML = "";
+	},
+	uninitialize: function() {
+		api.soundmanager.container.removeChild(this.domNode);
+	}
+});
 
 /* 
  * Group: api
