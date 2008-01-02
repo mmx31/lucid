@@ -63,6 +63,7 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		cd: function(params)
 		{
+			params += "/";
 			this.path=params;
 			this._path.innerHTML = params;
 			//TODO: check to see if the directory exists
