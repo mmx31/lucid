@@ -1279,3 +1279,5 @@ com.deconcept.PlayerVersion.prototype.versionIsValid = function(fv){
 	return true;
 }
 /* ---- end of detection functions ---- */
+
+api.aflax = new AFLAX("./api/aflax/aflax.swf");

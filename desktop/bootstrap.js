@@ -131,6 +131,7 @@ var bootstrap = {
         bootstrap.link("./dojo/dijit/themes/dijit.css", "dijit");
         bootstrap.link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
         bootstrap.link("desktop.css", "corestyle");
+		bootstrap.require("api.aflax");
         bootstrap.require('api.console');
 		bootstrap.require("api.crosstalk");
 		bootstrap.require("api.registry");
