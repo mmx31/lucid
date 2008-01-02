@@ -63,10 +63,11 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		cd: function(params)
 		{
-			params += "/";
+			params = "/"+params;
 			this.path=params;
-			this._path.innerHTML = params;
-			//TODO: check to see if the directory exists
+			this._path.innerHTML = (params == "/" ? "~" : params);
+			dojo.style(this._input, "paddingLeft", ((params.length*10)+11)+"px");
+			//TODO: check to see if the directory even exists
 		},
 		ls: function(params)
 		{

@@ -79,9 +79,19 @@ height: 100%;
 	font-family: monospace;
 	font-size: 10pt;
 }
+.console form b {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+.consoleinput {
+	padding-left: 21px;
+	width: 100%;
+}
 .console form
 {
 	margin: 0px;
+	position: relative;
 }
 #sysclock
 {
