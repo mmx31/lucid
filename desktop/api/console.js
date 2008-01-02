@@ -44,16 +44,13 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		ps: function(params)
 		{
-			this.stdout.innerHTML += "&nbsp;&nbsp;&nbsp;PID&nbsp;&nbsp;TTY&nbsp;&nbsp;&nbsp;CMD<br />";
+			this.stdout.innerHTML += "&nbsp;&nbsp;&nbsp;PID&nbsp;&nbsp;TTY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CMD<br />";
 			object = api.instances.getInstances();
-			this.stdout.innerHTML +=("0     pts/0   system");
-				for(i=0;i<object.length;i++) {
-					if(typeof(object[i]) != "undefined") {
-						if(object[i].status != "killed") {
-						this.stdout.innerHTML += object[i].instance+"&nbsp;&nbsp;&nbsp;&nbsp;pts/0&nbsp;&nbsp;&nbsp;"+object[i].name+" (AppID: "+object[i].appid+")<br />";
-						}
-					}
+			dojo.forEach(object, dojo.hitch(this, function(proc) {
+				if(proc.status != "killed") {
+					this.stdout.innerHTML += "&nbsp;&nbsp;&nbsp;"+proc.instance+"&nbsp;&nbsp;&nbsp;&nbsp;pts/0&nbsp;&nbsp;&nbsp;"+proc.name+" (AppID: "+proc.appid+")<br />";
 				}
+			}));
 		},
 		kill: function(params)
 		{
