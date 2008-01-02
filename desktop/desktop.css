@@ -85,8 +85,10 @@ height: 100%;
 	left: 0px;
 }
 .consoleinput {
-	padding-left: 21px;
+	padding-left: 26px;
 	width: 100%;
+	font-family: monospace;
+	font-size: 10pt;
 }
 .console form
 {

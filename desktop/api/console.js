@@ -63,10 +63,19 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		cd: function(params)
 		{
-			params = "/"+params;
-			this.path=params;
-			this._path.innerHTML = (params == "/" ? "~" : params);
-			dojo.style(this._input, "paddingLeft", ((params.length*10)+11)+"px");
+			if (params[0] != "/") {
+				if (params != "") {
+					params = (this.path[this.path.length-1] == "/" ? "" : "/") + params;
+					this.path += params;
+				}
+				else {
+					this.path = "/";
+				}
+			}
+			else 
+				this.path = params;
+			this._path.innerHTML = (this.path == "/" ? "~" : this.path);
+			dojo.style(this._input, "paddingLeft", ((this.path.length*9)+16)+"px");
 			//TODO: check to see if the directory even exists
 		},
 		ls: function(params)
