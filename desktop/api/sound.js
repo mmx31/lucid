@@ -15,6 +15,7 @@ dojo.declare("api.sound", dijit._Widget, {
 	position: 0,
 	startTime: 0,
 	timeInterval: 1000,
+	autoStart: false,
 	flash: false,
 	_startPos: 0,
 	flReady: false,
@@ -35,17 +36,21 @@ dojo.declare("api.sound", dijit._Widget, {
 		}
 	},
 	flashCallback: function() {
+		delete window["flashcallback"+this.id];
 		this.flSound = new api.aflax.FlashObject(this._aflax, "Sound");
 		this.flSound.exposeFunction("loadSound", this.flSound);		
 		this.flSound.exposeFunction("start", this.flSound);		
 		this.flSound.exposeFunction("stop", this.flSound);		
 		this.flSound.exposeFunction("setVolume", this);		
 		this.flSound.exposeProperty("position", this);
-		this.flSound.mapFunction("addEventHandler");		
-		this.flSound.addEventHandler("onLoad", dojo.hitch(this, this._ready));
+		this.flSound.mapFunction("addEventHandler");
+		window["flashcallback"+this.id] = dojo.hitch(this, this._ready);
+		this.flSound.addEventHandler("onLoad", "flashcallback"+this.id);
 		this.flSound.loadSound(this.src, true);
+		if(!this.autoStart) this.stop();
 	},
 	_ready: function() {
+		delete window["flashcallback"+this.id];
 		this.flReady = true;
 	},
 	play: function() {
@@ -69,7 +74,7 @@ dojo.declare("api.sound", dijit._Widget, {
 			this.stop();
 		}
 		else {
-			this._startPos = this.flSound.position;
+			this._startPos = this.position;
 			this.flSound.stop();
 		}
 	},
