@@ -113,7 +113,9 @@
 					$parent = new $me;
 					$type = $parent->$var['type'];
 					if($type == "foreignkey") {
-						return $this->get($this->$var);
+						$class = $parent->$var['model'];
+						$class = new $class();
+						return $class->get($this->$var);
 					}
 					elseif(isset($this->$var)) {
 						return $this->$var;
