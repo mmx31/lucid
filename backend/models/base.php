@@ -12,6 +12,17 @@
 				$p = $this->_make_parent();
 				return call_user_func_array(array($p, $method), $arguments);
 			}
+			function __get($var) {
+				$parent = new $this->_parentModel;
+				$type = $parent->$var['type'];
+				if($type == "foreignkey") {
+					$p = $this->_make_parent();
+					return $p->get($this->$var);
+				}
+				else {
+					return $this->$var;
+				}
+			}
 			function _make_parent()
 			{
 				if(!$this->_parentInstance)
@@ -89,19 +100,52 @@
 				$this->_link = null;
 			}
 			
+			function __get($var) {
+				$me = get_class($this);
+				$parent = new $me;
+				$type = $parent->$var['type'];
+				if($type == "foreignkey") {
+					return $this->get($this->$var);
+				}
+				elseif(isset($this->$var)) {
+					return $this->$var;
+				}
+			}
+			
 			function save()
 			{
 				$table = $this->_get_tablename();
 				if(is_numeric($this->id)) { $sql = "UPDATE ${table} SET "; }
 				else { $sql = "INSERT INTO ${table} SET "; }
 				$arr = array();
+				$me = get_class($this);
+				$parent = new $me;
 				foreach($this as $key => $value)
 				{
-					if($key{0} != "_" && $key != "id")
+					if($key{0} != "_" && $key != "id" && isset($parent->$key))
 					{
-						if(is_int($value))
+						$info = $parent->$key;
+						if(!isset($info['type'])) {
+							if(stristr($info['dbtype'], "text") !== false) {
+								$info['type'] = "string";
+							}
+							if(stristr($info['dbtype'], "int") !== false) {
+								$info['type'] = "integer";
+							}
+						}
+						else {
+							if($info['type'] == "array") {
+								$value = json_encode($value);
+							}
+							
+							if($info['type'] == "foreignkey") {
+								$value = ($value->id ? $value->id : null);
+							}
+						}
+						
+						if(is_int($value) || is_null($value))
 						{
-							@array_push($arr, $this->_escape($key) . "=" . $value);
+							@array_push($arr, $this->_escape($key) . "=" . (is_null($value) ? "null" : $value));
 						}
 						else
 						{
