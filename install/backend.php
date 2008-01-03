@@ -91,7 +91,7 @@
 		echo("\"...done\"");
 		$dir = opendir("./apps/");
 		while(($file = readdir($dir)) !== false){
-			if($file == '..' || $file == '.'){
+			if($file{0} == '.'){
 				continue;
 			}
 			else {
