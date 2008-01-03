@@ -1,12 +1,11 @@
 <?php 
 	class Crosstalk extends Base
 	{
-		var $sender = array('dbtype' => 'mediumtext');
-		var $userid = array('dbtype' => 'int', 'length' => 11);
-		var $appID = array('dbtype' => 'int', 'length' => 11);
-		var $message = array('dbtype' => 'mediumtext');
-		var $instance = array('dbtype' => 'int', 'length' => 11);
-		var $_tablename = "crosstalk";
+		var $sender = array('type' => 'text');
+		var $userid = array('type' => 'integer', 'length' => 11);
+		var $appID = array('type' => 'integer', 'length' => 11);
+		var $message = array('type' => 'text');
+		var $instance = array('type' => 'integer', 'length' => 11);
 	}
 	$Crosstalk = new Crosstalk();
 ?>

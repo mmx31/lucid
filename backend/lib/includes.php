@@ -16,6 +16,6 @@
 		"models/base.php"
 	) as $include)
 	{
-		require_once($path . $include);
+		if(!is_null($include)) require_once($path . $include);
 	}
 ?>

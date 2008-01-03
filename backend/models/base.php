@@ -49,11 +49,11 @@
 		class Base
 		{
 			var $id = array(
-				'dbtype' => "int",
-				'length' => 11,
-				'auto_increment' => true,
-				'null' => false,
-				'primary_key' => true
+				'type' => "integer",
+				'autoincrement' => 1,
+				'notnull' => 1,
+				'unsigned' => 1,
+				'default' => 0
 			);
 			var $_parentItem = null;
 			var $_result = false;
@@ -303,18 +303,25 @@
 			}
 			function _create_table()
 			{
-				$this->_query("DROP TABLE IF EXISTS `" . $this->_get_tablename() . "`");
-				$query = "CREATE TABLE `" . $this->_get_tablename() . "` (";
+				$this->_connect();
+				$man = $this->_link->loadModule('Manager');
+				$man->dropTable($this->_get_tablename());
 				$list = array();
 				foreach($this as $key => $v)
 				{
 					if($key{0} != "_" && is_array($v)) {
-						$list[] = "`" . $key . "` " . ($v['dbtype'] ? $v['dbtype'] : "int") . ($v['length'] ? "(" . $v['length'] . ")" : "") . ($v['auto_increment'] ? " auto_increment" : "") . ($v['primary_key'] ? " PRIMARY KEY" : "");
+						$list[$key] = $v;
 					}
 				}
-				$query .= implode(", ", $list);
-				$query .= ") TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci` AUTO_INCREMENT=1";
-				$this->_query($query);
+				$p = $man->createTable($this->_get_tablename(), $list);
+				if (PEAR::isError($p)) {
+        			die('Creation of table failed: "'.$p->getMessage().'"');
+    			}
+				$man->createIndex($this->_get_tablename(), "id_key", array(
+					'fields' => array(
+						'id' => array()
+					)
+				));
 			}
 		}
 		$Base = Base;
