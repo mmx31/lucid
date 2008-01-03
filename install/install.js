@@ -65,7 +65,7 @@ install = new function() {
 		if (e.target.id != "urlstr") {
 			var p = dijit.byId("form").getValues();
 			dijit.byId("urlstr").setValue(
-				p.db_type+"://"+(p.db_username ? p.db_username+(p.db_password ? ":"+p.db_password : "")+"@" : "") + p.db_host + (p.db_name ? "/" + p.db_name : "")
+				p.db_type+"://"+(p.db_type == "sqlite" ? "/" : "")+(p.db_username ? p.db_username+(p.db_password ? ":"+p.db_password : "")+"@" : "") + p.db_host + (p.db_type == "sqlite" ? "?mode=666" : "") + (p.db_name ? "/" + p.db_name : "")
 			);
 		}
 	}
