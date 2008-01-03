@@ -58,6 +58,7 @@
 			var $_parentItem = null;
 			var $_result = false;
 			var $_link;
+			var $_modified = false;
 			function __construct() {				
 				$p = new Item(func_get_args());
 				$p->_parentModel = get_class($this);
@@ -100,14 +101,25 @@
 				$this->_link = null;
 			}
 			
+			function __set($var, $value) {
+				if($this->_modified == false) $this->_modified = true;
+				$this->$var = $value;
+			}
+			
 			function __get($var) {
-				$me = get_class($this);
-				$parent = new $me;
-				$type = $parent->$var['type'];
-				if($type == "foreignkey") {
-					return $this->get($this->$var);
+				if($this->_modified == true)
+				{
+					$me = get_class($this);
+					$parent = new $me;
+					$type = $parent->$var['type'];
+					if($type == "foreignkey") {
+						return $this->get($this->$var);
+					}
+					elseif(isset($this->$var)) {
+						return $this->$var;
+					}
 				}
-				elseif(isset($this->$var)) {
+				else {
 					return $this->$var;
 				}
 			}
@@ -242,25 +254,16 @@
 			function _makeModel($line)
 			{
 				$p = new Item;
-				//mixin current values if we're not a table definition
-				if(!is_array($this->id))
-				{
-					foreach ($this as $key => $value)
-					{
-						$p->$key = $value;
-					}
-				}
-				//then add items provided to us
+				$me = get_class($this);
+				$parent = new $me();
 				foreach ($line as $key => $value)
 				{
+					if($parent->$key['type'] == "array") {
+						$value = json_decode($value);
+					}
 					$p->$key = $value;
 				}
-				if(isset($p->ID))
-				{
-					$p->id = $line['ID'];
-					unset($p->ID);
-				}
-				$p->_parentModel = get_class($this);
+				$p->_parentModel = $me;
 				return $p;
 			}
 			function truncate() {
