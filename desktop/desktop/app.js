@@ -76,6 +76,29 @@ desktop.app = new function()
 		}
 		/** 
 		* Fetches an app and stores it into the cache
+		* @param {Integer} name	The name of the app to launch
+		* @param {Object} args	The args to pass to the 'init' function of the app
+		* @memberOf desktop.app
+		* @alias desktop.app.fetchApp
+		*/
+		this.launchByName = function(name, args)
+		{
+			api.log("translating app name "+name+" to id...");
+			dojo.xhrGet({
+			    url: desktop.core.backend("core.app.fetch.id"),
+				content: {
+					name: name
+				},
+			    load: dojo.hitch(this, function(data, ioArgs)
+				{
+					if(data != "") { this.launch(data, args); }
+					else { api.log("translation failed. invalid app name"); }
+				}),
+			    error: function(error, ioArgs) { api.toaster("Error: "+error.message); }
+			});
+		}
+		/** 
+		* Fetches an app and stores it into the cache
 		* @param {Integer} id	The id of the app to launch
 		* @param {Object} args	The args to pass to the 'init' function of the app
 		* @memberOf desktop.app

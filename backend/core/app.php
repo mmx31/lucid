@@ -21,6 +21,13 @@
 	require("../models/app.php");
     if($_GET['section'] == "fetch")
 	{
+		if($_GET['action'] == "id")
+		{
+			$appname = $_GET["name"];
+			$p = $App->filter("name", $appname);
+			$p = $p[0];
+			echo $p->id;
+		}
 		if($_GET['action'] == "full")
 		{
 			header("Content-type: text/plain");
