@@ -38,7 +38,7 @@
 		class Base
 		{
 			var $id = array(
-				'type' => "int",
+				'dbtype' => "int",
 				'length' => 11,
 				'auto_increment' => true,
 				'null' => false,
@@ -260,7 +260,7 @@
 				foreach($this as $key => $v)
 				{
 					if($key{0} != "_" && is_array($v)) {
-						$list[] = "`" . $key . "` " . ($v['type'] ? $v['type'] : " int") . ($v['length'] ? "(" . $v['length'] . ")" : "") . ($v['auto_increment'] ? " auto_increment" : "") . ($v['primary_key'] ? " PRIMARY KEY" : "");
+						$list[] = "`" . $key . "` " . ($v['dbtype'] ? $v['dbtype'] : "int") . ($v['length'] ? "(" . $v['length'] . ")" : "") . ($v['auto_increment'] ? " auto_increment" : "") . ($v['primary_key'] ? " PRIMARY KEY" : "");
 					}
 				}
 				$query .= implode(", ", $list);

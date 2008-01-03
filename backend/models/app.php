@@ -1,13 +1,13 @@
 <?php 
 	class App extends Base
 	{
-		var $name = array('type' => "mediumtext");
-		var $author = array('type' => "mediumtext");
-		var $email = array('type' => "mediumtext");
-		var $code = array('type' => "longtext");
-		var $version = array('type' => "mediumtext");
-		var $maturity = array('type' => "mediumtext");
-		var $category = array('type' => "mediumtext");
+		var $name = array('dbtype' => "mediumtext");
+		var $author = array('dbtype' => "mediumtext");
+		var $email = array('dbtype' => "mediumtext");
+		var $code = array('dbtype' => "longtext");
+		var $version = array('dbtype' => "mediumtext");
+		var $maturity = array('dbtype' => "mediumtext");
+		var $category = array('dbtype' => "mediumtext");
 		var $_tablename = "apps";
 	}
 	$App = new App();

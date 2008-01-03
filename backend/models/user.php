@@ -1,11 +1,11 @@
 <?php 
 	class User extends Base
 	{
-		var $username = array('type' => 'mediumtext');
-		var $password = array('type' => 'mediumtext');
-		var $logged = array('type' => 'tinyint', 'length' => 1, 'default' => 0);
-		var $email = array('type' => 'mediumtext');
-		var $level = array('type' => 'mediumtext');
+		var $username = array('dbtype' => 'mediumtext');
+		var $password = array('dbtype' => 'mediumtext');
+		var $logged = array('dbtype' => 'tinyint', 'length' => 1, 'default' => 0);
+		var $email = array('dbtype' => 'mediumtext');
+		var $level = array('dbtype' => 'mediumtext');
 		var $_tablename = "users";
 		
 		function get_current()

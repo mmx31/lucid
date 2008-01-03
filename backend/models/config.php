@@ -1,8 +1,8 @@
 <?php 
 	class Config extends Base
 	{
-		var $userid = array('type' => 'int', 'length' => 11);
-		var $value = array('type' => 'mediumtext');
+		var $userid = array('dbtype' => 'int', 'length' => 11);
+		var $value = array('dbtype' => 'mediumtext');
 	}
 	$Config = new Config();
 ?>
