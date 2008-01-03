@@ -125,6 +125,7 @@ install = new function() {
 				}
 				else {
 				dijit.byId("next").setDisabled(true);
+				dijit.byId("previous").setDisabled(false);
 				install.updateBar(0);
 				}
 			});
