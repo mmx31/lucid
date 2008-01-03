@@ -162,21 +162,27 @@ install = new function() {
 			dojo.xhrGet({
 				url: "./backend.php?action=installprograms",
 				load: function(data, args){
-					var html = "<ul>";
-					var ready = true;
-					for (key in data) {
-						html += "<li>" + key.replace("../", "") + ": ";
-						if (data[key] == "...done") 
-							html += "<span style='color: green'>";
-						else {
-							html += "<span style='color: red'>";
-							ready = false;
+					if (typeof data != "string") {
+						var html = "<ul>";
+						var ready = true;
+						for (key in data) {
+							html += "<li>" + key.replace("../", "") + ": ";
+							if (data[key] == "...done") 
+								html += "<span style='color: green'>";
+							else {
+								html += "<span style='color: red'>";
+								ready = false;
+							}
+							html += data[key] + "</span></li>";
 						}
-						html += data[key] + "</span></li>";
+						html += "</ul>";
+						dojo.byId("taskList").innerHTML += html;
+						callback(ready);
 					}
-					html += "</ul>";
-					dojo.byId("taskList").innerHTML += html;
-					callback(ready);
+					else {
+						dojo.byId("taskList").innerHTML += "<span style='color: red'>A problem occurred:</span><br />"+data;
+						//TODO: once the output framework is used tell the user what went wrong.
+					}
 				},
 				callback: callback,
 				handleAs: "json"
@@ -191,21 +197,27 @@ install = new function() {
 					email: form.admin_email
 				},
 				load: function(data, args){
-					var html = "<ul>";
-					var ready = true;
-					for (key in data) {
-						html += "<li>" + key.replace("../", "") + ": ";
-						if (data[key] == "...done") 
-							html += "<span style='color: green'>";
-						else {
-							html += "<span style='color: red'>";
-							ready = false;
+					if (typeof data != "string") {
+						var html = "<ul>";
+						var ready = true;
+						for (key in data) {
+							html += "<li>" + key.replace("../", "") + ": ";
+							if (data[key] == "...done") 
+								html += "<span style='color: green'>";
+							else {
+								html += "<span style='color: red'>";
+								ready = false;
+							}
+							html += data[key] + "</span></li>";
 						}
-						html += data[key] + "</span></li>";
+						html += "</ul>";
+						dojo.byId("taskList").innerHTML += html;
+						callback(ready);
 					}
-					html += "</ul>";
-					dojo.byId("taskList").innerHTML += html;
-					callback(ready);
+					else {
+						dojo.byId("taskList").innerHTML += "<span style='color: red'>A problem occurred:</span><br />"+data;
+						//TODO: once the output framework is used tell the user what went wrong.
+					}
 				},
 				callback: callback,
 				handleAs: "json"
@@ -219,21 +231,27 @@ install = new function() {
 					db_prefix: form.db_prefix
 				},
 				load: function(data, args){
-					var html = "<ul>";
-					var ready = true;
-					for (key in data) {
-						html += "<li>" + key.replace("../", "") + ": ";
-						if (data[key] == "...done") 
-							html += "<span style='color: green'>";
-						else {
-							html += "<span style='color: red'>";
-							ready = false;
+					if (typeof data != "string") {
+						var html = "<ul>";
+						var ready = true;
+						for (key in data) {
+							html += "<li>" + key.replace("../", "") + ": ";
+							if (data[key] == "...done") 
+								html += "<span style='color: green'>";
+							else {
+								html += "<span style='color: red'>";
+								ready = false;
+							}
+							html += data[key] + "</span></li>";
 						}
-						html += data[key] + "</span></li>";
+						html += "</ul>";
+						dojo.byId("taskList").innerHTML += html;
+						callback(ready);
 					}
-					html += "</ul>";
-					dojo.byId("taskList").innerHTML += html;
-					callback(ready);
+					else {
+						dojo.byId("taskList").innerHTML += "<span style='color: red'>A problem occurred:</span><br />"+data;
+						//TODO: once the output framework is used tell the user what went wrong.
+					}
 				},
 				callback: callback,
 				handleAs: "json"
