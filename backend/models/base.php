@@ -318,7 +318,7 @@
 				if (PEAR::isError($p)) {
         			die('Creation of table failed: "'.$p->getMessage().'"');
     			}
-				$man->createIndex($this->_get_tablename(), "id_key", array(
+				$this->_link->mgCreateIndex($this->_get_tablename(), "id_key", array(
 					'fields' => array(
 						'id' => array()
 					)
