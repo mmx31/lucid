@@ -1,5 +1,6 @@
 this.kill = function() {
 	if(!this.win.hidden) { this.win.hide(); }
+	if(this._userMenu) { this._userMenu.destroy(); }
 	api.instances.setKilled(this.instance);
 }
 this.init = function(args)
@@ -100,6 +101,21 @@ this.pages = {
 			});
 			this.main.setContent(this._userGrid.domNode);
 			this._userGrid.render();
+			var menu = this._userMenu = new dijit.Menu({});
+			dojo.forEach([
+				{
+					label: "Delete"
+				}
+			], function(item) {
+				var menuItem = new dijit.MenuItem(item);
+				menu.addChild(menuItem);
+			});
+			this._userGrid.onRowContextMenu = dojo.hitch(this, function(e) {
+				this.__rowIndex = e.rowIndex;
+				this._userMenu._contextMouse();
+				this._userMenu._openMyself(e);
+			});
+			document.body.appendChild(menu.domNode);
 			this.win.startup();
 		}));
 	},

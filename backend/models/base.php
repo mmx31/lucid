@@ -310,6 +310,7 @@
 				foreach($this as $key => $v)
 				{
 					if($key{0} != "_" && is_array($v)) {
+						if($v == "foreignkey") $v = "integer";
 						$list[$key] = $v;
 					}
 				}
