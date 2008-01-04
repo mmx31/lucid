@@ -78,7 +78,7 @@
 				$this->_connect();
 			    $this->_result = array();
 			    if(sizeof($values) > 0) {
-			        $statement = $this->_link->prepare($sql, TRUE, MDB2_PREPARE_RESULT); 
+			        $statement = $this->_link->prepare($sql, TRUE, MDB2_PREPARE_RESULT);
 			        $resultset = $statement->execute($values);
 			        $statement->free();
 			    }
@@ -129,7 +129,9 @@
 			function save()
 			{
 				$table = $this->_get_tablename();
-				$values = array();
+				if(is_numeric($this->id)) { $sql = "UPDATE ${table} SET "; }
+				else { $sql = "INSERT INTO ${table} SET "; }
+				$arr = array();
 				$me = get_class($this);
 				$parent = new $me;
 				foreach($this as $key => $value)
@@ -137,25 +139,39 @@
 					if($key{0} != "_" && $key != "id" && isset($parent->$key))
 					{
 						$info = $parent->$key;
-						if($info['type'] == "array") {
-							$value = json_encode($value);
+						if(!isset($info['type'])) {
+							if(stristr($info['dbtype'], "text") !== false) {
+								$info['type'] = "string";
+							}
+							if(stristr($info['dbtype'], "int") !== false) {
+								$info['type'] = "integer";
+							}
+						}
+						else {
+							if($info['type'] == "array") {
+								$value = json_encode($value);
+							}
+							
+							if($info['type'] == "foreignkey") {
+								$value = ($value->id ? $value->id : null);
+							}
 						}
 						
-						if($info['type'] == "foreignkey") {
-							$value = ($value->id ? $value->id : null);
+						if(is_int($value) || is_null($value))
+						{
+							@array_push($arr, $this->_escape($key) . "=" . (is_null($value) ? "null" : $value));
 						}
-						$values[$key] = $value;
+						else
+						{
+							//when all else fails, make it a string
+							@array_push($arr, $this->_escape($key) . "=\"" . $this->_escape($value) ."\"");
+						}
 					}
 				}
-				if(is_numeric($this->id)) {
-					$this->_connect();
-					$this->_link->setLimit(1);
-					$this->_link->exAutoPrepare($table, $values, MDB2_AUTOQUERY_UPDATE, $this->id);
-				}
-				else {
-					$this->_connect();
-					$this->_link->exAutoPrepare($table, $values, MDB2_AUTOQUERY_INSERT);
-				}
+				$sql .= implode(', ',$arr);
+				$id = $this->id;
+				if(is_numeric($this->id)) { $sql .= " WHERE `ID`=${id} LIMIT 1"; }
+				$this->_query($sql);
 				if(!is_numeric($this->id)) {
 					$this->id = $this->_link->lastInsertID($this->_get_tablename());
 				}
@@ -191,7 +207,6 @@
 				{
 					$query = "SELECT * FROM ${tablename} WHERE ";
 					$list = array();
-					$values = array();
 					foreach($field as $key => $value)
 					{
 						array_push($list, $this->_escape($feild[$i]) . "=\"" . $this->_escape($value[$i]) . "\"");
