@@ -296,7 +296,7 @@
 			}
 			function delete()
 			{
-				if(isset($this->id))
+				if(is_numeric($this->id))
 				{
 					$this->_query("DELETE FROM " . $this->_get_tablename() . " WHERE ID=" . $this->id . " LIMIT 1");
 				}
@@ -304,17 +304,17 @@
 			function _create_table()
 			{
 				$this->_connect();
-				$man = $this->_link->loadModule('Manager');
-				$man->dropTable($this->_get_tablename());
+				$this->_link->mgDropTable($this->_get_tablename());
 				$list = array();
 				foreach($this as $key => $v)
 				{
 					if($key{0} != "_" && is_array($v)) {
 						if($v == "foreignkey") $v = "integer";
+						if($v == "array") $v = "text";
 						$list[$key] = $v;
 					}
 				}
-				$p = $man->createTable($this->_get_tablename(), $list);
+				$p = $this->_link->mgCreateTable($this->_get_tablename(), $list);
 				if (PEAR::isError($p)) {
         			die('Creation of table failed: "'.$p->getMessage().'"');
     			}
