@@ -326,6 +326,7 @@ class MDB2
     {
         if (!MDB2::classExists($class_name)) {
             $file_name = str_replace('_', DIRECTORY_SEPARATOR, $class_name).'.php';
+            $file_name = $GLOBALS['path'] . "lib/" . $file_name;
             if ($debug) {
                 $include = include_once($file_name);
             } else {

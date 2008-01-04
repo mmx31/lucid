@@ -8,6 +8,7 @@
 	{
 		$path .= "../";
 	}
+        $GLOBALS['path'] = $path;
 	foreach(array(
 		"configuration.php",
 		"lib/MDB2.php",
