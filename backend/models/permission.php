@@ -8,7 +8,7 @@
 				$user->remove_permission($this->name);
 			}
 		}
-		function is_permission($perm) {
+		function exists($perm) {
 			$p = $this->filter("name", $perm);
 			return isset($p[0]);
 		}
