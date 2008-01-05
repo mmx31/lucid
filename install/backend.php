@@ -1,6 +1,6 @@
 <?php
 	$GLOBALS['path'] = "./../backend/";
-	require("../backend/includes.php");
+	require("../backend/lib/includes.php");
     $act = ($_GET['action'] == "" ? "installprograms" : $_GET['action']);
 	if($act == "installadmin")
 	{
