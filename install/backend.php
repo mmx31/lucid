@@ -1,4 +1,5 @@
 <?php
+	$GLOBALS['path'] = "../backend/";
 	require("../backend/configuration.php");
 	require("../backend/lib/output.php");
 	require("../backend/lib/util.php");
