@@ -116,6 +116,7 @@ install = new function() {
 	}
 	this.doInstall = function()
 	{
+		dojo.byId("taskList").innerHTML = "";
 		form = dijit.byId("form").getValues();
 		if (form.type == "reset") {
 			this.tasks.apps(function(umm){
@@ -131,24 +132,37 @@ install = new function() {
 			});
 		}
 		else {
-			this.tasks.database(form, function(){
-				install.updateBar(33);
-				install.tasks.apps(function(){
-					install.updateBar(66);
-					install.tasks.admin(form, function(umm){
-						if(umm) {
-						dijit.byId("next").setDisabled(false);
-						install.updateBar(100);
+			this.tasks.database(form, function(nodberr){
+				if (nodberr) {
+					install.updateBar(33);
+					install.tasks.apps(function(noerr){
+						if (noerr) {
+							install.updateBar(66);
+							install.tasks.admin(form, function(umm){
+								if (umm) {
+									dijit.byId("next").setDisabled(false);
+									install.updateBar(100);
+								}
+								else {
+									install.Err();
+								}
+							});
 						}
 						else {
-						dijit.byId("next").setDisabled(true);
-						install.updateBar(0);
+							install.Err();
 						}
 					});
-				});
+				} else {
+					install.Err();
+				}
 			});
 		}
 	},
+	this.Err = function() {
+		dijit.byId("next").setDisabled(true);
+		dijit.byId("previous").setDisabled(false);
+		install.updateBar(0);
+	}
 	this.updateBar = function(percent)
 	{
 		dijit.byId("progressBar").update({
@@ -182,6 +196,7 @@ install = new function() {
 					}
 					else {
 						dojo.byId("taskList").innerHTML += "<span style='color: red'>A problem occurred:</span><br />"+data;
+						callback(false);
 						//TODO: once the output framework is used tell the user what went wrong.
 					}
 				},
@@ -217,6 +232,7 @@ install = new function() {
 					}
 					else {
 						dojo.byId("taskList").innerHTML += "<span style='color: red'>A problem occurred:</span><br />"+data;
+						callback(false);
 						//TODO: once the output framework is used tell the user what went wrong.
 					}
 				},
@@ -251,6 +267,7 @@ install = new function() {
 					}
 					else {
 						dojo.byId("taskList").innerHTML += "<span style='color: red'>A problem occurred:</span><br />"+data;
+						callback(false);
 						//TODO: once the output framework is used tell the user what went wrong.
 					}
 				},
