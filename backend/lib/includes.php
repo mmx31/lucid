@@ -1,14 +1,16 @@
 <?php
-	$p = substr(__FILE__, strrpos(__FILE__,"backend"));
-	$ml = explode(DIRECTORY_SEPARATOR, $p);
-
-	$path = "./";
-	$l = count((isset($ml[0]) ? $ml : $w));
-	for($i=0; $i < $l-2; $i++)
-	{
-		$path .= "../";
+	if(!isset($GLOBALS['path'])) {
+		$p = substr(__FILE__, strrpos(__FILE__,"backend"));
+		$ml = explode(DIRECTORY_SEPARATOR, $p);
+	
+		$path = "./";
+		$l = count((isset($ml[0]) ? $ml : $w));
+		for($i=0; $i < $l-2; $i++)
+		{
+			$path .= "../";
+		}
+	    $GLOBALS['path'] = $path;
 	}
-        $GLOBALS['path'] = $path;
 	foreach(array(
 		"configuration.php",
 		"lib/MDB2.php",
@@ -17,6 +19,6 @@
 		"models/base.php"
 	) as $include)
 	{
-		if(!is_null($include)) require_once($path . $include);
+		if(!is_null($include)) require_once($GLOBALS['path'] . $include);
 	}
 ?>

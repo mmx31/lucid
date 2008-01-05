@@ -16,9 +16,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-	session_start();
 	require("../lib/includes.php");
-	require("../models/crosstalk.php");
+	import("models.crosstalk");
 	if($_GET['section'] == "io")
 	{
 	    if ($_GET['action'] == "removeEvent")

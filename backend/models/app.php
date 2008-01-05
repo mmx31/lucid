@@ -9,5 +9,6 @@
 		var $maturity = array('type' => "text");
 		var $category = array('type' => "text");
 	}
+	global $App;
 	$App = new App();
 ?>

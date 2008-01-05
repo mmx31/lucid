@@ -13,5 +13,6 @@
 			return isset($p[0]);
 		}
 	}
+	global $Permission;
 	$Permission = new Permission();
 ?>

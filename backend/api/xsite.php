@@ -20,7 +20,6 @@
 require("../lib/includes.php");
 if($GLOBALS['conf']['xsite']) { die("<b>External Access is forbidden."); }
 else {
-	session_start();
 	if($_SESSION['userloggedin'] == TRUE)	//very important, make sure the user is logged in
 	{										//maybe in the future add this in the permissions system
 		// Get the REST call path from the AJAX application
@@ -41,15 +40,11 @@ else {
 			curl_setopt ($session, CURLOPT_POSTFIELDS, $postvars);
 		}
 		
-		// Don't return HTTP headers. Do return the contents of the call
-		curl_setopt($session, CURLOPT_HEADER, false);
+		curl_setopt($session, CURLOPT_HEADER, true);
 		curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
 		
 		// Make the call
 		$xml = curl_exec($session);
-		
-		// The web service returns XML. Set the Content-Type appropriately
-		header("Content-Type: text/xml");
 		
 		echo $xml;
 		curl_close($session);

@@ -127,5 +127,6 @@
 			$this->permissions[$perm] = true;
 		}
 	}
+	global $User;
 	$User = new User();
 ?>

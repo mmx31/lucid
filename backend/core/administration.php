@@ -17,9 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-	session_start();
 	require("../lib/includes.php");
-	require("../models/user.php");
+	import("models.user");
 	if($_SESSION['userlevel'] == "admin")
 	{
 		if($_GET['section'] == "general")

@@ -18,7 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
 	require("../lib/includes.php");
-	require("../models/app.php");
+	import("models.app");
     if($_GET['section'] == "fetch")
 	{
 		if($_GET['action'] == "id")

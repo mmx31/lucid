@@ -6,5 +6,6 @@
 		var $name = array('type' => 'text');
 		var $value = array('type' => 'text');
 	}
+	global $Registry;
 	$Registry = new Registry();
 ?>

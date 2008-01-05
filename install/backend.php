@@ -1,17 +1,10 @@
 <?php
 	$GLOBALS['path'] = "./../backend/";
-	@include("MDB2.php");
-	if(!class_exists("MDB2")) {
-		require("../backend/lib/MDB2.php");
-	}
-	require("../backend/configuration.php");
-	require("../backend/lib/output.php");
-	require("../backend/lib/util.php");
-	require("../backend/models/base.php");
+	require("../backend/includes.php");
     $act = ($_GET['action'] == "" ? "installprograms" : $_GET['action']);
 	if($act == "installadmin")
 	{
-		require("../backend/models/user.php");
+		import("models.user");
 		echo("{");
 		echo("\"Establishing connection to database...\":");
 		$User->truncate();
@@ -73,8 +66,8 @@
 			if($file{0} == '.' || $file == "base.php"){
 				continue;
 			}
-			require("../backend/models/" . $file);
 			$class = str_replace(".php", "", $file);
+			import("models." . $class);
 			$class = ucfirst($class);
 			$class = new $class;
 			$class->_create_table();
@@ -85,7 +78,7 @@
 	{
 		//TODO: this should use the models!
 		echo("{");
-		require("../backend/models/app.php");	
+		import("models.app");	
 		echo("\"Establishing connection to database...\":");
 		$App->truncate();
 		echo("\"...done\",");

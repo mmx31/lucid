@@ -17,12 +17,11 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 	*/
-	session_start();
 	require("../lib/includes.php");
-	require("../models/user.php");
-	$user = $User->get_current();
+	import("models.user");
 	if($_GET['section'] == "info")
 	{
+		$user = $User->get_current();
 		if($user != false)
 		{
 			if($_GET['action'] == "save")

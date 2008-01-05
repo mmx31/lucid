@@ -1,8 +1,7 @@
 <?php
-	session_start();
 	require("../lib/includes.php");
-	require("../models/registry.php");
-	require("../models/user.php");
+	import("models.registry");
+	import("models.user");
     if($_GET['section'] == "stream")
 	{
 		if($_GET['action'] == "save")

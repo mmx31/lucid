@@ -7,5 +7,6 @@
 		var $message = array('type' => 'text');
 		var $instance = array('type' => 'integer', 'length' => 11);
 	}
+	global $Crosstalk;
 	$Crosstalk = new Crosstalk();
 ?>

@@ -1,5 +1,6 @@
 <?php
 //error_reporting(0);
+session_start();
 //get rid of magicquotes
 if (get_magic_quotes_gpc())
 {
@@ -26,7 +27,8 @@ function internal_error($type)
 
 function import($module) {
 	$module = explode(".", $module);
-	$module = implode(DIRECTORY_SEPARATOR, $module);
-	return require($GLOBALS['path'] . $module . ".php");
+	$path = implode(DIRECTORY_SEPARATOR, $module);
+	$file = $GLOBALS['path'] . $path . ".php";
+	return require($file);
 }
 ?>
