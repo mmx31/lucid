@@ -27,8 +27,8 @@
 	{
 		echo("{");
 		echo("\"Parsing form values...\":");
-		$db_url = $_GET['db_url'];
-		$db_prefix = $_GET['db_prefix'];
+		$db_url = $_POST['db_url'];
+		$db_prefix = $_POST['db_prefix'];
 		echo("\"...done\",");
 		echo("\"Generating encryption hash...\":");
 		$characters = 10;
