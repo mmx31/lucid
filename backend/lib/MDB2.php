@@ -326,7 +326,7 @@ class MDB2
     {
         if (!MDB2::classExists($class_name)) {
             $file_name = str_replace('_', DIRECTORY_SEPARATOR, $class_name).'.php';
-            $file_name = $GLOBALS['path'] . "lib/" . $file_name;
+            $file_name = $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . $file_name;
             if ($debug) {
                 $include = include_once($file_name);
             } else {
@@ -517,6 +517,7 @@ class MDB2
     function loadFile($file)
     {
         $file_name = 'MDB2'.DIRECTORY_SEPARATOR.$file.'.php';
+		$file_name = $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . $file_name;
         if (!MDB2::fileExists($file_name)) {
             return MDB2::raiseError(MDB2_ERROR_NOT_FOUND, null, null,
                 'unable to find: '.$file_name);

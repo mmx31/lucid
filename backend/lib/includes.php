@@ -11,13 +11,15 @@
 		}
 	    $GLOBALS['path'] = $path;
 	}
-	foreach(array(
+	@include("MDB2.php");
+	$includes = array(
 		"configuration.php",
-		"lib/MDB2.php",
+		(class_exists(MDB2) ? null : "lib/MDB2.php"),
 		"lib/util.php",
 		"lib/output.php",
 		"models/base.php"
-	) as $include)
+	);
+	foreach($includes as $include)
 	{
 		if(!is_null($include)) require_once($GLOBALS['path'] . $include);
 	}
