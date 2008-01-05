@@ -174,7 +174,7 @@ install = new function() {
 	this.tasks = {
 		apps: function(callback)
 		{
-			dojo.xhrGet({
+			dojo.xhrPost({
 				url: "./backend.php?action=installprograms",
 				load: function(data, args){
 					if (typeof data != "string") {
@@ -241,7 +241,7 @@ install = new function() {
 			});
 		},
 		database: function(form, callback) {
-		dojo.xhrGet({
+		dojo.xhrPost({
 				url: "./backend.php?action=installdatabase",
 				content: {
 					db_url: form.db_url,
