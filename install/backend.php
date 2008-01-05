@@ -1,9 +1,12 @@
 <?php
-	$GLOBALS['path'] = "../backend/";
+	$GLOBALS['path'] = "./../backend/";
+	@include("MDB2.php");
+	if(!class_exists("MDB2")) {
+		require("../backend/lib/MDB2.php");
+	}
 	require("../backend/configuration.php");
 	require("../backend/lib/output.php");
 	require("../backend/lib/util.php");
-	if(!@include("MDB2.php")) require("../backend/lib/MDB2.php");
 	require("../backend/models/base.php");
     $act = ($_GET['action'] == "" ? "installprograms" : $_GET['action']);
 	if($act == "installadmin")

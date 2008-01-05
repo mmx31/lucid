@@ -308,6 +308,7 @@
 			}
 			function _create_table()
 			{
+				
 				$this->_connect();
 				$this->_link->mgDropTable($this->_get_tablename());
 				$list = array();
@@ -319,7 +320,6 @@
 						}
 						if($v['type'] == "array") {
 							$v['type'] = "text";
-							$v['default'] = "{}";
 						}
 						$list[$key] = $v;
 					}
