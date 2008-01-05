@@ -6,6 +6,7 @@
 		var $logged = array('type' => 'integer', 'length' => 1, 'default' => 0);
 		var $email = array('type' => 'text');
 		var $level = array('type' => 'text');
+		var $permissions = array('type' => 'array');
 		
 		function get_current()
 		{
@@ -112,6 +113,18 @@
 			}
 			$this->set_password($code);
 			return $code;
+		}
+		function remove_permission($perm) {
+			$this->permissions[$perm] = false;
+		}
+		function has_permission($perm) {
+			if(!isset($this->permissions[$perm])) {
+				return false;
+			}
+			return $this->permissions[$perm];
+		}
+		function add_permission($perm) {
+			$this->permissions[$perm] = true;
 		}
 	}
 	$User = new User();

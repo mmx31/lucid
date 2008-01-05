@@ -298,8 +298,13 @@
 			{
 				if(is_numeric($this->id))
 				{
+					$this->cleanup();
 					$this->_query("DELETE FROM " . $this->_get_tablename() . " WHERE ID=" . $this->id . " LIMIT 1");
 				}
+			}
+			function cleanup() {
+				//this is for cleaning up any associations with other models
+				//don't call this directly in your code.
 			}
 			function _create_table()
 			{
@@ -309,8 +314,13 @@
 				foreach($this as $key => $v)
 				{
 					if($key{0} != "_" && is_array($v)) {
-						if($v == "foreignkey") $v = "integer";
-						if($v == "array") $v = "text";
+						if($v['type'] == "foreignkey") {
+							$v['type'] = "integer";
+						}
+						if($v['type'] == "array") {
+							$v['type'] = "text";
+							$v['default'] = "{}";
+						}
 						$list[$key] = $v;
 					}
 				}
