@@ -52,7 +52,7 @@
  * @author      Lukas Smith <smith@pooteeweet.org>
  */
 
-require_once($GLOBALS['path'] . 'PEAR.php');
+require_once($GLOBALS['path'] . 'lib/PEAR.php');
 
 // {{{ Error constants
 
