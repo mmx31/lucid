@@ -1,6 +1,6 @@
 <?php
-	$GLOBALS['path'] = "./../backend/";
-	require("../backend/lib/includes.php");
+	$GLOBALS['path'] = realpath("./../backend") . DIRECTORY_SEPARATOR;
+	require("./../backend/lib/includes.php");
     $act = ($_GET['action'] == "" ? "installprograms" : $_GET['action']);
 	if($act == "installadmin")
 	{

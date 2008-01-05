@@ -44,7 +44,7 @@
 //
 // $Id: pgsql.php,v 1.12 2006/07/15 13:07:15 lsmith Exp $
 
-require_once 'MDB2/Driver/Native/Common.php';
+require_once $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . 'MDB2/Driver/Native/Common.php';
 
 /**
  * MDB2 PostGreSQL driver for the native module

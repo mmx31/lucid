@@ -47,7 +47,7 @@
 // $Id: mssql.php,v 1.89 2007/03/12 14:31:48 quipo Exp $
 //
 
-require_once 'MDB2/Driver/Manager/Common.php';
+require_once $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . 'MDB2/Driver/Manager/Common.php';
 
 // {{{ class MDB2_Driver_Manager_mssql
 

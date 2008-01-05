@@ -45,7 +45,7 @@
 // $Id: mysql.php,v 1.68 2007/03/29 18:18:06 quipo Exp $
 //
 
-require_once 'MDB2/Driver/Reverse/Common.php';
+require_once $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . 'MDB2/Driver/Reverse/Common.php';
 
 /**
  * MDB2 MySQL driver for the schema reverse engineering module

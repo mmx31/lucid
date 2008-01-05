@@ -46,7 +46,7 @@
 // $Id: sqlite.php,v 1.62 2007/03/28 16:58:54 quipo Exp $
 //
 
-require_once 'MDB2/Driver/Datatype/Common.php';
+require_once $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . 'MDB2/Driver/Datatype/Common.php';
 
 /**
  * MDB2 SQLite driver

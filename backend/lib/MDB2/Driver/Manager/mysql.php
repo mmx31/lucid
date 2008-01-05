@@ -45,7 +45,7 @@
 // $Id: mysql.php,v 1.94 2007/03/04 22:50:16 quipo Exp $
 //
 
-require_once 'MDB2/Driver/Manager/Common.php';
+require_once $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . 'MDB2/Driver/Manager/Common.php';
 
 /**
  * MDB2 MySQL driver for the management modules

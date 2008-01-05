@@ -44,7 +44,7 @@
 //
 // $Id: pgsql.php,v 1.70 2007/04/10 20:35:49 nrf Exp $
 
-require_once 'MDB2/Driver/Manager/Common.php';
+require_once $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . 'MDB2/Driver/Manager/Common.php';
 
 /**
  * MDB2 MySQL driver for the management modules

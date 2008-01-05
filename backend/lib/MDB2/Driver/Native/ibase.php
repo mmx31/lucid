@@ -45,7 +45,7 @@
 // $Id: ibase.php,v 1.10 2006/06/18 21:59:05 lsmith Exp $
 //
 
-require_once 'MDB2/Driver/Native/Common.php';
+require_once $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . 'MDB2/Driver/Native/Common.php';
 
 /**
  * MDB2 FireBird/InterBase driver for the native module

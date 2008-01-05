@@ -52,7 +52,7 @@
  * @author      Lukas Smith <smith@pooteeweet.org>
  */
 
-require_once($GLOBALS['path'] . 'lib/PEAR.php');
+require_once $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . 'PEAR.php';
 
 // {{{ Error constants
 
@@ -326,11 +326,10 @@ class MDB2
     {
         if (!MDB2::classExists($class_name)) {
             $file_name = str_replace('_', DIRECTORY_SEPARATOR, $class_name).'.php';
-            $file_name = $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . $file_name;
             if ($debug) {
-                $include = include_once($file_name);
+                $include = include_once($GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . $file_name);
             } else {
-                $include = @include_once($file_name);
+                $include = @include_once($GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . $file_name);
             }
             if (!$include) {
                 if (!MDB2::fileExists($file_name)) {
@@ -516,8 +515,7 @@ class MDB2
      */
     function loadFile($file)
     {
-        $file_name = 'MDB2'.DIRECTORY_SEPARATOR.$file.'.php';
-		$file_name = $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . $file_name;
+        $file_name = $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . 'MDB2'.DIRECTORY_SEPARATOR.$file.'.php';
         if (!MDB2::fileExists($file_name)) {
             return MDB2::raiseError(MDB2_ERROR_NOT_FOUND, null, null,
                 'unable to find: '.$file_name);
@@ -922,14 +920,12 @@ class MDB2
      */
     function fileExists($file)
     {
+    	$file = $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . $file;
         // safe_mode does notwork with is_readable()
         if (!@ini_get('safe_mode')) {
-             $dirs = explode(PATH_SEPARATOR, ini_get('include_path'));
-             foreach ($dirs as $dir) {
-                 if (is_readable($dir . DIRECTORY_SEPARATOR . $file)) {
-                     return true;
-                 }
-            }
+             if (is_readable($file)) {
+                 return true;
+             }
         } else {
             $fp = @fopen($file, 'r', true);
             if (is_resource($fp)) {
@@ -1844,7 +1840,6 @@ class MDB2_Driver_Common extends PEAR
         if (!$property) {
             $property = strtolower($module);
         }
-
         if (!isset($this->{$property})) {
             $version = $phptype_specific;
             if ($phptype_specific !== false) {
@@ -1893,7 +1888,6 @@ class MDB2_Driver_Common extends PEAR
                 $this->loaded_version_modules[] = $property;
             }
         }
-
         return $this->{$property};
     }
 

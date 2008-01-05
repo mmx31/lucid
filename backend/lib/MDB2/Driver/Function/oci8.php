@@ -44,7 +44,7 @@
 
 // $Id: oci8.php,v 1.14 2007/01/12 11:29:12 quipo Exp $
 
-require_once 'MDB2/Driver/Function/Common.php';
+require_once $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . 'MDB2/Driver/Function/Common.php';
 
 /**
  * MDB2 oci8 driver for the function modules

@@ -45,7 +45,7 @@
 // $Id: ibase.php,v 1.70 2007/05/03 12:34:41 quipo Exp $
 //
 
-require_once 'MDB2/Driver/Reverse/Common.php';
+require_once $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . 'MDB2/Driver/Reverse/Common.php';
 
 /**
  * MDB2 InterbaseBase driver for the reverse engineering module
