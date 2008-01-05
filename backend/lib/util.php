@@ -23,4 +23,10 @@ function internal_error($type)
 	$p->set($type);
 	die();
 }
+
+function import($module) {
+	$module = explode(".", $module);
+	$module = implode(DIRECTORY_SEPARATOR, $module);
+	return require($GLOBALS['path'] . $module . ".php");
+}
 ?>
