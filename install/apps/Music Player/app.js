@@ -5,7 +5,7 @@ this.init = function(args) {
 	dojo.require("dijit.layout.ContentPane");
 	this.win = new api.window({
 		title: "Music Player",
-		width: "300px",
+		width: "350px",
 		height: "150px",
 		bodyWidget: "LayoutContainer",
 		onClose: dojo.hitch(this, this.kill)
@@ -111,6 +111,8 @@ this.open = function(file) {
 			src: api.fs.embed(file)
 		});
 		this.play();
+		file = file.split("/");
+		this.filename = file.pop();
 	}
 }
 this.startTicker = function() {
@@ -122,7 +124,7 @@ this.stopTicker = function() {
 this.updateTicker = function() {
 	var pos = this.formatTime(this.sound.getPosition());
 	var dur = this.formatTime(this.sound.getDuration());
-	this.box.domNode.innerHTML = "&nbsp;" + pos + "/" + dur + "&nbsp;";
+	this.box.domNode.innerHTML = "&nbsp;" + this.filename + "&nbsp;&nbsp;" + pos + "/" + dur + "&nbsp;";
 }
 this.formatTime = function(ms) {
 	var ts = ms/1000;
@@ -130,7 +132,7 @@ this.formatTime = function(ms) {
 	var s = Math.floor(ts % 60);
 	
 	if (s == 60) { m++; s = 0; }
-	return m+":"+s;
+	return m+":"+(s < 10 ? "0"+s : s );
 }
 this.kill = function() {
 	if(!this.win.closed) this.win.close();
