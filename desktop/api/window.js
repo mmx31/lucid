@@ -606,11 +606,13 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 					duration: desktop.config.window.animSpeed
 				});
 				dojo.connect(anim, "onEnd", this, function(){
+					this.domNode.parentNode.removeChild(this.domNode);
 					this.destroy();
 				});
 				anim.play();
 			}
 			else {
+				this.domNode.parentNode.removeChild(this.domNode);
 				this.destroy();
 			}
 		}
