@@ -13,6 +13,10 @@
 			array(
 				'name' => 'api.ide',
 				'dispName' => 'Can develop applications'
+			),
+			array(
+				'name' => 'core.user.auth.login',
+				'dispName' => 'Can login'
 			)
 		) as $args) {
 			$out->append("Adding " . $args['name'] . " permission...", "...done");

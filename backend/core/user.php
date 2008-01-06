@@ -41,7 +41,15 @@
 		if($_GET['action'] == "login")
 		{
 			$p = $User->authenticate($_POST['username'], $_POST['password']);
-			if($p != FALSE) { $p->login(); echo "0"; }
+			if($p != FALSE) {
+				if($p->has_permission("core.user.auth.login")) {
+					$p->login();
+					echo "0";
+				}
+				else {
+					internal_error("permission_denied");
+				}
+			}
 			else { echo "1"; }
 		}
 		if($_GET['action'] == "logout")
