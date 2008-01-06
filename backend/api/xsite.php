@@ -18,36 +18,47 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 require("../lib/includes.php");
-if($GLOBALS['conf']['xsite']) { die("<b>External Access is forbidden."); }
-else {
-	if($_SESSION['userloggedin'] == TRUE)	//very important, make sure the user is logged in
-	{										//maybe in the future add this in the permissions system
-		// Get the REST call path from the AJAX application
-		// Is it a POST or a GET?
-		$url = ($_POST['path']) ? $_POST['path'] : $_GET['path'];
-		
-		// Open the Curl session
-		$session = curl_init($url);
-		
-		// If it's a POST, put the POST data in the body
-		if ($_POST['path']) {
-			$postvars = '';
-			while ($element = current($_POST)) {
-				$postvars .= key($_POST).'='.$element.'&';
-				next($_POST);
-			}
-			curl_setopt ($session, CURLOPT_POST, true);
-			curl_setopt ($session, CURLOPT_POSTFIELDS, $postvars);
+import("models.user");
+import("models.permission");
+if(!$Permission->exists("api.xsite")) {
+	$p = new $Permission(array(
+		'name' => 'api.xsite',
+		'dispName' => 'Can make cross-domain requests'
+	));
+	$p->save();
+}
+$user = $User->get_current();
+
+if($GLOBALS['conf']['xsite'] && $user->has_permission("xsite"))
+{
+	// Get the REST call path from the AJAX application
+	// Is it a POST or a GET?
+	$url = ($_POST['path']) ? $_POST['path'] : $_GET['path'];
+	
+	// Open the Curl session
+	$session = curl_init($url);
+	
+	// If it's a POST, put the POST data in the body
+	if ($_POST['path']) {
+		$postvars = '';
+		while ($element = current($_POST)) {
+			$postvars .= key($_POST).'='.$element.'&';
+			next($_POST);
 		}
-		
-		curl_setopt($session, CURLOPT_HEADER, true);
-		curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
-		
-		// Make the call
-		$xml = curl_exec($session);
-		
-		echo $xml;
-		curl_close($session);
+		curl_setopt ($session, CURLOPT_POST, true);
+		curl_setopt ($session, CURLOPT_POSTFIELDS, $postvars);
 	}
+	
+	curl_setopt($session, CURLOPT_HEADER, true);
+	curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
+	
+	// Make the call
+	$xml = curl_exec($session);
+	
+	echo $xml;
+	curl_close($session);
+}
+else {
+	internal_error("permission_denied");
 }
 ?>
