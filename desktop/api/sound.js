@@ -30,20 +30,20 @@ dojo.declare("api.sound", dijit._Widget, {
 		this.domNode.style.top="-999px";
 		document.body.appendChild(this.domNode);
 		if(this.flash) {
-			this._aflax = new api.aflax();
+			this.aflax = new api.aflax();
 			window["flashcallback"+this.id] = dojo.hitch(this, this.flashCallback);
-			this._aflax.addFlashToElement(this.domNode, 1, 1, "#FFFFFF", "flashcallback"+this.id, true);
+			this.aflax.addFlashToElement(this.domNode, 1, 1, "#FFFFFF", "flashcallback"+this.id, true);
 		}
 	},
 	flashCallback: function() {
 		delete window["flashcallback"+this.id];
-		this.flSound = new api.aflax.FlashObject(this._aflax, "Sound");
+		this.flSound = new api.aflax.FlashObject(this.aflax, "Sound");
 		this.flSound.exposeFunction("loadSound", this.flSound);		
 		this.flSound.exposeFunction("start", this.flSound);		
 		this.flSound.exposeFunction("stop", this.flSound);		
-		this.flSound.exposeFunction("setVolume", this);		
-		this.flSound.exposeProperty("position", this);	
-		this.flSound.exposeProperty("duration", this);
+		this.flSound.exposeFunction("setVolume", this.flSound);		
+		this.flSound.exposeProperty("position", this.flSound);	
+		this.flSound.exposeProperty("duration", this.flSound);
 		this.flSound.mapFunction("addEventHandler");
 		window["flashcallback"+this.id] = dojo.hitch(this, this._ready);
 		this.flSound.addEventHandler("onLoad", "flashcallback"+this.id);
@@ -70,13 +70,29 @@ dojo.declare("api.sound", dijit._Widget, {
 			else setTimeout(dojo.hitch(this, this.play), 100);
 		}
 	},
+	getPosition: function() {
+		if (this.flash) {
+			return this.flSound.getPosition();
+		}
+		else {
+			return this.position;
+		}
+	},
+	getDuration: function() {
+		if (this.flash) {
+			return this.flSound.getDuration();
+		}
+		else {
+			return 0;
+		}
+	},
 	pause: function() {
 		if(!this.flash) {
 			this.stop();
 		}
 		else {
 			this.flSound.stop();
-			this._startPos = Math.floor(this.getPosition() / 1000);
+			this._startPos = this.getPosition() / 1000;
 			console.log(this._startPos);
 		}
 	},
