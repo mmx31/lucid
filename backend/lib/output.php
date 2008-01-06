@@ -33,7 +33,8 @@ class intOutput {
 		"not_found" => 3,
 		"db_connect_err" => 4,
 		"db_select_err" => 5,
-		"db_query_err" => 6
+		"db_query_err" => 6,
+		"permission_denied" => 7
 	);	
 	function __destruct() {
 		if($this->dooutput) {

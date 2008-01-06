@@ -40,10 +40,11 @@ api.ide = new function()
 	                    code: app.code
 	               },
 	               load: function(data, ioArgs){
-						app.callback(parseInt(data));
+						app.callback(data.id);
 						api.log("IDE API: Save Sucessful");
 						delete desktop.app.apps[parseInt(data)];
-				   }
+				   },
+				   handleAs: "json"
 	          });
 	     }
 		 else

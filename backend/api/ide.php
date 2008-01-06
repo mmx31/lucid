@@ -19,6 +19,17 @@
 */
 require("../lib/includes.php");
 import("models.app");
+import("models.user");
+import("models.permission");
+if(!$Permission->exists("api.ide")) {
+	$p = new $Permission(array(
+		'name' => 'api.ide',
+		'dispName' => 'Can develop applications'
+	));
+	$p->save();
+}
+$user = $User->get_current();
+if(!$user->has_permission("api.ide")) internal_error("permission_denied");
 if($_GET['section'] == "io")
 {
 	if($_GET['action'] == "save")
@@ -29,7 +40,8 @@ if($_GET['section'] == "io")
 			$app->$item = $_POST[$item];
 		}
 		$app->save();
-		echo $app->id;
+		$out = new jsonOutput();
+		$out->append("id", $app->id);
 	}
 }
 ?>
