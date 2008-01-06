@@ -46,6 +46,7 @@
 		}
 		if($_GET['action'] == "logout")
 		{
+			$user = $User->get_current();
 			$user->logout();
 			echo "0";
 		}
