@@ -70,6 +70,9 @@ this.pause = function() {
 }
 this.stop = function() {
 	if(this.sound) {
+		dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
+		dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
+		this.ui.play.setLabel("play");
 		this.sound.stop();
 	}
 }
