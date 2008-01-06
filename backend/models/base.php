@@ -58,7 +58,7 @@
 		var $_link;
 		var $_modified = false;
 		function __construct($values=array(), $preserveSchema=false) {
-			if($preserveSchema) {
+			if(!$preserveSchema) {
 				foreach($this as $key => $value) {
 					$this->$key = null;
 				}
