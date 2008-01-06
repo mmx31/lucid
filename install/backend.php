@@ -69,7 +69,7 @@
 			$class = str_replace(".php", "", $file);
 			import("models." . $class);
 			$class = ucfirst($class);
-			$class = new $class;
+			$class = new $class(array(), true);
 			$class->_create_table();
 		}
 		echo "'creating database tables...': '...done'}";

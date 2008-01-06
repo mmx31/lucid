@@ -57,10 +57,15 @@
 		var $_result = false;
 		var $_link;
 		var $_modified = false;
-		function __construct() {				
-			$p = new Item(func_get_args());
-			$p->_parentModel = get_class($this);
-			return $p;
+		function __construct($values=array(), $preserveSchema=false) {
+			if($preserveSchema) {
+				foreach($this as $key => $value) {
+					$this->$key = null;
+				}
+			}
+			foreach($values as $key => $value) {
+					$this->$key = $value;
+			}
 		}
 		
 		function _connect() {
