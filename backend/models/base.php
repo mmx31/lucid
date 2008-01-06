@@ -60,7 +60,7 @@
 		function __construct($values=array(), $preserveSchema=false) {
 			if(!$preserveSchema) {
 				foreach($this as $key => $value) {
-					$this->$key = null;
+					if($key{0} != "_") $this->$key = null;
 				}
 			}
 			foreach($values as $key => $value) {
@@ -139,7 +139,7 @@
 			$parent = new $me;
 			foreach($this as $key => $value)
 			{
-				if($key{0} != "_" && $key != "id" && isset($parent->$key))
+				if($key{0} != "_" && $key != "id")
 				{
 					$info = $parent->$key;
 					if(!isset($info['type'])) {
@@ -260,7 +260,7 @@
 		{
 			$p = new Item;
 			$me = get_class($this);
-			$parent = new $me();
+			$parent = new $me(array(), true);
 			foreach ($line as $key => $value)
 			{
 				if($parent->$key['type'] == "array") {

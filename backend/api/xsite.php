@@ -19,14 +19,6 @@
 */
 require("../lib/includes.php");
 import("models.user");
-import("models.permission");
-if(!$Permission->exists("api.xsite")) {
-	$p = new $Permission(array(
-		'name' => 'api.xsite',
-		'dispName' => 'Can make cross-domain requests'
-	));
-	$p->save();
-}
 $user = $User->get_current();
 
 if($GLOBALS['conf']['xsite'] && $user->has_permission("xsite"))

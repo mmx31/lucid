@@ -2,6 +2,24 @@
 	$GLOBALS['path'] = realpath("./../backend") . DIRECTORY_SEPARATOR;
 	require("./../backend/lib/includes.php");
     $act = ($_GET['action'] == "" ? "installprograms" : $_GET['action']);
+	if($act == "installpermissions") {
+		import("models.permission");
+		$out = new jsonOutput();
+		foreach(array(
+			array(
+				'name' => 'api.xsite',
+				'dispName' => 'Can make cross-domain requests'
+			),
+			array(
+				'name' => 'api.ide',
+				'dispName' => 'Can develop applications'
+			)
+		) as $args) {
+			$out->append("Adding " . $args['name'] . " permission...", "...done");
+			$p = new $Permission($args);
+			$p->save();
+		}
+	}
 	if($act == "installadmin")
 	{
 		import("models.user");

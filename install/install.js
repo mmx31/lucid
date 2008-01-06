@@ -134,14 +134,22 @@ install = new function() {
 		else {
 			this.tasks.database(form, function(nodberr){
 				if (nodberr) {
-					install.updateBar(33);
+					install.updateBar(25);
 					install.tasks.apps(function(noerr){
 						if (noerr) {
-							install.updateBar(66);
-							install.tasks.admin(form, function(umm){
+							install.updateBar(50);
+							install.tasks.admin(form, function(umm) {
 								if (umm) {
-									dijit.byId("next").setDisabled(false);
-									install.updateBar(100);
+										install.updateBar(75);
+										install.tasks.permissions(function(asdfumm){
+											if (asdfumm) {
+												install.updateBar(100);
+												dijit.byId("next").setDisabled(false);
+											}
+											else {
+												install.Err();
+											}
+										});
 								}
 								else {
 									install.Err();
@@ -172,6 +180,37 @@ install = new function() {
 		});
 	}
 	this.tasks = {
+		permissions: function(callback) {
+			dojo.xhrPost({
+				url: "./backend.php?action=installpermissions",
+				load: function(data, args){
+					if (typeof data != "string") {
+						var html = "<ul>";
+						var ready = true;
+						for (key in data) {
+							html += "<li>" + key.replace("../", "") + ": ";
+							if (data[key] == "...done") 
+								html += "<span style='color: green'>";
+							else {
+								html += "<span style='color: red'>";
+								ready = false;
+							}
+							html += data[key] + "</span></li>";
+						}
+						html += "</ul>";
+						dojo.byId("taskList").innerHTML += html;
+						callback(ready);
+					}
+					else {
+						dojo.byId("taskList").innerHTML += "<span style='color: red'>A problem occurred:</span><br />"+data;
+						callback(false);
+						//TODO: once the output framework is used tell the user what went wrong.
+					}
+				},
+				callback: callback,
+				handleAs: "json"
+			});
+		},
 		apps: function(callback)
 		{
 			dojo.xhrPost({
