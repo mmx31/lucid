@@ -210,7 +210,7 @@ api.fs = new function()
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	}
-	this.display = function(path) {
+	this.embed = function(path) {
 		return desktop.core.backend("api.fs.io.display") + "&path=" + path;
 	}
 }
