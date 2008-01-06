@@ -113,7 +113,7 @@
 			if($this->_modified == true)
 			{
 				$me = get_class($this);
-				$parent = new $me;
+				$parent = new $me(array(), true);
 				$type = $parent->$var['type'];
 				if($type == "foreignkey") {
 					$class = $parent->$var['model'];
