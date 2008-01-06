@@ -93,7 +93,6 @@ dojo.declare("api.sound", dijit._Widget, {
 		else {
 			this.flSound.stop();
 			this._startPos = this.getPosition() / 1000;
-			console.log(this._startPos);
 		}
 	},
 	fixtime: function() {
