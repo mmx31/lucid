@@ -1,6 +1,7 @@
 this.init = function(args) {
 	dojo.require("dijit.Toolbar");
 	dojo.require("dijit.form.Button");
+	dojo.require("dijit.form.Slider");
 	dojo.require("dijit.layout.LayoutContainer");
 	dojo.require("dijit.layout.ContentPane");
 	this.win = new api.window({
@@ -34,7 +35,11 @@ this.init = function(args) {
 			showLabel: false,
 			label: "stop"
 		}),
-		ticker: document.createElement("div")
+		ticker: document.createElement("div"),
+		slider: new dijit.form.HorizontalSlider({
+			showButtons: false,
+			style: "width: 100%;"
+		})
 	};
 	var ticker = this.ui.ticker;
 	dojo.forEach([
@@ -47,6 +52,7 @@ this.init = function(args) {
 	ticker.innerHTML = "&nbsp;0:00/00:00&nbsp;";
 	var client = new dijit.Toolbar({layoutAlign: "client"});
 	for(item in this.ui) {
+		var name = item;
 		item = this.ui[item];
 		if(item.declaredClass == "dijit.form.Button") {
 			dojo.style(item.domNode, "width", "40px");
@@ -64,6 +70,7 @@ this.init = function(args) {
 	this.win.addChild(client);
 	this.win.show();
 	this.win.startup();
+	setTimeout(dojo.hitch(this, function() { this.ui.slider.setValue(100);}), 500);
 	api.instances.setActive(this.instance);
 	if(args.file) this.open(args.file);
 }
@@ -125,6 +132,7 @@ this.updateTicker = function() {
 	var p = this.sound.getPosition();
 	var d = this.sound.getDuration();
 	if(p == d) this.stop();
+	this.ui.slider.setValue(Math.floor((p/d)*100));
 	var pos = this.formatTime(p);
 	var dur = this.formatTime(d);
 	this.box.domNode.innerHTML = "&nbsp;" + this.filename + "&nbsp;&nbsp;" + pos + "/" + dur + "&nbsp;";
