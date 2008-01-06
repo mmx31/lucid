@@ -74,7 +74,7 @@ dojo.declare("api.sound", dijit._Widget, {
 			this.stop();
 		}
 		else {
-			this._startPos = this.position;
+			this._startPos = Math.floor(this.flSound.position / 1000);
 			this.flSound.stop();
 		}
 	},
