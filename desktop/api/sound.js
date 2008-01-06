@@ -42,7 +42,8 @@ dojo.declare("api.sound", dijit._Widget, {
 		this.flSound.exposeFunction("start", this.flSound);		
 		this.flSound.exposeFunction("stop", this.flSound);		
 		this.flSound.exposeFunction("setVolume", this);		
-		this.flSound.exposeProperty("position", this);
+		this.flSound.exposeProperty("position", this);	
+		this.flSound.exposeProperty("duration", this);
 		this.flSound.mapFunction("addEventHandler");
 		window["flashcallback"+this.id] = dojo.hitch(this, this._ready);
 		this.flSound.addEventHandler("onLoad", "flashcallback"+this.id);
@@ -74,8 +75,9 @@ dojo.declare("api.sound", dijit._Widget, {
 			this.stop();
 		}
 		else {
-			this._startPos = Math.floor(this.flSound.position / 1000);
 			this.flSound.stop();
+			this._startPos = Math.floor(this.getPosition() / 1000);
+			console.log(this._startPos);
 		}
 	},
 	fixtime: function() {
