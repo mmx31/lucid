@@ -119,7 +119,7 @@
 		}
 		function has_permission($perm) {
 			if(!isset($this->permissions[$perm])) {
-				return false;
+				return true;
 			}
 			return $this->permissions[$perm];
 		}
