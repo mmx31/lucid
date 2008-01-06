@@ -122,8 +122,11 @@ this.stopTicker = function() {
 	clearInterval(this.__ticker);
 }
 this.updateTicker = function() {
-	var pos = this.formatTime(this.sound.getPosition());
-	var dur = this.formatTime(this.sound.getDuration());
+	var p = this.sound.getPosition();
+	var d = this.sound.getDuration();
+	if(p == d) this.stop();
+	var pos = this.formatTime(p);
+	var dur = this.formatTime(d);
 	this.box.domNode.innerHTML = "&nbsp;" + this.filename + "&nbsp;&nbsp;" + pos + "/" + dur + "&nbsp;";
 }
 this.formatTime = function(ms) {
