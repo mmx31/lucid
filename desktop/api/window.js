@@ -25,21 +25,21 @@ dojo.require("dojox.fx.easing");
  * 		(end code)
  */
 dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
-	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"win-tl\"><div class=\"win-tr\"><div class=\"win-tc\" dojoattachevent=\"onmousedown: bringToFront\"><div dojoattachpoint=\"titleNode,handle\" class=\"win-title\">${title}</div><div class=\"win-buttons\"><div dojoattachevent=\"onmouseup: hide\" class=\"win-close\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"win-max\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"win-min\"></div></div></div></div></div><div class=\"win-bmw\"><div class=\"win-ml\"><div class=\"win-mr\"><div class=\"win-mc\" dojoattachpoint=\"body\"></div></div></div><div class=\"win-bl\"><div class=\"win-br\"><div class=\"win-bc\"></div></div></div><div dojoattachpoint=\"resize\" class=\"win-resize\"></div></div></div>",
+	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"win-tl\"><div class=\"win-tr\"><div class=\"win-tc\" dojoattachevent=\"onmousedown: bringToFront\"><div dojoattachpoint=\"titleNode,handle\" class=\"win-title\">${title}</div><div class=\"win-buttons\"><div dojoattachevent=\"onmouseup: close\" class=\"win-close\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"win-max\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"win-min\"></div></div></div></div></div><div class=\"win-bmw\"><div class=\"win-ml\"><div class=\"win-mr\"><div class=\"win-mc\" dojoattachpoint=\"body\"></div></div></div><div class=\"win-bl\"><div class=\"win-br\"><div class=\"win-bc\"></div></div></div><div dojoattachpoint=\"resize\" class=\"win-resize\"></div></div></div>",
 	/*
-	 * Property: destroyed
+	 * Property: closed
 	 * 
 	 * Summary:
-	 * 		Is the window destroyed?
+	 * 		Is the window closed?
 	 */
-	hidden: false,
+	closed: false,
 	/*
-	 * Property: onHide
+	 * Property: onClose
 	 * 
 	 * Summary:
 	 * 		What to do on destroying of the window
 	 */
-	onHide: function() {
+	onClose: function() {
 		
 	},
 	/*
@@ -425,7 +425,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			});
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.body.domNode, "display", "block");
-				this._hideBorders();
+				this._closeBorders();
 				this._resizeBody();
 			});
 			anim.play();
@@ -583,7 +583,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		else return true;
 	},
 	uninitialize: function() {
-		this.onHide();
+		this.onClose();
 		dojo.style(this.body.domNode, "display", "none");
 		this.body.destroy();
 		this._task.destroy();
@@ -591,15 +591,15 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		this.resize.destroy();
 	},
 	/* 
-	 * Method: hide
+	 * Method: close
 	 * 
 	 * Summary:
-	 * 		Hides the window (or closes it)
+	 * 		closes the window
 	 */
-	hide: function()
+	close: function()
 	{
-		if (!this.hidden) {
-			this.hidden = true;
+		if (!this.closed) {
+			this.closed = true;
 			if (desktop.config.fx) {
 				var anim = dojo.fadeOut({
 					node: this.domNode,

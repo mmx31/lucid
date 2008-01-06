@@ -9,7 +9,7 @@ this.init = function(args)
 	dojo.require("dijit.Toolbar");
 	this.win = new api.window({
 		title: "Katana IDE",
-		onHide: dojo.hitch(this, this.kill)
+		onClose: dojo.hitch(this, this.kill)
 	});
 	this.win.setBodyWidget("LayoutContainer", {});
 	
@@ -39,9 +39,9 @@ this.init = function(args)
 this.kill = function()
 {
 	if(typeof this.loadwin != "undefined") {
-		if(!this.loadwin.hidden) this.loadwin.hide();
+		if(!this.loadwin.closed) this.loadwin.close();
 	}
-	if(!this.win.hidden)this.win.hide();
+	if(!this.win.closed)this.win.close();
 	api.instances.setKilled(this.instance);
 }
 
@@ -97,7 +97,7 @@ this.editMetadata = function()
         this.winn = new api.window({
 			title: "Edit Metadata",
 			bodyWidget: "ContentPane",
-			onHide: dojo.hitch(this, this._editMetadata)
+			onClose: dojo.hitch(this, this._editMetadata)
 		});
 		var content = "";
         content += "Application ID(appid): <span id=\"appid"+this.instance+this.blah+"\">"+this.app.id+"</span><br>";
@@ -157,7 +157,7 @@ this.load = function()
 			l.style.cursor="pointer";
 			dojo.connect(l, "onclick", this, function(e) {
 				console.debug(this);
-				this.loadwin.hide();
+				this.loadwin.close();
 				api.ide.load(parseInt(e.target.title), dojo.hitch(this, function(data) {
 					this.editor.value=data.code;
 					this.app = data;

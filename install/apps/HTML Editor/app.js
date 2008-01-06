@@ -16,15 +16,15 @@ this.init = function(args) {
 }
 
 this.kill = function() {
-if(!this.window.hidden) {
-this.window.hide();
+if(!this.window.closed) {
+this.window.close();
 }
 api.instances.setKilled(this.instance);
 }
 
 this.start = function() {
 this.window = new api.window({
-	onHide: dojo.hitch(this, this.kill)
+	onClose: dojo.hitch(this, this.kill)
 });
 this.window.setBodyWidget("LayoutContainer", {});
 var toolbar = new dijit.Toolbar({layoutAlign: "top"});
@@ -53,7 +53,7 @@ this.editor = new dijit.Editor({id: "text"+this.instance, name:"text"+this.insta
 this.editor.replaceValue("<b>Open</b> or <b>Create</b> a file.");
 this.editor.setDisabled(true);
 api.instances.setActive(this.instance);
-this.window.onHide = dojo.hitch(this, this.kill);
+this.window.onClose = dojo.hitch(this, this.kill);
 }
 this.processNew = function() {
 this.editor.setDisabled(false);

@@ -1,6 +1,6 @@
 this.kill = function() {
-    if (!this.win.hidden) {
-        this.win.hide();
+    if (!this.win.closed) {
+        this.win.close();
     }
     clearTimeout(this.timer);
     api.instances.setKilled(this.instance);
@@ -45,7 +45,7 @@ this.init = function(args) {
     this.win.addChild(this.main);
     this.win.show();
     this.win.startup();
-    this.win.onHide = dojo.hitch(this, this.kill);
+    this.win.onClose = dojo.hitch(this, this.kill);
     api.instances.setActive(this.instance);
     this.main.setContent("Getting processes...");
     this.timer = setTimeout(dojo.hitch(this, this.home), 1000);

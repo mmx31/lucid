@@ -7,7 +7,7 @@ this.init = function(args)
 	this.win = new api.window({
 		title: "File Browser",
 		bodyWidget: "LayoutContainer",
-		onHide: dojo.hitch(this, this.kill)
+		onClose: dojo.hitch(this, this.kill)
 	});
 	this.fileArea = new api.filearea({layoutAlign: "client", path: (args.path || "/")})
 	this.win.addChild(this.fileArea);
@@ -79,7 +79,7 @@ this.init = function(args)
 }
 
 this.kill = function() {
-	if(!this.win.hidden) { this.win.hide(); }
+	if(!this.win.closed) { this.win.close(); }
 	api.instances.setKilled(this.instance);
 }
 api.addDojoCss("dojox/widget/FileInput/FileInput.css");

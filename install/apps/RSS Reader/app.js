@@ -14,7 +14,7 @@ this.init = function(args)
     this.win = new api.window({
         title: "RSS Reader",
         bodyWidget: "LayoutContainer",
-        onHide: dojo.hitch(this, this.kill)
+        onClose: dojo.hitch(this, this.kill)
 
     });
 
@@ -101,7 +101,7 @@ this.init = function(args)
     client.addChild(this.right);
 
     this.win.addChild(client);
-    this.win.onHide = dojo.hitch(this, this.kill);
+    this.win.onClose = dojo.hitch(this, this.kill);
     this.win.show();
     this.win.startup();
     api.instances.setActive(this.instance);
@@ -154,7 +154,7 @@ this.removeFeed = function(t) {
 this.addFeedDialog = function()
  {
     if (typeof(this.addfeedwin) != "undefined") {
-        this.addfeedwin.hide();
+        this.addfeedwin.close();
     }
     this.addfeedwin = new api.window({
         title: "Add Feed",
@@ -185,7 +185,7 @@ this.addFeedDialog = function()
     function(e) {
         console.log("test");
         this.addFeed(this._form.title.getValue(), this._form.url.getValue());
-        this.addfeedwin.hide();
+        this.addfeedwin.close();
 
     })
     this.addfeedwin.show();
@@ -212,10 +212,10 @@ this.addFeed = function(title, url)
 this.kill = function()
  {
     if (typeof(this.addfeedwin) != "undefined") {
-        this.addfeedwin.hide();
+        this.addfeedwin.close();
     }
     if (typeof(this.win) != "undefined") {
-        this.win.hide();
+        this.win.close();
     }
     api.instances.setKilled(this.instance);
 

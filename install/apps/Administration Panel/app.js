@@ -1,5 +1,5 @@
 this.kill = function() {
-	if(!this.win.hidden) { this.win.hide(); }
+	if(!this.win.closed) { this.win.close(); }
 	if(this._userMenu) { this._userMenu.destroy(); }
 	api.instances.setKilled(this.instance);
 }
@@ -15,7 +15,7 @@ this.init = function(args)
 	dojo.require("dijit.Menu");
 	api.addDojoCss("dojox/grid/_grid/Grid.css");
 	//make window
-	this.win = new api.window({title: "Administration Panel", width: "500px", height: "400px", onHide: dojo.hitch(this, this.kill)});
+	this.win = new api.window({title: "Administration Panel", width: "500px", height: "400px", onClose: dojo.hitch(this, this.kill)});
 	this.win.setBodyWidget("SplitContainer", {sizerWidth: 7, orientation: "horizontal"});
 	var pane = new dijit.layout.ContentPane({sizeMin: 10, sizeShare: 20}, document.createElement("div"));
 		var menu = new dijit.Menu({});
@@ -55,7 +55,7 @@ this.init = function(args)
 	this.win.show();
 	this.win.startup();
 	api.instances.setActive(this.instance);
-	this.win.onHide = dojo.hitch(this, this.kill);
+	this.win.onClose = dojo.hitch(this, this.kill);
 	setTimeout(dojo.hitch(this, this.pages.home), 100);
 }
 

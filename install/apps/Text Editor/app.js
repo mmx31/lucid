@@ -19,7 +19,7 @@ this.init = function(args) {
 
 this.kill = function() {
     if (typeof(this.window) != "undefined") {
-        this.window.hide();
+        this.window.close();
 
     }
     api.instances.setKilled(this.instance);
@@ -28,7 +28,7 @@ this.kill = function() {
 
 this.start = function() {
     this.window = new api.window({
-        onHide: dojo.hitch(this, this.kill)
+        onClose: dojo.hitch(this, this.kill)
 
     });
     this.window.setBodyWidget("LayoutContainer", {});

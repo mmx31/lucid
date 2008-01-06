@@ -7,14 +7,14 @@ this.init = function(args)
 		width: "400px",
 		height: "420px",
 		resizable: false,
-		onHide: dojo.hitch(this, this.kill)
+		onClose: dojo.hitch(this, this.kill)
 	});
 	this.win.show();
 	this.surface = dojox.gfx.createSurface(this.win.body.domNode, 400, 400);
 	this.drawBoard();
 }
 this.kill = function() {
-	if(!this.win.hidden) this.win.hide();
+	if(!this.win.closed) this.win.close();
 	api.instances.setKilled(this.instance);
 }
 this.drawBoard = function()

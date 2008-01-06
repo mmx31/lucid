@@ -1,5 +1,5 @@
 this.kill = function() {
-	if(!this.window.hidden) { this.window.hide(); }
+	if(!this.window.closed) { this.window.close(); }
 	api.instances.setKilled(this.instance);
 }
 this.init = function(args)
@@ -38,7 +38,7 @@ this.window = new api.window({
 });
 this.window.body.setContent(winHTML);
 this.window.show();
-dojo.connect(this.window, "onHide", this, this.kill);
+dojo.connect(this.window, "onClose", this, this.kill);
 api.instances.setActive(this.instance);
 }
 this.evaluate = function()

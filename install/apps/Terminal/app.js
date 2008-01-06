@@ -4,7 +4,7 @@ this.init = function(args)
 	this.win = new api.window({
 		title: "Terminal",
 		bodyWidget: "LayoutContainer",
-		onHide: dojo.hitch(this, this.kill)
+		onClose: dojo.hitch(this, this.kill)
 	});
 	this.term = new api.console({layoutAlign: "client", path: (args.path || "/")})
 	this.term.aliases.exit = dojo.hitch(this, this.kill);
@@ -16,6 +16,6 @@ this.init = function(args)
 }
 
 this.kill = function() {
-	if(!this.win.hidden) { this.win.hide(); }
+	if(!this.win.closed) { this.win.close(); }
 	api.instances.setKilled(this.instance);
 }
