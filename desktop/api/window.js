@@ -425,7 +425,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			});
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.body.domNode, "display", "block");
-				this._closeBorders();
+				this._hideBorders();
 				this._resizeBody();
 			});
 			anim.play();
