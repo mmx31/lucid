@@ -41,15 +41,25 @@ dojo.declare("api.sound", dijit._Widget, {
 		this.flSound.exposeFunction("loadSound", this.flSound);		
 		this.flSound.exposeFunction("start", this.flSound);		
 		this.flSound.exposeFunction("stop", this.flSound);		
-		this.flSound.exposeFunction("setVolume", this);		
+		this.flSound.exposeFunction("setVolume", this.flSound);	
+		this.flSound.exposeFunction("getVolume", this.flSound);		
 		this.flSound.exposeProperty("position", this.flSound);	
 		this.flSound.exposeProperty("duration", this.flSound);
-		this.flSound.exposeProperty("id3", this);
+		this.flSound.exposeProperty("id3", this.flSound);
 		this.flSound.mapFunction("addEventHandler");
 		window["flashcallback"+this.id] = dojo.hitch(this, this._ready);
 		this.flSound.addEventHandler("onLoad", "flashcallback"+this.id);
 		this.flSound.loadSound(this.src, true);
 		if(!this.autoStart) this.stop();
+	},
+	getId3: function() {
+		return this.flSound.id3;
+	},
+	setVolume: function(val) {
+		return this.flSound.setVolume(val)
+	},
+	getVolume: function(val) {
+		return this.flSound.getVolume(val)
 	},
 	_ready: function() {
 		delete window["flashcallback"+this.id];
