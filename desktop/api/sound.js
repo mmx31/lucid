@@ -85,7 +85,7 @@ dojo.declare("api.sound", dijit._Widget, {
 		}
 	},
 	getPosition: function() {
-		if (this.flSound) {
+		if (this.flReady && this.flash) {
 			return this.flSound.getPosition();
 		}
 		else {
@@ -93,7 +93,7 @@ dojo.declare("api.sound", dijit._Widget, {
 		}
 	},
 	getDuration: function() {
-		if (this.flReady && this.flash)) {
+		if (this.flReady && this.flash) {
 			return this.flSound.getDuration();
 		}
 		else {
