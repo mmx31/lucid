@@ -84,9 +84,8 @@ this.init = function(args) {
 	});
 	ticker.innerHTML = "&nbsp;0:00/00:00&nbsp;";
 	var client = new dijit.Toolbar({layoutAlign: "client"});
-	for(item in this.ui) {
-		var name = item;
-		item = this.ui[item];
+	for(name in this.ui) {
+		var item = this.ui[name];
 		if(item.declaredClass == "dijit.form.Button") {
 			dojo.style(item.domNode, "width", "40px");
 		}
