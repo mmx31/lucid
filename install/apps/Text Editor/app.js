@@ -67,7 +67,8 @@ this.start = function() {
     }));
     this.window.addChild(toolbar);
     var box = new dijit.layout.ContentPane({
-        layoutAlign: "client"
+        layoutAlign: "client",
+		style: "overflow: hidden;"
     },
     document.createElement("div"));
     this.other = new dijit.layout.ContentPane({

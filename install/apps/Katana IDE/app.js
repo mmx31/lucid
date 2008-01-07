@@ -13,7 +13,7 @@ this.init = function(args)
 	});
 	this.win.setBodyWidget("LayoutContainer", {});
 	
-	var client = new dijit.layout.ContentPane({style: "overflow-y: auto; overflow-x: hidden;", layoutAlign: "client"}, document.createElement("div"));
+	var client = new dijit.layout.ContentPane({style: "overflow: hidden;", layoutAlign: "client"}, document.createElement("div"));
 		this.editor = document.createElement("textarea");
 		this.editor.style.width="100%";	
 		this.editor.style.height="100%";
