@@ -584,12 +584,11 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		else return true;
 	},
 	uninitialize: function() {
-		this.onClose();
-		dojo.style(this.body.domNode, "display", "none");
+		if(!this.onCloseCalled) this.onClose();
 		this.body.destroy();
-		this._task.destroy();
-		this._drag.destroy();
-		this.resize.destroy();
+		if(this._task) this._task.destroy();
+		if(this._drag) this._drag.destroy();
+		if(this.resize) this.resize.destroy();
 	},
 	/* 
 	 * Method: close
@@ -599,9 +598,12 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 */
 	close: function()
 	{
+		this.onCloseCalled = true;
+		this.onClose();
 		if (!this.closed) {
 			this.closed = true;
 			if (desktop.config.fx) {
+				dojo.style(this.body.domNode, "display", "none");
 				var anim = dojo.fadeOut({
 					node: this.domNode,
 					duration: desktop.config.window.animSpeed
