@@ -53,13 +53,16 @@ dojo.declare("api.sound", dijit._Widget, {
 		if(!this.autoStart) this.stop();
 	},
 	getId3: function() {
-		return this.flSound.id3;
+		if(this.flSound) return this.flSound.id3;
+		else return false;
 	},
 	setVolume: function(val) {
-		return this.flSound.setVolume(val)
+		if(this.flSound) return this.flSound.setVolume(val);
+		else return false;
 	},
 	getVolume: function(val) {
-		return this.flSound.getVolume(val)
+		if(this.flSound) return this.flSound.getVolume(val);
+		else return false;
 	},
 	_ready: function() {
 		delete window["flashcallback"+this.id];
@@ -82,7 +85,7 @@ dojo.declare("api.sound", dijit._Widget, {
 		}
 	},
 	getPosition: function() {
-		if (this.flash) {
+		if (this.flSound) {
 			return this.flSound.getPosition();
 		}
 		else {
@@ -90,7 +93,7 @@ dojo.declare("api.sound", dijit._Widget, {
 		}
 	},
 	getDuration: function() {
-		if (this.flash) {
+		if (this.flsound) {
 			return this.flSound.getDuration();
 		}
 		else {
