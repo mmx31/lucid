@@ -402,9 +402,9 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		if(this._drag) this._drag.onMouseUp(); this._drag.destroy();
 		this.killResizer();
 		this.pos.top = dojo.style(this.domNode, "top");
-		this.pos.bottom = dojo.style(this.domNode, "bottom");
+		//this.pos.bottom = dojo.style(this.domNode, "bottom");
 		this.pos.left = dojo.style(this.domNode, "left");
-		this.pos.right = dojo.style(this.domNode, "right");
+		//this.pos.right = dojo.style(this.domNode, "right");
 		this.pos.width = dojo.style(this.domNode, "width");
 		this.pos.height = dojo.style(this.domNode, "height");
 		var win = this.domNode;
@@ -507,21 +507,22 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			this._showBorders();
 			dojo.style(this.body.domNode, "display", "none");
 			var anim = dojo.animateProperty({
-				node: win,
+				node: this.domNode,
 				properties: {
 					top: {end: this.pos.top},
 					left: {end: this.pos.left},
-					right: {end: this.pos.right},
-					bottom: {end: this.pos.bottom},
+					//right: {end: this.pos.right},
+					//bottom: {end: this.pos.bottom},
 					width: {end: this.pos.width},
 					height: {end: this.pos.height}
 				},
 				duration: desktop.config.window.animSpeed
 			});
-			dojo.connect(anim, "onEnd", this, function() {
+			dojo.connect(anim, "onEnd", this, function(e) {
 				dojo.style(this.body.domNode, "display", "block");
 				this._resizeBody();
 			});
+			void(anim); //fixes a weird ass IE bug. Don't ask me why :D
 			anim.play();
 		}
 		else
