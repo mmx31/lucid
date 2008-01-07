@@ -73,7 +73,8 @@ this.save = function()
 
 this.saved = function(id)
 {
-	api.ide.load(parseInt(id), dojo.hitch(this, function(data) {
+	desktop.app.apps=[];
+	api.ide.load(id, dojo.hitch(this, function(data) {
 		var scroll = this.editor.scrollTop;
 		var startPos = this.editor.selectionStart;
 		var endPos = this.editor.selectionEnd;
