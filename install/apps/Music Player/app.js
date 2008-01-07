@@ -38,9 +38,13 @@ this.init = function(args) {
 		ticker: document.createElement("div"),
 		slider: new dijit.form.HorizontalSlider({
 			showButtons: false,
-			style: "width: 100%;"
+			style: "width: 100%;",
+			onChange: dojo.hitch(this, this.skip)
 		})
 	};
+	dojo.connect(this.ui.slider.domNode, "onmousedown", this, function() {
+		this.stopTicker();
+	});
 	var ticker = this.ui.ticker;
 	dojo.forEach([
 		{p: "border", v: "1px solid gray"},
@@ -70,13 +74,13 @@ this.init = function(args) {
 	this.win.addChild(client);
 	this.win.show();
 	this.win.startup();
-	setTimeout(dojo.hitch(this, function() { this.ui.slider.setValue(100);}), 500);
 	api.instances.setActive(this.instance);
 	if(args.file) this.open(args.file);
 }
 this.sound = false;
 this.play = function() {
 	if(this.sound) {
+		this.is_playing=true;
 		this.sound.play();
 		dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
 		dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
@@ -88,6 +92,7 @@ this.play = function() {
 }
 this.pause = function() {
 	if(this.sound) {
+		this.is_playing=false;
 		this.sound.pause();
 		dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
 		dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
@@ -96,14 +101,26 @@ this.pause = function() {
 		this.stopTicker();
 	}
 }
+this.skip = function(value) {
+	if (!this.ignoreOnChange && this.sound) {
+		var d = this.sound.getDuration();
+		this.sound._startPos = ((value / 100) * (d/1000));
+		if(this.is_playing) {
+			this.sound.play();
+			this.startTicker();
+		}
+	}
+}
 this.stop = function() {
 	if(this.sound) {
+		this.is_playing=false;
 		dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
 		dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
 		this.ui.play.setLabel("play");
 		this.ui.play.onClick = dojo.hitch(this, this.play);
 		this.sound.stop();
 		this.stopTicker();
+		this.ui.slider.setValue(0);
 	}
 }
 this.openDialog = function() {
@@ -123,16 +140,19 @@ this.open = function(file) {
 	}
 }
 this.startTicker = function() {
-	this.__ticker = setInterval(dojo.hitch(this, "updateTicker"), 1000);
+	if(!this.__ticker) this.__ticker = setInterval(dojo.hitch(this, "updateTicker"), 1000);
 }
 this.stopTicker = function() {
 	clearInterval(this.__ticker);
+	this.__ticker = false;
 }
 this.updateTicker = function() {
 	var p = this.sound.getPosition();
 	var d = this.sound.getDuration();
 	if(p == d) this.stop();
+	this.ignoreOnChange=true;
 	this.ui.slider.setValue(Math.floor((p/d)*100));
+	this.ignoreOnChange=false;
 	var pos = this.formatTime(p);
 	var dur = this.formatTime(d);
 	this.box.domNode.innerHTML = "&nbsp;" + this.filename + "&nbsp;&nbsp;" + pos + "/" + dur + "&nbsp;";
