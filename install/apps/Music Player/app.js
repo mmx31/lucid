@@ -187,6 +187,7 @@ this.stopTicker = function() {
 this.updateTicker = function() {
 	var p = this.sound.getPosition();
 	var d = this.sound.getDuration();
+	if(d==0) d = p+1;
 	if(p == d) this.stop();
 	this.ignoreOnChange=true;
 	this.ui.slider.setValue(Math.floor((p/d)*100));
