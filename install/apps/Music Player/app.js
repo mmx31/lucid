@@ -121,13 +121,18 @@ this.play = function() {
 }
 this.pause = function() {
 	if(this.sound) {
-		this.is_playing=false;
-		this.sound.pause();
-		dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
-		dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
-		this.ui.play.setLabel("Play");
-		this.ui.play.onClick = dojo.hitch(this, this.play);
-		this.stopTicker();
+		if (this.sound.flReady || !this.sound.flash) {
+			this.is_playing = false;
+			this.sound.pause();
+			dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
+			dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
+			this.ui.play.setLabel("Play");
+			this.ui.play.onClick = dojo.hitch(this, this.play);
+			this.stopTicker();
+		}
+		else {
+			setTimeout(dojo.hitch(this, this.pause), 100);
+		}
 	}
 }
 this.skip = function(value) {
@@ -142,14 +147,19 @@ this.skip = function(value) {
 }
 this.stop = function() {
 	if(this.sound) {
-		this.is_playing=false;
-		dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
-		dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
-		this.ui.play.setLabel("Play");
-		this.ui.play.onClick = dojo.hitch(this, this.play);
-		this.sound.stop();
-		this.stopTicker();
-		this.ui.slider.setValue(0);
+		if (this.sound.flReady || !this.sound.flash) {
+			this.is_playing = false;
+			dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
+			dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
+			this.ui.play.setLabel("Play");
+			this.ui.play.onClick = dojo.hitch(this, this.play);
+			this.sound.stop();
+			this.stopTicker();
+			this.ui.slider.setValue(0);
+		}
+		else {
+			setTimeout(dojo.hitch(this, this.stop), 100);
+		}
 	}
 }
 this.openDialog = function() {
