@@ -584,7 +584,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		else return true;
 	},
 	uninitialize: function() {
-		if(!this.onCloseCalled) this.onClose();
+		if(!this.closed) this.onClose();
 		this.body.destroy();
 		if(this._task) this._task.destroy();
 		if(this._drag) this._drag.destroy();
@@ -598,10 +598,9 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 */
 	close: function()
 	{
-		this.onCloseCalled = true;
-		this.onClose();
 		if (!this.closed) {
 			this.closed = true;
+			this.onClose();
 			if (desktop.config.fx) {
 				dojo.style(this.body.domNode, "display", "none");
 				var anim = dojo.fadeOut({
