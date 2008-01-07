@@ -22,20 +22,49 @@ this.init = function(args) {
 		toolbar.addChild(new dijit.form.Button(item));
 	})
 	this.win.addChild(toolbar);
+	var volume = new dijit.form.VerticalSlider({
+		onChange: dojo.hitch(this, function(val) {
+			this.sound.setVolume(val);
+			dojo.removeClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-high");
+			dojo.removeClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-medium");
+			dojo.removeClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-low");
+			dojo.removeClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-muted");
+			if(val == 0) {
+				dojo.addClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-muted");
+			}
+			else if(val > 0 && val < 33) {
+				dojo.addClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-low");
+			}
+			else if(val >= 33 && val <= 66) {
+				dojo.addClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-medium");
+			}
+			else {
+				dojo.addClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-high");
+			}
+		}),
+		value: 100,
+		style: "height: 100px; background-color: white;"
+	});
 	this.ui = {
 		play: new dijit.form.Button({
 			iconClass: "icon-32-actions-media-playback-start",
 			onClick: dojo.hitch(this, this.play),
 			showLabel: false,
-			label: "play"
+			label: "Play"
 		}),
 		stop: new dijit.form.Button({
 			iconClass: "icon-32-actions-media-playback-stop",
 			onClick: dojo.hitch(this, this.stop),
 			showLabel: false,
-			label: "stop"
+			label: "Stop"
 		}),
 		ticker: document.createElement("div"),
+		volume: new dijit.form.DropDownButton({
+			dropDown: volume,
+			label: "Volume",
+			iconClass: "icon-32-status-audio-volume-high",
+			showLabel: false,
+		}),
 		slider: new dijit.form.HorizontalSlider({
 			showButtons: false,
 			style: "width: 100%;",
@@ -84,7 +113,7 @@ this.play = function() {
 		this.sound.play();
 		dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
 		dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
-		this.ui.play.setLabel("pause");
+		this.ui.play.setLabel("Pause");
 		this.ui.play.onClick = dojo.hitch(this, this.pause);
 		this.ui.play.startup();
 		this.startTicker();
@@ -96,7 +125,7 @@ this.pause = function() {
 		this.sound.pause();
 		dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
 		dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
-		this.ui.play.setLabel("play");
+		this.ui.play.setLabel("Play");
 		this.ui.play.onClick = dojo.hitch(this, this.play);
 		this.stopTicker();
 	}
@@ -116,7 +145,7 @@ this.stop = function() {
 		this.is_playing=false;
 		dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
 		dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
-		this.ui.play.setLabel("play");
+		this.ui.play.setLabel("Play");
 		this.ui.play.onClick = dojo.hitch(this, this.play);
 		this.sound.stop();
 		this.stopTicker();

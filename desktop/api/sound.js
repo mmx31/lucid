@@ -41,9 +41,10 @@ dojo.declare("api.sound", dijit._Widget, {
 		this.flSound.exposeFunction("loadSound", this.flSound);		
 		this.flSound.exposeFunction("start", this.flSound);		
 		this.flSound.exposeFunction("stop", this.flSound);		
-		this.flSound.exposeFunction("setVolume", this.flSound);		
+		this.flSound.exposeFunction("setVolume", this);		
 		this.flSound.exposeProperty("position", this.flSound);	
 		this.flSound.exposeProperty("duration", this.flSound);
+		this.flSound.exposeProperty("id3", this);
 		this.flSound.mapFunction("addEventHandler");
 		window["flashcallback"+this.id] = dojo.hitch(this, this._ready);
 		this.flSound.addEventHandler("onLoad", "flashcallback"+this.id);
