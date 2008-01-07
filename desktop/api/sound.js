@@ -36,6 +36,7 @@ dojo.declare("api.sound", dijit._Widget, {
 		}
 	},
 	flashCallback: function() {
+		console.log("callback triggered");
 		delete window["flashcallback"+this.id];
 		this.flSound = new api.aflax.FlashObject(this.aflax, "Sound");
 		this.flSound.exposeFunction("loadSound", this.flSound);		
@@ -53,7 +54,7 @@ dojo.declare("api.sound", dijit._Widget, {
 		if(!this.autoStart) this.stop();
 	},
 	getId3: function() {
-		if(this.flReady && this.flash) return this.flSound.id3;
+		if(this.flReady && this.flash) return this.flSound.getId3;
 		else return false;
 	},
 	setVolume: function(val) {
