@@ -75,10 +75,10 @@ this.start = function() {
         style: "height: 10%"
     },
     document.createElement("div"));
-    html = "<div padding=10>";
-    html += "<textarea id='text" + this.instance + "' style='width: 100%; height: 90%;'>";
-    html += "</textarea>";
-    box.setContent(html);
+	this.editor = document.createElement("textarea");
+	dojo.style(this.editor, "width", "100%");
+	dojo.style(this.editor, "height", "100%");
+    box.setContent(this.editor);
     this.other.setContent("No file open");
     this.window.addChild(box);
     this.window.addChild(this.other);
@@ -86,16 +86,13 @@ this.start = function() {
     this.window.width = "320px";
     this.window.height = "305px";
     this.window.show();
-    dojo.byId('text' + this.instance).disabled = true;
-    dojo.byId('text' + this.instance).value = "open or create a new file.";
-    this._new = false;
     this.window.startup();
     api.instances.setActive(this.instance);
-
+	this.processNew();
 }
 this.processNew = function() {
-    dojo.byId('text' + this.instance).disabled = false;
-    dojo.byId('text' + this.instance).value = "";
+    this.editor.disabled = false;
+    this.editor.value = "";
     this.editing = false;
     this.fileEditing = "";
     this.newAs = true;
@@ -103,8 +100,8 @@ this.processNew = function() {
 
 }
 this.processClose = function() {
-    dojo.byId('text' + this.instance).disabled = true;
-    dojo.byId('text' + this.instance).value = "open or create a new file.";
+    this.editor.disabled = true;
+    this.editor.value = "open or create a new file.";
     this.newAs = false;
     this.editing = false;
     this.fileEditing = "";
@@ -127,15 +124,15 @@ this._processOpen = function(path) {
     }
     this.other.setContent("Opening file \"" + path + "\"");
     this.newAs = true;
-    dojo.byId('text' + this.instance).disabled = true;
+    this.editor.disabled = true;
     api.fs.read({
         path: path,
         callback: dojo.hitch(this, 
         function(array) {
-            dojo.byId('text' + this.instance).value = array.contents;
+            this.editor.value = array.contents;
             this.editing = true;
             this.newAs = true;
-            dojo.byId('text' + this.instance).disabled = false;
+            this.editor.disabled = false;
             this.fileEditing = array.path;
             this.other.setContent("Editing file \"" + array.path + "\"");
 
@@ -148,7 +145,7 @@ this.processSave = function() {
     if (this.editing) {
         api.fs.write({
             path: this.fileEditing,
-            content: dojo.byId('text' + this.instance).value
+            content: this.editor.value
         });
         this.other.setContent("File saved!");
 
