@@ -63,7 +63,7 @@ this.init = function(args) {
 			dropDown: volume,
 			label: "Volume",
 			iconClass: "icon-32-status-audio-volume-high",
-			showLabel: false,
+			showLabel: false
 		}),
 		slider: new dijit.form.HorizontalSlider({
 			showButtons: false,
