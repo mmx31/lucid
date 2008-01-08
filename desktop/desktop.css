@@ -275,6 +275,7 @@ height: 100%;
 /* Applets */
 .desktopApplet {
 	height: 100%;
+	position: absolute;
 }
 .desktopAppletHandle {
 	height: 100%;

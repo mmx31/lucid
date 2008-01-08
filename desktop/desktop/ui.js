@@ -11,12 +11,10 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	width: "100%",
 	height: "20px",
 	locked: false,
-	postCreate: function() {
-		dojo.style(this.domNode, "width", this.width);
-		dojo.style(this.domNode, "height", this.height);
-	},
+	orientation: "horizontal",
+	placement: "BL",
 	_onClick: function() {
-		if (!this.locked) {
+		if(!this.locked) {
 			this._onOutEvent = dojo.connect(this.domNode, "onmouseout", this, function(){
 				this._onDragEvent = dojo.connect(document, "onmousemove", this, "_onMove");
 			});
@@ -35,6 +33,14 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		})
 		//get nearest edge, move the panel there if we're not allready, re-orient ourself
 		//also check for any panels allready placed on that edge
+	},
+	_place: function() {
+		var viewport = dijit.getViewport();
+		var s = this.domNode.style;
+		s.left = viewport.l + "px";
+		s.width = (viewport.w-2) + "px";
+		s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight + "px";
+		this._inPositioning = false;
 	},
 	_makeVertical: function() {
 		dojo.removeClass(this.domNode, "desktopPanelHorizontal");
@@ -58,17 +64,13 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	lock: function() {
 		this.locked = true;
 		dojo.forEach(this.getChildren(), function(item) {
-			if(item.declaredClass == "desktop.ui.applet") {
-				item.lock();
-			}
+			item.lock();
 		});
 	},
 	unlock: function() {
 		this.locked = false;
 		dojo.forEach(this.getChildren(), function(item) {
-			if(item.declaredClass == "desktop.ui.applet") {
-				item.unlock();
-			}
+			item.unlock();
 		});
 	},
 	sanitize: function() {
@@ -77,14 +79,33 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			var applet = {
 				settings: dojo.toJson(item.settings),
 				top: dojo.style(item.domNode, "top"),
-				left: dojo.style(item.domNode, "left")
+				left: dojo.style(item.domNode, "left"),
+				declaredClass: item.declaredClass
 			};
 			applets.push(applet);
 		});
 		return dojo.toJson(applets);
 	},
 	unsanitize: function(str) {
-		//create each applet, reset it's position, etc.
+		var applets = dojo.fromJson("applet");
+		dojo.forEach(applets, dojo.hitch(this, function(applet) {
+			var construct = eval(applet.declaredClass);
+			var a = new construct({settings: applet.settings});
+			dojo.style(a.domNode, "top", applet.top);
+			dojo.style(a.domNode, "left", applet.left);
+			this.addChild(a);
+		}));
+	},
+	startup: function() {
+		if(dojo.isIE){
+			dojo.connect(this.domNode,'onresize', this,"_place");
+		}
+		dojo.connect(window,'onresize',this,"_place");
+		
+		dojo.style(this.domNode, "width", this.width);
+		dojo.style(this.domNode, "height", this.height);
+		if(this.orientation == "horizontal") this._makeHorizontal();
+		else this._makeVertical();
 	}
 });
 dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Container, dijit._Contained], {
@@ -95,6 +116,7 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 			node: this.domNode,
 			handle: this.handleNode
 		});
+		//TODO: get it so that applets don't overlap eachother
 	},
 	uninitalize: function() {
 		this._moveable.destroy();
