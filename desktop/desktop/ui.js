@@ -37,10 +37,16 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	_place: function() {
 		var viewport = dijit.getViewport();
 		var s = this.domNode.style;
-		s.left = viewport.l + "px";
-		s.width = (viewport.w-2) + "px";
-		s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight + "px";
-		this._inPositioning = false;
+		if (this.orientation == "br") {
+			s.right = viewport.r + "px";
+			s.width = (viewport.w - 2) + "px";
+			s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight + "px";
+		}
+		if (this.orientation == "bl") {
+			s.left = viewport.l + "px";
+			s.width = (viewport.w - 2) + "px";
+			s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight + "px";
+		}
 	},
 	_makeVertical: function() {
 		dojo.removeClass(this.domNode, "desktopPanelHorizontal");
@@ -128,6 +134,6 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 		dojo.style(this.handleNode, "display", "block");
 	},
 	setOrientation: function(orientation) {
-		
+		//add any special things you need to do in order to change orientation in this function
 	}
 });
