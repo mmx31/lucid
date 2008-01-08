@@ -15,12 +15,10 @@ dojo.require("dojox.fx.easing");
  * 		win.width = "20%";
  * 		win.bodyWidget = "ContentPane";
  * 		win.bodyWidgetParams = {parseOnLoad: true};
- * 		win.write("bar");
- * 		//you can't use addChild before the window is shown...
- * 		win.show();
  * 		widget = new dijit.layout.ContentPane();
  * 		widget.setContent("baz");
  * 		win.addChild(widget, true);
+ * 		win.show();
  * 		setTimeout(dojo.hitch(win, win.destroy), 1000*5);
  * 		(end code)
  */
