@@ -5,6 +5,7 @@ dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
 dojo.require("dijit._Contained");
 dojo.require("dojo.dnd.move");
+
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {
 	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick\"></div>",
 	width: "100%",
@@ -38,23 +39,49 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	_makeVertical: function() {
 		dojo.removeClass(this.domNode, "desktopPanelHorizontal");
 		dojo.addClass(this.domNode, "desktopPanelVertical");
-		//go through each applet, make it vertical
+		this._swapAppletOrientation("vertical");
 	},
 	_makeHorizontal: function() {
 		dojo.removeClass(this.domNode, "desktopPanelVertical");
 		dojo.addClass(this.domNode, "desktopPanelHorizontal");
-		//go through each applet, make it horizontal
+		this._swapAppletOrientation("horizontal");
+	},
+	_swapAppletOrientation: function(orientation) {
+		dojo.forEach(this.getChildren(), function(item) {
+			var t = dojo.style(item.domNode, "top");
+			var l = dojo.style(item.domNode, "left");
+			dojo.style(item.domNode, "top", l);
+			dojo.style(item.domNode, "left", t);
+			item.setOrientation(orientation);
+		});
 	},
 	lock: function() {
 		this.locked = true;
-		//go through each applet, make them stationary
+		dojo.forEach(this.getChildren(), function(item) {
+			if(item.declaredClass == "desktop.ui.applet") {
+				item.lock();
+			}
+		});
 	},
 	unlock: function() {
 		this.locked = false;
-		//go through each applet, make them movable
+		dojo.forEach(this.getChildren(), function(item) {
+			if(item.declaredClass == "desktop.ui.applet") {
+				item.unlock();
+			}
+		});
 	},
 	sanitize: function() {
-		//save the applets' positions and dump it into a json string
+		var applets = [];
+		dojo.forEach(this.getChildren(), function(item) {
+			var applet = {
+				settings: dojo.toJson(item.settings),
+				top: dojo.style(item.domNode, "top"),
+				left: dojo.style(item.domNode, "left")
+			};
+			applets.push(applet);
+		});
+		return dojo.toJson(applets);
 	},
 	unsanitize: function(str) {
 		//create each applet, reset it's position, etc.
@@ -62,10 +89,23 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 });
 dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Container, dijit._Contained], {
 	templateString: "<div class=\"desktopApplet\"><div class=\"desktopAppletHandle\" dojoAttachPoint=\"handleNode\"></div><div class=\"desktopAppletContent\" dojoAttachPoint=\"containerNode\"></div></div>",
+	settings: {},
+	postCreate: function() {
+		this._moveable = new dojo.dnd.move.parentConstrainedMoveable({
+			node: this.domNode,
+			handle: this.handleNode
+		});
+	},
+	uninitalize: function() {
+		this._moveable.destroy();
+	},
 	lock: function() {
-		//hide the applet's move handles
+		dojo.style(this.handleNode, "display", "none");
 	},
 	unlock: function() {
-		//show the applet's move handles
+		dojo.style(this.handleNode, "display", "block");
+	},
+	setOrientation: function(orientation) {
+		
 	}
 });

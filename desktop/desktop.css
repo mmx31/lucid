@@ -272,3 +272,11 @@ height: 100%;
 	margin-left: auto;
 	margin-right: auto;
 }
+/* Applets */
+.desktopApplet {
+	height: 100%;
+}
+.desktopAppletHandle {
+	height: 100%;
+	float: left;
+}
