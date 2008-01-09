@@ -1,4 +1,4 @@
-﻿/**
+/**
   *  AFLAX(tm) is a JavaScript library for Macromedia's Flash(tm) Platform
   *
   *  AFLAX is a trademark of Paul Colton, all rights reserved.
@@ -47,49 +47,49 @@ function aflaxInit():Void
 	objectCache["_root"] = _root;
 	objectCache["_stage"] = Stage;
 
-	ExternalInterface.addCallback("aflaxUpdateAfterEvent", _root, updateAfterEvent);
+	DojoExternalInterface.addCallback("aflaxUpdateAfterEvent", _root, updateAfterEvent);
 
-	ExternalInterface.addCallback("aflaxCreateObject", _root, aflaxCreateObject);
-	ExternalInterface.addCallback("aflaxGetProperty", _root, aflaxGetProperty);
-	ExternalInterface.addCallback("aflaxSetProperty", _root, aflaxSetProperty);
-	ExternalInterface.addCallback("aflaxCallFunction", _root, aflaxCallFunction);
-	ExternalInterface.addCallback("aflaxBulkCallFunction", _root, aflaxBulkCallFunction);
+	DojoExternalInterface.addCallback("aflaxCreateObject", _root, aflaxCreateObject);
+	DojoExternalInterface.addCallback("aflaxGetProperty", _root, aflaxGetProperty);
+	DojoExternalInterface.addCallback("aflaxSetProperty", _root, aflaxSetProperty);
+	DojoExternalInterface.addCallback("aflaxCallFunction", _root, aflaxCallFunction);
+	DojoExternalInterface.addCallback("aflaxBulkCallFunction", _root, aflaxBulkCallFunction);
 
-	ExternalInterface.addCallback("aflaxCallStaticFunction", _root, aflaxCallStaticFunction);
-	ExternalInterface.addCallback("aflaxGetStaticProperty", _root, aflaxGetStaticProperty);
+	DojoExternalInterface.addCallback("aflaxCallStaticFunction", _root, aflaxCallStaticFunction);
+	DojoExternalInterface.addCallback("aflaxGetStaticProperty", _root, aflaxGetStaticProperty);
 	
-	ExternalInterface.addCallback("aflaxAttachSocketEvents", _root, aflaxAttachSocketEvents);
+	DojoExternalInterface.addCallback("aflaxAttachSocketEvents", _root, aflaxAttachSocketEvents);
 
-	ExternalInterface.addCallback("aflaxAttachVideo", _root, aflaxAttachVideo);
-	ExternalInterface.addCallback("aflaxAttachCuePointEvent", _root, aflaxAttachCuePointEvent);
-	ExternalInterface.addCallback("aflaxAttachVideoStatusEvent", _root, aflaxAttachVideoStatusEvent);
+	DojoExternalInterface.addCallback("aflaxAttachVideo", _root, aflaxAttachVideo);
+	DojoExternalInterface.addCallback("aflaxAttachCuePointEvent", _root, aflaxAttachCuePointEvent);
+	DojoExternalInterface.addCallback("aflaxAttachVideoStatusEvent", _root, aflaxAttachVideoStatusEvent);
 	
-	ExternalInterface.addCallback("aflaxCreateVideoClip", _root, aflaxCreateVideoClip);
-	ExternalInterface.addCallback("aflaxLoadMovie", _root, aflaxLoadMovie);
-	ExternalInterface.addCallback("aflaxAttachBitmap", _root, aflaxAttachBitmap);
-	ExternalInterface.addCallback("aflaxApplyFilter", _root, aflaxApplyFilter);
-	ExternalInterface.addCallback("aflaxAddEventHandler", _root, aflaxAddEventHandler);
-	ExternalInterface.addCallback("aflaxCreateTextField", _root, aflaxCreateTextField);
-	ExternalInterface.addCallback("aflaxCreateEmptyMovieClip", _root, aflaxCreateEmptyMovieClip);
-	ExternalInterface.addCallback("aflaxDuplicateMovieClip", _root, aflaxDuplicateMovieClip);
+	DojoExternalInterface.addCallback("aflaxCreateVideoClip", _root, aflaxCreateVideoClip);
+	DojoExternalInterface.addCallback("aflaxLoadMovie", _root, aflaxLoadMovie);
+	DojoExternalInterface.addCallback("aflaxAttachBitmap", _root, aflaxAttachBitmap);
+	DojoExternalInterface.addCallback("aflaxApplyFilter", _root, aflaxApplyFilter);
+	DojoExternalInterface.addCallback("aflaxAddEventHandler", _root, aflaxAddEventHandler);
+	DojoExternalInterface.addCallback("aflaxCreateTextField", _root, aflaxCreateTextField);
+	DojoExternalInterface.addCallback("aflaxCreateEmptyMovieClip", _root, aflaxCreateEmptyMovieClip);
+	DojoExternalInterface.addCallback("aflaxDuplicateMovieClip", _root, aflaxDuplicateMovieClip);
 
-	ExternalInterface.addCallback("aflaxStoreValue", _root, aflaxStoreValue);
-	ExternalInterface.addCallback("aflaxGetValue", _root, aflaxGetValue);
+	DojoExternalInterface.addCallback("aflaxStoreValue", _root, aflaxStoreValue);
+	DojoExternalInterface.addCallback("aflaxGetValue", _root, aflaxGetValue);
 
-	ExternalInterface.addCallback("aflaxGetCamera", _root, aflaxGetCamera);
+	DojoExternalInterface.addCallback("aflaxGetCamera", _root, aflaxGetCamera);
 	
-	ExternalInterface.addCallback("aflaxAddEventListener", _root, aflaxAddEventListener);
-	ExternalInterface.addCallback("aflaxAttachEventListener", _root, aflaxAttachEventListener);
+	DojoExternalInterface.addCallback("aflaxAddEventListener", _root, aflaxAddEventListener);
+	DojoExternalInterface.addCallback("aflaxAttachEventListener", _root, aflaxAttachEventListener);
 	
 	
 
 	if(_root["callback"] != null)
 	{
-		ExternalInterface.call(_root["callback"]);
+		DojoExternalInterface.call(_root["callback"]);
 	}
 	else
 	{
-		ExternalInterface.call("main");
+		DojoExternalInterface.call("main");
 	}
 }
 
@@ -118,7 +118,7 @@ function aflaxStoreValue(args)
 				report += i + "=" + infoObject[i] + ";";
 			}
 	
-			ExternalInterface.call(onStatusEvent, report);
+			DojoExternalInterface.call(onStatusEvent, report);
 		};
 	}
 
@@ -151,7 +151,7 @@ function aflaxAddEventListener(args)
 	var obj = objectCache[objName];
 	
 	var eventObj = new Object();
-	eventObj.eventListener = function(evt) { ExternalInterface.call(eventListener); }
+	eventObj.eventListener = function(evt) { DojoExternalInterface.call(eventListener); }
 
 	//aflaxTrace(obj);
 
@@ -177,7 +177,7 @@ function aflaxAttachEventListener(args)
 			s += getValuesFromObject(arguments[i]);
 		}
 
-		ExternalInterface.call(callbackName, s);
+		DojoExternalInterface.call(callbackName, s);
 	}
 
 	obj.addListener(eventObj);
@@ -215,7 +215,7 @@ function aflaxAttachSocketEvents(args)
 	{
 		obj.onConnect = function(success:Boolean)
 		{
-			ExternalInterface.call(onConnectEvent, success);
+			DojoExternalInterface.call(onConnectEvent, success);
 		}
 	}
 			
@@ -223,7 +223,7 @@ function aflaxAttachSocketEvents(args)
 	{
 		obj.onXML = function(src)
 		{
-			ExternalInterface.call(onDataEvent, src.toString());
+			DojoExternalInterface.call(onDataEvent, src.toString());
 		}
 	}
 
@@ -231,7 +231,7 @@ function aflaxAttachSocketEvents(args)
 	{
 		obj.onClose = function()
 		{
-			ExternalInterface.call(onCloseEvent);
+			DojoExternalInterface.call(onCloseEvent);
 		}
 	}
 
@@ -263,7 +263,7 @@ function aflaxAttachVideoStatusEvent(args)
             s += prop+"="+infoObject[prop] + ";";
         }
 		
-		ExternalInterface.call(callback, s);
+		DojoExternalInterface.call(callback, s);
 	}
 }
 
@@ -295,7 +295,7 @@ function aflaxAttachCuePointEvent(args)
 
 //		aflaxTrace("aflaxAttachCuePointEvent: " + s);
 	
-		ExternalInterface.call(callback, s);
+		DojoExternalInterface.call(callback, s);
 	}
 }
 
@@ -424,9 +424,9 @@ function aflaxLoadMovie(args)
 			listener.onLoadInit = function()
 			{
 				if(args.length > 3)
-					ExternalInterface.call(callback, extractArgs(args, 3));
+					DojoExternalInterface.call(callback, extractArgs(args, 3));
 				else
-					ExternalInterface.call(callback);
+					DojoExternalInterface.call(callback);
 					
 			}
 			
@@ -485,7 +485,7 @@ function aflaxAddEventHandler(args)
 	{
 		mc[eventName] = function()
 		{
-			ExternalInterface.call(functionName);
+			DojoExternalInterface.call(functionName);
 		}
 	}
 }
