@@ -33,7 +33,7 @@
   *
   **/
  
-import flash.external.*;
+//import flash.external.*;
 import flash.display.*;
 
 var objectCount:Number = 1;
@@ -46,6 +46,8 @@ function aflaxInit():Void
 
 	objectCache["_root"] = _root;
 	objectCache["_stage"] = Stage;
+
+	DojoExternalInterface.initialize();
 
 	DojoExternalInterface.addCallback("aflaxUpdateAfterEvent", _root, updateAfterEvent);
 
@@ -81,7 +83,7 @@ function aflaxInit():Void
 	DojoExternalInterface.addCallback("aflaxAddEventListener", _root, aflaxAddEventListener);
 	DojoExternalInterface.addCallback("aflaxAttachEventListener", _root, aflaxAttachEventListener);
 	
-	
+	DojoExternalInterface.loaded();
 
 	if(_root["callback"] != null)
 	{
