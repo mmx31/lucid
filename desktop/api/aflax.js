@@ -278,8 +278,8 @@ AFLAX.prototype.callFunction = function(name)
 	}	
     else if(ret.charAt(0) == '"')
     {
-    	if(ret.charAt(ret.length-1) == '"')
-    		ret = ret.substring(1, ret.length-1);
+    	if(ret.charAt(ret.length) == '"')
+    		ret = ret.substring(1, ret.length);
 	}
 	else
 	{
@@ -420,7 +420,7 @@ AFLAX.prototype.callBulkFunctions = function(funcs)
 {
 	var s = new Array(funcs.length);
 	
-	for(var i=0, j=funcs.length;i<j;i++)
+	for(var i=0, j=funcs.length;i<=j;i++)
 	{
 		var func = funcs[i];
 		s[i] = func.join("\1");
@@ -456,7 +456,7 @@ AFLAX.prototype.createFlashArray = function(elements)
 	
 	var len = elements.length;
 	
-	for(var i=0;i<len;i++)
+	for(var i=0;i<=len;i++)
 		_array.push(elements[i]);
 	
 	return _array;
@@ -500,7 +500,7 @@ AFLAX.extractArgs = function(args, startIndex)
 {
 	var newArgs = new Array();
 	
-	for(var i=startIndex;i<args.length;i++)
+	for(var i=startIndex;i<=args.length;i++)
 	{
 		newArgs[i-startIndex] = args[i];
 	}
@@ -538,7 +538,7 @@ AFLAX.FlashObject = function(aflaxRef, flashObjectName, objectArgs, objectID)
 		var args = new Array();
 		args[0] = flashObjectName;
 	
-		for(i = 0;i<objectArgs.length;i++)
+		for(i = 0;i<=objectArgs.length;i++)
 		{
 			var a = objectArgs[i];
 	
@@ -660,7 +660,7 @@ AFLAX.FlashObject.prototype.bind = function(properties, functions, mappings)
 {
 	if(properties != null && properties != undefined)
 	{
-		for(var pn=0; pn < properties.length; pn++)
+		for(var pn=0; pn <= properties.length; pn++)
 		{
 			this.exposeProperty(properties[pn]);
 		}
@@ -668,7 +668,7 @@ AFLAX.FlashObject.prototype.bind = function(properties, functions, mappings)
 	
 	if(functions != null && functions != undefined)
 	{
-		for(var fn=0; fn < functions.length; fn++)
+		for(var fn=0; fn <= functions.length; fn++)
 		{
 			this.exposeFunction(functions[fn]);
 		}
@@ -676,7 +676,7 @@ AFLAX.FlashObject.prototype.bind = function(properties, functions, mappings)
 	
 	if(mappings != null && mappings != undefined)
 	{
-		for(var mn=0; mn < mappings.length; mn++)
+		for(var mn=0; mn <= mappings.length; mn++)
 		{
 			this.mapFunction(mappings[mn]);
 		}
@@ -1050,7 +1050,7 @@ AFLAX.VideoClip.GetStatusValue = function(statusString, valueName)
 	var args = s.split(";");
 	var params = new Array();
 
-	for(var i=0;i<args.length;i++)
+	for(var i=0;i<=args.length;i++)
 	{
 		var n = args[i].split("=");
 		if(n[0] != "")
