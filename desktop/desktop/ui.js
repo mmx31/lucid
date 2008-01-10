@@ -1,5 +1,39 @@
 dojo.provide("desktop.ui");
 
+desktop.ui = {
+	init: function() {
+		//we can't use draw() because we need to fetch the config first
+		var panels = desktop.config.panels;
+		dojo.forEach(panels, function(panel) {
+			var args = {
+				thickness: panel.thickness,
+				span: panel.span,
+				locked: panel.locked,
+				orientation: panel.orientation,
+				placement: panel.placement
+			}
+			var p = new desktop.ui.panel(args);
+			p.fromJson(panel.applets);
+			document.body.appendChild(p.domNode);
+			p.startup();
+		});
+	},
+	save: function() {
+		desktop.config.panels = [];
+		dojo.query(".desktopPanel").forEach(function(panel, i) {
+			var wid = dijit.byNode(panel);
+			desktop.config.panels[i] = {
+				thickness: wid.thickness,
+				span: wid.span,
+				locked: wid.locked,
+				orientation: wid.orientation,
+				placement: wid.placement,
+				applets: wid.toJson()
+			}
+		});
+	}
+}
+
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
@@ -8,8 +42,8 @@ dojo.require("dojo.dnd.move");
 
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {
 	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick\"></div>",
-	width: "100%",
-	height: "20px",
+	span: "100%",
+	thickness: 24,
 	locked: false,
 	orientation: "horizontal",
 	placement: "BL",
@@ -37,16 +71,24 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	_place: function() {
 		var viewport = dijit.getViewport();
 		var s = this.domNode.style;
-		if (this.orientation == "br") {
+		dojo.style(this.domNode, (this.orientation == "horizontal" ? "width" : "height"), this.span);
+		dojo.style(this.domNode, (this.orientation == "vertical" ? "width" : "height"), this.thickness);
+		if(this.placement[1] == "R")
 			s.right = viewport.r + "px";
-			s.width = (viewport.w - 2) + "px";
-			s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight + "px";
-		}
-		if (this.orientation == "bl") {
+		if(this.placement[1] == "L")
 			s.left = viewport.l + "px";
-			s.width = (viewport.w - 2) + "px";
-			s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight + "px";
+		if(this.placement[1] == "C") {
+			if(this.span != "100%") {
+				var span = dojo.style(this.domNode, (this.orientation == "horizontal" ? "width" : "height"));
+				s[(this.orientation == "horizontal" ? "left" : "top")] = (viewport[(this.orientation == "horizontal" ? "w" : "h")] - span) / 2;
+			}
+			else s[(this.orientation == "horizontal" ? "left" : "top")] = viewport.l + "px";
 		}
+		
+		if(this.placement[0] == "B")
+			s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight + "px";
+		else 
+			s.top = (viewport.t - this.domNode.offsetHeight) + "px";
 	},
 	_makeVertical: function() {
 		dojo.removeClass(this.domNode, "desktopPanelHorizontal");

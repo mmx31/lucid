@@ -82,6 +82,15 @@ desktop.config = {
 		 */
 		isShown: true
 	},
+	panels: [
+		{
+			thickness: 24,
+			span: "100%",
+			locked: true,
+			orientation: "horizontal",
+			placement: "BC"
+		}
+	],
 	wallpaper: {
 		image: "./themes/green/wallpaper.jpg",
 		color: "#eeeeee"
