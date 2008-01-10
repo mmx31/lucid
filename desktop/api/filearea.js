@@ -14,6 +14,7 @@ dojo.require("dijit.form.Button");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
 dojo.require("dojo.dnd.Moveable");
+dojo.require("dijit.Menu");
 
 dojo.declare(
 	"api.filearea",

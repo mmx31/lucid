@@ -6,104 +6,9 @@
 * @memberOf desktop
 * @constructor
 */
-
+dojo.require("dijit.Menu");
 desktop.menu = new function()
-	{
-		/**
-		 * Tracks wheather or not the desktop's menu is visible
-		 * 
-		 * @type {String}
-		 * @alias desktop.menu.visibility
-		 * @memberOf desktop.menu
-		 */
-		this.visibility = "closed";
-		/**
-		 * Tracks the number of clicks. Used when closing the menu.
-		 * 
-		 * @type {Integer}
-		 * @alias desktop.menu.clickcache
-		 * @memberOf desktop.menu
-		 */
-		this.clickcache = 0;
-		/** 
-		* Triggered on the document's left click event, used to close the menu.
-		*
-		* @memberOf desktop.menu
-		* @alias desktop.menu.leftclick
-		*/
-		this.leftclick = function()
-		{
-			if(this.clickcache == '1')
-			{
-				if(this.visibility=="open")
-				{
-					this.hide();
-					this.visibility="closed";
-					this.clickcache = 0;
-				}
-			}
-			else
-			{
-				count=5;
-				while(count != 0)
-				{
-					if(this.visibility=="open")
-					{
-						this.clickcache = 1;
-					}
-					count--;
-				}
-			}
-		}
-		/** 
-		* Function that is triggered when the menu button is pressed.
-		* 
-		* @memberOf desktop.menu
-		* @alias desktop.menu.button
-		*/
-		this.button = function()
-		{
-			/*if(this.visibility == "closed")
-			{
-				document.getElementById("sysmenu").style.display = "inline";
-				if(desktop.config.fx == true) dojo.fadeIn({ node: 'sysmenu', duration: 300 }).play();
-				else dojo.style(dojo.byId("sysmenu"), "opacity", 100);
-				this.visibility = "open";
-			}
-			else
-			{
-				if(this.visibility == "open")
-				{
-					//this.visibility = "closed";
-				}
-			}*/
-			dijit.popup.open({
-				dropDown: this._menu
-			});
-		}
-		/** 
-		* Hides the menu
-		*
-		* @memberOf desktop.app
-		* @alias desktop.menu.hide
-		*/
-		this.hide = function()
-		{
-			if(desktop.config.fx == true)
-			{
-			var anim = dojo.fadeOut({ node: 'sysmenu', duration: 300 });
-			dojo.connect(anim, "onEnd", null, function(){
-				document.getElementById("sysmenu").style.display = "none";
-			});
-			anim.play();
-			}
-			else
-			{
-				document.getElementById("sysmenu").style.display = "none";
-			}
-		}
-		
-		
+	{		
 		/** 
 		* Gets a list of applications from the server and generates a menu from it.
 		* TODO: convert this into JSON
@@ -194,8 +99,5 @@ desktop.menu = new function()
 			//div.innerHTML = html;
 			document.body.appendChild(div);
 			if(!getApps) this.getApplications();
-		}
-		this.init = function() {
-			dojo.require("dijit.Menu");
 		}
 	}

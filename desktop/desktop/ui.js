@@ -1,6 +1,11 @@
 dojo.provide("desktop.ui");
 
 desktop.ui = {
+	draw: function() {
+		desktop.ui.domNode = document.createElement("div");
+		dojo.addClass(desktop.ui.domNode, "uiArea");
+		document.body.appendChild(desktop.ui.domNode);
+	},
 	init: function() {
 		//we can't use draw() because we need to fetch the config first
 		var panels = desktop.config.panels;
@@ -14,7 +19,7 @@ desktop.ui = {
 			}
 			var p = new desktop.ui.panel(args);
 			p.fromJson(panel.applets);
-			document.body.appendChild(p.domNode);
+			desktop.ui.domNode.appendChild(p.domNode);
 			p.startup();
 		});
 	},
@@ -37,7 +42,6 @@ desktop.ui = {
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
-dojo.require("dijit._Contained");
 dojo.require("dojo.dnd.move");
 
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {
@@ -56,17 +60,38 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		}
 	},
 	_onRelease: function() {
-		dojo.disconect(this._onOutEvent);
-		dojo.disconect(this._onInEvent);
-		dojo.disconect(this._onDragEvent);
-		dojo.disconect(this._docMouseUpEvent);
+		dojo.disconnect(this._onOutEvent);
+		//dojo.disconnect(this._onInEvent);
+		dojo.disconnect(this._onDragEvent);
+		dojo.disconnect(this._docMouseUpEvent);
 	},
-	_onMove: function() {
-		this._onInEvent = dojo.connect(this.domNode, "onmouseover", this, function() {
-			dojo.disconect(this._onDragEvent);
-		})
+	_onMove: function(e) {
+		/*this._onInEvent = dojo.connect(this.domNode, "onmouseover", this, function() {
+			dojo.disconnect(this._onDragEvent);
+		})*/
 		//get nearest edge, move the panel there if we're not allready, re-orient ourself
 		//also check for any panels allready placed on that edge
+		var viewport = dijit.getViewport();
+		var newPos = "";
+
+		if(e.clientY < viewport.h/3)
+			newPos += "T";
+		else if(e.clientY > (viewport.h/3)*2)
+			newPos += "B";
+		else
+			newPos += "B"; //because C does not work yet
+
+		if(e.clientX < viewport.w/3)
+			newPos += "L";
+		else if(e.clientX > (viewport.w/3)*2)
+			newPos += "R";
+		else
+			newPos += "C";
+
+		if (this.placement != newPos) {
+			this.placement = newPos;
+			this._place();
+		}
 	},
 	_place: function() {
 		var viewport = dijit.getViewport();
@@ -74,7 +99,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		dojo.style(this.domNode, (this.orientation == "horizontal" ? "width" : "height"), this.span);
 		dojo.style(this.domNode, (this.orientation == "vertical" ? "width" : "height"), this.thickness);
 		if(this.placement[1] == "R")
-			s.right = viewport.r + "px";
+			s.left = (viewport.w - this.domNode.offsetHeight) + "px";
 		if(this.placement[1] == "L")
 			s.left = viewport.l + "px";
 		if(this.placement[1] == "C") {
@@ -88,7 +113,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		if(this.placement[0] == "B")
 			s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight + "px";
 		else 
-			s.top = (viewport.t - this.domNode.offsetHeight) + "px";
+			s.top = viewport.t + "px";
 	},
 	_makeVertical: function() {
 		dojo.removeClass(this.domNode, "desktopPanelHorizontal");
@@ -153,11 +178,12 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		}));
 	},
 	startup: function() {
+		dojo.style(this.domNode, "zIndex", 9999*9999);
 		if(dojo.isIE){
 			dojo.connect(this.domNode,'onresize', this,"_place");
 		}
 		dojo.connect(window,'onresize',this,"_place");
-		
+		this._place();
 		dojo.style(this.domNode, "width", this.width);
 		dojo.style(this.domNode, "height", this.height);
 		if(this.orientation == "horizontal") this._makeHorizontal();

@@ -26,7 +26,6 @@ desktop.core = new function()
 				desktop.core.logout(true);
 			});
 			//dojo.connect(document, "onkeydown", desktop.console, desktop.console.toggle);
-			dojo.connect(document, "onmouseup", desktop.menu, desktop.menu.leftclick);
 			if(desktop.config.debug == false)
 			{
 				dojo.connect(window, "onerror", null, function(e)
