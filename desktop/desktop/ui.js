@@ -79,26 +79,34 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			item.unlock();
 		});
 	},
-	sanitize: function() {
+	toJson: function() {
 		var applets = [];
+		var myw = dojo.style(this.domNode, "width"), myh = dojo.style(this.domNode, "height");
 		dojo.forEach(this.getChildren(), function(item) {
+			var left=dojo.style(item.domNode, "left"), top=dojo.style(item.domNode, "top");
+			var side = "start";
+			var half = (this.orientation == "horizontal" ? myw : myh) / 2;
+			var pos = (this.orientation == "horizontal" ? left : top);
+			if(pos > half) {
+				side = "end";
+				pos = (this.orientation == "horizontal" ? dojo.style(item.domNode, "right") : dojo.style(item.domNode, "bottom"));
+			}
 			var applet = {
 				settings: dojo.toJson(item.settings),
-				top: dojo.style(item.domNode, "top"),
-				left: dojo.style(item.domNode, "left"),
+				pos: pos,
+				side: side,
 				declaredClass: item.declaredClass
 			};
 			applets.push(applet);
 		});
 		return dojo.toJson(applets);
 	},
-	unsanitize: function(str) {
-		var applets = dojo.fromJson("applet");
+	fromJson: function(str) {
+		var applets = dojo.fromJson(str);
 		dojo.forEach(applets, dojo.hitch(this, function(applet) {
 			var construct = eval(applet.declaredClass);
 			var a = new construct({settings: applet.settings});
-			dojo.style(a.domNode, "top", applet.top);
-			dojo.style(a.domNode, "left", applet.left);
+			dojo.style(a.domNode, (this.orientation == "horizontal" ? (applet.side == "start" ? "left" : "right") : (applet.side == "start" ? "top" : "bottom")));
 			this.addChild(a);
 		}));
 	},
