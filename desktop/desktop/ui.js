@@ -1,13 +1,14 @@
 dojo.provide("desktop.ui");
 
 desktop.ui = {
-	draw: function() {
+	init: function() {
+		dojo.subscribe("configApply", this, this.makePanels);
+	},
+	makePanels: function() {
 		desktop.ui.domNode = document.createElement("div");
 		dojo.addClass(desktop.ui.domNode, "uiArea");
 		document.body.appendChild(desktop.ui.domNode);
-	},
-	init: function() {
-		//we can't use draw() because we need to fetch the config first
+		
 		var panels = desktop.config.panels;
 		dojo.forEach(panels, function(panel) {
 			var args = {
@@ -56,22 +57,20 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	placement: "BL",
 	_onClick: function() {
 		if(!this.locked) {
-			this._onOutEvent = dojo.connect(this.domNode, "onmouseout", this, function(){
-				this._onDragEvent = dojo.connect(document, "onmousemove", this, "_onMove");
-			});
 			this._docMouseUpEvent = dojo.connect(document, "onmouseup", this, "_onRelease");
+			this._onOutEvent = dojo.connect(this.domNode, "onmouseout", this, function(){
+				dojo.disconnect(this._onOutEvent);
+				this._onDragEvent = dojo.connect(document, "onmousemove", this, "_onMove");
+				this._docMouseUpEvent = dojo.connect(document, "onmouseup", this, "_onRelease");
+			});
 		}
 	},
 	_onRelease: function() {
-		dojo.disconnect(this._onOutEvent);
-		//dojo.disconnect(this._onInEvent);
 		dojo.disconnect(this._onDragEvent);
 		dojo.disconnect(this._docMouseUpEvent);
+		dojo.disconnect(this._onOutEvent); //just to be sure...
 	},
 	_onMove: function(e) {
-		/*this._onInEvent = dojo.connect(this.domNode, "onmouseover", this, function() {
-			dojo.disconnect(this._onDragEvent);
-		})*/
 		//get nearest edge, move the panel there if we're not allready, re-orient ourself
 		//also check for any panels allready placed on that edge
 		var viewport = dijit.getViewport();
