@@ -217,8 +217,7 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 	templateString: "<div class=\"desktopApplet\"><div class=\"desktopAppletHandle\" dojoAttachPoint=\"handleNode\"></div><div class=\"desktopAppletContent\" dojoAttachPoint=\"containerNode\"></div></div>",
 	settings: {},
 	postCreate: function() {
-		this._moveable = new dojo.dnd.move.parentConstrainedMoveable({
-			node: this.domNode,
+		this._moveable = new dojo.dnd.move.parentConstrainedMoveable(this.domNode, {
 			handle: this.handleNode
 		});
 		//TODO: get it so that applets don't overlap eachother
@@ -247,7 +246,7 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 		clearInterval(this._interval);
 		if(this._menubutton) this._menubutton.destroy();
 		if(this._menu) this._menu.destroy();
-		this.inherited("uninitialize",arguments);
+		this.inherited("uninitialize",arguments, this);
 	},
 	_drawButton: function() {
 		dojo.require("dijit.form.Button");
