@@ -45,6 +45,8 @@ desktop.core = new function()
 				if((typeof f) == "number")
 				desktop.app.launch(g[f]);
 			}
+			dojo.require("dojo.dnd.autoscroll");
+			dojo.dnd.autoScroll = function(e) {} //in order to prevent autoscrolling of the window
 		}
 		/** 
 		* Logs the user out

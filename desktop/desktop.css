@@ -282,13 +282,20 @@ height: 100%;
 }
 .desktopAppletHandle {
 	height: 100%;
-	float: left;
+	position: absolute;
+	top: 0px;
+	left: 0px;
 	width: 10px;
 	background-color: #666;
+	display: none;
+}
+.desktopAppletHandleShow {
+	display: block;
 }
 .desktopPanel {
 	position: absolute;
 	background-color: white;
+	overflow: hidden;
 }
 .uiArea {
 	width: 100%;
@@ -296,5 +303,5 @@ height: 100%;
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	z-index: 1000;
+	z-index: 500;
 }

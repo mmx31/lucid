@@ -14,13 +14,14 @@ desktop.ui = {
 			var args = {
 				thickness: panel.thickness,
 				span: panel.span,
-				locked: panel.locked,
 				orientation: panel.orientation,
 				placement: panel.placement,
 				opacity: panel.opacity
 			}
 			var p = new desktop.ui.panel(args);
-			p.fromJson(panel.applets);
+			p.restore(panel.applets);
+			if(panel.locked) p.lock();
+			else p.unlock();
 			desktop.ui.domNode.appendChild(p.domNode);
 			p.startup();
 		});
@@ -36,7 +37,7 @@ desktop.ui = {
 				orientation: wid.orientation,
 				placement: wid.placement,
 				opacity: wid.opacity,
-				applets: wid.toJson()
+				applets: wid.dump()
 			}
 		});
 	}
@@ -166,10 +167,10 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			item.unlock();
 		});
 	},
-	toJson: function() {
+	dump: function() {
 		var applets = [];
 		var myw = dojo.style(this.domNode, "width"), myh = dojo.style(this.domNode, "height");
-		dojo.forEach(this.getChildren(), function(item) {
+		dojo.forEach(this.getChildren(), dojo.hitch(this, function(item) {
 			var left=dojo.style(item.domNode, "left"), top=dojo.style(item.domNode, "top");
 			var side = "start";
 			var half = (this.orientation == "horizontal" ? myw : myh) / 2;
@@ -177,26 +178,33 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			if(pos > half) {
 				side = "end";
 				pos = (this.orientation == "horizontal" ? dojo.style(item.domNode, "right") : dojo.style(item.domNode, "bottom"));
+				if(dojo.isString(pos)) pos=pos.replace("px", "");
 			}
 			var applet = {
-				settings: dojo.toJson(item.settings),
+				settings: item.settings,
 				pos: pos,
 				side: side,
 				declaredClass: item.declaredClass
 			};
 			applets.push(applet);
-		});
-		return dojo.toJson(applets);
+		}));
+		return applets;
 	},
-	fromJson: function(str) {
-		var applets = dojo.fromJson(str);
+	restore: function(applets) {
 		dojo.forEach(applets, dojo.hitch(this, function(applet) {
 			var construct = eval(applet.declaredClass);
 			var a = new construct({settings: applet.settings});
-			dojo.style(a.domNode, (this.orientation == "horizontal" ? (applet.side == "start" ? "left" : "right") : (applet.side == "start" ? "top" : "bottom")));
+			if(this.orientation == "horizontal") {
+				var attr = (applet.side == "start" ? "left" : "right");
+			}
+			else {
+				var attr = (applet.side == "start" ? "top" : "bottom");
+			}
+			dojo.style(a.domNode, attr, applet.pos);
 			if(this.locked) a.lock();
 			else a.unlock();
 			this.addChild(a);
+			a.startup();
 		}));
 	},
 	startup: function() {
@@ -213,26 +221,76 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		else this._makeVertical();
 	}
 });
+
+dojo.declare("desktop.ui._appletMover", dojo.dnd.move.constrainedMoveable, {
+	onMouseUp: function(e) {
+		this._appletOnMouseUp(e);
+		this.inherited("onMouseMove", arguments);
+	}
+})
+
 dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Container, dijit._Contained], {
-	templateString: "<div class=\"desktopApplet\"><div class=\"desktopAppletHandle\" dojoAttachPoint=\"handleNode\"></div><div class=\"desktopAppletContent\" dojoAttachPoint=\"containerNode\"></div></div>",
+	templateString: "<div class=\"desktopApplet\" dojoAttachEvent=\"onmouseover:_mouseover,onmouseout:_mouseout\"><div class=\"desktopAppletHandle\" dojoAttachPoint=\"handleNode\"></div><div class=\"desktopAppletContent\" dojoAttachPoint=\"containerNode\"></div></div>",
 	settings: {},
+	locked: false,
 	postCreate: function() {
-		this._moveable = new dojo.dnd.move.parentConstrainedMoveable(this.domNode, {
-			handle: this.handleNode
+		this._moveable = new desktop.ui._appletMover(this.domNode, {
+			handle: this.handleNode,
+			_appletOnMouseUp: dojo.hitch(this, function(e) {
+				var pos = dojo.style(this.domNode, (this.getParent().orientation == "horizontal" ? "left" : "top"));
+				var barSize = dojo.style(this.getParent().domNode, (this.orientation == "horizontal" ? "width" : "height"));
+				dojo.style(this.domNode, (this.getParent().orientation == "horizontal" ? "right" : "bottom"), barSize - pos);
+			}),
+			constraints: dojo.hitch(this, function() {
+				var c = {};
+				if (this.getParent().orientation == "horizontal") {
+					var c = {
+						t: 0,
+						l: 0,
+						w: dojo.style(this.getParent().domNode, "width") - dojo.style(this.domNode, "width"),
+						h: 0
+					}
+				}
+				else {
+					var c = {
+						t: 0,
+						l: 0,
+						w: 0,
+						h: dojo.style(this.getParent().domNode, "height") - dojo.style(this.domNode, "height")
+					}
+				}
+				return c;
+			})
 		});
 		//TODO: get it so that applets don't overlap eachother
 	},
 	uninitalize: function() {
 		this._moveable.destroy();
 	},
+	_mouseover: function() {
+		if(!this.locked) dojo.addClass(this.handleNode, "desktopAppletHandleShow");
+	},
+	_mouseout: function() {
+		dojo.removeClass(this.handleNode, "desktopAppletHandleShow");
+	},
 	lock: function() {
-		dojo.style(this.handleNode, "display", "none");
+		this.locked=true;
 	},
 	unlock: function() {
-		dojo.style(this.handleNode, "display", "block");
+		this.locked=false;
 	},
 	setOrientation: function(orientation) {
 		//add any special things you need to do in order to change orientation in this function
+	}
+});
+
+dojo.declare("desktop.ui.applets.seperator", desktop.ui.applet, {
+	postCreate: function() {
+		dojo.addClass(this.containerNode, "seperator");
+		dojo.style(this.handleNode, "background", "transparent none");
+		dojo.style(this.handleNode, "zIndex", "100");
+		dojo.style(this.containerNode, "zIndex", "1");
+		this.inherited("postCreate", arguments);
 	}
 });
 
@@ -240,13 +298,13 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 	postCreate: function() {
 		this._getApps();
 		this._interval = setInterval(dojo.hitch(this, this._getApps), 1000*60);
-		this.inherited("postCreate",arguments);
+		this.inherited("postCreate", arguments);
 	},
 	uninitialize: function() {
 		clearInterval(this._interval);
 		if(this._menubutton) this._menubutton.destroy();
 		if(this._menu) this._menu.destroy();
-		this.inherited("uninitialize",arguments, this);
+		this.inherited("uninitialize", arguments);
 	},
 	_drawButton: function() {
 		dojo.require("dijit.form.Button");
