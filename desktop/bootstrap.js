@@ -152,10 +152,11 @@ var bootstrap = {
         bootstrap.require('desktop.config');
         bootstrap.require('desktop.core');
         bootstrap.require('desktop.icon');
-        bootstrap.require('desktop.menu');
+        //bootstrap.require('desktop.menu');
         bootstrap.require('desktop.screensaver');
-        bootstrap.require('desktop.taskbar');
+        //bootstrap.require('desktop.taskbar');
         bootstrap.require('desktop.theme');
+		bootstrap.require('desktop.ui');
         bootstrap.require('desktop.user');
         bootstrap.require('desktop.wallpaper');
         bootstrap.require('desktop.widget');

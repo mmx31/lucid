@@ -15,7 +15,8 @@ desktop.ui = {
 				span: panel.span,
 				locked: panel.locked,
 				orientation: panel.orientation,
-				placement: panel.placement
+				placement: panel.placement,
+				opacity: panel.opacity
 			}
 			var p = new desktop.ui.panel(args);
 			p.fromJson(panel.applets);
@@ -33,6 +34,7 @@ desktop.ui = {
 				locked: wid.locked,
 				orientation: wid.orientation,
 				placement: wid.placement,
+				opacity: wid.opacity,
 				applets: wid.toJson()
 			}
 		});
@@ -47,6 +49,7 @@ dojo.require("dojo.dnd.move");
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {
 	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick\"></div>",
 	span: "100%",
+	opacity: 1,
 	thickness: 24,
 	locked: false,
 	orientation: "horizontal",
@@ -76,10 +79,11 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 
 		if(e.clientY < viewport.h/3)
 			newPos += "T";
-		else if(e.clientY > (viewport.h/3)*2)
+		//else if(e.clientY > (viewport.h/3)*2)
+		else if(e.clientY > (viewport.h/2))
 			newPos += "B";
-		else
-			newPos += "B"; //because C does not work yet
+		//else
+		//	newPos += "B"; //because C does not work yet
 
 		if(e.clientX < viewport.w/3)
 			newPos += "L";
@@ -95,25 +99,42 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	},
 	_place: function() {
 		var viewport = dijit.getViewport();
-		var s = this.domNode.style;
+		var s = {};
 		dojo.style(this.domNode, (this.orientation == "horizontal" ? "width" : "height"), this.span);
 		dojo.style(this.domNode, (this.orientation == "vertical" ? "width" : "height"), this.thickness);
 		if(this.placement[1] == "R")
-			s.left = (viewport.w - this.domNode.offsetHeight) + "px";
+			s.left = (viewport.w - this.domNode.offsetWidth);
 		if(this.placement[1] == "L")
-			s.left = viewport.l + "px";
+			s.left = viewport.l;
 		if(this.placement[1] == "C") {
 			if(this.span != "100%") {
 				var span = dojo.style(this.domNode, (this.orientation == "horizontal" ? "width" : "height"));
 				s[(this.orientation == "horizontal" ? "left" : "top")] = (viewport[(this.orientation == "horizontal" ? "w" : "h")] - span) / 2;
 			}
-			else s[(this.orientation == "horizontal" ? "left" : "top")] = viewport.l + "px";
+			else s[(this.orientation == "horizontal" ? "left" : "top")] = viewport.l;
 		}
 		
 		if(this.placement[0] == "B")
-			s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight + "px";
+			s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight;
 		else 
-			s.top = viewport.t + "px";
+			s.top = viewport.t;
+			
+		if(desktop.config.fx) {
+			var props = {};
+			for(key in s) {
+				props[key] = {end: s[key]};
+			}
+			dojo.animateProperty({
+				node: this.domNode,
+				properties: props,
+				duration: desktop.config.window.animSpeed
+			}).play();
+		}
+		else {
+			for(key in s) {
+				this.domNode.style[key] = s[key]+"px";
+			}
+		}
 	},
 	_makeVertical: function() {
 		dojo.removeClass(this.domNode, "desktopPanelHorizontal");
@@ -179,6 +200,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	},
 	startup: function() {
 		dojo.style(this.domNode, "zIndex", 9999*9999);
+		dojo.style(this.domNode, "opacity", this.opacity);
 		if(dojo.isIE){
 			dojo.connect(this.domNode,'onresize', this,"_place");
 		}

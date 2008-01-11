@@ -4,6 +4,7 @@ class objOutput {
 	var $dooutput = false;
 	function __destruct() {
 		if($this->dooutput) {
+			header("Content-Type: text/plain; charset=utf-8");
 			print_r($output);
 		}
 	}
@@ -38,6 +39,7 @@ class intOutput {
 	);	
 	function __destruct() {
 		if($this->dooutput) {
+			header("Content-Type: text/plain; charset=utf-8");
 			echo $this->output;
 		}
 	}
@@ -59,6 +61,7 @@ class intOutput {
 class jsonOutput extends objOutput {
 	function __destruct() {
 		if($this->dooutput) {
+			header("Content-Type: text/plain; charset=utf-8");
 			if($php_errormsg)
 			{
 				$this->append("sqlerror", $php_errormsg);
@@ -71,6 +74,7 @@ class jsonOutput extends objOutput {
 class textareaOutput extends jsonOutput {
 	function __destruct() {
 		if($this->dooutput) {
+			header("Content-Type: text/html; charset=utf-8");
 			if($php_errormsg)
 			{
 				$this->append("sqlerror", $php_errormsg);
@@ -83,7 +87,7 @@ class textareaOutput extends jsonOutput {
 class xmlOutput extends objOutput{
 	function __destruct() {
 		if($this->dooutput) {
-			header('Content-type: text/xml');
+			header('Content-type: text/xml; charset=utf-8"');
 			if($php_errormsg)
 			{
 				$this->append("sqlerror", $php_errormsg);

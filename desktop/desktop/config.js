@@ -88,7 +88,8 @@ desktop.config = {
 			span: "100%",
 			locked: true,
 			orientation: "horizontal",
-			placement: "BC"
+			placement: "BC",
+			opacity: 0.85
 		}
 	],
 	wallpaper: {
