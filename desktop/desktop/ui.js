@@ -194,6 +194,8 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			var construct = eval(applet.declaredClass);
 			var a = new construct({settings: applet.settings});
 			dojo.style(a.domNode, (this.orientation == "horizontal" ? (applet.side == "start" ? "left" : "right") : (applet.side == "start" ? "top" : "bottom")));
+			if(this.locked) a.lock();
+			else a.unlock();
 			this.addChild(a);
 		}));
 	},
@@ -238,12 +240,14 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 	postCreate: function() {
 		this._getApps();
-		this._interval = setInterval(dojo.hitch(this, this._getApps), 1000*60)
+		this._interval = setInterval(dojo.hitch(this, this._getApps), 1000*60);
+		this.inherited("postCreate",arguments);
 	},
 	uninitialize: function() {
 		clearInterval(this._interval);
 		if(this._menubutton) this._menubutton.destroy();
 		if(this._menu) this._menu.destroy();
+		this.inherited("uninitialize",arguments);
 	},
 	_drawButton: function() {
 		dojo.require("dijit.form.Button");
@@ -258,6 +262,9 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 			showLabel: false,
 			dropDown: this._menu
 		}, div);
+		dojo.addClass(b.domNode, "menuApplet");
+		dojo.style(b.focusNode, "border", "0px");
+		dojo.query(".dijitA11yDownArrow", b.focusNode).style("display", "none");
 		b.domNode.style.height="100%";
 		b.startup();
 		this._menubutton = b;
