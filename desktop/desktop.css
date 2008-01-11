@@ -42,14 +42,14 @@ height: 100%;
 }*/
 #taskbar
 {
-	z-index: 1000;
+	z-index: 100;
 	/*position: absolute;
 	bottom: 0px;
 	left: 0px;*/
 }
 #taskbarhider
 {
-	z-index: 1500;
+	z-index: 150;
 }
 #tasktray
 {
@@ -107,13 +107,13 @@ height: 100%;
 	font-size: 10pt;
 	width: 7em;
 }
-#menubutton {
+#menubutton, .menuApplet {
 	cursor: pointer;
 	background: none;
 	border: none;
 	padding: 0px;
 }
-#menubutton .dijitA11yDownArrow {
+#menubutton .dijitA11yDownArrow, .menuApplet .dijitA11yDownArrow {
 	display: none;
 }
 .hidetaskbar {
@@ -222,7 +222,7 @@ height: 100%;
 }
 
 .win-resize {
-	z-index: 1000000000;
+	z-index: 100;
 	position: absolute;
 }
 
@@ -283,6 +283,7 @@ height: 100%;
 }
 .desktopPanel {
 	position: absolute;
+	background-color: white;
 }
 .uiArea {
 	width: 100%;
@@ -290,5 +291,5 @@ height: 100%;
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	z-index: 1000000000;
+	z-index: 1000;
 }
