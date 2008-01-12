@@ -92,7 +92,8 @@ desktop.config = {
 			opacity: 0.85,
 			applets: [
 				{"settings": {}, "pos": 0, "declaredClass": "desktop.ui.applets.menu"},
-				{"settings": {}, "pos": 0.06, "declaredClass": "desktop.ui.applets.taskbar"}
+				{"settings": {}, "pos": 0.06, "declaredClass": "desktop.ui.applets.taskbar"},
+				{"settings": {}, "pos": 0.96, "declaredClass": "desktop.ui.applets.netmonitor"}
 			]
 		}
 	],
