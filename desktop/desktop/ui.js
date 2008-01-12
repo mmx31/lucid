@@ -336,6 +336,7 @@ dojo.declare("desktop.ui.applets.netmonitor", desktop.ui.applet, {
 			this.removeClasses();
 			dojo.addClass(this.containerNode, "icon-22-status-network-idle");
 		}); 
+		this.inherited("postCreate", arguments);
 	},
 	removeClasses: function() {
 		dojo.removeClass(this.containerNode, "icon-22-status-network-receive");
@@ -346,6 +347,7 @@ dojo.declare("desktop.ui.applets.netmonitor", desktop.ui.applet, {
 	uninitialize: function() {
 		dojo.disconnect(this._xhrStart);
 		dojo.disconnect(this._xhrEnd);
+		this.inherited("uninitialize", arguments);
 	}
 });
 
