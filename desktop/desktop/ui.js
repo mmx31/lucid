@@ -366,6 +366,38 @@ dojo.declare("desktop.ui.applets.netmonitor", desktop.ui.applet, {
 	}
 });
 
+dojo.declare("desktop.ui.applets.clock", desktop.ui.applet, {
+	postCreate: function() {
+		this.clockInterval = setInterval(dojo.hitch(this, function(){
+			var clock_time = new Date();
+			var clock_hours = clock_time.getHours();
+			var clock_minutes = clock_time.getMinutes();
+			var clock_seconds = clock_time.getSeconds();
+			var clock_suffix = "AM";
+			if (clock_hours > 11){
+				clock_suffix = "PM";
+				clock_hours = clock_hours - 12;
+			}
+			if (clock_hours == 0){
+				clock_hours = 12;
+			}
+			if (clock_hours < 10){
+				clock_hours = "0" + clock_hours;
+			}if (clock_minutes < 10){
+				clock_minutes = "0" + clock_minutes;
+			}if (clock_seconds < 10){
+				clock_seconds = "0" + clock_seconds;
+			}
+			this.containerNode.innerHTML = clock_hours + ":" + clock_minutes + ":" + clock_seconds + " " + clock_suffix;
+		}), 1000);
+		this.inherited("postCreate", arguments);
+	},
+	uninitialize: function() {
+		clearInterval(this.clockInterval);
+		this.inherited("uninitialize", arguments);
+	}
+});
+
 dojo.declare("desktop.ui.applets.taskbar", desktop.ui.applet, {
 	fullspan: true,
 	postCreate: function() {
