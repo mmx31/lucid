@@ -447,6 +447,7 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 	postCreate: function() {
 		this._getApps();
 		this._interval = setInterval(dojo.hitch(this, this._getApps), 1000*60);
+		dojo.addClass(this.containerNode, "menuApplet");
 		this.inherited("postCreate", arguments);
 	},
 	uninitialize: function() {

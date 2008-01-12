@@ -89,7 +89,7 @@ desktop.config = {
 			locked: true,
 			orientation: "horizontal",
 			placement: "BC",
-			opacity: 0.85,
+			opacity: 0.95,
 			applets: [
 				{"settings": {}, "pos": 0, "declaredClass": "desktop.ui.applets.menu"},
 				{"settings": {}, "pos": 0.06, "declaredClass": "desktop.ui.applets.taskbar"},
