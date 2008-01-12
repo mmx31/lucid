@@ -3,11 +3,14 @@ dojo.provide("desktop.ui");
 desktop.ui = {
 	draw: function() {
 		desktop.ui._area = new desktop.ui.area();
-		desktop.ui.domNode = desktop.ui._area.domNode;
-		document.body.appendChild(desktop.ui.domNode);
+		desktop.ui.containerNode = desktop.ui._area.containerNode;
+		document.body.appendChild(desktop.ui._area.domNode);
 	},
 	init: function() {
 		dojo.subscribe("configApply", this, this.makePanels);
+		dojo.subscribe("configApply", this, function() {
+			desktop.ui._area.updateWallpaper();
+		});
 	},
 	makePanels: function() {
 		var panels = desktop.config.panels;
@@ -23,7 +26,7 @@ desktop.ui = {
 			if(panel.locked) p.lock();
 			else p.unlock();
 			p.restore(panel.applets);
-			desktop.ui.domNode.appendChild(p.domNode);
+			desktop.ui._area.domNode.appendChild(p.domNode);
 			p.startup();
 		});
 	},
@@ -50,7 +53,19 @@ dojo.require("dijit._Container");
 dojo.require("dojo.dnd.move");
 
 dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Container], {
-	templateString: "<div class=\"uiArea\"><div id=\"windowcontainer\"></div></div>"
+	templateString: "<div class=\"uiArea\"><div dojoAttachPoint=\"containerNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10;\"></div><div dojoAttachPoint=\"wallpaperNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 1;\"></div></div>",
+	postCreate: function() {
+		var filearea = new api.filearea({path: "/Desktop/", textShadow: true, subdirs: false, style: "position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;", overflow: "hidden"});
+		filearea.refresh();
+		dojo.style(filearea.domNode, "zIndex", 1);
+		this.containerNode.appendChild(filearea.domNode);
+	},
+	updateWallpaper: function() {
+		var image = desktop.config.wallpaper.image;
+		var color = desktop.config.wallpaper.color;
+		dojo.style(this.wallpaperNode, "backgroundImage", (image ? "url("+image+")" : "none"));
+		dojo.style(this.wallpaperNode, "backgroundColor", color);
+	}
 });
 
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {

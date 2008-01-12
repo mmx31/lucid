@@ -158,7 +158,7 @@ var bootstrap = {
         bootstrap.require('desktop.theme');
 		bootstrap.require('desktop.ui');
         bootstrap.require('desktop.user');
-        bootstrap.require('desktop.wallpaper');
+        //bootstrap.require('desktop.wallpaper');
         bootstrap.require('desktop.widget');
         //bootstrap.require('desktop.windows');
         bootstrap._indicator.update({

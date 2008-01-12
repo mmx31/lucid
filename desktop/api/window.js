@@ -1,5 +1,6 @@
 dojo.require("dojox.layout.ResizeHandle");
 dojo.require("dojo.dnd.move");
+dojo.require("dijit.layout.ContentPane");
 dojo.require("dojox.fx.easing");
 /*
  * Package: window
@@ -196,7 +197,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 */
 	show: function()
 	{
-			dojo.byId("windowcontainer").appendChild(this.domNode);
+			desktop.ui.containerNode.appendChild(this.domNode);
 			dojo.style(this.domNode, "width", this.width);
 			dojo.style(this.domNode, "height", this.height);
 			this.titleNode.innerHTML = this.title;
