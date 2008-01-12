@@ -1,14 +1,15 @@
 dojo.provide("desktop.ui");
 
 desktop.ui = {
+	draw: function() {
+		desktop.ui._area = new desktop.ui.area();
+		desktop.ui.domNode = desktop.ui._area.domNode;
+		document.body.appendChild(desktop.ui.domNode);
+	},
 	init: function() {
 		dojo.subscribe("configApply", this, this.makePanels);
 	},
 	makePanels: function() {
-		desktop.ui.domNode = document.createElement("div");
-		dojo.addClass(desktop.ui.domNode, "uiArea");
-		document.body.appendChild(desktop.ui.domNode);
-		
 		var panels = desktop.config.panels;
 		dojo.forEach(panels, function(panel) {
 			var args = {
@@ -47,6 +48,10 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
 dojo.require("dojo.dnd.move");
+
+dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Container], {
+	templateString: "<div class=\"uiArea\"><div id=\"windowcontainer\"></div></div>"
+});
 
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {
 	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick\"></div>",
@@ -210,33 +215,34 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	}
 });
 
-dojo.declare("desktop.ui._appletMover", dojo.dnd.move.constrainedMoveable, {
-	onMouseUp: function(e) {
-		this._appletOnMouseUp(e);
-		this.inherited("onMouseMove", arguments);
+dojo.declare("desktop.ui._appletMoveable", dojo.dnd.move.constrainedMoveable, {
+	onMove: function(/* dojo.dnd.Mover */ mover, /* Object */ leftTop){
+		// summary: called during every move notification,
+		//	should actually move the node, can be overwritten.
+		var c = this.constraintBox;
+		leftTop.l = leftTop.l < c.l ? c.l : c.r < leftTop.l ? c.r : leftTop.l;
+		leftTop.t = leftTop.t < c.t ? c.t : c.b < leftTop.t ? c.b : leftTop.t;
+		dojo.marginBox(mover.node, leftTop);
+		this.onMoved(mover, leftTop);
 	}
-})
+});
 
 dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Container, dijit._Contained], {
 	templateString: "<div class=\"desktopApplet\" dojoAttachEvent=\"onmouseover:_mouseover,onmouseout:_mouseout\"><div class=\"desktopAppletHandle\" dojoAttachPoint=\"handleNode\"></div><div class=\"desktopAppletContent\" dojoAttachPoint=\"containerNode\"></div></div>",
 	settings: {},
 	locked: false,
 	pos: 0,
+	fullspan: false,
 	postCreate: function() {
-		this._moveable = new desktop.ui._appletMover(this.domNode, {
+		this._moveable = new desktop.ui._appletMoveable(this.domNode, {
 			handle: this.handleNode,
-			_appletOnMouseUp: dojo.hitch(this, function(e) {
-				var pos = dojo.style(this.domNode, (this.getParent().orientation == "horizontal" ? "left" : "top"));
-				var barSize = dojo.style(this.getParent().domNode, (this.orientation == "horizontal" ? "width" : "height"));
-				dojo.style(this.domNode, (this.getParent().orientation == "horizontal" ? "right" : "bottom"), barSize - pos);
-			}),
 			constraints: dojo.hitch(this, function() {
 				var c = {};
 				if (this.getParent().orientation == "horizontal") {
 					var c = {
 						t: 0,
 						l: 0,
-						w: dojo.style(this.getParent().domNode, "width") - dojo.style(this.domNode, "width"),
+						w: dojo.style(this.getParent().domNode, "width") - (this.fullspan ? 0 : dojo.style(this.domNode, "width")),
 						h: 0
 					}
 				}
@@ -245,11 +251,19 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 						t: 0,
 						l: 0,
 						w: 0,
-						h: dojo.style(this.getParent().domNode, "height") - dojo.style(this.domNode, "height")
+						h: dojo.style(this.getParent().domNode, "height") - (this.fullspan ? 0 : dojo.style(this.domNode, "height"))
 					}
 				}
 				return c;
 			})
+		});
+		this._moveable.onMoved = dojo.hitch(this, function(e, f) {
+			var pos = dojo.style(this.domNode, (this.getParent().orientation == "horizontal" ? "left" : "top"));
+			var barSize = dojo.style(this.getParent().domNode, (this.getParent().orientation == "horizontal" ? "width" : "height"));
+			this.pos = pos/barSize;
+			dojo.forEach(this.getParent().getChildren(), function(item) {
+				item._calcSpan();
+			});
 		});
 		//TODO: get it so that applets don't overlap eachother
 	},
@@ -257,6 +271,22 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 		var size = dojo.style(this.getParent().domNode, this.getParent().orientation == "horizontal" ? "width" : "height");
 		dojo.style(this.domNode, (this.getParent().orientation == "horizontal" ? "left" : "top"), this.pos*size);
 		dojo.style(this.domNode, (this.getParent().orientation != "horizontal" ? "left" : "top"), 0);
+		this._calcSpan(size);
+	},
+	_calcSpan: function(size) {
+		if(this.fullspan) {
+			if(!size) size = dojo.style(this.getParent().domNode, this.getParent().orientation == "horizontal" ? "width" : "height");
+			var nextApplet = size;
+			var children = this.getParent().getChildren();
+			for(a in children) {
+				var child = children[a];
+				if(child.pos > this.pos) {
+					nextApplet = child.pos*size;
+					break;
+				}
+			}
+			dojo.style(this.domNode, this.getParent().orientation == "horizontal" ? "width" : "height", (nextApplet - (this.pos*size)) - 1);
+		}
 	},
 	uninitalize: function() {
 		this._moveable.destroy();
@@ -285,6 +315,51 @@ dojo.declare("desktop.ui.applets.seperator", desktop.ui.applet, {
 		dojo.style(this.handleNode, "zIndex", "100");
 		dojo.style(this.containerNode, "zIndex", "1");
 		this.inherited("postCreate", arguments);
+	}
+});
+
+dojo.declare("desktop.ui.applets.taskbar", desktop.ui.applet, {
+	fullspan: true,
+	postCreate: function() {
+		dojo.addClass(this.containerNode, "desktopTaskbarApplet");
+		this.inherited("postCreate", arguments);
+	}
+});
+
+dojo.declare("desktop.ui.task", null, {
+	templateString: "<div class=\"taskBarItem\" dojoAttachEvent=\"onclick:onClick\">${label}</div>",
+	nodes: [],
+	constructor: function(params) {
+		dojo.mixin(this, params);
+		this._makeNode();
+		dojo.query(".desktopTaskbarApplet").forEach(dojo.hitch(this, function(item) {
+			var div = this.domNode.cloneNode(true);
+			dojo.style(div, "opacity", 0);
+			item.appendChild(div);
+			dojo.connect(div, "onclick", null, this.onClick);
+			dojo.fadeIn({ node: div, duration: 200 }).play();
+			this.nodes.push(div);
+		}));
+	},
+	_makeNode: function() {
+		this.domNode=document.createElement("div");
+		this.domNode.onclick = this.onclick;
+		dojo.addClass(this.domNode, "taskBarItem");
+		if(this.icon) this.domNode.innerHTML = "<img src='"+this.icon+"' />";
+		this.domNode.innerHTML += this.label;
+	},
+	onClick: function() {
+		//hook for onClick event
+	},
+	destroy: function() {
+		dojo.forEach(this.nodes, function(node){
+			var anim = dojo.fadeOut({ node: node, duration: 200 });
+			dojo.connect(anim, "onEnd", null, function() {
+				node.parentNode.removeChild(node);
+				node=null;
+			});
+			anim.play();
+		});
 	}
 });
 

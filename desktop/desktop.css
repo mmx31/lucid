@@ -291,11 +291,16 @@ height: 100%;
 }
 .desktopAppletHandleShow {
 	display: block;
+	cursor: move;
 }
 .desktopPanel {
 	position: absolute;
 	background-color: white;
 	overflow: hidden;
+}
+.desktopAppletContent {
+	width: 100%;
+	height: 100%;
 }
 .uiArea {
 	width: 100%;

@@ -20,7 +20,6 @@ desktop.core = new function()
 		this.init = function()
 		{
 			setTimeout('dijit.byId("desktop_main").resize()', 1000);
-			dojo.connect(window, "onresize", desktop.windows, desktop.windows.desktopResize);
 			this.beforeUnloadEvent = dojo.connect(window, "onbeforeunload", null, function(e)
 			{
 				desktop.core.logout(true);

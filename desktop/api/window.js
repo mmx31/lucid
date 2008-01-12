@@ -200,11 +200,10 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			dojo.style(this.domNode, "width", this.width);
 			dojo.style(this.domNode, "height", this.height);
 			this.titleNode.innerHTML = this.title;
-			this._task = new desktop.taskbar.task({
+			this._task = new desktop.ui.task({
 				label: this.title,
 				icon: this.icon,
-				winid: this.id,
-				onclick: dojo.hitch(this, this._onTaskClick)
+				onClick: dojo.hitch(this, this._onTaskClick)
 			});
 			if(this.maximized == true) this.maximize();
 			dojo.style(this.domNode, "display", "block");
@@ -316,24 +315,10 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			this.left = pos.x;
 			this.top = pos.y;
 			var win = this.domNode;
-			var width = win.style.width.replace(/px/g, "");
-			var height = win.style.height.replace(/px/g, "");
-			var t = width.indexOf("%");
-			var s = height.indexOf("%");
-			width = parseInt(width);
-			height = parseInt(height);
-			if(t != -1){
-				width = width.replace(/%/g, "");
-				width = (parseInt(win.parentNode.style.width.replace(/px/g, ""))/100)*width;
-			}
-			if(s != -1){
-				height = height.replace(/%/g, "");
-				height = (parseInt(win.parentNode.style.height.replace(/px/g, ""))/100)*height;
-			}
-			this._width = width;
-			this._height = height;
-			var pos = dojo.coords("task_"+this.id, true);
-			
+			console.log("test");
+			this._width = dojo.style(win, "width");
+			this._height = dojo.style(win, "height");
+			var pos = dojo.coords(this._task.nodes[0], true);
 			var anim = dojo.animateProperty({
 				node: this.domNode,
 				duration: desktop.config.window.animSpeed,
