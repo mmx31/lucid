@@ -172,6 +172,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				this._resizeBody();
 			});
 		});
+		this.bringToFront();
 	},
 	/*
 	 * Method: setBodyWidget
@@ -495,8 +496,6 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				properties: {
 					top: {end: this.pos.top},
 					left: {end: this.pos.left},
-					//right: {end: this.pos.right},
-					//bottom: {end: this.pos.bottom},
 					width: {end: this.pos.width},
 					height: {end: this.pos.height}
 				},
@@ -546,7 +545,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	bringToFront: function()
 	{
 		var ns = dojo.query("div.win", desktop.ui.containerNode);
-		var maxZindex = 0;
+		var maxZindex = 10;
 		for(i=0;i<ns.length;i++)
 		{
 			if((ns[i].style.display) != "none")
