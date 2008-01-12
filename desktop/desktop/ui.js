@@ -19,9 +19,9 @@ desktop.ui = {
 				opacity: panel.opacity
 			}
 			var p = new desktop.ui.panel(args);
-			p.restore(panel.applets);
 			if(panel.locked) p.lock();
 			else p.unlock();
+			p.restore(panel.applets);
 			desktop.ui.domNode.appendChild(p.domNode);
 			p.startup();
 		});
@@ -135,6 +135,9 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				this.domNode.style[key] = s[key]+"px";
 			}
 		}
+		dojo.forEach(this.getChildren(), function(item) {
+			item.resize();
+		});
 	},
 	_makeVertical: function() {
 		dojo.removeClass(this.domNode, "desktopPanelHorizontal");
@@ -172,18 +175,11 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		var myw = dojo.style(this.domNode, "width"), myh = dojo.style(this.domNode, "height");
 		dojo.forEach(this.getChildren(), dojo.hitch(this, function(item) {
 			var left=dojo.style(item.domNode, "left"), top=dojo.style(item.domNode, "top");
-			var side = "start";
-			var half = (this.orientation == "horizontal" ? myw : myh) / 2;
 			var pos = (this.orientation == "horizontal" ? left : top);
-			if(pos > half) {
-				side = "end";
-				pos = (this.orientation == "horizontal" ? dojo.style(item.domNode, "right") : dojo.style(item.domNode, "bottom"));
-				if(dojo.isString(pos)) pos=pos.replace("px", "");
-			}
+			pos = pos / (this.orientation == "horizontal" ? myw : myh);
 			var applet = {
 				settings: item.settings,
 				pos: pos,
-				side: side,
 				declaredClass: item.declaredClass
 			};
 			applets.push(applet);
@@ -191,16 +187,10 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		return applets;
 	},
 	restore: function(applets) {
+		var size = dojo.style(this.domNode, this.orientation == "horizontal" ? "width" : "height");
 		dojo.forEach(applets, dojo.hitch(this, function(applet) {
 			var construct = eval(applet.declaredClass);
-			var a = new construct({settings: applet.settings});
-			if(this.orientation == "horizontal") {
-				var attr = (applet.side == "start" ? "left" : "right");
-			}
-			else {
-				var attr = (applet.side == "start" ? "top" : "bottom");
-			}
-			dojo.style(a.domNode, attr, applet.pos);
+			var a = new construct({settings: applet.settings, pos: applet.pos});
 			if(this.locked) a.lock();
 			else a.unlock();
 			this.addChild(a);
@@ -215,10 +205,8 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		}
 		dojo.connect(window,'onresize',this,"_place");
 		this._place();
-		dojo.style(this.domNode, "width", this.width);
-		dojo.style(this.domNode, "height", this.height);
-		if(this.orientation == "horizontal") this._makeHorizontal();
-		else this._makeVertical();
+		//if(this.orientation == "horizontal") this._makeHorizontal();
+		//else this._makeVertical();
 	}
 });
 
@@ -233,6 +221,7 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 	templateString: "<div class=\"desktopApplet\" dojoAttachEvent=\"onmouseover:_mouseover,onmouseout:_mouseout\"><div class=\"desktopAppletHandle\" dojoAttachPoint=\"handleNode\"></div><div class=\"desktopAppletContent\" dojoAttachPoint=\"containerNode\"></div></div>",
 	settings: {},
 	locked: false,
+	pos: 0,
 	postCreate: function() {
 		this._moveable = new desktop.ui._appletMover(this.domNode, {
 			handle: this.handleNode,
@@ -263,6 +252,11 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 			})
 		});
 		//TODO: get it so that applets don't overlap eachother
+	},
+	resize: function() {
+		var size = dojo.style(this.getParent().domNode, this.getParent().orientation == "horizontal" ? "width" : "height");
+		dojo.style(this.domNode, (this.getParent().orientation == "horizontal" ? "left" : "top"), this.pos*size);
+		dojo.style(this.domNode, (this.getParent().orientation != "horizontal" ? "left" : "top"), 0);
 	},
 	uninitalize: function() {
 		this._moveable.destroy();
