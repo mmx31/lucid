@@ -154,13 +154,13 @@ var bootstrap = {
         bootstrap.require('desktop.icon');
         bootstrap.require('desktop.menu');
         bootstrap.require('desktop.screensaver');
-        bootstrap.require('desktop.taskbar');
+        //bootstrap.require('desktop.taskbar');
         bootstrap.require('desktop.theme');
-		//bootstrap.require('desktop.ui');
+		bootstrap.require('desktop.ui');
         bootstrap.require('desktop.user');
         bootstrap.require('desktop.wallpaper');
         bootstrap.require('desktop.widget');
-        bootstrap.require('desktop.windows');
+        //bootstrap.require('desktop.windows');
         bootstrap._indicator.update({
             indeterminate: false,
             progress: 0
