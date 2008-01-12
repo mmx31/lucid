@@ -143,6 +143,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		dojo.forEach(this.getChildren(), function(item) {
 			item.resize();
 		});
+		desktop.ui.save();
 	},
 	_makeVertical: function() {
 		dojo.removeClass(this.domNode, "desktopPanelHorizontal");
@@ -264,6 +265,7 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 			dojo.forEach(this.getParent().getChildren(), function(item) {
 				item._calcSpan();
 			});
+			desktop.ui.save();
 		});
 		//TODO: get it so that applets don't overlap eachother
 	},
@@ -315,6 +317,35 @@ dojo.declare("desktop.ui.applets.seperator", desktop.ui.applet, {
 		dojo.style(this.handleNode, "zIndex", "100");
 		dojo.style(this.containerNode, "zIndex", "1");
 		this.inherited("postCreate", arguments);
+	}
+});
+
+dojo.declare("desktop.ui.applets.netmonitor", desktop.ui.applet, {
+	postCreate: function() {
+		dojo.addClass(this.containerNode, "icon-22-status-network-idle");
+		this._xhrStart = dojo.connect(dojo,"_ioSetArgs",this,function(m)
+		{
+			this.removeClasses();
+			var f = Math.random();
+			if(f <= (1/3)) dojo.addClass(this.containerNode, "icon-22-status-network-receive");
+			else if(f <= (2/3)) dojo.addClass(this.containerNode, "icon-22-status-network-transmit");
+			else dojo.addClass(this.containerNode, "icon-22-status-network-transmit-receive");
+		}); 
+		this._xhrEnd = dojo.connect(dojo.Deferred.prototype,"_fire",this,function(m)
+		{
+			this.removeClasses();
+			dojo.addClass(this.containerNode, "icon-22-status-network-idle");
+		}); 
+	},
+	removeClasses: function() {
+		dojo.removeClass(this.containerNode, "icon-22-status-network-receive");
+		dojo.removeClass(this.containerNode, "icon-22-status-network-transmit");
+		dojo.removeClass(this.containerNode, "icon-22-status-network-transmit-receive");
+		dojo.removeClass(this.containerNode, "icon-22-status-network-idle");
+	},
+	uninitialize: function() {
+		dojo.disconnect(this._xhrStart);
+		dojo.disconnect(this._xhrEnd);
 	}
 });
 
