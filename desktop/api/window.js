@@ -232,7 +232,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		}
 		else
 		{
-			var ns = dojo.query("div.win", "windowcontainer");
+			var ns = dojo.query("div.win", desktop.ui.containerNode);
 			var box;
 			var myBox = new Object
 			var overlapping = false;
@@ -545,7 +545,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 */
 	bringToFront: function()
 	{
-		var ns = document.getElementById("windowcontainer").getElementsByTagName("div");
+		var ns = dojo.query("div.win", desktop.ui.containerNode);
 		var maxZindex = 0;
 		for(i=0;i<ns.length;i++)
 		{
