@@ -90,7 +90,10 @@ desktop.config = {
 			orientation: "horizontal",
 			placement: "BC",
 			opacity: 0.85,
-			applets: [{"settings": "{}", "pos": 0, "side": "start", "declaredClass": "desktop.ui.applets.menu"}]
+			applets: [
+				{"settings": {}, "pos": 0, "declaredClass": "desktop.ui.applets.menu"},
+				{"settings": {}, "pos": 0.06, "declaredClass": "desktop.ui.applets.taskbar"}
+			]
 		}
 	],
 	wallpaper: {
