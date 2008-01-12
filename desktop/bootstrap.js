@@ -150,16 +150,12 @@ var bootstrap = {
         bootstrap.require('desktop.app');
         bootstrap.require('desktop.config');
         bootstrap.require('desktop.core');
-        bootstrap.require('desktop.icon');
         bootstrap.require('desktop.menu');
-        bootstrap.require('desktop.screensaver');
-        //bootstrap.require('desktop.taskbar');
+        //bootstrap.require('desktop.screensaver');
         bootstrap.require('desktop.theme');
 		bootstrap.require('desktop.ui');
         bootstrap.require('desktop.user');
-        //bootstrap.require('desktop.wallpaper');
-        bootstrap.require('desktop.widget');
-        //bootstrap.require('desktop.windows');
+        //bootstrap.require('desktop.widget');
         bootstrap._indicator.update({
             indeterminate: false,
             progress: 0
