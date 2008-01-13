@@ -206,6 +206,16 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		}
 		dojo.addClass(this.domNode, "desktopPanel"+sides[this.placement[0]]);
 		
+		var count = 0;
+		//check for other panels in the same slot as us
+		dojo.query(".desktopPanel").forEach(dojo.hitch(this, function(panel) {
+			var panel = dijit.byNode(panel);
+			if(panel.id != this.id && panel.placement == this.placement) {
+				count += panel.thickness;
+			}
+		}));
+		if(this.placement[0] == "L" || this.placement[0] == "T") s[this.orientation == "horizontal" ? "top" : "left"] += count;
+		else s[this.orientation == "horizontal" ? "top" : "left"] -= count;
 		if(desktop.config.fx) {
 			var props = {};
 			for(key in s) {
