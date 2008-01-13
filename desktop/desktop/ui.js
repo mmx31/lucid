@@ -23,6 +23,22 @@ desktop.ui = {
 				opacity: panel.opacity
 			}
 			var p = new desktop.ui.panel(args);
+			if(args.placement[0] == "B") {
+				var viewport = dijit.getViewport();
+				dojo.style(p.domNode, "top", viewport.h + args.thickness);
+			}
+			else if(args.placement[0] == "T") {
+				dojo.style(p.domNode, "top", -(args.thickness))
+			}
+			else {
+				if(args.placement[1] == "R") {
+					var viewport = dijit.getViewport();
+					dojo.style(p.domNode, "left", viewport.w + args.thickness);
+				}
+				else {
+					dojo.style(p.domNode, "left", -(args.thickness));
+				}
+			}
 			if(panel.locked) p.lock();
 			else p.unlock();
 			p.restore(panel.applets);
