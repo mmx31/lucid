@@ -462,12 +462,12 @@ dojo.declare("desktop.ui.task", null, {
 dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 	postCreate: function() {
 		this._getApps();
-		this._interval = setInterval(dojo.hitch(this, this._getApps), 1000*60);
+		//this._interval = setInterval(dojo.hitch(this, this._getApps), 1000*60);
 		dojo.addClass(this.containerNode, "menuApplet");
 		this.inherited("postCreate", arguments);
 	},
 	uninitialize: function() {
-		clearInterval(this._interval);
+		//clearInterval(this._interval);
 		if(this._menubutton) this._menubutton.destroy();
 		if(this._menu) this._menu.destroy();
 		this.inherited("uninitialize", arguments);
