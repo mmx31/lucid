@@ -115,11 +115,10 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 
 		if(e.clientY < viewport.h/3)
 			newPos += "T";
-		//else if(e.clientY > (viewport.h/3)*2)
 		else if(e.clientY > (viewport.h/2))
 			newPos += "B";
-		//else
-		//	newPos += "B"; //because C does not work yet
+		else
+			newPos += "C";
 
 		if(e.clientX < viewport.w/3)
 			newPos += "L";
@@ -138,22 +137,34 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		var s = {};
 		dojo.style(this.domNode, (this.orientation == "horizontal" ? "width" : "height"), this.span);
 		dojo.style(this.domNode, (this.orientation == "vertical" ? "width" : "height"), this.thickness);
-		if(this.placement[1] == "R")
-			s.left = (viewport.w - this.domNode.offsetWidth);
-		if(this.placement[1] == "L")
-			s.left = viewport.l;
-		if(this.placement[1] == "C") {
-			if(this.span != "100%") {
-				var span = dojo.style(this.domNode, (this.orientation == "horizontal" ? "width" : "height"));
-				s[(this.orientation == "horizontal" ? "left" : "top")] = (viewport[(this.orientation == "horizontal" ? "w" : "h")] - span) / 2;
+		if(this.placement[0] != "C") {
+			if(this.placement[1] == "R") 
+				s.left = (viewport.w - this.domNode.offsetWidth);
+			if(this.placement[1] == "L") 
+				s.left = viewport.l;
+			if(this.placement[1] == "C" && (this.placement[0] == "B" || this.placement[0] == "B")) {
+				if(this.span != "100%") {
+					var span = dojo.style(this.domNode, (this.orientation == "horizontal" ? "width" : "height"));
+					s[(this.orientation == "horizontal" ? "left" : "top")] = (viewport[(this.orientation == "horizontal" ? "w" : "h")] - span) / 2;
+				}
+				else 
+					s[(this.orientation == "horizontal" ? "left" : "top")] = viewport.l;
 			}
-			else s[(this.orientation == "horizontal" ? "left" : "top")] = viewport.l;
+			
+			if(this.placement[0] == "B") 
+				s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight;
+			else 
+				if(this.placement[0] == "T") 
+					s.top = viewport.t;
 		}
-		
-		if(this.placement[0] == "B")
-			s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight;
-		else 
-			s.top = viewport.t;
+		else {
+			//we need a completely different layout algorytm :D
+			
+		}
+			
+		dojo.removeClass(this.domNode, "desktopPanelHorizontal");
+		dojo.removeClass(this.domNode, "desktopPanelVertical");
+		dojo.addClass(this.domNode, (this.orientation == "horizontal" ? "desktopPanelHorizontal" : "desktopPanelVertical"));
 			
 		if(desktop.config.fx) {
 			var props = {};
@@ -298,6 +309,7 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 			});
 			desktop.ui.save();
 		});
+		if(this.fullspan) dojo.addClass(this.domNode, "desktopAppletFullspan");
 		//TODO: get it so that applets don't overlap eachother
 	},
 	resize: function() {
@@ -404,7 +416,15 @@ dojo.declare("desktop.ui.applets.clock", desktop.ui.applet, {
 			}if (clock_seconds < 10){
 				clock_seconds = "0" + clock_seconds;
 			}
-			this.containerNode.innerHTML = clock_hours + ":" + clock_minutes + ":" + clock_seconds + " " + clock_suffix;
+			var p = clock_hours + ":" + clock_minutes + ":" + clock_seconds + " " + clock_suffix;
+			if(this.getParent().orientation == "vertical") {
+				var v = "";
+				dojo.forEach(p, function(e) {
+					v += e + "<br />";
+				})
+				p = v;
+			}
+			this.containerNode.innerHTML = p;
 		}), 1000);
 		this.inherited("postCreate", arguments);
 	},
@@ -427,9 +447,9 @@ dojo.declare("desktop.ui.task", null, {
 	nodes: [],
 	constructor: function(params) {
 		dojo.mixin(this, params);
-		this._makeNode();
 		dojo.query(".desktopTaskbarApplet").forEach(dojo.hitch(this, function(item) {
-			var div = this.domNode.cloneNode(true);
+			var p = dijit.byNode(item);
+			var div = this._makeNode(p.getParent().orientation);
 			dojo.style(div, "opacity", 0);
 			item.appendChild(div);
 			dojo.connect(div, "onclick", null, this.onClick);
@@ -437,12 +457,22 @@ dojo.declare("desktop.ui.task", null, {
 			this.nodes.push(div);
 		}));
 	},
-	_makeNode: function() {
-		this.domNode=document.createElement("div");
-		this.domNode.onclick = this.onclick;
-		dojo.addClass(this.domNode, "taskBarItem");
-		if(this.icon) this.domNode.innerHTML = "<img src='"+this.icon+"' />";
-		this.domNode.innerHTML += this.label;
+	_makeNode: function(orientation) {
+		domNode=document.createElement("div");
+		domNode.onclick = this.onclick;
+		dojo.addClass(domNode, "taskBarItem");
+		if(orientation == "horizontal") dojo.addClass(domNode, "taskBarItemHorizontal");
+		else dojo.addClass(domNode, "taskBarItemVertical");
+		if(this.icon) domNode.innerHTML = "<img src='"+this.icon+"' />";
+		var v = this.label;
+		if(orientation == "vertical") {
+			v = "<br />";
+			dojo.forEach(this.label, function(s) {
+				v += s + "<br />";
+			});
+		}
+		domNode.innerHTML += v;
+		return domNode;
 	},
 	onClick: function() {
 		//hook for onClick event
