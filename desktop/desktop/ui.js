@@ -195,7 +195,17 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				s.left = (viewport.w + viewport.l) - this.domNode.offsetWidth;
 			}
 		}
-			
+		var sides = {
+			T: "Top",
+			L: "Left",
+			R: "Right",
+			B: "Bottom"
+		}
+		for(sk in sides) {
+			dojo.removeClass(this.domNode, "desktopPanel"+sides[sk]);
+		}
+		dojo.addClass(this.domNode, "desktopPanel"+sides[this.placement[0]]);
+		
 		if(desktop.config.fx) {
 			var props = {};
 			for(key in s) {
