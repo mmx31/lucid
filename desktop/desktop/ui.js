@@ -121,16 +121,14 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			else newPos = "LT";
 		}
 		else if(e.clientY > (viewport.h/3)*2 && e.clientX < viewport.w/3) {
-			//todo
-			if(e.clientX < (e.clientY-(viewport.t/3)*2))
+			if(e.clientX / (viewport.w/3) > ((viewport.h/3)-(e.clientY-(viewport.h/3)*2)) / (viewport.h/3))
 				newPos = "BL";
 			else
 				newPos = "LB";
 			
 		}
 		else if(e.clientY < viewport.h/3 && e.clientX > (viewport.w/3)*2) {
-			//todo
-			if((viewport.w/3)-(e.clientX-(viewport.l/3)*2) < e.clientY)
+			if(((viewport.w/3)-(e.clientX-(viewport.w/3)*2)) / (viewport.w/3) > e.clientY / (viewport.h/3))
 				newPos = "TR";
 			else
 				newPos = "RT";
@@ -147,16 +145,6 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			else newPos = this.placement;
 		}
 		if (this.placement != newPos) {
-			if(desktop.config.debug == true) {
-				var deb = document.createElement("div");
-				deb.innerHTML = newPos;
-				deb.style.position = "absolute";
-				deb.style.top = e.clientY;
-				deb.style.left = e.clientX;
-				deb.style.backgroundColor = "white";
-				deb.style.zIndex = 999;
-				document.body.appendChild(deb);
-			}
 			this.placement = newPos;
 			this._place();
 		}
