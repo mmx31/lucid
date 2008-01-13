@@ -490,7 +490,7 @@ dojo.declare("desktop.ui.task", null, {
 	constructor: function(params) {
 		dojo.mixin(this, params);
 		dojo.query(".desktopTaskbarApplet").forEach(dojo.hitch(this, function(item) {
-			var p = dijit.byNode(item);
+			var p = dijit.byNode(item.parentNode);
 			var div = this._makeNode(p.getParent().orientation);
 			dojo.style(div, "opacity", 0);
 			item.appendChild(div);
