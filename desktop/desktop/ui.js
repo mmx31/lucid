@@ -117,10 +117,11 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		var newPos;
 
 		if(e.clientY < viewport.h/3 && e.clientX < viewport.w/3) {
-			if(e.clientX > e.clientY) newPos = "TL";
+			if(e.clientX / (viewport.w/3) > e.clientY / (viewport.h/3)) newPos = "TL";
 			else newPos = "LT";
 		}
 		else if(e.clientY > (viewport.h/3)*2 && e.clientX < viewport.w/3) {
+			//todo
 			if(e.clientX < (e.clientY-(viewport.t/3)*2))
 				newPos = "BL";
 			else
@@ -128,13 +129,14 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			
 		}
 		else if(e.clientY < viewport.h/3 && e.clientX > (viewport.w/3)*2) {
+			//todo
 			if((viewport.w/3)-(e.clientX-(viewport.l/3)*2) < e.clientY)
 				newPos = "TR";
 			else
 				newPos = "RT";
 		}
 		else if(e.clientY > (viewport.h/3)*2 && e.clientX > (viewport.w/3)*2) {
-			if(e.clientX > e.clientY) newPos = "RB";
+			if((e.clientX - (viewport.w/3)*2) / (viewport.w/3) > (e.clientY - (viewport.h/3)*2) / (viewport.h/3)) newPos = "RB";
 			else newPos = "BR";
 		}
 		else {
