@@ -15,6 +15,10 @@
 				'dispName' => 'Can develop applications'
 			),
 			array(
+				'name' => 'api.mail',
+				'dispName' => 'Can send/receive mail'
+			),
+			array(
 				'name' => 'core.user.auth.login',
 				'dispName' => 'Can login'
 			)

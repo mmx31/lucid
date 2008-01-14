@@ -35,8 +35,10 @@ class intOutput {
 		"db_connect_err" => 4,
 		"db_select_err" => 5,
 		"db_query_err" => 6,
-		"permission_denied" => 7
-	);	
+		"permission_denied" => 7,
+		"mail_connect_err" => 8,
+		"feature_not_available" => 9
+	);
 	function __destruct() {
 		if($this->dooutput) {
 			header("Content-Type: text/plain; charset=utf-8");
