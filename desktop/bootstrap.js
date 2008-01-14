@@ -31,26 +31,52 @@ dojo.require("dijit.ProgressBar");
 * 		Finally, it looks for an 'init()' method, and calls it.
 * 		If a module does not have an 'init' or 'draw' method, it does not get called.
 */
-var bootstrap = {
-    modules: [],
+bootstrap = {
+    modules: [
+		"api.aflax",
+	    'api.console',
+		"api.crosstalk",
+		"api.registry",
+		"api.filearea",
+		"api.fs",
+		"api.ide",
+		"api.instances",
+		"api.misc",
+		"api.sound",
+		"api.startup",
+		"api.tray",
+		"api.ui",
+		"api.user",
+		"api.window",
+		"api.xsite",
+	    'desktop.admin',
+	    'desktop.app',
+	    'desktop.config',
+	    'desktop.core',
+	    'desktop.menu',
+	    //'desktop.screensaver',
+	    'desktop.theme',
+		'desktop.ui',
+	    //'desktop.widget',
+	    'desktop.user'
+	],
 	loaded: false,
-    require: function(libraryName) {
-        var path = libraryName.split(".").join("/");
-		var base = libraryName.split(".")[0];
-		if(typeof window[base] == "undefined")
-			window[base] = {}; //make the root object
-        dojo.io.script.get({
-            url: "./" + path + ".js",
-            preventCache: false,
-            module: libraryName,
-            checkString: libraryName,
-            canDelete: false,
-            load: bootstrap.check
-
-        });
-        bootstrap.modules.push(libraryName);
-
-    },
+    require: function() {
+		dojo.forEach(bootstrap.modules, function(libraryName) {
+	        var path = libraryName.split(".").join("/");
+			var base = libraryName.split(".")[0];
+			if(typeof window[base] == "undefined")
+				window[base] = {}; //make the root object
+	        dojo.io.script.get({
+	            url: "./" + path + ".js",
+	            preventCache: false,
+	            module: libraryName,
+	            checkString: libraryName,
+	            canDelete: false,
+	            load: dojo.hitch(bootstrap, bootstrap.check)
+	        });
+	    });
+	},
     check: function()
     {
 		if (!bootstrap.loaded) {
@@ -59,12 +85,13 @@ var bootstrap = {
 			for (key in bootstrap.modules) {
 				if (eval('typeof(' + bootstrap.modules[key] + ')') == "undefined") {
 					ready = false;
+					break;
 				}
 				else 
 					modCount++;
 				
 			}
-			if (ready) {
+			if (ready) { alert("ready");
 				bootstrap.loaded = true;
 				bootstrap.startup();
 			}
@@ -81,15 +108,15 @@ var bootstrap = {
     {
 		bootstrap._loading.parentNode.removeChild(bootstrap._loading);
         dojo.forEach(bootstrap.modules, function(module) {
-			if(eval("typeof(" + module + ".draw) == 'function'"))
+			if(dojo.isFunction(eval(module + ".draw")))
 			{
-				eval(module).draw();
+				eval(module+".draw()");
 			}
 		});
 		dojo.forEach(bootstrap.modules, function(module) {
-			if(eval("typeof(" + module + ".init) == 'function'"))
+			if(dojo.isFunction(eval(module + ".init")))
 			{
-				eval(module).init();
+				eval(module+".init()");
 			}
 		});
 	},
@@ -102,11 +129,10 @@ var bootstrap = {
         element.href = file;
         element.id = id;
         document.getElementsByTagName("head")[0].appendChild(element);
-
     },
     load: function() {
         bootstrap._loading = dojo.doc.createElement("div");
-        bootstrap._loading.innerHTML = "Loading...";
+        bootstrap._loading.innerHTML = "Loading..."; 
         var d = dijit.getViewport();
 		var style = {
 			position: "absolute",
@@ -130,32 +156,7 @@ var bootstrap = {
         bootstrap.link("desktop.css", "corestyle");
         bootstrap.link("./dojo/dijit/themes/dijit.css", "dijit");
         bootstrap.link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
-		bootstrap.require("api.aflax");
-        bootstrap.require('api.console');
-		bootstrap.require("api.crosstalk");
-		bootstrap.require("api.registry");
-		bootstrap.require("api.filearea");
-		bootstrap.require("api.fs");
-		bootstrap.require("api.ide");
-		bootstrap.require("api.instances");
-		bootstrap.require("api.misc");
-		bootstrap.require("api.sound");
-		bootstrap.require("api.startup");
-		bootstrap.require("api.tray");
-		bootstrap.require("api.ui");
-		bootstrap.require("api.user");
-		bootstrap.require("api.window");
-		bootstrap.require("api.xsite");
-        bootstrap.require('desktop.admin');
-        bootstrap.require('desktop.app');
-        bootstrap.require('desktop.config');
-        bootstrap.require('desktop.core');
-        bootstrap.require('desktop.menu');
-        //bootstrap.require('desktop.screensaver');
-        bootstrap.require('desktop.theme');
-		bootstrap.require('desktop.ui');
-        bootstrap.require('desktop.user');
-        //bootstrap.require('desktop.widget');
+		bootstrap.require();
         bootstrap._indicator.update({
             indeterminate: false,
             progress: 0
