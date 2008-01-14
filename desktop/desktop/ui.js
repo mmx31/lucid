@@ -511,7 +511,6 @@ dojo.declare("desktop.ui.applets.taskbar", desktop.ui.applet, {
 });
 
 dojo.declare("desktop.ui.task", null, {
-	templateString: "<div class=\"taskBarItem\" dojoAttachEvent=\"onclick:onClick\">${label}</div>",
 	nodes: [],
 	constructor: function(params) {
 		dojo.mixin(this, params);
@@ -524,6 +523,7 @@ dojo.declare("desktop.ui.task", null, {
 			dojo.fadeIn({ node: div, duration: 200 }).play();
 			this.nodes.push(div);
 		}));
+		console.log(this);
 	},
 	_makeNode: function(orientation) {
 		domNode=document.createElement("div");
@@ -641,7 +641,6 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 				}));
 				menu.domNode.style.display="none";
 				menu.startup();
-				dojo.doc.body.appendChild(menu.domNode);
 				this._drawButton();
 			})
 		});

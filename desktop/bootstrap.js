@@ -53,7 +53,6 @@ bootstrap = {
 	    'desktop.app',
 	    'desktop.config',
 	    'desktop.core',
-	    'desktop.menu',
 	    //'desktop.screensaver',
 	    'desktop.theme',
 		'desktop.ui',
