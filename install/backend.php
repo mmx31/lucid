@@ -27,11 +27,9 @@
 	if($act == "installadmin")
 	{
 		import("models.user");
-		echo("{");
-		echo("\"Establishing connection to database...\":");
+		$out = new jsonOutput();
 		$User->truncate();
-		echo("\"...done\",");
-	    echo("\"Writing admin username, password, and e-mail to database...\":");
+		$out->append("Connecting to database...", "...done");
 		$user = new $User();
 		$user->username = $_POST['username'];
 		$user->email = $_POST['email'];
@@ -39,17 +37,14 @@
 		$user->crypt_password();
 		$user->level = "admin";
 		$user->save();
-		echo("\"...done\"");
-		echo("}");
+		$out->append("Writing admin username, password, and e-mail to database...", "...done");
 	}
 	if($act == "installdatabase")
 	{
-		echo("{");
-		echo("\"Parsing form values...\":");
+		$out = new jsonOutput();
 		$db_url = $_POST['db_url'];
 		$db_prefix = $_POST['db_prefix'];
-		echo("\"...done\",");
-		echo("\"Generating encryption hash...\":");
+		$out->append("Parsing form values...", "...done");
 		$characters = 10;
 		$possible = '23456789bcdfghjkmnpqrstvwxyz'; 
 		$code = '';
@@ -59,8 +54,7 @@
 			$i++;
 		}    
 		$conf_secretword = bin2hex( md5($code, TRUE) );
-		echo("\"...done\",");
-		echo("\"Saving new configuration...\":");
+		$out->append("Generating encryption hash...", "...done");
 		$writebuffer  = "<" . "?php\n";
 		$writebuffer .= "\t$" . "GLOBALS['db'] = Array(\n";
 		$writebuffer .= "\t\t\"database\" => \"" . $db_url. "\",\n";
@@ -72,16 +66,14 @@
 		$writebuffer .= "\t);\n";
 		$writebuffer .= "?" . ">";
 		if (is_writable("../backend/configuration.php")) {
-        $handle = fopen("../backend/configuration.php", 'w');
-        fwrite($handle, $writebuffer);
-        fclose($handle);
-		echo("\"...done\",");
-		//echo("}");
+	        $handle = fopen("../backend/configuration.php", 'w');
+	        fwrite($handle, $writebuffer);
+	        fclose($handle);
+			$out->append("Saving new configuration...", "...done");
 		}
 		else {
-		echo("\"...fail\"");
-		echo("}");
-		die();
+			$out->append("Saving new configuration...", "...fail");
+			die();
 		}
 		$dir = opendir("../backend/models");
 		while(($file = readdir($dir)) !== false){
@@ -94,20 +86,17 @@
 			$class = new $class(array(), true);
 			$class->_create_table();
 		}
-		echo "'creating database tables...': '...done'}";
+		$out->append("Creating database tables...", "...done");
 	}
 	if($act == "installprograms")
 	{
-		//TODO: this should use the models!
-		echo("{");
-		import("models.app");	
-		echo("\"Establishing connection to database...\":");
+		$out = new jsonOutput();
+		import("models.app");
 		$App->truncate();
-		echo("\"...done\",");
-		echo("\"Initalizing application installer...\":");
+		$out->append("Establishing connection to database...", "...done");
 		require("../backend/lib.xml.php");
 		$xml = new Xml; 
-		echo("\"...done\"");
+		$out->append("Initalizing application installer...", "...done");
 		$dir = opendir("./apps/");
 		while(($file = readdir($dir)) !== false){
 			if($file{0} == '.'){
@@ -116,23 +105,21 @@
 			else {
 			if(is_dir("./apps/" . $file)){
 				if(!file_exists("./apps/" . $file . "/appmeta.xml")) { continue; }
-				echo(",");
-				$out = $xml->parse('./apps/'.$file.'/appmeta.xml', 'FILE');
+				$in = $xml->parse('./apps/'.$file.'/appmeta.xml', 'FILE');
 				$app = new $App();
-				$app->name = $out[name];
-				$app->author = $out[author];
-				$app->email = $out[email];
-				$app->version = $out[version];
-				$app->maturity = $out[maturity];
-				$app->category = $out[category];
-				$installfile = $out[installFile];
-				$message = $out[installMessage];
-				$message2 = $out[installedMessage];
+				$app->name = $in[name];
+				$app->author = $in[author];
+				$app->email = $in[email];
+				$app->version = $in[version];
+				$app->maturity = $in[maturity];
+				$app->category = $in[category];
+				$installfile = $in[installFile];
+				$message = $in[installMessage];
+				$message2 = $in[installedMessage];
 				/* no optional files required for the core apps
-				$fr = $out[filesRequired];
-				$frt = $out[filesCopyTo];
-				$frf = $out[filesCopyFrom]; */
-				echo("\"".$message."\":");
+				$fr = $in[filesRequired];
+				$frt = $in[filesCopyTo];
+				$frf = $in[filesCopyFrom]; */
 				$templine = '';
 				$file2 = fopen("./apps/$file/$installfile", "r");
 				while(!feof($file2)) {
@@ -141,11 +128,10 @@
 				fclose ($file2); 
 				$app->code = $templine;
 				$app->save();
-				echo("\"" . $message2 . "\"");
+				$out->append($message, $message2);
 				}
 			}
 		}
-		echo("}");
 	}
 			
 	if($act == "checkpermissions")
@@ -169,16 +155,13 @@
 			$a++;
 		}
 		$x = count($dir);
-		echo "{";
-		$list = array();
+		$out = new jsonOutput();
 		for($i=0;$i<=$x;$i++)
 		{
 			$p = $dirs[$i];
 			$d = $ok[$i];
-			array_push($list,"\"" . $p . "\":" . "\"" . $d . "\"");
+			$out->append($p, $d);
 		}
-		echo join(",\n", $list);
-		echo "}";
 	}
 	if($act == "listApps")
 	{
