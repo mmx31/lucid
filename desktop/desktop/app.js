@@ -133,7 +133,7 @@ desktop.app = new function()
 							this.instances[instance].status = "error";
 						}
 						else {
-					            api.ui.alertDialog({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: "+e+"<br><br><br>You can help by copying this and posting it to the Psych Desktop forums."});
+					            api.ui.alertDialog({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: <textarea>"+dojo.toJson(e)+"</textarea><br>You can help by copying this and posting it to the Psych Desktop forums."});
 						}
 					}
 					console.error(e);
