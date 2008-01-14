@@ -91,7 +91,7 @@ bootstrap = {
 					modCount++;
 				
 			}
-			if (ready) { alert("ready");
+			if (ready) {
 				bootstrap.loaded = true;
 				bootstrap.startup();
 			}
