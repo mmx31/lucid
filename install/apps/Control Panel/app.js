@@ -163,14 +163,13 @@ this.processSave = function() {
 	var crosstalkPing=dijit.byId("crosstalkPing"+this.instance).getValue();
 	desktop.theme.set(theme);
 	dojo.byId("currentTheme"+this.instance).innerHTML = theme;
-	desktop.wallpaper.set(image);
-	desktop.wallpaper.setColor(color);
 	desktop.config.debug = debug;
 	desktop.config.crosstalkPing = parseInt(crosstalkPing);
 	desktop.config.wallpaper.image = image;
 	desktop.config.wallpaper.color = color;
 	desktop.config.fx = fx;
 	desktop.config.save();
+	desktop.config.apply();
 	api.ui.alertDialog({title: "Notice", message: "Changes were applied successfully."});
 	api.user.getUserName(dojo.hitch(this, this.processUserName));
 	api.user.getUserID(dojo.hitch(this, this.processUserID));
