@@ -210,8 +210,10 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		//check for other panels in the same slot as us
 		dojo.query(".desktopPanel").forEach(dojo.hitch(this, function(panel) {
 			var panel = dijit.byNode(panel);
-			if(panel.id != this.id && panel.placement == this.placement) {
-				count += panel.thickness;
+			if(panel.id != this.id) {
+				if(this.placement[0] == panel.placement[0] && (panel.span=="100%" || this.span=="100%")) count += panel.thickness;
+				else if(panel.placement == this.placement)
+					count += panel.thickness;
 			}
 		}));
 		if(this.placement[0] == "L" || this.placement[0] == "T") s[this.orientation == "horizontal" ? "top" : "left"] += count;
