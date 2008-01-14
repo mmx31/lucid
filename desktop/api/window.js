@@ -166,8 +166,8 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			this.killResizer();
 		}
 		dojo.addClass(this.resize.domNode, "win-resize");
-		dojo.connect(this.resize.domNode, "onmousedown", this, function(e){
-			this._resizeEnd = dojo.connect(document, "onmouseup", this, function(e){
+		this.connect(this.resize.domNode, "onmousedown", this, function(e){
+			this._resizeEnd = this.connect(document, "onmouseup", this, function(e){
 				dojo.disconnect(this._resizeEnd);
 				this._resizeBody();
 			});
@@ -216,7 +216,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 					node: this.domNode,
 					duration: desktop.config.window.animSpeed
 				});
-				dojo.connect(anim, "onEnd", this, function() {
+				this.connect(anim, "onEnd", this, function() {
 					if (desktop.config.fx == 1) dojo.style(this.body.domNode, "display", "block");
 					this._resizeBody();
 				});
@@ -333,7 +333,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				},
 				easing: dojox.fx.easing.easeIn
 			});
-			dojo.connect(anim, "onEnd", this, function() {
+			this.connect(anim, "onEnd", this, function() {
 				dojo.style(this.domNode, "display", "none");
 			});
 			anim.play();
@@ -367,7 +367,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				},
 				easing: dojox.fx.easing.easeOut
 			});
-			dojo.connect(anim, "onEnd", this, function() {
+			this.connect(anim, "onEnd", this, function() {
 				dojo.style(this.body.domNode, "display", "block");
 				this._resizeBody();
 			});
@@ -408,7 +408,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				},
 				duration: desktop.config.window.animSpeed
 			});
-			dojo.connect(anim, "onEnd", this, function() {
+			this.connect(anim, "onEnd", this, function() {
 				dojo.style(this.body.domNode, "display", "block");
 				this._hideBorders();
 				this._resizeBody();
@@ -466,10 +466,10 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				handle: this.handle
 			});
 		}
-		this._dragStartListener = dojo.connect(this._drag, "onMoveStart", dojo.hitch(this, function(mover){
+		this._dragStartListener = this.connect(this._drag, "onMoveStart", dojo.hitch(this, function(mover){
 			dojo.style(this.body.domNode, "display", "none");
 		}));
-		this._dragStopListener = dojo.connect(this._drag, "onMoveStop", dojo.hitch(this, function(mover){
+		this._dragStopListener = this.connect(this._drag, "onMoveStop", dojo.hitch(this, function(mover){
 			dojo.style(this.body.domNode, "display", "block");
 			this._resizeBody();
 		}));
@@ -501,7 +501,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				},
 				duration: desktop.config.window.animSpeed
 			});
-			dojo.connect(anim, "onEnd", this, function(e) {
+			this.connect(anim, "onEnd", this, function(e) {
 				dojo.style(this.body.domNode, "display", "block");
 				this._resizeBody();
 			});
@@ -590,7 +590,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 					node: this.domNode,
 					duration: desktop.config.window.animSpeed
 				});
-				dojo.connect(anim, "onEnd", this, function(){
+				this.connect(anim, "onEnd", this, function(){
 					this.domNode.parentNode.removeChild(this.domNode);
 					this.destroy();
 				});
