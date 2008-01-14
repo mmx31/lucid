@@ -511,10 +511,12 @@ dojo.declare("desktop.ui.applets.taskbar", desktop.ui.applet, {
 });
 
 dojo.declare("desktop.ui.task", null, {
-	nodes: [],
 	constructor: function(params) {
-		dojo.mixin(this, params);
-		dojo.query(".desktopTaskbarApplet").forEach(dojo.hitch(this, function(item) {
+		this.icon = params.icon;
+		this.nodes = [];
+		this.label = params.label;
+		this.onClick = params.onClick;
+		dojo.query(".desktopTaskbarApplet").forEach(function(item) {
 			var p = dijit.byNode(item.parentNode);
 			var div = this._makeNode(p.getParent().orientation);
 			dojo.style(div, "opacity", 0);
@@ -522,12 +524,11 @@ dojo.declare("desktop.ui.task", null, {
 			dojo.connect(div, "onclick", null, this.onClick);
 			dojo.fadeIn({ node: div, duration: 200 }).play();
 			this.nodes.push(div);
-		}));
-		console.log(this);
+		}, this);
+		console.debug(this);
 	},
 	_makeNode: function(orientation) {
 		domNode=document.createElement("div");
-		domNode.onclick = this.onclick;
 		dojo.addClass(domNode, "taskBarItem");
 		if(orientation == "horizontal") dojo.addClass(domNode, "taskBarItemHorizontal");
 		else dojo.addClass(domNode, "taskBarItemVertical");
