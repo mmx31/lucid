@@ -23,22 +23,6 @@ desktop.ui = {
 				opacity: panel.opacity
 			}
 			var p = new desktop.ui.panel(args);
-			if(args.placement[0] == "B") {
-				var viewport = dijit.getViewport();
-				dojo.style(p.domNode, "top", viewport.h + args.thickness);
-			}
-			else if(args.placement[0] == "T") {
-				dojo.style(p.domNode, "top", -(args.thickness))
-			}
-			else {
-				if(args.placement[1] == "R") {
-					var viewport = dijit.getViewport();
-					dojo.style(p.domNode, "left", viewport.w + args.thickness);
-				}
-				else {
-					dojo.style(p.domNode, "left", -(args.thickness));
-				}
-			}
 			if(panel.locked) p.lock();
 			else p.unlock();
 			p.restore(panel.applets);
@@ -159,9 +143,8 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			if(this.placement[1] == "L") 
 				s.left = viewport.l;
 			if(this.placement[1] == "C") {
-				if(this.span != "100%") {
-					var span = dojo.style(this.domNode, "width");
-					s.left = (viewport.w - span) / 2;
+				if(this.span != 1) {
+					s.left = (viewport.w - (this.span*viewport.w)) / 2;
 				}
 				else 
 					s.left = viewport.l;
@@ -177,7 +160,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			//we need a completely different layout algorytm :D
 			this._makeVertical();
 			if(this.placement[1] == "C") {
-				if(this.span != "100%") {
+				if(this.span != 1) {
 					var span = dojo.style(this.domNode, "height");
 					s.top = (viewport.h - span)/2;
 				}
@@ -211,7 +194,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		dojo.query(".desktopPanel").forEach(dojo.hitch(this, function(panel) {
 			var panel = dijit.byNode(panel);
 			if(panel.id != this.id) {
-				if(this.placement[0] == panel.placement[0] && (panel.span=="100%" || this.span=="100%")) count += panel.thickness;
+				if(this.placement[0] == panel.placement[0] && (panel.span==1 || this.span==1)) count += panel.thickness;
 				else if(panel.placement == this.placement)
 					count += panel.thickness;
 			}
@@ -240,7 +223,8 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		desktop.ui.save();
 	},
 	resize: function() {
-		dojo.style(this.domNode, (this.orientation == "horizontal" ? "width" : "height"), this.span);
+		var viewport = dijit.getViewport();
+		dojo.style(this.domNode, (this.orientation == "horizontal" ? "width" : "height"), this.span*viewport[(this.orientation == "horizontal" ? "w" : "h")]);
 		dojo.style(this.domNode, (this.orientation == "vertical" ? "width" : "height"), this.thickness);
 		dojo.forEach(this.getChildren(), function(item) {
 			item.resize();
@@ -298,6 +282,38 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		}));
 	},
 	startup: function() {
+		if(desktop.config.fx) {
+			//TODO: add to viewport when there are other panels around!
+			var viewport = dijit.getViewport();
+			if(this.placement[0] == "B") {
+				dojo.style(this.domNode, "top", viewport.h + this.thickness);
+			}
+			else if(this.placement[0] == "T") {
+				dojo.style(this.domNode, "top", -(this.thickness))
+			}
+			else if(this.placement[0] == "R") {
+				dojo.style(this.domNode, "left", viewport.w + this.thickness);
+			}
+			else {
+				dojo.style(this.domNode, "left", -(this.thickness));
+			}
+			
+			if(this.placement[1] == "T") {
+				dojo.style(this.domNode, "top", "0px");
+			} else if(this.placement[1] == "B") {
+				dojo.style(this.domNode, "top", (viewport.h - this.domNode.offsetHeight)+"px");
+			} else if(this.placement[1] == "L") {
+				dojo.style(this.domNode, "left", "0px");
+			} else if(this.placement[1] == "R") {
+				dojo.style(this.domNode, "left", (viewport.w - this.domNode.offsetWidth)+"px");
+			}
+			else {
+				if(this.orientation == "horizontal")
+					dojo.style(this.domNode, "left", (( viewport.w - (viewport.w*this.span))/2)+"px");
+				else
+					dojo.style(this.domNode, "top", ((viewport.h - (this.span*viewport.h)) / 2)+"px");
+			}
+		}
 		dojo.style(this.domNode, "zIndex", 9999*9999);
 		dojo.style(this.domNode, "opacity", this.opacity);
 		if(dojo.isIE){

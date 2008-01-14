@@ -85,7 +85,7 @@ desktop.config = {
 	panels: [
 		{
 			thickness: 24,
-			span: "100%",
+			span: 1,
 			locked: true,
 			orientation: "horizontal",
 			placement: "BC",
