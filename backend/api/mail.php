@@ -25,7 +25,7 @@
 		if($protocol == 'IMAP') import('lib.mail.imap');
 		else import('lib.mail.pop3');
 		$con = iil_Connect($_POST['host'], $_POST['username'], $_POST['password']);
-		if($con === false) internal_error("mail_connect_err");
+		if($con === false) internal_error("mail_connect_err", $iil_error);
 		
 		
 		if($_GET['action'] == "listMailboxes") {
