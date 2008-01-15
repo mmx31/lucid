@@ -78,7 +78,7 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 });
 
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {
-	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick\"></div>",
+	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick, oncontextmenu:_onRightClick\"></div>",
 	span: "100%",
 	opacity: 1,
 	thickness: 24,
@@ -97,6 +97,21 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				this._docMouseUpEvent = dojo.connect(document, "onmouseup", this, "_onRelease");
 			});
 		}
+	},
+	_onRightClick: function(e) {
+		this.menu = new dijit.Menu({});
+		if(this.locked) {
+			this.menu.addChild(new dijit.MenuItem({label: "Unlock the Panel", onClick: dojo.hitch(this, this.unlock)}));
+		}
+		else {
+			this.menu.addChild(new dijit.MenuItem({label: "Lock the Panel", onClick: dojo.hitch(this, this.lock)}));
+		}
+		this.onRightClick(this.locked);
+		this.menu._contextMouse();
+		this.menu._openMyself(e);
+	},
+	onRightClick: function(lock) {
+		//This is a hook for third party panels to add stuff to the right click menu of the panel
 	},
 	_onRelease: function() {
 		dojo.disconnect(this._onDragEvent);
