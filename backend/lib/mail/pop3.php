@@ -23,8 +23,8 @@
 
 ********************************************************/
 
-include_once('../include/fs_path.inc');
-include_once('../include/icl_commons.inc');
+import('lib.mail.fs_path');
+import('lib.mail.icl_commons');
 
 $iil_error;
 $iil_errornum;

@@ -26,7 +26,7 @@
 
 ********************************************************/
 
-include_once("../include/icl_commons.inc");
+import("lib.mail.icl_commons");
 
 
 if (!$IMAP_USE_HEADER_DATE) $IMAP_USE_INTERNAL_DATE = true;

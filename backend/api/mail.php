@@ -18,12 +18,12 @@
 	*/
 	require("../lib/includes.php");
 	import("models.user");
-	$u = $User->getCurrent();
+	$u = $User->get_current();
 	if(!$u->has_permission("api.mail")) internal_error("permission_denied");
 	if($_GET['section'] == "in") {
 		$protocol = $POST['protocol'];
-		if($protocol == 'IMAP') import('lib.imap');
-		else import('lib.pop3');
+		if($protocol == 'IMAP') import('lib.mail.imap');
+		else import('lib.mail.pop3');
 		$con = iil_Connect($_POST['host'], $_POST['username'], $_POST['password']);
 		if($con === false) internal_error("mail_connect_err");
 		
@@ -54,6 +54,6 @@
 		ill_Close($con);
 	}
 	if($_GET['section'] == "out") {
-		import("lib.stmp");
+		import("lib.mail.stmp");
 	}
 ?>
