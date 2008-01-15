@@ -14,13 +14,15 @@ desktop.ui = {
 	},
         drawn: false,
 	makePanels: function() {
-                if(this.drawn) return;
-                this.drawn = true;
-		//dojo.query(".desktopPanel").forEach(function(panel) {
-		//	var p = dijit.byNode(panel);
-		//	p.destroy();
-		//}, this);
-		var panels = desktop.config.panels;
+                if(this.drawn) {
+		        dojo.query(".desktopPanel").forEach(function(panel) {
+			       var p = dijit.byNode(panel);
+			       p._place();
+		        }, this);
+                        return;
+                }
+	        this.drawn = true;
+                var panels = desktop.config.panels;
 		dojo.forEach(panels, function(panel) {
 			var args = {
 				thickness: panel.thickness,
