@@ -3,7 +3,10 @@ session_start();
 if($_GET['section'] == "io")
 {
 	$_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop "l33t" hax.
-	$username = $_SESSION['username'];
+	require("../lib/includes.php");
+	import("models.user");
+	$user = $User->get_current();
+	$username = $user->username;
 	if ($_GET['action'] == "createDirectory") {
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$username."/$odir";
@@ -84,6 +87,8 @@ if($_GET['section'] == "io")
 					echo "0";
 	}
 	if($_GET['action'] == "upload") {
+		$user = $User->get_current();
+		if($user->has_permission("api.fs.upload")) { die("<textarea>{status: 'failed', details: 'Contact administrator; Your account lacks uploading permissions. '}</textarea>"); }
 		if(!isset($_SESSION['userid'])) {
 			die("<textarea>{status: 'failed', details: 'Session is dead.'}</textarea>");
 		}
@@ -106,7 +111,27 @@ if($_GET['section'] == "io")
 			die("<textarea>{status: 'failed', details: 'File not uploaded'}</textarea>");
 		}
 	}
+	if($_GET['action'] == "downloadFolder") {
+		$user = $User->get_current();
+		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
+		require("../lib.zip.php");
+		$newzip = new dZip('folder.zip');
+		$newzip->addDir("../../files/" . $username . "/" . $_GET['path']);
+		$newzip->save();
+		$name = basename('folder.zip');
+		$type = mime_content_type('folder.zip');
+		$size = filesize('folder.zip');
+		header("Content-type: $type");
+		header("Content-Disposition: attachment;filename=\"$name\"");
+		header('Pragma: no-cache');
+		header('Expires: 0');
+		header("Content-length: $size");
+		readfile('folder.zip');
+		unlink('folder.zip');
+	}
 	if($_GET['action'] == "download") {
+			$user = $User->get_current();
+		if($user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
 		$f = "../../files/" . $username . "/" . $_GET['path'];
 		if(file_exists($f))
 		{

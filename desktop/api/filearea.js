@@ -288,6 +288,9 @@ dojo.declare(
 			if(!this.isDir) this.menu.addChild(new dijit.MenuItem({label: "Download", iconClass: "icon-16-actions-document-save-as", onClick: dojo.hitch(this, function(e) {
 				api.fs.download(this.path);
 			})}));
+			if(this.isDir) this.menu.addChild(new dijit.MenuItem({label: "Download as ZIP", iconClass: "icon-16-actions-document-save-as", onClick: dojo.hitch(this, function(e) {
+				api.fs.downloadFolder(this.path);
+			})}));
 		this.menu.addChild(new dijit.MenuSeparator({}));
 	       	this.menu.addChild(new dijit.MenuItem({label: "Move", iconClass: "icon-16-actions-edit-find-replace", onClick: dojo.hitch(this, this._replace_file)}));
 		this.menu.addChild(new dijit.MenuItem({label: "Rename", iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, this._rename_file)}));

@@ -15,6 +15,14 @@
 				'dispName' => 'Can develop applications'
 			),
 			array(
+				'name' => 'api.fs.download',
+				'dispName' => 'Can download files'
+			),
+			array(
+				'name' => 'api.fs.upload',
+				'dispName' => 'Can upload files'
+			),
+			array(
 				'name' => 'api.mail',
 				'dispName' => 'Can send/receive mail'
 			),
