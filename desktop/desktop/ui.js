@@ -12,11 +12,14 @@ desktop.ui = {
 			desktop.ui._area.updateWallpaper();
 		});
 	},
+        drawn: false,
 	makePanels: function() {
-		dojo.query(".desktopPanel").forEach(function(panel) {
-			var p = dijit.byNode(panel);
-			p.destroy();
-		}, this);
+                if(this.drawn) return;
+                this.drawn = true;
+		//dojo.query(".desktopPanel").forEach(function(panel) {
+		//	var p = dijit.byNode(panel);
+		//	p.destroy();
+		//}, this);
 		var panels = desktop.config.panels;
 		dojo.forEach(panels, function(panel) {
 			var args = {
