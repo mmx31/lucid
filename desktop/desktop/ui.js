@@ -13,6 +13,10 @@ desktop.ui = {
 		});
 	},
 	makePanels: function() {
+		dojo.query(".desktopPanel").forEach(function(panel) {
+			var p = dijit.byNode(panel);
+			p.destroy();
+		}, this);
 		var panels = desktop.config.panels;
 		dojo.forEach(panels, function(panel) {
 			var args = {
