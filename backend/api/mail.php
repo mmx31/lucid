@@ -26,6 +26,7 @@
 		else import('lib.mail.pop3');
 		$con = iil_Connect($_POST['host'], $_POST['username'], $_POST['password']);
 		if($con === false) internal_error("mail_connect_err", $iil_error);
+		$con->rootdir = "/";
 		
 		
 		if($_GET['action'] == "listMailboxes") {
