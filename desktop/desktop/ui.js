@@ -554,7 +554,6 @@ dojo.declare("desktop.ui.task", null, {
 			dojo.fadeIn({ node: div, duration: 200 }).play();
 			this.nodes.push(div);
 		}, this);
-		console.debug(this);
 	},
 	_makeNode: function(orientation) {
 		domNode=document.createElement("div");
