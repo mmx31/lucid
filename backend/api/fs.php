@@ -129,6 +129,24 @@ if($_GET['section'] == "io")
 		readfile('folder.zip');
 		unlink('folder.zip');
 	}
+	if($_GET['action'] == "compressDownload") {
+		$user = $User->get_current();
+		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
+		require("../lib.zip.php");
+		$newzip = new dZip('compressed.zip');
+		$newzip->addFile("../../files/" . $username . "/" . $_GET['path'], $_GET['path']);
+		$newzip->save();
+		$name = basename('compressed.zip');
+		$type = mime_content_type('compressed.zip');
+		$size = filesize('compressed.zip');
+		header("Content-type: $type");
+		header("Content-Disposition: attachment;filename=\"$name\"");
+		header('Pragma: no-cache');
+		header('Expires: 0');
+		header("Content-length: $size");
+		readfile('compressed.zip');
+		unlink('compressed.zip');
+	}
 	if($_GET['action'] == "download") {
 			$user = $User->get_current();
 		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }

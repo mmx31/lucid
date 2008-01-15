@@ -288,6 +288,9 @@ dojo.declare(
 			if(!this.isDir) this.menu.addChild(new dijit.MenuItem({label: "Download", iconClass: "icon-16-actions-document-save-as", onClick: dojo.hitch(this, function(e) {
 				api.fs.download(this.path);
 			})}));
+			if(!this.isDir) this.menu.addChild(new dijit.MenuItem({label: "Download as ZIP", iconClass: "icon-16-actions-document-save-as", onClick: dojo.hitch(this, function(e) {
+				api.fs.compressDownload(this.path);
+			})}));
 			if(this.isDir) this.menu.addChild(new dijit.MenuItem({label: "Download as ZIP", iconClass: "icon-16-actions-document-save-as", onClick: dojo.hitch(this, function(e) {
 				api.fs.downloadFolder(this.path);
 			})}));

@@ -215,6 +215,11 @@ api.fs = new function()
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	}
+	this.compressDownload = function(path) {
+		var url = desktop.core.backend("api.fs.io.compressDownload") + "&path=" + path;
+		var frame = dojo.io.iframe.create("fs_downloadframe", "");
+		dojo.io.iframe.setSrc(frame, url, true);
+	}
 	this.embed = function(path) {
 		return desktop.core.backend("api.fs.io.display") + "&path=" + path;
 	}
