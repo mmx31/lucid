@@ -21,7 +21,7 @@
 	$u = $User->get_current();
 	if(!$u->has_permission("api.mail")) internal_error("permission_denied");
 	if($_GET['section'] == "in") {
-		$protocol = $POST['protocol'];
+		$protocol = $_POST['protocol'];
 		if($protocol == "IMAP") import('lib.mail.imap');
 		else import('lib.mail.pop3');
 		$con = iil_Connect($_POST['host'], $_POST['username'], $_POST['password']);

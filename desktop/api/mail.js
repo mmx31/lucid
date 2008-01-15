@@ -3,6 +3,7 @@ dojo.provide("api.mail");
 dojo.declare("api.mail", null, {
 	constructor: function(params) {
 		if(!params) params = {};
+		if(!params.rootdir) params.rootdir = "/";
 		dojo.forEach(["host", "username", "password", "protocol", "rootdir"], function(item) {
 			this[item] = params[item] || "";
 		}, this);
@@ -11,7 +12,7 @@ dojo.declare("api.mail", null, {
 		dojo.xhrPost({
 			url: desktop.core.backend("api.mail.in.listMailboxes"),
 			content: this._getArgs(),
-			handleAs: "JSON",
+			handleAs: "json",
 			load: callback
 		});
 	},
