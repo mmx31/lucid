@@ -9,7 +9,7 @@ dojo.declare("api.mail", null, {
 	},
 	listMailboxes: function(callback) {
 		dojo.xhrPost({
-			url: desktop.backend("api.mail.in.listMailboxes"),
+			url: desktop.core.backend("api.mail.in.listMailboxes"),
 			content: this._getArgs(),
 			handleAs: "JSON",
 			load: callback
@@ -25,7 +25,7 @@ dojo.declare("api.mail", null, {
 	folder: {
 		create: function(name, callback) {
 			dojo.xhrPost({
-				url: desktop.backend("api.mail.in.createFolder"),
+				url: desktop.core.backend("api.mail.in.createFolder"),
 				content: this._getArgs({
 					folder: name
 				}),
@@ -36,7 +36,7 @@ dojo.declare("api.mail", null, {
 		},
 		remove: function(name) {
 			dojo.xhrPost({
-				url: desktop.backend("api.mail.in.deleteFolder"),
+				url: desktop.core.backend("api.mail.in.deleteFolder"),
 				content: this._getArgs({
 					folder: name
 				}),
@@ -47,7 +47,7 @@ dojo.declare("api.mail", null, {
 		},
 		rename: function(from, to, callback) {
 			dojo.xhrPost({
-				url: desktop.backend("api.mail.in.renameFolder"),
+				url: desktop.core.backend("api.mail.in.renameFolder"),
 				content: this._getArgs({
 					from: from,
 					to: to
