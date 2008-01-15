@@ -88,7 +88,7 @@ if($_GET['section'] == "io")
 	}
 	if($_GET['action'] == "upload") {
 		$user = $User->get_current();
-		if($user->has_permission("api.fs.upload")) { die("<textarea>{status: 'failed', details: 'Contact administrator; Your account lacks uploading permissions. '}</textarea>"); }
+		if(!$user->has_permission("api.fs.upload")) { die("<textarea>{status: 'failed', details: 'Contact administrator; Your account lacks uploading permissions. '}</textarea>"); }
 		if(!isset($_SESSION['userid'])) {
 			die("<textarea>{status: 'failed', details: 'Session is dead.'}</textarea>");
 		}
@@ -131,7 +131,7 @@ if($_GET['section'] == "io")
 	}
 	if($_GET['action'] == "download") {
 			$user = $User->get_current();
-		if($user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
+		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
 		$f = "../../files/" . $username . "/" . $_GET['path'];
 		if(file_exists($f))
 		{
