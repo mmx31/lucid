@@ -20,6 +20,7 @@ if (get_magic_quotes_gpc())
 //util functions
 function internal_error($type, $msg)
 {
+	header('FirePHP-Data: {"msg":"' . addslashes($msg) . '"}');
 	$p = new intOutput();
 	$p->set($type);
 	error_log($msg);
