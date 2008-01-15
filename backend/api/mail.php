@@ -32,6 +32,21 @@
 			$p = new jsonOutput();
 			$p->set(iil_C_ListMailboxes($con, $_POST['rootdir'] ? $_POST['rootdir'] : "/", "*"));
 		}
+		if($_GET['action'] == "listSubscribed") {
+			$p = new jsonOutput();
+			$p->set(iil_C_ListSubscribed($con, $_POST['rootdir'] ? $_POST['rootdir'] : "/", "*"));
+		}
+		if($_GET['action'] == "getQuota") {
+			$p = new jsonOutput();
+			$p->set(iil_C_GetQuota($con));
+		}
+		if($_GET['action'] == "countMessages") {
+			$p = new jsonOutput();
+			$mailboxes = iil_C_ListMailboxes($con, $_POST['rootdir'] ? $_POST['rootdir'] : "/", "*");
+			foreach($mailboxes as $mailbox) {
+				$p->append($mailbox, iil_C_CountMessages($con, $mailbox));
+			}
+		}
 		if($_GET['action'] == "createFolder") {
 			if($protocol != "IMAP") internal_error("feature_not_available");
 			iil_C_CreateFolder($con, $_POST['folder']);
