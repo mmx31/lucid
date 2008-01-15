@@ -285,15 +285,20 @@ dojo.declare(
 	startup: function() {
 		this.menu = new dijit.Menu({});
 	       	this.menu.addChild(new dijit.MenuItem({label: "Open", iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
-			if(!this.isDir) this.menu.addChild(new dijit.MenuItem({label: "Download", iconClass: "icon-16-actions-document-save-as", onClick: dojo.hitch(this, function(e) {
+			menuDl = new dijit.PopupMenuItem({iconClass: "icon-16-actions-document-open", label: "Download"});
+			this.menu2 = new dijit.Menu({parentMenu: menuDl});
+			if(!this.isDir) this.menu2.addChild(new dijit.MenuItem({label: "as file", onClick: dojo.hitch(this, function(e) {
 				api.fs.download(this.path);
 			})}));
-			if(!this.isDir) this.menu.addChild(new dijit.MenuItem({label: "Download as ZIP", iconClass: "icon-16-actions-document-save-as", onClick: dojo.hitch(this, function(e) {
+			if(!this.isDir) this.menu2.addChild(new dijit.MenuItem({label: "as ZIP",onClick: dojo.hitch(this, function(e) {
 				api.fs.compressDownload(this.path);
 			})}));
-			if(this.isDir) this.menu.addChild(new dijit.MenuItem({label: "Download as ZIP", iconClass: "icon-16-actions-document-save-as", onClick: dojo.hitch(this, function(e) {
+			if(this.isDir) this.menu2.addChild(new dijit.MenuItem({label: "as ZIP", onClick: dojo.hitch(this, function(e) {
 				api.fs.downloadFolder(this.path);
 			})}));
+			this.menu2.startup();
+			menuDl.popup = this.menu2;
+			this.menu.addChild(menuDl);
 		this.menu.addChild(new dijit.MenuSeparator({}));
 	       	this.menu.addChild(new dijit.MenuItem({label: "Move", iconClass: "icon-16-actions-edit-find-replace", onClick: dojo.hitch(this, this._replace_file)}));
 		this.menu.addChild(new dijit.MenuItem({label: "Rename", iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, this._rename_file)}));
