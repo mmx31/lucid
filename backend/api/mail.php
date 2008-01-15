@@ -30,7 +30,7 @@
 		
 		if($_GET['action'] == "listMailboxes") {
 			$p = new jsonOutput();
-			$p->set(iil_C_ListMailboxes($con, $_POST['rootdir'] ? $_POST['rootdir'] : "/"));
+			$p->set(iil_C_ListMailboxes($con, $_POST['rootdir'] ? $_POST['rootdir'] : "/", "*"));
 		}
 		if($_GET['action'] == "createFolder") {
 			if($protocol != "IMAP") internal_error("feature_not_available");
@@ -51,7 +51,7 @@
 			$p->set("ok");
 		}
 		
-		ill_Close($con);
+		iil_Close($con);
 	}
 	if($_GET['section'] == "out") {
 		import("lib.mail.stmp");
