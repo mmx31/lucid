@@ -3,8 +3,8 @@ dojo.provide("api.mail");
 dojo.declare("api.mail", null, {
 	constructor: function(params) {
 		if(!params) params = {};
-		dojo.forEach(["host", "username", "password", "protocol"], function(item) {
-			this[item] = params[item];
+		dojo.forEach(["host", "username", "password", "protocol", "rootdir"], function(item) {
+			this[item] = params[item] || "";
 		}, this);
 	},
 	listMailboxes: function(callback) {
@@ -17,7 +17,7 @@ dojo.declare("api.mail", null, {
 	},
 	_getArgs: function(obj) {
 		if(!obj) obj = {};
-		dojo.forEach(["host", "username", "password", "protocol"], function(item) {
+		dojo.forEach(["host", "username", "password", "protocol", "rootdir"], function(item) {
 			obj[item] = this[item];
 		}, this);
 		return obj;
@@ -59,7 +59,7 @@ dojo.declare("api.mail", null, {
 		}
 	},
 	destroy: function() {
-		dojo.forEach(["host", "username", "password", "protocol"], function(item) {
+		dojo.forEach(["host", "username", "password", "protocol", "rootdir"], function(item) {
 			this[item] = null;
 		}, this);
 		//to protect the user's information

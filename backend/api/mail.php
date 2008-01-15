@@ -22,16 +22,15 @@
 	if(!$u->has_permission("api.mail")) internal_error("permission_denied");
 	if($_GET['section'] == "in") {
 		$protocol = $POST['protocol'];
-		if($protocol == 'IMAP') import('lib.mail.imap');
+		if($protocol == "IMAP") import('lib.mail.imap');
 		else import('lib.mail.pop3');
 		$con = iil_Connect($_POST['host'], $_POST['username'], $_POST['password']);
 		if($con === false) internal_error("mail_connect_err", $iil_error);
-		$con->rootdir = "/";
 		
 		
 		if($_GET['action'] == "listMailboxes") {
 			$p = new jsonOutput();
-			$p->set(iil_C_ListMailboxes($con));
+			$p->set(iil_C_ListMailboxes($con, $_POST['rootdir'] ? $_POST['rootdir'] : "/"));
 		}
 		if($_GET['action'] == "createFolder") {
 			if($protocol != "IMAP") internal_error("feature_not_available");
