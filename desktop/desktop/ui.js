@@ -137,6 +137,11 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			this._place();
 		}
 	},
+	uninitialize: function() {
+		dojo.forEach(this.getChildren(), function(item) {
+			item.destroy();
+		});
+	},
 	_place: function() {
 		var viewport = dijit.getViewport();
 		var s = {};
