@@ -41,6 +41,7 @@ bootstrap = {
 		"api.fs",
 		"api.ide",
 		"api.instances",
+		"api.mail",
 		"api.misc",
 		"api.sound",
 		"api.startup",
