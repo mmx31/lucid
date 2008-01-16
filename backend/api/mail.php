@@ -44,7 +44,8 @@
 			$p = new jsonOutput();
 			$mailboxes = iil_C_ListMailboxes($con, $_POST['rootdir'] ? $_POST['rootdir'] : "/", "*");
 			foreach($mailboxes as $mailbox) {
-				$p->append($mailbox, iil_C_CountMessages($con, $mailbox));
+				if($_POST['flag'] == "UNSEEN") $p->append($mailbox, iil_C_CountUnseen($con, $mailbox));
+				else $p->append($mailbox, iil_C_CountMessages($con, $mailbox));
 			}
 		}
 		if($_GET['action'] == "createFolder") {
