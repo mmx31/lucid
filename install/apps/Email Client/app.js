@@ -42,18 +42,28 @@ this.init = function(args) {
 	this.win.startup();
 	api.instances.setActive(this.instance);
 }
+this.updateUI=function() {
+	//TODO: here we would update the grid
+}
+this.folders = [];
 this.refresh = function() {
 	this.mail.countMessages("UNSEEN", dojo.hitch(this, function(f) {
 		for(key in f) {
-			this.store.fetchItemByIdentity({identity: key, scope: this, onItem: function(item) {
-				var label = key+(f[key] > 0 ? " ("+f[key]+")" : "");
-				if(item === null) {
-					this.store.newItem({name: key, disp: label});
+			if(!this.folders[key] || this.folders[key] < f[key]) {
+				this.updateUI();
+				for(k in f) {
+					this.store.fetchItemByIdentity({identity: k, scope: this, onItem: function(item) {
+						var label = key+(f[k] > 0 ? " ("+f[k]+")" : "");
+						if(item === null) {
+							this.store.newItem({name: k, disp: label});
+						}
+						else {
+							this.store.setValue(item, "disp", label);
+						}
+					}});
 				}
-				else {
-					this.store.setValue(item, "disp", label);
-				}
-			}});
+				break;
+			}
 		}
 	}));
 }
