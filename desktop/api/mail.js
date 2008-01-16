@@ -23,41 +23,57 @@ dojo.declare("api.mail", null, {
 		}, this);
 		return obj;
 	},
-	folder: {
-		create: function(name, callback) {
-			dojo.xhrPost({
-				url: desktop.core.backend("api.mail.in.createFolder"),
-				content: this._getArgs({
-					folder: name
-				}),
-				load: function(data) {
-					callback(data == "0");
-				}
-			});
-		},
-		remove: function(name) {
-			dojo.xhrPost({
-				url: desktop.core.backend("api.mail.in.deleteFolder"),
-				content: this._getArgs({
-					folder: name
-				}),
-				load: function(data) {
-					callback(data == "0");
-				}
-			});
-		},
-		rename: function(from, to, callback) {
-			dojo.xhrPost({
-				url: desktop.core.backend("api.mail.in.renameFolder"),
-				content: this._getArgs({
-					from: from,
-					to: to
-				}),
-				load: function(data) {
-					callback(data == "0");
-				}
-			});
-		}
+	getQuota: function(callback) {
+		dojo.xhrPost({
+			url: desktop.core.backend("api.mail.in.getQuota"),
+			content: this._getArgs(),
+			handleAs: "json",
+			load: callback
+		});
+	},
+	countMessages: function(mode, callback) {
+		dojo.xhrPost({
+			url: desktop.core.backend("api.mail.in.countMessages"),
+			content: this._getArgs({
+				mode: mode || "ALL"
+			}),
+			handleAs: "json",
+			load: callback
+		});
+	},
+	createFolder: function(name, callback) {
+		dojo.xhrPost({
+			url: desktop.core.backend("api.mail.in.createFolder"),
+			content: this._getArgs({
+				folder: name
+			}),
+			load: function(data) {
+				callback(data == "0");
+			}
+		});
+	},
+	deleteFolder: function(name) {
+		dojo.xhrPost({
+			url: desktop.core.backend("api.mail.in.deleteFolder"),
+			content: this._getArgs({
+				folder: name
+			}),
+			load: function(data) {
+				callback(data == "0");
+			}
+		});
+	},
+	renameFolder: function(from, to, callback) {
+		dojo.xhrPost({
+			url: desktop.core.backend("api.mail.in.renameFolder"),
+			content: this._getArgs({
+				from: from,
+				to: to
+			}),
+			load: function(data) {
+				callback(data == "0");
+			}
+		});
 	},
 	destroy: function() {
 		dojo.forEach(["host", "username", "password", "protocol", "rootdir"], function(item) {
