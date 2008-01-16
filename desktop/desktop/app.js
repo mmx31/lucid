@@ -54,7 +54,7 @@ desktop.app = new function()
 			dojo.xhrPost({
 			    url: desktop.core.backend("core.app.fetch.full"),
 				content: {
-					id: appID
+					id: parseInt(appID)
 				},
 			    load: dojo.hitch(this, function(data, ioArgs)
 				{
