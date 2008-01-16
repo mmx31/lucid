@@ -122,9 +122,24 @@ var desktop = {
 						dijit.byId(desktop.formid).domNode.submit.disabled=false;
 						}
 					}
-					else
+					else if(data == "1")
 					{
 						dojo.byId("desktop_formerror").innerHTML = "Incorrect username or password.";
+						dijit.byId(desktop.formid).domNode.submit.disabled=false;
+					}
+					else if(data == "4" || data == "5" || data == "6")
+					{
+						dojo.byId("desktop_formerror").innerHTML = "A database error occured. Contact the Administrator.";
+						dijit.byId(desktop.formid).domNode.submit.disabled=false;
+					}
+					else if(data == "7")
+					{
+						dojo.byId("desktop_formerror").innerHTML = "You do not have permission to login. Contact the Administrator.";
+						dijit.byId(desktop.formid).domNode.submit.disabled=false;
+					}
+					else
+					{
+						dojo.byId("desktop_formerror").innerHTML = "Unknown Error occured. Check your installation.";
 						dijit.byId(desktop.formid).domNode.submit.disabled=false;
 					}
 				}
