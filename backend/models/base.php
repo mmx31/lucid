@@ -8,14 +8,22 @@
 		{
 			//map this to the parent model
 			$p = $this->_make_parent();
-			return call_user_func_array(array($p, $method), $arguments);
+			$r = call_user_func_array(array($p, $method), $arguments);
+			foreach($p as $key => $value) {
+				$this->$key = $value;
+			}
 		}
 		function __get($var) {
-			$parent = new $this->_parentModel;
+			$parent = new $this->_parentModel(array(), true);
 			$type = $parent->$var['type'];
 			if($type == "foreignkey") {
 				$p = $this->_make_parent();
 				return $p->get($this->$var);
+			}
+			elseif($type == "array") {
+				if(!is_array($this->$var)) $val = json_decode($this->$var);
+				if(is_array($val)) return $val;
+				else return array();
 			}
 			else {
 				return $this->$var;
@@ -57,15 +65,16 @@
 		var $_result = false;
 		var $_link;
 		var $_modified = false;
+		var $_schema = false;
 		function __construct($values=array(), $preserveSchema=false) {
 			if(!$preserveSchema) {
 				foreach($this as $key => $value) {
 					if($key{0} != "_") $this->$key = ($this->$key['type'] == "array" ? array() : null);
 				}
-			}
-			foreach($values as $key => $value) {
-					$this->$key = $value;
-			}
+				foreach($values as $key => $value) {
+						$this->$key = $value;
+				}
+			} else $this->_schema = true;
 		}
 		
 		function _connect() {
@@ -120,6 +129,9 @@
 					$class = new $class();
 					return $class->get($this->$var);
 				}
+				elseif($type == "array") {
+					if(!is_array($this->$var)) return json_decode($this->$var);
+				}
 				elseif(isset($this->$var)) {
 					return $this->$var;
 				}
@@ -152,6 +164,7 @@
 					}
 					else {
 						if($info['type'] == "array") {
+							if(is_null($value)) $value = array();
 							$value = json_encode($value);
 						}
 						
@@ -263,7 +276,7 @@
 			$parent = new $me(array(), true);
 			foreach ($line as $key => $value)
 			{
-				if($parent->$key['type'] == "array") {
+				if($parent->$key["type"] == "array") {
 					$value = json_decode($value);
 				}
 				$p->$key = $value;

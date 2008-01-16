@@ -118,6 +118,7 @@
 			$this->permissions[$perm] = false;
 		}
 		function has_permission($perm) {
+			//var_dump($this->permissions);
 			if(!isset($this->permissions[$perm])) {
 				return true;
 			}
