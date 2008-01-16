@@ -8,13 +8,20 @@ this.init = function(args) {
 	dojo.require("dojox.grid.Grid");
 	dojo.require("dojo.data.ItemFileWriteStore");
 	api.addDojoCss("dojox/grid/_grid/Grid.css");
-	
-	this.store = new dojo.data.ItemFileWriteStore({data: {
+	//I made this fake account to test it with...
+	this.prefs = new api.registry({appid: this.id, name: "accounts", data: {
+				identifier: 'id',
+	            label: 'label',
+	            items: [
+					{id: 0, label: "Test AOL account", host: "imap.aim.com", protocol: "IMAP", username: "rtemingbalm@aol.com", password: "rickyman"}
+				]
+	        }
+	});
+	this.treeStore = new dojo.data.ItemFileWriteStore({data: {
 		identifier: "name",
 		label: "disp",
 		items: []
 	}});
-	this.mail = new api.mail({host: "imap.aim.com", protocol: "IMAP", username: "rtemingbalm@aol.com", password: "rickyman"}); //I made this fake account to test it with...
 	this.win = new api.window({
 		title: "Email Clent",
 		bodyWidget: "LayoutContainer",
@@ -28,7 +35,7 @@ this.init = function(args) {
 	}, this);
 	this.win.addChild(this.toolbar);
 	var split = new dijit.layout.SplitContainer({orientation: "horizontal", layoutAlign: "client"});
-	var tree = new dijit.Tree({store: this.store});
+	var tree = new dijit.Tree({store: this.treeStore});
 	split.addChild(tree);
 	var main = new dijit.layout.SplitContainer({orientation: "vertical"});
 	this.grid = new dojox.Grid();
@@ -42,23 +49,32 @@ this.init = function(args) {
 	this.win.startup();
 	api.instances.setActive(this.instance);
 }
+this.mail = [];
+this.makeMailClasses = function() {
+	this.prefs.fetch({
+		onComplete: dojo.hitch(this, function(items) {
+			this.mail.push(new api.mail()); //TODO: add account info to class
+		})
+	});
+}
 this.updateUI=function() {
 	//TODO: here we would update the grid
 }
 this.folders = [];
 this.refresh = function() {
+	this.prefs
 	this.mail.countMessages("UNSEEN", dojo.hitch(this, function(f) {
 		for(key in f) {
 			if(!this.folders[key] || this.folders[key] < f[key]) {
 				this.updateUI();
 				for(k in f) {
-					this.store.fetchItemByIdentity({identity: k, scope: this, onItem: function(item) {
+					this.treeStore.fetchItemByIdentity({identity: k, scope: this, onItem: function(item) {
 						var label = key+(f[k] > 0 ? " ("+f[k]+")" : "");
 						if(item === null) {
-							this.store.newItem({name: k, disp: label});
+							this.treeStore.newItem({name: k, disp: label});
 						}
 						else {
-							this.store.setValue(item, "disp", label);
+							this.treeStore.setValue(item, "disp", label);
 						}
 					}});
 				}
@@ -69,7 +85,7 @@ this.refresh = function() {
 }
 this.kill = function() {
 	if(!this.win.closed) this.win.close();
-	this.store.close();
+	this.treeStore.close();
 	this.mail.destroy();
 	api.instances.setKilled(this.instance);
 }
