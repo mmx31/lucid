@@ -43,14 +43,19 @@ this.init = function(args) {
 	api.instances.setActive(this.instance);
 }
 this.refresh = function() {
-	this.store.fetch({query:{name:"*"}, onComplete: dojo.hitch(this, function(data) {
-		dojo.forEach(data, function(item) { console.log(item); if(this.store.isItem(item)) this.store.deleteItem(item); console.log(item); }, this);
-		this.mail.countMessages("UNSEEN", dojo.hitch(this, function(data) {
-			for(key in data) {
-				this.store.newItem({name: key, disp: key+(data[key] > 0 ? " ("+data[key]+")" : "")});
-			}
-		}));
-	})});
+	this.mail.countMessages("UNSEEN", dojo.hitch(this, function(f) {
+		for(key in f) {
+			this.store.fetchItemByIdentity({identity: key, scope: this, onItem: function(item) {
+				var label = key+(f[key] > 0 ? " ("+f[key]+")" : "");
+				if(item === null) {
+					this.store.newItem({name: key, disp: label});
+				}
+				else {
+					this.store.setValue(item, "disp", label);
+				}
+			}});
+		}
+	}));
 }
 this.kill = function() {
 	if(!this.win.closed) this.win.close();
