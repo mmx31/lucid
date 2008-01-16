@@ -12,6 +12,7 @@
 			foreach($p as $key => $value) {
 				$this->$key = $value;
 			}
+			return $r;
 		}
 		function __get($var) {
 			$parent = new $this->_parentModel(array(), true);
@@ -21,7 +22,7 @@
 				return $p->get($this->$var);
 			}
 			elseif($type == "array") {
-				if(!is_array($this->$var)) $val = json_decode($this->$var);
+				if(!is_array($this->$var)) $val = json_decode($this->$var, true);
 				if(is_array($val)) return $val;
 				else return array();
 			}
@@ -130,7 +131,7 @@
 					return $class->get($this->$var);
 				}
 				elseif($type == "array") {
-					if(!is_array($this->$var)) return json_decode($this->$var);
+					if(!is_array($this->$var)) return json_decode($this->$var, true);
 				}
 				elseif(isset($this->$var)) {
 					return $this->$var;
@@ -275,9 +276,9 @@
 			$me = get_class($this);
 			$parent = new $me(array(), true);
 			foreach ($line as $key => $value)
-			{
-				if($parent->$key["type"] == "array") {
-					$value = json_decode($value);
+			{ $dec = $parent->$key;
+				if($dec["type"] == "array") {
+					$value = json_decode($value, true);
 				}
 				$p->$key = $value;
 			}

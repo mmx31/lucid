@@ -118,8 +118,7 @@
 			$this->permissions[$perm] = false;
 		}
 		function has_permission($perm) {
-			//var_dump($this->permissions);
-			if(!isset($this->permissions[$perm])) {
+			if(!isset($this->permissions[$perm]) || is_null($this->permissions[$perm])) {
 				return true;
 			}
 			return $this->permissions[$perm];
