@@ -60,7 +60,7 @@
 		function __construct($values=array(), $preserveSchema=false) {
 			if(!$preserveSchema) {
 				foreach($this as $key => $value) {
-					if($key{0} != "_") $this->$key = null;
+					if($key{0} != "_") $this->$key = ($this->$key['type'] == "array" ? array() : null);
 				}
 			}
 			foreach($values as $key => $value) {
@@ -136,7 +136,7 @@
 			else { $sql = "INSERT INTO ${table} SET "; }
 			$arr = array();
 			$me = get_class($this);
-			$parent = new $me;
+			$parent = new $me(array(), true);
 			foreach($this as $key => $value)
 			{
 				if($key{0} != "_" && $key != "id")
