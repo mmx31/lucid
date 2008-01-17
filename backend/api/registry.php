@@ -10,7 +10,7 @@
 			$result = $Registry->filter(array("userid" => $p->id, "appid" => $_POST['appid'], "name" => $_POST['name']));
 			if(!isset($result[0])) { $u = new $Registry(); $u->userid = $p->id; $u->name=$_POST['name']; $u->appid = $_POST['appid']; }
 			else { $u = $result[0]; }
-			$u->value = stripslashes($_POST['value']);
+			$u->value = $_POST['value'];
 			$u->save();
 			echo "0";
 		}
@@ -25,10 +25,6 @@
 			}
 			else
 			{
-				if (get_magic_quotes_gpc())
-				{
-					$_GET['data'] = stripslashes($_GET['data']);
-				}
 				echo $_GET['data'];
 			}
 		}

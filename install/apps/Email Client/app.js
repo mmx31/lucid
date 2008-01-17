@@ -53,7 +53,15 @@ this.mail = [];
 this.makeMailClasses = function() {
 	this.prefs.fetch({
 		onComplete: dojo.hitch(this, function(items) {
-			this.mail.push(new api.mail()); //TODO: add account info to class
+			dojo.forEach(items, function(item) {
+				this.mail.push(new api.mail({
+					host: this.prefs.getValue(item, "host"),
+					username: this.prefs.getValue(item, "username"),
+					password: this.prefs.getValue(item, "password"),
+					protocol: this.prefs.getValue(item, "protocol")
+				}));
+			}, this);
+			this.refresh();
 		})
 	});
 }
@@ -62,30 +70,31 @@ this.updateUI=function() {
 }
 this.folders = [];
 this.refresh = function() {
-	this.prefs
-	this.mail.countMessages("UNSEEN", dojo.hitch(this, function(f) {
-		for(key in f) {
-			if(!this.folders[key] || this.folders[key] < f[key]) {
-				this.updateUI();
-				for(k in f) {
-					this.treeStore.fetchItemByIdentity({identity: k, scope: this, onItem: function(item) {
-						var label = key+(f[k] > 0 ? " ("+f[k]+")" : "");
-						if(item === null) {
-							this.treeStore.newItem({name: k, disp: label});
-						}
-						else {
-							this.treeStore.setValue(item, "disp", label);
-						}
-					}});
+	dojo.forEach(this.mail, function(mail) {
+		mail.countMessages("UNSEEN", dojo.hitch(this, function(f) {
+			for(key in f) {
+				if(!this.folders[key] || this.folders[key] < f[key]) {
+					this.updateUI();
+					for(k in f) {
+						this.treeStore.fetchItemByIdentity({identity: k, scope: this, onItem: function(item) {	
+							var label = key+(f[k] > 0 ? " ("+f[k]+")" : "");
+							if(item === null) {
+								this.treeStore.newItem({name: k, disp: label});
+							}
+							else {
+								this.treeStore.setValue(item, "disp", label);
+							}
+						}});
+					}
+					break;
 				}
-				break;
 			}
-		}
-	}));
+		}));
+	}, this);
 }
 this.kill = function() {
 	if(!this.win.closed) this.win.close();
 	this.treeStore.close();
-	this.mail.destroy();
+	dojo.forEach(this.mail, function(mail) { mail.destroy(); });
 	api.instances.setKilled(this.instance);
 }

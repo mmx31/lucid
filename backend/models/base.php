@@ -217,21 +217,21 @@
 			$this->_connect();
 			return $this->_link->escape($str);
 		}
-		function filter($feild, $value=false)
+		function filter($field, $value=false)
 		{
 			$tablename = $this->_get_tablename();
-			if(is_array($feild))
+			if(is_array($field))
 			{
 				$query = "SELECT * FROM ${tablename} WHERE ";
 				$list = array();
 				foreach($field as $key => $value)
 				{
-					array_push($list, $this->_escape($feild[$i]) . "=\"" . $this->_escape($value[$i]) . "\"");
+					array_push($list, $this->_escape($field[$i]) . "=\"" . $this->_escape($value[$i]) . "\"");
 				}
 				$query .= implode(" AND ", $list);
 			}
 			else {
-				$feild = $this->_escape($feild);
+				$field = $this->_escape($field);
 				//TODO: format value's datatype accordingly
 				$value = $this->_escape($value);
 				$query = "SELECT * FROM ${tablename} WHERE ${feild}=\"${value}\"";
