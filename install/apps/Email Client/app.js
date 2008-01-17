@@ -38,8 +38,12 @@ this.init = function(args) {
 	var tree = new dijit.Tree({store: this.treeStore});
 	split.addChild(tree);
 	var main = new dijit.layout.SplitContainer({orientation: "vertical"});
-	this.grid = new dojox.Grid();
-	main.addChild(this.grid);
+	this.grid = new dojox.Grid({structure: [{
+				cells: [[{name: "Read"}, {name: "Subject"}, {name: "Sender"}]]
+			}]});
+	var cpane = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
+	cpane.setContent(this.grid.domNode);
+	main.addChild(cpane);
 	this.msgArea = new dijit.layout.ContentPane();
 	this.msgArea.setContent("test message");
 	main.addChild(this.msgArea);
