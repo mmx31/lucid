@@ -10,13 +10,21 @@ this.init = function(args) {
 	api.addDojoCss("dojox/grid/_grid/Grid.css");
 	//I made this fake account to test it with...
 	this.prefs = new api.registry({appid: this.id, name: "accounts", data: {
-				identifier: 'id',
-	            label: 'label',
-	            items: [
-					{id: 0, label: "Test AOL account", host: "imap.aim.com", protocol: "IMAP", username: "rtemingbalm@aol.com", password: "rickyman"}
-				]
-	        }
-	});
+		identifier: 'id',
+	        label: 'label',
+	        items: [{
+				id: 0,
+				label: "Test AOL account",
+				downHost: "imap.aol.com",
+				downProtocol: "IMAP",
+				downUsername: "rtemingbalm@aol.com",
+				downPassword: "rickyman",
+				upHost: "stmp.aol.com",
+				upProtocol: "STMP",
+				upUsername: "rtemingbalm@aol.com",
+				upPassword: "rickyman"
+		}]
+	}});
 	this.treeStore = new dojo.data.ItemFileWriteStore({data: {
 		identifier: "name",
 		label: "disp",
@@ -39,7 +47,7 @@ this.init = function(args) {
 	split.addChild(tree);
 	var main = new dijit.layout.SplitContainer({orientation: "vertical"});
 	this.grid = new dojox.Grid({structure: [{
-				cells: [[{name: "Read"}, {name: "Subject"}, {name: "Sender"}]]
+				cells: [[{name: "Read"}, {name: "Subject"}, {name: "Sender"}, {name: "Date"}]]
 			}]});
 	var cpane = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
 	cpane.setContent(this.grid.domNode);
@@ -59,12 +67,21 @@ this.makeMailClasses = function() {
 	this.prefs.fetch({
 		onComplete: dojo.hitch(this, function(items) {
 			dojo.forEach(items, function(item) {
-				this.mail.push(new api.mail({
-					host: this.prefs.getValue(item, "host"),
-					username: this.prefs.getValue(item, "username"),
-					password: this.prefs.getValue(item, "password"),
-					protocol: this.prefs.getValue(item, "protocol")
-				}));
+				this.mail.push({
+					prefItem: item,
+					down: new api.mail({
+						host: this.prefs.getValue(item, "downHost"),
+						username: this.prefs.getValue(item, "downUsername"),
+						password: this.prefs.getValue(item, "downPassword"),
+						protocol: this.prefs.getValue(item, "downProtocol")
+					}),
+					up: new api.mail({
+						host: this.prefs.getValue(item, "upHost"),
+						username: this.prefs.getValue(item, "upUsername"),
+						password: this.prefs.getValue(item, "upPassword"),
+						protocol: this.prefs.getValue(item, "upProtocol")
+					})
+				});
 			}, this);
 			this.refresh();
 		})
@@ -76,7 +93,7 @@ this.updateUI=function() {
 this.folders = [];
 this.refresh = function() {
 	dojo.forEach(this.mail, function(mail) {
-		mail.countMessages("UNSEEN", dojo.hitch(this, function(f) {
+		mail.down.countMessages("UNSEEN", dojo.hitch(this, function(f) {
 			for(key in f) {
 				if(!this.folders[key] || this.folders[key] < f[key]) {
 					this.updateUI();
@@ -100,6 +117,7 @@ this.refresh = function() {
 this.kill = function() {
 	if(!this.win.closed) this.win.close();
 	this.treeStore.close();
-	dojo.forEach(this.mail, function(mail) { mail.destroy(); });
+	this.prefs.close();
+	dojo.forEach(this.mail, function(mail) { mail.down.destroy(); mail.up.destroy(); });
 	api.instances.setKilled(this.instance);
 }
