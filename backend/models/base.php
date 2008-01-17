@@ -234,7 +234,7 @@
 				$field = $this->_escape($field);
 				//TODO: format value's datatype accordingly
 				$value = $this->_escape($value);
-				$query = "SELECT * FROM ${tablename} WHERE ${feild}=\"${value}\"";
+				$query = "SELECT * FROM ${tablename} WHERE ${field}=\"${value}\"";
 			}
 			$this->_query($query); 
 			$list = Array();
