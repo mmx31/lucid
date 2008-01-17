@@ -17,7 +17,7 @@
 		if($_GET['action'] == "load")
 		{
 			$p = $User->get_current();
-			$result = $Registry->filter(array("userid", "appid", "name"), array($p->id, $_GET['appid'], $_GET['name']));
+			$result = $Registry->filter(array("userid" => $p->id, "appid" => $_GET['appid'], "name" => $_GET['name']));
 			if($result != false)
 			{
 				$result = $result[0];
@@ -35,7 +35,7 @@
 		if($_GET['action'] == "delete")
 		{
 			$p = $User->get_current();
-			$result = $Registry->filter(array("userid", "appid", "name"), array($p->id, $_POST['appid'], $_POST['name']));			
+			$result = $Registry->filter(array("userid" => $p->id, "appid" => $_POST['appid'], "name" => $_POST['name']));			
 			if(isset($result[0])) { $result[0]->delete(); echo "0"; }
 			else { echo "1"; }
 		}
@@ -45,7 +45,7 @@
 		if($_GET['action'] == "exists")
 		{
 			$p = $User->get_current();
-			$result = $Registry->filter(array("userid", "appid", "name"), array($p->id, $_POST['appid'], $_POST['name']));
+			$result = $Registry->filter(array("userid" => $p->id, "appid" => $_POST['appid'], "name" => $_POST['name']));
 			if(isset($result[0])) { echo "0"; }
 			else { echo "1"; }
 		}
