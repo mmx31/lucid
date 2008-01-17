@@ -93,26 +93,42 @@ this.updateUI=function() {
 this.folders = [];
 this.refresh = function() {
 	dojo.forEach(this.mail, function(mail) {
-		mail.down.countMessages("UNSEEN", dojo.hitch(this, function(f) {
-			for(key in f) {
-				if(!this.folders[key] || this.folders[key] < f[key]) {
-					this.updateUI();
-					for(k in f) {
-						this.treeStore.fetchItemByIdentity({identity: k, scope: this, onItem: function(item) {	
-							var label = key+(f[k] > 0 ? " ("+f[k]+")" : "");
-							if(item === null) {
-								this.treeStore.newItem({name: k, disp: label});
-							}
-							else {
-								this.treeStore.setValue(item, "disp", label);
-							}
-						}});
-					}
-					break;
+		this.treeStore.fetch({
+			query: {name: "ROOT_"+this.prefs.getValue(mail.prefItem, "id")},
+			scope: this,
+			onComplete: function(items) {
+				if(typeof items[0] == "undefined") {
+					var rootitem = this.treeStore.newItem({
+						name: "ROOT_"+this.prefs.getValue(mail.prefItem, "id"),
+						disp: this.prefs.getValue(mail.prefItem, "label")
+					});
 				}
+				else var rootitem = false;
+				this._refreshHost(rootitem || items[0], mail);
 			}
-		}));
+		});
 	}, this);
+}
+this._refreshHost = function(rootitem, mail) {
+	mail.down.countMessages("UNSEEN", dojo.hitch(this, function(f) {
+		for(key in f) {
+			if(!this.folders[key] || this.folders[key] < f[key]) {
+				this.updateUI();
+				for(k in f) {
+					this.treeStore.fetch({query: {name: k}, queryOptions: {deep: true}, scope: this, onComplete: function(item) {
+						var label = k+(f[k] > 0 ? " ("+f[k]+")" : "");
+						if(typeof item[0] == "undefined") {
+							this.treeStore.newItem({name: k, disp: label}, {parent: rootitem, attribute: "children"});
+						}
+						else {
+							this.treeStore.setValue(item[0], "disp", label);
+						}
+					}});
+				}
+				break;
+			}
+		}
+	}));
 }
 this.kill = function() {
 	if(!this.win.closed) this.win.close();
