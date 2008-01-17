@@ -7,7 +7,7 @@
 		if($_GET['action'] == "save")
 		{
 			$p = $User->get_current();
-			$result = $Registry->filter(array("userid", "appid", "name"), array($p->id, $_POST['appid'], $_POST['name']));
+			$result = $Registry->filter(array("userid" => $p->id, "appid" => $_POST['appid'], "name" => $_POST['name']));
 			if(!isset($result[0])) { $u = new $Registry(); $u->userid = $p->id; $u->name=$_POST['name']; $u->appid = $_POST['appid']; }
 			else { $u = $result[0]; }
 			$u->value = stripslashes($_POST['value']);
