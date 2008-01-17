@@ -226,7 +226,7 @@
 				$list = array();
 				foreach($field as $key => $value)
 				{
-					array_push($list, $this->_escape($field[$i]) . "=\"" . $this->_escape($value[$i]) . "\"");
+					array_push($list, $this->_escape($key) . "=\"" . $this->_escape($value) . "\"");
 				}
 				$query .= implode(" AND ", $list);
 			}
