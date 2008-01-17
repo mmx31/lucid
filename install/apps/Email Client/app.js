@@ -48,6 +48,7 @@ this.init = function(args) {
 	this.win.show();
 	this.win.startup();
 	api.instances.setActive(this.instance);
+	this.makeMailClasses();
 }
 this.mail = [];
 this.makeMailClasses = function() {
