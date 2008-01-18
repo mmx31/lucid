@@ -13,7 +13,10 @@ dojo.declare("api.mail", null, {
 			url: desktop.core.backend("api.mail.in.listMailboxes"),
 			content: this._getArgs(),
 			handleAs: "json",
-			load: callback
+			load: dojo.hitch(this, function(data, ioArgs) {
+				this._folderCache = data;
+				callback(data);
+			})
 		});
 	},
 	_getArgs: function(obj) {
@@ -73,6 +76,18 @@ dojo.declare("api.mail", null, {
 			load: function(data) {
 				callback(data == "0");
 			}
+		});
+	},
+	listFolder: function(args) {
+		dojo.xhrPost({
+			url: desktop.core.backend("api.mail.in.listFolder"),
+			content: this._getArgs({
+				mailbox: args.folder || (this._folderCache[0] || "INBOX"),
+				start: args.start || 0,
+				end: args.end || 20
+			}),
+			load: args.callback,
+			handleAs: "json"
 		});
 	},
 	destroy: function() {
