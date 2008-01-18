@@ -83,7 +83,7 @@ dojo.declare("api.mail", null, {
 			url: desktop.core.backend("api.mail.in.listFolder"),
 			content: this._getArgs({
 				mailbox: args.folder || (this._folderCache[0] || "INBOX"),
-				start: args.start || 0,
+				start: args.start || 1,
 				end: args.end || 20
 			}),
 			load: args.callback,

@@ -67,7 +67,7 @@
 			$p->set("ok");
 		}
 		if($_GET['action'] == "listFolder") {
-			$list = iil_C_FetchHeaders($con, $_POST['mailbox'], $_POST['start'] . ":" . $_POST['end']);
+			$list = iil_C_FetchHeader($con, $_POST['mailbox'], $_POST['start'] . ":" . $_POST['end']);
 			$out = new jsonOutput();
 			$out->set($list);
 		}

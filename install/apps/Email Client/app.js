@@ -89,14 +89,14 @@ this.makeMailClasses = function() {
 }
 this.currentItem = null;
 this.onTreeClick = function(item) {
-	if(this.treeStore.getValue(this.currentItem, "name") != this.treeStore.getValue(item, "name")) {
+	if(this.treeStore.getValue(item, "root") != true && this.treeStore.getValue(this.currentItem, "name") != this.treeStore.getValue(item, "name")) {
 		this.currentItem = item;
 		this.updateUI();
 	}
 }
 this.updateUI=function() {
 	if(this.currentItem && this.treeStore.getValue(this.currentItem, "root") == false) {
-		var folder = this.treeStore.getValue(this.currentItem, "name");
+		var folder = this.treeStore.getValue(this.currentItem, "sysname");
 		var account = this.treeStore.getValue(this.currentItem, "parentAccount");
 		var mailObj = false;
 		for(key in this.mail) {
@@ -108,7 +108,7 @@ this.updateUI=function() {
 		if(mailObj) {
 			mailObj.listFolder({
 				folder: folder,
-				start: 0,
+				start: 1,
 				end: 4,
 				callback: dojo.hitch(this, function(data) {
 					var p = new dojox.grid.data.Objects(data);
@@ -147,7 +147,7 @@ this._refreshHost = function(rootitem, mail) {
 					this.treeStore.fetch({query: {name: k+"_"+this.treeStore.getValue(rootitem, "name")}, queryOptions: {deep: true}, scope: this, onComplete: function(item) {
 						var label = k+(f[k] > 0 ? " ("+f[k]+")" : "");
 						if(typeof item[0] == "undefined") {
-							var newItem = this.treeStore.newItem({name: k+"_"+this.treeStore.getValue(rootitem, "name"), disp: label, parentAccount: this.treeStore.getValue(rootitem, "id"), root: false}, {parent: rootitem, attribute: "children"});
+							var newItem = this.treeStore.newItem({name: k+"_"+this.treeStore.getValue(rootitem, "name"), sysname:k, disp: label, parentAccount: this.treeStore.getValue(rootitem, "id"), root: false}, {parent: rootitem, attribute: "children"});
 							if(this.currentItem === null) {
 								this.currentItem = newItem;
 							}
