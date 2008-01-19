@@ -13,7 +13,7 @@ dojo.require("dijit.form.TextBox");
 dojo.require("dijit.form.Button");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
-dojo.require("dojo.dnd.Moveable");
+dojo.require("dojo.dnd.Source");
 dojo.require("dijit.Menu");
 
 dojo.declare(
@@ -25,7 +25,7 @@ dojo.declare(
 	iconStyle: "list",
 	overflow: "scroll",
 	subdirs: true,
-	textShadow: false,
+	forDesktop: false,
 	templateString: "<div class='desktopFileArea' dojoAttachEvent='onclick:_onClick, oncontextmenu:_onRightClick' dojoAttachPoint='focusNode,containerNode' style='overflow-x: hidden; overflow-y: ${overflow};'></div></div>",
 	postCreate: function() {
 		this.menu = new dijit.Menu({});
@@ -33,9 +33,37 @@ dojo.declare(
 		this.menu.addChild(new dijit.MenuItem({label: "Create File", iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, this._makeFile)}));
 		this.menu.addChild(new dijit.MenuSeparator({}));
 		this.menu.addChild(new dijit.MenuItem({label: "Refresh", iconClass: "icon-16-actions-view-refresh", onClick: dojo.hitch(this, this.refresh)}));
+		this.source = new dojo.dnd.Source(this.domNode, {
+			horizontal: !this.forDesktop,
+			accept: ["dir", "item"],
+			creator: function(item, hint){
+				item.id = dojo.dnd.getUniqueId();
+				var p = new api.filearea._item(item);
+				p.startup();
+				return {node: p.domNode, data: p, type: [p.isDir ? "dir" : "item"]};
+			}
+		});
+		this.source.startup();
+		dojo.connect(this.source, "onDndDrop", this.source, function(source, nodes, copy, target){
+			if(source != target && target == this) {
+				var t = dijit.byNode(target.node);
+				dojo.forEach(nodes, function(node){
+					var c = dijit.byNode(node);
+					console.log([c.domNode, node, (c.domNode == node)]);
+					api.fs.move({
+						path: c.path,
+						newpath: t.path + c.fileName,
+						callback: function(){
+							t.refresh();
+						}
+					})
+				});
+			}
+		});
 	},
 	refresh: function()
 	{
+		this.source.selectAll().deleteSelectedNodes();
 		dojo.forEach(this.getChildren(), dojo.hitch(this, function(item){
 			item.destroy();
 		}));
@@ -43,7 +71,8 @@ dojo.declare(
 			path: this.path,
 			callback: dojo.hitch(this, function(array)
 			{
-				dojo.forEach(array, dojo.hitch(this, function(item) {
+				var widList = [];
+				dojo.forEach(array, function(item) {
 					var p = item.file.lastIndexOf(".");
 					item.ext = item.file.substring(p+1, item.file.length);
 					if(desktop.config.filesystem.hideExt && !item.isDir)
@@ -53,17 +82,18 @@ dojo.declare(
 					}
 					else { item.fullFile = item.file; }
 					var icon = desktop.config.filesystem.icons[item.ext.toLowerCase()];
-					var wid = new api.filearea._item({
+					var wid = {
 						label: item.file,
 						fileName: item.fullFile,
 						iconClass: (item.isDir ? "icon-32-places-folder" : (icon || "icon-32-mimetypes-text-x-generic")),
 						isDir: item.isDir,
 						path: this.path+item.fullFile,
-						textshadow: this.textShadow
-					});
-					this.addChild(wid);
-					wid.startup();
-				}));
+						textShadow: this.forDesktop,
+						floatLeft: !this.forDesktop
+					};
+					widList.push(wid);
+				}, this);
+				this.source.insertNodes(false, widList);
 			})
 		});
 	},
@@ -155,10 +185,6 @@ dojo.declare(
 		dojo.forEach(this.getChildren(), function(item){
 			item.startup();
 		});
-	},
-	moveChild: function(item) {
-		//moves an api.filearea._item from it's folder to our folder.
-		this.addChild(item);
 	}
 });
 
@@ -171,16 +197,19 @@ dojo.declare(
 	highlighted: false,
 	isDir: false,
 	textShadow: false,
-	templateString: "<div class='desktopFileItem' style='float: left; padding: 10px;' dojoAttachPoint='focusNode'><div class='desktopFileItemIcon ${iconClass}'></div><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px;' style='text-align: center;'><div class='desktopFileItemTextFront'>${label}</div><div class='desktopFileItemTextBack'>${label}</div></div></div>",
+	floatLeft: false,
+	templateString: "<div class='desktopFileItem' style='width: 80px; padding: 10px;' dojoAttachPoint='focusNode'><div class='desktopFileItemIcon ${iconClass}'></div><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px; text-align: center;'><div dojoAttachPoint='textFront' class='desktopFileItemTextFront'>${label}</div><div dojoAttachPoint='textBack' class='desktopFileItemTextBack'>${label}</div></div></div>",
 	postCreate: function() {
-		if(!this.textshadow)
+		if(!this.textShadow)
 		{
-			dojo.query(".desktopFileItemTextBack", this.domNode).style("display", "none");
-			dojo.query(".desktopFileItemTextFront", this.domNode).removeClass("desktopFileItemTextFront").addClass("desktopFileItemText");
+			dojo.style(this.textBack, "display", "none");
+			dojo.removeClass(this.textFront, "desktopFileItemTextFront")
+			dojo.addClass(this.textFront, "desktopFileItemText")
+			dojo.addClass(this.textFront, "usedToBeDesktopFileItemTextFront");
 		}
-		/*this.movable = new api.filearea._movable(this.domNode, {
-			mover: api.filearea._Mover
-		});*/
+		if(this.floatLeft) {
+			dojo.addClass(this.domNode, "desktopFileItemInline");
+		}
 	},
 	_delete_file: function(e)
 	{
@@ -304,68 +333,4 @@ dojo.declare(
 		this.menu.addChild(new dijit.MenuItem({label: "Rename", iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, this._rename_file)}));
 		this.menu.addChild(new dijit.MenuItem({label: "Delete", iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, this._delete_file)}));
 	}
-});
-
-dojo.declare("api.filearea._Mover", dojo.dnd.Mover, {
-	onFirstMove: function(){
-		// summary: makes the node absolute; it is meant to be called only once\
-		this._item_parentNode = this.node.parentNode;
-		document.body.appendChild(this.node);
-		dojo.style(this.node, "zIndex", 100000);
-		console.log(this.host);
-		this.node.style.position = "absolute";	// enforcing the absolute mode
-		var m = dojo.marginBox(this.node);
-		m.l -= this.marginBox.l;
-		m.t -= this.marginBox.t;
-		this.marginBox = m;
-		this.host.onFirstMove(this);
-		dojo.disconnect(this.events.pop());
-	},
-	onMouseMove: function(e){
-		// summary: event processor for onmousemove
-		// e: Event: mouse event
-		if (this.node) {
-			dojo.dnd.autoScroll(e);
-			/*var m = this.marginBox;*/
-			this.host.onMove(this, {
-				l: /*m.l +*/ e.pageX+2,
-				t: /*m.t +*/ e.pageY+2
-			});
-		}
-	},
-	_revertToParent: function(e) {
-		this._item_parentNode.appendChild(this.node);
-		this._fixPos(e);
-	},
-	_fixPos: function(e) {
-		var t = e.layerY;
-		var l = e.layerX;
-		console.log([t,l]);
-		dojo.style(this.node, "top", t);
-		dojo.style(this.node, "left", l);
-	},
-	onMouseUp: function(e){
-		if(this.mouseButton == e.button){
-			p = dijit.getEnclosingWidget(e.target);
-			this._fixPos(e);
-			if(p.declaredClass == "api.filearea._item" && p.domNode.id != e.target.id) {
-				if(p.isDir)
-				{
-					//move item
-				}
-				else this._revertToParent(e);
-			}
-			else if(p.declaredClass == "api.filearea") {
-				p.moveChild(dijit.byId(this.node.id));
-				this._fixPos(e);
-			}
-			else this._revertToParent(e);
-			dojo.style(this.node, "zIndex", 1);
-			this.destroy();
-		}
-	}
-});
-
-dojo.declare("api.filearea._mover", dojo.dnd.Moveable, {
-	
 });
