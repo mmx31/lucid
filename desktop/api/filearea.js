@@ -220,53 +220,8 @@ dojo.declare(
 	_rename_file: function(e)
 	{
 		this.parent = this.getParent();
-		api.ui.inputDialog({title: "Rename File/Folder", message: "Rename file/folder (currently \""+this.fileName+"\") to:", callback: dojo.hitch(this, function(newv) { api.fs.rename({path: this.path, newname: newv}); this.parent.refresh(); })});
+		api.ui.inputDialog({title: "Rename File/Folder", message: "Rename file/folder (currently \""+this.fileName+"\") to:", callback: dojo.hitch(this, function(newv) { api.fs.rename({path: this.path, newname: newv, callback: dojo.hitch(this, function() {this.parent.refresh();})}); })});
 	},
-	_replace_file: function(e)
-	{
-		this.parent = this.getParent();
-        this.window = new api.window({
-            title: "Move File",
-              width: "300px",
-         height: "200px"
-		});
-		this.form = {
-            currentname: new dijit.form.TextBox({value: this.path, disabled: true, enabled: false}),
-            newname: new dijit.form.TextBox({value: this.path})
-		};
-		var line = document.createElement("div");
-        var p = document.createElement("span");
-		p.innerHTML = "Current Location:";
-		line.appendChild(p);
-		line.appendChild(this.form.currentname.domNode);
-		var line2 = document.createElement("div");
-        var p = document.createElement("span");
-		p.innerHTML = "New Location:";
-		line2.appendChild(p);
-		line2.appendChild(this.form.newname.domNode);
-		var button = new dijit.form.Button({
-          label: "Move",
-		  onClick: dojo.hitch(this, function() {
-			this.window.destroy();
-			blah = this.form.newname.getValue();
-			api.fs.move({path: this.path, newpath: blah});
-			this.parent.refresh();
-		  })
-		});
-		var button2 = new dijit.form.Button({
-          label: "Cancel",
-		  onClick: dojo.hitch(this, function() {
-			this.window.destroy();
-		  })
-		});
-		this.window.showClose = false;
-		this.window.show();
-		this.window.body.domNode.appendChild(line);
-		this.window.body.domNode.appendChild(line2);
-		this.window.body.domNode.appendChild(button.domNode);
-		this.window.body.domNode.appendChild(button2.domNode);
-		this.window.startup();
-		},
 	onClick: function()
 	{
 		this.getParent().onItem(this.path);
@@ -329,7 +284,6 @@ dojo.declare(
 			menuDl.popup = this.menu2;
 			this.menu.addChild(menuDl);
 		this.menu.addChild(new dijit.MenuSeparator({}));
-	       	this.menu.addChild(new dijit.MenuItem({label: "Move", iconClass: "icon-16-actions-edit-find-replace", onClick: dojo.hitch(this, this._replace_file)}));
 		this.menu.addChild(new dijit.MenuItem({label: "Rename", iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, this._rename_file)}));
 		this.menu.addChild(new dijit.MenuItem({label: "Delete", iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, this._delete_file)}));
 	}
