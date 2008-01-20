@@ -78,7 +78,7 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 });
 
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {
-	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick, oncontextmenu:_onRightClick\"></div>",
+	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick, oncontextmenu:_onRightClick, ondragstart:_stopSelect, onselectstart:_stopSelect\"></div>",
 	span: "100%",
 	opacity: 1,
 	thickness: 24,
@@ -87,6 +87,9 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	placement: "BL",
 	postCreate: function() {
 		this.lastPlacement = this.placement;
+	},
+	_stopSelect: function(e) {
+		dojo.stopEvent(e);
 	},
 	_onClick: function() {
 		if(!this.locked) {
