@@ -191,11 +191,17 @@ margin: 0px;
 	top: 0px;
 	color: black;
 }
-
 .desktopFileItemTextFront {
+	color: black;
+}
+.mainFileArea .desktopFileItemTextFront {
 	color: white;
 }
 .desktopFileItemTextBack {
+	display: none;
+}
+.mainFileArea .desktopFileItemTextBack {
+	display: block;
 	z-index: -1;
 	color: black;
 	position: absolute;
@@ -209,13 +215,16 @@ margin: 0px;
 	margin-left: auto;
 	margin-right: auto;
 }
-.dojoDndItemSelected .desktopFileItemIcon, .dojoDndItemOver {
+.dojoDndItemSelected .desktopFileItemIcon, .desktopFileArea .dojoDndItemOver {
 	opacity: 0.8;
 	filter: alpha(opacity=80);
 }
 
-.desktopFileItemInline {
+.desktopFileItem {
 	float: left;
+}
+.mainFileArea .desktopFileItem {
+	float: none;
 }
 /* Applets */
 .desktopApplet {

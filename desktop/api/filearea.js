@@ -54,7 +54,7 @@ dojo.declare(
 						path: c.path,
 						newpath: t.path + c.fileName,
 						callback: function(){
-							t.refresh();
+							//t.refresh();
 						}
 					})
 				});
@@ -114,6 +114,12 @@ dojo.declare(
 	clearSelection: function()
 	{
 		this.source.selectNone();
+		this.unhighlightChildren();
+	},
+	unhighlightChildren: function() {
+		dojo.forEach(this.getChildren(), function(c) {
+			c.unhighlight();
+		});
 	},
 	up: function()
 	{
@@ -141,14 +147,18 @@ dojo.declare(
 		if (w.declaredClass == "api.filearea._item") {
 			if (dojo.hasClass(e.target, "desktopFileItemIcon")) 
 				w._onIconClick();
-			else if(dojo.hasClass(e.target, "desktopFileItemTextFront")
-					|| dojo.hasClass(e.target, "desktopFileItemTextBack")
-					|| dojo.hasClass(e.target, "desktopFileItemText"))
-				w._onTextClick();
-			else
-				this.clearSelection();
+			else 
+				if (dojo.hasClass(e.target, "desktopFileItemTextFront") ||
+				dojo.hasClass(e.target, "desktopFileItemTextBack") ||
+				dojo.hasClass(e.target, "desktopFileItemText")) 
+					w._onTextClick();
+				else 
+					w._onIconClick();
 		}
-		else this.clearSelection();
+		else {
+			//we could put a dragbox selection hook here
+			this.clearSelection();
+		}
 	},
 	_onRightClick: function(e)
 	{
@@ -199,7 +209,7 @@ dojo.declare(
 	_timeouts: [],
 	templateString: "<div class='desktopFileItem' style='width: 80px; padding: 10px;' dojoAttachPoint='focusNode'><div class='desktopFileItemIcon ${iconClass}'></div><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px; text-align: center;'><div dojoAttachPoint='textFront' class='desktopFileItemTextFront'>${label}</div><div dojoAttachPoint='textBack' class='desktopFileItemTextBack'>${label}</div></div></div>",
 	postCreate: function() {
-		if(!this.textShadow)
+		/*if(!this.textShadow)
 		{
 			dojo.style(this.textBack, "display", "none");
 			dojo.removeClass(this.textFront, "desktopFileItemTextFront")
@@ -208,7 +218,7 @@ dojo.declare(
 		}
 		if(this.floatLeft) {
 			dojo.addClass(this.domNode, "desktopFileItemInline");
-		}
+		}*/
 	},
 	_delete_file: function(e)
 	{
@@ -223,12 +233,13 @@ dojo.declare(
 	},
 	onClick: function()
 	{
-		this.getParent().onItem(this.path);
+		this.getParent().unhighlightChildren();
+		return this.getParent().onItem(this.path);
 	},
 	_onIconClick: function(e) {
 		if(this.highlighted == false)
 		{
-			this.getParent().clearSelection();
+			this.getParent().unhighlightChildren();
 			this.highlight();
 			this.getParent().onHighlight(this.path);
 			this._timeouts.push(setTimeout(dojo.hitch(this, function() {
@@ -255,6 +266,7 @@ dojo.declare(
 	_onTextClick: function(e) {
 		if(this.highlighted == false)
 		{
+			this.getParent().unhighlightChildren();
 			this._onIconClick();
 		}
 		else
