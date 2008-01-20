@@ -113,9 +113,7 @@ dojo.declare(
 	},
 	clearSelection: function()
 	{
-		dojo.forEach(this.getChildren(), dojo.hitch(this, function(item){
-			item.unhighlight();
-		}));
+		this.source.selectNone();
 	},
 	up: function()
 	{
@@ -198,6 +196,7 @@ dojo.declare(
 	isDir: false,
 	textShadow: false,
 	floatLeft: false,
+	_timeouts: [],
 	templateString: "<div class='desktopFileItem' style='width: 80px; padding: 10px;' dojoAttachPoint='focusNode'><div class='desktopFileItemIcon ${iconClass}'></div><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px; text-align: center;'><div dojoAttachPoint='textFront' class='desktopFileItemTextFront'>${label}</div><div dojoAttachPoint='textBack' class='desktopFileItemTextBack'>${label}</div></div></div>",
 	postCreate: function() {
 		if(!this.textShadow)
@@ -232,9 +231,15 @@ dojo.declare(
 			this.getParent().clearSelection();
 			this.highlight();
 			this.getParent().onHighlight(this.path);
+			this._timeouts.push(setTimeout(dojo.hitch(this, function() {
+				this.unhighlight();
+			}), 1000));
 		}
 		else
 		{
+			dojo.forEach(this._timeouts, function(e) {
+				clearTimeout(e);
+			});
 			this._onOpen();
 		}
 	},
@@ -244,6 +249,7 @@ dojo.declare(
 		}
 		else {
 			this.getParent().onItem(this.path);
+			this.unhighlight();
 		}
 	},
 	_onTextClick: function(e) {
@@ -257,13 +263,9 @@ dojo.declare(
 		}
 	},
 	highlight: function() {
-		dojo.query(".desktopFileItemIcon", this.domNode).style("opacity", "0.8").addClass("desktopFileItemHighlight");
-		dojo.query(".desktopFileItemText", this.domNode).style("backgroundColor", desktop.config.wallpaper.color).addClass("desktopFileItemHighlight");
 		this.highlighted = true;
 	},
 	unhighlight: function() {
-		dojo.query(".desktopFileItemIcon", this.domNode).style("opacity", "1").removeClass("desktopFileItemHighlight");
-		dojo.query(".desktopFileItemText", this.domNode).style("backgroundColor", "transparent").removeClass("desktopFileItemHighlight");
 		this.highlighted = false;
 	},
 	startup: function() {

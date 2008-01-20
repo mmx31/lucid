@@ -1,3 +1,11 @@
+.dojoDndItemSelected .desktopFileItemText {
+	background-color: #eeeeee;
+}
+/*
+	YOU MUST LEAVE THIS AS THE FIRST RULE DEFINITION
+	(otherwise we cannot change it dynamically)
+*/
+
 /**********Page stuff*************/
 html body {
 overflow: hidden;
@@ -201,6 +209,11 @@ margin: 0px;
 	margin-left: auto;
 	margin-right: auto;
 }
+.dojoDndItemSelected .desktopFileItemIcon, .dojoDndItemOver {
+	opacity: 0.8;
+	filter: alpha(opacity=80);
+}
+
 .desktopFileItemInline {
 	float: left;
 }

@@ -74,6 +74,12 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 		var color = desktop.config.wallpaper.color;
 		dojo.style(this.wallpaperNode, "backgroundImage", (image ? "url("+image+")" : "none"));
 		dojo.style(this.wallpaperNode, "backgroundColor", color);
+		var css = dojo.byId("corestyle").sheet;
+		if (css.cssRules)
+			var rules = css.cssRules
+		else if (css.rules)
+			var rules = css.rules
+		rules[0].style.backgroundColor = desktop.config.wallpaper.color;
 	}
 });
 
