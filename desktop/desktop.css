@@ -272,3 +272,8 @@ margin: 0px;
 	left: 0px;
 	z-index: 500;
 }
+/****** Widget Layer *******/
+.widgetLayer {	
+	opacity: 0.8;
+	filter: alpha(opacity=80);
+}

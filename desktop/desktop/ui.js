@@ -10,6 +10,7 @@ desktop.ui = {
 		dojo.subscribe("configApply", this, this.makePanels);
 		dojo.subscribe("configApply", this, function() {
 			desktop.ui._area.updateWallpaper();
+			desktop.ui._area.restoreWidgets();
 		});
 	},
         drawn: false,
@@ -62,13 +63,16 @@ dojo.require("dijit._Container");
 dojo.require("dojo.dnd.move");
 
 dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Container], {
-	templateString: "<div class=\"uiArea\"><div dojoAttachPoint=\"containerNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10;\"></div><div dojoAttachPoint=\"wallpaperNode\" class=\"wallpaper\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 1;\"></div></div>",
+	templateString: "<div class=\"uiArea\"><div dojoAttachPoint=\"widgetNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10; display: none;\"></div><div dojoAttachPoint=\"containerNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10;\"></div><div dojoAttachPoint=\"wallpaperNode\" class=\"wallpaper\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 1;\"></div></div>",
+	drawn: false,
 	postCreate: function() {
 		var filearea = new api.filearea({path: "/Desktop/", forDesktop: true, subdirs: false, style: "position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;", overflow: "hidden"});
 		dojo.addClass(filearea.domNode, "mainFileArea");
 		filearea.refresh();
 		dojo.style(filearea.domNode, "zIndex", 1);
 		this.containerNode.appendChild(filearea.domNode);
+		dojo.addClass(this.widgetNode, "widgetLayer");
+		this.widgetLayer = new desktop.ui.widgetArea({}, this.widgetNode);
 	},
 	updateWallpaper: function() {
 		var image = desktop.config.wallpaper.image;
@@ -81,6 +85,26 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 		else if (css.rules)
 			var rules = css.rules
 		rules[0].style.backgroundColor = desktop.config.wallpaper.color;
+	}
+});
+
+dojo.require("dijit.layout.TabContainer");
+dojo.require("dijit.layout.ContentPane");
+dojo.declare("desktop.ui.widgetArea", dijit.layout.TabContainer, {
+	restoreWidgets: function() {
+		if(!this.drawn) {
+			this.drawn = true;
+			var widgets = desktop.config.widgets;
+			for(i in widgets) {
+				var pane = new dijit.layout.ContentPane({title: i});
+			}
+		}
+	},
+	dump: function() {
+		var obj = {};
+		dojo.forEach(this.getChildren(), function(c) {
+			
+		});
 	}
 });
 
