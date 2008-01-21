@@ -54,7 +54,7 @@ dojo.declare(
 						path: c.path,
 						newpath: t.path + c.fileName,
 						callback: function(){
-							//t.refresh();
+							t.refresh();
 						}
 					})
 				});
