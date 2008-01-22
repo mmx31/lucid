@@ -10,7 +10,6 @@ desktop.ui = {
 		dojo.subscribe("configApply", this, this.makePanels);
 		dojo.subscribe("configApply", this, function() {
 			desktop.ui._area.updateWallpaper();
-			desktop.ui._area.restoreWidgets();
 		});
 	},
         drawn: false,
