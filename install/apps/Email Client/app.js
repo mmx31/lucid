@@ -47,7 +47,7 @@ this.init = function(args) {
 	split.addChild(tree);
 	var main = new dijit.layout.SplitContainer({orientation: "vertical"});
 	this.grid = new dojox.Grid({structure: [{
-				cells: [[{name: "Read"}, {name: "Subject"}, {name: "Sender"}, {name: "Date"}]]
+				cells: [[{name: "read"}, {name: "subject"}, {name: "sender"}, {name: "date"}]]
 			}]});
 	var cpane = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
 	cpane.setContent(this.grid.domNode);
