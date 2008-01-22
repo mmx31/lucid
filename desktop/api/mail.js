@@ -97,3 +97,40 @@ dojo.declare("api.mail", null, {
 		//to protect the user's information
 	}
 });
+
+dojo.require("dojox.grid._data.Model");
+dojo.declare("api.mail.gridModel", dojox.grid.data.Dynamic, {
+	constructor: function(mailClass, mailbox) {
+		this.mailClass = mailClass;
+		this.mailbox = mailbox;
+	},
+	getRowCount: function(){
+		dojo.xhrPost({
+			url: desktop.core.backend("api.mail.in.countMessages"),
+			content: this.mailClass._getArgs({
+				mode: "ALL"
+			}),
+			sync: true,
+			handleAs: "json",
+			load: dojo.hitch(this, function(data) {
+				this.count = data[this.mailbox] || 0;
+			})
+		});
+		return this.count;
+	},
+	requestRows: function(inRowIndex, inCount){
+		inRowIndex--;
+		dojo.xhrPost({
+			url: desktop.core.backend("api.mail.in.listFolder"),
+			content: this.mailClass._getArgs({
+				mailbox: this.mailbox,
+				start: inRowIndex,
+				end: inRowIndex + inCount
+			}),
+			load: dojo.hitch(this, function(data) {
+				for(item in data) { this.setRow(data[item], parseInt(item)+1); }
+			}),
+			handleAs: "json"
+		});
+	}
+});
