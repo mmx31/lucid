@@ -226,13 +226,15 @@ api.fs = new function()
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	}
-	this.downloadFolder = function(path) {
-		var url = desktop.core.backend("api.fs.io.downloadFolder") + "&path=" + path;
+	this.downloadFolder = function(path, as) {
+		if(as == null) { as = "zip" }
+		var url = desktop.core.backend("api.fs.io.downloadFolder") + "&path=" + path + "&as=" + as;
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	}
-	this.compressDownload = function(path) {
-		var url = desktop.core.backend("api.fs.io.compressDownload") + "&path=" + path;
+	this.compressDownload = function(path, as) {
+		if(as == null) { as = "zip" }
+		var url = desktop.core.backend("api.fs.io.compressDownload") + "&path=" + path + "&as=" + as;
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	}

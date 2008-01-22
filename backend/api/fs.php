@@ -121,37 +121,25 @@ if($_GET['section'] == "io")
 		$user = $User->get_current();
 		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
 		require("../lib.zip.php");
-		$newzip = new dZip('folder.zip');
-		$newzip->addDir("../../files/" . $username . "/" . $_GET['path']);
-		$newzip->save();
-		$name = basename('folder.zip');
-		$type = mime_content_type('folder.zip');
-		$size = filesize('folder.zip');
-		header("Content-type: $type");
-		header("Content-Disposition: attachment;filename=\"$name\"");
-		header('Pragma: no-cache');
-		header('Expires: 0');
-		header("Content-length: $size");
-		readfile('folder.zip');
-		unlink('folder.zip');
+		if($_GET["as"] == "zip") { $newzip = new gzip_file("folder.zip"); }
+		if($_GET["as"] == "gzip") { $newzip = new zip_file("folder.tgz"); }
+		if($_GET["as"] == "bzip") { $newzip = new zip_file("folder.tbz2"); }
+		$newzip->set_options(array('inmemory' => 1, 'recurse' => 1, 'storepaths' => 1));
+		$newzip->add_files(array("../../files/".$username."/".$_GET['path']));
+		$newzip->create_archive();
+		$newzip->download_file();
 	}
 	if($_GET['action'] == "compressDownload") {
 		$user = $User->get_current();
 		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
 		require("../lib.zip.php");
-		$newzip = new dZip('compressed.zip');
-		$newzip->addFile("../../files/" . $username . "/" . $_GET['path'], $_GET['path']);
-		$newzip->save();
-		$name = basename('compressed.zip');
-		$type = mime_content_type('compressed.zip');
-		$size = filesize('compressed.zip');
-		header("Content-type: $type");
-		header("Content-Disposition: attachment;filename=\"$name\"");
-		header('Pragma: no-cache');
-		header('Expires: 0');
-		header("Content-length: $size");
-		readfile('compressed.zip');
-		unlink('compressed.zip');
+		if($_GET["as"] == "zip") { $newzip = new gzip_file("compressed.zip"); }
+		if($_GET["as"] == "gzip") { $newzip = new zip_file("compressed.tgz"); }
+		if($_GET["as"] == "bzip") { $newzip = new zip_file("compressed.tbz2"); }
+		$newzip->set_options(array('inmemory' => 1, 'recurse' => 1, 'storepaths' => 1));
+		$newzip->add_files("../../files/".$username."/".$_GET['path']);
+		$newzip->create_archive();
+		$newzip->download_file();
 	}
 	if($_GET['action'] == "download") {
 			$user = $User->get_current();

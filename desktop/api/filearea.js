@@ -285,15 +285,30 @@ dojo.declare(
 	       	this.menu.addChild(new dijit.MenuItem({label: "Open", iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
 			menuDl = new dijit.PopupMenuItem({iconClass: "icon-16-actions-document-open", label: "Download"});
 			this.menu2 = new dijit.Menu({parentMenu: menuDl});
-			if(!this.isDir) this.menu2.addChild(new dijit.MenuItem({label: "as file", onClick: dojo.hitch(this, function(e) {
+			if(!this.isDir) { this.menu2.addChild(new dijit.MenuItem({label: "as file", onClick: dojo.hitch(this, function(e) {
 				api.fs.download(this.path);
 			})}));
-			if(!this.isDir) this.menu2.addChild(new dijit.MenuItem({label: "as ZIP",onClick: dojo.hitch(this, function(e) {
-				api.fs.compressDownload(this.path);
+			this.menu2.addChild(new dijit.MenuItem({label: "as ZIP (ZIP)",onClick: dojo.hitch(this, function(e) {
+				api.fs.compressDownload(this.path, "zip");
 			})}));
-			if(this.isDir) this.menu2.addChild(new dijit.MenuItem({label: "as ZIP", onClick: dojo.hitch(this, function(e) {
-				api.fs.downloadFolder(this.path);
+			this.menu2.addChild(new dijit.MenuItem({label: "as TGZ (GZIP)", onClick: dojo.hitch(this, function(e) {
+				api.fs.compressDownload(this.path, "gzip");
 			})}));
+			this.menu2.addChild(new dijit.MenuItem({label: "as TBZ2 (BZIP)", onClick: dojo.hitch(this, function(e) {
+				api.fs.compressDownload(this.path, "bzip");
+			})}));
+			}
+			if(this.isDir) {
+				this.menu2.addChild(new dijit.MenuItem({label: "as ZIP (ZIP)", onClick: dojo.hitch(this, function(e) {
+					api.fs.downloadFolder(this.path, "zip");
+				})}));
+				this.menu2.addChild(new dijit.MenuItem({label: "as TGZ (GZIP)", onClick: dojo.hitch(this, function(e) {
+					api.fs.downloadFolder(this.path, "gzip");
+				})}));
+				this.menu2.addChild(new dijit.MenuItem({label: "as TBZ2 (BZIP)", onClick: dojo.hitch(this, function(e) {
+					api.fs.downloadFolder(this.path, "bzip");
+				})}));
+			}
 			this.menu2.startup();
 			menuDl.popup = this.menu2;
 			this.menu.addChild(menuDl);
