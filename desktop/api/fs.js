@@ -159,6 +159,22 @@ api.fs = new function()
         mimetype: "text/html"
         });
     }
+   this.copy = function(object)
+    {
+        dojo.xhrPost({
+        url: desktop.core.backend("api.fs.io.copyFile"),
+		content: {
+			path: object.from,
+			newpath: object.to
+		},
+		dsktp_callback: object.callback,
+		load: function(data, ioArgs) {
+			ioArgs.args.dsktp_callback(data);
+		},
+        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
+        mimetype: "text/html"
+        });
+    }
    this.rmdir = function(object)
     {
         dojo.xhrPost({

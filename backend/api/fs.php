@@ -13,6 +13,12 @@ if($_GET['section'] == "io")
 					mkdir($dir);
 					echo "0";
 	}
+		if ($_GET['action'] == "copyFile") {
+					$odir = "../../files/".$username."/".$_POST['path'];
+					$odira = "../../files/".$username."/".$_POST['newpath'];
+					copy($odir, $odira);
+					echo "0";
+	}
 		if ($_GET['action'] == "removeFile") {
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$username."/$odir";
