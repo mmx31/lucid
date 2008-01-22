@@ -73,8 +73,8 @@
 			$listout = array();
 			foreach($list as $key => $value) {
 				$listout[$key] = array();
-				foreach(array("id", "uid", "to", "from", "subject", "answered") as $header) {
-					$listout[(int) $key][$header] = $value->$header;
+				foreach(array("id", "uid", "to", "from", "subject", "answered", "date") as $header) {
+					$listout[$key][$header] = $value->$header;
 				}
 			}
 			$out->set($listout);
