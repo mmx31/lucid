@@ -67,9 +67,17 @@
 			$p->set("ok");
 		}
 		if($_GET['action'] == "listFolder") {
-			$list = iil_C_FetchHeader($con, $_POST['mailbox'], $_POST['start'] . ":" . $_POST['end']);
+			$list = iil_C_FetchHeaders($con, $_POST['mailbox'], $_POST['start'] . ":" . $_POST['end']);
 			$out = new jsonOutput();
-			$out->set($list);
+			//we need to optimize this so we don't send too much over the wire
+			$listout = array();
+			foreach($list as $key => $value) {
+				$listout[$key] = array();
+				foreach(array("id", "uid", "to", "from", "subject", "answered") as $header) {
+					$listout[(int) $key][$header] = $value->$header;
+				}
+			}
+			$out->set($listout);
 		}
 		
 		iil_Close($con);
