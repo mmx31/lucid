@@ -95,11 +95,17 @@ class xmlOutput extends objOutput{
 				$this->append("sqlerror", $php_errormsg);
 			}
 			$xml = new XMLWriter;
-			foreach ($this->output as $index => $text){
-            		$xml->startElement($index);
-	        		$xml->text($text);
-	        		$xml->endElement();
-        		}
+			foreach ($this->output as $index => $values){
+				$xml->startElement($index);
+				if(is_string($values)) $xml->text($values);
+				else {
+					foreach($values as $key => $value) {
+						if($key != "innerText") $xml->writeAttribute($key, $value);
+					}
+					$xml->text($values["innerText"] or "");
+				}
+        		$xml->endElement();
+    		}
 			echo $xml->getDocument();
 		}
 	}
