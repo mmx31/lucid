@@ -27,7 +27,6 @@ api.user = new function()
         load: function(data, ioArgs) {
 			api.user.userEmail = data;
         	if(callback) { callback(data); }
-        	desktop.core.loadingIndicator(1);
 		},
         error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }
         });

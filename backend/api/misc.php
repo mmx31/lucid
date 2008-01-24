@@ -45,19 +45,20 @@ if (isset($_GET['action'])) {
 		if($old == $user->password) {
 			$user->set_password($_GET['new']);
 			$user->save();
-			echo("0");
+			$out = new intOutput();
+			$out->set("ok");
 		}
 		else { echo("1"); }
 	}
 	if ($_GET['action'] == "changeEmail") {
-		require("../config.php");
+		$out = new intOutput();
 		$user = $User->get_current();
-		$pass = crypt($_GET['pass'], $conf_secretword);
-		if($pass == $user->password) {
-			$user->email = $_GET['email'];
+		if($user->check_password($_POST['pass'])) {
+			$user->email = $_POST['email'];
 			$user->save();
+			$out->set("ok");
 		}
-		else { echo("1"); }
+		else { $out->set("generic_err"); }
 	}
 	if ($_GET['action'] == "getUserIDFromName") {
 		$username = $_GET["username"];

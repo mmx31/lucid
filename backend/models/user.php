@@ -101,6 +101,10 @@
 		{
 			$this->password = crypt($this->password, $GLOBALS['conf']['salt']);
 		}
+		function check_password($provided)
+		{
+			return $this->password == crypt($this->password, $GLOBALS['conf']['salt']);
+		}
 		function generate_password()
 		{
 			$characters = 10;

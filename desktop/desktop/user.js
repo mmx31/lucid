@@ -11,8 +11,12 @@ desktop.user = new function() {
         });
 	}
 	this.changeUserEmail = function(obj) {
-		dojo.xhrGet({
-        url: "../backend/api/misc.php?action=changeEmail&pass="+obj.old+"&email="+obj.newemail,
+		dojo.xhrPost({
+        url: "../backend/api/misc.php?action=changeEmail",
+		content: {
+			pass: obj.old,
+			email: obj.newemail
+		},
         load: function(data, ioArgs) {
 			if(obj.callback) { obj.callback(data); }
      		desktop.core.loadingIndicator(1);

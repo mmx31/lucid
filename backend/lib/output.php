@@ -96,7 +96,7 @@ class xmlOutput extends objOutput{
 			}
 			$xml = new XMLWriter;
 			foreach ($this->output as $index => $text){
-            			$xml->startElement($index);
+            		$xml->startElement($index);
 	        		$xml->text($text);
 	        		$xml->endElement();
         		}
