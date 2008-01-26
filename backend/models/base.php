@@ -343,7 +343,7 @@
 			}
 			$p = $this->_link->mgCreateTable($this->_get_tablename(), $list);
 			if (PEAR::isError($p)) {
-    			die('Creation of table failed: "'.$p->getMessage().'"');
+    			internal_error("generic_err", 'Creation of table failed: "'.$p->getMessage().'"');
 			}
 			$this->_link->mgCreateIndex($this->_get_tablename(), "id_key", array(
 				'fields' => array(

@@ -701,7 +701,7 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 				menu.addChild(new dijit.MenuItem({
 					label: "Log Out", 
 					iconClass: "icon-16-actions-system-log-out",
-					onClick: desktop.core.logout
+					onClick: desktop.user.logout
 				}));
 				menu.domNode.style.display="none";
 				menu.startup();

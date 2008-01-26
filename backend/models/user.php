@@ -124,6 +124,7 @@
 		function has_permission($perm) {
 			if(!isset($this->permissions[$perm]) || is_null($this->permissions[$perm])) {
 				import("models.permission");
+				global $Permission;
 				$p = $Permission->filter("name", $perm);
 				if($p == false) return false;
 				return $p[0]->initial;
