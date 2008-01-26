@@ -31,15 +31,18 @@ desktop.app = new function()
 		 * @memberOf desktop.app
 		 */
 		this.instanceCount = 0;
-		/**
-		 * The seperator used when retreiving an app
-		 * 
-		 * @type {String}
-		 * @alias desktop.app.xml_seperator
-		 * @memberOf desktop.app
-		 * @deprecated We use json to transfer the apps instead.
-		 */
-		this.xml_seperator = "[==separator==]";
+		this.init = function() {
+			this.onConfigApply = dojo.subscribe("configApply", this, this.startupApps);
+		}
+		this.startupApps = function() {
+			dojo.unsubscribe(this.onConfigApply);
+			g = desktop.config.startupapps;
+			for(f in g)
+			{
+				if((typeof f) == "number")
+				desktop.app.launch(g[f]);
+			}
+		}
 		/** 
 		* Fetches an app and stores it into the cache
 		* @param {String} appID	The appID to store into the cache

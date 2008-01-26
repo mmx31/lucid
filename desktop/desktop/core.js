@@ -19,33 +19,10 @@ desktop.core = new function()
 		*/
 		this.init = function()
 		{
-			setTimeout('dijit.byId("desktop_main").resize()', 1000);
 			this.beforeUnloadEvent = dojo.connect(window, "onbeforeunload", null, function(e)
 			{
 				desktop.core.logout(true);
 			});
-			//dojo.connect(document, "onkeydown", desktop.console, desktop.console.toggle);
-			if(desktop.config.debug == false)
-			{
-				dojo.connect(window, "onerror", null, function(e)
-				{
-					api.log(e);
-					alert("Psych Desktop encountered an error.\nPlease report this to the developers with the console output.\n(press the '`' key)")
-				});
-			}
-			//cleanup
-			desktop.isLoaded = true;
-			dojo.publish("desktopload", ["yes"]);
-			
-			//startup applications
-			g = desktop.config.startupapps;
-			for(f in g)
-			{
-				if((typeof f) == "number")
-				desktop.app.launch(g[f]);
-			}
-			dojo.require("dojo.dnd.autoscroll");
-			dojo.dnd.autoScroll = function(e) {} //in order to prevent autoscrolling of the window
 		}
 		/** 
 		* Logs the user out
@@ -118,15 +95,5 @@ desktop.core = new function()
 			url += ".php?section="+escape(mod[mod.length-2]);
 			url += "&action="+escape(mod[mod.length-1])
 			return url;
-		}
-		this.draw = function()
-		{
-			dojo.require("dijit.layout.LayoutContainer");
-			var elm = new dijit.layout.LayoutContainer({
-				id: "desktop_main",
-				style: "width: 100%; height: 100%;"
-			}, document.createElement("div"));
-			document.body.appendChild(elm.domNode);
-			elm.startup();
 		}
 }

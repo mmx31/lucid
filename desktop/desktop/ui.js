@@ -11,6 +11,8 @@ desktop.ui = {
 		dojo.subscribe("configApply", this, function() {
 			desktop.ui._area.updateWallpaper();
 		});
+		dojo.require("dojo.dnd.autoscroll");
+		dojo.dnd.autoScroll = function(e) {} //in order to prevent autoscrolling of the window
 	},
         drawn: false,
 	makePanels: function() {
