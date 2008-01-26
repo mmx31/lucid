@@ -19,16 +19,19 @@
 			$type = $parent->$var['type'];
 			if($type == "foreignkey") {
 				$p = $this->_make_parent();
-				return $p->get($this->$var);
+				$return = $p->get($this->$var) or null;
 			}
 			elseif($type == "array") {
 				if(!is_array($this->$var)) $val = json_decode($this->$var, true);
-				if(is_array($val)) return $val;
-				else return array();
+				if(is_array($val)) $return = $val or null;
 			}
 			else {
-				return $this->$var;
+				$return = $this->$var or null;
 			}
+			if(is_null($return)) {
+				$return = $parent->$var['default'] or ($type == "array" ? array() : null);
+			}
+			return $return;
 		}
 		function _make_parent()
 		{
@@ -70,7 +73,12 @@
 		function __construct($values=array(), $preserveSchema=false) {
 			if(!$preserveSchema) {
 				foreach($this as $key => $value) {
-					if($key{0} != "_") $this->$key = ($this->$key['type'] == "array" ? array() : null);
+					if($key{0} != "_"){
+						$this->$key = ($this->$key['type'] == "array" ? array() : null);
+						if(is_null($this->$key)) {
+							unset($this->$key);
+						}
+					}
 				}
 				foreach($values as $key => $value) {
 						$this->$key = $value;
@@ -115,27 +123,31 @@
 		}
 		
 		function __set($var, $value) {
-			if($this->_modified == false) $this->_modified = true;
-			$this->$var = $value;
+			$this->_modified = true;
+			return $this->$var = $value;
 		}
 		
 		function __get($var) {
-			if($this->_modified == true)
+			if($this->_modified == true) //needed to prevent infinite recursion
 			{
 				$me = get_class($this);
 				$parent = new $me(array(), true);
 				$type = $parent->$var['type'];
 				if($type == "foreignkey") {
-					$class = $parent->$var['model'];
-					$class = new $class();
-					return $class->get($this->$var);
+					$p = new $this->$var['model'];
+					$return = $p->get($this->$var['id']) or null;
 				}
 				elseif($type == "array") {
-					if(!is_array($this->$var)) return json_decode($this->$var, true);
+					if(!is_array($this->$var)) $val = json_decode($this->$var, true);
+					if(is_array($val)) $return = $val or null;
 				}
-				elseif(isset($this->$var)) {
-					return $this->$var;
+				else {
+					$return = $this->$var or null;
 				}
+				if(is_null($return)) {
+					$return = $default or ($type == "array" ? array() : null);
+				}
+				return $return;
 			}
 			else {
 				return $this->$var;

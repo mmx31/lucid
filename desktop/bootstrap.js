@@ -49,7 +49,7 @@ bootstrap = {
 		"api.ui",
 		"api.user",
 		"api.window",
-		"api.xhr",
+		//"api.xhr",
 		"api.xsite",
 	    'desktop.admin',
 	    'desktop.app',

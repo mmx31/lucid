@@ -98,7 +98,7 @@ dojo.declare("api.mail", null, {
 	}
 });
 
-dojo.require("dojox.grid._data.Model");
+dojo.require("dojox.grid._data.model");
 dojo.declare("api.mail.gridModel", dojox.grid.data.Dynamic, {
 	constructor: function(mailClass, mailbox) {
 		this.mailClass = mailClass;
