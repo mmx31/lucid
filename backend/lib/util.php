@@ -32,6 +32,6 @@ function import($module) {
 	$module = explode(".", $module);
 	$path = implode(DIRECTORY_SEPARATOR, $module);
 	$file = $GLOBALS['path'] . $path . ".php";
-	return require($file);
+	return require_once($file);
 }
 ?>

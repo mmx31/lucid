@@ -119,17 +119,27 @@ install = new function() {
 		dojo.byId("taskList").innerHTML = "";
 		form = dijit.byId("form").getValues();
 		if (form.type == "reset") {
-			this.tasks.apps(function(umm){
+			this.tasks.apps(dojo.hitch(this, function(umm){
 				if(umm) {
-				dijit.byId("next").setDisabled(false);
-				install.updateBar(100);
+					install.updateBar(50);
+					this.tasks.permissions(function(comp) {
+						if(comp) {
+							dijit.byId("next").setDisabled(false);
+							install.updateBar(100);
+						}
+						else {
+							dijit.byId("next").setDisabled(true);
+							dijit.byId("previous").setDisabled(false);
+							install.updateBar(0);
+						}
+					});
 				}
 				else {
 				dijit.byId("next").setDisabled(true);
 				dijit.byId("previous").setDisabled(false);
 				install.updateBar(0);
 				}
-			});
+			}));
 		}
 		else {
 			this.tasks.database(form, function(nodberr){

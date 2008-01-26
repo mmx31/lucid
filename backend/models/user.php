@@ -123,7 +123,10 @@
 		}
 		function has_permission($perm) {
 			if(!isset($this->permissions[$perm]) || is_null($this->permissions[$perm])) {
-				return true;
+				import("models.permission");
+				$p = $Permission->filter("name", $perm);
+				if($p == false) return false;
+				return $p[0]->initial;
 			}
 			return $this->permissions[$perm];
 		}
