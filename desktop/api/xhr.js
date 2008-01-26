@@ -1,4 +1,4 @@
-desktop.xhr = function(/*dojo.__ioArgs*/args) {
+api.xhr = function(/*dojo.__ioArgs*/args) {
 	if(args.backend) {
 		var mod=module.split(".");
 		//TODO: put in something so we can switch to python backends when desired
