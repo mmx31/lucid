@@ -156,7 +156,8 @@
 		
 		function save()
 		{
-			$table = $this->_get_tablename();
+			$this->_connect();
+			$table = $this->_link->quoteIdentifier($this->_get_tablename());
 			if(is_numeric($this->id)) { $sql = "UPDATE ${table} SET "; }
 			else { $sql = "INSERT INTO ${table} SET "; }
 			$arr = array();
@@ -208,7 +209,8 @@
 		
 		function get($id)
 		{
-			$tablename = $this->_get_tablename();
+			$this->_connect();
+			$tablename = $this->_link->quoteIdentifier($this->_get_tablename());
             if(!is_numeric($id))
             {
                 $id = "'" . $this->_escape($id) . "'"; 
@@ -231,7 +233,8 @@
 		}
 		function filter($field, $value=false)
 		{
-			$tablename = $this->_get_tablename();
+			$this->_connect();
+			$tablename = $this->_link->quoteIdentifier($this->_get_tablename());
 			if(is_array($field))
 			{
 				$query = "SELECT * FROM ${tablename} WHERE ";
@@ -260,7 +263,8 @@
 		}
 		function all()
 		{
-			$tablename = $this->_get_tablename();
+			$this->_connect();
+			$tablename = $this->_link->quoteIdentifier($this->_get_tablename());
 			$this->_query("SELECT * FROM ${tablename}");
 			$list = Array();
 			foreach($this->_result as $line)
@@ -298,9 +302,9 @@
 			return $p;
 		}
 		function truncate() {
-			$table = $this->_get_tablename();
-			$this->_query("TRUNCATE TABLE `${table}`");
-			$this->_query("ALTER TABLE `${table}` AUTO_INCREMENT = 1");
+			$table = $this->_link->quoteIdentifier($this->_get_tablename());
+			$this->_query("TRUNCATE TABLE ${table}");
+			$this->_query("ALTER TABLE ${table} AUTO_INCREMENT = 1");
 		}
 		function make_json($columns=false)
 		{
@@ -328,7 +332,7 @@
 			if(is_numeric($this->id))
 			{
 				$this->cleanup();
-				$this->_query("DELETE FROM " . $this->_get_tablename() . " WHERE ID=" . $this->id . " LIMIT 1");
+				$this->_query("DELETE FROM " . $this->_link->quoteIdentifier($this->_get_tablename()) . " WHERE ID=" . $this->id . " LIMIT 1");
 			}
 		}
 		function cleanup() {
@@ -357,7 +361,7 @@
 			if (PEAR::isError($p)) {
     			internal_error("db_query_err", 'Creation of table failed: "'.$p->getMessage().'"');
 			}
-			$this->_link->mgCreateIndex($this->_get_tablename(), "id_key", array(
+			$this->_link->mgCreateIndex($this->_link->quoteIdentifier($this->_get_tablename()), "id_key", array(
 				'fields' => array(
 					'id' => array()
 				)
