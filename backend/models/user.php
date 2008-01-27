@@ -7,6 +7,7 @@
 		var $email = array('type' => 'text');
 		var $level = array('type' => 'text');
 		var $permissions = array('type' => 'array');
+		var $groups = array('type' => 'array');
 		
 		function get_current()
 		{
@@ -118,18 +119,35 @@
 			$this->set_password($code);
 			return $code;
 		}
+		function clear_permission($perm) {
+			unset($this->permissions[$perm]);
+		}
 		function remove_permission($perm) {
 			$this->permissions[$perm] = false;
 		}
 		function has_permission($perm) {
-			if(!isset($this->permissions[$perm]) || is_null($this->permissions[$perm])) {
-				import("models.permission");
-				global $Permission;
-				$p = $Permission->filter("name", $perm);
-				if($p == false) return false;
-				return $p[0]->initial;
+			if(!isset($this->permissions[$perm]) && !is_null($this->permissions[$perm])) {
+				return $this->permissions[$perm];
 			}
-			return $this->permissions[$perm];
+			$groupPerms = array();
+			if(!empty($this->groups)) {
+				import("models.group");
+				$allowed = null;
+				foreach($this->groups as $group) {
+					$g = $Group->filter("name", $group);
+					if($g !== false) {
+						$allowed = $g[0]->has_permission($perm);
+						if($allowed === false) return false;
+					}
+				}
+				if($allowed != null) return true;
+			}
+			//fallback on the default
+			import("models.permission");
+			global $Permission;
+			$p = $Permission->filter("name", $perm);
+			if($p == false) return false;
+			return $p[0]->initial;
 		}
 		function add_permission($perm) {
 			$this->permissions[$perm] = true;

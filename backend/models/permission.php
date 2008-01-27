@@ -1,7 +1,7 @@
 <?php
 	class Permission extends Base {
 		var $name = array('type' => "text");
-		var $dispName = array('type' => "text");
+		var $description = array('type' => "text");
 		var $initial = array('type' => "boolean", "default" => true);
 		function cleanup() {
 			$users = $User->all();

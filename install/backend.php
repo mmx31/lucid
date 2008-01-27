@@ -8,27 +8,27 @@
 		foreach(array(
 			array(
 				'name' => 'api.xsite',
-				'dispName' => 'Can make cross-domain requests'
+				'description' => 'Can make cross-domain requests'
 			),
 			array(
 				'name' => 'api.ide',
-				'dispName' => 'Can develop applications'
+				'description' => 'Can develop applications'
 			),
 			array(
 				'name' => 'api.fs.download',
-				'dispName' => 'Can download files'
+				'description' => 'Can download files'
 			),
 			array(
 				'name' => 'api.fs.upload',
-				'dispName' => 'Can upload files'
+				'description' => 'Can upload files'
 			),
 			array(
 				'name' => 'api.mail',
-				'dispName' => 'Can send/receive mail'
+				'description' => 'Can send/receive mail'
 			),
 			array(
 				'name' => 'core.user.auth.login',
-				'dispName' => 'Can login'
+				'description' => 'Can login'
 			)
 		) as $args) {
 			$out->append("Adding " . $args['name'] . " permission...", "...done");
