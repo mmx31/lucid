@@ -526,8 +526,15 @@ dojo.declare("desktop.ui.applets.netmonitor", desktop.ui.applet, {
 	}
 });
 
+dojo.require("dijit.form.Button");
+dojo.require("dijit._Calendar");
 dojo.declare("desktop.ui.applets.clock", desktop.ui.applet, {
 	postCreate: function() {
+		var calendar = new dijit._Calendar({});
+		this.button = new dijit.form.DropDownButton({
+			label: "loading...",
+			dropDown: calendar
+		}, this.containerNode);
 		this.clockInterval = setInterval(dojo.hitch(this, function(){
 			var clock_time = new Date();
 			var clock_hours = clock_time.getHours();
@@ -556,7 +563,7 @@ dojo.declare("desktop.ui.applets.clock", desktop.ui.applet, {
 				})
 				p = v;
 			}
-			this.containerNode.innerHTML = p;
+			this.button.setLabel(p);
 		}), 1000);
 		this.inherited("postCreate", arguments);
 	},
