@@ -343,7 +343,7 @@
 		function _create_table()
 		{
 			$this->_connect();
-			$this->_link->mgDropTable($this->_get_tablename());
+			$this->_link->mgDropTable($this->_link->quoteIdentifier($this->_get_tablename()));
 			$list = array();
 			foreach($this as $key => $v)
 			{
