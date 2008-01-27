@@ -108,7 +108,8 @@ dojo.declare("desktop.ui.widgetArea", dijit.layout.TabContainer, {
 		});
 	}
 });
-
+dojo.require("dijit.layout.LayoutContainer");
+dojo.require("dijit.layout.ContentPane");
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {
 	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick, oncontextmenu:_onRightClick, ondragstart:_stopSelect, onselectstart:_stopSelect\"></div>",
 	span: "100%",
@@ -117,9 +118,6 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	locked: false,
 	orientation: "horizontal",
 	placement: "BL",
-	postCreate: function() {
-		this.lastPlacement = this.placement;
-	},
 	_stopSelect: function(e) {
 		dojo.stopEvent(e);
 	},
@@ -134,6 +132,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		}
 	},
 	_onRightClick: function(e) {
+		if(this.menu) this.menu.destroy();
 		this.menu = new dijit.Menu({});
 		if(this.locked) {
 			this.menu.addChild(new dijit.MenuItem({label: "Unlock the Panel", onClick: dojo.hitch(this, this.unlock)}));
@@ -141,9 +140,76 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		else {
 			this.menu.addChild(new dijit.MenuItem({label: "Lock the Panel", onClick: dojo.hitch(this, this.lock)}));
 		}
+		this.menu.addChild(new dijit.MenuItem({label: "Add to panel", iconClass: "icon-16-actions-list-add", onClick: dojo.hitch(this, this.addDialog)}));
 		this.onRightClick(this.locked);
 		this.menu._contextMouse();
 		this.menu._openMyself(e);
+	},
+	addDialog: function() {
+		if(this.window) {
+			this.window.bringToFront();
+			return;
+		}
+		var win = this.window = new api.window({
+			title: "Add to panel",
+			bodyWidget: "LayoutContainer",
+			onClose: dojo.hitch(this, function() {
+				this.window = false;
+			})
+		});
+		var client = new dijit.layout.ContentPane({layoutAlign: "client", style: "border: 1px solid black;"});
+		this.addDialogSelected = "";
+		this.addDialogIcons = [];
+		var div = document.createElement("div");
+		dojo.forEach([
+			{k: "overflow", v: "auto"},
+			{k: "width", v: "100%"},
+			{k: "height", v: "100%"}
+		], function(i) {
+			dojo.style(div, i.k, i.v);
+		});
+		for(key in desktop.ui.appletList) {
+			var header = document.createElement("h4");
+			header.innerText = key;
+			div.appendChild(header);
+			for(applet in desktop.ui.appletList[key]) {
+				var name = desktop.ui.appletList[key][applet];
+				var iconClass = desktop.ui.applets[name].prototype.appletIcon;
+				var dispName = desktop.ui.applets[name].prototype.dispName;
+				c = document.createElement("div");
+				c.name = name;
+				dojo.addClass(c, "dijitInline");
+				c.innerHTML = "<div class='"+iconClass+"'></div><span style='padding-top: 5px; padding-bottom: 5px;'>"+dispName+"</span>";
+				div.appendChild(c);
+				this.addDialogIcons.push(c);
+			}
+			div.appendChild(document.createElement("hr"));
+		}
+		client.setContent(div);
+		win.addChild(client);
+		dojo.forEach(this.addDialogIcons, function(c) {
+			dojo.connect(c, "onclick", this, function(e) {
+				dojo.forEach(this.addDialogIcons, function(icon) {
+					dojo.removeClass(icon, "selectedItem");
+				})
+				dojo.addClass(c, "selectedItem");
+				this.addDialogSelected = c.name;
+			});
+		}, this);
+		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom", style: "height: 40px;"});
+		var button = new dijit.form.Button({label: "Add to panel", style: "float: right;"});
+		bottom.setContent(button.domNode);
+		win.addChild(bottom);
+		dojo.connect(button, "onClick", this, function() {
+			if(dojo.isFunction(desktop.ui.applets[this.addDialogSelected])) {
+				var applet = new desktop.ui.applets[this.addDialogSelected]();
+				this.addChild(applet);
+				applet.startup();
+				desktop.ui.save();
+			}
+		});
+		win.show();
+		win.startup();
 	},
 	onRightClick: function(lock) {
 		//This is a hook for third party panels to add stuff to the right click menu of the panel
@@ -401,13 +467,15 @@ dojo.declare("desktop.ui._appletMoveable", dojo.dnd.move.constrainedMoveable, {
 		this.onMoved(mover, leftTop);
 	}
 });
-
+dojo.require("dijit.Menu");
 dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Container, dijit._Contained], {
 	templateString: "<div class=\"desktopApplet\" dojoAttachEvent=\"onmouseover:_mouseover,onmouseout:_mouseout\"><div class=\"desktopAppletHandle\" dojoAttachPoint=\"handleNode\"></div><div class=\"desktopAppletContent\" dojoAttachPoint=\"containerNode\"></div></div>",
 	settings: {},
 	locked: false,
 	pos: 0,
 	fullspan: false,
+	dispName: "Applet",
+	appletIcon: "icon-32-categories-applications-other",
 	postCreate: function() {
 		this._moveable = new desktop.ui._appletMoveable(this.domNode, {
 			handle: this.handleNode,
@@ -442,6 +510,21 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 			desktop.ui.save();
 		});
 		if(this.fullspan) dojo.addClass(this.domNode, "desktopAppletFullspan");
+		var menu = this.menu = new dijit.Menu({});
+		this.menu.bindDomNode(this.handleNode);
+		dojo.forEach([
+			{
+				label: "Remove from panel",
+				iconClass: "icon-16-actions-list-remove",
+				onClick: dojo.hitch(this, function() {
+					this.destroy();
+					desktop.ui.save();
+				})
+			}
+		], function(args) {
+			var item = new dijit.MenuItem(args);
+			menu.addChild(item);
+		});
 		//TODO: get it so that applets don't overlap eachother
 	},
 	resize: function() {
@@ -485,7 +568,15 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 	}
 });
 
+desktop.ui.appletList = {
+		"Accessories": ["clock"],
+		"Desktop & Windows": ["taskbar"],
+		"System & Hardware": ["netmonitor"],
+		"Utilities": ["menu", "seperator"]
+}
+
 dojo.declare("desktop.ui.applets.seperator", desktop.ui.applet, {
+	dispName: "Seperator",
 	postCreate: function() {
 		dojo.addClass(this.containerNode, "seperator");
 		dojo.style(this.handleNode, "background", "transparent none");
@@ -496,6 +587,8 @@ dojo.declare("desktop.ui.applets.seperator", desktop.ui.applet, {
 });
 
 dojo.declare("desktop.ui.applets.netmonitor", desktop.ui.applet, {
+	dispName: "Network Monitor",
+	appletIcon: "icon-32-status-network-transmit-receive",
 	postCreate: function() {
 		dojo.addClass(this.containerNode, "icon-22-status-network-idle");
 		this._xhrStart = dojo.connect(dojo,"_ioSetArgs",this,function(m)
@@ -529,6 +622,7 @@ dojo.declare("desktop.ui.applets.netmonitor", desktop.ui.applet, {
 dojo.require("dijit.form.Button");
 dojo.require("dijit._Calendar");
 dojo.declare("desktop.ui.applets.clock", desktop.ui.applet, {
+	dispName: "Clock",
 	postCreate: function() {
 		var calendar = new dijit._Calendar({});
 		this.button = new dijit.form.DropDownButton({
@@ -574,6 +668,7 @@ dojo.declare("desktop.ui.applets.clock", desktop.ui.applet, {
 });
 
 dojo.declare("desktop.ui.applets.taskbar", desktop.ui.applet, {
+	dispName: "Window List",
 	fullspan: true,
 	postCreate: function() {
 		dojo.addClass(this.containerNode, "desktopTaskbarApplet");
@@ -629,6 +724,7 @@ dojo.declare("desktop.ui.task", null, {
 });
 
 dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
+	dispName: "Main Menu",
 	postCreate: function() {
 		this._getApps();
 		//this._interval = setInterval(dojo.hitch(this, this._getApps), 1000*60);

@@ -1,4 +1,4 @@
-.dojoDndItemSelected .desktopFileItemText {
+.dojoDndItemSelected .desktopFileItemText, .selectedItem {
 	background-color: #eeeeee;
 }
 /*
@@ -190,6 +190,7 @@ margin: 0px;
 	left: 0px;
 	top: 0px;
 	color: black;
+	text-align: center;
 }
 .desktopFileItemTextFront {
 	color: black;
