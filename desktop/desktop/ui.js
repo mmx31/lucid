@@ -112,7 +112,7 @@ dojo.require("dijit.layout.LayoutContainer");
 dojo.require("dijit.layout.ContentPane");
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {
 	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick, oncontextmenu:_onRightClick, ondragstart:_stopSelect, onselectstart:_stopSelect\"></div>",
-	span: "100%",
+	span: 1,
 	opacity: 1,
 	thickness: 24,
 	locked: false,
@@ -134,13 +134,25 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	_onRightClick: function(e) {
 		if(this.menu) this.menu.destroy();
 		this.menu = new dijit.Menu({});
+		this.menu.addChild(new dijit.MenuItem({label: "Add to panel", iconClass: "icon-16-actions-list-add", onClick: dojo.hitch(this, this.addDialog)}));
+		this.menu.addChild(new dijit.MenuItem({label: "Properties", iconClass: "icon-16-actions-document-properties", disabled: true}));
+		this.menu.addChild(new dijit.MenuItem({label: "Delete This Panel", iconClass: "icon-16-actions-edit-delete", disabled: (typeof dojo.query(".desktopPanel")[1] == "undefined"), onClick: dojo.hitch(this, function() {
+			//TODO: animate?
+			this.destroy();
+		})}));
+		this.menu.addChild(new dijit.MenuSeparator);
 		if(this.locked) {
 			this.menu.addChild(new dijit.MenuItem({label: "Unlock the Panel", onClick: dojo.hitch(this, this.unlock)}));
 		}
 		else {
 			this.menu.addChild(new dijit.MenuItem({label: "Lock the Panel", onClick: dojo.hitch(this, this.lock)}));
 		}
-		this.menu.addChild(new dijit.MenuItem({label: "Add to panel", iconClass: "icon-16-actions-list-add", onClick: dojo.hitch(this, this.addDialog)}));
+		this.menu.addChild(new dijit.MenuSeparator);
+		this.menu.addChild(new dijit.MenuItem({label: "New Panel", iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, function() {
+			var p = new desktop.ui.panel();
+			desktop.ui._area.domNode.appendChild(p.domNode);
+			p.startup();
+		})}));
 		this.onRightClick(this.locked);
 		this.menu._contextMouse();
 		this.menu._openMyself(e);
