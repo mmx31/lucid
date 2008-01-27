@@ -355,7 +355,6 @@
 			}
 			$p = $this->_link->mgCreateTable($this->_link->quoteIdentifier($this->_get_tablename()), $list);
 			if (PEAR::isError($p)) {
-				var_dump($p);
     			internal_error("db_query_err", 'Creation of table failed: "'.$p->getMessage().'"');
 			}
 			$this->_link->mgCreateIndex($this->_get_tablename(), "id_key", array(
