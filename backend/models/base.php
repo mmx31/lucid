@@ -302,6 +302,7 @@
 			return $p;
 		}
 		function truncate() {
+			$this->_connect();
 			$table = $this->_link->quoteIdentifier($this->_get_tablename());
 			$this->_query("TRUNCATE TABLE ${table}");
 			$this->_query("ALTER TABLE ${table} AUTO_INCREMENT = 1");
@@ -341,7 +342,6 @@
 		}
 		function _create_table()
 		{
-			
 			$this->_connect();
 			$this->_link->mgDropTable($this->_get_tablename());
 			$list = array();
