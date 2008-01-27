@@ -11,19 +11,19 @@ html body {
 overflow: hidden;
 margin: 0px;
 }
-.menuApplet {
+.desktopApplet .dijitButton {
 	cursor: pointer;
 	background: none;
 	border: 0px none;
 	padding: 0px;
 }
-.menuApplet .dijit button {
+.desktopApplet .dijit button {
 	border: 0px none;
 }
-.menuApplet .dijit .dijitA11yDownArrow {
+.desktopApplet .dijit .dijitA11yDownArrow {
 	display: none;
 }
-.menuApplet .dijit .dijitButtonNode {
+.desktopApplet .dijit .dijitButtonNode {
 	background: transparent none no-repeat;
 }
 .wallpaper {
