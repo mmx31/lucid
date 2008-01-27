@@ -4,6 +4,7 @@
 		var $description = array('type' => "text");
 		var $initial = array('type' => "boolean", "default" => true);
 		function cleanup() {
+			import("models.user");
 			$users = $User->all();
 			foreach($users as $user) {
 				$user->remove_permission($this->name);
