@@ -14,5 +14,12 @@ api.xhr = function(/*dojo.__ioArgs*/args) {
 	else if(args.app) {
 		args.url = "../apps/"+args.app+"/"+args.url;
 	}
+	var callback = args.load;
+	args.load = function(data, ioArgs) {
+		if(typeof parseInt(data) == "number" && parseInt(data) > 0) {
+			console.error(data); //TODO: we should alert the user in some cases, or possibly retry the request
+		}
+		callback.call(args.context || this, arguments);
+	}
 	return dojo.xhrPost(args);
 }
