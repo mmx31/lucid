@@ -80,6 +80,10 @@ this.init = function(args)
     {
         title: "Psych's blog",
         url: "http://psychdesigns.net/psych/rss.xml"
+    },
+	{
+        title: "Jay's blog",
+        url: "http://www.jaymacdesigns.net/feed/"
     }
     ];
     dojo.forEach(this.feeds, dojo.hitch(this, 
@@ -227,6 +231,7 @@ this.fetchFeed = function(url)
         preventCache: true,
         load: dojo.hitch(this, 
         function(data, ioArgs) {
+			if(data == "9") { api.ui.alertDialog({title: "Psych Desktop internal error", message: "cURL not supported by this server<br>enchanced web features disabled"}); }
             var items = data.getElementsByTagName("item");
             var text = "";
             dojo.forEach(items, 

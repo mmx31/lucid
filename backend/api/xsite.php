@@ -26,7 +26,8 @@ if($GLOBALS['conf']['xsite'] && $user->has_permission("xsite"))
 	// Get the REST call path from the AJAX application
 	// Is it a POST or a GET?
 	$url = ($_POST['path']) ? $_POST['path'] : $_GET['path'];
-	
+	// Is Curl on this server?
+	if (!function_exists('curl_init')) { internal_error("feature_not_available"); }
 	// Open the Curl session
 	$session = curl_init($url);
 	
