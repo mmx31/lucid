@@ -32,14 +32,16 @@ var desktop = {
 	init: function()
 	{
 		
-		if(typeof window.onload!="function"){
-			window.onload=desktop.start;
+		if(typeof window.onload != "function"){
+			window.onload = function(){
+				desktop.start();
+			}
 		}
 		else
 		{
-			desktop.oldonload=window.onLoad;
+			desktop.oldonload=window.onload;
 			window.onload=function(){
-				desktop.oldonload();
+				desktop.oldonload.apply(this, arguments);
 				desktop.start();
 			};
 		}
