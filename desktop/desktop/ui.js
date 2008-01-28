@@ -110,6 +110,9 @@ dojo.declare("desktop.ui.widgetArea", dijit.layout.TabContainer, {
 });
 dojo.require("dijit.layout.LayoutContainer");
 dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit.form.Form");
+dojo.require("dijit.form.Slider");
+dojo.require("dijit.form.NumberSpinner");
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {
 	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick, oncontextmenu:_onRightClick, ondragstart:_stopSelect, onselectstart:_stopSelect\"></div>",
 	span: 1,
@@ -135,7 +138,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		if(this.menu) this.menu.destroy();
 		this.menu = new dijit.Menu({});
 		this.menu.addChild(new dijit.MenuItem({label: "Add to panel", iconClass: "icon-16-actions-list-add", onClick: dojo.hitch(this, this.addDialog)}));
-		this.menu.addChild(new dijit.MenuItem({label: "Properties", iconClass: "icon-16-actions-document-properties", disabled: true}));
+		this.menu.addChild(new dijit.MenuItem({label: "Properties", iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, this.propertiesDialog)}));
 		this.menu.addChild(new dijit.MenuItem({label: "Delete This Panel", iconClass: "icon-16-actions-edit-delete", disabled: (typeof dojo.query(".desktopPanel")[1] == "undefined"), onClick: dojo.hitch(this, function() {
 			//TODO: animate?
 			this.destroy();
@@ -156,6 +159,67 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		this.onRightClick(this.locked);
 		this.menu._contextMouse();
 		this.menu._openMyself(e);
+	},
+	propertiesDialog: function() {
+		if(this.propertiesWin) {
+			this.propertiesWin.bringToFront();
+			return;
+		}
+		var win = this.propertiesWin = new api.window({
+			title: "Panel Properties",
+			bodyWidget: "LayoutContainer",
+			width: "180px",
+			height: "200px",
+			onClose: dojo.hitch(this, function() {
+				this.propertiesWin = false;
+			})
+		});
+		var client = new dijit.layout.ContentPane({layoutAlign: "client", style: "padding: 5px;"});
+		var div = document.createElement("div");
+		var rows = {
+			Width: {
+				widget: "HorizontalSlider",
+				params: {
+					maximum: 1,
+					value: this.span,
+					showButtons: false,
+					onChange: dojo.hitch(this, function(value) {
+						this.span = value;
+						this._place();
+					})
+				}
+			},
+			Thickness: {
+				widget: "NumberSpinner",
+				params: {
+					value: this.thickness,
+					style: "width: 60px;",
+					onChange: dojo.hitch(this, function(value) {
+						this.thickness = value;
+						dojo.style(this.domNode, this.orientation == "horizontal" ? "width" : "height", this.thickness+"px");
+						this._place();
+					})
+				}
+			}
+		};
+		for(key in rows) {
+			var row = document.createElement("div");
+			dojo.style(row, "marginBottom", "5px");
+			row.innerHTML = key+":&nbsp;";
+			row.appendChild(new dijit.form[rows[key].widget](rows[key].params).domNode);
+			div.appendChild(row);
+		};
+		client.setContent(new dijit.form.Form({}, div).domNode);
+		win.addChild(client);
+		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom", style: "height: 40px;"});
+		var button = new dijit.form.Button({label: "Close"});
+		bottom.setContent(button.domNode);
+		win.addChild(bottom);
+		dojo.connect(button, "onClick", this, function() {
+			this.propertiesWin.close();
+		});
+		win.show();
+		win.startup();
 	},
 	addDialog: function() {
 		if(this.window) {
