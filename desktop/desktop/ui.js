@@ -181,6 +181,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				widget: "HorizontalSlider",
 				params: {
 					maximum: 1,
+					minimum: 0.01,
 					value: this.span,
 					showButtons: false,
 					onChange: dojo.hitch(this, function(value) {
@@ -192,6 +193,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			Thickness: {
 				widget: "NumberSpinner",
 				params: {
+					constraints: {min: 23, max: 200},
 					value: this.thickness,
 					style: "width: 60px;",
 					onChange: dojo.hitch(this, function(value) {
