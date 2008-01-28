@@ -7,70 +7,17 @@
 */
 api.user = new function()
 {
-	this.getUserName = function(callback) {
-        dojo.xhrGet({
-        url: "../backend/api/misc.php?action=getUserName",
+	this.get(options) {
+		if(!options.id) { options.id = "0"; }
+		dojo.xhrGet({
+        url: desktop.core.backend("api.misc.user.get"),
+		content: {
+			id: options.id
+		},
         load: function(data, ioArgs) {
-			api.user.userName = data;
-        	if(callback) { callback(data); }
+			data = dojo.fromJson(data);
+        	if(options.callback) { options.callback(data); }
 		},
         error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }
         });
-		}
-		
-	this.getUserEmail = function(callback) {
-        dojo.xhrGet({
-        url: "../backend/api/misc.php?action=getUserEmail",
-        load: function(data, ioArgs) {
-			api.user.userEmail = data;
-        	if(callback) { callback(data); }
-		},
-        error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }
-        });
-		}
-
-	this.getUserID = function(callback)
-	{
-        dojo.xhrGet({
-        url: "../backend/api/misc.php?action=getUserID",
-        load: function(data, ioArgs) {
-			api.user.userID = data;
-	        if(callback) { callback(data); }
-		},
-        error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }, mimetype: "text/plain"
-        });
-	}
-	
-	this.userIDToUserName = function(userid, callback)
-	{
-        dojo.xhrGet({
-        url: "../backend/api/misc.php?action=getUserNameFromID&userid="+userid,
-        load: function(data, ioArgs) {
-			api.user.username = data;
-        	if(callback) { callback(data); }
-		},
-        error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }
-        });
-	}
-	this.userNameToUserID = function(username, callback)
-	{
-        dojo.xhrGet({
-        url: "../backend/api/misc.php?action=getUserIDFromName&username="+username,
-        load: function(data, ioArgs) {
-	        api.user.username = data;
-	        if(callback) { callback(data); }
-		},
-        error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }, mimetype: "text/plain"
-        });
-	}
-	this.getUserLevel = function(callback) {
-        dojo.xhrGet({
-        url: "../backend/api/misc.php?action=getUserLevel",
-        load: function(data, ioArgs) {
-		    api.user.userLevel = data;
-    	    if(callback) { callback(data); }
-		},
-        error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }
-        });
-	}
 }

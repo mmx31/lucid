@@ -19,28 +19,19 @@
 require("../lib/includes.php");
 import("models.user");
 if (isset($_GET['action'])) {
-	// get password will NEVER be implamented
-	if ($_GET['action'] == "getStatus") {
-		if(isset($_SESSION['userid'])) {
-			echo("OK");
-		}
-		else {
-			echo("FAIL");
-		}
-	}
-	if ($_GET['action'] == "getUserName") {
-		$user = $User->get_current();
-		echo $user->username;
-	}
-	if ($_GET['action'] == "getUserNameFromID") {
-		$user = $User->get($_GET['userid']);
-		echo $user->username;
+	if ($_GET['action'] == "get") {
+		if($_GET['id'] == "0") { $user = $User->get_current(); }
+		else { $user = $User->get($_GET['id']); }
+		$out = new jsonOutput();
+		$out->append("id", $user->id);
+		$out->append("username", $user->username);
+		$out->append("email", $user->email);
+		$out->append("level", $user->level);
 	}
 	if ($_GET['action'] == "changePassword") {
 		require("../config.php");
 		$username = $_SESSION['username'];
 		$old = crypt($_GET['old'], $conf_secretword);
-		//$new = crypt($_GET['new'], $conf_secretword);
 		$user = $User->get_current();
 		if($old == $user->password) {
 			$user->set_password($_GET['new']);
@@ -48,7 +39,7 @@ if (isset($_GET['action'])) {
 			$out = new intOutput();
 			$out->set("ok");
 		}
-		else { echo("1"); }
+		else { $out->set("generic_err"); }
 	}
 	if ($_GET['action'] == "changeEmail") {
 		$out = new intOutput();
@@ -59,23 +50,6 @@ if (isset($_GET['action'])) {
 			$out->set("ok");
 		}
 		else { $out->set("generic_err"); }
-	}
-	if ($_GET['action'] == "getUserIDFromName") {
-		$username = $_GET["username"];
-		$user = $User->filter("name", $username);
-		echo $user->id;
-	}
-	if ($_GET['action'] == "getUserEmail") {
-		$user = $User->get_current();
-		echo $user->email;
-	}
-	if ($_GET['action'] == "getUserID") {
-		$user = $User->get_current();
-		echo $user->id;
-	}
-	if ($_GET['action'] == "getUserLevel") {
-		$user = $User->get_current();
-		echo $user->level;
 	}
 }
 ?>

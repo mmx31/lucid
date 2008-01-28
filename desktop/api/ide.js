@@ -40,9 +40,10 @@ api.ide = new function()
 	                    code: app.code
 	               },
 	               load: function(data, ioArgs){
+						data = dojo.fromJson(data);
 						app.callback(data.id);
 						api.log("IDE API: Save Sucessful");
-						delete desktop.app.apps[parseInt(data)];
+						delete desktop.app.apps[parseInt(data.id)];
 				   },
 				   handleAs: "json"
 	          });

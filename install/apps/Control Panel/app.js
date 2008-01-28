@@ -14,17 +14,11 @@ this.kill = function() {
 this.init = function(args) {
 	this.open();
 }
-this.processUserName = function(username) {
-	dojo.byId("userName"+this.instance).innerHTML = username;
-}
-this.processUserEmail = function(useremail) {
-	dojo.byId("userEmail"+this.instance).innerHTML = useremail;
-}
-this.processUserID = function(userid) {
-	dojo.byId("userID"+this.instance).innerHTML = userid;
-}
-this.processUserLevel = function(userlevel) {
-	dojo.byId("userLevel"+this.instance).innerHTML = userlevel;
+this.processUser = function(blah) {
+	dojo.byId("userName"+this.instance).innerHTML = blah.username;
+	dojo.byId("userEmail"+this.instance).innerHTML = blah.email;
+	dojo.byId("userID"+this.instance).innerHTML = blah.id;
+	dojo.byId("userID"+this.instance).innerHTML = blah.level;
 }
 this.processThemes = function(theme) {
 	output = "";
@@ -109,10 +103,7 @@ this.open = function(args)
 	dijit.byId("fx"+this.instance).setChecked(desktop.config.fx);
 	dijit.byId("debug"+this.instance).setChecked(desktop.config.debug);
 	dijit.byId("crosstalkPing"+this.instance).setValue(desktop.config.crosstalkPing);
-	api.user.getUserName(dojo.hitch(this, this.processUserName));
-	api.user.getUserID(dojo.hitch(this, this.processUserID));
-	api.user.getUserLevel(dojo.hitch(this, this.processUserLevel));
-	api.user.getUserEmail(dojo.hitch(this, this.processUserEmail));
+	api.user.get(dojo.hitch(this, this.processUser));
 	desktop.theme.list(dojo.hitch(this, this.processThemes));
 }
 this.radioButton = function(a) {
