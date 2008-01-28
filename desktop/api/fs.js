@@ -33,7 +33,6 @@ api.fs = new function()
 			api.fs.lsArray[i].file = results[i].firstChild.nodeValue;
 			}
 	        if(object.callback) { object.callback(api.fs.lsArray); }
-        	desktop.core.loadingIndicator(1);
 		},
         error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
         mimetype: "text/xml"

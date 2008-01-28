@@ -8,20 +8,17 @@
 api.user = new function()
 {
 	this.getUserName = function(callback) {
-        desktop.core.loadingIndicator(0);
         dojo.xhrGet({
         url: "../backend/api/misc.php?action=getUserName",
         load: function(data, ioArgs) {
 			api.user.userName = data;
         	if(callback) { callback(data); }
-        	desktop.core.loadingIndicator(1);
 		},
         error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }
         });
 		}
 		
 	this.getUserEmail = function(callback) {
-        desktop.core.loadingIndicator(0);
         dojo.xhrGet({
         url: "../backend/api/misc.php?action=getUserEmail",
         load: function(data, ioArgs) {
@@ -34,13 +31,11 @@ api.user = new function()
 
 	this.getUserID = function(callback)
 	{
-        desktop.core.loadingIndicator(0);
         dojo.xhrGet({
         url: "../backend/api/misc.php?action=getUserID",
         load: function(data, ioArgs) {
 			api.user.userID = data;
 	        if(callback) { callback(data); }
-	        desktop.core.loadingIndicator(1);
 		},
         error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }, mimetype: "text/plain"
         });
@@ -48,38 +43,32 @@ api.user = new function()
 	
 	this.userIDToUserName = function(userid, callback)
 	{
-        desktop.core.loadingIndicator(0);
         dojo.xhrGet({
         url: "../backend/api/misc.php?action=getUserNameFromID&userid="+userid,
         load: function(data, ioArgs) {
 			api.user.username = data;
         	if(callback) { callback(data); }
-        	desktop.core.loadingIndicator(1);
 		},
         error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }
         });
 	}
 	this.userNameToUserID = function(username, callback)
 	{
-        desktop.core.loadingIndicator(0);
         dojo.xhrGet({
         url: "../backend/api/misc.php?action=getUserIDFromName&username="+username,
         load: function(data, ioArgs) {
 	        api.user.username = data;
 	        if(callback) { callback(data); }
-	        desktop.core.loadingIndicator(1);
 		},
         error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }, mimetype: "text/plain"
         });
 	}
 	this.getUserLevel = function(callback) {
-        desktop.core.loadingIndicator(0);
         dojo.xhrGet({
         url: "../backend/api/misc.php?action=getUserLevel",
         load: function(data, ioArgs) {
 		    api.user.userLevel = data;
     	    if(callback) { callback(data); }
-	        desktop.core.loadingIndicator(1);
 		},
         error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }
         });
