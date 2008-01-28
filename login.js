@@ -8,7 +8,7 @@ var desktop = {
 				+"<input type='text' class='desktop-input' name='username' /></div>"
 				+"<div><span class='desktop-inputlabel'>Password:</span>"
 				+"<input type='password' class='desktop-input' name='password' /></div>"
-				+"<div><input type='radio' name='windowAct' id='desktop_form_windowActNew' value='new' /><label for='desktop_form_windowActNew'> New window</label> "
+				+"<div><input type='radio' name='windowAct' id='desktop_form_windowActNew' value='new' /><label for='desktop_form_windowActNew'> New window</label>&nbsp;&nbsp;&nbsp;"
 				+"<input type='radio' name='windowAct' id='desktop_form_windowActCurrent' value='current' /><label for=' id='desktop_form_windowActCurrent''> Current window</label></div>"
 				+"<input type='submit' name='submit' class='desktop-input' value='Submit' />"
 				+"<div><a href='javascript: desktop.registerDialog();'>Register</a></div>"
