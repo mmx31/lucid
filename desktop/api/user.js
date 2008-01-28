@@ -7,7 +7,7 @@
 */
 api.user = new function()
 {
-	this.get(options) {
+	this.get = function(options) {
 		if(!options.id) { options.id = "0"; }
 		dojo.xhrGet({
         url: desktop.core.backend("api.misc.user.get"),
@@ -20,4 +20,5 @@ api.user = new function()
 		},
         error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); }
         });
+	}
 }

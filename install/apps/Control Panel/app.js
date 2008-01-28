@@ -18,7 +18,7 @@ this.processUser = function(blah) {
 	dojo.byId("userName"+this.instance).innerHTML = blah.username;
 	dojo.byId("userEmail"+this.instance).innerHTML = blah.email;
 	dojo.byId("userID"+this.instance).innerHTML = blah.id;
-	dojo.byId("userID"+this.instance).innerHTML = blah.level;
+	dojo.byId("userLevel"+this.instance).innerHTML = blah.level;
 }
 this.processThemes = function(theme) {
 	output = "";
@@ -103,7 +103,7 @@ this.open = function(args)
 	dijit.byId("fx"+this.instance).setChecked(desktop.config.fx);
 	dijit.byId("debug"+this.instance).setChecked(desktop.config.debug);
 	dijit.byId("crosstalkPing"+this.instance).setValue(desktop.config.crosstalkPing);
-	api.user.get(dojo.hitch(this, this.processUser));
+	api.user.get({callback: dojo.hitch(this, this.processUser)});
 	desktop.theme.list(dojo.hitch(this, this.processThemes));
 }
 this.radioButton = function(a) {
