@@ -175,6 +175,7 @@ bootstrap = {
 				}
 				else
 				{
+					history.back();
 					window.close();
 					document.body.innerHTML = "Not Logged In";
 					//Maybe one day we should implement a login form

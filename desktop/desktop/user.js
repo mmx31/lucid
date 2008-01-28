@@ -42,20 +42,9 @@ desktop.user = new function() {
 			load: function(data, ioArgs){
 				if(data == "0")
 				{
-					if(desktop.config.fx == true)
-					{
-						var anim = dojo.fadeOut({node: document.body, duration: 1000});
-						dojo.connect(anim, "onEnd", null, function(){
-							dojo.style(document.body, "opacity", 0);
-							window.close();
-						});
-						anim.play();
-					}
-					else
-					{
-						dojo.style(document.body, "opacity", 0);
-						window.close();
-					}
+					dojo.style(document.body, "display", "none");
+					history.back();
+					window.close();
 				}
 				else
 				{

@@ -8,6 +8,8 @@ var desktop = {
 				+"<input type='text' class='desktop-input' name='username' /></div>"
 				+"<div><span class='desktop-inputlabel'>Password:</span>"
 				+"<input type='password' class='desktop-input' name='password' /></div>"
+				+"<div><input type='radio' name='windowAct' id='desktop_form_windowActNew' value='new' /><label for='desktop_form_windowActNew'> New window</label> "
+				+"<input type='radio' name='windowAct' id='desktop_form_windowActCurrent' value='current' /><label for=' id='desktop_form_windowActCurrent''> Current window</label></div>"
 				+"<input type='submit' name='submit' class='desktop-input' value='Submit' />"
 				+"<div><a href='javascript: desktop.registerDialog();'>Register</a></div>"
 				+"<div><a href='javascript: desktop.forgotPassDialog();'>Reset Password</a></div>",
@@ -83,6 +85,7 @@ var desktop = {
 			dojo.addClass(document.body, "tundra");
 			dojo.require("dijit.form.Form");
 			dojo.require("dijit.form.TextBox");
+			dojo.require("dijit.form.CheckBox");
 			desktop.elements.loginform = new dijit.form.Form({}, dojo.byId(desktop.formid));
 			desktop.elements.loginform.domNode.innerHTML = desktop.loginForm;
 			desktop.elements.onExecuteForm = dojo.connect(desktop.elements.loginform, "execute", desktop, desktop.login);
@@ -93,6 +96,15 @@ var desktop = {
 				type: "password",
 				name: "password"
 			}, desktop.elements.loginform.domNode.password);
+			new dijit.form.RadioButton({
+				name: "windowAct",
+				checked: true,
+				value: "new"
+			}, dojo.query("#desktop_form_windowActNew", desktop.elements.loginform.domNode)[0]);
+			new dijit.form.RadioButton({
+				name: "windowAct",
+				value: "current"
+			}, dojo.query("#desktop_form_windowActCurrent", desktop.elements.loginform.domNode)[0]);
 		}
 		else {setTimeout(desktop.setOnLoad, 10);}
 	},
@@ -110,16 +122,22 @@ var desktop = {
 				{
 					if(data == "0")
 					{
-						if(desktop.popUp()) {
-						desktop.loggedin();
-						dojo.disconnect(desktop.elements.onExecuteForm);
-						dijit.byId(desktop.formid).domNode.username.value = "";
-						dijit.byId(desktop.formid).domNode.password.value = "";
-						dojo.byId("desktop_formerror").innerHTML = "Logged in. Window open.";
+						if(contents.windowAct == "current") {
+							dojo.byId("desktop_formerror").innerHTML = "Logged in. Redirecting to desktop...";
+							window.location = desktop.path+"/desktop/index.html";
 						}
 						else {
-						dojo.byId("desktop_formerror").innerHTML = "Your popup blocker is blocking the Psych Desktop window.";
-						dijit.byId(desktop.formid).domNode.submit.disabled=false;
+							if (desktop.popUp()) {
+								desktop.loggedin();
+								dojo.disconnect(desktop.elements.onExecuteForm);
+								dijit.byId(desktop.formid).domNode.username.value = "";
+								dijit.byId(desktop.formid).domNode.password.value = "";
+								dojo.byId("desktop_formerror").innerHTML = "Logged in. Window open.";
+							}
+							else {
+								dojo.byId("desktop_formerror").innerHTML = "Your popup blocker is blocking the Psych Desktop window.";
+								dijit.byId(desktop.formid).domNode.submit.disabled = false;
+							}
 						}
 					}
 					else if(data == "1")
