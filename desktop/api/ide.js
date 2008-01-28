@@ -40,7 +40,6 @@ api.ide = new function()
 	                    code: app.code
 	               },
 	               load: function(data, ioArgs){
-						data = dojo.fromJson(data);
 						app.callback(data.id);
 						api.log("IDE API: Save Sucessful");
 						delete desktop.app.apps[parseInt(data.id)];
@@ -63,9 +62,9 @@ api.ide = new function()
 			},
 			load: function(data, ioArgs)
 			{
-				data = dojo.fromJson(data);
 				if(callback) callback(data);
-			}
+			},
+			handleAs: "json"
 		});
 	}
 	this.getAppList = function(callback) {
@@ -73,10 +72,9 @@ api.ide = new function()
 		url: desktop.core.backend("core.app.fetch.list"),
 		load: function(data, ioArgs)
 		{
-			var apps = dojo.fromJson(data);
 			callback(apps);
 		},
-		mimetype: "text/plain"
+		handleAs: "json"
 	});
 	}
 }
