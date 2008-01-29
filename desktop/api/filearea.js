@@ -139,7 +139,7 @@ dojo.declare(
 			this.refresh();
 			this.onPathChange(path);
 		}
-		else api.fs.launchApp(path, true);
+		else desktop.app.launchHandler(path);
 	},
 	_onClick: function(e)
 	{

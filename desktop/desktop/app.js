@@ -120,15 +120,17 @@ desktop.app = new function()
 						desktop.app.launch(c[0], dojo.fromJson(c[1]));
 					})
 				});
+				return;
 			}
 			else {
 				api.fs.info(file, function(f){
 					var type = f.mimetype;
-					if(type == "text/directory") {
-						for(app in this.appList) {
-							var app = this.appList[app];
-							for(key in app.filetypes) {
-								if(app.filetypes[key] == "text/directory") {
+					if (type == "text/directory") {
+						for (app in this.appList) {
+						console.log("testdir");
+							app = this.appList[app];
+							for (key in app.filetypes) {
+								if (app.filetypes[key] == "text/directory") {
 									args.path = file;
 									desktop.app.launch(app.id, args);
 									return;
@@ -136,21 +138,23 @@ desktop.app = new function()
 							}
 						}
 					}
-					var typeParts = type.split("/");
-					for(app in this.appList) {
-						var app = this.appList[app];
-						for(key in app.filetypes) {
-							var parts = app.filetypes[key].split("/");
-							if(parts[0] == typeParts[0] && (parts[1] == "*" || parts[1] == typeParts[1])) {
-								args.file = file;
-								desktop.app.launch(app.id, args);
-								return;
+					else {
+						var typeParts = type.split("/");
+						for (app in this.appList) {
+							var app = this.appList[app];
+							for (key in app.filetypes) {
+								var parts = app.filetypes[key].split("/");
+								if (parts[0] == typeParts[0] && (parts[1] == "*" || parts[1] == typeParts[1])) {
+									args.file = file;
+									desktop.app.launch(app.id, args);
+									return;
+								}
 							}
 						}
 					}
 					api.ui.alertDialog({
 						title: "Error",
-						message: "Cannot open " + file + ", no app associated with that extention"
+						message: "Cannot open " + file + ", no app associated with " + type
 					});
 				});
 			}
