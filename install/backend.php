@@ -125,7 +125,7 @@
 				$app->version = $in[version];
 				$app->maturity = $in[maturity];
 				$app->category = $in[category];
-				$app->filetypes = json_decode($in[filetypes] or "[]");
+				$app->filetypes = json_decode($in['filetypes']);
 				$installfile = $in[installFile];
 				$message = $in[installMessage];
 				$message2 = $in[installedMessage];

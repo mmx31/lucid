@@ -353,6 +353,7 @@
 					}
 					if($v['type'] == "array") {
 						$v['type'] = "text";
+						$v['default'] = $v['default'] ? $v['default'] : "[]";
 					}
 					$list[$key] = $v;
 				}
