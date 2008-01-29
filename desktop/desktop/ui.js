@@ -861,7 +861,6 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 					var cat = list[cat];
 					//cat.meow();
 					var category = new dijit.PopupMenuItem({iconClass: "icon-16-categories-applications-"+cat.toLowerCase(), label: cat});
-					//category.addChild(dojo.doc.createElement("span"));
 					var catMenu = new dijit.Menu({parentMenu: category});
 					for(app in data)
 					{

@@ -6,6 +6,7 @@
 <version>1.0.3.1</version>
 <maturity>Beta</maturity>
 <category>Accessories</category>
+<filetypes>["text/*"]</filetypes>
 <installFile>app.js</installFile>
 <filesRequired>false</filesRequired>
 <installMessage>Text Editor is being installed...</installMessage>

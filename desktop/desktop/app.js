@@ -15,6 +15,7 @@ desktop.app = new function()
 		 * @memberOf desktop.app
 		 */
 		this.apps = new Array();
+		this.appList = [];
 		/**
 		 * Contains each instance of all apps
 		 * 
@@ -33,6 +34,13 @@ desktop.app = new function()
 		this.instanceCount = 0;
 		this.init = function() {
 			this.onConfigApply = dojo.subscribe("configApply", this, this.startupApps);
+			api.xhr({
+				backend: "core.app.fetch.list",
+				load: dojo.hitch(this, function(data, ioArgs) {
+					this.appList = data;
+				}),
+				handleAs: "json"
+			});
 		}
 		this.startupApps = function() {
 			dojo.unsubscribe(this.onConfigApply);
@@ -99,6 +107,53 @@ desktop.app = new function()
 				}),
 			    error: function(error, ioArgs) { api.toaster("Error: "+error.message); }
 			});
+		}
+		this.launchHandler = function(file, args) {
+			if(!args) args = {};
+			var l = file.lastIndexOf(".");
+			var ext = file.substring(l + 1, file.length);
+			if (ext == "desktop") {
+				api.fs.read({
+					path: file,
+					callback: dojo.hitch(this, function(file){
+						var c = file.contents.split("\n");
+						desktop.app.launch(c[0], dojo.fromJson(c[1]));
+					})
+				});
+			}
+			else {
+				api.fs.info(file, function(f){
+					var type = f.mimetype;
+					if(type == "text/directory") {
+						for(app in this.appList) {
+							var app = this.appList[app];
+							for(key in app.filetypes) {
+								if(app.filetypes[key] == "text/directory") {
+									args.path = file;
+									desktop.app.launch(app.id, args);
+									return;
+								}
+							}
+						}
+					}
+					var typeParts = type.split("/");
+					for(app in this.appList) {
+						var app = this.appList[app];
+						for(key in app.filetypes) {
+							var parts = app.filetypes[key].split("/");
+							if(parts[0] == typeParts[0] && (parts[1] == "*" || parts[1] == typeParts[1])) {
+								args.file = file;
+								desktop.app.launch(app.id, args);
+								return;
+							}
+						}
+					}
+					api.ui.alertDialog({
+						title: "Error",
+						message: "Cannot open " + file + ", no app associated with that extention"
+					});
+				});
+			}
 		}
 		/** 
 		* Fetches an app and stores it into the cache

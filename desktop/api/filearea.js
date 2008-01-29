@@ -178,7 +178,7 @@ dojo.declare(
 	{
 		//this is a hook to use when an item is opened
 		//this defaults to opening the file
-		api.fs.launchApp(path);
+		desktop.app.launchHandler(path);
 	},
 	onHighlight: function(path)
 	{

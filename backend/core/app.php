@@ -37,14 +37,17 @@
 		if($_GET['action'] == "list")
 		{
 			$p = $App->all();
-			echo "[";
+			$out = new jsonOutput();
 			$list = array();
 			foreach($p as $d => $v)
 			{
-				array_push($list, $v->make_json(array("id", "name", "category", "version")));
+				$item = array();
+				foreach(array("id", "name", "category", "version", "filetypes") as $key) {
+					$item[$key] = $v->$key;
+				}
+				array_push($list, $item);
 			}
-			echo implode(",\n", $list);
-			echo "]";
+			$out->set($list);
 		}
 	}
 ?>

@@ -189,37 +189,6 @@ api.fs = new function()
 	        mimetype: "text/html"
         });
     }
-	this.launchApp = function(path, dir)
-	{
-		if (dir) {
-			desktop.app.launch(desktop.config.filesystem.handlers.folder, {path: path})
-		}
-		else {
-			var l = path.lastIndexOf(".");
-			var ext = path.substring(l + 1, path.length);
-			if (ext == "desktop") {
-				this.read({
-					path: path,
-					callback: dojo.hitch(this, function(file){
-						var c = file.contents.split("\n");
-						desktop.app.launch(c[0], dojo.fromJson(c[1]));
-					})
-				});
-			}
-			else 
-				if (typeof desktop.config.filesystem.handlers[ext] == "number") {
-					desktop.app.launch(desktop.config.filesystem.handlers[ext], {
-						file: path
-					});
-				}
-				else {
-					api.ui.alertDialog({
-						title: "Error",
-						message: "Cannot open " + path + ", no app associated with that extention"
-					});
-				}
-		}
-	}
 	this.download = function(path) {
 		var url = desktop.core.backend("api.fs.io.download") + "&path=" + path;
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
@@ -239,5 +208,17 @@ api.fs = new function()
 	}
 	this.embed = function(path) {
 		return desktop.core.backend("api.fs.io.display") + "&path=" + path;
+	}
+	this.info = function(path, callback) {
+		api.xhr({
+			backend: "api.fs.io.info",
+			content: {
+				path: path
+			},
+			load: function(data, args) {
+				callback(data);
+			},
+			handleAs: "json"
+		})
 	}
 }

@@ -173,6 +173,23 @@ if($_GET['section'] == "io")
 			readfile($f);
 		}
 	}
+	if ($_GET['action'] == "info") {
+			$odir = $_POST['path'];
+		    $dir = "../../files/".$username."/$odir";
+			$out = new jsonOutput();
+			$out->append("path", $odir);
+			if(is_dir($dir)) {
+				$out->append("dir", true);
+				$out->append("mimetype", "text/directory");
+			}
+			else if(is_file($dir)) {
+				$out->append("file", true);
+				$out->append("last_modified", date ("F d Y H:i:s.", filemtime($dir)));
+				$out->append("size", filesize($dir));
+				$out->append("mimetype", mime_content_type($dir));
+			}
+			
+	}
 }
 
 function deltree( $f ){

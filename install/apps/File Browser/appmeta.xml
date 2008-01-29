@@ -6,6 +6,7 @@
 <version>1.0</version>
 <maturity>Stable</maturity>
 <category>System</category>
+<filetypes>["text/directory"]</filetypes>
 <installFile>app.js</installFile>
 <filesRequired>false</filesRequired>
 <installMessage>File Browser is being installed...</installMessage>

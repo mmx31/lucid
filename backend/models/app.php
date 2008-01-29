@@ -8,6 +8,7 @@
 		var $version = array('type' => "text");
 		var $maturity = array('type' => "text");
 		var $category = array('type' => "text");
+		var $filetypes = array('type' => "array");
 	}
 	global $App;
 	$App = new App();
