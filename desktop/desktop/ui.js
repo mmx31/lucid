@@ -344,13 +344,13 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	_place: function() {
 		var viewport = dijit.getViewport();
 		var s = {};
-		if(this.placement[0] == "T" || this.placement[0] == "B") {
+		if(this.placement.charAt(0) == "T" || this.placement.charAt(0) == "B") {
 			this._makeHorizontal();
-			if(this.placement[1] == "R") 
+			if(this.placement.charAt(1) == "R") 
 				s.left = (viewport.w - this.domNode.offsetWidth);
-			if(this.placement[1] == "L") 
+			if(this.placement.charAt(1) == "L") 
 				s.left = viewport.l;
-			if(this.placement[1] == "C") {
+			if(this.placement.charAt(1) == "C") {
 				if(this.span != 1) {
 					s.left = (viewport.w - (this.span*viewport.w)) / 2;
 				}
@@ -358,28 +358,28 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 					s.left = viewport.l;
 			}
 			
-			if(this.placement[0] == "B") 
+			if(this.placement.charAt(0) == "B") 
 				s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight;
 			else 
-				if(this.placement[0] == "T") 
+				if(this.placement.charAt(0) == "T") 
 					s.top = viewport.t;
 		}
 		else {
 			//we need a completely different layout algorytm :D
 			this._makeVertical();
-			if(this.placement[1] == "C") {
+			if(this.placement.charAt(1) == "C") {
 				if(this.span != 1) {
 					var span = dojo.style(this.domNode, "height");
 					s.top = (viewport.h - span)/2;
 				}
 			}
-			else if(this.placement[1] == "B") {
+			else if(this.placement.charAt(1) == "B") {
 				s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight;
 			}
 			else {
 				s.top = viewport.t;
 			}
-			if(this.placement[0] == "L") {
+			if(this.placement.charAt(0) == "L") {
 				s.left = viewport.l;
 			}
 			else {
@@ -395,19 +395,19 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		for(sk in sides) {
 			dojo.removeClass(this.domNode, "desktopPanel"+sides[sk]);
 		}
-		dojo.addClass(this.domNode, "desktopPanel"+sides[this.placement[0]]);
+		dojo.addClass(this.domNode, "desktopPanel"+sides[this.placement.charAt(0)]);
 		
 		var count = 0;
 		//check for other panels in the same slot as us
 		dojo.query(".desktopPanel").forEach(dojo.hitch(this, function(panel) {
 			var panel = dijit.byNode(panel);
 			if(panel.id != this.id) {
-				if(this.placement[0] == panel.placement[0] && (panel.span==1 || this.span==1)) count += panel.thickness;
+				if(this.placement.charAt(0) == panel.placement.charAt(0) && (panel.span==1 || this.span==1)) count += panel.thickness;
 				else if(panel.placement == this.placement)
 					count += panel.thickness;
 			}
 		}));
-		if(this.placement[0] == "L" || this.placement[0] == "T") s[this.orientation == "horizontal" ? "top" : "left"] += count;
+		if(this.placement.charAt(0) == "L" || this.placement.charAt(0) == "T") s[this.orientation == "horizontal" ? "top" : "left"] += count;
 		else s[this.orientation == "horizontal" ? "top" : "left"] -= count;
 		if(desktop.config.fx) {
 			var props = {};
@@ -493,26 +493,26 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		if(desktop.config.fx) {
 			//TODO: add to viewport when there are other panels around!
 			var viewport = dijit.getViewport();
-			if(this.placement[0] == "B") {
+			if(this.placement.charAt(0) == "B") {
 				dojo.style(this.domNode, "top", viewport.h + this.thickness);
 			}
-			else if(this.placement[0] == "T") {
+			else if(this.placement.charAt(0) == "T") {
 				dojo.style(this.domNode, "top", -(this.thickness))
 			}
-			else if(this.placement[0] == "R") {
+			else if(this.placement.charAt(0) == "R") {
 				dojo.style(this.domNode, "left", viewport.w + this.thickness);
 			}
 			else {
 				dojo.style(this.domNode, "left", -(this.thickness));
 			}
 			
-			if(this.placement[1] == "T") {
+			if(this.placement.charAt(1) == "T") {
 				dojo.style(this.domNode, "top", "0px");
-			} else if(this.placement[1] == "B") {
+			} else if(this.placement.charAt(1) == "B") {
 				dojo.style(this.domNode, "top", (viewport.h - this.domNode.offsetHeight)+"px");
-			} else if(this.placement[1] == "L") {
+			} else if(this.placement.charAt(1) == "L") {
 				dojo.style(this.domNode, "left", "0px");
-			} else if(this.placement[1] == "R") {
+			} else if(this.placement.charAt(1) == "R") {
 				dojo.style(this.domNode, "left", (viewport.w - this.domNode.offsetWidth)+"px");
 			}
 			else {
