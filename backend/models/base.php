@@ -353,7 +353,7 @@
 					}
 					if($v['type'] == "array") {
 						$v['type'] = "text";
-						$v['default'] = $v['default'] ? $v['default'] : "[]";
+						//$v['default'] = $v['default'] ? json_encode($v['default']) : "[]";
 					}
 					$list[$key] = $v;
 				}
