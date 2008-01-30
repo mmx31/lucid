@@ -23,8 +23,8 @@ a {
 	width: 350px;
 	margin-left: auto;
 	margin-right: auto;
-	margin-top: 12%;
 	position: relative;
+	vertical-align: middle;
 	opacity: 0.8;
 	filter: alpha(opacity=80);
 }
