@@ -123,16 +123,14 @@ desktop.app = new function()
 				return;
 			}
 			else {
-				api.fs.info(file, function(f){
+				api.fs.info(file, dojo.hitch(this, function(f){
 					var type = f.mimetype;
 					if (type == "text/directory") {
 						for (app in this.appList) {
-						console.log("testdir");
-							app = this.appList[app];
-							for (key in app.filetypes) {
-								if (app.filetypes[key] == "text/directory") {
+							for (key in this.appList[app].filetypes) {
+								if (this.appList[app].filetypes[key] == "text/directory") {
 									args.path = file;
-									desktop.app.launch(app.id, args);
+									desktop.app.launch(this.appList[app].id, args);
 									return;
 								}
 							}
@@ -141,12 +139,11 @@ desktop.app = new function()
 					else {
 						var typeParts = type.split("/");
 						for (app in this.appList) {
-							var app = this.appList[app];
-							for (key in app.filetypes) {
-								var parts = app.filetypes[key].split("/");
+							for (key in this.appList[app].filetypes) {
+								var parts = this.appList[app].filetypes[key].split("/");
 								if (parts[0] == typeParts[0] && (parts[1] == "*" || parts[1] == typeParts[1])) {
 									args.file = file;
-									desktop.app.launch(app.id, args);
+									desktop.app.launch(this.appList[app].id, args);
 									return;
 								}
 							}
@@ -156,7 +153,7 @@ desktop.app = new function()
 						title: "Error",
 						message: "Cannot open " + file + ", no app associated with " + type
 					});
-				});
+				}));
 			}
 		}
 		/** 
