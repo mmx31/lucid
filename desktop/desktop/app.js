@@ -108,7 +108,7 @@ desktop.app = new function()
 			    error: function(error, ioArgs) { api.toaster("Error: "+error.message); }
 			});
 		}
-		this.launchHandler = function(file, args) {
+		this.launchHandler = function(file, args, format) {
 			if(!args) args = {};
 			var l = file.lastIndexOf(".");
 			var ext = file.substring(l + 1, file.length);
@@ -123,38 +123,46 @@ desktop.app = new function()
 				return;
 			}
 			else {
-				api.fs.info(file, dojo.hitch(this, function(f){
-					var type = f.mimetype;
-					if (type == "text/directory") {
-						for (app in this.appList) {
-							for (key in this.appList[app].filetypes) {
-								if (this.appList[app].filetypes[key] == "text/directory") {
-									args.path = file;
-									desktop.app.launch(this.appList[app].id, args);
-									return;
-								}
-							}
-						}
-					}
-					else {
-						var typeParts = type.split("/");
-						for (app in this.appList) {
-							for (key in this.appList[app].filetypes) {
-								var parts = this.appList[app].filetypes[key].split("/");
-								if (parts[0] == typeParts[0] && (parts[1] == "*" || parts[1] == typeParts[1])) {
-									args.file = file;
-									desktop.app.launch(this.appList[app].id, args);
-									return;
-								}
-							}
-						}
-					}
-					api.ui.alertDialog({
-						title: "Error",
-						message: "Cannot open " + file + ", no app associated with " + type
-					});
-				}));
+				if(!format) {
+					api.fs.info(file, dojo.hitch(this, function(f){
+						var type = f.mimetype;
+						this._launchHandler(file, type, args);
+					}));
+				}
+				else {
+					this._launchHandler(file, format, args);
+				}
 			}
+		}
+		this._launchHandler = function(file, type, args) {
+			if (type == "text/directory") {
+				for (app in this.appList) {
+					for (key in this.appList[app].filetypes) {
+						if (this.appList[app].filetypes[key] == "text/directory") {
+							args.path = file;
+							desktop.app.launch(this.appList[app].id, args);
+							return;
+						}
+					}
+				}
+			}
+			else {
+				var typeParts = type.split("/");
+				for (app in this.appList) {
+					for (key in this.appList[app].filetypes) {
+						var parts = this.appList[app].filetypes[key].split("/");
+						if (parts[0] == typeParts[0] && (parts[1] == "*" || parts[1] == typeParts[1])) {
+							args.file = file;
+							desktop.app.launch(this.appList[app].id, args);
+							return;
+						}
+					}
+				}
+			}
+			api.ui.alertDialog({
+				title: "Error",
+				message: "Cannot open " + file + ", no app associated with " + type
+			});
 		}
 		/** 
 		* Fetches an app and stores it into the cache
