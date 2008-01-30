@@ -3,6 +3,7 @@ this.init = function(args)
 {
 	api.instances.setActive(this.instance);
 	dojo.require("dijit.layout.LayoutContainer");
+	dojo.require("dijit.layout.ContentPane");
 	dojo.require("dijit.form.Textarea");
 	dojo.require("dijit.form.Button");
     dojo.require("dijit.form.TextBox");

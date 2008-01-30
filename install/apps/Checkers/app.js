@@ -93,9 +93,9 @@ this.makePiece = function(c)
 			}
 		}
 	});
-	shape.__color = c.color,
-	shape.__king = false;
-	shape.__id = this.pieceCount;
+	shape._checkers_color = c.color,
+	shape._checkers_king = false;
+	shape._checkers_id = this.pieceCount;
 	this.pieces[this.pieces.length] = {
 		circle: shape,
 		movable: move,
@@ -105,17 +105,17 @@ this.makePiece = function(c)
 }
 this.checkKing = function(x, y, piece)
 {
-	if(piece.__color == "red") {
+	if(piece._checkers_color == "red") {
 		if(y/50 == 8)
 		{
-			piece.__king = true;
+			piece._checkers_king = true;
 			piece.setStroke("gold");
 		}
 	}
-	if(piece.__color == "black") {
+	if(piece._checkers_color == "black") {
 		if(y/50 == 1)
 		{
-			piece.__king = true;
+			piece._checkers_king = true;
 			piece.setStroke("gold");
 		}
 	}
@@ -130,7 +130,7 @@ this.checkMove = function(old_pos, x, y, shape)
 		dojo.forEach(this.pieces, function(piece) {
 			if(piece)
 			{
-				if(piece.id != shape.__id) {
+				if(piece.id != shape._checkers_id) {
 					var pos = piece.circle.getShape();
 					var trans = (piece.circle.getTransform() || {dx: 0, dy: 0});
 					var c = {
@@ -146,15 +146,15 @@ this.checkMove = function(old_pos, x, y, shape)
 			x: Math.abs((old_pos.x/50) - (x/50)+1),
 			y: (old_pos.y/50) - (y/50)+1
 		};
-		if(shape.__king) spaces.y = Math.abs(spaces.y);
-		else if(shape.__color == "red") spaces.y = -spaces.y;
+		if(shape._checkers_king) spaces.y = Math.abs(spaces.y);
+		else if(shape._checkers_color == "red") spaces.y = -spaces.y;
 		if(spaces.x == 1 && spaces.y == 1) {
 			if(typeof board[(x/50)-1] != "undefined" && typeof board[(x/50)-1][(y/50)-1] == "undefined") return true;
 		}
 		else if(spaces.x == 2 && spaces.y == 2) {
 			var ey = (((old_pos.y/50) + (y/50))/2)-0.5;
 			var ex = (((old_pos.x/50) + (x/50))/2)-0.5;
-			if(typeof board[ex][ey] != "undefined" && board[ex][ey].circle.__color != shape.__color) {
+			if(typeof board[ex][ey] != "undefined" && board[ex][ey].circle._checkers_color != shape._checkers_color) {
 				if(typeof board[(x/50)-1] != "undefined" && typeof board[(x/50)-1][(y/50)-1] == "undefined") {
 					this.surface.remove(board[ex][ey].circle);
 					for(i in this.pieces) {
