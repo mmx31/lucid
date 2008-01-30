@@ -57,13 +57,15 @@ this.makePiece = function(c)
 			dy: 0
 		});
 	});
+	var bodyNode = this.win.body.domNode;
 	shape.connect("onmouseup", shape, function(e) {
+		var bCoords = dojo.coords(bodyNode);
 		for(var c=0; c <= 400; c+=50)
 		{
-			if(e.layerY <= c && e.layerY >= c-50) {
+			if(e.clientY - bCoords.y <= c && e.clientY - bCoords.y >= c-50) {
 				for(var v=0; v <= 400; v+=50)
 				{
-					if(e.layerX <= v && e.layerX >= v-50)
+					if(e.clientX - bCoords.x <= v && e.clientX - bCoords.x >= v-50)
 					{
 						var os=this.old_shape;
 						var pos = this.old_pos;
