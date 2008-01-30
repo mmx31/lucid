@@ -72,7 +72,7 @@ api.ide = new function()
 		url: desktop.core.backend("core.app.fetch.list"),
 		load: function(data, ioArgs)
 		{
-			callback(apps);
+			callback(data);
 		},
 		handleAs: "json"
 	});
