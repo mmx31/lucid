@@ -108,12 +108,12 @@ if($_GET['section'] == "io")
 			}
 		}
 		else {
-			echo "/*";
-			foreach($_FILES as $file)
-			{
-				echo $file['name'] . "\n";
-			}
-			echo "*/";
+			#echo "/*";
+			#foreach($_FILES as $file)
+			#{
+			#	echo $file['name'] . "\n";
+			#}
+			#echo "*/";
 			die("<textarea>{status: 'failed', details: 'File not uploaded'}</textarea>");
 		}
 	}
@@ -175,21 +175,28 @@ if($_GET['section'] == "io")
 	}
 	if ($_GET['action'] == "info") {
 			$odir = $_POST['path'];
-		    $dir = "../../files/".$username."/$odir";
 			$out = new jsonOutput();
-			$out->append("path", $odir);
-			if(is_dir($dir)) {
-				$out->append("dir", true);
-				$out->append("mimetype", "text/directory");
-			}
-			else if(is_file($dir)) {
-				$out->append("file", true);
-				$out->append("last_modified", date ("F d Y H:i:s.", filemtime($dir)));
-				$out->append("size", filesize($dir));
-				$out->append("mimetype", mime_content_type($dir));
-			}
-			
+			$out->set(getInfo($odir));
 	}
+}
+
+function getInfo($file) {
+	global $username;
+	$r = array();
+	$r['path'] = $file;
+	$f = "../../files/".$username."/$file";
+	$r['name'] = basename($f);
+	if(is_dir($f)) {
+		$r["dir"] = true;
+		$r["mimetype"] = "text/directory";
+	}
+	else if(is_file($f)) {
+		$r["file"] = true;
+		$r["last_modified"] = date ("F d Y H:i:s.", filemtime($f));
+		$r["size"] = filesize($f);
+		$r["mimetype"] = mime_content_type($f);
+	}
+	return $r;
 }
 
 function deltree( $f ){
