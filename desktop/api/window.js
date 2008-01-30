@@ -223,6 +223,14 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				anim.play();
 			} else this._resizeBody();
 	},
+	_getPoints: function(box) {
+		return {
+			tl: {x: box.x, y: box.y},
+			tr: {x: box.x+box.w, y: box.y},
+			bl: {x: box.x, y: box.y+box.h},
+			br: {x: box.x+box.w, y: box.y+box.h}
+		}
+	},
 	_onTaskClick: function()
 	{
 		var s = this.domNode.style.display;
@@ -235,45 +243,36 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		{
 			var ns = dojo.query("div.win", desktop.ui.containerNode);
 			var box;
-			var myBox = new Object
+			var myBox = dojo.coords(this.domNode);
+			var sides = {
+				t: myBox.y,
+				l: myBox.x,
+				b: myBox.y+myBox.h,
+				r: myBox.x+myBox.w
+			};
 			var overlapping = false;
-			myBox.l = this.domNode.style.left;
-			myBox.t = this.domNode.style.top;
-			myBox.b = myBox.t + myBox.h;
-			myBox.r = myBox.l + myBox.w;
+			//TODO: if the windows form a cross, this algorythm does not work
+			//TODO: I'm going to have to find the max zIndex of only the overlapping windows in some cases too...
 			for(n = 0; n < ns.length; n++)
 			{
-				if(ns[n].id != this.id && (ns[n].style.display) != "none")
-				{
-					//TODO: overlap detection is really bad. rewrite it.
-					box = new Object();
-					box.l = ns[n].style.left;
-					box.t = ns[n].style.top;
-					box.w = ns[n].style.width;
-					box.h = ns[n].style.height;
-					if(box.l <= myBox.r &&
-					   box.l >= myBox.l &&
-					   box.t <= myBox.b &&
-					   box.t >= myBox.t)
-					{
-						if(desktop.config.debug == true) api.log("windows are overlapping!");
+				if(dojo.style(ns[n], "display") == "none") continue;
+				var box = dojo.coords(ns[n]);
+				var points = this._getPoints(box);
+				for(point in points) {
+					p = points[point];
+					if(p.x >= sides.l && p.x <= sides.r
+					&& p.y >= sides.t && p.y <= sides.b) {
 						overlapping = true;
 						break;
 					}
 				}
+				if(overlapping) break;
 			}
-			var wasontop = this.bringToFront();
-			if(desktop.config.debug == true) api.log("onTop: "+wasontop+" overlap: "+overlapping);
-			if(overlapping == false)
-			{
-				this.minimize();
-			}
-			else if(wasontop == true)
-			{
-				this.minimize();
-				}
-			}
-		},
+			var ctf = this.bringToFront();
+			if(overlapping && !ctf) this.minimize();
+			else if(!overlapping) this.minimize();
+		}
+	},
 	_toggleMaximize: function() {
 		if(this.maximized == true) this.unmaximize();
 		else this.maximize();
@@ -548,23 +547,20 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		var maxZindex = 10;
 		for(i=0;i<ns.length;i++)
 		{
-			if((ns[i].style.display) != "none")
+			if(dojo.style(ns[i], "display") == "none") continue;
+			if(dojo.style(ns[i], "zIndex") > maxZindex)
 			{
-				if((ns[i].style.zIndex) >= maxZindex)
-				{
-					maxZindex = ns[i].style.zIndex;
-				}
+				maxZindex = dojo.style(ns[i], "zIndex");
 			}
 		}
-		zindex = this.domNode.style.zIndex;
-		if(desktop.config.debug == true) { api.log(maxZindex+" != "+zindex); }
+		var zindex = dojo.style(this.domNode, "zIndex");
 		if(maxZindex != zindex)
 		{
 			maxZindex++;
 			dojo.style(this.domNode, "zIndex", maxZindex);
-			return false;
+			return true;
 		}
-		else return true;
+		return false;
 	},
 	uninitialize: function() {
 		if(!this.closed) this.onClose();
