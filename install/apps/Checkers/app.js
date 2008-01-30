@@ -59,7 +59,7 @@ this.makePiece = function(c)
 	});
 	var bodyNode = this.win.body.domNode;
 	shape.connect("onmouseup", shape, function(e) {
-		var bCoords = dojo.coords(bodyNode);
+		var bCoords = dojo.coords(bodyNode, false);
 		for(var c=0; c <= 400; c+=50)
 		{
 			if(e.clientY - bCoords.y <= c && e.clientY - bCoords.y >= c-50) {
