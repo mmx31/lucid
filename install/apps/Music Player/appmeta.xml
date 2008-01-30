@@ -6,6 +6,7 @@
 <version>1.0</version>
 <maturity>Stable</maturity>
 <category>Multimedia</category>
+<filetypes>["audio/*"]</filetypes>
 <installFile>app.js</installFile>
 <filesRequired>false</filesRequired>
 <installMessage>Music Player is being installed...</installMessage>

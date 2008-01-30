@@ -6,6 +6,7 @@
 <version>1.0</version>
 <maturity>Alpha</maturity>
 <category>Accessories</category>
+<filetypes>["text/html"]</filetypes>
 <installFile>app.js</installFile>
 <filesRequired>false</filesRequired>
 <installMessage>Rich/HTML Editor is being installed...</installMessage>
