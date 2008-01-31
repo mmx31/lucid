@@ -12,7 +12,7 @@
 			else { $u = $result[0]; }
 			$u->value = $_POST['value'];
 			$u->save();
-			echo "0";
+			$out = new intOutput("ok");
 		}
 		if($_GET['action'] == "load")
 		{
@@ -32,8 +32,8 @@
 		{
 			$p = $User->get_current();
 			$result = $Registry->filter(array("userid" => $p->id, "appid" => $_POST['appid'], "name" => $_POST['name']));			
-			if(isset($result[0])) { $result[0]->delete(); echo "0"; }
-			else { echo "1"; }
+			if(isset($result[0])) { $result[0]->delete(); $out = new intOutput("ok"); }
+			else { $out = new intOutput("generic_err"); }
 		}
 	}
 	if($_GET['section'] == "info")
@@ -42,8 +42,8 @@
 		{
 			$p = $User->get_current();
 			$result = $Registry->filter(array("userid" => $p->id, "appid" => $_POST['appid'], "name" => $_POST['name']));
-			if(isset($result[0])) { echo "0"; }
-			else { echo "1"; }
+			if(isset($result[0])) { $out = new intOutput("ok"); }
+			else { $out = new intOutput("generic_err"); }
 		}
 	}
 ?>

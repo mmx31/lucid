@@ -24,11 +24,11 @@ if($_GET['section'] == "check")
 	{
 		if($_SESSION['userloggedin'] == true)
 		{
-			echo "0";
+			$out = new intOutput("ok");
 		}
 		else
 		{
-			echo "1";
+			$out = new intOutput("generic_err");
 		}
 	}
 }

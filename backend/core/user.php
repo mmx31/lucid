@@ -44,19 +44,19 @@
 			if($p != FALSE) {
 				if($p->has_permission("core.user.auth.login")) {
 					$p->login();
-					echo "0";
+					$out = new intOutput("ok");
 				}
 				else {
 					internal_error("permission_denied");
 				}
 			}
-			else { echo "1"; }
+			else { $out = new intOutput("generic_err"); }
 		}
 		if($_GET['action'] == "logout")
 		{
 			$user = $User->get_current();
 			$user->logout();
-			echo "0";
+			$out = new intOutput("ok");
 		}
 		if($_GET['action'] == "resetpass")
 		{
@@ -69,11 +69,11 @@
 					$pass = $p->generate_password();
 					$message= "In response to your forgotten password request, here's your new password.\r\n\r\n" . "New Password: '" . $pass . "'\r\n\r\nLog in with this password, then change your password using the control panel. Thanks!\r\n\r\n--The Management";
 					mail($p->email, "Psych Desktop Password Reset", $message, "From: Psych Desktop Account Service");
-					echo "0";
+					$out = new intOutput("ok");
 				}
-				else { echo "2"; }
+				else { $out = new intOutput(2); }
 			}
-			else { echo "1"; }
+			else { $out = new intOutput("generic_err"); }
 		}
 		if($_GET['action'] == "register")
 		{
@@ -81,7 +81,7 @@
 			if($conf_public == "yes")
 			{
 				$u = $User->filter("username", $_POST['username']);
-				if(isset($u[0])) { echo "1"; }
+				if(isset($u[0])) { $out = new intOutput("generic_err"); }
 				else
 				{
 					$p = new User();
@@ -96,7 +96,7 @@
 			}
 			else
 			{
-				echo "1";
+				$out = new intOutput("generic_err");
 			}
 		}
 		if($_GET['action'] == "public")

@@ -11,25 +11,25 @@ if($_GET['section'] == "io")
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$username."/$odir";
 					mkdir($dir);
-					echo "0";
+					$out = new intOutput("ok");
 	}
 		if ($_GET['action'] == "copyFile") {
 					$odir = "../../files/".$username."/".$_POST['path'];
 					$odira = "../../files/".$username."/".$_POST['newpath'];
 					copy($odir, $odira);
-					echo "0";
+					$out = new intOutput("ok");
 	}
 		if ($_GET['action'] == "removeFile") {
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$username."/$odir";
 					unlink($dir);
-					echo "0";
+					$out = new intOutput("ok");
 	}
 		if ($_GET['action'] == "removeDir") {
 					$odir = $_POST['path'];
 				    $dir = "../../files/".$username."/$odir";
 					deltree($dir);
-					echo "0";
+					$out = new intOutput("ok");
 	}
 		if ($_GET['action'] == "renameFile") {
 					$file = $_POST['path'];
@@ -37,7 +37,7 @@ if($_GET['section'] == "io")
 				    $dir = "../../files/".$username."/$file";
 					$dir2 = "../../files/".$username."/$newfile";
 					rename($dir, $dir2);
-					echo "0";
+					$out = new intOutput("ok");
 	}
 		if ($_GET['action'] == "getFolder") {
 			$odir = $_POST['path'];
@@ -90,7 +90,7 @@ if($_GET['section'] == "io")
 					$odir = $_POST['path'];
 				    	$dir = "../../files/".$username."/$odir";
 					$file = file_put_contents($dir, $content);
-					echo "0";
+					$out = new intOutput("ok");
 	}
 	if($_GET['action'] == "upload") {
 		$user = $User->get_current();

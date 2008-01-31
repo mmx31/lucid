@@ -24,7 +24,7 @@
 		{
 		   	$p = $Crosstalk->filter(Array("userid", "id"), Array($_SESSION['userid'], $_POST['id']));
 			$p[0]->delete();
-			echo("OK.");
+			$out = new intOutput("ok");
 		}
 		if ($_GET['action'] == "checkForEvents")
 	    {
@@ -51,7 +51,7 @@
 				$p->destination = $p->sender;
 				$p->save();
 			}
-		    echo("OK. appID=" . $p->appid);
+		    $out = new intOutput("ok");
 		}
 	}
 ?>
