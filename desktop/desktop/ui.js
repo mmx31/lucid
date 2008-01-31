@@ -202,7 +202,20 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 						this._place();
 					})
 				}
-			}
+			},
+			Opacity: {
+				widget: "HorizontalSlider",
+				params: {
+					maximum: 1,
+					minimum: 0.1,
+					value: this.span,
+					showButtons: false,
+					onChange: dojo.hitch(this, function(value) {
+						this.opacity = value;
+						dojo.style(this.domNode, "opacity", value);
+					})
+				}
+			},
 		};
 		for(key in rows) {
 			var row = document.createElement("div");
