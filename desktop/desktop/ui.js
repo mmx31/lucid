@@ -114,7 +114,7 @@ dojo.require("dijit.form.Form");
 dojo.require("dijit.form.Slider");
 dojo.require("dijit.form.NumberSpinner");
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {
-	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick, oncontextmenu:_onRightClick, ondragstart:_stopSelect, onselectstart:_stopSelect\"></div>",
+	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick, oncontextmenu:_onRightClick, ondragstart:_stopSelect, onselectstart:_stopSelect\"><div class=\"desktopPanel-start\"><div class=\"desktopPanel-end\"><div class=\"desktopPanel-middle\" dojoAttachPoint=\"containerNode\"></div></div></div></div>",
 	span: 1,
 	opacity: 1,
 	thickness: 24,
@@ -193,7 +193,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			Thickness: {
 				widget: "NumberSpinner",
 				params: {
-					constraints: {min: 23, max: 200},
+					constraints: {min: 20, max: 200},
 					value: this.thickness,
 					style: "width: 60px;",
 					onChange: dojo.hitch(this, function(value) {
