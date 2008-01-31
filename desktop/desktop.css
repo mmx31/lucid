@@ -259,7 +259,7 @@ margin: 0px;
 .desktopPanel {
 	position: absolute;
 	background-color: white;
-	overflow: hidden;
+	/*overflow: hidden;*/
 }
 .desktopAppletFullspan .desktopAppletContent {
 	width: 100%;
