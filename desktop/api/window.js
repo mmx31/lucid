@@ -241,36 +241,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		}
 		else
 		{
-			var ns = dojo.query("div.win", desktop.ui.containerNode);
-			var box;
-			var myBox = dojo.coords(this.domNode);
-			var sides = {
-				t: myBox.y,
-				l: myBox.x,
-				b: myBox.y+myBox.h,
-				r: myBox.x+myBox.w
-			};
-			var overlapping = false;
-			//TODO: if the windows form a cross, this algorythm does not work
-			//TODO: I'm going to have to find the max zIndex of only the overlapping windows in some cases too...
-			for(n = 0; n < ns.length; n++)
-			{
-				if(dojo.style(ns[n], "display") == "none") continue;
-				var box = dojo.coords(ns[n]);
-				var points = this._getPoints(box);
-				for(point in points) {
-					p = points[point];
-					if(p.x >= sides.l && p.x <= sides.r
-					&& p.y >= sides.t && p.y <= sides.b) {
-						overlapping = true;
-						break;
-					}
-				}
-				if(overlapping) break;
-			}
-			var ctf = this.bringToFront();
-			if(overlapping && !ctf) this.minimize();
-			else if(!overlapping) this.minimize();
+			if(!this.bringToFront()) this.minimize();
 		}
 	},
 	_toggleMaximize: function() {
