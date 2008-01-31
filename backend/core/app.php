@@ -23,14 +23,15 @@
 	{
 		if($_GET['action'] == "id")
 		{
-			$appname = $_GET["name"];
+			$appname = $_POST["name"];
 			$p = $App->filter("name", $appname);
 			$p = $p[0];
-			echo $p->id;
+			$out = new jsonOutput();
+			$out->append("appid", $p->id);
 		}
 		if($_GET['action'] == "full")
 		{
-			header("Content-type: text/plain");
+			header("Content-type: text/json");
 			$p = $App->get($_POST['id']);
 			echo $p->make_json();
 		}

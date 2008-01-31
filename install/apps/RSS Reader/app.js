@@ -226,9 +226,10 @@ this.kill = function()
 }
 this.fetchFeed = function(url)
  {
-    dojo.xhrGet({
-        url: api.xsite(url),
+    api.xhr({
+        url: url,
         preventCache: true,
+		xsite: true,
         load: dojo.hitch(this, 
         function(data, ioArgs) {
 			if(data == "9") { api.ui.alertDialog({title: "Psych Desktop internal error", message: "cURL not supported by this server<br>enchanced web features disabled"}); }

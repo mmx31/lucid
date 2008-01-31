@@ -9,8 +9,8 @@ dojo.declare("api.mail", null, {
 		}, this);
 	},
 	listMailboxes: function(callback) {
-		dojo.xhrPost({
-			url: desktop.core.backend("api.mail.in.listMailboxes"),
+		api.xhr({
+			backend: "api.mail.in.listMailboxes",
 			content: this._getArgs(),
 			handleAs: "json",
 			load: dojo.hitch(this, function(data, ioArgs) {
@@ -27,16 +27,16 @@ dojo.declare("api.mail", null, {
 		return obj;
 	},
 	getQuota: function(callback) {
-		dojo.xhrPost({
-			url: desktop.core.backend("api.mail.in.getQuota"),
+		api.xhr({
+			backend: "api.mail.in.getQuota",
 			content: this._getArgs(),
 			handleAs: "json",
 			load: callback
 		});
 	},
 	countMessages: function(mode, callback) {
-		dojo.xhrPost({
-			url: desktop.core.backend("api.mail.in.countMessages"),
+		api.xhr({
+			backend: "api.mail.in.countMessages",
 			content: this._getArgs({
 				mode: mode || "ALL"
 			}),
@@ -45,8 +45,8 @@ dojo.declare("api.mail", null, {
 		});
 	},
 	createFolder: function(name, callback) {
-		dojo.xhrPost({
-			url: desktop.core.backend("api.mail.in.createFolder"),
+		api.xhr({
+			backend: "api.mail.in.createFolder",
 			content: this._getArgs({
 				folder: name
 			}),
@@ -56,8 +56,8 @@ dojo.declare("api.mail", null, {
 		});
 	},
 	deleteFolder: function(name) {
-		dojo.xhrPost({
-			url: desktop.core.backend("api.mail.in.deleteFolder"),
+		api.xhr({
+			backend: "api.mail.in.deleteFolder",
 			content: this._getArgs({
 				folder: name
 			}),
@@ -67,8 +67,8 @@ dojo.declare("api.mail", null, {
 		});
 	},
 	renameFolder: function(from, to, callback) {
-		dojo.xhrPost({
-			url: desktop.core.backend("api.mail.in.renameFolder"),
+		api.xhr({
+			backend: "api.mail.in.renameFolder",
 			content: this._getArgs({
 				from: from,
 				to: to
@@ -79,8 +79,8 @@ dojo.declare("api.mail", null, {
 		});
 	},
 	listFolder: function(args) {
-		dojo.xhrPost({
-			url: desktop.core.backend("api.mail.in.listFolder"),
+		api.xhr({
+			backend: "api.mail.in.listFolder",
 			content: this._getArgs({
 				mailbox: args.folder || (this._folderCache[0] || "INBOX"),
 				start: args.start || 1,
@@ -105,8 +105,8 @@ dojo.declare("api.mail.gridModel", dojox.grid.data.Dynamic, {
 		this.mailbox = mailbox;
 	},
 	getRowCount: function(){
-		dojo.xhrPost({
-			url: desktop.core.backend("api.mail.in.countMessages"),
+		api.xhr({
+			backend: "api.mail.in.countMessages",
 			content: this.mailClass._getArgs({
 				mode: "ALL"
 			}),
@@ -120,8 +120,8 @@ dojo.declare("api.mail.gridModel", dojox.grid.data.Dynamic, {
 	},
 	requestRows: function(inRowIndex, inCount){
 		inRowIndex--;
-		dojo.xhrPost({
-			url: desktop.core.backend("api.mail.in.listFolder"),
+		api.xhr({
+			backend: "api.mail.in.listFolder",
 			content: this.mailClass._getArgs({
 				mailbox: this.mailbox,
 				start: inRowIndex,

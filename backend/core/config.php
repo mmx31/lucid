@@ -12,7 +12,8 @@ if($_GET['section'] == "stream")
 		else { $u = $result[0]; }
 		$u->value = $_POST['value'];
 		$u->save();
-		echo "0";
+		$out = new intOutput();
+		$out->set("ok");
 	}
 	if($_GET['action'] == "load")
 	{

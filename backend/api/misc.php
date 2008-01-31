@@ -20,8 +20,8 @@ require("../lib/includes.php");
 import("models.user");
 if (isset($_GET['action'])) {
 	if ($_GET['action'] == "get") {
-		if($_GET['id'] == "0") { $user = $User->get_current(); }
-		else { $user = $User->get($_GET['id']); }
+		if($_POST['id'] == "0") { $user = $User->get_current(); }
+		else { $user = $User->get($_POST['id']); }
 		$out = new jsonOutput();
 		$out->append("id", $user->id);
 		$out->append("username", $user->username);
@@ -31,10 +31,10 @@ if (isset($_GET['action'])) {
 	if ($_GET['action'] == "changePassword") {
 		require("../config.php");
 		$username = $_SESSION['username'];
-		$old = crypt($_GET['old'], $conf_secretword);
+		$old = crypt($_POST['old'], $conf_secretword);
 		$user = $User->get_current();
 		if($old == $user->password) {
-			$user->set_password($_GET['new']);
+			$user->set_password($_POST['new']);
 			$user->save();
 			$out = new intOutput();
 			$out->set("ok");

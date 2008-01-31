@@ -6,18 +6,20 @@ desktop.user = new function() {
 		});
 	}
 	this.changeUserPassword = function(obj) {
-		dojo.xhrGet({
-        url: "../backend/api/misc.php?action=changePassword&old="+obj.old+"&new="+obj.newpass,
-        load: function(data, ioArgs) {
-			if(obj.callback) { obj.callback(data); }
-		},
-        error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); },
-		mimetype: "text/plain"
+		api.xhr({
+			backend: "api.misc.user.changePassword",
+			content: {
+				"old": obj.old,
+				"new": obj.newpass
+			},
+	        load: function(data, ioArgs) {
+				if(obj.callback) { obj.callback(data); }
+			}
         });
 	}
 	this.changeUserEmail = function(obj) {
-		dojo.xhrPost({
-        url: "../backend/api/misc.php?action=changeEmail",
+		api.xhr({
+        backend: "api.misc.user.changeEmail",
 		content: {
 			pass: obj.old,
 			email: obj.newemail
@@ -36,8 +38,8 @@ desktop.user = new function() {
 		if(typeof sync == "undefined") sync=false;
 		desktop.config.save(sync);
 		dojo.publish("desktoplogout", ["yes"]);
-		dojo.xhrGet({
-			url: desktop.core.backend("core.user.auth.logout"),
+		api.xhr({
+			backend: "core.user.auth.logout",
 			sync: sync,
 			load: function(data, ioArgs){
 				if(data == "0")
@@ -50,8 +52,7 @@ desktop.user = new function() {
 				{
 					api.log("Error communicating with server, could not log out");
 				}
-			},
-				mimetype: "text/plain"
+			}
 		});
 	}
 }

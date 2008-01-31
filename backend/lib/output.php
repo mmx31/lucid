@@ -60,15 +60,27 @@ class intOutput {
 	}
 }
 
+//this is a utility function for comment filtering that you may use from within a backend
+function json_comment_filter($json) {
+	$json = str_replace("/*", "/\*", $json);
+	$json = str_replace("*/", "*\/", $json);
+	$json = "/* " . $json . " */";
+	return $json;
+}
+
 class jsonOutput extends objOutput {
 	function __destruct() {
 		if($this->dooutput) {
-			header("Content-Type: text/plain; charset=utf-8");
+			//header("Content-Type: text/json-comment-filtered; charset=utf-8");
+			header("Content-Type: text/json; charset=utf-8");
 			if($php_errormsg)
 			{
 				$this->append("sqlerror", $php_errormsg);
 			}
-			echo json_encode($this->output);
+			$json = json_encode($this->output);
+			//comment filtering is tricky in certain cases...
+			//$json = json_comment_filter($json);
+			echo $json;
 		}
 	}
 }

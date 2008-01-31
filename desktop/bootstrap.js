@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+(function() {
 dojo.require("dojo.io.script");
 dojo.require("dijit.ProgressBar");
 /* 
@@ -31,7 +32,7 @@ dojo.require("dijit.ProgressBar");
 * 		Finally, it looks for an 'init()' method, and calls it.
 * 		If a module does not have an 'init' or 'draw' method, it does not get called.
 */
-bootstrap = {
+var bootstrap = {
     modules: [
 		"api.aflax",
 	    'api.console',
@@ -50,11 +51,9 @@ bootstrap = {
 		"api.user",
 		"api.window",
 		"api.xhr",
-		"api.xsite",
 	    'desktop.admin',
 	    'desktop.app',
 	    'desktop.config',
-	    'desktop.core',
 	    //'desktop.screensaver',
 	    'desktop.theme',
 		'desktop.ui',
@@ -185,3 +184,4 @@ bootstrap = {
 	}
 };
 dojo.addOnLoad(bootstrap.checkLoggedIn);
+})();

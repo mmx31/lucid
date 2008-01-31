@@ -10,8 +10,8 @@ api.fs = new function()
 { 
    this.ls = function(object)
     {
-        dojo.xhrPost({
-        url: desktop.core.backend("api.fs.io.getFolder"),
+        api.xhr({
+        backend: "api.fs.io.getFolder",
 		content: {
 			path: object.path
 		},
@@ -40,8 +40,8 @@ api.fs = new function()
     }
    this.read = function(object)
     {
-        dojo.xhrPost({
-        url: desktop.core.backend("api.fs.io.getFile"),
+        api.xhr({
+        backend: "api.fs.io.getFile",
 		content: {
 			path: object.path
 		},
@@ -82,8 +82,8 @@ api.fs = new function()
 		catch(e) {
 		object.content = "";
 		}
-        dojo.xhrPost({
-        url: desktop.core.backend("api.fs.io.writeFile"),
+        api.xhr({
+        backend: "api.fs.io.writeFile",
 		content: {
 			path: object.path,
 			content: object.content
@@ -107,8 +107,8 @@ api.fs = new function()
 		else {
 		newpath = object.newpath;
 		}
-        dojo.xhrPost({
-        url: desktop.core.backend("api.fs.io.renameFile"),
+        api.xhr({
+        backend: "api.fs.io.renameFile",
 		content: {
 			path: object.path,
 			newpath: newpath
@@ -129,8 +129,8 @@ api.fs = new function()
 	}
     this.mkdir = function(object)
     {
-        dojo.xhrPost({
-        url: desktop.core.backend("api.fs.io.createDirectory"),
+        api.xhr({
+        backend: "api.fs.io.createDirectory",
 		content: {
 			path: object.path
 		},
@@ -145,8 +145,8 @@ api.fs = new function()
     }
    this.rm = function(object)
     {
-        dojo.xhrPost({
-        url: desktop.core.backend("api.fs.io.removeFile"),
+        api.xhr({
+        backend: "api.fs.io.removeFile",
 		content: {
 			path: object.path
 		},
@@ -160,8 +160,8 @@ api.fs = new function()
     }
    this.copy = function(object)
     {
-        dojo.xhrPost({
-        url: desktop.core.backend("api.fs.io.copyFile"),
+        api.xhr({
+        backend: "api.fs.io.copyFile",
 		content: {
 			path: object.from,
 			newpath: object.to
@@ -176,8 +176,8 @@ api.fs = new function()
     }
    this.rmdir = function(object)
     {
-        dojo.xhrPost({
-	        url: desktop.core.backend("api.fs.io.removeDir"),
+        api.xhr({
+	        backend: "api.fs.io.removeDir",
 			content: {
 				path: object.path
 			},
@@ -190,24 +190,24 @@ api.fs = new function()
         });
     }
 	this.download = function(path) {
-		var url = desktop.core.backend("api.fs.io.download") + "&path=" + path;
+		var url = api.xhr("api.fs.io.download") + "&path=" + path;
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	}
 	this.downloadFolder = function(path, as) {
 		if(as == null) { as = "zip" }
-		var url = desktop.core.backend("api.fs.io.downloadFolder") + "&path=" + path + "&as=" + as;
+		var url = api.xhr("api.fs.io.downloadFolder") + "&path=" + path + "&as=" + as;
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	}
 	this.compressDownload = function(path, as) {
 		if(as == null) { as = "zip" }
-		var url = desktop.core.backend("api.fs.io.compressDownload") + "&path=" + path + "&as=" + as;
+		var url = api.xhr("api.fs.io.compressDownload") + "&path=" + path + "&as=" + as;
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	}
 	this.embed = function(path) {
-		return desktop.core.backend("api.fs.io.display") + "&path=" + path;
+		return api.xhr("api.fs.io.display") + "&path=" + path;
 	}
 	this.info = function(path, callback) {
 		api.xhr({

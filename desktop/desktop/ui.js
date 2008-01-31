@@ -849,8 +849,8 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 		this._menubutton = b;
 	},
 	_getApps: function() {
-		dojo.xhrGet({
-			url: desktop.core.backend("core.app.fetch.list"),
+		api.xhr({
+			backend: "core.app.fetch.list",
 			load: dojo.hitch(this, function(data, ioArgs){
 				data = dojo.fromJson(data);
 				if (this._menu) {

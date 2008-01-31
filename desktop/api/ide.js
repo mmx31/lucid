@@ -27,8 +27,8 @@ api.ide = new function()
 	        typeof app.code != "undefined")
 		{
 			  api.log("IDE API: Saving application...");
-	          dojo.xhrPost({
-	               url: desktop.core.backend("api.ide.io.save"),
+	          api.xhr({
+	               backend: "api.ide.io.save",
 	               content : {
 	                    id: app.id,
 	                    name: app.name,
@@ -55,8 +55,8 @@ api.ide = new function()
 	}
 	this.load = function(appID, callback)
 	{
-		dojo.xhrPost({
-			url: desktop.core.backend("core.app.fetch.full"),
+		api.xhr({
+			backend: "core.app.fetch.full",
 			content: {
 				id: appID
 			},
@@ -68,8 +68,8 @@ api.ide = new function()
 		});
 	}
 	this.getAppList = function(callback) {
-	dojo.xhrGet({
-		url: desktop.core.backend("core.app.fetch.list"),
+	api.xhr({
+		backend: "core.app.fetch.list",
 		load: function(data, ioArgs)
 		{
 			callback(data);

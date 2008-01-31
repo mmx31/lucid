@@ -62,8 +62,8 @@ desktop.app = new function()
 		this.fetchApp = function(appID, callback, args)
 		{
 			//fetch an app, put it into the cache
-			dojo.xhrPost({
-			    url: desktop.core.backend("core.app.fetch.full"),
+			api.xhr({
+			    backend: "core.app.fetch.full",
 				content: {
 					id: parseInt(appID)
 				},
@@ -71,13 +71,11 @@ desktop.app = new function()
 				{
 					this._fetchApp(data, callback, args);
 				}),
-			    error: function(error, ioArgs) { api.toaster("Error: "+error.message); }
+				handleAs: "json"
 			});
 		}
-		this._fetchApp = function(data, callback, args)
+		this._fetchApp = function(app, callback, args)
 		{
-			var app = dojo.fromJson(data);
-			api.log("creating app constructor...");
 			this.apps[app.id] = new Function("\tthis.id = "+app.id+";\n\tthis.name = \""+app.name+"\";\n\tthis.version = \""+app.version+"\";\n\tthis.instance = -1;\n"+app.code);
 			if(callback)
 			{
@@ -95,17 +93,17 @@ desktop.app = new function()
 		this.launchByName = function(name, args)
 		{
 			api.log("translating app name "+name+" to id...");
-			dojo.xhrGet({
-			    url: desktop.core.backend("core.app.fetch.id"),
+			api.xhr({
+			    backend: "core.app.fetch.id",
 				content: {
 					name: name
 				},
 			    load: dojo.hitch(this, function(data, ioArgs)
 				{
-					if(data != "") { this.launch(data, args); }
+					if(typeof data.appid != "undefined") { this.launch(data.appid, args); }
 					else { api.log("translation failed. invalid app name"); }
 				}),
-			    error: function(error, ioArgs) { api.toaster("Error: "+error.message); }
+				handleAs: "json"
 			});
 		}
 		this.launchHandler = function(file, args, format) {

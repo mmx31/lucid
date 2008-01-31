@@ -4,6 +4,43 @@ this.init = function(args)
 	dojo.require("dijit.layout.LayoutContainer");
 	dojo.require("dijit.form.Button");
 	dojo.require("dijit.Dialog");
+	api.addDojoCss("dojox/widget/FileInput/FileInput.css");
+	dojo.require("dojox.widget.FileInputAuto");
+	
+	dojo.declare("dojox.widget.FileInput_fileb_remix",
+	dojox.widget.FileInputAuto,
+	{
+		path: "/",
+		url: api.xhr("api.fs.io.upload"),
+		name: "uploadedfile",
+		templateString:"<div class=\"dijitFileInput tundra\">\n\t<input class=\"dijitFileInputReal\" type=\"file\" dojoAttachPoint=\"fileInput\" />\n\t<div class=\"dijitFakeInput\" dojoAttachPoint=\"fakeNodeHolder\">\n\t\t<input class=\"dijitFileInputVisible\" type=\"text\" dojoAttachPoint=\"focusNode, inputNode\" />\n\t\t<span class=\"dijitInline dijitFileInputText\" dojoAttachPoint=\"titleNode\">${label}</span>\n\t\t<span class=\"dijitInline dijitFileInputButton\" dojoAttachPoint=\"cancelNode\" dojoAttachEvent=\"onclick:_onClick\">${cancelText}</span>\n\t</div>\n\t<div class=\"dijitProgressOverlay\" dojoAttachPoint=\"overlay\">&nbsp;</div>\n</div>\n",
+		
+		_sendFile: function(/* Event */e){
+			// summary: triggers the chain of events needed to upload a file in the background.
+			if(!this.fileInput.value || this._sent){ return; }
+			
+			dojo.style(this.fakeNodeHolder,"display","none");
+			dojo.style(this.overlay,"opacity","0");
+			dojo.style(this.overlay,"display","block");
+	
+			this.setMessage(this.uploadMessage);
+	
+			dojo.fadeIn({ node: this.overlay, duration:this.duration }).play();
+			this.fileInput.name="uploadedfile";
+			var _newForm = document.createElement('form');
+			_newForm.setAttribute("enctype","multipart/form-data");
+			var node = dojo.clone(this.fileInput);
+			_newForm.appendChild(this.fileInput);;
+			dojo.body().appendChild(_newForm);
+			dojo.io.iframe.send({
+				url: this.url+"&path="+encodeURIComponent(this.path),
+				form: _newForm,
+				handleAs: "json",
+				handle: dojo.hitch(this,"_handleSend")
+			});
+		}
+	});
+	
 	this.win = new api.window({
 		title: "File Browser",
 		bodyWidget: "LayoutContainer",
@@ -82,38 +119,3 @@ this.kill = function() {
 	if(!this.win.closed) { this.win.close(); }
 	api.instances.setKilled(this.instance);
 }
-api.addDojoCss("dojox/widget/FileInput/FileInput.css");
-dojo.require("dojox.widget.FileInputAuto");
-dojo.declare("dojox.widget.FileInput_fileb_remix",
-	dojox.widget.FileInputAuto,
-{
-	path: "/",
-	url: desktop.core.backend("api.fs.io.upload"),
-	name: "uploadedfile",
-	templateString:"<div class=\"dijitFileInput tundra\">\n\t<input class=\"dijitFileInputReal\" type=\"file\" dojoAttachPoint=\"fileInput\" />\n\t<div class=\"dijitFakeInput\" dojoAttachPoint=\"fakeNodeHolder\">\n\t\t<input class=\"dijitFileInputVisible\" type=\"text\" dojoAttachPoint=\"focusNode, inputNode\" />\n\t\t<span class=\"dijitInline dijitFileInputText\" dojoAttachPoint=\"titleNode\">${label}</span>\n\t\t<span class=\"dijitInline dijitFileInputButton\" dojoAttachPoint=\"cancelNode\" dojoAttachEvent=\"onclick:_onClick\">${cancelText}</span>\n\t</div>\n\t<div class=\"dijitProgressOverlay\" dojoAttachPoint=\"overlay\">&nbsp;</div>\n</div>\n",
-	
-	_sendFile: function(/* Event */e){
-		// summary: triggers the chain of events needed to upload a file in the background.
-		if(!this.fileInput.value || this._sent){ return; }
-		
-		dojo.style(this.fakeNodeHolder,"display","none");
-		dojo.style(this.overlay,"opacity","0");
-		dojo.style(this.overlay,"display","block");
-
-		this.setMessage(this.uploadMessage);
-
-		dojo.fadeIn({ node: this.overlay, duration:this.duration }).play();
-		this.fileInput.name="uploadedfile";
-		var _newForm = document.createElement('form');
-		_newForm.setAttribute("enctype","multipart/form-data");
-		var node = dojo.clone(this.fileInput);
-		_newForm.appendChild(this.fileInput);;
-		dojo.body().appendChild(_newForm);
-		dojo.io.iframe.send({
-			url: this.url+"&path="+encodeURIComponent(this.path),
-			form: _newForm,
-			handleAs: "json",
-			handle: dojo.hitch(this,"_handleSend")
-		});
-	}
-});

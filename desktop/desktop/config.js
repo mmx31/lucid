@@ -13,8 +13,8 @@ desktop.config = {
 		setInterval(desktop.config.save, 1000*60);
 	},
 	load: function(cback) {
-		dojo.xhrGet({
-	        url: desktop.core.backend("core.config.stream.load"),
+		api.xhr({
+	        backend: "core.config.stream.load",
 	        load: function(data, ioArgs) {
 				desktop.config = dojo.mixin(desktop.config, data);
 				for(var a=0;a<desktop.config.startupapps.length;a++) {
@@ -23,15 +23,14 @@ desktop.config = {
 				desktop.config.apply();
 				if(cback) cback();
 			},
-	        error: function(error, ioArgs) { api.log("Error loading the config: "+error.message); },
 			handleAs: "json"
         });
 	},
 	save: function(sync) {
 		if(typeof sync == "undefined") sync=false;
 		var conf = dojo.toJson(desktop.config);
-		dojo.xhrPost({
-            url: desktop.core.backend("core.config.stream.save"),
+		api.xhr({
+            backend: "core.config.stream.save",
 			sync: sync,
             content: {value: conf},
 			error: function(error, ioArgs) { api.log("Error saving the config: "+error.message); }
@@ -111,12 +110,6 @@ desktop.config = {
 	crosstalkPing: 500,
 	filesystem: {
 		hideExt: true,
-		handlers: {
-			txt: 4,
-			folder: 10,
-			htm: 6,
-			html: 6
-		},
 		icons: {
 			txt: "icon-32-mimetypes-text-x-generic",
 			desktop: "icon-32-mimetypes-application-x-executable",

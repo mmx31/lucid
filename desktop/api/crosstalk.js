@@ -58,8 +58,8 @@ api.crosstalk = new function()
 			}
 		else { // handlers found. ask to obtain any events.
 		//api.log("Crosstalk API: Checking for events...");
-        	dojo.xhrPost({
-	        	url: desktop.core.backend("api.crosstalk.io.checkForEvents"),
+        	api.xhr({
+	        	backend: "api.crosstalk.io.checkForEvents",
 				handleAs: "xml",
 	        	load: dojo.hitch(this, this._internalCheck2),
 	        	error: function(type, error) { api.log("Error in Crosstalk call: "+error.message); }
@@ -75,8 +75,8 @@ api.crosstalk = new function()
 	*/
 	this.sendEvent = function(params)
 		{
-        	dojo.xhrPost({
-        	url: desktop.core.backend("api.crosstalk.io.sendEvent"),
+        	api.xhr({
+        	backend: "api.crosstalk.io.sendEvent",
 			content: {
 				destination: params.userid,
 				message: params.message,
@@ -120,8 +120,8 @@ api.crosstalk = new function()
 								var id = results[i].getAttribute("id"); //id of the event in database.
 								api.crosstalk.session[x].callback({ message: results[i].firstChild.nodeValue, appid: results[i].getAttribute("appid"), instance: results[i].getAttribute("instance"), sender: results[i].getAttribute("sender")});
 								//remove the event, now. it has been handled.
-						        dojo.xhrPost({
-						        	url: desktop.core.backend("api.crosstalk.io.removeEvent"),
+						        api.xhr({
+						        	backend: "api.crosstalk.io.removeEvent",
 									content: {
 										id: id
 									},
