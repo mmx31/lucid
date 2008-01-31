@@ -208,7 +208,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				params: {
 					maximum: 1,
 					minimum: 0.1,
-					value: this.span,
+					value: this.opacity,
 					showButtons: false,
 					onChange: dojo.hitch(this, function(value) {
 						this.opacity = value;
