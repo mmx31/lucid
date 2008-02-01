@@ -40,6 +40,7 @@ desktop.ui = {
 			desktop.ui._area.domNode.appendChild(p.domNode);
 			p.startup();
 		});
+		desktop.ui._area.resize();
 	},
 	save: function() {
 		desktop.config.panels = [];
@@ -382,6 +383,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		}
 		if (this.placement != newPos) {
 			this.placement = newPos;
+			desktop.ui._area.resize();
 			this._place();
 		}
 	},
@@ -478,7 +480,6 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			item.resize();
 		});
 		desktop.ui.save();
-		desktop.ui._area.resize();
 	},
 	resize: function() {
 		var viewport = dijit.getViewport();
