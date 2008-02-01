@@ -112,11 +112,12 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 		dojo.style(this.filearea.domNode, "width", viewport.w - max.R);
 		dojo.style(this.filearea.domNode, "height", viewport.h - max.B);
 		dojo.query("div.win", desktop.ui.containerNode).forEach(function(win) {
+			console.log(e, win);
 			var c = dojo.coords(win);
 			if(c.t < max.T && max.T > 0) dojo.style(win, "top", max.T+c.t+"px");
 			if(c.l < max.L && max.L > 0) dojo.style(win, "left", max.L+c.l+"px");
-			if(viewport.w - (c.l) < max.R && max.R > 0) dojo.style(win, "left", (viewport.w - (viewport.w - c.l)  - max.R)+"px");
-			if(viewport.h - (c.t) < max.B && max.B > 0) dojo.style(win, "top", (viewport.h - (viewport.h - c.t) - max.B)+"px");
+			if(c.l > viewport.w - max.R && ((max.R > 0 || e.type=="resize") || (max.R > 0 && e.type=="resize"))) dojo.style(win, "left", (viewport.w - 20  - max.R)+"px");
+			if(c.t > viewport.h - max.B && ((max.B > 0 || e.type=="resize") || (max.B > 0 && e.type=="resize"))) dojo.style(win, "top", (viewport.h - 20 - max.B)+"px");
 		}, this);
 	},
 	updateWallpaper: function() {
