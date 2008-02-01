@@ -2,8 +2,8 @@
 class objOutput {
 	var $output = Array();
 	var $dooutput = false;
-	function __construct($val) {
-		if(isset($val)) $this->set($val);
+	function __construct($val=false) {
+		if($val) $this->set($val);
 	}
 	function __destruct() {
 		if($this->dooutput) {
@@ -42,8 +42,8 @@ class intOutput {
 		"mail_connect_err" => 8,
 		"feature_not_available" => 9
 	);
-	function __construct($val) {
-		if(isset($val)) $this->set($val);
+	function __construct($val=false) {
+		if($val) $this->set($val);
 	}
 	function __destruct() {
 		if($this->dooutput) {
