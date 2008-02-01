@@ -70,6 +70,8 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 	postCreate: function() {
 		var filearea = this.filearea = new api.filearea({path: "/Desktop/", forDesktop: true, subdirs: false, style: "position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;", overflow: "hidden"});
 		dojo.addClass(filearea.domNode, "mainFileArea");
+		filearea.menu.addChild(new dijit.MenuSeparator({}));
+		filearea.menu.addChild(new dijit.MenuItem({label: "Wallpaper", iconClass: "icon-16-apps-preferences-desktop-wallpaper", onClick: dojo.hitch(this, this.wallpaper)}));
 		filearea.refresh();
 		dojo.style(filearea.domNode, "zIndex", 1);
 		this.containerNode.appendChild(filearea.domNode);
@@ -81,7 +83,25 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 		}
 		dojo.connect(window,'onresize',this,"resize");
 	},
-	resize: function(e) {
+	wallpaper: function(e) {
+		if(this.wallWin) return this.wallWin.bringToFront();
+		var color = new dijit.ColorPalette({palette: "7x10", onChange: dojo.hitch(this, function(value) {
+			desktop.config.wallpaper.color = value;
+			desktop.config.save();
+			desktop.config.apply();
+		})});
+		var win = this.wallWin = new api.window({
+			title: "Wallpaper",
+			onClose: dojo.hitch(this, function() {
+				this.wallWin = false;
+			}),
+			bodyWidget: "LayoutContainer"
+		});
+		var p = new dijit.layout.ContentPane();
+		
+		win.show();
+	},
+	getBox: function() {
 		var thicknesses = {BR: 0, BL: 0, BC: 0, TR: 0, TL: 0, TC: 0, LT: 0, LC: 0, LB: 0, RT: 0, RC: 0, RB: 0};
 		dojo.query(".desktopPanel").forEach(function(panel, i) {
 			var w = dijit.byNode(panel);
@@ -106,6 +126,10 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 				max[k.charAt(0)] = thicknesses[k];
 			}
 		}
+		return max;
+	},
+	resize: function(e) {
+		var max = this.getBox();
 		var viewport = dijit.getViewport();
 		dojo.style(this.filearea.domNode, "top", max.T);
 		dojo.style(this.filearea.domNode, "left", max.L);

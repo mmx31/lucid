@@ -118,6 +118,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 * 		To set this after window creation, use <window.setBodyWidget>
 	 */
 	maximized: false,
+	minimized: false,
 	/*
 	 * Property: height
 	 * 
@@ -172,6 +173,11 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				this._resizeBody();
 			});
 		});
+		
+		if(dojo.isIE){
+			dojo.connect(this.domNode,'onresize', this,"_onResize");
+		}
+		dojo.connect(window,'onresize',this,"_onResize");
 		this.bringToFront();
 	},
 	/*
@@ -313,6 +319,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			dojo.style(this.domNode, "opacity", 100)
 			dojo.style(this.domNode, "display", "none");
 		}
+		this.minimized = true;
 	},
 	/*
 	 * Method: restore
@@ -343,6 +350,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			});
 			anim.play();
 		}
+		this.minimized = false;
 	},
 	/*
 	 * Method: maximize
@@ -368,13 +376,14 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		{
 			//api.log("maximizing... (in style!)");
 			dojo.style(this.body.domNode, "display", "none");
+			var max = desktop.ui._area.getBox();
 			var anim = dojo.animateProperty({
 				node: this.domNode,
 				properties: {
-					top: {end: 0},
-					left: {end: 0},
-					width: {end: dojo.style(this.domNode.parentNode, "width")},
-					height: {end: dojo.style(this.domNode.parentNode, "height")}
+					top: {end: max.T},
+					left: {end: max.L},
+					width: {end: dojo.style(this.domNode.parentNode, "width") - max.R},
+					height: {end: dojo.style(this.domNode.parentNode, "height") - max.B}
 				},
 				duration: desktop.config.window.animSpeed
 			});
@@ -587,5 +596,20 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	startup: function()
 	{
 		this.body.startup();
+	},
+	_onResize: function(e) {
+		if (this.maximized && !this.minimized) {
+			var max = desktop.ui._area.getBox();
+			var c = dojo.coords(this.domNode);
+			var v = dijit.getViewport();
+			dojo.style(this.domNode, "width", v.w - max.L - max.R);
+			dojo.style(this.domNode, "height", v.h - max.T - max.B);
+		}
+		else if(this.maximized && this.minimized) {
+			var max = desktop.ui._area.getBox();
+			var v = dijit.getViewport();
+			this.pos.width = v.w - max.L - max.R;
+			this.pos.height = v.h - max.T - max.B;
+		}
 	}
 });
