@@ -215,7 +215,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 						dojo.style(this.domNode, "opacity", value);
 					})
 				}
-			},
+			}
 		};
 		for(key in rows) {
 			var row = document.createElement("div");
