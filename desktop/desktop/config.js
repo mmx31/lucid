@@ -32,8 +32,7 @@ desktop.config = {
 		api.xhr({
             backend: "core.config.stream.save",
 			sync: sync,
-            content: {value: conf},
-			error: function(error, ioArgs) { api.log("Error saving the config: "+error.message); }
+            content: {value: conf}
         });
 	},
 	apply: function()
