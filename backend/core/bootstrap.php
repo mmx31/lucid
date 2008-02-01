@@ -17,7 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-if (session_id() == "") session_start(); // if no active session we start a new one
+require("../lib/includes.php");
 if($_GET['section'] == "check")
 {
 	if($_GET['action'] == "loggedin")

@@ -3,7 +3,7 @@ class objOutput {
 	var $output = Array();
 	var $dooutput = false;
 	function __construct($val=false) {
-		if($val) $this->set($val);
+		if($val !== false) $this->set($val);
 	}
 	function __destruct() {
 		if($this->dooutput) {
@@ -43,7 +43,8 @@ class intOutput {
 		"feature_not_available" => 9
 	);
 	function __construct($val=false) {
-		if($val) $this->set($val);
+		if($val !== false) $this->set($val);
+		error_log($val);
 	}
 	function __destruct() {
 		if($this->dooutput) {
