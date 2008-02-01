@@ -63,6 +63,8 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
 dojo.require("dojo.dnd.move");
+dojo.require("dijit.ColorPalette");
+api.addDojoCss("dojox/widget/ColorPicker/ColorPicker.css");
 
 dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Container], {
 	templateString: "<div class=\"uiArea\"><div dojoAttachPoint=\"widgetNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10; display: none;\"></div><div dojoAttachPoint=\"containerNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10;\"></div><div dojoAttachPoint=\"wallpaperNode\" class=\"wallpaper\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 1;\"></div></div>",
@@ -85,7 +87,7 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 	},
 	wallpaper: function(e) {
 		if(this.wallWin) return this.wallWin.bringToFront();
-		var color = new dijit.ColorPalette({palette: "7x10", onChange: dojo.hitch(this, function(value) {
+		var color = new dijit.ColorPalette({value: desktop.config.wallpaper.color, onChange: dojo.hitch(this, function(value) {
 			desktop.config.wallpaper.color = value;
 			desktop.config.save();
 			desktop.config.apply();
@@ -97,9 +99,18 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 			}),
 			bodyWidget: "LayoutContainer"
 		});
-		var p = new dijit.layout.ContentPane();
-		
+		var p = new dijit.layout.ContentPane({layoutAlign: "client"});
+		var colorTitle = document.createElement("h4");
+		colorTitle.innerHTML = "Color";
+		var body = document.createElement("div");
+		dojo.forEach([colorTitle, color.domNode], function(c) {
+			body.appendChild(c);
+		});
+		p.setContent(body);
+		win.addChild(p);
 		win.show();
+		win.startup();
+		color.startup();
 	},
 	getBox: function() {
 		var thicknesses = {BR: 0, BL: 0, BC: 0, TR: 0, TL: 0, TC: 0, LT: 0, LC: 0, LB: 0, RT: 0, RC: 0, RB: 0};
@@ -136,7 +147,6 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 		dojo.style(this.filearea.domNode, "width", viewport.w - max.R);
 		dojo.style(this.filearea.domNode, "height", viewport.h - max.B);
 		dojo.query("div.win", desktop.ui.containerNode).forEach(function(win) {
-			console.log(e, win);
 			var c = dojo.coords(win);
 			if(c.t < max.T && max.T > 0) dojo.style(win, "top", max.T+c.t+"px");
 			if(c.l < max.L && max.L > 0) dojo.style(win, "left", max.L+c.l+"px");
