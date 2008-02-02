@@ -54,7 +54,6 @@ var bootstrap = {
 	    'desktop.admin',
 	    'desktop.app',
 	    'desktop.config',
-	    //'desktop.screensaver',
 	    'desktop.theme',
 		'desktop.ui',
 	    //'desktop.widget',
