@@ -61,7 +61,10 @@ var bootstrap = {
 	    'desktop.user'
 	],
 	loaded: false,
-    require: function() {
+    load: function() {
+        bootstrap.link("desktop.css", "corestyle");
+        bootstrap.link("./dojo/dijit/themes/dijit.css", "dijit");
+        bootstrap.link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
 		dojo.forEach(bootstrap.modules, function(libraryName) {
 	        var path = libraryName.split(".").join("/");
 			var base = libraryName.split(".")[0];
@@ -81,32 +84,21 @@ var bootstrap = {
     {
 		if (!bootstrap.loaded) {
 			var ready = true;
-			var modCount = 0;
 			for (key in bootstrap.modules) {
 				if (eval('typeof(' + bootstrap.modules[key] + ')') == "undefined") {
 					ready = false;
 					break;
 				}
-				else 
-					modCount++;
 				
 			}
 			if (ready) {
 				bootstrap.loaded = true;
 				bootstrap.startup();
 			}
-			else {
-				bootstrap._indicator.update({
-					indeterminate: false,
-					progress: modCount,
-					maximum: bootstrap.modules.length
-				});
-			}
 		}
     },
     startup: function()
     {
-		bootstrap._loading.parentNode.removeChild(bootstrap._loading);
         dojo.forEach(bootstrap.modules, function(module) {
 			if(dojo.isFunction(eval(module + ".draw")))
 			{
@@ -129,39 +121,6 @@ var bootstrap = {
         element.href = file;
         element.id = id;
         document.getElementsByTagName("head")[0].appendChild(element);
-    },
-    load: function() {
-        bootstrap._loading = dojo.doc.createElement("div");
-        bootstrap._loading.innerHTML = "Loading..."; 
-        var d = dijit.getViewport();
-		var style = {
-			position: "absolute",
-			top: (d.h / 3) + "px",
-	        left: (d.w / 3) + "px",
-	        height: (d.h / 3) + "px",
-	        width: (d.w / 3) + "px",
-	        textAlign: "center",
-	        zIndex: "1000000"
-		};
-		for(key in style) {
-			dojo.style(bootstrap._loading, key, style[key]);
-		}
-       
-        dojo.addClass(bootstrap._loading, "tundra");
-        bootstrap._indicator = new dijit.ProgressBar({
-            indeterminate: true
-        });
-        bootstrap._loading.appendChild(bootstrap._indicator.domNode);
-        dojo.doc.body.appendChild(bootstrap._loading);
-        bootstrap.link("desktop.css", "corestyle");
-        bootstrap.link("./dojo/dijit/themes/dijit.css", "dijit");
-        bootstrap.link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
-		bootstrap.require();
-        bootstrap._indicator.update({
-            indeterminate: false,
-            progress: 0
-        });
-
     },
 	checkLoggedIn: function()
 	{
