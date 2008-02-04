@@ -64,6 +64,7 @@ dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
 dojo.require("dojo.dnd.move");
 dojo.require("dijit.ColorPalette");
+dojo.require("dijit.form.Button");
 api.addDojoCss("dojox/widget/ColorPicker/ColorPicker.css");
 
 dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Container], {
@@ -92,18 +93,20 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 			desktop.config.save();
 			desktop.config.apply();
 		})});
+		var colorButton = new dijit.form.DropDownButton({
+			dropDown: color,
+			label: "Background Color"
+		});
 		var win = this.wallWin = new api.window({
-			title: "Wallpaper",
+			title: "Wallpaper Preferences",
 			onClose: dojo.hitch(this, function() {
 				this.wallWin = false;
 			}),
 			bodyWidget: "LayoutContainer"
 		});
 		var p = new dijit.layout.ContentPane({layoutAlign: "client"});
-		var colorTitle = document.createElement("h4");
-		colorTitle.innerHTML = "Color";
 		var body = document.createElement("div");
-		dojo.forEach([colorTitle, color.domNode], function(c) {
+		dojo.forEach([colorButton.domNode], function(c) {
 			body.appendChild(c);
 		});
 		p.setContent(body);
