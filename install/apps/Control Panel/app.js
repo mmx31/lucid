@@ -1,4 +1,5 @@
-dojo.require("dojo.parser");
+
+.require("dojo.parser");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.ColorPalette");
 dojo.require("dijit.layout.ContentPane");
@@ -43,7 +44,7 @@ this.open = function(args)
 	toolbar.addChild(new dijit.form.Button({label: "Save to server", onClick: dojo.hitch(this, this.processSave), iconClass: "icon-16-actions-document-save"}));
 	this.window.addChild(toolbar);
 	var tabs = new dijit.layout.TabContainer({layoutAlign: "client"}, document.createElement("div"));
-		
+
 		var themes = new dijit.layout.ContentPane({title: "Themes"}, document.createElement("div"));
 		winHTML = "Current theme: <span id=\"currentTheme"+this.instance+"\">"+desktop.config.theme+"</span> theme.<br><br><fieldset><legend>Change theme</legend>Theme Name: <input type=\"text\" name=\"theme"+this.instance+"\" id=\"theme"+this.instance+"\" value=\""+desktop.config.theme+"\"></fieldset><p><p><fieldset><legend>Installed Themes</legend><span id=\"themeList"+this.instance+"\">obtaining...</span></fieldset>";
 		themes.setContent(winHTML);
@@ -73,16 +74,16 @@ this.open = function(args)
 	this.window.show();
 	this.window.startup();
 	api.instances.setActive(this.instance);
+	new dijit.form.TextBox({id: "theme"+this.instance, name: "theme"+this.instance}, document.getElementById("theme"+this.instance));
 	new dijit.form.TextBox({id: "oldPass"+this.instance, name: "oldPass"+this.instance}, document.getElementById("oldPass"+this.instance));
 	new dijit.form.TextBox({id: "newPass"+this.instance, name: "newPass"+this.instance}, document.getElementById("newPass"+this.instance));
 	new dijit.form.TextBox({id: "newPassConfirm"+this.instance, name: "newPassConfirm"+this.instance}, document.getElementById("newPassConfirm"+this.instance));
 	new dijit.form.TextBox({id: "image"+this.instance, name: "image"+this.instance}, document.getElementById("image"+this.instance));
-	new dijit.form.RadioButton({checked: false, name:"radiobutton",id:"radio1"+this.instance}, document.getElementById("radio1"+this.instance));
-	new dijit.form.RadioButton({checked: false, name:"radiobutton",id:"radio2"+this.instance}, document.getElementById("radio2"+this.instance));
 	new dijit.form.CheckBox({name:"fx"+this.instance, id:"fx"+this.instance}, document.getElementById("bbbbb"+this.instance));
 	new dijit.form.CheckBox({name:"debug"+this.instance, id:"debug"+this.instance}, document.getElementById("debug"+this.instance));
 	new dijit.form.TextBox({id: "crosstalkPing"+this.instance, name: "crosstalkPing"+this.instance}, document.getElementById("crosstalkPing"+this.instance));
 	new dijit.form.TextBox({id: "email"+this.instance, name: "email"+this.instance}, document.getElementById("email"+this.instance));
+	dijit.byId("theme"+this.instance).setValue(desktop.config.theme);
 	dijit.byId("fx"+this.instance).setChecked(desktop.config.fx);
 	dijit.byId("debug"+this.instance).setChecked(desktop.config.debug);
 	dijit.byId("crosstalkPing"+this.instance).setValue(desktop.config.crosstalkPing);
@@ -127,6 +128,7 @@ this.processSave = function() {
 		dijit.byId("email"+this.instance).setValue("");
 	}
 	var fx=dijit.byId("fx"+this.instance).checked;
+	var theme=dijit.byId("theme"+this.instance).getValue();
 	var debug=dijit.byId("debug"+this.instance).checked;
 	var crosstalkPing=dijit.byId("crosstalkPing"+this.instance).getValue();
 	desktop.theme.set(theme);
