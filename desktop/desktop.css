@@ -26,6 +26,9 @@ margin: 0px;
 .desktopApplet .dijit .dijitButtonNode {
 	background: transparent none no-repeat;
 }
+.desktopPanel {
+	font-size: 10pt;
+}
 .wallpaper {
 	z-index: 0;
 	height: 100%;
