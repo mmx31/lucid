@@ -98,7 +98,13 @@ desktop.config = {
 	],
 	wallpaper: {
 		image: "./themes/green/wallpaper.jpg",
-		color: "#eeeeee"
+		color: "#eeeeee",
+		style: "centered",
+		storedList: [
+			"./themes/green/wallpaper.jpg",
+			"./themes/default/wallpaper.png",
+			"./themes/tsunami/wallpaper.jpg"
+		]
 	},
 	theme: "green",
 	startupapps: [],

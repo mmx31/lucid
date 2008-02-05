@@ -65,6 +65,8 @@ dojo.require("dijit._Container");
 dojo.require("dojo.dnd.move");
 dojo.require("dijit.ColorPalette");
 dojo.require("dijit.form.Button");
+dojo.require("dijit.form.FilteringSelect");
+dojo.require("dojo.data.ItemFileReadStore");
 api.addDojoCss("dojox/widget/ColorPicker/ColorPicker.css");
 
 dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Container], {
@@ -88,15 +90,6 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 	},
 	wallpaper: function(e) {
 		if(this.wallWin) return this.wallWin.bringToFront();
-		var color = new dijit.ColorPalette({value: desktop.config.wallpaper.color, onChange: dojo.hitch(this, function(value) {
-			desktop.config.wallpaper.color = value;
-			desktop.config.save();
-			desktop.config.apply();
-		})});
-		var colorButton = new dijit.form.DropDownButton({
-			dropDown: color,
-			label: "Background Color"
-		});
 		var win = this.wallWin = new api.window({
 			title: "Wallpaper Preferences",
 			onClose: dojo.hitch(this, function() {
@@ -104,9 +97,83 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 			}),
 			bodyWidget: "LayoutContainer"
 		});
-		var p = new dijit.layout.ContentPane({layoutAlign: "client"});
+		
+		var c = new dijit.layout.ContentPane({layoutAlign: "center", style: "overflow: auto;"});
+		var cbody = document.createElement("div");
+		dojo.style(cbody, "width", "100%");
+		dojo.style(cbody, "height", "100%");
+		var makeThumb = function(item) {
+			var p = document.createElement("div");
+			dojo.addClass(p, "floatLeft");
+			dojo.style(p, "width", "150px;");
+			dojo.style(p, "height", "112px");
+			dojo.style(p, "margin", "5px");
+			dojo.style(p, "padding", "5px");
+				if (item != "") {
+					var img = document.createElement("img");
+					dojo.style(img, "width", "100%");
+					dojo.style(img, "height", "100%");
+					img.src = item; //todo: thumbnails?
+					p.appendChild(img);
+				}
+			if(desktop.config.wallpaper.image == item) dojo.addClass(p, "selectedItem");
+			dojo.connect(p, "onclick", null, function() {
+				if(desktop.config.wallpaper.image != item) {
+					dojo.query(".selectedItem", c.domNode).removeClass("selectedItem");
+					dojo.addClass(p, "selectedItem");
+					desktop.config.wallpaper.image = item;
+					desktop.config.apply();
+				}
+			})
+			cbody.appendChild(p);
+		}
+		makeThumb("");
+		dojo.forEach(desktop.config.wallpaper.storedList, makeThumb);
+		c.setContent(cbody);
+		win.addChild(c);
+		
+		//botom part -------------
+		var color = new dijit.ColorPalette({value: desktop.config.wallpaper.color, onChange: dojo.hitch(this, function(value) {
+			desktop.config.wallpaper.color = value;
+			desktop.config.apply();
+		})});
+		var colorButton = new dijit.form.DropDownButton({
+			dropDown: color,
+			label: "Background Color"
+		});
+		var styleLabel = document.createElement("span");
+		styleLabel.innerHTML = " Style:";
+		var styleButton = new dijit.form.FilteringSelect({
+			autoComplete: true,
+			searchAttr: "label",
+			style: "width: 120px;",
+			store: new dojo.data.ItemFileReadStore({
+				data: {
+					identifier: "value",
+					items: [
+						{label: "Centered", value: "centered"},
+						{label: "Fill Screen", value: "fillscreen"},
+						{label: "Tiled", value: "tiled"}
+					]
+				}
+			}),
+			onChange: function(val) {
+				desktop.config.wallpaper.style=val;
+				desktop.config.apply();
+			}
+		});
+		styleButton.setValue(desktop.config.wallpaper.style);
+		/*var closeButton = new dijit.form.Button({
+			label: "Close",
+			style: "position: absolute; right: 0px; top: 0px;",
+			onClick: function() {
+				win.close();
+			}
+		});*/
+		var p = new dijit.layout.ContentPane({layoutAlign: "bottom"});
 		var body = document.createElement("div");
-		dojo.forEach([colorButton.domNode], function(c) {
+		dojo.forEach([colorButton.domNode, styleLabel, styleButton.domNode/*, closeButton.domNode*/], function(c) {
+			dojo.addClass(c, "dijitInline");
 			body.appendChild(c);
 		});
 		p.setContent(body);
@@ -160,8 +227,35 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 	updateWallpaper: function() {
 		var image = desktop.config.wallpaper.image;
 		var color = desktop.config.wallpaper.color;
-		dojo.style(this.wallpaperNode, "backgroundImage", (image ? "url("+image+")" : "none"));
+		var style = desktop.config.wallpaper.style;
 		dojo.style(this.wallpaperNode, "backgroundColor", color);
+		if(image == "") {
+			if(this.wallpaperImageNode) {
+				 this.wallpaperImageNode.parentNode.removeChild(this.wallpaperImageNode);
+				 this.wallpaperImageNode = false;
+			}
+			dojo.style(this.wallpaperNode, "backgroundImage", "none")
+			return;
+		}
+		else if(style == "centered" || style == "tiled")
+			dojo.style(this.wallpaperNode, "backgroundImage", "url("+image+")");
+			if(this.wallpaperImageNode) {
+				 this.wallpaperImageNode.parentNode.removeChild(this.wallpaperImageNode);
+				 this.wallpaperImageNode = false;
+			}
+		if(style == "centered")
+			dojo.style(this.wallpaperNode, "backgroundRepeat", "no-repeat");
+		else if(style == "tiled")
+			dojo.style(this.wallpaperNode, "backgroundRepeat", "repeat");
+		else if(style == "fillscreen") {
+			if(!this.wallpaperImageNode) {
+				this.wallpaperImageNode = document.createElement("img");
+				dojo.style(this.wallpaperImageNode, "width", "100%");
+				dojo.style(this.wallpaperImageNode, "height", "100%");
+				this.wallpaperNode.appendChild(this.wallpaperImageNode);
+			}
+			this.wallpaperImageNode.src = image;
+		}
 		var css = dojo.byId("corestyle").sheet;
 		if (css.cssRules)
 			var rules = css.cssRules
