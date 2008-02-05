@@ -99,10 +99,12 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 			bodyWidget: "LayoutContainer"
 		});
 		
-		var c = new dijit.layout.ContentPane({layoutAlign: "center", style: "overflow: auto;"});
+		var c = new dijit.layout.ContentPane({layoutAlign: "center"});
 		var cbody = document.createElement("div");
 		dojo.style(cbody, "width", "100%");
 		dojo.style(cbody, "height", "100%");
+		dojo.style(cbody, "overflow", "auto");
+		
 		var makeThumb = function(item) {
 			var p = document.createElement("div");
 			dojo.addClass(p, "floatLeft");
@@ -173,6 +175,10 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 					callback: function(path) {
 						if(path) {
 							var p = api.fs.embed(path);
+							for(key in desktop.config.wallpaper.storedList) {
+								var val = desktop.config.wallpaper.storedList[key];
+								if(val == p) return;
+							}
 							makeThumb(p);
 							desktop.config.wallpaper.storedList.push(p);
 						}
