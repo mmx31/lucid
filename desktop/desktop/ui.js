@@ -99,7 +99,7 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 			bodyWidget: "LayoutContainer"
 		});
 		
-		var c = new dijit.layout.ContentPane({layoutAlign: "center"});
+		var c = new dijit.layout.ContentPane({layoutAlign: "client"});
 		var cbody = document.createElement("div");
 		dojo.style(cbody, "width", "100%");
 		dojo.style(cbody, "height", "100%");
