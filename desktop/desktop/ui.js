@@ -879,7 +879,7 @@ desktop.ui.appletList = {
 		"Accessories": ["clock"],
 		"Desktop & Windows": ["taskbar"],
 		"System & Hardware": ["netmonitor"],
-		"Utilities": ["menu", "seperator"]
+		"Utilities": ["menu", "menubar", "seperator"]
 }
 
 dojo.declare("desktop.ui.applets.seperator", desktop.ui.applet, {
@@ -1049,11 +1049,16 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 		if (this._menubutton) {
 			this._menubutton.destroy();
 		}
+		this._menu.addChild(new dijit.MenuItem({
+			label: "Log Out", 
+			iconClass: "icon-16-actions-system-log-out",
+			onClick: desktop.user.logout
+		}));
 		var div = document.createElement("div");
 		this.containerNode.appendChild(div);
 		var b = new dijit.form.DropDownButton({
-			iconClass: "menubutton-icon",
-			label: "Apps",
+			iconClass: "icon-16-places-start-here",
+			label: "Applications",
 			showLabel: false,
 			dropDown: this._menu
 		}, div);
@@ -1107,15 +1112,107 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 					category.popup = catMenu;
 					menu.addChild(category);
 				}
-				menu.addChild(new dijit.MenuItem({
-					label: "Log Out", 
-					iconClass: "icon-16-actions-system-log-out",
-					onClick: desktop.user.logout
-				}));
 				menu.domNode.style.display="none";
 				menu.startup();
 				this._drawButton();
 			})
 		});
 	}
+});
+dojo.declare("desktop.ui.applets.menubar", desktop.ui.applets.menu, {
+	dispName: "Menu Bar",
+	_makePrefsMenu: function() {
+		var pMenu = new dijit.Menu();
+		dojo.forEach([
+			{
+				label: "Wallpaper",
+				iconClass: "icon-16-apps-preferences-desktop-wallpaper",
+				onClick: function() { desktop.ui._area.wallpaper(); }
+			}
+		], function(args) {
+			pMenu.addChild(new dijit.MenuItem(args));
+		});
+		return pMenu;
+	},
+	_makeSystemMenu: function() {
+		var m = new dijit.Menu();
+		dojo.forEach([
+			new dijit.PopupMenuItem({
+				label: "Preferences",
+				iconClass: "icon-16-categories-preferences-desktop",
+				popup: this._makePrefsMenu()
+			}),
+			new dijit.PopupMenuItem({
+				label: "Administration",
+				iconClass: "icon-16-categories-preferences-system",
+				popup: new dijit.Menu()
+			}),
+			new dijit.MenuSeparator(),
+			new dijit.MenuItem({
+				label: "About Psych Desktop",
+				iconClass: "icon-16-apps-help-browser",
+				onClick: function() {
+					api.ui.alert({
+						title: "About",
+						style: "width: 400px;",
+						message: "<h2>Psych Desktop</h2><b>Version SVN</b><br /><br />Brought to you by:<ul style='padding: 0px;'><li>Will \"Psychcf\" Riley</li><li>Jay Macdonald</li><li>Dave \"mmx\"</li></ul>"
+					})
+				}
+			}),
+			new dijit.MenuSeparator(),
+			new dijit.MenuItem({
+				label: "Log Out", 
+				iconClass: "icon-16-actions-system-log-out",
+				onClick: desktop.user.logout
+			})
+		], m.addChild, m);
+		return m;
+	},
+	_makePlacesMenu: function() {
+		var m = new dijit.Menu();
+		dojo.forEach([
+			new dijit.MenuItem({
+				label: "Home",
+				iconClass: "icon-16-places-user-home",
+				onClick: function() {
+					desktop.app.launchHandler("/", {}, "text/directory");
+				}
+			}),
+			new dijit.MenuItem({
+				label: "Desktop",
+				iconClass: "icon-16-places-user-desktop",
+				onClick: function() {
+					desktop.app.launchHandler("/Desktop/", {}, "text/directory");
+				}
+			})
+		], m.addChild, m);
+		return m;
+	},
+	_drawButton: function() {
+		dojo.require("dijit.Toolbar");
+		dojo.require("dijit.form.Button");
+		var tbar = new dijit.Toolbar();
+		this.addChild(tbar);
+		dojo.forEach([
+			{
+				iconClass: "icon-16-places-start-here",
+				label: "Applications",
+				dropDown: this._menu
+			},
+			{
+				label: "Places",
+				dropDown: this._makePlacesMenu()
+			},
+			{
+				label: "System",
+				dropDown: this._makeSystemMenu()
+			}
+		], function(i) {
+			var b = new dijit.form.DropDownButton(i);
+			tbar.addChild(b);
+			//dojo.query(".dijitA11yDownArrow", b.focusNode).style("display", "none");
+			b.domNode.style.height="100%";
+			b.startup();
+		});
+	},
 });
