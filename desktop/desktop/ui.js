@@ -162,6 +162,7 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 				}
 			}),
 			onChange: function(val) {
+				if(typeof val == "undefined") return;
 				desktop.config.wallpaper.style=val;
 				desktop.config.apply();
 			}
