@@ -11,21 +11,21 @@ html body {
 overflow: hidden;
 margin: 0px;
 }
-.desktopApplet .dijitButton {
-	cursor: pointer;
-	background: none;
-	border: 0px none;
-	padding: 0px;
-}
+
 .desktopApplet .dijit button {
 	border: 0px none;
 }
-.desktopApplet .dijit .dijitA11yDownArrow {
+.dijit .desktopPanel .desktopApplet .dijitA11yDownArrow {
 	display: none;
 }
-.desktopApplet .dijit .dijitButtonNode {
-	background: transparent none no-repeat;
+.dijit .desktopPanel .desktopApplet .dijitButtonNode,
+.dijit .desktopPanel .desktopApplet .dijitToolbar {
+	background: transparent none repeat scroll 0%;
 }
+.dijit .desktopPanel .desktopApplet .dijitToolbar {
+	border: 0px none;
+}
+
 .desktopPanel {
 	font-size: 10pt;
 }
