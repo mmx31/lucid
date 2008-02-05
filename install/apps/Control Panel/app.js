@@ -1,5 +1,4 @@
-
-.require("dojo.parser");
+dojo.require("dojo.parser");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.ColorPalette");
 dojo.require("dijit.layout.ContentPane");
@@ -65,11 +64,6 @@ this.open = function(args)
 		password.setContent(winHTML);
 		tabs.addChild(password); 
 
-		var advanced = new dijit.layout.ContentPane({title: "Advanced"}, document.createElement("div"));
-		winHTML = "debug: <div id=\"debug"+this.instance+"\"></div> <p> crosstalkPing:<span style=\"display: inline\" id=\"crosstalkPing"+this.instance+"\"></span><span id=\"buttonMaybe"+this.instance+"\"></span><p><b>debug:</b> an option that enables some advanced output and options.(dev only). <br> <b>crosstalkPing:</b> how often the desktop communicates with the server. (in miliseconds).";
-		advanced.setContent(winHTML);
-		tabs.addChild(advanced); 
-
 	this.window.addChild(tabs);
 	this.window.show();
 	this.window.startup();
@@ -78,20 +72,12 @@ this.open = function(args)
 	new dijit.form.TextBox({id: "oldPass"+this.instance, name: "oldPass"+this.instance}, document.getElementById("oldPass"+this.instance));
 	new dijit.form.TextBox({id: "newPass"+this.instance, name: "newPass"+this.instance}, document.getElementById("newPass"+this.instance));
 	new dijit.form.TextBox({id: "newPassConfirm"+this.instance, name: "newPassConfirm"+this.instance}, document.getElementById("newPassConfirm"+this.instance));
-	new dijit.form.TextBox({id: "image"+this.instance, name: "image"+this.instance}, document.getElementById("image"+this.instance));
 	new dijit.form.CheckBox({name:"fx"+this.instance, id:"fx"+this.instance}, document.getElementById("bbbbb"+this.instance));
-	new dijit.form.CheckBox({name:"debug"+this.instance, id:"debug"+this.instance}, document.getElementById("debug"+this.instance));
-	new dijit.form.TextBox({id: "crosstalkPing"+this.instance, name: "crosstalkPing"+this.instance}, document.getElementById("crosstalkPing"+this.instance));
 	new dijit.form.TextBox({id: "email"+this.instance, name: "email"+this.instance}, document.getElementById("email"+this.instance));
 	dijit.byId("theme"+this.instance).setValue(desktop.config.theme);
 	dijit.byId("fx"+this.instance).setChecked(desktop.config.fx);
-	dijit.byId("debug"+this.instance).setChecked(desktop.config.debug);
-	dijit.byId("crosstalkPing"+this.instance).setValue(desktop.config.crosstalkPing);
 	api.user.get({callback: dojo.hitch(this, this.processUser)});
 	desktop.theme.list(dojo.hitch(this, this.processThemes));
-}
-this.radioButton = function(a) {
-	alert(a);
 }
 this.about = function() {
 	api.ui.alertDialog({title: "Control Panel", message:"Psych Desktop Control Panel<br>Version "+this.version});
@@ -129,12 +115,8 @@ this.processSave = function() {
 	}
 	var fx=dijit.byId("fx"+this.instance).checked;
 	var theme=dijit.byId("theme"+this.instance).getValue();
-	var debug=dijit.byId("debug"+this.instance).checked;
-	var crosstalkPing=dijit.byId("crosstalkPing"+this.instance).getValue();
 	desktop.theme.set(theme);
 	dojo.byId("currentTheme"+this.instance).innerHTML = theme;
-	desktop.config.debug = debug;
-	desktop.config.crosstalkPing = parseInt(crosstalkPing);
 	desktop.config.fx = fx;
 	desktop.config.save();
 	desktop.config.apply();
