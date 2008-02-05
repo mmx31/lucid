@@ -270,7 +270,7 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 				 this.wallpaperImageNode.parentNode.removeChild(this.wallpaperImageNode);
 				 this.wallpaperImageNode = false;
 			}
-			dojo.style(this.wallpaperNode, "backgroundImage", "none")
+			dojo.style(this.wallpaperNode, "backgroundImage", "none");
 			return;
 		}
 		else if(style == "centered" || style == "tiled")
@@ -284,6 +284,7 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 		else if(style == "tiled")
 			dojo.style(this.wallpaperNode, "backgroundRepeat", "repeat");
 		else if(style == "fillscreen") {
+			dojo.style(this.wallpaperNode, "backgroundImage", "none");
 			if(!this.wallpaperImageNode) {
 				this.wallpaperImageNode = document.createElement("img");
 				dojo.style(this.wallpaperImageNode, "width", "100%");
