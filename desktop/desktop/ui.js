@@ -852,6 +852,7 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 				}
 			}
 			dojo.style(this.domNode, this.getParent().orientation == "horizontal" ? "width" : "height", (nextApplet - (this.pos*size)) - 1);
+			dojo.style(this.domNode, this.getParent().orientation == "horizontal" ? "height" : "width", "auto");
 		}
 	},
 	uninitalize: function() {
