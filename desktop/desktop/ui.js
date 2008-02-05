@@ -56,6 +56,152 @@ desktop.ui = {
 				applets: wid.dump()
 			}
 		});
+	},
+	config: {
+		wallpaper: function(e) {
+			if(this.wallWin) return this.wallWin.bringToFront();
+			var win = this.wallWin = new api.window({
+				title: "Wallpaper Preferences",
+				width: "600px",
+				height: "500px",
+				onClose: dojo.hitch(this, function() {
+					this.wallWin = false;
+				}),
+				bodyWidget: "LayoutContainer"
+			});
+			
+			var c = new dijit.layout.ContentPane({layoutAlign: "client"});
+			var cbody = document.createElement("div");
+			dojo.style(cbody, "width", "100%");
+			dojo.style(cbody, "height", "100%");
+			dojo.style(cbody, "overflow", "auto");
+			
+			var makeThumb = function(item) {
+				var p = document.createElement("div");
+				dojo.addClass(p, "floatLeft");
+				dojo.style(p, "width", "150px;");
+				dojo.style(p, "height", "112px");
+				dojo.style(p, "margin", "5px");
+				dojo.style(p, "padding", "5px");
+					if (item != "") {
+						var img = document.createElement("img");
+						dojo.style(img, "width", "100%");
+						dojo.style(img, "height", "100%");
+						img.src = item; //todo: thumbnails?
+						img.name = item; //so we can look it up later, src resolves a local path to a hostname
+						p.appendChild(img);
+					}
+				if(desktop.config.wallpaper.image == item) dojo.addClass(p, "selectedItem");
+				dojo.connect(p, "onclick", null, function() {
+					if(desktop.config.wallpaper.image != item) {
+						dojo.query(".selectedItem", c.domNode).removeClass("selectedItem");
+						dojo.addClass(p, "selectedItem");
+						desktop.config.wallpaper.image = item;
+						desktop.config.apply();
+					}
+				})
+				cbody.appendChild(p);
+			}
+			makeThumb("");
+			dojo.forEach(desktop.config.wallpaper.storedList, makeThumb);
+			c.setContent(cbody);
+			win.addChild(c);
+			
+			//botom part -------------
+			var color = new dijit.ColorPalette({value: desktop.config.wallpaper.color, onChange: dojo.hitch(this, function(value) {
+				desktop.config.wallpaper.color = value;
+				desktop.config.apply();
+			})});
+			var colorButton = new dijit.form.DropDownButton({
+				dropDown: color,
+				label: "Background Color"
+			});
+			var styleLabel = document.createElement("span");
+			styleLabel.innerHTML = " Style:";
+			var styleButton = new dijit.form.FilteringSelect({
+				autoComplete: true,
+				searchAttr: "label",
+				style: "width: 120px;",
+				store: new dojo.data.ItemFileReadStore({
+					data: {
+						identifier: "value",
+						items: [
+							{label: "Centered", value: "centered"},
+							{label: "Fill Screen", value: "fillscreen"},
+							{label: "Tiled", value: "tiled"}
+						]
+					}
+				}),
+				onChange: function(val) {
+					if(typeof val == "undefined") return;
+					desktop.config.wallpaper.style=val;
+					desktop.config.apply();
+				}
+			});
+			styleButton.setValue(desktop.config.wallpaper.style);
+			var addButton = new dijit.form.Button({
+				label: "Add",
+				iconClass: "icon-22-actions-list-add",
+				onClick: function() {
+					api.ui.fileDialog({
+						callback: function(path) {
+							if(path) {
+								var p = api.fs.embed(path);
+								for(key in desktop.config.wallpaper.storedList) {
+									var val = desktop.config.wallpaper.storedList[key];
+									if(val == p) return;
+								}
+								makeThumb(p);
+								desktop.config.wallpaper.storedList.push(p);
+							}
+						}
+					});
+				}
+			});
+			var removeButton = new dijit.form.Button({
+				label: "Remove",
+				iconClass: "icon-22-actions-list-remove",
+				onClick: function() {
+					var q = dojo.query("div.selectedItem img", c.domNode)
+					if(q[0]) {
+						dojo.forEach(desktop.config.wallpaper.storedList, function(url, i) {
+							if(url == q[0].name) desktop.config.wallpaper.storedList.splice(i, 1);
+						});
+						q[0].parentNode.parentNode.removeChild(q[0].parentNode);
+					}
+				}
+			});
+			/*var closeButton = new dijit.form.Button({
+				label: "Close",
+				style: "position: absolute; right: 0px; top: 0px;",
+				onClick: function() {
+					win.close();
+				}
+			});*/
+			var p = new dijit.layout.ContentPane({layoutAlign: "bottom"});
+			var body = document.createElement("div");
+			dojo.forEach([colorButton.domNode, styleLabel, styleButton.domNode, addButton.domNode, removeButton.domNode/*, closeButton.domNode*/], function(c) {
+				dojo.addClass(c, "dijitInline");
+				body.appendChild(c);
+			});
+			p.setContent(body);
+			win.addChild(p);
+			win.show();
+			win.startup();
+			color.startup();
+		},
+		account: function() {
+			if(this.accountWin) return this.accountWin.bringToFront();
+			var win = this.accountWin = new api.window({
+				title: "Account Information",
+				width: "600px",
+				height: "500px",
+				onClose: dojo.hitch(this, function() {
+					this.accountWin = false;
+				}),
+				bodyWidget: "LayoutContainer"
+			});
+		}
 	}
 }
 
@@ -75,7 +221,7 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 		var filearea = this.filearea = new api.filearea({path: "/Desktop/", forDesktop: true, subdirs: false, style: "position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;", overflow: "hidden"});
 		dojo.addClass(filearea.domNode, "mainFileArea");
 		filearea.menu.addChild(new dijit.MenuSeparator({}));
-		filearea.menu.addChild(new dijit.MenuItem({label: "Wallpaper", iconClass: "icon-16-apps-preferences-desktop-wallpaper", onClick: dojo.hitch(this, this.wallpaper)}));
+		filearea.menu.addChild(new dijit.MenuItem({label: "Wallpaper", iconClass: "icon-16-apps-preferences-desktop-wallpaper", onClick: dojo.hitch(desktop.ui.config, "wallpaper")}));
 		filearea.refresh();
 		dojo.style(filearea.domNode, "zIndex", 1);
 		this.containerNode.appendChild(filearea.domNode);
@@ -86,138 +232,6 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 			dojo.connect(this.domNode,'onresize', this,"resize");
 		}
 		dojo.connect(window,'onresize',this,"resize");
-	},
-	wallpaper: function(e) {
-		if(this.wallWin) return this.wallWin.bringToFront();
-		var win = this.wallWin = new api.window({
-			title: "Wallpaper Preferences",
-			width: "600px",
-			height: "500px",
-			onClose: dojo.hitch(this, function() {
-				this.wallWin = false;
-			}),
-			bodyWidget: "LayoutContainer"
-		});
-		
-		var c = new dijit.layout.ContentPane({layoutAlign: "client"});
-		var cbody = document.createElement("div");
-		dojo.style(cbody, "width", "100%");
-		dojo.style(cbody, "height", "100%");
-		dojo.style(cbody, "overflow", "auto");
-		
-		var makeThumb = function(item) {
-			var p = document.createElement("div");
-			dojo.addClass(p, "floatLeft");
-			dojo.style(p, "width", "150px;");
-			dojo.style(p, "height", "112px");
-			dojo.style(p, "margin", "5px");
-			dojo.style(p, "padding", "5px");
-				if (item != "") {
-					var img = document.createElement("img");
-					dojo.style(img, "width", "100%");
-					dojo.style(img, "height", "100%");
-					img.src = item; //todo: thumbnails?
-					img.name = item; //so we can look it up later, src resolves a local path to a hostname
-					p.appendChild(img);
-				}
-			if(desktop.config.wallpaper.image == item) dojo.addClass(p, "selectedItem");
-			dojo.connect(p, "onclick", null, function() {
-				if(desktop.config.wallpaper.image != item) {
-					dojo.query(".selectedItem", c.domNode).removeClass("selectedItem");
-					dojo.addClass(p, "selectedItem");
-					desktop.config.wallpaper.image = item;
-					desktop.config.apply();
-				}
-			})
-			cbody.appendChild(p);
-		}
-		makeThumb("");
-		dojo.forEach(desktop.config.wallpaper.storedList, makeThumb);
-		c.setContent(cbody);
-		win.addChild(c);
-		
-		//botom part -------------
-		var color = new dijit.ColorPalette({value: desktop.config.wallpaper.color, onChange: dojo.hitch(this, function(value) {
-			desktop.config.wallpaper.color = value;
-			desktop.config.apply();
-		})});
-		var colorButton = new dijit.form.DropDownButton({
-			dropDown: color,
-			label: "Background Color"
-		});
-		var styleLabel = document.createElement("span");
-		styleLabel.innerHTML = " Style:";
-		var styleButton = new dijit.form.FilteringSelect({
-			autoComplete: true,
-			searchAttr: "label",
-			style: "width: 120px;",
-			store: new dojo.data.ItemFileReadStore({
-				data: {
-					identifier: "value",
-					items: [
-						{label: "Centered", value: "centered"},
-						{label: "Fill Screen", value: "fillscreen"},
-						{label: "Tiled", value: "tiled"}
-					]
-				}
-			}),
-			onChange: function(val) {
-				if(typeof val == "undefined") return;
-				desktop.config.wallpaper.style=val;
-				desktop.config.apply();
-			}
-		});
-		styleButton.setValue(desktop.config.wallpaper.style);
-		var addButton = new dijit.form.Button({
-			label: "Add",
-			iconClass: "icon-22-actions-list-add",
-			onClick: function() {
-				api.ui.fileDialog({
-					callback: function(path) {
-						if(path) {
-							var p = api.fs.embed(path);
-							for(key in desktop.config.wallpaper.storedList) {
-								var val = desktop.config.wallpaper.storedList[key];
-								if(val == p) return;
-							}
-							makeThumb(p);
-							desktop.config.wallpaper.storedList.push(p);
-						}
-					}
-				});
-			}
-		});
-		var removeButton = new dijit.form.Button({
-			label: "Remove",
-			iconClass: "icon-22-actions-list-remove",
-			onClick: function() {
-				var q = dojo.query("div.selectedItem img", c.domNode)
-				if(q[0]) {
-					dojo.forEach(desktop.config.wallpaper.storedList, function(url, i) {
-						if(url == q[0].name) desktop.config.wallpaper.storedList.splice(i, 1);
-					});
-					q[0].parentNode.parentNode.removeChild(q[0].parentNode);
-				}
-			}
-		});
-		/*var closeButton = new dijit.form.Button({
-			label: "Close",
-			style: "position: absolute; right: 0px; top: 0px;",
-			onClick: function() {
-				win.close();
-			}
-		});*/
-		var p = new dijit.layout.ContentPane({layoutAlign: "bottom"});
-		var body = document.createElement("div");
-		dojo.forEach([colorButton.domNode, styleLabel, styleButton.domNode, addButton.domNode, removeButton.domNode/*, closeButton.domNode*/], function(c) {
-			dojo.addClass(c, "dijitInline");
-			body.appendChild(c);
-		});
-		p.setContent(body);
-		win.addChild(p);
-		win.show();
-		win.startup();
-		color.startup();
 	},
 	getBox: function() {
 		var thicknesses = {BR: 0, BL: 0, BC: 0, TR: 0, TL: 0, TC: 0, LT: 0, LC: 0, LB: 0, RT: 0, RC: 0, RB: 0};
@@ -1127,7 +1141,7 @@ dojo.declare("desktop.ui.applets.menubar", desktop.ui.applets.menu, {
 			{
 				label: "Wallpaper",
 				iconClass: "icon-16-apps-preferences-desktop-wallpaper",
-				onClick: function() { desktop.ui._area.wallpaper(); }
+				onClick: function() { desktop.ui.config.wallpaper(); }
 			}
 		], function(args) {
 			pMenu.addChild(new dijit.MenuItem(args));

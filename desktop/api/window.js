@@ -1,7 +1,8 @@
 dojo.require("dojox.layout.ResizeHandle");
 dojo.require("dojo.dnd.move");
-dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dojox.fx.easing");
+dojo.require("dijit._Templated");
 /*
  * Package: window
  * 
@@ -23,8 +24,8 @@ dojo.require("dojox.fx.easing");
  * 		setTimeout(dojo.hitch(win, win.destroy), 1000*5);
  * 		(end code)
  */
-dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
-	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"win-tl\"><div class=\"win-tr\"><div class=\"win-tc\" dojoattachevent=\"onmousedown: bringToFront\"><div dojoattachpoint=\"titleNode,handle\" class=\"win-title\">${title}</div><div class=\"win-buttons\"><div dojoattachevent=\"onmouseup: close\" class=\"win-close\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"win-max\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"win-min\"></div></div></div></div></div><div class=\"win-bmw\"><div class=\"win-ml\"><div class=\"win-mr\"><div class=\"win-mc\" style=\"overflow: hidden;\" dojoattachpoint=\"body\"></div></div></div><div class=\"win-bl\"><div class=\"win-br\"><div class=\"win-bc\"></div></div></div><div dojoattachpoint=\"resize\" class=\"win-resize\"></div></div></div>",
+dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
+	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"win-tl\"><div class=\"win-tr\"><div class=\"win-tc\" dojoattachevent=\"onmousedown: bringToFront\"><div dojoattachpoint=\"titleNode,handle\" class=\"win-title\">${title}</div><div class=\"win-buttons\"><div dojoattachevent=\"onmouseup: close\" class=\"win-close\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"win-max\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"win-min\"></div></div></div></div></div><div class=\"win-bmw\"><div class=\"win-ml\"><div class=\"win-mr\"><div class=\"win-mc\" style=\"overflow: hidden;\" dojoattachpoint=\"containerNode\"></div></div></div><div class=\"win-bl\"><div class=\"win-br\"><div class=\"win-bc\"></div></div></div><div dojoattachpoint=\"resize\" class=\"win-resize\"></div></div></div>",
 	/*
 	 * Property: closed
 	 * 
@@ -90,27 +91,6 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 */
 	showClose: true,
 	/*
-	 * Property: bodyWidget
-	 * 
-	 * Summary:
-	 * 		The window body's widget type
-	 * 
-	 * Note:
-	 * 		This must be a member of dijit.layout
-	 * 
-	 * Notes:
-	 * 		This is usefull for things like layout container creation
-	 * 		To set this after window creation, use <window.setBodyWidget>
-	 */
-	bodyWidget: "ContentPane",
-	 /*
-	 * Property: bodyWidgetParams
-	 * 
-	 * Summary:
-	 * 		The window body's widget params
-	 */
-	bodyWidgetParams: {},
-	/*
 	 * Property: maximized
 	 * 
 	 * Summary:
@@ -155,22 +135,21 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 */
 	pos: {},
 	postCreate: function() {
-		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.body);
 		this.domNode.title="";
 		this.makeDragger();
-		this.resize = new dojox.layout.ResizeHandle({
+		this.sizeHandle = new dojox.layout.ResizeHandle({
 			targetContainer: this.domNode,
 			activeResize: true
-		}, this.resize);
+		}, this.sizeHandle);
 		if(!this.resizable)
 		{
 			this.killResizer();
 		}
-		dojo.addClass(this.resize.domNode, "win-resize");
-		dojo.connect(this.resize.domNode, "onmousedown", this, function(e){
+		dojo.addClass(this.sizeHandle.domNode, "win-resize");
+		dojo.connect(this.sizeHandle.domNode, "onmousedown", this, function(e){
 			this._resizeEnd = dojo.connect(document, "onmouseup", this, function(e){
 				dojo.disconnect(this._resizeEnd);
-				this._resizeBody();
+				this.layout();
 			});
 		});
 		
@@ -179,22 +158,6 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		}
 		dojo.connect(window,'onresize',this,"_onResize");
 		this.bringToFront();
-	},
-	/*
-	 * Method: setBodyWidget
-	 * 
-	 * Summary:
-	 * 		sets the body widget. Cannot use after the window has been shown.
-	 * Parameters:
-	 * 		widget - the body widget's name. must be a member of dijit.layout
-	 * 		widgetParams - The body widget params
-	 */
-	setBodyWidget: function(widget, widgetParams)
-	{
-		this.bodyWidget = widget;
-		this.bodyWidgetParams = widgetParams;
-		this.bodyWidgetParams.id=this.id+"body";
-		this.body = new dijit.layout[this.bodyWidget](this.bodyWidgetParams, this.body.domNode);
 	},
 	/*
 	 * Method: show
@@ -216,18 +179,18 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			if(this.maximized == true) this.maximize();
 			dojo.style(this.domNode, "display", "block");
 			if (desktop.config.fx) {
-				if (desktop.config.fx == 1) dojo.style(this.body.domNode, "display", "none");
+				if (desktop.config.fx == 1) dojo.style(this.containerNode, "display", "none");
 				dojo.style(this.domNode, "opacity", 0);
 				var anim = dojo.fadeIn({
 					node: this.domNode,
 					duration: desktop.config.window.animSpeed
 				});
 				dojo.connect(anim, "onEnd", this, function() {
-					if (desktop.config.fx == 1) dojo.style(this.body.domNode, "display", "block");
-					this._resizeBody();
+					if (desktop.config.fx == 1) dojo.style(this.containerNode, "display", "block");
+					this.layout();
 				});
 				anim.play();
-			} else this._resizeBody();
+			} else this.layout();
 	},
 	_getPoints: function(box) {
 		return {
@@ -261,7 +224,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	 * 		Internal method that makes a resizer for the window.
 	 */
 	makeResizer: function() {
-		dojo.style(this.resize.domNode, "display", "block");
+		dojo.style(this.sizeHandle.domNode, "display", "block");
 	},
 	/*
 	 * Method: killResizer
@@ -274,8 +237,8 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		/*dojo.disconnect(this._dragging);
 		dojo.disconnect(this._resizeEvent);
 		dojo.disconnect(this._doconmouseup);
-		this.resize.style.cursor = "default";*/
-		dojo.style(this.resize.domNode, "display", "none");
+		this.sizeHandle.style.cursor = "default";*/
+		dojo.style(this.sizeHandle.domNode, "display", "none");
 	},
 	/* 
 	 * Method: minimize
@@ -288,7 +251,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		this.onMinimize();
 		if(desktop.config.fx == true)
 		{
-			dojo.style(this.body.domNode, "display", "none");
+			dojo.style(this.containerNode, "display", "none");
 			var pos = dojo.coords(this.domNode, true);
 			this.left = pos.x;
 			this.top = pos.y;
@@ -345,8 +308,8 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				easing: dojox.fx.easing.easeOut
 			});
 			dojo.connect(anim, "onEnd", this, function() {
-				dojo.style(this.body.domNode, "display", "block");
-				this._resizeBody();
+				dojo.style(this.containerNode, "display", "block");
+				this.layout();
 			});
 			anim.play();
 		}
@@ -375,7 +338,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		if(desktop.config.fx == true)
 		{
 			//api.log("maximizing... (in style!)");
-			dojo.style(this.body.domNode, "display", "none");
+			dojo.style(this.containerNode, "display", "none");
 			var max = desktop.ui._area.getBox();
 			var anim = dojo.animateProperty({
 				node: this.domNode,
@@ -388,9 +351,9 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				duration: desktop.config.window.animSpeed
 			});
 			dojo.connect(anim, "onEnd", this, function() {
-				dojo.style(this.body.domNode, "display", "block");
+				dojo.style(this.containerNode, "display", "block");
 				this._hideBorders();
-				this._resizeBody();
+				this.layout();
 			});
 			anim.play();
 		}
@@ -402,7 +365,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			win.style.width = dojo.style(this.domNode.parentNode, "width");
 			win.style.height = dojo.style(this.domNode.parentNode, "height");
 			this._hideBorders();
-			this._resizeBody();
+			this.layout();
 		}
 	},
 	_showBorders: function() {
@@ -446,11 +409,11 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			});
 		}
 		this._dragStartListener = dojo.connect(this._drag, "onMoveStart", dojo.hitch(this, function(mover){
-			dojo.style(this.body.domNode, "display", "none");
+			dojo.style(this.containerNode, "display", "none");
 		}));
 		this._dragStopListener = dojo.connect(this._drag, "onMoveStop", dojo.hitch(this, function(mover){
-			dojo.style(this.body.domNode, "display", "block");
-			this._resizeBody();
+			dojo.style(this.containerNode, "display", "block");
+			this.layout();
 		}));
 	},
 	/*
@@ -469,7 +432,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 		if(desktop.config.fx == true)
 		{
 			this._showBorders();
-			dojo.style(this.body.domNode, "display", "none");
+			dojo.style(this.containerNode, "display", "none");
 			var anim = dojo.animateProperty({
 				node: this.domNode,
 				properties: {
@@ -481,8 +444,8 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 				duration: desktop.config.window.animSpeed
 			});
 			dojo.connect(anim, "onEnd", this, function(e) {
-				dojo.style(this.body.domNode, "display", "block");
-				this._resizeBody();
+				dojo.style(this.containerNode, "display", "block");
+				this.layout();
 			});
 			void(anim); //fixes a weird ass IE bug. Don't ask me why :D
 			anim.play();
@@ -496,20 +459,9 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			win.style.height= this.pos.height;
 			win.style.width= this.pos.width;
 			this._showBorders();
-			this._resizeBody();
+			this.layout();
 		}
 		this.maximized = false;
-	},
-	/*
-	 * Method: unmaximize
-	 * Summary:
-	 * 		UnMaximizes the window
-	 */
-	_resizeBody: function()
-	{
-		if(this.body.resize) this.body.resize();
-		if(this.body.layout) this.body.layout();
-		this.onResize();
 	},
 	/*
 	 * Method: bringToFront
@@ -544,10 +496,9 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 	},
 	uninitialize: function() {
 		if(!this.closed) this.onClose();
-		this.body.destroy();
 		if(this._task) this._task.destroy();
 		if(this._drag) this._drag.destroy();
-		if(this.resize) this.resize.destroy();
+		if(this.sizeHandle) this.sizeHandle.destroy();
 	},
 	/* 
 	 * Method: close
@@ -561,7 +512,7 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			this.closed = true;
 			this.onClose();
 			if (desktop.config.fx) {
-				dojo.style(this.body.domNode, "display", "none");
+				dojo.style(this.containerNode, "display", "none");
 				var anim = dojo.fadeOut({
 					node: this.domNode,
 					duration: desktop.config.window.animSpeed
@@ -578,24 +529,51 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			}
 		}
 	},
-	/*
-	 * Adds a dojo widget or HTML element to the window.
-	 * 
-	 * Parameters:
-	 * 		node - A dojo widget or HTML element.
-	 * 
-	 * Note:
-	 * 		If you are adding widgets in bulk, you should not set restartWidget
-	 * 		to 'true' untill adding the very last widget, otherwize the UI will
-	 * 		take forever to render
-	 */
-	addChild: function(node)
-	{
-		this.body.addChild(node);
+	resize: function(args){
+		// summary:
+		//		Explicitly set this widget's size (in pixels),
+		//		and then call layout() to resize contents (and maybe adjust child widgets)
+		//	
+		// args: Object?
+		//		{w: int, h: int, l: int, t: int}
+
+		var node = this.domNode;
+
+		// set margin box size, unless it wasn't specified, in which case use current size
+		if(args){
+			dojo.marginBox(node, args);
+
+			// set offset of the node
+			if(args.t){ node.style.top = args.t + "px"; }
+			if(args.l){ node.style.left = args.l + "px"; }
+		}
+		// If either height or width wasn't specified by the user, then query node for it.
+		// But note that setting the margin box and then immediately querying dimensions may return
+		// inaccurate results, so try not to depend on it.
+		var mb = dojo.mixin(dojo.marginBox(this.containerNode), args||{});
+
+		// Save the size of my content box.
+		this._contentBox = dijit.layout.marginBox2contentBox(this.containerNode, mb);
+
+		// Callback for widget to adjust size of it's children
+		this.layout();
 	},
-	startup: function()
-	{
-		this.body.startup();
+	layout: function(){
+		dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());
+	},
+
+	addChild: function(/*Widget*/ child, /*Integer?*/ insertIndex){
+		dijit._Container.prototype.addChild.apply(this, arguments);
+		if(this._started){
+			dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());
+		}
+	},
+
+	removeChild: function(/*Widget*/ widget){
+		dijit._Container.prototype.removeChild.apply(this, arguments);
+		if(this._started){
+			dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());
+		}
 	},
 	_onResize: function(e) {
 		if (this.maximized && !this.minimized) {
@@ -612,4 +590,11 @@ dojo.declare("api.window", [dijit._Widget, dijit._Templated], {
 			this.pos.height = v.h - max.T - max.B;
 		}
 	}
+});
+
+dojo.extend(dijit._Widget, {
+	// layoutAlign: String
+	//		"none", "left", "right", "bottom", "top", and "client".
+	//		See the LayoutContainer description for details on this parameter.
+	layoutAlign: 'none'
 });
