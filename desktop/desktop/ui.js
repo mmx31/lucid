@@ -1,5 +1,6 @@
 dojo.provide("desktop.ui");
 dojo.require("dijit.layout.ContentPane");
+dojo.require("dojo.fx");
 desktop.ui = {
 	draw: function() {
 		desktop.ui._area = new desktop.ui.area();
@@ -1030,7 +1031,16 @@ dojo.declare("desktop.ui.task", null, {
 	},
 	destroy: function() {
 		dojo.forEach(this.nodes, function(node){
-			var anim = dojo.fadeOut({ node: node, duration: 200 });
+			var fade = dojo.fadeOut({ node: node, duration: 200 });
+			var slide = dojo.animateProperty({
+				node: node,
+				duration: 200,
+				properties: {
+					width: {end: 0},
+					height: {end: 0}
+				}
+			});
+			var anim = dojo.fx.chain([fade, slide]);
 			dojo.connect(anim, "onEnd", null, function() {
 				node.parentNode.removeChild(node);
 				node=null;
