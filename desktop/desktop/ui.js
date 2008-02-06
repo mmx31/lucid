@@ -1041,7 +1041,7 @@ dojo.declare("desktop.ui.task", null, {
 				}
 			});
 			var anim = dojo.fx.chain([fade, slide]);
-			dojo.connect(anim, "onEnd", null, function() {
+			dojo.connect(slide, "onEnd", null, function() {
 				node.parentNode.removeChild(node);
 				node=null;
 			});
