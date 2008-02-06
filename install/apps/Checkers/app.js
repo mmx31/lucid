@@ -58,7 +58,7 @@ this.makePiece = function(c)
 			dy: 0
 		});
 	});
-	var bodyNode = this.win.body.domNode;
+	var bodyNode = this.win.containerNode;
 	shape.connect("onmouseup", shape, function(e) {
 		var bCoords = dojo.coords(bodyNode, false);
 		for(var c=0; c <= 400; c+=50)
