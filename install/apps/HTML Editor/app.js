@@ -125,7 +125,7 @@ this._processOpen = function(path) {
     }
     this.other.setContent("Opening file \"" + path + "\"");
     this.newAs = true;
-    dojo.byId('text' + this.instance).disabled = true;
+    this.editor.setDisabled(true);
     api.fs.read({
         path: path,
         callback: dojo.hitch(this, 
