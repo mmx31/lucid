@@ -79,7 +79,7 @@ desktop.ui = {
 			var makeThumb = function(item) {
 				var p = document.createElement("div");
 				dojo.addClass(p, "floatLeft");
-				dojo.style(p, "width", "150px;");
+				dojo.style(p, "width", "150px");
 				dojo.style(p, "height", "112px");
 				dojo.style(p, "margin", "5px");
 				dojo.style(p, "padding", "5px");
