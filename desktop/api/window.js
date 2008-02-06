@@ -25,7 +25,7 @@ dojo.require("dijit._Templated");
  * 		(end code)
  */
 dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
-	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"win-tl\"><div class=\"win-tr\"><div class=\"win-tc\" dojoattachevent=\"onmousedown: bringToFront\"><div dojoattachpoint=\"titleNode,handle\" class=\"win-title\">${title}</div><div class=\"win-buttons\"><div dojoattachevent=\"onmouseup: close\" class=\"win-close\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"win-max\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"win-min\"></div></div></div></div></div><div class=\"win-bmw\"><div class=\"win-ml\"><div class=\"win-mr\"><div class=\"win-mc\" style=\"overflow: hidden;\" dojoattachpoint=\"containerNode\"></div></div></div><div class=\"win-bl\"><div class=\"win-br\"><div class=\"win-bc\"></div></div></div><div dojoattachpoint=\"resize\" class=\"win-resize\"></div></div></div>",
+	templateString: "<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\"><div class=\"win-tl\"><div class=\"win-tr\"><div class=\"win-tc\" dojoattachevent=\"onmousedown: bringToFront\"><div dojoattachpoint=\"titleNode,handle\" class=\"win-title\">${title}</div><div class=\"win-buttons\"><div dojoattachevent=\"onmouseup: close\" class=\"win-close\"></div><div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"win-max\"></div><div dojoattachevent=\"onmouseup: minimize\" class=\"win-min\"></div></div></div></div></div><div class=\"win-bmw\"><div class=\"win-ml\"><div class=\"win-mr\"><div class=\"win-mc\" style=\"overflow: hidden;\" dojoattachpoint=\"containerNode\"></div></div></div><div class=\"win-bl\"><div class=\"win-br\"><div class=\"win-bc\"></div></div></div><div dojoattachpoint=\"sizeHandle\" class=\"win-resize\"></div></div></div>",
 	/*
 	 * Property: closed
 	 * 
@@ -589,6 +589,10 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			this.pos.width = v.w - max.L - max.R;
 			this.pos.height = v.h - max.T - max.B;
 		}
+	},
+	startup: function() {
+		this.inherited("startup", arguments);
+		this.resize();
 	}
 });
 
