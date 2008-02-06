@@ -60,11 +60,6 @@ this.start = function() {
         onClick: dojo.hitch(this, this.processClose),
         iconClass: "icon-16-actions-process-stop"
     }));
-    toolbar.addChild(new dijit.form.Button({
-        label: "Exit",
-        onClick: dojo.hitch(this, this.kill),
-        iconClass: "icon-16-actions-system-log-out"
-    }));
     this.window.addChild(toolbar);
     var box = new dijit.layout.ContentPane({
         layoutAlign: "client"
@@ -72,24 +67,28 @@ this.start = function() {
     document.createElement("div"));
     this.other = new dijit.layout.ContentPane({
         layoutAlign: "bottom",
-        style: "height: 10%"
+		style: "padding: 2px;"
     },
     document.createElement("div"));
     this.other.setContent("No file open");
     this.window.addChild(this.other);
     this.window.title = "HTML Editor";
-    this.window.width = "320px";
-    this.window.height = "305px";
-    this.editor = new dijit.Editor({layoutAlign: "client"}, document.body.appendChild(document.createElement("div")));
-	//hackish, but it's nesisary... weird...
-    this.editor.replaceValue("<b>Open</b> or <b>Create</b> a file.");
-    this.editor.setDisabled(true);
-	this.window.addChild(this.editor);
+    var editor = this.editor = new dijit.Editor({layoutAlign: "client"}, document.body.appendChild(document.createElement("div")));
+	editor.startup();
+	this.window.addChild(editor);
     this.window.show();
     this._new = false;
     this.window.startup();
     api.instances.setActive(this.instance);
     this.window.onClose = dojo.hitch(this, this.kill);
+
+	setTimeout(function() {
+		editor = dijit.byId(editor.id);
+		delete editor.toolbar;
+		editor.postCreate();
+		editor.replaceValue("<b>Open</b> or <b>Create</b> a file.");
+	    editor.setDisabled(true);
+	}, 500);
 
 }
 this.processNew = function() {
