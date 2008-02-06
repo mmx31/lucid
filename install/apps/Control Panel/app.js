@@ -37,7 +37,6 @@ this.open = function(args)
 	this.window.title="Control Panel";
 	this.window.width="620px";
 	this.window.height="410px";
-	this.window.setBodyWidget("LayoutContainer", {});
 	var toolbar = new dijit.Toolbar({layoutAlign: "top"});
 	toolbar.addChild(new dijit.form.Button({label: "About", onClick: dojo.hitch(this, this.about), iconClass: "icon-16-apps-help-browser"}));
 	toolbar.addChild(new dijit.form.Button({label: "Save to server", onClick: dojo.hitch(this, this.processSave), iconClass: "icon-16-actions-document-save"}));

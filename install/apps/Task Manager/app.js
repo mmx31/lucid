@@ -19,7 +19,6 @@ this.init = function(args) {
         width: "500px",
         height: "400px"
     });
-    this.win.setBodyWidget("LayoutContainer", {});
     var toolbar = new dijit.Toolbar({
         layoutAlign: "top"
     });

@@ -8,7 +8,6 @@ this.init = function(args) {
 		title: "Music Player",
 		width: "350px",
 		height: "150px",
-		bodyWidget: "LayoutContainer",
 		onClose: dojo.hitch(this, this.kill)
 	});
 	var toolbar = new dijit.Toolbar({layoutAlign: "top"});

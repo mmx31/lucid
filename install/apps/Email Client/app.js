@@ -32,7 +32,6 @@ this.init = function(args) {
 	}});
 	this.win = new api.window({
 		title: "Email Clent",
-		bodyWidget: "LayoutContainer",
 		onClose: dojo.hitch(this, this.kill)
 	});
 	this.toolbar = new dijit.Toolbar({layoutAlign: "top"});

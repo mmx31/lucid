@@ -1,3 +1,5 @@
+dojo.require("dijit.layout.ContentPane");
+
 /** 
 * An API that provides things like dialogs and such
 * 
@@ -26,7 +28,6 @@ api.ui = new function() {
 		//api.ui.inputDialog({title: "UI Test", message: "What is your name?", callback: api.log});
 		this.dialog = new api.window();
 		this.dialog.title = object.title;	
-		this.dialog.setBodyWidget("LayoutContainer", {sizerWidth: 7, orientation: "horizontal"});		
 		this.dialog.width = "400px";
 		this.dialog.height = "150px";
 		this.details = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
@@ -60,7 +61,6 @@ api.ui = new function() {
 		this.dialog.title = object.title;
 		this.dialog.width = "500px";
 		this.dialog.height = "300px";
-		this.dialog.setBodyWidget("LayoutContainer", {sizerWidth: 7, orientation: "horizontal"});		
 		this.file = new api.filearea({onItem: dojo.hitch(this, function(path) { object.callback(path); this.dialog.destroy(); })}); //Make the fileArea
 		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
 		var layout = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));

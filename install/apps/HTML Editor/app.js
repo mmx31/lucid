@@ -1,5 +1,5 @@
 dojo.require("dijit.Toolbar");
-dojo.require("dijit.layout.LayoutContainer");
+dojo.require("dijit.layout.ContentPane");
 dojo.require("dojo.parser");
 dojo.require("dijit.Editor");
 this.newAs = false;
@@ -26,7 +26,6 @@ this.start = function() {
 this.window = new api.window({
 	onClose: dojo.hitch(this, this.kill)
 });
-this.window.setBodyWidget("LayoutContainer", {});
 var toolbar = new dijit.Toolbar({layoutAlign: "top"});
 toolbar.addChild(new dijit.form.Button({label: "New", onClick: dojo.hitch(this, this.processNew), iconClass: "icon-16-actions-document-open"}));
 toolbar.addChild(new dijit.form.Button({label: "Open", onClick: dojo.hitch(this, this.processOpen), iconClass: "icon-16-actions-document-open"}));

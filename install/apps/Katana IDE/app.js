@@ -12,7 +12,6 @@ this.init = function(args)
 		title: "Katana IDE",
 		onClose: dojo.hitch(this, this.kill)
 	});
-	this.win.setBodyWidget("LayoutContainer", {});
 	
 	var client = new dijit.layout.ContentPane({style: "overflow: hidden;", layoutAlign: "client"}, document.createElement("div"));
 		this.editor = document.createElement("textarea");
@@ -98,7 +97,6 @@ this.editMetadata = function()
         this.editor.disabled = true;
         this.winn = new api.window({
 			title: "Edit Metadata",
-			bodyWidget: "ContentPane",
 			onClose: dojo.hitch(this, this._editMetadata)
 		});
 		var content = "";
@@ -110,7 +108,9 @@ this.editMetadata = function()
         content += "Application Maturity: <span id=\"appmaturity"+this.instance+this.blah+"\"></span><br>";
         content += "Application Category: <span id=\"appcategory"+this.instance+this.blah+"\"></span><br>";
 	content += "<p>Closing this window will apply the metadata change.</p>";
-	this.winn.body.setContent(content);
+	var body = new dijit.layout.ContentPane();
+	body.setContent(content);
+	this.winn.addChild(body);
 	this.winn.show();
 	new dijit.form.TextBox({id: "appname"+this.instance+this.blah, name: "appname"+this.instance+this.blah}, document.getElementById("appname"+this.instance+this.blah));
 	new dijit.form.TextBox({id: "appauthor"+this.instance+this.blah, name: "appauthor"+this.instance+this.blah}, document.getElementById("appauthor"+this.instance+this.blah));
@@ -148,7 +148,7 @@ this.load = function()
 {
 	//create a window with a list of apps to edit.
 	api.ide.getAppList(dojo.hitch(this, function(data){
-		this.loadwin = new api.window({title: "Select App", bodyWidget: "LayoutContainer"});
+		this.loadwin = new api.window({title: "Select App"});
 		var pane = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
 		content=document.createElement("ul");
 		dojo.forEach(data, dojo.hitch(this, function(a){

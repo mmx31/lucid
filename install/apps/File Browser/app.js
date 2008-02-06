@@ -43,7 +43,6 @@ this.init = function(args)
 	
 	this.win = new api.window({
 		title: "File Browser",
-		bodyWidget: "LayoutContainer",
 		onClose: dojo.hitch(this, this.kill)
 	});
 	this.fileArea = new api.filearea({layoutAlign: "client", path: (args.path || "/")})

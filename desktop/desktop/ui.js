@@ -1,5 +1,5 @@
 dojo.provide("desktop.ui");
-
+dojo.require("dijit.layout.ContentPane");
 desktop.ui = {
 	draw: function() {
 		desktop.ui._area = new desktop.ui.area();
@@ -66,8 +66,7 @@ desktop.ui = {
 				height: "500px",
 				onClose: dojo.hitch(this, function() {
 					this.wallWin = false;
-				}),
-				bodyWidget: "LayoutContainer"
+				})
 			});
 			
 			var c = new dijit.layout.ContentPane({layoutAlign: "client"});
@@ -198,8 +197,7 @@ desktop.ui = {
 				height: "500px",
 				onClose: dojo.hitch(this, function() {
 					this.accountWin = false;
-				}),
-				bodyWidget: "LayoutContainer"
+				})
 			});
 		}
 	}
@@ -395,7 +393,6 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		}
 		var win = this.propertiesWin = new api.window({
 			title: "Panel Properties",
-			bodyWidget: "LayoutContainer",
 			width: "180px",
 			height: "200px",
 			onClose: dojo.hitch(this, function() {
@@ -471,7 +468,6 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		}
 		var win = this.window = new api.window({
 			title: "Add to panel",
-			bodyWidget: "LayoutContainer",
 			onClose: dojo.hitch(this, function() {
 				this.window = false;
 			})

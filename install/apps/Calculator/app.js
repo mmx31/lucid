@@ -4,6 +4,7 @@ this.kill = function() {
 }
 this.init = function(args)
 {
+	dojo.require("dijit.layout.ContentPane");
 winHTML  = '<form style="height: 12%; overflow: hidden;" onSubmit="return desktop.app.instances['+this.instance+'].evaluate();"><input type="text" id="results'+this.instance+'" style="text-align: right; width: 100%;" /></form>';
 //------------------
 winHTML += '<button style="width: 25%; height: 16%;" onClick="document.getElementById(\'results'+this.instance+'\').value += \'(\'">(</button>';
@@ -36,8 +37,11 @@ this.window = new api.window({
 	width: "200px",
 	height: "235px"
 });
-this.window.body.setContent(winHTML);
+var b = new dijit.layout.ContentPane();
+b.setContent(winHTML);
+this.window.addChild(b);
 this.window.show();
+this.window.startup();
 dojo.connect(this.window, "onClose", this, this.kill);
 api.instances.setActive(this.instance);
 }

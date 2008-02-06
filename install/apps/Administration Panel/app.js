@@ -16,7 +16,7 @@ this.init = function(args)
 	api.addDojoCss("dojox/grid/_grid/Grid.css");
 	//make window
 	this.win = new api.window({title: "Administration Panel", width: "500px", height: "400px", onClose: dojo.hitch(this, this.kill)});
-	this.win.setBodyWidget("SplitContainer", {sizerWidth: 7, orientation: "horizontal"});
+	var split = new dijit.layout.SplitContainer({sizerWidth: 7, orientation: "horizontal"});
 	var pane = new dijit.layout.ContentPane({sizeMin: 10, sizeShare: 20}, document.createElement("div"));
 		var menu = new dijit.Menu({});
 		menu.domNode.style.width="100%";
@@ -45,13 +45,14 @@ this.init = function(args)
 						       onClick: dojo.hitch(this, this.pages.filesystem)});
 			menu.addChild(item);
 		pane.setContent(menu.domNode);
-	this.win.addChild(pane);
+	split.addChild(pane);
 	var layout = new dijit.layout.LayoutContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
 	this.main = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
 	layout.addChild(this.main);
 	this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
 	layout.addChild(this.toolbar);
-	this.win.addChild(layout);
+	split.addChild(layout);
+	this.win.addChild(split);
 	this.win.show();
 	this.win.startup();
 	api.instances.setActive(this.instance);

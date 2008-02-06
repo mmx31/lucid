@@ -7,17 +7,16 @@ this.init = function(args)
 	dojo.require("dijit.Toolbar");
 	dojo.require("dijit.form.Form");
 	dojo.require("dijit.form.Button");
-	dojo.require("dijit.layout.LayoutContainer");
+	dojo.require("dijit.layout.ContentPane");
 	this.win = new api.window({
 		title: "Web Browser",
-		bodyWidget: "LayoutContainer",
 		onClose: dojo.hitch(this, this.kill)
 	});
 	this.Iframe = document.createElement("iframe");
 	dojo.style(this.Iframe, "width", "100%");
 	dojo.style(this.Iframe, "height", "100%");
 	dojo.style(this.Iframe, "border", "0px");
-	this.urlbox = new dijit.form.TextBox({onExecute: dojo.hitch(this, this.go), style: "width: 90%;"});
+	this.urlbox = new dijit.form.TextBox({onExecute: dojo.hitch(this, this.go), style: "width: 80%;"});
 	var form = new dijit.Toolbar({layoutAlign: "top"});
 	form.addChild(this.urlbox);
 	form.addChild(new dijit.form.Button({label: "Go", onClick: dojo.hitch(this, this.go), style: "width: 10%;"}));
@@ -36,6 +35,7 @@ this.init = function(args)
 		};
 		if(loc != "about:blank") this.urlbox.setValue(loc);
 	}), 500);*/
+	this.win.startup();
 	api.instances.setActive(this.instance);
 }
 

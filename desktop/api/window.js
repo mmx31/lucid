@@ -15,12 +15,11 @@ dojo.require("dijit._Templated");
  * 		win.title = "foo";
  * 		win.height =  "200px";
  * 		win.width = "20%";
- * 		win.bodyWidget = "ContentPane";
- * 		win.bodyWidgetParams = {parseOnLoad: true};
  * 		widget = new dijit.layout.ContentPane();
  * 		widget.setContent("baz");
- * 		win.addChild(widget, true);
+ * 		win.addChild(widget);
  * 		win.show();
+ * 		win.startup();
  * 		setTimeout(dojo.hitch(win, win.destroy), 1000*5);
  * 		(end code)
  */
@@ -149,7 +148,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		dojo.connect(this.sizeHandle.domNode, "onmousedown", this, function(e){
 			this._resizeEnd = dojo.connect(document, "onmouseup", this, function(e){
 				dojo.disconnect(this._resizeEnd);
-				this.layout();
+				this.resize();
 			});
 		});
 		
@@ -187,10 +186,10 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 				});
 				dojo.connect(anim, "onEnd", this, function() {
 					if (desktop.config.fx == 1) dojo.style(this.containerNode, "display", "block");
-					this.layout();
+					this.resize();
 				});
 				anim.play();
-			} else this.layout();
+			} else this.resize();
 	},
 	_getPoints: function(box) {
 		return {
@@ -309,7 +308,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			});
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.containerNode, "display", "block");
-				this.layout();
+				this.resize();
 			});
 			anim.play();
 		}
@@ -353,7 +352,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.containerNode, "display", "block");
 				this._hideBorders();
-				this.layout();
+				this.resize();
 			});
 			anim.play();
 		}
@@ -365,7 +364,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			win.style.width = dojo.style(this.domNode.parentNode, "width");
 			win.style.height = dojo.style(this.domNode.parentNode, "height");
 			this._hideBorders();
-			this.layout();
+			this.resize();
 		}
 	},
 	_showBorders: function() {
@@ -413,7 +412,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		}));
 		this._dragStopListener = dojo.connect(this._drag, "onMoveStop", dojo.hitch(this, function(mover){
 			dojo.style(this.containerNode, "display", "block");
-			this.layout();
+			this.resize();
 		}));
 	},
 	/*
@@ -445,7 +444,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			});
 			dojo.connect(anim, "onEnd", this, function(e) {
 				dojo.style(this.containerNode, "display", "block");
-				this.layout();
+				this.resize();
 			});
 			void(anim); //fixes a weird ass IE bug. Don't ask me why :D
 			anim.play();
@@ -459,7 +458,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			win.style.height= this.pos.height;
 			win.style.width= this.pos.width;
 			this._showBorders();
-			this.layout();
+			this.resize();
 		}
 		this.maximized = false;
 	},
@@ -556,7 +555,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		this._contentBox = dijit.layout.marginBox2contentBox(this.containerNode, mb);
 
 		// Callback for widget to adjust size of it's children
-		this.layout();
+		this.resize();
 	},
 	layout: function(){
 		dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());

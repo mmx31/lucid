@@ -10,8 +10,9 @@ this.init = function(args)
 		onClose: dojo.hitch(this, this.kill)
 	});
 	this.win.show();
-	this.surface = dojox.gfx.createSurface(this.win.body.domNode, 400, 400);
+	this.surface = dojox.gfx.createSurface(this.win.containerNode, 400, 400);
 	this.drawBoard();
+	this.win.startup();
 }
 this.kill = function() {
 	if(!this.win.closed) this.win.close();

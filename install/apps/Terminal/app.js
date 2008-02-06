@@ -3,7 +3,6 @@ this.init = function(args)
 	dojo.require("dijit.layout.LayoutContainer");
 	this.win = new api.window({
 		title: "Terminal",
-		bodyWidget: "LayoutContainer",
 		onClose: dojo.hitch(this, this.kill)
 	});
 	this.term = new api.console({layoutAlign: "client", path: (args.path || "/")})

@@ -13,9 +13,7 @@ this.init = function(args)
 
     this.win = new api.window({
         title: "RSS Reader",
-        bodyWidget: "LayoutContainer",
         onClose: dojo.hitch(this, this.kill)
-
     });
 
     this.toolbar = new dijit.Toolbar({
@@ -47,7 +45,6 @@ this.init = function(args)
     var client = new dijit.layout.SplitContainer({
         orientation: "horizontal",
         layoutAlign: "client"
-
     },
     document.createElement("div"));
 
@@ -78,7 +75,7 @@ this.init = function(args)
         url: "http://www.xkcd.com/rss.xml"
     },
     {
-        title: "Psych's blog",
+        title: "Psychcf's blog",
         url: "http://psychdesigns.net/psych/rss.xml"
     },
 	{

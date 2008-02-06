@@ -4,7 +4,7 @@ this.fileEditing = "";
 
 this.init = function(args) {
     dojo.require("dijit.Toolbar");
-    dojo.require("dijit.layout.LayoutContainer");
+    dojo.require("dijit.layout.ContentPane");
     if (args.file) {
         this.start();
         this._processOpen(args.file);
@@ -29,9 +29,7 @@ this.kill = function() {
 this.start = function() {
     this.window = new api.window({
         onClose: dojo.hitch(this, this.kill)
-
     });
-    this.window.setBodyWidget("LayoutContainer", {});
     var toolbar = new dijit.Toolbar({
         layoutAlign: "top"
     });
