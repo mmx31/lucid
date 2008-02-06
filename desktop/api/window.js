@@ -555,7 +555,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		this._contentBox = dijit.layout.marginBox2contentBox(this.containerNode, mb);
 
 		// Callback for widget to adjust size of it's children
-		this.resize();
+		this.layout();
 	},
 	layout: function(){
 		dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());
