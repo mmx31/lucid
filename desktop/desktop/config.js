@@ -89,8 +89,8 @@ desktop.config = {
 			placement: "BC",
 			opacity: 0.95,
 			applets: [
-				{"settings": {}, "pos": 0, "declaredClass": "desktop.ui.applets.menu"},
-				{"settings": {}, "pos": 0.06, "declaredClass": "desktop.ui.applets.taskbar"},
+				{"settings": {}, "pos": 0, "declaredClass": "desktop.ui.applets.menubar"},
+				{"settings": {}, "pos": 0.20, "declaredClass": "desktop.ui.applets.taskbar"},
 				{"settings": {}, "pos": 0.89, "declaredClass": "desktop.ui.applets.netmonitor"},
 				{"settings": {}, "pos": 0.92, "declaredClass": "desktop.ui.applets.clock"}
 			]
