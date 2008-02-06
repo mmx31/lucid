@@ -75,7 +75,7 @@ dojo.declare(
 				dojo.forEach(array, function(item) {
 					var p = item.file.lastIndexOf(".");
 					item.ext = item.file.substring(p+1, item.file.length);
-					if(desktop.config.filesystem.hideExt && !item.isDir)
+					if(desktop.config.filesystem.hideExt && !item.isDir && p != -1)
 					{
 						item.fullFile = item.file;
 						item.file = item.file.substring(0, p);
