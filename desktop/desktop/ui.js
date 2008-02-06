@@ -1034,7 +1034,7 @@ dojo.declare("desktop.ui.task", null, {
 			var fade = dojo.fadeOut({ node: node, duration: 200 });
 			var slide = dojo.animateProperty({
 				node: node,
-				duration: 200,
+				duration: 1000,
 				properties: {
 					width: {end: 0},
 					height: {end: 0}
