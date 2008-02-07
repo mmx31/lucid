@@ -105,27 +105,33 @@ class textareaOutput extends jsonOutput {
 	}
 }
 
-class xmlOutput extends objOutput{
+class xmlOutput {
+	// see http://us2.php.net/manual/en/ref.xmlwriter.php
+	var $_xml;
+	var $dooutput = false;
+	function __construct() {
+		$this->_xml = new XMLWriter;
+		$this->_xml->openMemory();
+		$this->_xml->startDocument();
+	}
+	function __call($name, $args) {
+		if(method_exists($this, $name))
+			return call_user_func_array(array($this, $name), $args);
+		return call_user_func_array(array($this->_xml, $name), $args);
+	}
 	function __destruct() {
 		if($this->dooutput) {
 			header('Content-type: text/xml; charset=utf-8"');
-			if($php_errormsg)
-			{
-				$this->append("sqlerror", $php_errormsg);
-			}
-			$xml = new XMLWriter;
-			foreach ($this->output as $index => $values){
-				$xml->startElement($index);
-				if(is_string($values)) $xml->text($values);
-				else {
-					foreach($values as $key => $value) {
-						if($key != "innerText") $xml->writeAttribute($key, $value);
-					}
-					$xml->text($values["innerText"] or "");
-				}
-        		$xml->endElement();
-    		}
-			echo $xml->getDocument();
+			$this->_xml->endDocument();
+			echo $this->_xml->outputMemory(true);
+		}
+	}
+	function attribute($name, $value) {
+		$this->_xml->writeAttribute($name, $value);
+	}
+	function attributes($arr) {
+		foreach($arr as $key => $val) {
+			$this->attribute($key, $val);
 		}
 	}
 }
