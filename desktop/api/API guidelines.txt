@@ -2,28 +2,7 @@ When designing an API, please use this format:
 
 	General rules of thumb:
 		
-		keep method names short.
-
-	For constructors:
-		
-		Accept one argument, called params.
-		When declaring class parameters
-		(that are user-definable, of course), use something like this:
-			
-			/*
-			 * 	Property: parameter
-			 *  
-			 *  Summary:
-			 *  	Change a behavior of this widget
-			 *  
-			 *  Note:
-			 *  	This will not work in all browsers (*cough* IE *cough cough*)
-			 */
-			this.parameter = ((typeof params.parameter == "string") ? params.parameter : "default value");
-			
-		At the top of your code, put this:
-			
-			if(typeof params != "object") params = {};
+		keep method and property names short but descriptive.
 	
 	For storage-centric APIs:
 	
@@ -37,4 +16,4 @@ When designing an API, please use this format:
 		
 	For widgets/windows:
 		
-		To show/hide, use methods named show() and destroy().
+		To show/hide, use methods named show() and close().
