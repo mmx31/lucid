@@ -1,6 +1,6 @@
 desktop.user = new function() {
 	this.init = function() {
-		this.beforeUnloadEvent = dojo.connect(window, "onbeforeunload", null, function(e)
+		this.beforeUnloadEvent = dojo.addOnUnload(function(e)
 		{
 			desktop.user.logout(true);
 		});
@@ -34,7 +34,6 @@ desktop.user = new function() {
 	this.logout = function(sync)
 	{
 		if(desktop.reload) { return false; }
-		dojo.disconnect(this.beforeUnloadEvent);
 		if(typeof sync == "undefined") sync=false;
 		desktop.config.save(sync);
 		dojo.publish("desktoplogout", ["yes"]);
