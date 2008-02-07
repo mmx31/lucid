@@ -37,7 +37,7 @@ this.window = new api.window({
 	width: "200px",
 	height: "235px"
 });
-var b = new dijit.layout.ContentPane();
+var b = new dijit.layout.ContentPane({layoutAlign: "client"});
 b.setContent(winHTML);
 this.window.addChild(b);
 this.window.show();

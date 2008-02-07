@@ -16,7 +16,7 @@ this.init = function(args)
 	api.addDojoCss("dojox/grid/_grid/Grid.css");
 	//make window
 	this.win = new api.window({title: "Administration Panel", width: "500px", height: "400px", onClose: dojo.hitch(this, this.kill)});
-	var split = new dijit.layout.SplitContainer({sizerWidth: 7, orientation: "horizontal"});
+	var split = new dijit.layout.SplitContainer({sizerWidth: 7, orientation: "horizontal", layoutAlign: "client"});
 	var pane = new dijit.layout.ContentPane({sizeMin: 10, sizeShare: 20}, document.createElement("div"));
 		var menu = new dijit.Menu({});
 		menu.domNode.style.width="100%";

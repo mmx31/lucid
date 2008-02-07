@@ -108,7 +108,7 @@ this.editMetadata = function()
         content += "Application Maturity: <span id=\"appmaturity"+this.instance+this.blah+"\"></span><br>";
         content += "Application Category: <span id=\"appcategory"+this.instance+this.blah+"\"></span><br>";
 	content += "<p>Closing this window will apply the metadata change.</p>";
-	var body = new dijit.layout.ContentPane();
+	var body = new dijit.layout.ContentPane({layoutAlign: "client"});
 	body.setContent(content);
 	this.winn.addChild(body);
 	this.winn.show();
