@@ -105,7 +105,10 @@ this.pages = {
 			var menu = this._userMenu = new dijit.Menu({});
 			dojo.forEach([
 				{
-					label: "Delete"
+					label: "Delete",
+					onClick: dojo.hitch(this, function(e) {
+						var row = this._userGrid.model.getRow(this.__rowIndex);
+					})
 				}
 			], function(item) {
 				var menuItem = new dijit.MenuItem(item);
