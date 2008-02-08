@@ -80,7 +80,7 @@ class jsonOutput extends objOutput {
 		if($this->dooutput) {
 			//header("Content-Type: text/json-comment-filtered; charset=utf-8");
 			header("Content-Type: text/json; charset=utf-8");
-			if($php_errormsg)
+			if(isset($php_errormsg))
 			{
 				$this->append("sqlerror", $php_errormsg);
 			}
@@ -96,7 +96,7 @@ class textareaOutput extends jsonOutput {
 	function __destruct() {
 		if($this->dooutput) {
 			header("Content-Type: text/html; charset=utf-8");
-			if($php_errormsg)
+			if(isset($php_errormsg))
 			{
 				$this->append("sqlerror", $php_errormsg);
 			}
