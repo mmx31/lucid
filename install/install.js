@@ -75,6 +75,10 @@ install = new function() {
 			dojo.xhrGet({
 				url: "./backend.php?action=checkpermissions",
 				load: function(data, args){
+					if(dojo.isString(data)) {
+						dojo.byId("perms").innerHTML = "<span style='color: red'>An error occurred:</span><br />"+data;
+						return;
+					}
 					var html = "<ul>";
 					var ready = true;
 					for (key in data) {
@@ -194,7 +198,7 @@ install = new function() {
 			dojo.xhrPost({
 				url: "./backend.php?action=installpermissions",
 				load: function(data, args){
-					if (typeof data != "string") {
+					if (dojo.isObject(data)) {
 						var html = "<ul>";
 						var ready = true;
 						for (key in data) {
@@ -226,7 +230,7 @@ install = new function() {
 			dojo.xhrPost({
 				url: "./backend.php?action=installprograms",
 				load: function(data, args){
-					if (typeof data != "string") {
+					if (dojo.isObject(data)) {
 						var html = "<ul>";
 						var ready = true;
 						for (key in data) {
@@ -262,7 +266,7 @@ install = new function() {
 					email: form.admin_email
 				},
 				load: function(data, args){
-					if (typeof data != "string") {
+					if (dojo.isObject(data)) {
 						var html = "<ul>";
 						var ready = true;
 						for (key in data) {
@@ -297,7 +301,7 @@ install = new function() {
 					db_prefix: form.db_prefix
 				},
 				load: function(data, args){
-					if (typeof data != "string") {
+					if (dojo.isObject(data)) {
 						var html = "<ul>";
 						var ready = true;
 						for (key in data) {
