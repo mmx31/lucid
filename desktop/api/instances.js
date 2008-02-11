@@ -65,7 +65,6 @@
 	* @memberOf api.instances
 	*/
 	this.setActive = function(instance) {
-		desktop.app.instances[instance].status = "active";
 	}
 	/** 
 	* Set instance as killed
@@ -75,13 +74,6 @@
 	* @memberOf api.instances
 	*/
 	this.setKilled = function(instance) {
-		if (desktop.app.instances[instance] != null) {
-			desktop.app.instances[instance].status = "killed";
-			//allow the garbage collector to free up memory
-			setTimeout(function(){
-				desktop.app.instances[instance] = null;
-			}, desktop.config.window.animSpeed + 50);
-		}
 	}
 	/** 
 	* Get all instances
