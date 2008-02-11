@@ -34,7 +34,6 @@ dojo.require("dijit.ProgressBar");
 */
 var bootstrap = {
     modules: [
-		"api.aflax",
 	    'api.console',
 		"api.crosstalk",
 		"api.registry",
@@ -94,15 +93,21 @@ var bootstrap = {
     startup: function()
     {
         dojo.forEach(bootstrap.modules, function(module) {
-			if(dojo.isFunction(eval(module + ".draw")))
+			if(dojo.isFunction(eval(module).draw))
 			{
-				eval(module+".draw()");
+				eval(module).draw();
+			}
+			else if(eval(module).prototype && dojo.isFunction(eval(module).prototype.draw)) {
+				eval(module).prototype.draw();
 			}
 		});
 		dojo.forEach(bootstrap.modules, function(module) {
-			if(dojo.isFunction(eval(module + ".init")))
+			if(dojo.isFunction(eval(module).init))
 			{
-				eval(module+".init()");
+				eval(module).init();
+			}
+			else if(eval(module).prototype && dojo.isFunction(eval(module).prototype.init)) {
+				eval(module).prototype.init();
 			}
 		});
 	},
