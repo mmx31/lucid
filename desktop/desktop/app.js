@@ -184,7 +184,24 @@ desktop.app = new function()
 					this.instances[this.instanceCount].instance = this.instances.length-1;
                                         var instance = this.instances.length-1;
                                         this.instances[this.instanceCount].status = "init";
-
+					dojo.connect(this.instances[this.instanceCount],
+							"init",
+							this.instances[this.instanceCount],
+							function() {
+								this.status = "active";
+							}
+					);
+					dojo.connect(this.instances[this.instanceCount],
+                                                        "kill",
+                                                        this.instances[this.instanceCount],
+                                                        function() {
+                                                                this.status = "killed";
+								//allow the garbage collector to free up memory
+								setTimeout(function(){
+									this.instances[this.instanceCount]=null;
+								}, desktop.config.window.animSpeed + 50);
+                                                        }
+                                        );
 					api.log("Executing app...");
 					this.instances[this.instanceCount].init((args || {}));
 				}
