@@ -1,3 +1,4 @@
+api.util = {};
 djConfig.usePlainJson=true;
 
 api.xhr = function(/*dojo.__ioArgs|String*/args) {
@@ -38,4 +39,14 @@ api.xhr = function(/*dojo.__ioArgs|String*/args) {
 	//	args.handleAs="json-comment-filtered";
 	//}
 	return dojo.xhrPost(args);
+}
+
+api.addDojoCss = function(path)
+{
+	var element = document.createElement("link");
+	element.rel = "stylesheet";
+	element.type = "text/css";
+	element.media = "screen";
+	element.href = "./dojo/"+path;
+	document.getElementsByTagName("head")[0].appendChild(element);
 }

@@ -128,4 +128,8 @@ api.ui = new function() {
 		this.file.refresh();
 		this.dialog.startup();
 	}
+	this.notify = function(message)
+	{
+		dojo.publish("notification", [message]);
+	}
 }
