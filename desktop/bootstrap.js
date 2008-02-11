@@ -55,7 +55,6 @@ var bootstrap = {
 	    'desktop.config',
 	    'desktop.theme',
 		'desktop.ui',
-	    //'desktop.widget',
 	    'desktop.user'
 	],
 	loaded: false,
