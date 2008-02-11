@@ -58,7 +58,6 @@ this.init = function(args) {
 	this.win.addChild(split);
 	this.win.show();
 	this.win.startup();
-	api.instances.setActive(this.instance);
 	this.makeMailClasses();
 }
 this.mail = [];
@@ -167,5 +166,4 @@ this.kill = function() {
 	this.treeStore.close();
 	this.prefs.close();
 	dojo.forEach(this.mail, function(mail) { mail.down.destroy(); mail.up.destroy(); });
-	api.instances.setKilled(this.instance);
 }

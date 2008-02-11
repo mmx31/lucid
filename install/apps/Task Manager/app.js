@@ -3,8 +3,6 @@ this.kill = function() {
         this.win.close();
     }
     clearTimeout(this.timer);
-    api.instances.setKilled(this.instance);
-
 }
 this.init = function(args) {
     dojo.require("dijit.layout.LayoutContainer");
@@ -45,7 +43,6 @@ this.init = function(args) {
     this.win.show();
     this.win.startup();
     this.win.onClose = dojo.hitch(this, this.kill);
-    api.instances.setActive(this.instance);
     this.main.setContent("Getting processes...");
     this.timer = setTimeout(dojo.hitch(this, this.home), 1000);
 
@@ -60,8 +57,8 @@ this.about = function() {
 }
 
 this.executeKill = function(id) {
-    if (api.instances.getStatus(id) != "killed") {
-        api.instances.kill(id);
+    if (desktop.app.getInstance(id).status != "killed") {
+        desktop.app.kill(id);
         api.ui.alertDialog({
             title: "Task Manager",
             message: "Instance " + id + " was killed sucessfully."
@@ -80,7 +77,7 @@ this.executeKill = function(id) {
 }
 this.home = function() {
     this.main.setContent("Refreshing...");
-    var data = api.instances.getInstances();
+    var data = desktop.app.getInstances();
     var html = "<table style='width: 100%;'><thead><tr style='background-color: #dddddd;'><td>Name</td><td>Instance</td><td>AppID</td><td>Status</td><td>Actions</td></tr></thead><tbody>";
     for (var x = 0; x < data.length; x++) {
         if (typeof(data[x]) == "object") {

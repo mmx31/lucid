@@ -41,7 +41,6 @@ var bootstrap = {
 		"api.filearea",
 		"api.fs",
 		"api.ide",
-		"api.instances",
 		"api.mail",
 		"api.misc",
 		"api.sound",

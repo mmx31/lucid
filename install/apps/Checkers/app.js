@@ -16,7 +16,6 @@ this.init = function(args)
 }
 this.kill = function() {
 	if(!this.win.closed) this.win.close();
-	api.instances.setKilled(this.instance);
 }
 this.drawBoard = function()
 {

@@ -1,7 +1,6 @@
 this.blah = 0;
 this.init = function(args)
 {
-	api.instances.setActive(this.instance);
 	dojo.require("dijit.layout.LayoutContainer");
 	dojo.require("dijit.layout.ContentPane");
 	dojo.require("dijit.form.Textarea");
@@ -42,7 +41,6 @@ this.kill = function()
 		if(!this.loadwin.closed) this.loadwin.close();
 	}
 	if(!this.win.closed)this.win.close();
-	api.instances.setKilled(this.instance);
 }
 
 this.newApp = function()

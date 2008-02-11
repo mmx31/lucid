@@ -101,7 +101,6 @@ this.init = function(args) {
 	this.win.addChild(client);
 	this.win.show();
 	this.win.startup();
-	api.instances.setActive(this.instance);
 	if(args.file) this.open(args.file);
 }
 this.sound = false;
@@ -207,5 +206,4 @@ this.kill = function() {
 	if(!this.win.closed) this.win.close();
 	if(this.sound) this.sound.destroy();
 	this.stopTicker();
-	api.instances.setKilled(this.instance);
 }

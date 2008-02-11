@@ -23,8 +23,6 @@ this.kill = function() {
         this.window.close();
 
     }
-    api.instances.setKilled(this.instance);
-
 }
 
 this.start = function() {
@@ -79,7 +77,6 @@ this.start = function() {
     this.window.show();
     this._new = false;
     this.window.startup();
-    api.instances.setActive(this.instance);
     this.window.onClose = dojo.hitch(this, this.kill);
 
 	setTimeout(function() {

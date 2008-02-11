@@ -1,6 +1,5 @@
 this.kill = function() {
 	if(!this.window.closed) { this.window.close(); }
-	api.instances.setKilled(this.instance);
 }
 this.init = function(args)
 {
@@ -43,7 +42,6 @@ this.window.addChild(b);
 this.window.show();
 this.window.startup();
 dojo.connect(this.window, "onClose", this, this.kill);
-api.instances.setActive(this.instance);
 }
 this.evaluate = function()
 {

@@ -105,8 +105,6 @@ this.init = function(args)
     this.win.onClose = dojo.hitch(this, this.kill);
     this.win.show();
     this.win.startup();
-    api.instances.setActive(this.instance);
-
 }
 
 this.changeFeeds = function(e)
@@ -218,8 +216,6 @@ this.kill = function()
     if (typeof(this.win) != "undefined") {
         this.win.close();
     }
-    api.instances.setKilled(this.instance);
-
 }
 this.fetchFeed = function(url)
  {

@@ -1,6 +1,5 @@
 this.kill = function() {
 	if(!this.win.closed) { this.win.close(); }
-	api.instances.setKilled(this.instance);
 }
 this.init = function(args)
 {
@@ -36,7 +35,6 @@ this.init = function(args)
 		if(loc != "about:blank") this.urlbox.setValue(loc);
 	}), 500);*/
 	this.win.startup();
-	api.instances.setActive(this.instance);
 }
 
 this.go = function(url)

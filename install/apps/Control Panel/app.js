@@ -9,7 +9,6 @@ dojo.require("dijit.form.CheckBox");
 dojo.require("dijit.Toolbar");
 this.kill = function() {
 	if(!this.window.closed) { this.window.close(); }
-	api.instances.setKilled(this.instance);
 }
 this.init = function(args) {
 	this.open();
@@ -66,7 +65,6 @@ this.open = function(args)
 	this.window.addChild(tabs);
 	this.window.show();
 	this.window.startup();
-	api.instances.setActive(this.instance);
 	new dijit.form.TextBox({id: "theme"+this.instance, name: "theme"+this.instance}, document.getElementById("theme"+this.instance));
 	new dijit.form.TextBox({id: "oldPass"+this.instance, name: "oldPass"+this.instance}, document.getElementById("oldPass"+this.instance));
 	new dijit.form.TextBox({id: "newPass"+this.instance, name: "newPass"+this.instance}, document.getElementById("newPass"+this.instance));

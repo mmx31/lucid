@@ -11,10 +11,8 @@ this.init = function(args)
 	this.win.show();
 	this.win.startup();
 	this.win.onDestroy = dojo.hitch(this, this.kill);
-	api.instances.setActive(this.instance);
 }
 
 this.kill = function() {
 	if(!this.win.closed) { this.win.close(); }
-	api.instances.setKilled(this.instance);
 }

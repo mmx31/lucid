@@ -111,10 +111,8 @@ this.init = function(args)
 	this.win.onDestroy = dojo.hitch(this, this.kill);
 	this.fileArea.refresh();
 	this.uploader.startup();
-	api.instances.setActive(this.instance);
 }
 
 this.kill = function() {
 	if(!this.win.closed) { this.win.close(); }
-	api.instances.setKilled(this.instance);
 }

@@ -45,7 +45,7 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		ps: function(params)
 		{
 			this.stdout.innerHTML += "&nbsp;&nbsp;&nbsp;PID&nbsp;&nbsp;TTY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CMD<br />";
-			object = api.instances.getInstances();
+			object = desktop.app.getInstances();
 			dojo.forEach(object, dojo.hitch(this, function(proc) {
 				if(proc.status != "killed") {
 					this.stdout.innerHTML += "&nbsp;&nbsp;&nbsp;"+proc.instance+"&nbsp;&nbsp;&nbsp;&nbsp;pts/0&nbsp;&nbsp;&nbsp;"+proc.name+" (AppID: "+proc.appid+")<br />";
@@ -57,7 +57,7 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 			if(params == "") { this.stdout.innerHTML += "kill: usage: kill [instance]<br />"; }
 			else if(params == "0") { this.stdout.innerHTML += "kill: system cannot be killed<br />"; }
 			else {
-			if(api.instances.kill(params) == 1) { this.stdout.innerHTML += "kill: process killed<br />"; }
+			if(desktop.app.kill(params) == 1) { this.stdout.innerHTML += "kill: process killed<br />"; }
 			else { this.stdout.innerHTML += "kill: process kill failed<br />"; }
 			}
 		},

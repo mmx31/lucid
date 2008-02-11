@@ -1,7 +1,6 @@
 this.kill = function() {
 	if(!this.win.closed) { this.win.close(); }
 	if(this._userMenu) { this._userMenu.destroy(); }
-	api.instances.setKilled(this.instance);
 }
 this.init = function(args)
 {
@@ -55,7 +54,6 @@ this.init = function(args)
 	this.win.addChild(split);
 	this.win.show();
 	this.win.startup();
-	api.instances.setActive(this.instance);
 	this.win.onClose = dojo.hitch(this, this.kill);
 	setTimeout(dojo.hitch(this, this.pages.home), 100);
 }
