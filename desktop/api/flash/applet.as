@@ -1,18 +1,46 @@
 class objManager {
 	var objects = new Object();
-	var realObjects:Array = new Array();
 	function objManager(){
-		this.realObjects["_root"] = _root;
-		this.realObjects["_stage"] = Stage;
 		DojoExternalInterface.initialize();
 
 		DojoExternalInterface.addCallback("makeObj", this, this.makeObj);
 		DojoExternalInterface.addCallback("getValue", this, this.getValue);
+		DojoExternalInterface.addCallback("setValue", this, this.setValue);
+		DojoExternalInterface.addCallback("attachEvent", this, this.attachEvent;
+		DojoExternalInterface.addCallback("callFunction", this, this.callFunction);
 			
 		DojoExternalInterface.loaded();
 	}
-	function makeObj(id, name) {
-		this.objects[id] = new this.realObjects[name]();
+	function makeObj(id, objectType, args) {
+		var json = new JSON();
+		var obj = null;
+		args = json.parse(args);
+		if(args.length == 1)
+			var obj = new (eval(objectType))();
+		else if(args.length == 2)
+			var obj = new (eval(objectType))(args[1]);
+		else if(args.length == 3)
+			var obj = new (eval(objectType))(args[1], args[2]);
+		else if(args.length == 4)
+			var obj = new (eval(objectType))(args[1], args[2], args[3]);
+		else if(args.length == 5)
+			var obj = new (eval(objectType))(args[1], args[2], args[3], args[4]);
+		else if(args.length == 6)
+			var obj = new (eval(objectType))(args[1], args[2], args[3], args[4], args[5]);
+		else if(args.length == 7)
+			var obj = new (eval(objectType))(args[1], args[2], args[3], args[4], args[5], args[6]);
+		else if(args.length == 8)
+			var obj = new (eval(objectType))(args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
+		else if(args.length == 9)
+			var obj = new (eval(objectType))(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+		else if(args.length == 10)
+			var obj = new (eval(objectType))(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
+		else if(args.length == 11)
+			var obj = new (eval(objectType))(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10]);
+		else if(args.length == 12)
+			var obj = new (eval(objectType))(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11]);
+			
+		if(obj) this.objects[id] = obj;		
 	}
 	function attachEvent(id, method, callback) {
 		var evtClass = new Object();
@@ -26,7 +54,12 @@ class objManager {
 		DojoExternalInterface.call(callback, null, json.stringify(this.objects[id][key]));
 	}
 	function setValue(id, key, value) {
-		this.objects[id][key] = value;
+		this.objects[id][key] = json.parse(value);
+	}
+	function callFunction(id, method, args, callback) {
+		var json = new JSON();
+		var p = this.objects[id][method].apply(this.objects[id], json.parse(args));
+		if(callback) DojoExternalInterface.call(callback, null, json.stringify(p));
 	}
 }
 //The notice below only applies to the JSON class...
