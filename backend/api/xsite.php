@@ -21,7 +21,7 @@ require("../lib/includes.php");
 import("models.user");
 $user = $User->get_current();
 
-if($GLOBALS['conf']['xsite'] && $user->has_permission("api.xsite"))
+if($user->has_permission("api.xsite"))
 {
 	// Get the REST call path from the AJAX application
 	// Is it a POST or a GET?
