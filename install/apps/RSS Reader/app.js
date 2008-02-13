@@ -9,6 +9,7 @@ this.init = function(args)
     dojo.require("dijit.form.TextBox");
     dojo.require("dijit.form.ValidationTextBox");
     dojo.require("dijit.form.Button");
+    dojo.require("dojox.validate.web");
 
 
     this.win = new api.window({
@@ -132,10 +133,13 @@ this.addFeedDialog = function()
         height: "200px"
 
     });
+	dojox.regexp.integer = dojo.number._integerRegexp; //workaround, remove when dojo 1.1 comes
     this._form = {
-        title: new dijit.form.TextBox({}),
+        title: new dijit.form.TextBox({required: true}),
         url: new dijit.form.ValidationTextBox({
-			regExp: "(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?",
+			isValid: function(isFocused) {
+				return dojox.validate.isUrl(this.textbox.value);
+			},
 			invalidMessage: "Invalid URL"
 		})
     };
