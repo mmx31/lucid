@@ -18,14 +18,16 @@ api.xhr = function(/*dojo.__ioArgs|String*/args) {
 		//if we just need to get a module url, pass a string
 		return backend(args);
 	}
-	if(args.backend) {
+	if(args.xsite) {
+		if(!dojo.isObject(args.content)) args.content = {};
+		args.content.path = args.url;
+		args.url = "../backend/api/xsite.php";
+	}
+	else if(args.backend) {
 		args.url = backend(args.backend);
 	}
 	else if(args.app) {
 		args.url = "../apps/"+args.app+"/"+args.url;
-	}
-	else if(args.xsite) {
-		args.url = "../backend/api/xsite.php?path="+encodeURIComponent(args.url);
 	}
 	var callback = args.load;
 	args.load = function(data, ioArgs) {

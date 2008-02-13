@@ -4,18 +4,55 @@ this.init = function(args)
     dojo.require("dijit.layout.LayoutContainer");
     dojo.require("dijit.layout.SplitContainer");
     dojo.require("dijit.layout.ContentPane");
-    dojo.require("dojox.widget.SortList");
+    dojo.require("dijit.Tree");
     dojo.require("dijit.Toolbar");
     dojo.require("dijit.form.TextBox");
+    dojo.require("dijit.form.ValidationTextBox");
     dojo.require("dijit.form.Button");
 
-    api.addDojoCss("dojox/widget/SortList/SortList.css");
 
     this.win = new api.window({
         title: "RSS Reader",
         onClose: dojo.hitch(this, this.kill)
     });
-
+	this.feedStore = new api.registry({
+		appid: this.id,
+		name: "rssFeeds",
+		data: {
+			identifier: "title",
+			label: "title",
+			items: [
+				{
+					title: "Psych Desktop",
+					url: "http://www.psychdesktop.net/rss.xml"
+				},
+				{
+					title: "Slashdot",
+					url: "http://rss.slashdot.org/Slashdot/slashdot"
+				},
+				{
+					title: "Ajaxian",
+					url: "http://feeds.feedburner.com/ajaxian"
+				},
+				{
+					title: "Dojo Toolkit",
+					url: "http://dojotoolkit.org/rss.xml"
+				},
+				{
+					title: "xkcd",
+					url: "http://www.xkcd.com/rss.xml"
+				},
+				{
+					title: "Psychcf's blog",
+					url: "http://psychdesigns.net/psych/rss.xml"
+				},
+				{
+					title: "Jay's blog",
+					url: "http://www.jaymacdesigns.net/feed/"
+				}
+			]
+		}
+	});
     this.toolbar = new dijit.Toolbar({
         layoutAlign: "top"
     });
@@ -48,47 +85,12 @@ this.init = function(args)
     },
     document.createElement("div"));
 
-    this.left = new dojox.widget.SortList({
-        title: "Feeds",
-        sortable: true
+    this.left = new dijit.Tree({
+        store: this.feedStore,
+		labelAttr: "title",
+		label: "Feeds"
     });
-
-    this.feeds = [
-    {
-        title: "Psych Desktop",
-        url: "http://www.psychdeskop.net/rss.xml"
-    },
-    {
-        title: "Dojo Toolkit",
-        url: "http://dojotoolkit.org/rss.xml"
-    },
-    {
-        title: "Ajaxian",
-        url: "http://feeds.feedburner.com/ajaxian"
-    },
-    {
-        title: "Slashdot",
-        url: "http://rss.slashdot.org/Slashdot/slashdot"
-    },
-    {
-        title: "xkcd",
-        url: "http://www.xkcd.com/rss.xml"
-    },
-    {
-        title: "Psychcf's blog",
-        url: "http://psychdesigns.net/psych/rss.xml"
-    },
-	{
-        title: "Jay's blog",
-        url: "http://www.jaymacdesigns.net/feed/"
-    }
-    ];
-    dojo.forEach(this.feeds, dojo.hitch(this, 
-    function(e)
-    {
-        this.addFeed(e.title, e.url);
-
-    }));
+	dojo.connect(this.left, "onClick", this, "changeFeeds");
     this.left.startup();
     client.addChild(this.left);
 
@@ -108,46 +110,15 @@ this.init = function(args)
 }
 
 this.changeFeeds = function(e)
- {
-    this.fetchFeed(e.target.title);
-    this.currentFeed = e.target;
-
+{
+	if(!this.feedStore.isItem(e)) return;
+    this.fetchFeed(this.feedStore.getValue(e, "url"));
+    this.currentFeed = e;
 }
 
 this.removeFeed = function(t) {
-    console.log(this.currentFeed);
-    if (this.currentFeed)
-    {
-        dojo.forEach(this.feeds, dojo.hitch(this, 
-        function(e) {
-            if (typeof e != "undefined")
-            {
-                if (e.url == this.currentFeed.title && e.title == this.currentFeed.textContent && this.currentFeed)
-                {
-                    try
-                    {
-                        this.currentFeed.parentNode.removeChild(this.currentFeed);
-                        for (var i = 0; i < this.feeds.length; i++) {
-                            var c = this.feeds[i];
-                            if (c.title == this.currentFeed.textContent && c.url == this.currentFeed.title)
-                            {
-                                delete this.feeds[i];
-
-                            }
-
-                        }
-
-                    } catch(exception) {}
-                    this.currentFeed = false;
-
-                }
-
-            }
-
-        }));
-
-    }
-
+	if (this.currentFeed) this.feedStore.deleteItem(this.currentFeed);
+	this.feedStore.save();
 }
 
 this.addFeedDialog = function()
@@ -163,8 +134,10 @@ this.addFeedDialog = function()
     });
     this._form = {
         title: new dijit.form.TextBox({}),
-        url: new dijit.form.TextBox({})
-
+        url: new dijit.form.ValidationTextBox({
+			regExp: "(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?",
+			invalidMessage: "Invalid URL"
+		})
     };
     var line = document.createElement("div");
     var p = document.createElement("span");
@@ -178,36 +151,32 @@ this.addFeedDialog = function()
     line2.appendChild(this._form.url.domNode);
     var button = new dijit.form.Button({
         label: "Add Feed"
-
     });
+	var div = document.createElement("div");
+	dojo.style(div, "color", "red");
     dojo.connect(button, "onClick", this, 
     function(e) {
-        console.log("test");
-        this.addFeed(this._form.title.getValue(), this._form.url.getValue());
-        this.addfeedwin.close();
+		if(!(this._form.title.getValue() != "" && this._form.url.isValid())) return;
+	this.feedStore.fetch({query: {title: this._form.title.getValue()}, onComplete: dojo.hitch(this, function(f) {
+		if(typeof f[0] != "undefined") {
+			div.innerHTML = "A feed with that name already exists";
+			return;
+		}
+		this.feedStore.newItem({title: this._form.title.getValue(), url: this._form.url.getValue()});
+		this.feedStore.save();
+        	this.addfeedwin.close();
+	})});
 
     })
     this.addfeedwin.show();
-    this.addfeedwin.body.domNode.appendChild(line);
-    this.addfeedwin.body.domNode.appendChild(line2);
-    this.addfeedwin.body.domNode.appendChild(button.domNode);
+    this.addfeedwin.containerNode.appendChild(div);
+    this.addfeedwin.containerNode.appendChild(line);
+    this.addfeedwin.containerNode.appendChild(line2);
+    this.addfeedwin.containerNode.appendChild(button.domNode);
     this.addfeedwin.startup();
 
 }
 
-this.addFeed = function(title, url)
- {
-    var p = document.createElement("li");
-    p.innerHTML = title;
-    p.title = url;
-    dojo.connect(p, "onclick", this, this.changeFeeds);
-    this.left.containerNode.appendChild(p);
-    this.feeds.push({
-        url: url,
-        title: title
-    });
-
-}
 this.kill = function()
  {
     if (typeof(this.addfeedwin) != "undefined") {
@@ -223,9 +192,8 @@ this.fetchFeed = function(url)
         url: url,
         preventCache: true,
 		xsite: true,
-        load: dojo.hitch(this, 
-        function(data, ioArgs) {
-			if(data == "9") { api.ui.alertDialog({title: "Psych Desktop internal error", message: "cURL not supported by this server<br>enchanced web features disabled"}); }
+        load: dojo.hitch(this, function(data, ioArgs) {
+			if(data == "9") { api.ui.alertDialog({title: "Psych Desktop internal error", message: "cURL not supported by this server<br>enchanced web features disabled"}); return; }
             var items = data.getElementsByTagName("item");
             var text = "";
             dojo.forEach(items, 

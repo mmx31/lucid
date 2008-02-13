@@ -23,32 +23,37 @@ $user = $User->get_current();
 
 if($user->has_permission("api.xsite"))
 {
-	// Get the REST call path from the AJAX application
-	// Is it a POST or a GET?
-	$url = ($_POST['path']) ? $_POST['path'] : $_GET['path'];
+	$url = $_POST['path'];
 	// Is Curl on this server?
 	if (!function_exists('curl_init')) { internal_error("feature_not_available"); }
 	// Open the Curl session
-	$session = curl_init($url);
+	$session = curl_init();
+	curl_setopt($session, CURLOPT_URL,$url);
+	curl_setopt($session, CURLOPT_FAILONERROR, 1);
+	curl_setopt($session, CURLOPT_FOLLOWLOCATION, 1);// allow redirects 
 	
-	// If it's a POST, put the POST data in the body
-	if ($_POST['path']) {
-		$postvars = '';
-		while ($element = current($_POST)) {
-			$postvars .= key($_POST).'='.$element.'&';
-			next($_POST);
-		}
-		curl_setopt ($session, CURLOPT_POST, true);
-		curl_setopt ($session, CURLOPT_POSTFIELDS, $postvars);
+	$postvars = '';
+	while ($element = current($_POST)) {
+		$postvars .= key($_POST).'='.$element.'&';
+		next($_POST);
 	}
+	curl_setopt ($session, CURLOPT_POST, true);
+	curl_setopt ($session, CURLOPT_POSTFIELDS, $postvars);
 	
-	curl_setopt($session, CURLOPT_HEADER, true);
+	curl_setopt($session, CURLOPT_HEADER, false);
 	curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
 	
 	// Make the call
 	$xml = curl_exec($session);
 	
+	//Print contentType header
+	$type = curl_getinfo($session, CURLINFO_CONTENT_TYPE);
+	header("Content-Type: $type");
+	
 	echo $xml;
+	/*print_r(curl_getinfo($session)); 
+echo "\n\ncURL error number:" .curl_errno($session); 
+echo "\n\ncURL error:" . curl_error($session); */
 	curl_close($session);
 }
 else {
