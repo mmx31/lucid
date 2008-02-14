@@ -9,6 +9,7 @@ this.init = function(args)
     dojo.require("dijit.form.TextBox");
     dojo.require("dijit.form.ValidationTextBox");
     dojo.require("dijit.form.Button");
+    dojo.require("dijit.Dialog");
     dojo.require("dojox.validate.web");
 
 
@@ -71,11 +72,10 @@ this.init = function(args)
 
     });
     this.toolbar.addChild(button);
-    var button = new dijit.form.Button({
+    var button = new dijit.form.DropDownButton({
         label: "Add Feed",
         iconClass: "icon-22-actions-list-add",
-        onClick: dojo.hitch(this, this.addFeedDialog)
-
+        dropDown: this.addFeedDialog()
     });
     this.toolbar.addChild(button);
     var button = new dijit.form.Button({
@@ -133,21 +133,14 @@ this.changeFeeds = function(e)
 }
 
 this.removeFeed = function(t) {
-	if (this.currentFeed) this.feedStore.deleteItem(this.currentFeed);
+	if (!this.feedStore.isItem(this.currentFeed)) return;
+	this.feedStore.deleteItem(this.currentFeed);
 	this.feedStore.save();
 }
 
 this.addFeedDialog = function()
  {
-    if (typeof(this.addfeedwin) != "undefined") {
-        this.addfeedwin.close();
-    }
-    this.addfeedwin = new api.window({
-        title: "Add Feed",
-        width: "300px",
-        height: "200px"
-
-    });
+    dialog = new dijit.TooltipDialog({});
 	dojox.regexp.integer = dojo.number._integerRegexp; //workaround, remove when dojo 1.1 comes
     this._form = {
         title: new dijit.form.TextBox({required: true}),
@@ -184,24 +177,22 @@ this.addFeedDialog = function()
 		var item = this.feedStore.newItem({title: this._form.title.getValue(), label: this._form.title.getValue(), url: this._form.url.getValue()});
 		this.feedStore.save();
 		this.updateCount(item);
-        	this.addfeedwin.close();
+        this._form.title.setValue("");
+        this._form.url.setValue("");
+        div.innerHTML = "";
 	})});
 
     })
-    this.addfeedwin.show();
-    this.addfeedwin.containerNode.appendChild(div);
-    this.addfeedwin.containerNode.appendChild(line);
-    this.addfeedwin.containerNode.appendChild(line2);
-    this.addfeedwin.containerNode.appendChild(button.domNode);
-    this.addfeedwin.startup();
-
+    dialog.startup();
+	dialog.containerNode.appendChild(div);
+    dialog.containerNode.appendChild(line);
+    dialog.containerNode.appendChild(line2);
+    dialog.containerNode.appendChild(button.domNode);
+	return dialog;
 }
 
 this.kill = function()
  {
-    if (typeof(this.addfeedwin) != "undefined") {
-        this.addfeedwin.close();
-    }
     if (typeof(this.win) != "undefined") {
         this.win.close();
     }
@@ -241,7 +232,7 @@ this.fetchFeed = function(url)
                 var title = item.getElementsByTagName("title")[0].textContent;
                 var content = item.getElementsByTagName("description")[0].textContent;
                 var url = item.getElementsByTagName("link")[0].textContent;
-                text += "<div style='border: 1px solid black;'><h4><a href='javascript:desktop.app.launch(2, {url: \"" + escape(url) + "\"})'>" + title + "</a></h4><p>" + content + "</p></div>";
+                text += "<div style='border: 1px solid black;'><h4><a href='javascript:desktop.app.launchHandler(null, {url: \"" + escape(url) + "\"}, \"text/x-uri\")'>" + title + "</a></h4><p>" + content + "</p></div>";
 
             });
             this.right.setContent(text);
