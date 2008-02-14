@@ -21,33 +21,40 @@ this.init = function(args)
 		name: "rssFeeds",
 		data: {
 			identifier: "title",
-			label: "title",
+			label: "label",
 			items: [
 				{
+					label: "Psych Desktop",
 					title: "Psych Desktop",
 					url: "http://www.psychdesktop.net/rss.xml"
 				},
 				{
+					label: "Slashdot",
 					title: "Slashdot",
 					url: "http://rss.slashdot.org/Slashdot/slashdot"
 				},
 				{
+					label: "Ajaxian",
 					title: "Ajaxian",
 					url: "http://feeds.feedburner.com/ajaxian"
 				},
 				{
+					label: "Dojo Toolkit",
 					title: "Dojo Toolkit",
 					url: "http://dojotoolkit.org/rss.xml"
 				},
 				{
+					label: "xkcd",
 					title: "xkcd",
 					url: "http://www.xkcd.com/rss.xml"
 				},
 				{
+					label: "Psychcf's blog",
 					title: "Psychcf's blog",
 					url: "http://psychdesigns.net/psych/rss.xml"
 				},
 				{
+					label: "Jay's blog",
 					title: "Jay's blog",
 					url: "http://www.jaymacdesigns.net/feed/"
 				}
@@ -57,6 +64,13 @@ this.init = function(args)
     this.toolbar = new dijit.Toolbar({
         layoutAlign: "top"
     });
+    var button = new dijit.form.Button({
+        label: "Refresh",
+        iconClass: "icon-22-actions-view-refresh",
+        onClick: dojo.hitch(this, this.refresh)
+
+    });
+    this.toolbar.addChild(button);
     var button = new dijit.form.Button({
         label: "Add Feed",
         iconClass: "icon-22-actions-list-add",
@@ -108,6 +122,7 @@ this.init = function(args)
     this.win.onClose = dojo.hitch(this, this.kill);
     this.win.show();
     this.win.startup();
+	this.refresh();
 }
 
 this.changeFeeds = function(e)
@@ -166,8 +181,9 @@ this.addFeedDialog = function()
 			div.innerHTML = "A feed with that name already exists";
 			return;
 		}
-		this.feedStore.newItem({title: this._form.title.getValue(), url: this._form.url.getValue()});
+		var item = this.feedStore.newItem({title: this._form.title.getValue(), label: this._form.title.getValue(), url: this._form.url.getValue()});
 		this.feedStore.save();
+		this.updateCount(item);
         	this.addfeedwin.close();
 	})});
 
@@ -189,6 +205,26 @@ this.kill = function()
     if (typeof(this.win) != "undefined") {
         this.win.close();
     }
+}
+this.refresh = function() {
+	this.feedStore.fetch({onItem: dojo.hitch(this, function(item) {
+		this.updateCount(item);
+	})})
+}
+
+this.updateCount = function(item) {
+	var store = this.feedStore
+	api.xhr({
+        url: store.getValue(item, "url"),
+        preventCache: true,
+		xsite: true,
+        load: function(data) {
+			var items = data.getElementsByTagName("item").length;
+			store.setValue(item, "label", store.getValue(item, "title")+(items > 0 ? " ("+items+")" : ""))
+		},
+        handleAs: "xml"
+
+    });	
 }
 this.fetchFeed = function(url)
  {
