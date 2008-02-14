@@ -9,6 +9,9 @@ this.init = function(args)
     dojo.require("dijit.form.TextBox");
     dojo.require("dijit.form.ValidationTextBox");
     dojo.require("dijit.form.Button");
+    dojo.require("dijit.form.FilteringSelect");
+    dojo.require("dijit.form.CheckBox");
+    dojo.require("dojo.data.ItemFileReadStore");
     dojo.require("dijit.Dialog");
     dojo.require("dojox.validate.web");
 
@@ -21,43 +24,56 @@ this.init = function(args)
 		appid: this.id,
 		name: "rssFeeds",
 		data: {
-			identifier: "title",
 			label: "label",
 			items: [
 				{
-					label: "Psych Desktop",
-					title: "Psych Desktop",
-					url: "http://www.psychdesktop.net/rss.xml"
-				},
-				{
-					label: "Slashdot",
-					title: "Slashdot",
-					url: "http://rss.slashdot.org/Slashdot/slashdot"
-				},
-				{
-					label: "Ajaxian",
-					title: "Ajaxian",
-					url: "http://feeds.feedburner.com/ajaxian"
-				},
-				{
-					label: "Dojo Toolkit",
-					title: "Dojo Toolkit",
-					url: "http://dojotoolkit.org/rss.xml"
-				},
-				{
-					label: "xkcd",
-					title: "xkcd",
-					url: "http://www.xkcd.com/rss.xml"
-				},
-				{
-					label: "Psychcf's blog",
-					title: "Psychcf's blog",
-					url: "http://psychdesigns.net/psych/rss.xml"
-				},
-				{
-					label: "Jay's blog",
-					title: "Jay's blog",
-					url: "http://www.jaymacdesigns.net/feed/"
+					label: "Feeds",
+					title: "Feeds",
+					category: true,
+					children: [
+						{
+							label: "Psych Desktop",
+							title: "Psych Desktop",
+							url: "http://www.psychdesktop.net/rss.xml",
+							category: false
+						},
+						{
+							label: "Slashdot",
+							title: "Slashdot",
+							url: "http://rss.slashdot.org/Slashdot/slashdot",
+							category: false
+						},
+						{
+							label: "Ajaxian",
+							title: "Ajaxian",
+							url: "http://feeds.feedburner.com/ajaxian",
+							category: false
+						},
+						{
+							label: "Dojo Toolkit",
+							title: "Dojo Toolkit",
+							url: "http://dojotoolkit.org/rss.xml",
+							category: false
+						},
+						{
+							label: "xkcd",
+							title: "xkcd",
+							url: "http://www.xkcd.com/rss.xml",
+							category: false
+						},
+						{
+							label: "Psychcf's blog",
+							title: "Psychcf's blog",
+							url: "http://psychdesigns.net/psych/rss.xml",
+							category: false
+						},
+						{
+							label: "Jay's blog",
+							title: "Jay's blog",
+							url: "http://www.jaymacdesigns.net/feed/",
+							category: false
+						}
+					]
 				}
 			]
 		}
@@ -73,13 +89,13 @@ this.init = function(args)
     });
     this.toolbar.addChild(button);
     var button = new dijit.form.DropDownButton({
-        label: "Add Feed",
+        label: "Add",
         iconClass: "icon-22-actions-list-add",
         dropDown: this.addFeedDialog()
     });
     this.toolbar.addChild(button);
     var button = new dijit.form.Button({
-        label: "Remove Feed",
+        label: "Remove",
         iconClass: "icon-22-actions-list-remove",
         onClick: dojo.hitch(this, this.removeFeed)
 
@@ -103,7 +119,10 @@ this.init = function(args)
     this.left = new dijit.Tree({
         store: this.feedStore,
 		labelAttr: "title",
-		label: "Feeds"
+		getIconClass: function(/*dojo.data.Item*/ item){
+			if(item != null && this.store.hasAttribute(item, "iconClass"))
+				return this.store.getValue(item, "iconClass");
+		}
     });
 	dojo.connect(this.left, "onClick", this, "changeFeeds");
     this.left.startup();
@@ -128,8 +147,9 @@ this.init = function(args)
 this.changeFeeds = function(e)
 {
 	if(!this.feedStore.isItem(e)) return;
-    this.fetchFeed(this.feedStore.getValue(e, "url"));
     this.currentFeed = e;
+	if(this.feedStore.getValue(e, "category") === true) return;
+    this.fetchFeed(this.feedStore.getValue(e, "url"));
 }
 
 this.removeFeed = function(t) {
@@ -144,12 +164,41 @@ this.addFeedDialog = function()
 	dojox.regexp.integer = dojo.number._integerRegexp; //workaround, remove when dojo 1.1 comes
     this._form = {
         title: new dijit.form.TextBox({required: true}),
-        url: new dijit.form.ValidationTextBox({
-			isValid: function(isFocused) {
-				return dojox.validate.isUrl(this.textbox.value);
-			},
-			invalidMessage: "Invalid URL"
+	isCategory: new dijit.form.CheckBox({
+		onChange: dojo.hitch(this, function(val) {
+			if(!this._form) return;
+			this._form.url.setDisabled(val);
+			this._form.category.setDisabled(val);
 		})
+	}),
+	category: new dijit.form.FilteringSelect({
+		store: this.feedStore,
+		searchAttr: "title",
+		query: {category: true}
+	}),
+        url: new dijit.form.ValidationTextBox({
+		isValid: function(isFocused) {
+			return dojox.validate.isUrl(this.textbox.value);
+		},
+		invalidMessage: "Invalid URL"
+	}),
+	icon: new dijit.form.FilteringSelect({
+		searchAttr: "name",
+		labelAttr: "label",
+		labelType: "html",
+		store: new dojo.data.ItemFileReadStore({
+			data: {identifier: "name", items: [
+				{label: "", name: ""},
+				{label: "<div class='icon-16-actions-go-home'></div>", name: "icon-16-actions-go-home"},
+				{label: "<div class='icon-16-apps-internet-news-reader'></div>", name: "icon-16-apps-internet-news-reader"},
+				{label: "<div class='icon-16-apps-internet-web-browser'></div>", name: "icon-16-apps-internet-web-browser"},
+				{label: "<div class='icon-16-apps-internet-group-chat'></div>", name: "icon-16-apps-internet-group-chat"},
+				{label: "<div class='icon-16-apps-accessories-text-editor'></div>", name: "icon-16-apps-accessories-text-editor"},
+				{label: "<div class='icon-16-actions-system-search'></div>", name: "icon-16-actions-system-search"},
+				{label: "<div class='icon-16-status-weather-clear'></div>", name: "icon-16-status-weather-clear"}
+			]}
+		})
+	})
     };
     var line = document.createElement("div");
     var p = document.createElement("span");
@@ -161,24 +210,70 @@ this.addFeedDialog = function()
     p.innerHTML = "URL: ";
     line2.appendChild(p);
     line2.appendChild(this._form.url.domNode);
+
+    var line3 = document.createElement("div");
+    var p = document.createElement("span");
+    p.innerHTML = "Icon: ";
+    line3.appendChild(p);
+    line3.appendChild(this._form.icon.domNode);
+
+    var line4 = document.createElement("div");
+    var p = document.createElement("span");
+    p.innerHTML = "Is Category: ";
+    line4.appendChild(p);
+    line4.appendChild(this._form.isCategory.domNode);
+
+
+    var line5 = document.createElement("div");
+    var p = document.createElement("span");
+    p.innerHTML = "Category: ";
+    line5.appendChild(p);
+    line5.appendChild(this._form.category.domNode);
+
     var button = new dijit.form.Button({
-        label: "Add Feed"
+        label: "Add"
     });
 	var div = document.createElement("div");
 	dojo.style(div, "color", "red");
     dojo.connect(button, "onClick", this, 
     function(e) {
-		if(!(this._form.title.getValue() != "" && this._form.url.isValid())) return;
+		if(this._form.title.getValue() == "") return;
+		if(!this._form.url.isValid() && this._form.isCategory.checked) return;
+		if(!this._form.category.isValid() && this._form.isCategory.checked) return;
+		if(!this._form.icon.isValid()) return;
 	this.feedStore.fetch({query: {title: this._form.title.getValue()}, onComplete: dojo.hitch(this, function(f) {
 		if(typeof f[0] != "undefined") {
-			div.innerHTML = "A feed with that name already exists";
+			div.innerHTML = "An item with that name already exists";
 			return;
 		}
-		var item = this.feedStore.newItem({title: this._form.title.getValue(), label: this._form.title.getValue(), url: this._form.url.getValue()});
-		this.feedStore.save();
-		this.updateCount(item);
+		var makeItem = dojo.hitch(this, function(items) {
+			var item = this.feedStore.newItem({
+				title: this._form.title.getValue(),
+				label: this._form.title.getValue(),
+				url: this._form.url.getValue(),
+				iconClass: this._form.icon.getValue() || null,
+				category: this._form.isCategory.checked
+			}, (items ? {
+				attribute: "children",
+				item: items[0]
+			} : null));
+			this.updateCount(item);
+			this.feedStore.save();
+		});
+		if(this._form.isCategory.checked) {
+			this.feedStore.fetch({
+				query: {
+					category: true,
+					title: this._form.category.getValue()
+				},
+				onComplete: makeItem
+			})
+		}
+		else makeItem();
         this._form.title.setValue("");
         this._form.url.setValue("");
+        this._form.icon.setValue("");
+        this._form.isCategory.setChecked(false);
         div.innerHTML = "";
 	})});
 
@@ -187,6 +282,9 @@ this.addFeedDialog = function()
 	dialog.containerNode.appendChild(div);
     dialog.containerNode.appendChild(line);
     dialog.containerNode.appendChild(line2);
+    dialog.containerNode.appendChild(line3);
+    dialog.containerNode.appendChild(line4);
+    dialog.containerNode.appendChild(line5);
     dialog.containerNode.appendChild(button.domNode);
 	return dialog;
 }
