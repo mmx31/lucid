@@ -46,9 +46,7 @@ if($_GET['section'] == "io")
 				$out = new intOutput();
 				$out->set("generic_err", true);
 			} else {
-				$out = new xmlOutput();
-				$out->startElement("getFolderResponse");
-				$out->attribute("path", $_REQUEST['path']);
+				$output = "<" . "?xml version='1.0' encoding='utf-8' ?" . ">" . "\r\n" . "<getFolderResponse path=\"" . $_REQUEST['path'] . "\">";
 				while(($file = readdir($dir)) !== false){
 					if($file == '..' || $file == '.'){
 						continue;
@@ -59,13 +57,12 @@ if($_GET['section'] == "io")
 						} else {
 							$type = 'file';
 						}
-						$out->startElement("file");
-						$out->attribute("type", $type);
-						$out->text($file);
-						$out->endElement();
+						$output .=  "\r\n" . '<file type="' . $type . '">' . $file . '</file>';
 					}
 				}
-				$out->endElement();
+				$output .=  "\r\n" . '</getFolderResponse>';
+				header('Content-type: text/xml');
+				echo $output;
 			}
 	}
 		if ($_GET['action'] == "getFile") {
