@@ -588,6 +588,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			this.pos.width = v.w - max.L - max.R;
 			this.pos.height = v.h - max.T - max.B;
 		}
+		this.resize();
 	},
 	startup: function() {
 		this.inherited("startup", arguments);
