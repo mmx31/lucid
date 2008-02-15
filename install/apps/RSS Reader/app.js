@@ -119,6 +119,7 @@ this.init = function(args)
     this.left = new dijit.Tree({
         store: this.feedStore,
 		labelAttr: "title",
+		query: {category: true},
 		getIconClass: function(/*dojo.data.Item*/ item){
 			if(item != null && this.store.hasAttribute(item, "iconClass"))
 				return this.store.getValue(item, "iconClass");
@@ -253,7 +254,7 @@ this.addFeedDialog = function()
 				url: this._form.url.getValue(),
 				iconClass: this._form.icon.getValue() || null,
 				category: this._form.isCategory.checked
-			}, (items ? {
+			}, (items ? { //TODO: allways appending to root because items is null... why?
 				attribute: "children",
 				item: items[0]
 			} : null));
