@@ -1,17 +1,18 @@
-/**
- * Package: config
+/*
+ * Class: desktop.config
  * 
- * Group: desktop
- * 
- * Summary: 
- * 		Contains configuraton for the desktop.
- * 
+ * Contains configuraton for the desktop.
  */
 desktop.config = {
 	init: function(cback) {
 		desktop.config.load(cback);
 		setInterval(desktop.config.save, 1000*60);
 	},
+	/*
+	 * Method: load
+	 * 
+	 * Loads the configuration from the server
+	 */
 	load: function(cback) {
 		api.xhr({
 	        backend: "core.config.stream.load",
@@ -26,6 +27,11 @@ desktop.config = {
 			handleAs: "json"
         });
 	},
+	/*
+	 * Method: save
+	 * 
+	 * Saves the current configuration to the server
+	 */
 	save: function(sync) {
 		if(typeof sync == "undefined") sync=false;
 		var conf = dojo.toJson(desktop.config);
@@ -35,51 +41,38 @@ desktop.config = {
             content: {value: conf}
         });
 	},
+	/*
+	 * Method: apply
+	 * 
+	 * Applies the current configuration settings
+	 */
 	apply: function()
 	{
 		dojo.publish("configApply", [desktop.config]);
 	},
-	/**
-	 * Intensity of desktop effects (3 = insane, 0 = none)
+	/*
+	 * Property: fx
 	 * 
-	 * @type {Int}
-	 * @alias desktop.config.fx
-	 * @memberOf desktop.config
+	 * Intensity of desktop effects (3 = insane, 0 = none)
 	 */
 	fx: 1,
-	/**
-	 * Whether or not the desktop should do various debugging tasks
+	/*
+	 * Property: debug
 	 * 
-	 * @type {Boolean}
-	 * @alias desktop.config.debug
-	 * @memberOf desktop.config
+	 * Whether or not the desktop should output information involving debugging
 	 */
 	debug: true,
-	/**
-	 * Crosstalk Ping timer
+	/*
+	 * Property: crosstalkPing
 	 * 
-	 * @type {Integer}
-	 * @alias desktop.config.crosstalkPing
-	 * @memberOf desktop.config
+	 * Crosstalk ping interval (in miliseconds)
 	 */
 	crosstalkPing: 800,
-	/**
-	 * Configuration on taskbar elements
+	/*
+	 * Property: panels
 	 * 
-	 * @type {Object}
-	 * @alias desktop.config.taskbar
-	 * @memberOf desktop.config
+	 * an array of each panel's settings and applets
 	 */
-	taskbar: {
-		/**
-		 * Whether or not the taskbar is shown
-		 * 
-		 * @type {Boolean}
-		 * @alias desktop.config.taskbar.isShown
-		 * @memberOf desktop.config.taskbar
-		 */
-		isShown: true
-	},
 	panels: [
 		{
 			thickness: 24,
@@ -96,6 +89,16 @@ desktop.config = {
 			]
 		}
 	],
+	/*
+	 * Property: wallpaper
+	 * 
+	 * wallpaper information
+	 * 
+	 * image - the image to display
+	 * color - the background color of the wallpaper
+	 * style - can be "centered", "tiled", or "fillscreen"
+	 * storedList - an array of wallpapers that the user can pick from in the wallpaper dialog
+	 */
 	wallpaper: {
 		image: "./themes/green/wallpaper.jpg",
 		color: "#eeeeee",
@@ -106,15 +109,42 @@ desktop.config = {
 			"./themes/tsunami/wallpaper.jpg"
 		]
 	},
+	/*
+	 * Property: theme
+	 * 
+	 * The user's preferred theme
+	 */
 	theme: "green",
+	/*
+	 * Property: theme
+	 * 
+	 * An array of app ids to launch at startup
+	 */
 	startupapps: [],
+	/*
+	 * Property: window
+	 * 
+	 * window settings
+	 * 
+	 * constrain - should the window be constrained to the screen's edge?
+	 * animSpeed - how fast the fade/maximize/minimize animations should be in miliseconds
+	 */
 	window: {
 		constrain: false,
 		animSpeed: 275
 	},
-	crosstalkPing: 500,
+	
+	/*
+	 * Property: filesystem
+	 * 
+	 * Some filesystem options (primarily for filearea)
+	 * 
+	 * hideExt - should the file extentions be hidden?
+	 * icons - a json object containing icons for each file extention
+	 */
 	filesystem: {
 		hideExt: true,
+		//TODO: use mimetypes, not extentions!
 		icons: {
 			txt: "icon-32-mimetypes-text-x-generic",
 			desktop: "icon-32-mimetypes-application-x-executable",

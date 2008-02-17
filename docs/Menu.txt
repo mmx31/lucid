@@ -1,0 +1,137 @@
+Format: 1.35
+
+
+# You can add a title and sub-title to your menu like this:
+# Title: [project name]
+# SubTitle: [subtitle]
+
+# You can add a footer to your documentation like this:
+# Footer: [text]
+# If you want to add a copyright notice, this would be the place to do it.
+
+
+# --------------------------------------------------------------------------
+# 
+# Cut and paste the lines below to change the order in which your files
+# appear on the menu.  Don't worry about adding or removing files, Natural
+# Docs will take care of that.
+# 
+# You can further organize the menu by grouping the entries.  Add a
+# "Group: [name] {" line to start a group, and add a "}" to end it.
+# 
+# You can add text and web links to the menu by adding "Text: [text]" and
+# "Link: [name] ([URL])" lines, respectively.
+# 
+# The formatting and comments are auto-generated, so don't worry about
+# neatness when editing the file.  Natural Docs will clean it up the next
+# time it is run.  When working with groups, just deal with the braces and
+# forget about the indentation and comments.
+# 
+# --------------------------------------------------------------------------
+
+
+Group: Api  {
+
+   File: api.window  (api/window.js)
+   File: crosstalk.js  (api/crosstalk.js)
+   File: filearea  (api/filearea.js)
+   File: objManager  (api/flash/applet.as)
+   File: registry.js  (api/registry.js)
+   File: sound.js  (api/sound.js)
+   }  # Group: Api
+
+File: bootstrap  (bootstrap.js)
+File: desktop.config  (desktop/config.js)
+File: desktop.ui  (desktop/ui.js)
+
+Group: Dojo  {
+
+   Group: Dijit  {
+
+      File: _editor/RichText.js  (dojo/dijit/_editor/RichText.js)
+      File: dijit.js.uncompressed.js  (dojo/dijit/dijit.js.uncompressed.js)
+
+      Group: Layout  {
+
+         File: String  (dojo/dijit/layout/ContentPane.js)
+         File: String  (dojo/dijit/layout/StackContainer.js)
+         File: we are treating the container as controller here  (dojo/dijit/layout/AccordionContainer.js)
+         }  # Group: Layout
+
+      File: node is assumed to be absolutely or relatively positioned.  (dojo/dijit/_base/place.js)
+      File: On IE e....charCode.  (dojo/dijit/Tree.js)
+      File: Opera not supported by dijit  (dojo/dijit/_base/sniff.js)
+      File: String  (dojo/dijit/TitlePane.js)
+      File: String  (dojo/dijit/dijit-all.js.uncompressed.js)
+      File: String  (dojo/dijit/_Widget.js)
+      File: String  (dojo/dijit/form/_FormWidget.js)
+      File: we want to support attributes that have the form  (dojo/dijit/_Templated.js)
+      }  # Group: Dijit
+
+   Group: Dojo  {
+
+      File: .  (dojo/dojo/date/locale.js)
+
+      Group: _base  {
+
+         File: below, this method is overridden for IE  (dojo/dojo/_base/event.js)
+         File: document.body is not defined for a strict xhtml document  (dojo/dojo/_base/window.js)
+         File: html.js  (dojo/dojo/_base/html.js)
+         File: must be declared before scope switches ie. this._xhrObj()  (dojo/dojo/_base/_loader/hostenv_browser.js)
+         File: query.js  (dojo/dojo/_base/query.js)
+         File: we intentionally avoid handling exceptions, since the caller will  (dojo/dojo/_base/_loader/hostenv_rhino.js)
+         File: we provide the json-comment-filtered option as one solution to  (dojo/dojo/_base/xhr.js)
+         }  # Group: _base
+
+      File: dojo.js.uncompressed.js  (dojo/dojo/dojo.js.uncompressed.js)
+      }  # Group: Dojo
+
+   Group: Dojox  {
+
+      File: _sql/common.js  (dojo/dojox/_sql/common.js)
+      File: Array  (dojo/dojox/timing/Sequence.js)
+
+      Group: Flash  {
+
+         File: DojoExternalInterface  (dojo/dojox/flash/flash8/DojoExternalInterface.as)
+         File: DojoExternalInterface  (dojo/dojox/flash/flash6/DojoExternalInterface.as)
+         File: flash8/ExpressInstall.as  (dojo/dojox/flash/flash8/ExpressInstall.as)
+         }  # Group: Flash
+
+      File: gfx3d/object.js  (dojo/dojox/gfx3d/object.js)
+      File: gfx3d/scheduler.js  (dojo/dojox/gfx3d/scheduler.js)
+
+      Group: Grid  {
+
+         File: not called in 'view' context  (dojo/dojox/grid/_grid/view.js)
+         File: object or string  (dojo/dojox/grid/VirtualGrid.js)
+         File: we assume Read and Identity APIs for all stores!  (dojo/dojox/grid/_data/model.js)
+         }  # Group: Grid
+
+      File: image/Lightbox.js  (dojo/dojox/image/Lightbox.js)
+      File: off/offline.js.uncompressed.js  (dojo/dojox/off/offline.js.uncompressed.js)
+      File: Storage  (dojo/dojox/storage/Storage.as)
+      File: String  (dojo/dojox/widget/SortList.js)
+      File: String  (dojo/dojox/layout/FloatingPane.js)
+      File: String  (dojo/dojox/presentation/_base.js)
+      File: String  (dojo/dojox/image/SlideShow.js)
+      File: String.  (dojo/dojox/data/FlickrStore.js)
+      File: the return data from the io.iframe is used to populate the input element with  (dojo/dojox/widget/FileInputAuto.js)
+      File: validate/regexp.js  (dojo/dojox/validate/regexp.js)
+      }  # Group: Dojox
+
+   }  # Group: Dojo
+
+Group: Index  {
+
+   Index: Everything
+   Class Index: Classes
+   Event Index: Events
+   File Index: Files
+   Function Index: Functions
+   Macro Index: Macros
+   Property Index: Properties
+   Type Index: Types
+   Variable Index: Variables
+   }  # Group: Index
+

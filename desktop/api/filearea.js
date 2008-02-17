@@ -1,10 +1,3 @@
-/*
- * Package: filearea
- * 
- * Summary:
- * 		The file area widget
- * 
- */
 dojo.provide("api.filearea");
 dojo.provide("api.filearea._item");
 dojo.provide("api.filearea._Mover");
@@ -16,6 +9,15 @@ dojo.require("dijit._Container");
 dojo.require("dojo.dnd.Source");
 dojo.require("dijit.Menu");
 
+/*
+ * Class: filearea
+ * 
+ * Scope: api
+ * 
+ * Summary:
+ * 		The file area widget
+ * 
+ */
 dojo.declare(
 	"api.filearea",
 	[dijit._Widget, dijit._Templated, dijit._Container, dijit._Contained],

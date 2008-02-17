@@ -4,7 +4,7 @@ dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dojox.fx.easing");
 dojo.require("dijit._Templated");
 /*
- * Package: window
+ * Class: api.window
  * 
  * Summary:
  * 		The window constructor

@@ -1,12 +1,30 @@
 dojo.provide("desktop.ui");
 dojo.require("dijit.layout.ContentPane");
 dojo.require("dojo.fx");
+/*
+ * Class: desktop.ui
+ * 
+ * Summary:
+ * 		Draws core UI for the desktop such as panels and wallpaper
+ */
 desktop.ui = {
+	/*
+	 * Method: draw
+	 *  
+	 * Summary:
+	 * 		creates a desktop.ui.area widget and places it on the screen
+	 */
 	draw: function() {
 		desktop.ui._area = new desktop.ui.area();
 		desktop.ui.containerNode = desktop.ui._area.containerNode;
 		document.body.appendChild(desktop.ui._area.domNode);
 	},
+	/*
+	 * Method: init
+	 *  
+	 * Summary:
+	 * 		subscribes to events, overwrites the autoscroll method in dojo.dnd
+	 */
 	init: function() {
 		dojo.subscribe("configApply", this, this.makePanels);
 		dojo.subscribe("configApply", this, function() {
@@ -15,17 +33,30 @@ desktop.ui = {
 		dojo.require("dojo.dnd.autoscroll");
 		dojo.dnd.autoScroll = function(e) {} //in order to prevent autoscrolling of the window
 	},
-        drawn: false,
+	/*
+	 * Property: drawn
+	 *  
+	 * Summary:
+	 * 		have the panels been drawn yet?
+	 */
+    drawn: false,
+	/*
+	 * Method: makePanels
+	 *  
+	 * Summary:
+	 * 		the first time it is called it draws each panel based on what's stored in the configuration,
+	 * 		after that it cycles through each panel and calls it's _place(); method
+	 */
 	makePanels: function() {
-                if(this.drawn) {
-		        dojo.query(".desktopPanel").forEach(function(panel) {
-			       var p = dijit.byNode(panel);
-			       p._place();
-		        }, this);
-                        return;
-                }
-	        this.drawn = true;
-                var panels = desktop.config.panels;
+        if(this.drawn) {
+	        dojo.query(".desktopPanel").forEach(function(panel) {
+		       var p = dijit.byNode(panel);
+		       p._place();
+	        }, this);
+            return;
+        }
+        this.drawn = true;
+        var panels = desktop.config.panels;
 		dojo.forEach(panels, function(panel) {
 			var args = {
 				thickness: panel.thickness,
@@ -43,6 +74,13 @@ desktop.ui = {
 		});
 		desktop.ui._area.resize();
 	},
+	/*
+	 * Method: save
+	 *  
+	 * Summary:
+	 * 		Cylces through each panel and stores each panel's information in desktop.config
+	 * 		so it can be restored during the next login
+	 */
 	save: function() {
 		desktop.config.panels = [];
 		dojo.query(".desktopPanel").forEach(function(panel, i) {
@@ -58,7 +96,19 @@ desktop.ui = {
 			}
 		});
 	},
+	/*
+	 * Class: desktop.ui.config
+	 *  
+	 * Summary:
+	 * 		contains some configuration dialogs
+	 */
 	config: {
+		/*
+		 * Method: wallpaper
+		 *  
+		 * Summary:
+		 * 		Shows the wallpaper configuration dialog
+		 */
 		wallpaper: function(e) {
 			if(this.wallWin) return this.wallWin.bringToFront();
 			var win = this.wallWin = new api.window({
@@ -190,6 +240,12 @@ desktop.ui = {
 			win.startup();
 			color.startup();
 		},
+		/*
+		 * Method: account
+		 *  
+		 * Summary:
+		 * 		Shows the account configuration dialog
+		 */
 		account: function() {
 			if(this.accountWin) return this.accountWin.bringToFront();
 			var win = this.accountWin = new api.window({
@@ -213,6 +269,14 @@ dojo.require("dijit.form.Button");
 dojo.require("dijit.form.FilteringSelect");
 dojo.require("dojo.data.ItemFileReadStore");
 
+
+/*
+ * 
+ * Class: desktop.ui.area
+ *  
+ * Summary:
+ * 		the main UI area
+ */
 dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Container], {
 	templateString: "<div class=\"uiArea\"><div dojoAttachPoint=\"widgetNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10; display: none;\"></div><div dojoAttachPoint=\"containerNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10;\"></div><div dojoAttachPoint=\"wallpaperNode\" class=\"wallpaper\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 1;\"></div></div>",
 	drawn: false,
