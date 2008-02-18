@@ -240,7 +240,45 @@ desktop.ui = {
 		 */
 		_themes: function() {
 			var p = new dijit.layout.LayoutContainer({title: "Theme"});
-			
+			var m = new dijit.layout.ContentPane({layoutAlign: "client"});
+			var area = document.createElement("div");
+			var makeThumb = function(item) {
+				var p = document.createElement("div");
+				dojo.addClass(p, "floatLeft");
+				dojo.style(p, "width", "150px");
+				dojo.style(p, "height", "130px");
+				dojo.style(p, "margin", "5px");
+				dojo.style(p, "padding", "5px");
+				var img = document.createElement("img");
+				dojo.style(img, "width", "100%");
+				dojo.style(img, "height", "100%");
+				img.src = item.thumb //todo: thumbnails?
+				img.name = item.name;
+				p.appendChild(img);
+				var subtitle = document.createElement("div");
+				subtitle.textContent = item.name
+				dojo.style(subtitle, "textAlign", "center");
+				p.appendChild(subtitle);
+				if(desktop.config.theme == item.name) dojo.addClass(p, "selectedItem");
+				dojo.connect(p, "onclick", null, function() {
+					if(desktop.config.wallpaper.image != item) {
+						dojo.query(".selectedItem", m.domNode).removeClass("selectedItem");
+						dojo.addClass(p, "selectedItem");
+						desktop.config.theme = item.name;
+						desktop.config.apply();
+					}
+				})
+				area.appendChild(p);
+			}
+			desktop.theme.list(function(list) {
+				dojo.forEach(list, function(theme) {
+					//Change this when theme metadata works
+					makeThumb({name: theme, thumb: "about:blank"});
+					//makeThumb(theme);
+				});
+			});
+			m.setContent(area);
+			p.addChild(m);
 			return p;
 		},
 		/*
@@ -311,9 +349,6 @@ desktop.ui = {
 		 * 		Shows the appearance configuration dialog
 		 */
 		appearance: function(e) {
-			if(e == "wallpaper" && this.wallWin) {
-				
-			}
 			if(this.wallWin) return this.wallWin.bringToFront();
 			var win = this.wallWin = new api.window({
 				title: "Appearance Preferences",
