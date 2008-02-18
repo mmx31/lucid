@@ -481,7 +481,7 @@ desktop.ui = {
 			var win = this.passwordWin = new api.window({
 				title: "Change password",
 				width: "450px",
-				height: "400px",
+				height: "350px",
 				onClose: dojo.hitch(this, function() {
 					this.passwordWin = false;
 				})
@@ -489,23 +489,88 @@ desktop.ui = {
 			var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding: 20px;"});
 			top.setContent("To change your password, enter your current password in the field below and click <b>Authenticate</b>.<br />"
 						  +"After you have authenticated, enter your new password, retype it for verification and click <b>Change Password</b>")
+			
+			var client = new dijit.layout.ContentPane({layoutAlign: "client"});
+			var row4 = document.createElement("div");
+			dojo.style(row4, "textAlign", "center");
+			var onChange = dojo.hitch(this, function() {
+				if(this.newpasswd.getValue() == this.confpasswd.getValue()) {
+					row4.textContent = "The two passwords match";
+					this.chPasswdButton.setDisabled(false)
+				}
+				else {
+					row4.textContent = "The two passwords do not match";
+					this.chPasswdButton.setDisabled(true);
+				}
+			});
+			var row2 = document.createElement("div");
+			row2.innerHTML = "New password:&nbsp;";
+			var newpasswd = this.newpasswd = new dijit.form.TextBox({type: "password", onChange: onChange, disabled: true});
+			row2.appendChild(newpasswd.domNode)
+			var row3 = document.createElement("div");
+			row3.innerHTML = "Retype new password:&nbsp;";
+			var confpasswd = this.confpasswd = new dijit.form.TextBox({type: "password", onChange: onChange, disabled: true});
+			row3.appendChild(confpasswd.domNode);
+			var row1 = document.createElement("div");
+			row1.innerHTML = "Current password:&nbsp;";
+			var current = new dijit.form.TextBox({type: "password", style: "width: 125px;"});
+			row1.appendChild(current.domNode);
+			var authButton = this.authButton = new dijit.form.Button({
+				label: "Authenticate",
+				onClick: dojo.hitch(this, function() {
+					current.setDisabled(true);
+					this.authButton.setDisabled(true);
+					
+					var data = "0"; //simulated response
+					current.setDisabled(data == "0");
+					authButton.setDisabled(data == "0");
+					newpasswd.setDisabled(data != "0");
+					confpasswd.setDisabled(data != "0");
+					row4.textContent = (data == "0" ? "Authentication was successful" : "Authentication failed");
+				})
+			})
+			row1.appendChild(authButton.domNode);
+			
+			
+			var main = document.createElement("div");
+			dojo.style(main, "padding", "10px");
+			dojo.forEach([row1, row2, row3, row4], function(e){ main.appendChild(e); });
+			client.setContent(main);
+			
 			var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
 			var div = document.createElement("div");
 			dojo.addClass(div, "floatRight");
-			dojo.forEach([
-				{
-					label: "Close",
-					onClick: dojo.hitch(win, win.close)
-				},
-				{
-					label: "Change password",
-					disabled: true
+			div.appendChild((new dijit.form.Button({
+				label: "Close",
+				onClick: dojo.hitch(win, win.close)
+			})).domNode);
+			div.appendChild((this.chPasswdButton = new dijit.form.Button({
+				label: "Change password",
+				disabled: true,
+				onClick: function() {
+					row4.textContent = "Changing password...";
+					current.setDisabled(true);
+					this.authButton.setDisabled(true);
+					current.setDisabled(true);
+					authButton.setDisabled(true);
+					newpasswd.setDisabled(true);
+					confpasswd.setDisabled(true);
+					this.chPasswdButton.setDisabled(true);
+					
+					//xhr, response, yadda yadda yadda
+					row4.textContent = "Password change successful";
+					current.setDisabled(false);
+					this.authButton.setDisabled(false);
+					current.setDisabled(true);
+					authButton.setDisabled(true);
+					newpasswd.setDisabled(true);
+					confpasswd.setDisabled(true);
+					this.chPasswdButton.setDisabled(true);
 				}
-			], function(item) {
-				div.appendChild((new dijit.form.Button(item)).domNode);
-			});
+			})).domNode);
 			bottom.setContent(div);
-			dojo.forEach([top, bottom], function(e) {
+			
+			dojo.forEach([top, bottom, client], function(e) {
 				win.addChild(e);
 			});
 			win.show();
