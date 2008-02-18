@@ -41,29 +41,20 @@ this.open = function(args)
 		themes.setContent(winHTML);
 		tabs.addChild(themes);
 
-		var performance = new dijit.layout.ContentPane({title: "Performance"}, document.createElement("div"));
-		winHTML = "Effects: <input checked type='checkbox' value='true' name='bbbbb' id='bbbbb"+this.instance+"'><br><br>Disabling effects can have a major speed boost on a slow machine. <br> If you have a high-end machine, you are recommended to leave effects on."; 
-		performance.setContent(winHTML);
-		tabs.addChild(performance);
-
 	this.window.addChild(tabs);
 	this.window.show();
 	this.window.startup();
 	new dijit.form.TextBox({id: "theme"+this.instance, name: "theme"+this.instance}, document.getElementById("theme"+this.instance));
-	new dijit.form.CheckBox({name:"fx"+this.instance, id:"fx"+this.instance}, document.getElementById("bbbbb"+this.instance));
 	dijit.byId("theme"+this.instance).setValue(desktop.config.theme);
-	dijit.byId("fx"+this.instance).setChecked(desktop.config.fx);
 	desktop.theme.list(dojo.hitch(this, this.processThemes));
 }
 this.about = function() {
 	api.ui.alertDialog({title: "Control Panel", message:"Psych Desktop Control Panel<br>Version "+this.version});
 }
 this.processSave = function() {
-	var fx=dijit.byId("fx"+this.instance).checked;
 	var theme=dijit.byId("theme"+this.instance).getValue();
 	desktop.theme.set(theme);
 	dojo.byId("currentTheme"+this.instance).innerHTML = theme;
-	desktop.config.fx = fx;
 	desktop.config.save();
 	desktop.config.apply();
 	api.ui.alertDialog({title: "Notice", message: "Changes were applied successfully."});

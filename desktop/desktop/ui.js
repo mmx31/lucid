@@ -3,6 +3,7 @@ dojo.require("dijit.layout.ContentPane");
 dojo.require("dijit.layout.TabContainer");
 dojo.require("dijit.form.Form");
 dojo.require("dijit.form.ValidationTextBox");
+dojo.require("dijit.form.CheckBox");
 dojo.require("dojo.fx");
 dojo.require("dojox.validate.web");
 /*
@@ -103,28 +104,17 @@ desktop.ui = {
 	/*
 	 * Class: desktop.ui.config
 	 *  
-	 * Summary:
-	 * 		contains some configuration dialogs
+	 * contains some configuration dialogs
 	 */
 	config: {
 		/*
-		 * Method: wallpaper
-		 *  
-		 * Summary:
-		 * 		Shows the wallpaper configuration dialog
+		 * Method: _wallpaper
+		 * 
+		 * Creates a layoutContainer with wallpaper configuration UI and returns it
 		 */
-		wallpaper: function(e) {
-			if(this.wallWin) return this.wallWin.bringToFront();
-			var win = this.wallWin = new api.window({
-				title: "Wallpaper Preferences",
-				width: "600px",
-				height: "500px",
-				onClose: dojo.hitch(this, function() {
-					this.wallWin = false;
-				})
-			});
-			
-			var c = new dijit.layout.ContentPane({layoutAlign: "client"});
+		_wallpaper: function() {
+			var wallpaper = new dijit.layout.LayoutContainer({title: "Wallpaper"});
+			var c = new dijit.layout.ContentPane({});
 			var cbody = document.createElement("div");
 			dojo.style(cbody, "width", "100%");
 			dojo.style(cbody, "height", "100%");
@@ -159,7 +149,7 @@ desktop.ui = {
 			makeThumb("");
 			dojo.forEach(desktop.config.wallpaper.storedList, makeThumb);
 			c.setContent(cbody);
-			win.addChild(c);
+			wallpaper.addChild(c);
 			
 			//botom part -------------
 			var color = new dijit.ColorPalette({value: desktop.config.wallpaper.color, onChange: dojo.hitch(this, function(value) {
@@ -239,10 +229,107 @@ desktop.ui = {
 				body.appendChild(c);
 			});
 			p.setContent(body);
-			win.addChild(p);
+			wallpaper.addChild(p);
+			color.startup();
+			return wallpaper;
+		},
+		/*
+		 * Method: _themes
+		 * 
+		 * generates a theme configuration pane and returns it
+		 */
+		_themes: function() {
+			var p = new dijit.layout.LayoutContainer({title: "Theme"});
+			
+			return p;
+		},
+		/*
+		 * Method: _effects
+		 * 
+		 * generates an effects configuration pane and returns it
+		 */
+		_effects: function() {
+			var p = new dijit.layout.ContentPane({title: "Visual Effects"});
+			var rows = {
+				None: {
+					desc: "Provides a desktop environment without any effects. Good for older computers or browsers.",
+					params: {
+						checked: desktop.config.fx == 0,
+						onClick: function(){
+							desktop.config.fx = 0;
+						}
+					}
+				},
+				Basic: {
+					desc: "Provides basic transitional effects that don't require a fast computer.",
+					params: {
+						checked: desktop.config.fx == 1,
+						onClick: function(){
+							desktop.config.fx = 1;
+						}
+					}
+				},
+				Extra: {
+					desc: "Provides a desktop environment with extra transitional effects that require a faster computer.",
+					params: {
+						checked: desktop.config.fx == 2,
+						onClick: function(){
+							desktop.config.fx = 2;
+						}
+					}
+				},
+				Insane: {
+					desc: "Provides a desktop environment with full transitional effects. Requires a fast-rendering browser and a fast computer.",
+					params: {
+						checked: desktop.config.fx == 3,
+						onClick: function() {
+							desktop.config.fx = 3;
+						}
+					}
+				}
+			}
+			var div = document.createElement("div");
+			dojo.style(div, "padding", "20px");
+			for(key in rows) {
+				var row = document.createElement("div");
+				dojo.style(row, "margin", "10px");
+				rows[key].params.name = "visualeffects_picker";
+				row.appendChild(new dijit.form.RadioButton(rows[key].params).domNode);
+				var desc = document.createElement("span");
+				desc.innerHTML = "<b>&nbsp;&nbsp;" +key + ":&nbsp;</b>" + rows[key].desc;
+				dojo.style(desc, "padding-left", "10px");
+				row.appendChild(desc);
+				div.appendChild(row);
+			};
+			p.setContent(new dijit.form.Form({}, div).domNode);
+			return p;
+		},
+		/*
+		 * Method: appearance
+		 *  
+		 * Summary:
+		 * 		Shows the appearance configuration dialog
+		 */
+		appearance: function(e) {
+			if(e == "wallpaper" && this.wallWin) {
+				
+			}
+			if(this.wallWin) return this.wallWin.bringToFront();
+			var win = this.wallWin = new api.window({
+				title: "Appearance Preferences",
+				width: "600px",
+				height: "500px",
+				onClose: dojo.hitch(this, function() {
+					this.wallWin = false;
+				})
+			});
+			var tabs = new dijit.layout.TabContainer({layoutAlign: "client"});
+			tabs.addChild(desktop.ui.config._wallpaper());
+			tabs.addChild(desktop.ui.config._themes());
+			tabs.addChild(desktop.ui.config._effects());
+			win.addChild(tabs);
 			win.show();
 			win.startup();
-			color.startup();
 		},
 		/*
 		 * Method: account
@@ -365,7 +452,7 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 		var filearea = this.filearea = new api.filearea({path: "/Desktop/", forDesktop: true, subdirs: false, style: "position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;", overflow: "hidden"});
 		dojo.addClass(filearea.domNode, "mainFileArea");
 		filearea.menu.addChild(new dijit.MenuSeparator({}));
-		filearea.menu.addChild(new dijit.MenuItem({label: "Wallpaper", iconClass: "icon-16-apps-preferences-desktop-wallpaper", onClick: dojo.hitch(desktop.ui.config, "wallpaper")}));
+		filearea.menu.addChild(new dijit.MenuItem({label: "Wallpaper", iconClass: "icon-16-apps-preferences-desktop-wallpaper", onClick: dojo.hitch(desktop.ui.config, "appearance")}));
 		filearea.refresh();
 		dojo.style(filearea.domNode, "zIndex", 1);
 		this.containerNode.appendChild(filearea.domNode);
@@ -1215,7 +1302,7 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 			{
 				label: "Wallpaper",
 				iconClass: "icon-16-apps-preferences-desktop-wallpaper",
-				onClick: function() { desktop.ui.config.wallpaper(); }
+				onClick: function() { desktop.ui.config.appearance(); }
 			},
 			{
 				label: "Account Information",
