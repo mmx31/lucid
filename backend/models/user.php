@@ -1,6 +1,7 @@
 <?php 
 	class User extends Base
 	{
+		var $name = array('type' => 'text');
 		var $username = array('type' => 'text');
 		var $password = array('type' => 'text');
 		var $logged = array('type' => 'integer', 'length' => 1, 'default' => 0);

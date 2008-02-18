@@ -226,6 +226,9 @@ margin: 0px;
 .floatLeft {
 	float: left; /* I know this is stupid, but you can't really set the float property in js */
 }
+.floatRight {
+	float: right;
+}
 .desktopFileItem {
 	float: left;
 }

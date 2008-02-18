@@ -1,6 +1,10 @@
 dojo.provide("desktop.ui");
 dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit.layout.TabContainer");
+dojo.require("dijit.form.Form");
+dojo.require("dijit.form.ValidationTextBox");
 dojo.require("dojo.fx");
+dojo.require("dojox.validate.web");
 /*
  * Class: desktop.ui
  * 
@@ -256,6 +260,83 @@ desktop.ui = {
 					this.accountWin = false;
 				})
 			});
+			var top = new dijit.layout.ContentPane({layoutAlign: "top"});
+			var picture = new dijit.form.Button({iconClass: "icon-32-apps-system-users", label: "Picutre", showLabel: false})
+			var chpasswd = document.createElement("div");
+			dojo.style(chpasswd, "position", "absolute");
+			dojo.style(chpasswd, "top", "0px");
+			dojo.style(chpasswd, "right", "0px");
+			//chpasswd.innerHTML = "User name: "
+			var button = new dijit.form.Button({
+				label: "Change Password...",
+				onClick: desktop.ui.config.password
+			});
+			chpasswd.appendChild(button.domNode)
+			
+			topContent = document.createElement("div");
+			dojo.forEach([picture, chpasswd], function(item) {
+				topContent.appendChild(item.domNode || item);
+			}, this);
+			top.setContent(topContent);
+			
+			var client = new dijit.layout.TabContainer({
+				layoutAlign: "client"
+			});
+			
+			var general = new dijit.layout.ContentPane({title: "General"});
+			
+			var rows = {
+				Name: {
+					widget: "TextBox",
+					params: {}
+				},
+				Email: {
+					widget: "ValidationTextBox",
+					params: {
+						isValid: function(blah) {
+							return dojox.validate.isEmailAddress(this.textbox.value);
+						}
+					}
+				}
+			}
+			var div = document.createElement("div");
+			var elems = {};
+			for(key in rows) {
+				var row = document.createElement("div");
+				dojo.style(row, "marginBottom", "5px");
+				row.innerHTML = key+":&nbsp;";
+				row.appendChild(elems[key] = new dijit.form[rows[key].widget](rows[key].params).domNode);
+				div.appendChild(row);
+			};
+			general.setContent(new dijit.form.Form({}, div).domNode);
+			
+			client.addChild(general);
+			
+			var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
+			var close = new dijit.form.Button({
+				label: "Close",
+				onClick: dojo.hitch(win, win.destroy),
+			});
+			var p=document.createElement("div");
+			dojo.addClass(p, "floatRight");
+			p.appendChild(close.domNode)
+			bottom.setContent(p)
+			
+			dojo.forEach([top, client, bottom], function(wid) {
+				win.addChild(wid);
+				wid.startup();
+			}, this);
+			
+			dojo.connect(win, "onClose", this, function() {
+				//todo: save the user's preferences if they're valid
+				//use the 'elems' object to get the form data
+			});
+			
+			win.show();
+			win.startup();
+		},
+		password: function() {
+			//TODO:
 		}
 	}
 }
@@ -1128,11 +1209,34 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 		if(this._menu) this._menu.destroy();
 		this.inherited("uninitialize", arguments);
 	},
+	_makePrefsMenu: function() {
+		var pMenu = new dijit.Menu();
+		dojo.forEach([
+			{
+				label: "Wallpaper",
+				iconClass: "icon-16-apps-preferences-desktop-wallpaper",
+				onClick: function() { desktop.ui.config.wallpaper(); }
+			},
+			{
+				label: "Account Information",
+				iconClass: "icon-16-apps-system-users",
+				onClick: function() { desktop.ui.config.account(); }
+			}
+		], function(args) {
+			pMenu.addChild(new dijit.MenuItem(args));
+		});
+		return pMenu;
+	},
 	_drawButton: function() {
 		dojo.require("dijit.form.Button");
 		if (this._menubutton) {
 			this._menubutton.destroy();
 		}
+		this.menu.addChild(new dijit.PopupMenuItem({
+			label: "Preferences",
+			iconClass: "icon-16-categories-preferences-desktop",
+			popup: this._makePrefsMenu()
+		}))
 		this._menu.addChild(new dijit.MenuItem({
 			label: "Log Out", 
 			iconClass: "icon-16-actions-system-log-out",
@@ -1205,19 +1309,6 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 });
 dojo.declare("desktop.ui.applets.menubar", desktop.ui.applets.menu, {
 	dispName: "Menu Bar",
-	_makePrefsMenu: function() {
-		var pMenu = new dijit.Menu();
-		dojo.forEach([
-			{
-				label: "Wallpaper",
-				iconClass: "icon-16-apps-preferences-desktop-wallpaper",
-				onClick: function() { desktop.ui.config.wallpaper(); }
-			}
-		], function(args) {
-			pMenu.addChild(new dijit.MenuItem(args));
-		});
-		return pMenu;
-	},
 	_makeSystemMenu: function() {
 		var m = new dijit.Menu();
 		dojo.forEach([
@@ -1225,11 +1316,6 @@ dojo.declare("desktop.ui.applets.menubar", desktop.ui.applets.menu, {
 				label: "Preferences",
 				iconClass: "icon-16-categories-preferences-desktop",
 				popup: this._makePrefsMenu()
-			}),
-			new dijit.PopupMenuItem({
-				label: "Administration",
-				iconClass: "icon-16-categories-preferences-system",
-				popup: new dijit.Menu()
 			}),
 			new dijit.MenuSeparator(),
 			new dijit.MenuItem({
@@ -1294,7 +1380,6 @@ dojo.declare("desktop.ui.applets.menubar", desktop.ui.applets.menu, {
 		], function(i) {
 			var b = new dijit.form.DropDownButton(i);
 			tbar.addChild(b);
-			//dojo.query(".dijitA11yDownArrow", b.focusNode).style("display", "none");
 			b.domNode.style.height="100%";
 			b.startup();
 		});
