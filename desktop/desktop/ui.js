@@ -481,7 +481,10 @@ desktop.ui = {
 			var win = this.passwordWin = new api.window({
 				title: "Change password",
 				width: "450px",
-				height: "400px"
+				height: "400px",
+				onClose: dojo.hitch(this, function() {
+					this.passwordWin = false;
+				})
 			});
 			var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding: 20px;"});
 			top.setContent("To change your password, enter your current password in the field below and click <b>Authenticate</b>.<br />"
