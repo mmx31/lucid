@@ -1354,7 +1354,7 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 		if (this._menubutton) {
 			this._menubutton.destroy();
 		}
-		this.menu.addChild(new dijit.PopupMenuItem({
+		this._menu.addChild(new dijit.PopupMenuItem({
 			label: "Preferences",
 			iconClass: "icon-16-categories-preferences-desktop",
 			popup: this._makePrefsMenu()
