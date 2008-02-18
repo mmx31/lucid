@@ -24,6 +24,7 @@ if (isset($_GET['action'])) {
 		else { $user = $User->get($_POST['id']); }
 		$out = new jsonOutput();
 		$out->append("id", $user->id);
+		$out->append("name", $user->name);
 		$out->append("username", $user->username);
 		$out->append("email", $user->email);
 		$out->append("level", $user->level);

@@ -383,18 +383,22 @@ desktop.ui = {
 					this.accountWin = false;
 				})
 			});
-			var top = new dijit.layout.ContentPane({layoutAlign: "top"});
+			var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding-bottom: 5px;"});
 			var picture = new dijit.form.Button({iconClass: "icon-32-apps-system-users", label: "Picutre", showLabel: false})
 			var chpasswd = document.createElement("div");
 			dojo.style(chpasswd, "position", "absolute");
 			dojo.style(chpasswd, "top", "0px");
 			dojo.style(chpasswd, "right", "0px");
-			//chpasswd.innerHTML = "User name: "
+			var topRow = document.createElement("div");
+			topRow.innerHTML = "User name: ";
+			var usernameSpan = document.createElement("span");
+			topRow.appendChild(usernameSpan);
 			var button = new dijit.form.Button({
 				label: "Change Password...",
 				onClick: desktop.ui.config.password
 			});
-			chpasswd.appendChild(button.domNode)
+			chpasswd.appendChild(topRow);
+			chpasswd.appendChild(button.domNode);
 			
 			topContent = document.createElement("div");
 			dojo.forEach([picture, chpasswd], function(item) {
@@ -428,7 +432,7 @@ desktop.ui = {
 				var row = document.createElement("div");
 				dojo.style(row, "marginBottom", "5px");
 				row.innerHTML = key+":&nbsp;";
-				row.appendChild(elems[key] = new dijit.form[rows[key].widget](rows[key].params).domNode);
+				row.appendChild((elems[key] = new dijit.form[rows[key].widget](rows[key].params)).domNode);
 				div.appendChild(row);
 			};
 			general.setContent(new dijit.form.Form({}, div).domNode);
@@ -449,10 +453,24 @@ desktop.ui = {
 				win.addChild(wid);
 				wid.startup();
 			}, this);
-			
+			api.user.get({callback: function(info) {
+				elems["Name"].setValue(info.name);
+				elems["Email"].setValue(info.email);
+				usernameSpan.textContent = info.username
+			}});
 			dojo.connect(win, "onClose", this, function() {
-				//todo: save the user's preferences if they're valid
-				//use the 'elems' object to get the form data
+				for(key in elems) {
+					var elem = elems[key];
+					if(typeof elem.isValid != "undefined") {
+						if(!elem.isValid()) continue;
+					}
+					switch(key) {
+						case "Name":
+							
+						case "Email":
+						
+					}
+				}
 			});
 			
 			win.show();
