@@ -1335,8 +1335,8 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 		var pMenu = new dijit.Menu();
 		dojo.forEach([
 			{
-				label: "Wallpaper",
-				iconClass: "icon-16-apps-preferences-desktop-wallpaper",
+				label: "Appearance",
+				iconClass: "icon-16-apps-preferences-desktop-theme",
 				onClick: function() { desktop.ui.config.appearance(); }
 			},
 			{
