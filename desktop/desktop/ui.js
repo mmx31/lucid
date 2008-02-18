@@ -547,26 +547,25 @@ desktop.ui = {
 			div.appendChild((this.chPasswdButton = new dijit.form.Button({
 				label: "Change password",
 				disabled: true,
-				onClick: function() {
+				onClick: dojo.hitch(this, function() {
 					row4.textContent = "Changing password...";
 					current.setDisabled(true);
 					this.authButton.setDisabled(true);
-					current.setDisabled(true);
-					authButton.setDisabled(true);
 					newpasswd.setDisabled(true);
 					confpasswd.setDisabled(true);
 					this.chPasswdButton.setDisabled(true);
 					
 					//xhr, response, yadda yadda yadda
-					row4.textContent = "Password change successful";
+					current.setValue("");
+					newpasswd.setValue("");
+					confpasswd.setValue("");
 					current.setDisabled(false);
 					this.authButton.setDisabled(false);
-					current.setDisabled(true);
-					authButton.setDisabled(true);
 					newpasswd.setDisabled(true);
 					confpasswd.setDisabled(true);
 					this.chPasswdButton.setDisabled(true);
-				}
+					row4.textContent = "Password change successful";
+				})
 			})).domNode);
 			bottom.setContent(div);
 			
