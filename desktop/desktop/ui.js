@@ -492,7 +492,7 @@ desktop.ui = {
 			dojo.forEach([
 				{
 					label: "Close",
-					onClick: win.close
+					onClick: dojo.hitch(win, win.close)
 				},
 				{
 					label: "Change password",
