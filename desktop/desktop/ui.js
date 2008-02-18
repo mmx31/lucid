@@ -477,7 +477,36 @@ desktop.ui = {
 			win.startup();
 		},
 		password: function() {
-			//TODO:
+			if(this.passwordWin) return this.passwordWin.bringToFront();
+			var win = this.passwordWin = new api.window({
+				title: "Change password",
+				width: "450px",
+				height: "400px"
+			});
+			var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding: 20px;"});
+			top.setContent("To change your password, enter your current password in the field below and click <b>Authenticate</b>.<br />"
+						  +"After you have authenticated, enter your new password, retype it for verification and click <b>Change Password</b>")
+			var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
+			var div = document.createElement("div");
+			dojo.addClass(div, "floatRight");
+			dojo.forEach([
+				{
+					label: "Close",
+					onClick: win.close
+				},
+				{
+					label: "Change password",
+					disabled: true
+				}
+			], function(item) {
+				div.appendChild((new dijit.form.Button(item)).domNode);
+			});
+			bottom.setContent(div);
+			dojo.forEach([top, bottom], function(e) {
+				win.addChild(e);
+			});
+			win.show();
+			win.startup();
 		}
 	}
 }
