@@ -77,8 +77,7 @@
 		}
 		if($_GET['action'] == "register")
 		{
-			require("../config.php");
-			if($conf_public == "yes")
+			if($GLOBALS['conf']['public'] == "yes")
 			{
 				$u = $User->filter("username", $_POST['username']);
 				if(isset($u[0])) { $out = new intOutput("generic_err"); }
