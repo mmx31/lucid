@@ -6,7 +6,7 @@ dojo.require("dijit.Toolbar");
 dojo.require("dijit._editor._Plugin");
 dojo.require("dijit._Container");
 dojo.require("dojo.i18n");
-dojo.requireLocalization("dijit._editor", "commands", null, "ko,zh,ja,zh-tw,ru,it,hu,fr,pt,pl,es,ROOT,de,cs");
+dojo.requireLocalization("dijit._editor", "commands", null, "zh,pt,ru,de,ja,cs,fr,es,gr,ko,zh-tw,pl,it,hu,ROOT");
 
 dojo.declare(
 	"dijit.Editor",
@@ -24,8 +24,10 @@ dojo.declare(
 		extraPlugins: null,
 
 		constructor: function(){
-			this.plugins=["undo","redo","|","cut","copy","paste","|","bold","italic","underline","strikethrough","|",
-			"insertOrderedList","insertUnorderedList","indent","outdent","|","justifyLeft","justifyRight","justifyCenter","justifyFull"/*"createLink"*/];
+			if(!dojo.isArray(this.plugins)){
+				this.plugins=["undo","redo","|","cut","copy","paste","|","bold","italic","underline","strikethrough","|",
+				"insertOrderedList","insertUnorderedList","indent","outdent","|","justifyLeft","justifyRight","justifyCenter","justifyFull"/*"createLink"*/];
+			}
 
 			this._plugins=[];
 			this._editInterval = this.editActionInterval * 1000;
@@ -45,15 +47,15 @@ dojo.declare(
 			}
 
 //			try{
-			dijit.Editor.superclass.postCreate.apply(this, arguments);
+			this.inherited(arguments);
+//			dijit.Editor.superclass.postCreate.apply(this, arguments);
 
 			this.commands = dojo.i18n.getLocalization("dijit._editor", "commands", this.lang);
 
 			if(!this.toolbar){
 				// if we haven't been assigned a toolbar, create one
-				var toolbarNode = dojo.doc.createElement("div");
-				dojo.place(toolbarNode, this.editingArea, "before");
-				this.toolbar = new dijit.Toolbar({}, toolbarNode);
+				this.toolbar = new dijit.Toolbar({});
+				dojo.place(this.toolbar.domNode, this.editingArea, "before");
 			}
 
 			dojo.forEach(this.plugins, this.addPlugin, this);
@@ -62,13 +64,13 @@ dojo.declare(
 		},
 		destroy: function(){
 			dojo.forEach(this._plugins, function(p){
-				if(p.destroy){
+				if(p && p.destroy){
 					p.destroy();
 				}
 			});
 			this._plugins=[];
 			this.toolbar.destroy(); delete this.toolbar;
-			this.inherited('destroy',arguments);
+			this.inherited(arguments);
 		},
 		addPlugin: function(/*String||Object*/plugin, /*Integer?*/index){
 			//	summary:
@@ -87,7 +89,7 @@ dojo.declare(
 			var args=dojo.isString(plugin)?{name:plugin}:plugin;
 			if(!args.setEditor){
 				var o={"args":args,"plugin":null,"editor":this};
-				dojo.publish("dijit.Editor.getPlugin",[o]);
+				dojo.publish(dijit._scopeName + ".Editor.getPlugin",[o]);
 				if(!o.plugin){
 					var pc = dojo.getObject(args.name);
 					if(pc){
@@ -95,7 +97,7 @@ dojo.declare(
 					}
 				}
 				if(!o.plugin){
-					console.debug('Cannot find plugin',plugin);
+					console.warn('Cannot find plugin',plugin);
 					return;
 				}
 				plugin=o.plugin;
@@ -175,25 +177,28 @@ dojo.declare(
 				return this.inherited('queryCommandEnabled',arguments);
 			}
 		},
-		_changeToStep: function(from,to){
-			this.setValue(to.text);
-			var b=to.bookmark;
-			if(!b){ return; }
+		_moveToBookmark: function(b){
+			var bookmark;
 			if(dojo.isIE){
 				if(dojo.isArray(b)){//IE CONTROL
-					var tmp=[];
+					bookmark=[];
 					dojo.forEach(b,function(n){
-						tmp.push(dijit.range.getNode(n,this.editNode));
+						bookmark.push(dijit.range.getNode(n,this.editNode));
 					},this);
-					b=tmp;
 				}
 			}else{//w3c range
 				var r=dijit.range.create();
 				r.setStart(dijit.range.getNode(b.startContainer,this.editNode),b.startOffset);
 				r.setEnd(dijit.range.getNode(b.endContainer,this.editNode),b.endOffset);
-				b=r;
+				bookmark=r;
 			}
-			dojo.withGlobal(this.window,'moveToBookmark',dijit,[b]);
+			dojo.withGlobal(this.window,'moveToBookmark',dijit,[bookmark]);
+		},
+		_changeToStep: function(from,to){
+			this.setValue(to.text);
+			var b=to.bookmark;
+			if(!b){ return; }
+			this._moveToBookmark(b);
 		},
 		undo: function(){
 //			console.log('undo');
@@ -232,16 +237,16 @@ dojo.declare(
 		},
 		_getBookmark: function(){
 			var b=dojo.withGlobal(this.window,dijit.getBookmark);
+			var tmp=[];
 			if(dojo.isIE){
 				if(dojo.isArray(b)){//CONTROL
-					var tmp=[];
 					dojo.forEach(b,function(n){
 						tmp.push(dijit.range.getIndex(n,this.editNode).o);
 					},this);
 					b=tmp;
 				}
 			}else{//w3c range
-				var tmp=dijit.range.getIndex(b.startContainer,this.editNode).o
+				tmp=dijit.range.getIndex(b.startContainer,this.editNode).o;
 				b={startContainer:tmp,
 					startOffset:b.startOffset,
 					endContainer:b.endContainer===b.startContainer?tmp:dijit.range.getIndex(b.endContainer,this.editNode).o,
@@ -281,8 +286,6 @@ dojo.declare(
 
 			switch(k){
 					case ks.ENTER:
-						this.beginEditing();
-						break;
 					case ks.BACKSPACE:
 					case ks.DELETE:
 						this.beginEditing();
@@ -342,7 +345,7 @@ dojo.declare(
 );
 
 /* the following code is to registered a handler to get default plugins */
-dojo.subscribe("dijit.Editor.getPlugin",null,function(o){
+dojo.subscribe(dijit._scopeName + ".Editor.getPlugin",null,function(o){
 	if(o.plugin){ return; }
 	var args=o.args, p;
 	var _p = dijit._editor._Plugin;
@@ -362,8 +365,7 @@ dojo.subscribe("dijit.Editor.getPlugin",null,function(o){
 		case "|":
 			p = new _p({ button: new dijit.ToolbarSeparator() });
 			break;
-		case "createLink":
-//					dojo['require']('dijit._editor.plugins.LinkDialog');
+		case "createLink": case "insertImage":
 			p = new dijit._editor.plugins.LinkDialog({ command: name });
 			break;
 		case "foreColor": case "hiliteColor":
@@ -371,6 +373,9 @@ dojo.subscribe("dijit.Editor.getPlugin",null,function(o){
 			break;
 		case "fontName": case "fontSize": case "formatBlock":
 			p = new dijit._editor.plugins.FontChoice({ command: name });
+			break;
+		case "toggleDir":
+			p = new dijit._editor.plugins.ToggleDir({ command: name});
 	}
 //	console.log('name',name,p);
 	o.plugin=p;

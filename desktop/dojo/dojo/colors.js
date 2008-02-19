@@ -2,8 +2,16 @@ if(!dojo._hasResource["dojo.colors"]){ //_hasResource checks added by build. Do 
 dojo._hasResource["dojo.colors"] = true;
 dojo.provide("dojo.colors");
 
+//TODO: this module appears to break naming conventions
+
+/*=====
+dojo.colors = {
+	// summary: Color utilities
+}
+=====*/
+
 (function(){
-	// this is a standard convertion prescribed by the CSS3 Color Module
+	// this is a standard conversion prescribed by the CSS3 Color Module
 	var hue2rgb = function(m1, m2, h){
 		if(h < 0){ ++h; }
 		if(h > 1){ --h; }
@@ -77,7 +85,6 @@ dojo.colors.makeGrey = function(/*Number*/ g, /*Number?*/ a){
 	// summary: creates a greyscale color with an optional alpha
 	return dojo.colorFromArray([g, g, g, a]);
 };
-
 
 // mixin all CSS3 named colors not already in _base, along with SVG 1.0 variant spellings
 dojo.Color.named = dojo.mixin({

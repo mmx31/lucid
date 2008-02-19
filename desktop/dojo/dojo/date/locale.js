@@ -12,19 +12,18 @@ dojo.require("dojo.i18n");
 
 // Load the bundles containing localization information for
 // names and formats
-dojo.requireLocalization("dojo.cldr", "gregorian", null, "ko,zh-cn,zh,ja,en,it-it,en-ca,en-au,it,en-gb,es-es,fr,pt,ROOT,ko-kr,es,de,pt-br");
+dojo.requireLocalization("dojo.cldr", "gregorian", null, "zh-cn,zh,en-ca,ko-kr,pt,pt-br,it-it,ROOT,en-gb,de,ja,en,en-au,fr,es,ko,zh-tw,it,es-es");
 
 //NOTE: Everything in this module assumes Gregorian calendars.
 // Other calendars will be implemented in separate modules.
 
 (function(){
 	// Format a pattern without literals
-	function formatPattern(dateObject, bundle, pattern){
+	function formatPattern(dateObject, bundle, fullYear, pattern){
 		return pattern.replace(/([a-z])\1*/ig, function(match){
-			var s;
+			var s, pad;
 			var c = match.charAt(0);
 			var l = match.length;
-			var pad;
 			var widthList = ["abbr", "wide", "narrow"];
 			switch(c){
 				case 'G':
@@ -36,8 +35,11 @@ dojo.requireLocalization("dojo.cldr", "gregorian", null, "ko,zh-cn,zh,ja,en,it-i
 						case 1:
 							break;
 						case 2:
-							s = String(s); s = s.substr(s.length - 2);
-							break;
+							if(!fullYear){
+								s = String(s); s = s.substr(s.length - 2);
+								break;
+							}
+							// falthrough
 						default:
 							pad = true;
 					}
@@ -55,19 +57,19 @@ dojo.requireLocalization("dojo.cldr", "gregorian", null, "ko,zh-cn,zh,ja,en,it-i
 				case 'M':
 				case 'L':
 					var m = dateObject.getMonth();
-					var width;
+					var widthM;
 					switch(l){
 						case 1: case 2:
 							s = m+1; pad = true;
 							break;
 						case 3: case 4: case 5:
-							width = widthList[l-3];
+							widthM = widthList[l-3];
 							break;
 					}
-					if(width){
-						var type = (c == "L") ? "standalone" : "format";
-						var prop = ["months",type,width].join("-");
-						s = bundle[prop][m];
+					if(widthM){
+						var typeM = (c == "L") ? "standalone" : "format";
+						var propM = ["months", typeM, widthM].join("-");
+						s = bundle[propM][m];
 					}
 					break;
 				case 'w':
@@ -84,7 +86,7 @@ dojo.requireLocalization("dojo.cldr", "gregorian", null, "ko,zh-cn,zh,ja,en,it-i
 				case 'e':
 				case 'c': // REVIEW: don't see this in the spec?
 					var d = dateObject.getDay();
-					var width;
+					var widthD;
 					switch(l){
 						case 1: case 2:
 							if(c == 'e'){
@@ -97,13 +99,13 @@ dojo.requireLocalization("dojo.cldr", "gregorian", null, "ko,zh-cn,zh,ja,en,it-i
 							}
 							// else fallthrough...
 						case 3: case 4: case 5:
-							width = widthList[l-3];
+							widthD = widthList[l-3];
 							break;
 					}
-					if(width){
-						var type = (c == "c") ? "standalone" : "format";
-						var prop = ["days",type,width].join("-");
-						s = bundle[prop][d];
+					if(widthD){
+						var typeD = (c == "c") ? "standalone" : "format";
+						var propD = ["days", typeD, widthD].join("-");
+						s = bundle[propD][d];
 					}
 					break;
 				case 'a':
@@ -196,6 +198,7 @@ dojo.date.locale.format = function(/*Date*/dateObject, /*Object?*/options){
 	//		datePattern,timePattern- override pattern with this string
 	//		am,pm- override strings for am/pm in times
 	//		locale- override the locale used to determine formatting rules
+	//		fullYear- use 4 digit years whenever 2 digit years are called for
 
 	options = options || {};
 
@@ -203,7 +206,7 @@ dojo.date.locale.format = function(/*Date*/dateObject, /*Object?*/options){
 	var formatLength = options.formatLength || 'short';
 	var bundle = dojo.date.locale._getGregorianBundle(locale);
 	var str = [];
-	var sauce = dojo.hitch(this, formatPattern, dateObject, bundle);
+	var sauce = dojo.hitch(this, formatPattern, dateObject, bundle, options.fullYear);
 	if(options.selector == "year"){
 		// Special case as this is not yet driven by CLDR data
 		var year = dateObject.getFullYear();
@@ -272,6 +275,9 @@ dojo.date.locale.parse = function(/*String*/value, /*Object?*/options){
 	//		the addCustomFormats method.
 	//		Formatting patterns are implemented using the syntax described at
 	//		http://www.unicode.org/reports/tr35/#Date_Format_Patterns
+	//		When two digit years are used, a century is chosen according to a sliding 
+	//		window of 80 years before and 20 years after present year, for both yy and yyyy patterns.
+	//		year < 100CE requires strict mode.
 	//
 	// value:
 	//		A string representation of a date
@@ -291,21 +297,17 @@ dojo.date.locale.parse = function(/*String*/value, /*Object?*/options){
 	if(!match){ return null; } // null
 
 	var widthList = ['abbr', 'wide', 'narrow'];
-	//1972 is a leap year.  We want to avoid Feb 29 rolling over into Mar 1,
-	//in the cases where the year is parsed after the month and day.
-	var result = new Date(1972, 0);
-	var expected = {};
+	var result = [1970,0,1,0,0,0,0]; // will get converted to a Date at the end
 	var amPm = "";
-	dojo.forEach(match, function(v, i){
-		if(!i){return;}
+	var valid = dojo.every(match, function(v, i){
+		if(!i){return true;}
 		var token=tokens[i-1];
 		var l=token.length;
 		switch(token.charAt(0)){
 			case 'y':
-				if(l != 2){
+				if(l != 2 && options.strict){
 					//interpret year literally, so '5' would be 5 A.D.
-					result.setFullYear(v);
-					expected.year = v;
+					result[0] = v;
 				}else{
 					if(v<100){
 						v = Number(v);
@@ -313,20 +315,17 @@ dojo.date.locale.parse = function(/*String*/value, /*Object?*/options){
 						//of 80 years before and 20 years after present year
 						var year = '' + new Date().getFullYear();
 						var century = year.substring(0, 2) * 100;
-						var yearPart = Number(year.substring(2, 4));
-						var cutoff = Math.min(yearPart + 20, 99);
+						var cutoff = Math.min(Number(year.substring(2, 4)) + 20, 99);
 						var num = (v < cutoff) ? century + v : century - 100 + v;
-						result.setFullYear(num);
-						expected.year = num;
+						result[0] = num;
 					}else{
 						//we expected 2 digits and got more...
 						if(options.strict){
-							return null;
+							return false;
 						}
 						//interpret literally, so '150' would be 150 A.D.
 						//also tolerate '1950', if 'yyyy' input passed to 'yy' format
-						result.setFullYear(v);
-						expected.year = v;
+						result[0] = v;
 					}
 				}
 				break;
@@ -342,13 +341,12 @@ dojo.date.locale.parse = function(/*String*/value, /*Object?*/options){
 					v = dojo.indexOf(months, v);
 					if(v == -1){
 //						console.debug("dojo.date.locale.parse: Could not parse month name: '" + v + "'.");
-						return null;
+						return false;
 					}
 				}else{
 					v--;
 				}
-				result.setMonth(v);
-				expected.month = v;
+				result[1] = v;
 				break;
 			case 'E':
 			case 'e':
@@ -356,12 +354,12 @@ dojo.date.locale.parse = function(/*String*/value, /*Object?*/options){
 				if(!options.strict){
 					//Case-insensitive comparison
 					v = v.toLowerCase();
-					days = dojo.map(days, "".toLowerCase);
+					days = dojo.map(days, function(d){return d.toLowerCase();});
 				}
 				v = dojo.indexOf(days, v);
 				if(v == -1){
 //					console.debug("dojo.date.locale.parse: Could not parse weekday name: '" + v + "'.");
-					return null;
+					return false;
 				}
 
 				//TODO: not sure what to actually do with this input,
@@ -369,14 +367,11 @@ dojo.date.locale.parse = function(/*String*/value, /*Object?*/options){
 				//without more context, can't affect the actual date
 				//TODO: just validate?
 				break;
-			case 'd':
-				result.setDate(v);
-				expected.date = v;
-				break;
 			case 'D':
-				//FIXME: need to defer this until after the year is set for leap-year?
-				result.setMonth(0);
-				result.setDate(v);
+				result[1] = 0;
+				// fallthrough...
+			case 'd':
+				result[2] = v;
 				break;
 			case 'a': //am/pm
 				var am = options.am || bundle.am;
@@ -389,14 +384,14 @@ dojo.date.locale.parse = function(/*String*/value, /*Object?*/options){
 				}
 				if(options.strict && v != am && v != pm){
 //					console.debug("dojo.date.locale.parse: Could not parse am/pm part.");
-					return null;
+					return false;
 				}
 
 				// we might not have seen the hours field yet, so store the state and apply hour change later
 				amPm = (v == pm) ? 'p' : (v == am) ? 'a' : '';
 				break;
 			case 'K': //hour (1-24)
-				if(v==24){v=0;}
+				if(v == 24){ v = 0; }
 				// fallthrough...
 			case 'h': //hour (1-12)
 			case 'H': //hour (0-23)
@@ -404,21 +399,21 @@ dojo.date.locale.parse = function(/*String*/value, /*Object?*/options){
 				//TODO: strict bounds checking, padding
 				if(v > 23){
 //					console.debug("dojo.date.locale.parse: Illegal hours value");
-					return null;
+					return false;
 				}
 
 				//in the 12-hour case, adjusting for am/pm requires the 'a' part
 				//which could come before or after the hour, so we will adjust later
-				result.setHours(v);
+				result[3] = v;
 				break;
 			case 'm': //minutes
-				result.setMinutes(v);
+				result[4] = v;
 				break;
 			case 's': //seconds
-				result.setSeconds(v);
+				result[5] = v;
 				break;
 			case 'S': //milliseconds
-				result.setMilliseconds(v);
+				result[6] = v;
 //				break;
 //			case 'w':
 //TODO				var firstDay = 0;
@@ -426,32 +421,31 @@ dojo.date.locale.parse = function(/*String*/value, /*Object?*/options){
 //TODO: throw?
 //				console.debug("dojo.date.locale.parse: unsupported pattern char=" + token.charAt(0));
 		}
+		return true;
 	});
 
-	var hours = result.getHours();
+	var hours = result[3]*1;
 	if(amPm === 'p' && hours < 12){
-		result.setHours(hours + 12); //e.g., 3pm -> 15
+		result[3] = hours + 12; //e.g., 3pm -> 15
 	}else if(amPm === 'a' && hours == 12){
-		result.setHours(0); //12am -> 0
-	}
-
-	//validate parse date fields versus input date fields
-	if(expected.year && result.getFullYear() != expected.year){
-//		console.debug("dojo.date.locale.parse: Parsed year: '" + result.getFullYear() + "' did not match input year: '" + expected.year + "'.");
-		return null;
-	}
-	if(expected.month && result.getMonth() != expected.month){
-//		console.debug("dojo.date.locale.parse: Parsed month: '" + result.getMonth() + "' did not match input month: '" + expected.month + "'.");
-		return null;
-	}
-	if(expected.date && result.getDate() != expected.date){
-//		console.debug("dojo.date.locale.parse: Parsed day of month: '" + result.getDate() + "' did not match input day of month: '" + expected.date + "'.");
-		return null;
+		result[3] = 0; //12am -> 0
 	}
 
 	//TODO: implement a getWeekday() method in order to test 
 	//validity of input strings containing 'EEE' or 'EEEE'...
-	return result; // Date
+
+	var dateObject = new Date(result[0], result[1], result[2], result[3], result[4], result[5], result[6]); // Date
+
+	// Check for overflow.  The Date() constructor normalizes things like April 32nd...
+	//TODO: why isn't this done for times as well?
+	var allTokens = tokens.join("");
+	if(!valid ||
+		(allTokens.indexOf('M') != -1 && dateObject.getMonth() != result[1]) ||
+		(allTokens.indexOf('d') != -1 && dateObject.getDate() != result[2])){
+		return null;
+	}
+
+	return dateObject; // Date
 };
 
 function _processPattern(pattern, applyPattern, applyLiteral, applyAll){

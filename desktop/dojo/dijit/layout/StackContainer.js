@@ -5,28 +5,37 @@ dojo.provide("dijit.layout.StackContainer");
 dojo.require("dijit._Templated");
 dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dijit.form.Button");
+dojo.require("dijit.Menu");
+dojo.requireLocalization("dijit", "common", null, "zh,pt,ru,sv,de,ja,ROOT,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
 
 dojo.declare(
 	"dijit.layout.StackContainer",
 	dijit.layout._LayoutWidget,
-
-	// summary
+	{
+	// summary: 
 	//	A container that has multiple children, but shows only
-	//	one child at a time (like looking at the pages in a book one by one).
+	//	one child at a time
 	//
+	// description:
+	// 	A container for widgets (ContentPanes, for example) That displays
+	//	only one Widget at a time.
+	//	
 	//	Publishes topics <widgetId>-addChild, <widgetId>-removeChild, and <widgetId>-selectChild
 	//
 	//	Can be base class for container, Wizard, Show, etc.
-{
+	// 
+	//
 	// doLayout: Boolean
 	//  if true, change the size of my currently displayed child to match my size
 	doLayout: true,
 
 	_started: false,
-
+/*=====
 	// selectedChildWidget: Widget
 	//	References the currently selected child widget, if any
-
+	//
+	selectedChildWidget: null,
+=====*/
 	postCreate: function(){
 		dijit.setWaiRole((this.containerNode || this.domNode), "tabpanel");
 		this.connect(this.domNode, "onkeypress", this._onKeyPress);
@@ -61,8 +70,8 @@ dojo.declare(
 
 		// Now publish information about myself so any StackControllers can initialize..
 		dojo.publish(this.id+"-startup", [{children: children, selected: selected}]);
-		this.inherited("startup",arguments);
-		this._started = true;
+
+		this.inherited(arguments);
 	},
 
 	_setupChild: function(/*Widget*/ page){
@@ -204,20 +213,20 @@ dojo.declare(
 	},
 
 	closeChild: function(/*Widget*/ page){
-		// summary
+		// summary:
 		//	callback when user clicks the [X] to remove a page
-		//	if onClose() returns true then remove and destroy the childd
+		//	if onClose() returns true then remove and destroy the child
 		var remove = page.onClose(this, page);
 		if(remove){
 			this.removeChild(page);
 			// makes sure we can clean up executeScripts in ContentPane onUnLoad
-			page.destroy();
+			page.destroyRecursive();
 		}
 	},
 
 	destroy: function(){
 		this._beingDestroyed = true;
-		this.inherited("destroy",arguments);
+		this.inherited(arguments);
 	}
 });
 
@@ -225,10 +234,10 @@ dojo.declare(
 	"dijit.layout.StackController",
 	[dijit._Widget, dijit._Templated, dijit._Container],
 	{
-		// summary:
-		//	Set of buttons to select a page in a page list.
-		//	Monitors the specified StackContainer, and whenever a page is
-		//	added, deleted, or selected, updates itself accordingly.
+	// summary:
+	//	Set of buttons to select a page in a page list.
+	//	Monitors the specified StackContainer, and whenever a page is
+	//	added, deleted, or selected, updates itself accordingly.
 
 		templateString: "<span wairole='tablist' dojoAttachEvent='onkeypress' class='dijitStackController'></span>",
 
@@ -261,7 +270,7 @@ dojo.declare(
 
 		destroy: function(){
 			dojo.forEach(this._subscriptions, dojo.unsubscribe);
-			this.inherited("destroy",arguments);
+			this.inherited(arguments);
 		},
 
 		onAddChild: function(/*Widget*/ page, /*Integer?*/ insertIndex){
@@ -270,7 +279,7 @@ dojo.declare(
 			//   Create button corresponding to the page.
 
 			// add a node that will be promoted to the button widget
-			var refNode = document.createElement("span");
+			var refNode = dojo.doc.createElement("span");
 			this.domNode.appendChild(refNode);
 			// create an instance of the button widget
 			var cls = dojo.getObject(this.buttonWidget);
@@ -280,8 +289,15 @@ dojo.declare(
 			page.controlButton = button;	// this value might be overwritten if two tabs point to same container
 			
 			dojo.connect(button, "onClick", dojo.hitch(this,"onButtonClick",page));
-			dojo.connect(button, "onClickCloseButton", dojo.hitch(this,"onCloseButtonClick",page));
-			
+			if(page.closable){
+				dojo.connect(button, "onClickCloseButton", dojo.hitch(this,"onCloseButtonClick",page));
+				// add context menu onto title button
+				var _nlsResources = dojo.i18n.getLocalization("dijit", "common");
+				var closeMenu = new dijit.Menu({targetNodeIds:[button.id], id:button.id+"_Menu"});
+				var mItem = new dijit.MenuItem({label:_nlsResources.itemClose});
+            	dojo.connect(mItem, "onClick", dojo.hitch(this, "onCloseButtonClick", page));
+           		closeMenu.addChild(mItem);
+			}
 			if(!this._currentChild){ // put the first child into the tab order
 				button.focusNode.setAttribute("tabIndex","0");
 				this._currentChild = page;
@@ -309,14 +325,16 @@ dojo.declare(
 
 			if(this._currentChild){
 				var oldButton=this.pane2button[this._currentChild];
-				oldButton.setChecked(false);
+				oldButton.setAttribute('checked', false);
 				oldButton.focusNode.setAttribute("tabIndex", "-1");
 			}
 
 			var newButton=this.pane2button[page];
-			newButton.setChecked(true);
+			newButton.setAttribute('checked', true);
 			this._currentChild = page;
 			newButton.focusNode.setAttribute("tabIndex", "0");
+			var container = dijit.byId(this.containerId);
+			dijit.setWaiState(container.containerNode || container.domNode, "labelledby", newButton.id);
 		},
 
 		onButtonClick: function(/*Widget*/ page){
@@ -339,6 +357,7 @@ dojo.declare(
 		
 		// TODO: this is a bit redundant with forward, back api in StackContainer
 		adjacent: function(/*Boolean*/ forward){
+			if(!this.isLeftToRight()){ forward = !forward; }
 			// find currently focused button in children array
 			var children = this.getChildren();
 			var current = dojo.indexOf(children, this.pane2button[this._currentChild]);
@@ -353,20 +372,23 @@ dojo.declare(
 			//   and closing the current page if the page is closable.
 
 			if(this.disabled || e.altKey ){ return; }
-			var forward = true;
+			var forward = null;
 			if(e.ctrlKey || !e._djpage){
 				var k = dojo.keys;
 				switch(e.keyCode){
 					case k.LEFT_ARROW:
 					case k.UP_ARROW:
+						if(!e._djpage){ forward = false; }
+						break;
 					case k.PAGE_UP:
-						forward = false;
-						// fall through
+						if(e.ctrlKey){ forward = false; }
+						break;
 					case k.RIGHT_ARROW:
 					case k.DOWN_ARROW:
+						if(!e._djpage){ forward = true; }
+						break;
 					case k.PAGE_DOWN:
-						this.adjacent(forward).onClick();
-						dojo.stopEvent(e);
+						if(e.ctrlKey){ forward = true; }
 						break;
 					case k.DELETE:
 						if(this._currentChild.closable){
@@ -386,6 +408,11 @@ dojo.declare(
 								dojo.stopEvent(e); // avoid browser tab closing.
 							}
 						}
+				}
+				// handle page navigation
+				if(forward != null){
+					this.adjacent(forward).onClick();
+					dojo.stopEvent(e);
 				}
 			}
 		},
@@ -407,7 +434,7 @@ dojo.declare("dijit.layout._StackButton",
 	
 	postCreate: function(/*Event*/ evt){
 		dijit.setWaiRole((this.focusNode || this.domNode), "tab");
-		this.inherited("postCreate", arguments);
+		this.inherited(arguments);
 	},
 	
 	onClick: function(/*Event*/ evt){

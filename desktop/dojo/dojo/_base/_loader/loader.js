@@ -8,7 +8,7 @@ dojo._hasResource["dojo.foo"] = true;
 (function(){
 	var d = dojo;
 
-	dojo.mixin(dojo, {
+	d.mixin(d, {
 		_loadedModules: {},
 		_inFlightCount: 0,
 		_hasResource: {},
@@ -70,14 +70,11 @@ dojo._hasResource["dojo.foo"] = true;
 		// cb: 
 		//		a callback function to pass the result of evaluating the script
 
-		var uri = (((relpath.charAt(0) == '/' || relpath.match(/^\w+:/))) ? "" : this.baseUrl) + relpath;
-		if(djConfig.cacheBust && d.isBrowser){
-			uri += "?" + String(djConfig.cacheBust).replace(/\W+/g,"");
-		}
+		var uri = ((relpath.charAt(0) == '/' || relpath.match(/^\w+:/)) ? "" : this.baseUrl) + relpath;
 		try{
 			return !module ? this._loadUri(uri, cb) : this._loadUriAndCheck(uri, module, cb); // Boolean
 		}catch(e){
-			console.debug(e);
+			console.error(e);
 			return false; // Boolean
 		}
 	}
@@ -103,7 +100,13 @@ dojo._hasResource["dojo.foo"] = true;
 		if(!contents){ return false; } // Boolean
 		this._loadedUrls[uri] = true;
 		this._loadedUrls.push(uri);
-		if(cb){ contents = '('+contents+')'; }
+		if(cb){
+			contents = '('+contents+')';
+		}else{
+			//Only do the scoping if no callback. If a callback is specified,
+			//it is most likely the i18n bundle stuff.
+			contents = this._scopePrefix + contents + this._scopeSuffix;
+		}
 		var value = d["eval"](contents+"\r\n//@ sourceURL="+uri);
 		if(cb){ cb(value); }
 		return true; // Boolean
@@ -117,9 +120,9 @@ dojo._hasResource["dojo.foo"] = true;
 		try{
 			ok = this._loadUri(uri, cb);
 		}catch(e){
-			console.debug("failed loading " + uri + " with error: " + e);
+			console.error("failed loading " + uri + " with error: " + e);
 		}
-		return Boolean(ok && this._loadedModules[moduleName]); // Boolean
+		return !!(ok && this._loadedModules[moduleName]); // Boolean
 	}
 
 	dojo.loaded = function(){
@@ -139,7 +142,7 @@ dojo._hasResource["dojo.foo"] = true;
 		this._loaders = [];
 
 		for(var x=0; x<mll.length; x++){
-			mll[x]();
+			try{ mll[x](); }catch(e){ console.error(e); /* let other events fire */ }
 		}
 
 		this._loadNotifying = false;
@@ -147,7 +150,7 @@ dojo._hasResource["dojo.foo"] = true;
 		//Make sure nothing else got added to the onload queue
 		//after this first run. If something did, and we are not waiting for any
 		//more inflight resources, run again.
-		if(d._postLoad && d._inFlightCount == 0 && this._loaders.length > 0){
+		if(d._postLoad && d._inFlightCount == 0 && this._loaders.length){
 			d._callLoaded();
 		}
 	}
@@ -208,7 +211,7 @@ dojo._hasResource["dojo.foo"] = true;
 	dojo._modulesLoaded = function(){
 		if(d._postLoad){ return; }
 		if(d._inFlightCount > 0){ 
-			console.debug("files still in flight!");
+			console.warn("files still in flight!");
 			return;
 		}
 		d._callLoaded();
@@ -221,8 +224,12 @@ dojo._hasResource["dojo.foo"] = true;
 		//still for non-browser environments though). This might also help the issue with
 		//FF 2.0 and freezing issues where we try to do sync xhr while background css images
 		//are being loaded (trac #2572)? Consider for 0.9.
-		if(typeof setTimeout == "object" || (djConfig["useXDomain"] && d.isOpera)){
-			setTimeout("dojo.loaded();", 0);
+		if(typeof setTimeout == "object" || (dojo.config.useXDomain && d.isOpera)){
+			if(dojo.isAIR){
+				setTimeout(function(){dojo.loaded();}, 0);
+			}else{
+				setTimeout(dojo._scopeName + ".loaded();", 0);
+			}
 		}else{
 			d.loaded();
 		}
@@ -283,6 +290,8 @@ dojo._hasResource["dojo.foo"] = true;
 		//	   	|	...
 		//	returns: the required namespace object
 		omitModuleCheck = this._global_omit_module_check || omitModuleCheck;
+
+		//Check if it is already loaded.
 		var module = this._loadedModules[moduleName];
 		if(module){
 			return module;
@@ -294,13 +303,13 @@ dojo._hasResource["dojo.foo"] = true;
 		var modArg = (!omitModuleCheck) ? moduleName : null;
 		var ok = this._loadPath(relpath, modArg);
 
-		if((!ok)&&(!omitModuleCheck)){
+		if(!ok && !omitModuleCheck){
 			throw new Error("Could not load '" + moduleName + "'; last tried '" + relpath + "'");
 		}
 
 		// check that the symbol was defined
 		// Don't bother if we're doing xdomain (asynchronous) loading.
-		if((!omitModuleCheck)&&(!this["_isXDomain"])){
+		if(!omitModuleCheck && !this._isXDomain){
 			// pass in false so we can give better error
 			module = this._loadedModules[moduleName];
 			if(!module){
@@ -366,8 +375,8 @@ dojo._hasResource["dojo.foo"] = true;
 
 		// FIXME: dojo.name_ no longer works!!
 
-		var common = modMap["common"]||[];
-		var result = common.concat(modMap[d._name]||modMap["default"]||[]);
+		var common = modMap.common || [];
+		var result = common.concat(modMap[d._name] || modMap["default"] || []);
 
 		for(var x=0; x<result.length; x++){
 			var curr = result[x];
@@ -378,7 +387,6 @@ dojo._hasResource["dojo.foo"] = true;
 			}
 		}
 	}
-
 
 	dojo.requireIf = function(/*Boolean*/ condition, /*String*/ resourceName){
 		// summary:
@@ -404,6 +412,26 @@ dojo._hasResource["dojo.foo"] = true;
 		//		relative to Dojo root. For example, module acme is mapped to
 		//		../acme.  If you want to use a different module name, use
 		//		dojo.registerModulePath. 
+		//	example:
+		//		If your dojo.js is located at this location in the web root:
+		//	|	/myapp/js/dojo/dojo/dojo.js
+		//		and your modules are located at:
+		//	|	/myapp/js/foo/bar.js
+		//	|	/myapp/js/foo/baz.js
+		//	|	/myapp/js/foo/thud/xyzzy.js
+		//		Your application can tell Dojo to locate the "foo" namespace by calling:
+		//	|	dojo.registerModulePath("foo", "../../foo");
+		//		At which point you can then use dojo.require() to load the
+		//		modules (assuming they provide() the same things which are
+		//		required). The full code might be:
+		//	|	<script type="text/javascript" 
+		//	|		src="/myapp/js/dojo/dojo/dojo.js"></script>
+		//	|	<script type="text/javascript">
+		//	|		dojo.registerModulePath("foo", "../../foo");
+		//	|		dojo.require("foo.bar");
+		//	|		dojo.require("foo.baz");
+		//	|		dojo.require("foo.thud.xyzzy");
+		//	|	</script>
 		d._modulePrefixes[module] = { name: module, value: prefix };
 	}
 
@@ -504,10 +532,10 @@ dojo._hasResource["dojo.foo"] = true;
 			var uriobj = new d._Url(uri+"");
 
 			if(
-				(relobj.path=="")	&&
-				(!relobj.scheme)	&&
-				(!relobj.authority)	&&
-				(!relobj.query)
+				relobj.path == "" &&
+				!relobj.scheme &&
+				!relobj.authority &&
+				!relobj.query
 			){
 				if(relobj.fragment != n){
 					uriobj.fragment = relobj.fragment;
@@ -598,7 +626,7 @@ dojo._hasResource["dojo.foo"] = true;
 		// example:
 		//	|	dojo.moduleUrl("acme","images/small.png")
 
-		var loc = dojo._getModuleSymbols(module).join('/');
+		var loc = d._getModuleSymbols(module).join('/');
 		if(!loc){ return null; }
 		if(loc.lastIndexOf("/") != loc.length-1){
 			loc += "/";

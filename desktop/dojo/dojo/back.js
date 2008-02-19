@@ -2,20 +2,26 @@ if(!dojo._hasResource["dojo.back"]){ //_hasResource checks added by build. Do no
 dojo._hasResource["dojo.back"] = true;
 dojo.provide("dojo.back");
 
-(function() { 
-	
+/*=====
+dojo.back = {
+	// summary: Browser history management resources
+}
+=====*/
+
+
+(function(){ 
 	var back = dojo.back;
-	
+
 	// everyone deals with encoding the hash slightly differently
-	
+
 	function getHash(){ 
 		var h = window.location.hash;
-		if(h.charAt(0) == "#") { h = h.substring(1); }
+		if(h.charAt(0) == "#"){ h = h.substring(1); }
 		return dojo.isMozilla ? h : decodeURIComponent(h); 
 	}
 	
 	function setHash(h){
-		if(!h) { h = "" };
+		if(!h){ h = ""; }
 		window.location.hash = encodeURIComponent(h);
 		historyCounter = history.length;
 	}
@@ -91,7 +97,7 @@ dojo.provide("dojo.back");
 	function getUrlQuery(url){
 		//summary: private method. Do not call this directly.
 		var segments = url.split("?");
-		if (segments.length < 2){
+		if(segments.length < 2){
 			return null; //null
 		}
 		else{
@@ -101,11 +107,11 @@ dojo.provide("dojo.back");
 	
 	function loadIframeHistory(){
 		//summary: private method. Do not call this directly.
-		var url = (djConfig["dojoIframeHistoryUrl"] || dojo.moduleUrl("dojo", "resources/iframe_history.html")) + "?" + (new Date()).getTime();
+		var url = (dojo.config["dojoIframeHistoryUrl"] || dojo.moduleUrl("dojo", "resources/iframe_history.html")) + "?" + (new Date()).getTime();
 		moveForward = true;
-        if (historyIframe) {
-		    (dojo.isSafari) ? historyIframe.location = url : window.frames[historyIframe.name].location = url;
-        } else {
+        if(historyIframe){
+		    dojo.isSafari ? historyIframe.location = url : window.frames[historyIframe.name].location = url;
+        }else{
             //console.warn("dojo.back: Not initialised. You need to call dojo.back.init() from a <script> block that lives inside the <body> tag.");
         }
 		return url; //String
@@ -157,7 +163,7 @@ dojo.provide("dojo.back");
 		//summary: Initializes the undo stack. This must be called from a <script> 
 		//         block that lives inside the <body> tag to prevent bugs on IE.
 		if(dojo.byId("dj_history")){ return; } // prevent reinit
-		var src = djConfig["dojoIframeHistoryUrl"] || dojo.moduleUrl("dojo", "resources/iframe_history.html");
+		var src = dojo.config["dojoIframeHistoryUrl"] || dojo.moduleUrl("dojo", "resources/iframe_history.html");
 		document.write('<iframe style="border:0;width:1px;height:1px;position:absolute;visibility:hidden;bottom:0;right:0;" name="dj_history" id="dj_history" src="' + src + '"></iframe>');
 	};
 
@@ -257,7 +263,7 @@ dojo.provide("dojo.back");
 		var hash = null;
 		var url = null;
 		if(!historyIframe){
-			if(djConfig["useXDomain"] && !djConfig["dojoIframeHistoryUrl"]){
+			if(dojo.config["useXDomain"] && !dojo.config["dojoIframeHistoryUrl"]){
 				console.debug("dojo.back: When using cross-domain Dojo builds,"
 					+ " please save iframe_history.html to your domain and set djConfig.dojoIframeHistoryUrl"
 					+ " to the path on your domain to iframe_history.html");
@@ -379,8 +385,7 @@ dojo.provide("dojo.back");
 		//Note that only one step back or forward is supported.
 		if(historyStack.length >= 2 && query == getUrlQuery(historyStack[historyStack.length-2].url)){
 			handleBackButton();
-		}
-		else if(forwardStack.length > 0 && query == getUrlQuery(forwardStack[forwardStack.length-1].url)){
+		}else if(forwardStack.length > 0 && query == getUrlQuery(forwardStack[forwardStack.length-1].url)){
 			handleForwardButton();
 		}
 	};

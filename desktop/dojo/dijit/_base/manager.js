@@ -3,9 +3,10 @@ dojo._hasResource["dijit._base.manager"] = true;
 dojo.provide("dijit._base.manager");
 
 dojo.declare("dijit.WidgetSet", null, {
+	// summary:
+	//	A set of widgets indexed by id
+
 	constructor: function(){
-		// summary:
-		//	A set of widgets indexed by id
 		this._hash={};
 	},
 
@@ -43,7 +44,12 @@ dojo.declare("dijit.WidgetSet", null, {
 	}
 	});
 
-// registry: list of all widgets on page
+/*=====
+dijit.registry = {
+	// summary: A list of widgets on a page.
+	// description: Is an instance of dijit.WidgetSet
+};
+=====*/
 dijit.registry = new dijit.WidgetSet();
 
 dijit._widgetTypeCtr = {};
@@ -93,6 +99,84 @@ dijit.getEnclosingWidget = function(/* DOMNode */ node){
 		node = node.parentNode;
 	}
 	return null;
+};
+
+// elements that are tab-navigable if they have no tabindex value set
+// (except for "a", which must have an href attribute)
+dijit._tabElements = {
+	area: true,
+	button: true,
+	input: true,
+	object: true,
+	select: true,
+	textarea: true
+};
+
+dijit.isTabNavigable = function(/*Element*/elem){
+	// summary:
+	//		Tests if an element is tab-navigable
+	if(dojo.hasAttr(elem, "disabled")){ return false; }
+	var hasTabindex = dojo.hasAttr(elem, "tabindex");
+	var tabindex = dojo.attr(elem, "tabindex");
+	if(hasTabindex && tabindex >= 0) {
+		return true; // boolean
+	}
+	var name = elem.nodeName.toLowerCase();
+	if(((name == "a" && dojo.hasAttr(elem, "href"))
+			|| dijit._tabElements[name])
+		&& (!hasTabindex || tabindex >= 0)){
+		return true; // boolean
+	}
+	return false; // boolean
+};
+
+dijit._getTabNavigable = function(/*DOMNode*/root){
+	// summary:
+	//		Finds the following descendants of the specified root node:
+	//		* the first tab-navigable element in document order
+	//		  without a tabindex or with tabindex="0"
+	//		* the last tab-nagibale element in document order
+	//		  without a tabindex or with tabindex="0"
+	//		* the first element in document order with the lowest
+	//		  positive tabindex value
+	//		* the last element in document order with the highest
+	//		  positive tabindex value
+	var first, last, lowest, lowestTabindex, highest, highestTabindex;
+	dojo.query('*', root).forEach(function(elem){
+		if(dijit.isTabNavigable(elem)){
+			var tabindex = dojo.attr(elem, "tabindex");
+			if(!dojo.hasAttr(elem, "tabindex") || tabindex == 0){
+				if(!first){ first = elem; }
+				last = elem;
+			}else if(tabindex > 0){
+				if(!lowest || tabindex < lowestTabindex){
+					lowestTabindex = tabindex;
+					lowest = elem;
+				}
+				if(!highest || tabindex >= highestTabindex){
+					highestTabindex = tabindex;
+					highest = elem;
+				}
+			}
+		}
+	});
+	return { first: first, last: last, lowest: lowest, highest: highest };
+}
+
+dijit.getFirstInTabbingOrder = function(/*String|DOMNode*/root){
+	// summary:
+	//		Finds the descendant of the specified root node
+	//		that is first in the tabbing order
+	var elems = dijit._getTabNavigable(dojo.byId(root));
+	return elems.lowest ? elems.lowest : elems.first; // Element
+};
+
+dijit.getLastInTabbingOrder = function(/*String|DOMNode*/root){
+	// summary:
+	//		Finds the descendant of the specified root node
+	//		that is last in the tabbing order
+	var elems = dijit._getTabNavigable(dojo.byId(root));
+	return elems.last ? elems.last : elems.highest; // Element
 };
 
 }

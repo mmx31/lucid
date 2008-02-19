@@ -55,6 +55,22 @@ dojo.declare("dijit.layout.TabContainer",
 			// sometimes safari 3.0.3 miscalculates the height of the tab labels, see #4058
 			setTimeout(dojo.hitch(this, "layout"), 0);
 		}
+
+		if(dojo.isIE && !dojo._isBodyLtr() && this.tabPosition == "right-h" &&
+		   this.tablist && this.tablist.pane2button){
+			//need rectify non-closable tab in IE, only for "right-h" mode
+			for(var pane in this.tablist.pane2button){
+				var tabButton = this.tablist.pane2button[pane];
+				if(!tabButton.closeButton){ continue; }
+				tabButtonStyle = tabButton.closeButtonNode.style;
+				tabButtonStyle.position ="absolute";
+				if(dojo.isIE < 7){
+					tabButtonStyle.left = tabButton.domNode.offsetWidth + "px";
+				}else{
+					tabButtonStyle.padding = "0px";
+				}
+			}
+		}
 	},
 
 	layout: function(){
@@ -82,7 +98,9 @@ dojo.declare("dijit.layout.TabContainer",
 	},
 
 	destroy: function(){
-		this.tablist.destroy();
+		if(this.tablist){
+			this.tablist.destroy();
+		}
 		this.inherited("destroy",arguments);
 	}
 });
@@ -130,7 +148,7 @@ dojo.declare("dijit.layout._TabButton",
 
 	baseClass: "dijitTab",
 
-	templateString:"<div dojoAttachEvent='onclick:onClick,onmouseenter:_onMouse,onmouseleave:_onMouse'>\n    <div class='dijitTabInnerDiv' dojoAttachPoint='innerDiv'>\n        <span dojoAttachPoint='containerNode,focusNode'>${!label}</span>\n        <span dojoAttachPoint='closeButtonNode' class='closeImage' dojoAttachEvent='onmouseenter:_onMouse, onmouseleave:_onMouse, onclick:onClickCloseButton' stateModifier='CloseButton'>\n            <span dojoAttachPoint='closeText' class='closeText'>x</span>\n        </span>\n    </div>\n</div>\n",
+	templateString:"<div waiRole=\"presentation\" dojoAttachEvent='onclick:onClick,onmouseenter:_onMouse,onmouseleave:_onMouse'>\n    <div waiRole=\"presentation\" class='dijitTabInnerDiv' dojoAttachPoint='innerDiv'>\n        <div waiRole=\"presentation\" class='dijitTabContent' dojoAttachPoint='tabContent'>\n\t        <span dojoAttachPoint='containerNode,focusNode'>${!label}</span>\n\t        <span dojoAttachPoint='closeButtonNode' class='closeImage' dojoAttachEvent='onmouseenter:_onMouse, onmouseleave:_onMouse, onclick:onClickCloseButton' stateModifier='CloseButton'>\n\t            <span dojoAttachPoint='closeText' class='closeText'>x</span>\n\t        </span>\n        </div>\n    </div>\n</div>\n",
 
 	postCreate: function(){
 		if(this.closeButton){

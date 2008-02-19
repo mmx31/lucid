@@ -3,6 +3,12 @@ dojo._hasResource["dojo.NodeList-fx"] = true;
 dojo.provide("dojo.NodeList-fx");
 dojo.require("dojo.fx");
 
+/*=====
+dojo["NodeList-fx"] = {
+	// summary: Adds dojo.fx animation support to dojo.query()
+};
+=====*/
+
 dojo.extend(dojo.NodeList, {
 	_anim: function(obj, method, args){
 		var anims = [];

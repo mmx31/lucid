@@ -52,7 +52,7 @@ dojo.mixin(dijit,
 				bookmark = range.getBookmark();
 			}
 		}else{
-			if(dojo.global.getSelection){
+			if(window.getSelection){
 				selection = dojo.global.getSelection();
 				if(selection){
 					var range = selection.getRangeAt(0);
@@ -90,7 +90,7 @@ dojo.mixin(dijit,
 		}
 	},
 
-	getFocus: function(/*Widget*/menu, /*Window*/ openedForWindow){
+	getFocus: function(/*Widget?*/menu, /*Window?*/openedForWindow){
 		// summary:
 		//	Returns the current focus and selection.
 		//	Called when a popup appears (either a top level menu or a dialog),
@@ -209,11 +209,6 @@ dojo.mixin(dijit,
 		dijit._prevFocus = dijit._curFocus;
 		dijit._curFocus = null;
 
-		var w = dijit.getEnclosingWidget(node);
-		if (w && w._setStateClass){
-			w._focused = false;
-			w._setStateClass();
-		}
 		if(dijit._justMouseDowned){
 			// the mouse down caused a new widget to be marked as active; this blur event
 			// is coming late, so ignore it.
@@ -277,13 +272,6 @@ dojo.mixin(dijit,
 		dijit._prevFocus = dijit._curFocus;
 		dijit._curFocus = node;
 		dojo.publish("focusNode", [node]);
-
-		// handle focus/blur styling
-		var w = dijit.getEnclosingWidget(node);
-		if (w && w._setStateClass){
-			w._focused = true;
-			w._setStateClass();
-		}
 	},
 
 	_setStack: function(newStack){
@@ -304,10 +292,14 @@ dojo.mixin(dijit,
 		for(var i=oldStack.length-1; i>=nCommon; i--){
 			var widget = dijit.byId(oldStack[i]);
 			if(widget){
-				dojo.publish("widgetBlur", [widget]);
+				widget._focused = false;
 				if(widget._onBlur){
 					widget._onBlur();
 				}
+				if (widget._setStateClass){
+					widget._setStateClass();
+				}
+				dojo.publish("widgetBlur", [widget]);
 			}
 		}
 
@@ -315,10 +307,14 @@ dojo.mixin(dijit,
 		for(var i=nCommon; i<newStack.length; i++){
 			var widget = dijit.byId(newStack[i]);
 			if(widget){
-				dojo.publish("widgetFocus", [widget]);
+				widget._focused = true;
 				if(widget._onFocus){
 					widget._onFocus();
 				}
+				if (widget._setStateClass){
+					widget._setStateClass();
+				}
+				dojo.publish("widgetFocus", [widget]);
 			}
 		}
 	}

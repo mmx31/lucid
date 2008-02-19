@@ -174,7 +174,7 @@ dojox.off.files = {
 		//	with details on errors encountered. If no error occured then message is
 		//	empty array with length 0.
 		try{
-			if(djConfig.isDebug){
+			if(dojo.config.isDebug){
 				this.printURLs();
 			}
 			
@@ -183,8 +183,8 @@ dojox.off.files = {
 			if(this.versionURL){
 				this._getVersionInfo(function(oldVersion, newVersion, justDebugged){
 					//console.warn("getVersionInfo, oldVersion="+oldVersion+", newVersion="+newVersion
-					//				+ ", justDebugged="+justDebugged+", isDebug="+djConfig.isDebug);
-					if(djConfig.isDebug || !newVersion || justDebugged 
+					//				+ ", justDebugged="+justDebugged+", isDebug="+dojo.config.isDebug);
+					if(dojo.config.isDebug || !newVersion || justDebugged 
 							|| !oldVersion || oldVersion != newVersion){
 						console.warn("Refreshing offline file list");
 						this._doRefresh(callback, newVersion);
@@ -405,7 +405,7 @@ dojox.off.files = {
 					dojox.storage.put("oldVersion", newVersion, null,
 									dojox.off.STORAGE_NAMESPACE);
 				}
-				dojox.storage.put("justDebugged", djConfig.isDebug, null,
+				dojox.storage.put("justDebugged", dojo.config.isDebug, null,
 									dojox.off.STORAGE_NAMESPACE);
 				callback(false, []);
 			}

@@ -4,24 +4,25 @@ dojo.provide("dijit._editor.RichText");
 
 dojo.require("dijit._Widget");
 dojo.require("dijit._editor.selection");
+dojo.require("dijit._editor.html");
 dojo.require("dojo.i18n");
 dojo.requireLocalization("dijit", "Textarea", null, "ROOT");
 
 // used to restore content when user leaves this page then comes back
-// but do not try doing document.write if we are using xd loading.
-// document.write will only work if RichText.js is included in the dojo.js
+// but do not try doing dojo.doc.write if we are using xd loading.
+// dojo.doc.write will only work if RichText.js is included in the dojo.js
 // file. If it is included in dojo.js and you want to allow rich text saving
-// for back/forward actions, then set djConfig.allowXdRichTextSave = true.
-if(!djConfig["useXDomain"] || djConfig["allowXdRichTextSave"]){
+// for back/forward actions, then set dojo.config.allowXdRichTextSave = true.
+if(!dojo.config["useXDomain"] || dojo.config["allowXdRichTextSave"]){
 	if(dojo._postLoad){
 		(function(){
 			var savetextarea = dojo.doc.createElement('textarea');
-			savetextarea.id = "dijit._editor.RichText.savedContent";
+			savetextarea.id = dijit._scopeName + "._editor.RichText.savedContent";
 			var s = savetextarea.style;
 			s.display='none';
 			s.position='absolute';
 			s.top="-100px";
-			s.left="-100px"
+			s.left="-100px";
 			s.height="3px";
 			s.width="3px";
 			dojo.body().appendChild(savetextarea);
@@ -29,12 +30,12 @@ if(!djConfig["useXDomain"] || djConfig["allowXdRichTextSave"]){
 	}else{
 		//dojo.body() is not available before onLoad is fired
 		try {
-			dojo.doc.write('<textarea id="dijit._editor.RichText.savedContent" ' +
+			dojo.doc.write('<textarea id="' + dijit._scopeName + '._editor.RichText.savedContent" ' +
 				'style="display:none;position:absolute;top:-100px;left:-100px;height:3px;width:3px;overflow:hidden;"></textarea>');
 		}catch(e){ }
 	}
 }
-dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
+dojo.declare("dijit._editor.RichText", dijit._Widget, {
 	constructor: function(){
 		// summary:
 		//		dijit._editor.RichText is the core of the WYSIWYG editor in dojo, which
@@ -74,6 +75,9 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 		this.contentPreFilters.push(dojo.hitch(this, "_preFixUrlAttributes"));
 		if(dojo.isMoz){
 			this.contentPreFilters.push(this._fixContentForMoz);
+			this.contentPostFilters.push(this._removeMozBogus);
+		}else if(dojo.isSafari){
+			this.contentPostFilters.push(this._removeSafariBogus);
 		}
 		//this.contentDomPostFilters.push(this._postDomFixUrlAttributes);
 
@@ -129,7 +133,7 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 
 	postCreate: function(){
 		// summary: init
-		dojo.publish("dijit._editor.RichText::init", [this]);
+		dojo.publish(dijit._scopeName + "._editor.RichText::init", [this]);
 		this.open();
 		this.setupDefaultShortcuts();
 	},
@@ -141,25 +145,30 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 		// 		implementation does not use Editor commands, but directly
 		//		executes the builtin commands within the underlying browser
 		//		support.
-		var ctrl = this.KEY_CTRL;
 		var exec = function(cmd, arg){
 			return arguments.length == 1 ? function(){ this.execCommand(cmd); } :
-				function(){ this.execCommand(cmd, arg); }
-		}
-		this.addKeyHandler("b", ctrl, exec("bold"));
-		this.addKeyHandler("i", ctrl, exec("italic"));
-		this.addKeyHandler("u", ctrl, exec("underline"));
-		this.addKeyHandler("a", ctrl, exec("selectall"));
-		this.addKeyHandler("s", ctrl, function () { this.save(true); });
+				function(){ this.execCommand(cmd, arg); };
+		};
 
-		this.addKeyHandler("1", ctrl, exec("formatblock", "h1"));
-		this.addKeyHandler("2", ctrl, exec("formatblock", "h2"));
-		this.addKeyHandler("3", ctrl, exec("formatblock", "h3"));
-		this.addKeyHandler("4", ctrl, exec("formatblock", "h4"));
+		var ctrlKeyHandlers = { b: exec("bold"),
+			i: exec("italic"),
+			u: exec("underline"),
+			a: exec("selectall"),
+			s: function(){ this.save(true); },
 
-		this.addKeyHandler("\\", ctrl, exec("insertunorderedlist"));
+			"1": exec("formatblock", "h1"),
+			"2": exec("formatblock", "h2"),
+			"3": exec("formatblock", "h3"),
+			"4": exec("formatblock", "h4"),
+
+			"\\": exec("insertunorderedlist") };
+
 		if(!dojo.isIE){
-			this.addKeyHandler("Z", ctrl, exec("redo"));
+			ctrlKeyHandlers.Z = exec("redo"); //FIXME: undo?
+		}
+
+		for(var key in ctrlKeyHandlers){
+			this.addKeyHandler(key, this.KEY_CTRL, ctrlKeyHandlers[key]);
 		}
 	},
 
@@ -199,22 +208,22 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 			}
 		}
 		//queryCommandValue returns empty if we hide editNode, so move it out of screen temporary
-		var div=document.createElement('div');
+		var div=dojo.doc.createElement('div');
 		div.style.position = "absolute";
 		div.style.left = "-2000px";
 		div.style.top = "-2000px";
-		document.body.appendChild(div);
+		dojo.doc.body.appendChild(div);
 		div.innerHTML = localhtml;
 		var node = div.firstChild;
 		while(node){
 			dijit._editor.selection.selectElement(node.firstChild);
 			dojo.withGlobal(this.window, "selectElement", dijit._editor.selection, [node.firstChild]);
 			var nativename = node.tagName.toLowerCase();
-			this._local2NativeFormatNames[nativename] = document.queryCommandValue("formatblock");//this.queryCommandValue("formatblock");
+			this._local2NativeFormatNames[nativename] = dojo.doc.queryCommandValue("formatblock");//this.queryCommandValue("formatblock");
 			this._native2LocalFormatNames[this._local2NativeFormatNames[nativename]] = nativename;
 			node = node.nextSibling;
 		}
-		document.body.removeChild(div);
+		dojo.doc.body.removeChild(div);
 	},
 
 	open: function(/*DomNode?*/element){
@@ -228,18 +237,19 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 		}
 
 		if(!this.isClosed){ this.close(); }
-		dojo.publish("dijit._editor.RichText::open", [ this ]);
+		dojo.publish(dijit._scopeName + "._editor.RichText::open", [ this ]);
 
 		this._content = "";
 		if((arguments.length == 1)&&(element["nodeName"])){ this.domNode = element; } // else unchanged
 
+		var html;
 		if(	(this.domNode["nodeName"])&&
 			(this.domNode.nodeName.toLowerCase() == "textarea")){
 			// if we were created from a textarea, then we need to create a
 			// new editing harness node.
 			this.textarea = this.domNode;
 			this.name=this.textarea.name;
-			var html = this._preFilterContent(this.textarea.value);
+			html = this._preFilterContent(this.textarea.value);
 			this.domNode = dojo.doc.createElement("div");
 			this.domNode.setAttribute('widgetId',this.id);
 			this.textarea.removeAttribute('widgetId');
@@ -276,7 +286,7 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 //					});
 //				}
 		}else{
-			var html = this._preFilterContent(this.getNodeChildrenHtml(this.domNode));
+			html = this._preFilterContent(dijit._editor.getChildrenHtml(this.domNode));
 			this.domNode.innerHTML = '';
 		}
 		if(html == ""){ html = "&nbsp;"; }
@@ -298,8 +308,8 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 		this.editingArea = dojo.doc.createElement("div");
 		this.domNode.appendChild(this.editingArea);
 
-		if(this.name != "" && (!djConfig["useXDomain"] || djConfig["allowXdRichTextSave"])){
-			var saveTextarea = dojo.byId("dijit._editor.RichText.savedContent");
+		if(this.name != "" && (!dojo.config["useXDomain"] || dojo.config["allowXdRichTextSave"])){
+			var saveTextarea = dojo.byId(dijit._scopeName + "._editor.RichText.savedContent");
 			if(saveTextarea.value != ""){
 				var datas = saveTextarea.value.split(this._SEPARATOR), i=0, dat;
 				while((dat=datas[i++])){
@@ -313,16 +323,17 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 			}
 
 			// FIXME: need to do something different for Opera/Safari
-			dojo.connect(window, "onbeforeunload", this, "_saveContent");
+			this.connect(window, "onbeforeunload", "_saveContent");
 			// dojo.connect(window, "onunload", this, "_saveContent");
 		}
 
 		this.isClosed = false;
 		// Safari's selections go all out of whack if we do it inline,
 		// so for now IE is our only hero
-		//if (typeof document.body.contentEditable != "undefined") {
+		//if (typeof dojo.doc.body.contentEditable != "undefined") {
 		if(dojo.isIE || dojo.isSafari || dojo.isOpera){ // contentEditable, easy
 			var ifr = this.iframe = dojo.doc.createElement('iframe');
+			ifr.id=this.id;
 			ifr.src = 'javascript:void(0)';
 			this.editorObject = ifr;
 			ifr.style.border = "none";
@@ -422,8 +433,9 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 
 		if(!this.iframe){
 			var ifr = this.iframe = dojo.doc.createElement("iframe");
+			ifr.id=this.id;
 			// this.iframe.src = "about:blank";
-			// document.body.appendChild(this.iframe);
+			// dojo.doc.body.appendChild(this.iframe);
 			// console.debug(this.iframe.contentDocument.open());
 			// dojo.body().appendChild(this.iframe);
 			var ifrs = ifr.style;
@@ -451,10 +463,11 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 			this.iframe.height = this._oldHeight;
 		}
 
+		var tmpContent;
 		if(this.textarea){
-			var tmpContent = this.srcNodeRef;
+			tmpContent = this.srcNodeRef;
 		}else{
-			var tmpContent = dojo.doc.createElement('div');
+			tmpContent = dojo.doc.createElement('div');
 			tmpContent.style.display="none";
 			tmpContent.innerHTML = html;
 			//append tmpContent to under the current domNode so that the margin
@@ -481,7 +494,11 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 
 		var contentDoc = this.iframe.contentDocument;
 		contentDoc.open();
-		contentDoc.write(this._getIframeDocTxt(html));
+		if(dojo.isAIR){
+			contentDoc.body.innerHTML = html;
+		}else{
+			contentDoc.write(this._getIframeDocTxt(html));
+		}
 		contentDoc.close();
 
 		// now we wait for onload. Janky hack!
@@ -509,13 +526,6 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 				}
 
 				dojo._destroyElement(tmpContent);
-				this.document.designMode = "on";
-				//	try{
-				//	this.document.designMode = "on";
-				// }catch(e){
-				//	this._tryDesignModeOnClick=true;
-				// }
-
 				this.onLoad();
 			}else{
 				dojo._destroyElement(tmpContent);
@@ -562,7 +572,7 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 		}
 
 		if(dojo.indexOf(this.editingAreaStyleSheets, url) > -1){
-			console.debug("dijit._editor.RichText.addStyleSheet: Style sheet "+url+" is already applied to the editing area!");
+//			console.debug("dijit._editor.RichText.addStyleSheet: Style sheet "+url+" is already applied");
 			return;
 		}
 
@@ -591,24 +601,25 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 		}
 		var index = dojo.indexOf(this.editingAreaStyleSheets, url);
 		if(index == -1){
-			console.debug("dijit._editor.RichText.removeStyleSheet: Style sheet "+url+" is not applied to the editing area so it can not be removed!");
+//			console.debug("dijit._editor.RichText.removeStyleSheet: Style sheet "+url+" has not been applied");
 			return;
 		}
 		delete this.editingAreaStyleSheets[index];
 		dojo.withGlobal(this.window,'query', dojo, ['link:[href="'+url+'"]']).orphan()
 	},
 
-	disabled: false,
+	disabled: true,
 	_mozSettingProps: ['styleWithCSS','insertBrOnReturn'],
 	setDisabled: function(/*Boolean*/ disabled){
 		if(dojo.isIE || dojo.isSafari || dojo.isOpera){
 			this.editNode.contentEditable=!disabled;
 		}else{ //moz
 			if(disabled){
+				//AP: why isn't this set in the constructor, or put in mozSettingProps as a hash?
 				this._mozSettings=[false,this.blockNodeForEnter==='BR'];
 			}
 			this.document.designMode=(disabled?'off':'on');
-			if(!disabled){
+			if(!disabled && this._mozSettings){
 				dojo.forEach(this._mozSettingProps, function(s,i){
 					this.document.execCommand(s,false,this._mozSettings[i]);
 				},this);
@@ -617,9 +628,8 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 //				if(disabled){
 //					this.blur(); //to remove the blinking caret
 //				}
-//				
 		}
-		this.disabled=disabled;
+		this.disabled = disabled;
 	},
 
 /* Event handlers
@@ -630,12 +640,27 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 	onLoad: function(/* Event */ e){
 		// summary: handler after the content of the document finishes loading
 		this.isLoaded = true;
+		if(!this.window.__registeredWindow){
+			this.window.__registeredWindow=true;
+			dijit.registerWin(this.window);
+		}
 		if(this.height || dojo.isMoz){
 			this.editNode=this.document.body;
 		}else{
 			this.editNode=this.document.body.firstChild;
 		}
-		this.editNode.contentEditable = true; //should do no harm in FF
+
+		try{
+			this.setDisabled(false);
+		}catch(e){
+			// Firefox throws an exception if the editor is initially hidden
+			// so, if this fails, try again onClick by adding "once" advice
+			var handle = dojo.connect(this, "onClick", this, function(){
+				this.setDisabled(false);
+				dojo.disconnect(handle);
+			});
+		}
+
 		this._preDomFilterContent(this.editNode);
 
 		var events=this.events.concat(this.captureEvents),i=0,et;
@@ -644,6 +669,7 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 		}
 		if(!dojo.isIE){
 			try{ // sanity check for Mozilla
+			//AP: what's the point of this?
 //					this.document.execCommand("useCSS", false, true); // old moz call
 				this.document.execCommand("styleWithCSS", false, false); // new moz call
 				//this.document.execCommand("insertBrOnReturn", false, false); // new moz call
@@ -755,21 +781,16 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 	},
 
 	onClick: function(/*Event*/e){
-//			console.debug('onClick',this._tryDesignModeOnClick);
-//			if(this._tryDesignModeOnClick){
-//				try{
-//					this.document.designMode='on';
-//					this._tryDesignModeOnClick=false;
-//				}catch(e){}
-//			}
-		this.onDisplayChanged(e); },
+//		console.info('onClick',this._tryDesignModeOn);
+		this.onDisplayChanged(e);
+	},
 	_onBlur: function(e){
 		var _c=this.getValue(true);
 		if(_c!=this.savedContent){
 			this.onChange(_c);
 			this.savedContent=_c;
 		}
-		if (dojo.isMoz && this.iframe){
+		if(dojo.isMoz && this.iframe){
 			this.iframe.contentDocument.title = this._localizedIframeTitles.iframeEditTitle;
 		} 
 //			console.info('_onBlur')
@@ -778,7 +799,7 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 	_onFocus: function(/*Event*/e){
 //			console.info('_onFocus')
 		// summary: Fired on focus
-		if( (dojo.isMoz)&&(this._initialFocus) ){
+		if(dojo.isMoz && this._initialFocus){
 			this._initialFocus = false;
 			if(this.editNode.innerHTML.replace(/^\s+|\s+$/g, "") == "&nbsp;"){
 				this.placeCursorAtStart();
@@ -804,8 +825,9 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 		}else if(this.editNode && this.editNode.focus){
 			// editNode may be hidden in display:none div, lets just punt in this case
 			dijit.focus(this.editNode);
-		}else{
-			console.debug("Have no idea how to focus into the editor!");
+//		}else{
+// TODO: should we throw here?
+//			console.debug("Have no idea how to focus into the editor!");
 		}
 	},
 
@@ -892,7 +914,7 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 			case "fontname": case "fontsize":
 			case "forecolor": case "hilitecolor":
 			case "justifycenter": case "justifyfull": case "justifyleft":
-			case "justifyright": case "delete": case "selectall":
+			case "justifyright": case "delete": case "selectall": case "toggledir":
 				supportedBy = isSupportedBy(mozilla | ie | safari | opera);
 				break;
 
@@ -1027,36 +1049,43 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 
 	queryCommandEnabled: function(/*String*/command){
 		// summary: check whether a command is enabled or not
+
+		if(this.disabled){ return false; }
 		command = this._normalizeCommand(command);
 		if(dojo.isMoz || dojo.isSafari){
 			if(command == "unlink"){ // mozilla returns true always
 				// console.debug(dojo.withGlobal(this.window, "hasAncestorElement",dijit._editor.selection, ['a']));
 				return dojo.withGlobal(this.window, "hasAncestorElement",dijit._editor.selection, ['a']);
-			}else if (command == "inserttable"){
+			}else if(command == "inserttable"){
 				return true;
 			}
 		}
 		//see #4109
-		if(dojo.isSafari)
+		if(dojo.isSafari){
 			if(command == "copy"){
-				command="cut";
+				command = "cut";
 			}else if(command == "paste"){
 				return true;
+			}
 		}
 
 		// return this.document.queryCommandEnabled(command);
-		var elem = (dojo.isIE) ? this.document.selection.createRange() : this.document;
+		var elem = dojo.isIE ? this.document.selection.createRange() : this.document;
 		return elem.queryCommandEnabled(command);
 	},
 
 	queryCommandState: function(command){
 		// summary: check the state of a given command
+
+		if(this.disabled){ return false; }
 		command = this._normalizeCommand(command);
 		return this.document.queryCommandState(command);
 	},
 
 	queryCommandValue: function(command){
 		// summary: check the value of a given command
+
+		if(this.disabled){ return false; }
 		command = this._normalizeCommand(command);
 		if(dojo.isIE && command == "formatblock"){
 			return this._local2NativeFormatNames[this.document.queryCommandValue(command)];
@@ -1154,14 +1183,11 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 			this.textarea.value=html;
 		}else{
 			html = this._preFilterContent(html);
-			if(this.isClosed){
-				this.domNode.innerHTML = html;
-				this._preDomFilterContent(this.domNode);
-			}else{
-				this.editNode.innerHTML = html;
-				this._preDomFilterContent(this.editNode);
-			}
+			var node = this.isClosed ? this.domNode : this.editNode;
+			node.innerHTML = html;
+			this._preDomFilterContent(node);
 		}
+		this.onDisplayChanged();
 	},
 
 	replaceValue: function(/*String*/html){
@@ -1207,19 +1233,25 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 		}, this);
 	},
 
-	_postFilterContent: function(/*DomNode|DomNode[]?*/dom,/*Boolean?*/nonDestructive){
+	_postFilterContent: function(/*DomNode|DomNode[]|String?*/dom,/*Boolean?*/nonDestructive){
 		// summary:
 		//		filter the output after getting the content of the editing area
-		dom = dom || this.editNode;
-		if(this.contentDomPostFilters.length){
-			if(nonDestructive && dom['cloneNode']){
-				dom = dom.cloneNode(true);
+		var ec;
+		if(!dojo.isString(dom)){
+			dom = dom || this.editNode;
+			if(this.contentDomPostFilters.length){
+				if(nonDestructive && dom['cloneNode']){
+					dom = dom.cloneNode(true);
+				}
+				dojo.forEach(this.contentDomPostFilters, function(ef){
+					dom = ef(dom);
+				});
 			}
-			dojo.forEach(this.contentDomPostFilters, function(ef){
-				dom = ef(dom);
-			});
+			ec = dijit._editor.getChildrenHtml(dom);
+		}else{
+			ec = dom;
 		}
-		var ec = this.getNodeChildrenHtml(dom);
+		
 		if(!ec.replace(/^(?:\s|\xA0)+/g, "").replace(/(?:\s|\xA0)+$/g,"").length){ ec = ""; }
 
 		//	if(dojo.isIE){
@@ -1236,114 +1268,23 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 	_saveContent: function(/*Event*/e){
 		// summary:
 		//		Saves the content in an onunload event if the editor has not been closed
-		var saveTextarea = dojo.byId("dijit._editor.RichText.savedContent");
+		var saveTextarea = dojo.byId(dijit._scopeName + "._editor.RichText.savedContent");
 		saveTextarea.value += this._SEPARATOR + this.name + ":" + this.getValue();
 	},
 
-
 	escapeXml: function(/*String*/str, /*Boolean*/noSingleQuotes){
-		//summary:
-		//		Adds escape sequences for special characters in XML: &<>"'
-		//		Optionally skips escapes for single quotes
-		str = str.replace(/&/gm, "&amp;").replace(/</gm, "&lt;").replace(/>/gm, "&gt;").replace(/"/gm, "&quot;");
-		if(!noSingleQuotes){
-			str = str.replace(/'/gm, "&#39;");
-		}
-		return str; // string
+		dojo.deprecated('dijit.Editor::escapeXml is deprecated','use dijit._editor.escapeXml instead', 2);
+		return dijit._editor.escapeXml(str,noSingleQuotes);
 	},
 
 	getNodeHtml: function(/* DomNode */node){
-		switch(node.nodeType){
-			case 1: //element node
-				var output = '<'+node.tagName.toLowerCase();
-				if(dojo.isMoz){
-					if(node.getAttribute('type')=='_moz'){
-						node.removeAttribute('type');
-					}
-					if(node.getAttribute('_moz_dirty') != undefined){
-						node.removeAttribute('_moz_dirty');
-					}
-				}
-				//store the list of attributes and sort it to have the
-				//attributes appear in the dictionary order
-				var attrarray = [];
-				if(dojo.isIE){
-					var s = node.outerHTML;
-					s = s.substr(0,s.indexOf('>'));
-					s = s.replace(/(?:['"])[^"']*\1/g, '');//to make the following regexp safe
-					var reg = /([^\s=]+)=/g;
-					var m, key;
-					while((m = reg.exec(s)) != undefined){
-						key=m[1];
-						if(key.substr(0,3) != '_dj'){
-							if(key == 'src' || key == 'href'){
-								if(node.getAttribute('_djrealurl')){
-									attrarray.push([key,node.getAttribute('_djrealurl')]);
-									continue;
-								}
-							}
-							if(key == 'class'){
-								attrarray.push([key,node.className]);
-							}else{
-								attrarray.push([key,node.getAttribute(key)]);
-							}
-						}
-					}
-				}else{
-					var attr, i=0, attrs = node.attributes;
-					while((attr=attrs[i++])){
-						//ignore all attributes starting with _dj which are
-						//internal temporary attributes used by the editor
-						if(attr.name.substr(0,3) != '_dj' /*&&
-							(attr.specified == undefined || attr.specified)*/){
-							var v = attr.value;
-							if(attr.name == 'src' || attr.name == 'href'){
-								if(node.getAttribute('_djrealurl')){
-									v = node.getAttribute('_djrealurl');
-								}
-							}
-							attrarray.push([attr.name,v]);
-						}
-					}
-				}
-				attrarray.sort(function(a,b){
-					return a[0]<b[0]?-1:(a[0]==b[0]?0:1);
-				});
-				i=0;
-				while((attr=attrarray[i++])){
-					output += ' '+attr[0]+'="'+attr[1]+'"';
-				}
-				if(node.childNodes.length){
-					output += '>' + this.getNodeChildrenHtml(node)+'</'+node.tagName.toLowerCase()+'>';
-				}else{
-					output += ' />';
-				}
-				break;
-			case 3: //text
-				// FIXME:
-				var output = this.escapeXml(node.nodeValue,true);
-				break;
-			case 8: //comment
-				// FIXME:
-				var output = '<!--'+this.escapeXml(node.nodeValue,true)+'-->';
-				break;
-			default:
-				var output = "Element not recognized - Type: " + node.nodeType + " Name: " + node.nodeName;
-		}
-		return output;
+		dojo.deprecated('dijit.Editor::getNodeHtml is deprecated','use dijit._editor.getNodeHtml instead', 2);
+		return dijit._editor.getNodeHtml(node);
 	},
 
 	getNodeChildrenHtml: function(/* DomNode */dom){
-		// summary: Returns the html content of a DomNode and children
-		var out = "";
-		if(!dom){ return out; }
-		var nodes = dom["childNodes"]||dom;
-		var i=0;
-		var node;
-		while((node=nodes[i++])){
-			out += this.getNodeHtml(node);
-		}
-		return out; // String
+		dojo.deprecated('dijit.Editor::getNodeChildrenHtml is deprecated','use dijit._editor.getChildrenHtml instead', 2);
+		return dijit._editor.getChildrenHtml(dom);
 	},
 
 	close: function(/*Boolean*/save, /*Boolean*/force){
@@ -1373,15 +1314,11 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 					this.__overflow = null;
 				}
 			}
-			if(save){
-				this.textarea.value = this._content;
-			}else{
-				this.textarea.value = this.savedContent;
-			}
+			this.textarea.value = save ? this._content : this.savedContent;
 			dojo._destroyElement(this.domNode);
 			this.domNode = this.textarea;
 		}else{
-			if(save){
+//			if(save){
 				//why we treat moz differently? comment out to fix #1061
 //					if(dojo.isMoz){
 //						var nc = dojo.doc.createElement("span");
@@ -1390,10 +1327,8 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 //					}else{
 //						this.domNode.innerHTML = this._content;
 //					}
-				this.domNode.innerHTML = this._content;
-			}else{
-				this.domNode.innerHTML = this.savedContent;
-			}
+//			}
+			this.domNode.innerHTML = save ? this._content : this.savedContent;
 		}
 
 		dojo.removeClass(this.domNode, "RichTextEditable");
@@ -1425,21 +1360,25 @@ dojo.declare("dijit._editor.RichText", [ dijit._Widget ], {
 		//dijit._editor.RichText.superclass.destroy.call(this);
 	},
 
+	_removeMozBogus: function(/* String */ html){
+		return html.replace(/\stype="_moz"/gi, '').replace(/\s_moz_dirty=""/gi, ''); // String
+	},
+	_removeSafariBogus: function(/* String */ html){
+		return html.replace(/\sclass="webkit-block-placeholder"/gi, ''); // String
+	},
 	_fixContentForMoz: function(/* String */ html){
 		// summary:
 		//		Moz can not handle strong/em tags correctly, convert them to b/i
-		html = html.replace(/<(\/)?strong([ \>])/gi, '<$1b$2' );
-		html = html.replace(/<(\/)?em([ \>])/gi, '<$1i$2' );
-		return html; // String
+		return html.replace(/<(\/)?strong([ \>])/gi, '<$1b$2')
+			.replace(/<(\/)?em([ \>])/gi, '<$1i$2' ); // String
 	},
 
 	_srcInImgRegex	: /(?:(<img(?=\s).*?\ssrc=)("|')(.*?)\2)|(?:(<img\s.*?src=)([^"'][^ >]+))/gi ,
 	_hrefInARegex	: /(?:(<a(?=\s).*?\shref=)("|')(.*?)\2)|(?:(<a\s.*?href=)([^"'][^ >]+))/gi ,
 
 	_preFixUrlAttributes: function(/* String */ html){
-		html = html.replace(this._hrefInARegex, '$1$4$2$3$5$2 _djrealurl=$2$3$5$2') ;
-		html = html.replace(this._srcInImgRegex, '$1$4$2$3$5$2 _djrealurl=$2$3$5$2') ;
-		return html; // String
+		return html.replace(this._hrefInARegex, '$1$4$2$3$5$2 _djrealurl=$2$3$5$2')
+			.replace(this._srcInImgRegex, '$1$4$2$3$5$2 _djrealurl=$2$3$5$2'); // String
 	}
 });
 

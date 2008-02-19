@@ -21,7 +21,7 @@ dojo.declare("dijit.layout._LayoutWidget",
 		startup: function(){
 			// summary:
 			//		Called after all the widgets have been instantiated and their
-			//		dom nodes have been inserted somewhere under document.body.
+			//		dom nodes have been inserted somewhere under dojo.doc.body.
 			//
 			//		Widgets should override this method to do any initialization
 			//		dependent on other widgets existing, and then call
@@ -31,11 +31,8 @@ dojo.declare("dijit.layout._LayoutWidget",
 			//		size related because the size of the widget hasn't been set yet.
 
 			if(this._started){ return; }
-			this._started=true;
 
-			if(this.getChildren){
-				dojo.forEach(this.getChildren(), function(child){ child.startup(); });
-			}
+			dojo.forEach(this.getChildren(), function(child){ child.startup(); });
 
 			// If I am a top level widget
 			if(!this.getParent || !this.getParent()){
@@ -48,6 +45,8 @@ dojo.declare("dijit.layout._LayoutWidget",
 				// (passing in no argument to resize means that it has to glean the size itself)
 				this.connect(window, 'onresize', function(){this.resize();});
 			}
+			
+			this.inherited(arguments);
 		},
 
 		resize: function(args){
@@ -72,6 +71,8 @@ dojo.declare("dijit.layout._LayoutWidget",
 			// But note that setting the margin box and then immediately querying dimensions may return
 			// inaccurate results, so try not to depend on it.
 			var mb = dojo.mixin(dojo.marginBox(node), args||{});
+
+//			console.log(this, ": setting size to ", mb);
 
 			// Save the size of my content box.
 			this._contentBox = dijit.layout.marginBox2contentBox(node, mb);

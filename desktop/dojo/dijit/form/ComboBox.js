@@ -2,9 +2,8 @@ if(!dojo._hasResource["dijit.form.ComboBox"]){ //_hasResource checks added by bu
 dojo._hasResource["dijit.form.ComboBox"] = true;
 dojo.provide("dijit.form.ComboBox");
 
-dojo.require("dojo.data.ItemFileReadStore");
 dojo.require("dijit.form.ValidationTextBox");
-dojo.requireLocalization("dijit.form", "ComboBox", null, "ko,zh,ja,zh-tw,ru,it,hu,ROOT,fr,pt,pl,es,de,cs");
+dojo.requireLocalization("dijit.form", "ComboBox", null, "zh,pt,ROOT,ru,de,ja,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
 
 dojo.declare(
 	"dijit.form.ComboBoxMixin",
@@ -41,6 +40,7 @@ dojo.declare(
 		// query: Object
 		//		A query that can be passed to 'store' to initially filter the items,
 		//		before doing further filtering based on searchAttr and the key.
+		//		Any reference to the searchAttr is ignored.
 		query: {},
 
 		// autoComplete: Boolean
@@ -58,6 +58,13 @@ dojo.declare(
 		//		Searches pattern match against this field
 		searchAttr: "name",
 
+		// queryExpr: String
+		//		dojo.data query expression pattern.
+		//		${0} will be substituted for the user text.
+		//		* is used for wildcards.
+		//		${0}* means "starts with", *${0}* means "contains", ${0} means "is"
+		queryExpr: "${0}*",
+
 		// ignoreCase: Boolean
 		//		Set true if the ComboBox should ignore case when matching possible items
 		ignoreCase: true,
@@ -72,7 +79,7 @@ dojo.declare(
 		// TODO: get rid of this; it's unnecessary (but currently referenced in FilteringSelect)
 		_hasFocus:false,
 
-		templateString:"<table class=\"dijit dijitReset dijitInlineTable dijitLeft\" cellspacing=\"0\" cellpadding=\"0\"\n\tid=\"widget_${id}\" name=\"${name}\" dojoAttachEvent=\"onmouseenter:_onMouse,onmouseleave:_onMouse\" waiRole=\"presentation\"\n\t><tr class=\"dijitReset\"\n\t\t><td class='dijitReset dijitStretch dijitInputField' width=\"100%\"\n\t\t\t><input type=\"text\" autocomplete=\"off\" name=\"${name}\"\n\t\t\tdojoAttachEvent=\"onkeypress, onkeyup, onfocus, compositionend\"\n\t\t\tdojoAttachPoint=\"textbox,focusNode\" waiRole=\"combobox\"\n\t\t/></td\n\t\t><td class=\"dijitReset dijitValidationIconField\" width=\"0%\"\n\t\t\t><div dojoAttachPoint='iconNode' class='dijitValidationIcon'></div\n\t\t\t><div class='dijitValidationIconText'>&Chi;</div\n\t\t></td\n\t\t><td class='dijitReset dijitRight dijitButtonNode dijitDownArrowButton' width=\"0%\"\n\t\t\tdojoAttachPoint=\"downArrowNode\"\n\t\t\tdojoAttachEvent=\"onmousedown:_onArrowMouseDown,onmouseup:_onMouse,onmouseenter:_onMouse,onmouseleave:_onMouse\"\n\t\t\t><div class=\"dijitDownArrowButtonInner\" waiRole=\"presentation\"\n\t\t\t\t><div class=\"dijitDownArrowButtonChar\">&#9660;</div\n\t\t\t></div\n\t\t></td\t\n\t></tr\n></table>\n",
+		templateString:"<div class=\"dijit dijitReset dijitInlineTable dijitLeft\"\n\tid=\"widget_${id}\"\n\tdojoAttachEvent=\"onmouseenter:_onMouse,onmouseleave:_onMouse,onmousedown:_onMouse\" dojoAttachPoint=\"comboNode\" waiRole=\"combobox\" waiState=\"haspopup-true\" tabIndex=\"-1\"\n\t><div style=\"overflow:hidden;\"\n\t\t><div class='dijitReset dijitRight dijitButtonNode dijitArrowButton dijitDownArrowButton'\n\t\t\tdojoAttachPoint=\"downArrowNode\" waiRole=\"presentation\"\n\t\t\tdojoAttachEvent=\"onmousedown:_onArrowMouseDown,onmouseup:_onMouse,onmouseenter:_onMouse,onmouseleave:_onMouse\"\n\t\t\t><div class=\"dijitArrowButtonInner\">&thinsp;</div\n\t\t\t><div class=\"dijitArrowButtonChar\">&#9660;</div\n\t\t></div\n\t\t><div class=\"dijitReset dijitValidationIcon\"><br></div\n\t\t><div class=\"dijitReset dijitValidationIconText\">&Chi;</div\n\t\t><div class=\"dijitReset dijitInputField\"\n\t\t\t><input type=\"text\" autocomplete=\"off\" name=\"${name}\" class='dijitReset'\n\t\t\tdojoAttachEvent=\"onkeypress, onkeyup, onfocus, compositionend\"\n\t\t\tdojoAttachPoint=\"textbox,focusNode\" waiRole=\"textbox\"\n\t\t/></div\n\t></div\n></div>\n",
 
 		baseClass:"dijitComboBox",
 
@@ -90,15 +97,16 @@ dojo.declare(
 
 		_getCaretPos: function(/*DomNode*/ element){
 			// khtml 3.5.2 has selection* methods as does webkit nightlies from 2005-06-22
+			var pos = 0;
 			if(typeof(element.selectionStart)=="number"){
 				// FIXME: this is totally borked on Moz < 1.3. Any recourse?
-				return element.selectionStart;
+				pos = element.selectionStart;
 			}else if(dojo.isIE){
 				// in the case of a mouse click in a popup being handled,
-				// then the document.selection is not the textarea, but the popup
-				// var r = document.selection.createRange();
+				// then the dojo.doc.selection is not the textarea, but the popup
+				// var r = dojo.doc.selection.createRange();
 				// hack to get IE 6 to play nice. What a POS browser.
-				var tr = document.selection.createRange().duplicate();
+				var tr = dojo.doc.selection.createRange().duplicate();
 				var ntr = element.createTextRange();
 				tr.move("character",0);
 				ntr.move("character",0);
@@ -107,11 +115,12 @@ dojo.declare(
 					// Seems to happen on reverse-tab, but can also happen on tab (seems to be a race condition - only happens sometimes).
 					// There appears to be no workaround for this - googled for quite a while.
 					ntr.setEndPoint("EndToEnd", tr);
-					return String(ntr.text).replace(/\r/g,"").length;
+					pos = String(ntr.text).replace(/\r/g,"").length;
 				}catch(e){
-					return 0; // If focus has shifted, 0 is fine for caret pos.
+					// If focus has shifted, 0 is fine for caret pos.
 				}
 			}
+			return pos;
 		},
 
 		_setCaretPos: function(/*DomNode*/ element, /*Number*/ location){
@@ -146,13 +155,20 @@ dojo.declare(
 				var tchar = String.fromCharCode(37);
 				var tcc = tchar.charCodeAt(0);
 				for(var x = 0; x < dist; x++){
-					var te = document.createEvent("KeyEvents");
+					var te = dojo.doc.createEvent("KeyEvents");
 					te.initKeyEvent("keypress", true, true, null, false, false, false, false, tcc, tcc);
 					element.dispatchEvent(te);
 				}
 			}
 		},
-
+		
+		_setAttribute: function(/*String*/ attr, /*anything*/ value){
+			// summary: additional code to set disablbed state of combobox node
+			if (attr == "disabled"){
+				dijit.setWaiState(this.comboNode, "disabled", value);
+			}
+		},	
+		
 		onkeypress: function(/*Event*/ evt){
 			// summary: handles keyboard events
 
@@ -162,43 +178,49 @@ dojo.declare(
 			}
 			var doSearch = false;
 			this.item = null; // #4872
-			if(this._isShowingNow){this._popupWidget.handleKey(evt);}
+			var pw = this._popupWidget;
+			var dk = dojo.keys;
+			if(this._isShowingNow){
+				pw.handleKey(evt);
+			}
 			switch(evt.keyCode){
-				case dojo.keys.PAGE_DOWN:
-				case dojo.keys.DOWN_ARROW:
+				case dk.PAGE_DOWN:
+				case dk.DOWN_ARROW:
 					if(!this._isShowingNow||this._prev_key_esc){
 						this._arrowPressed();
 						doSearch=true;
 					}else{
-						this._announceOption(this._popupWidget.getHighlightedOption());
+						this._announceOption(pw.getHighlightedOption());
 					}
 					dojo.stopEvent(evt);
 					this._prev_key_backspace = false;
 					this._prev_key_esc = false;
 					break;
 
-				case dojo.keys.PAGE_UP:
-				case dojo.keys.UP_ARROW:
+				case dk.PAGE_UP:
+				case dk.UP_ARROW:
 					if(this._isShowingNow){
-						this._announceOption(this._popupWidget.getHighlightedOption());
+						this._announceOption(pw.getHighlightedOption());
 					}
 					dojo.stopEvent(evt);
 					this._prev_key_backspace = false;
 					this._prev_key_esc = false;
 					break;
 
-				case dojo.keys.ENTER:
-					// prevent submitting form if user presses enter
-					// also prevent accepting the value if either Next or Previous are selected
+				case dk.ENTER:
+					// prevent submitting form if user presses enter. Also
+					// prevent accepting the value if either Next or Previous
+					// are selected
 					var highlighted;
-					if(this._isShowingNow&&(highlighted=this._popupWidget.getHighlightedOption())){
+					if(	this._isShowingNow && 
+						(highlighted = pw.getHighlightedOption())
+					){
 						// only stop event on prev/next
-						if(highlighted==this._popupWidget.nextButton){
+						if(highlighted == pw.nextButton){
 							this._nextSearch(1);
 							dojo.stopEvent(evt);
 							break;
-						}
-						else if(highlighted==this._popupWidget.previousButton){
+						}else if(highlighted == pw.previousButton){
 							this._nextSearch(-1);
 							dojo.stopEvent(evt);
 							break;
@@ -211,28 +233,31 @@ dojo.declare(
 					evt.preventDefault();
 					// fall through
 
-				case dojo.keys.TAB:
-					var newvalue=this.getDisplayedValue();
-					// #4617: if the user had More Choices selected fall into the _onBlur handler
-					if(this._popupWidget &&
-						(newvalue == this._popupWidget._messages["previousMessage"] ||
-							newvalue == this._popupWidget._messages["nextMessage"])){
+				case dk.TAB:
+					var newvalue = this.getDisplayedValue();
+					// #4617: 
+					//		if the user had More Choices selected fall into the
+					//		_onBlur handler
+					if(pw && (
+							newvalue == pw._messages["previousMessage"] ||
+							newvalue == pw._messages["nextMessage"])
+					){
 						break;
 					}
 					if(this._isShowingNow){
 						this._prev_key_backspace = false;
 						this._prev_key_esc = false;
-						if(this._popupWidget.getHighlightedOption()){
-							this._popupWidget.setValue({target:this._popupWidget.getHighlightedOption()}, true);
+						if(pw.getHighlightedOption()){
+							pw.setValue({ target: pw.getHighlightedOption() }, true);
 						}
 						this._hideResultList();
 					}
 					break;
 
-				case dojo.keys.SPACE:
+				case dk.SPACE:
 					this._prev_key_backspace = false;
 					this._prev_key_esc = false;
-					if(this._isShowingNow && this._popupWidget.getHighlightedOption()){
+					if(this._isShowingNow && pw.getHighlightedOption()){
 						dojo.stopEvent(evt);
 						this._selectOption();
 						this._hideResultList();
@@ -241,7 +266,7 @@ dojo.declare(
 					}
 					break;
 
-				case dojo.keys.ESCAPE:
+				case dk.ESCAPE:
 					this._prev_key_backspace = false;
 					this._prev_key_esc = true;
 					this._hideResultList();
@@ -253,70 +278,72 @@ dojo.declare(
 					}
 					break;
 
-				case dojo.keys.DELETE:
-				case dojo.keys.BACKSPACE:
+				case dk.DELETE:
+				case dk.BACKSPACE:
 					this._prev_key_esc = false;
 					this._prev_key_backspace = true;
 					doSearch = true;
 					break;
 
-				case dojo.keys.RIGHT_ARROW: // fall through
-
-				case dojo.keys.LEFT_ARROW: // fall through
+				case dk.RIGHT_ARROW: // fall through
+				case dk.LEFT_ARROW: 
 					this._prev_key_backspace = false;
 					this._prev_key_esc = false;
 					break;
 
-				default:// non char keys (F1-F12 etc..)  shouldn't open list
+				default: // non char keys (F1-F12 etc..)  shouldn't open list
 					this._prev_key_backspace = false;
 					this._prev_key_esc = false;
 					if(dojo.isIE || evt.charCode != 0){
-						doSearch=true;
+						doSearch = true;
 					}
 			}
 			if(this.searchTimer){
 				clearTimeout(this.searchTimer);
 			}
 			if(doSearch){
-				// need to wait a tad before start search so that the event bubbles through DOM and we have value visible
-				this.searchTimer = setTimeout(dojo.hitch(this, this._startSearchFromInput), this.searchDelay);
+				// need to wait a tad before start search so that the event
+				// bubbles through DOM and we have value visible
+				this.searchTimer = setTimeout(dojo.hitch(this, "_startSearchFromInput"), this.searchDelay);
 			}
 		},
 
 		_autoCompleteText: function(/*String*/ text){
 			// summary:
-			// Fill in the textbox with the first item from the drop down list, and
-			// highlight the characters that were auto-completed.   For example, if user
-			// typed "CA" and the drop down list appeared, the textbox would be changed to
-			// "California" and "ifornia" would be highlighted.
+			// 		Fill in the textbox with the first item from the drop down
+			// 		list, and highlight the characters that were
+			// 		auto-completed. For example, if user typed "CA" and the
+			// 		drop down list appeared, the textbox would be changed to
+			// 		"California" and "ifornia" would be highlighted.
+
+			var fn = this.focusNode;
 
 			// IE7: clear selection so next highlight works all the time
-			this._setSelectedRange(this.focusNode, this.focusNode.value.length, this.focusNode.value.length);
+			this._setSelectedRange(	fn, fn.value.length, fn.value.length);
 			// does text autoComplete the value in the textbox?
-			// #3744: escape regexp so the user's input isn't treated as a regular expression.
-			// Example: If the user typed "(" then the regexp would throw "unterminated parenthetical."
-			// Also see #2558 for the autocompletion bug this regular expression fixes.
-			if(new RegExp("^"+escape(this.focusNode.value), this.ignoreCase ? "i" : "").test(escape(text))){
-				var cpos = this._getCaretPos(this.focusNode);
+			var caseFilter = this.ignoreCase? 'toLowerCase' : 'substr';
+			if(text[caseFilter](0).indexOf(this.focusNode.value[caseFilter](0)) == 0){
+				var cpos = this._getCaretPos(fn);
 				// only try to extend if we added the last character at the end of the input
-				if((cpos+1) > this.focusNode.value.length){
+				if((cpos+1) > fn.value.length){
 					// only add to input node as we would overwrite Capitalisation of chars
 					// actually, that is ok
-					this.focusNode.value = text;//.substr(cpos);
+					fn.value = text;//.substr(cpos);
 					// visually highlight the autocompleted characters
-					this._setSelectedRange(this.focusNode, cpos, this.focusNode.value.length);
-					dijit.setWaiState(this.focusNode, "valuenow", text);
+					this._setSelectedRange(fn, cpos, fn.value.length);
 				}
 			}else{
 				// text does not autoComplete; replace the whole value and highlight
-				this.focusNode.value = text;
-				this._setSelectedRange(this.focusNode, 0, this.focusNode.value.length);
-				dijit.setWaiState(this.focusNode, "valuenow", text);
+				fn.value = text;
+				this._setSelectedRange(fn, 0, fn.value.length);
 			}
 		},
 
 		_openResultList: function(/*Object*/ results, /*Object*/ dataObject){
-			if(this.disabled || dataObject.query[this.searchAttr] != this._lastQuery){
+			if(	this.disabled || 
+				this.readOnly || 
+				(dataObject.query[this.searchAttr] != this._lastQuery)
+			){
 				return;
 			}
 			this._popupWidget.clearResultList();
@@ -325,32 +352,37 @@ dojo.declare(
 				return;
 			}
 
-			// Fill in the textbox with the first item from the drop down list, and
-			// highlight the characters that were auto-completed.   For example, if user
-			// typed "CA" and the drop down list appeared, the textbox would be changed to
-			// "California" and "ifornia" would be highlighted.
+			// Fill in the textbox with the first item from the drop down list,
+			// and highlight the characters that were auto-completed. For
+			// example, if user typed "CA" and the drop down list appeared, the
+			// textbox would be changed to "California" and "ifornia" would be
+			// highlighted.
 
-			var zerothvalue=new String(this.store.getValue(results[0], this.searchAttr));
+			var zerothvalue = new String(this.store.getValue(results[0], this.searchAttr));
 			if(zerothvalue && this.autoComplete && !this._prev_key_backspace &&
-			// when the user clicks the arrow button to show the full list,
-			// startSearch looks for "*".
-			// it does not make sense to autocomplete
-			// if they are just previewing the options available.
 				(dataObject.query[this.searchAttr] != "*")){
+				// when the user clicks the arrow button to show the full list,
+				// startSearch looks for "*".
+				// it does not make sense to autocomplete
+				// if they are just previewing the options available.
 				this._autoCompleteText(zerothvalue);
-				// announce the autocompleted value
-				dijit.setWaiState(this.focusNode || this.domNode, "valuenow", zerothvalue);
 			}
-			this._popupWidget.createOptions(results, dataObject, dojo.hitch(this, this._getMenuLabelFromItem));
+			this._popupWidget.createOptions(
+				results, 
+				dataObject, 
+				dojo.hitch(this, "_getMenuLabelFromItem")
+			);
 
 			// show our list (only if we have content, else nothing)
 			this._showResultList();
 
-			// #4091: tell the screen reader that the paging callback finished by shouting the next choice
+			// #4091:
+			//		tell the screen reader that the paging callback finished by
+			//		shouting the next choice
 			if(dataObject.direction){
-				if(dataObject.direction==1){
+				if(1 == dataObject.direction){
 					this._popupWidget.highlightFirstOption();
-				}else if(dataObject.direction==-1){
+				}else if(-1 == dataObject.direction){
 					this._popupWidget.highlightLastOption();
 				}
 				this._announceOption(this._popupWidget.getHighlightedOption());
@@ -363,27 +395,45 @@ dojo.declare(
 				visibleCount = Math.min(items.length,this.maxListLength);
 			this._arrowPressed();
 			// hide the tooltip
-			this._displayMessage("");
+			this.displayMessage("");
 			
 			// Position the list and if it's too big to fit on the screen then
 			// size it to the maximum possible height
-			// Our dear friend IE doesnt take max-height so we need to calculate that on our own every time
-			// TODO: want to redo this, see http://trac.dojotoolkit.org/ticket/3272, http://trac.dojotoolkit.org/ticket/4108
+			// Our dear friend IE doesnt take max-height so we need to
+			// calculate that on our own every time
+
+			// TODO: want to redo this, see 
+			//		http://trac.dojotoolkit.org/ticket/3272
+			//	and
+			//		http://trac.dojotoolkit.org/ticket/4108
+
 			with(this._popupWidget.domNode.style){
-				// natural size of the list has changed, so erase old width/height settings,
-				// which were hardcoded in a previous call to this function (via dojo.marginBox() call) 
-				width="";
-				height="";
+				// natural size of the list has changed, so erase old
+				// width/height settings, which were hardcoded in a previous
+				// call to this function (via dojo.marginBox() call) 
+				width = "";
+				height = "";
 			}
-			var best=this.open();
-			// #3212: only set auto scroll bars if necessary
-			// prevents issues with scroll bars appearing when they shouldn't when node is made wider (fractional pixels cause this)
-			var popupbox=dojo.marginBox(this._popupWidget.domNode);
-			this._popupWidget.domNode.style.overflow=((best.h==popupbox.h)&&(best.w==popupbox.w))?"hidden":"auto";
-			// #4134: borrow TextArea scrollbar test so content isn't covered by scrollbar and horizontal scrollbar doesn't appear
-			var newwidth=best.w;
-			if(best.h<this._popupWidget.domNode.scrollHeight){newwidth+=16;}
-			dojo.marginBox(this._popupWidget.domNode, {h:best.h,w:Math.max(newwidth,this.domNode.offsetWidth)});
+			var best = this.open();
+			// #3212:
+			//		only set auto scroll bars if necessary prevents issues with
+			//		scroll bars appearing when they shouldn't when node is made
+			//		wider (fractional pixels cause this)
+			var popupbox = dojo.marginBox(this._popupWidget.domNode);
+			this._popupWidget.domNode.style.overflow = 
+				((best.h==popupbox.h)&&(best.w==popupbox.w)) ? "hidden" : "auto";
+			// #4134:
+			//		borrow TextArea scrollbar test so content isn't covered by
+			//		scrollbar and horizontal scrollbar doesn't appear
+			var newwidth = best.w;
+			if(best.h < this._popupWidget.domNode.scrollHeight){
+				newwidth += 16;
+			}
+			dojo.marginBox(this._popupWidget.domNode, {
+				h: best.h,
+				w: Math.max(newwidth, this.domNode.offsetWidth)
+			});
+			dijit.setWaiState(this.comboNode, "expanded", "true");
 		},
 
 		_hideResultList: function(){
@@ -391,6 +441,7 @@ dojo.declare(
 				dijit.popup.close(this._popupWidget);
 				this._arrowIdle();
 				this._isShowingNow=false;
+				dijit.setWaiState(this.comboNode, "expanded", "false");
 			}
 		},
 
@@ -400,10 +451,19 @@ dojo.declare(
 			this._hasBeenBlurred = true;
 			this._hideResultList();
 			this._arrowIdle();
-			// if the user clicks away from the textbox OR tabs away, set the value to the textbox value
-			// #4617: if value is now more choices or previous choices, revert the value
+			// if the user clicks away from the textbox OR tabs away, set the
+			// value to the textbox value
+
+			// #4617: 
+			//		if value is now more choices or previous choices, revert
+			//		the value
 			var newvalue=this.getDisplayedValue();
-			if(this._popupWidget&&(newvalue==this._popupWidget._messages["previousMessage"]||newvalue==this._popupWidget._messages["nextMessage"])){
+			var pw = this._popupWidget;
+			if(	pw && (
+					newvalue == pw._messages["previousMessage"] ||
+					newvalue == pw._messages["nextMessage"]
+				)
+			){
 				this.setValue(this._lastValueReported, true);
 			}else{
 				this.setDisplayedValue(newvalue);
@@ -419,19 +479,23 @@ dojo.declare(
 
 		_announceOption: function(/*Node*/ node){
 			// summary:
-			//	a11y code that puts the highlighted option in the textbox
-			//	This way screen readers will know what is happening in the menu
+			//		a11y code that puts the highlighted option in the textbox
+			//		This way screen readers will know what is happening in the
+			//		menu
 
-			if(node==null){return;}
+			if(node == null){
+				return;
+			}
 			// pull the text value from the item attached to the DOM node
 			var newValue;
-			if(node==this._popupWidget.nextButton||node==this._popupWidget.previousButton){
-				newValue=node.innerHTML;
+			if( node == this._popupWidget.nextButton ||
+				node == this._popupWidget.previousButton){
+				newValue = node.innerHTML;
 			}else{
-				newValue=this.store.getValue(node.item, this.searchAttr);
+				newValue = this.store.getValue(node.item, this.searchAttr);
 			}
 			// get the text that the user manually entered (cut off autocompleted text)
-			this.focusNode.value=this.focusNode.value.substring(0, this._getCaretPos(this.focusNode));
+			this.focusNode.value = this.focusNode.value.substring(0, this._getCaretPos(this.focusNode));
 			// autocomplete the rest of the option to announce change
 			this._autoCompleteText(newValue);
 		},
@@ -452,7 +516,10 @@ dojo.declare(
 			}
 			if(!evt.noHide){
 				this._hideResultList();
-				this._setCaretPos(this.focusNode, this.store.getValue(tgt.item, this.searchAttr).length);
+				this._setCaretPos(
+					this.focusNode, 
+					this.store.getValue(tgt.item, this.searchAttr).length
+				);
 			}
 			this._doSelect(tgt);
 		},
@@ -464,7 +531,7 @@ dojo.declare(
 
 		_onArrowMouseDown: function(evt){
 			// summary: callback when arrow is clicked
-			if(this.disabled){
+			if(this.disabled || this.readOnly){
 				return;
 			}
 			dojo.stopEvent(evt);
@@ -482,23 +549,45 @@ dojo.declare(
 			this._startSearch(this.focusNode.value);
 		},
 
+		_getQueryString: function(/*String*/ text){
+			return dojo.string.substitute(this.queryExpr, [text]);
+		},
+
 		_startSearch: function(/*String*/ key){
 			if(!this._popupWidget){
 				this._popupWidget = new dijit.form._ComboBoxMenu({
 					onChange: dojo.hitch(this, this._selectOption)
 				});
 			}
-			// create a new query to prevent accidentally querying for a hidden value from FilteringSelect's keyField
-			var query=this.query;
-			this._lastQuery=query[this.searchAttr]=key+"*";
-			var dataObject=this.store.fetch({queryOptions:{ignoreCase:this.ignoreCase, deep:true}, query: query, onComplete:dojo.hitch(this, "_openResultList"), start:0, count:this.pageSize});
-			function nextSearch(dataObject, direction){
-				dataObject.start+=dataObject.count*direction;
-				// #4091: tell callback the direction of the paging so the screen reader knows which menu option to shout
-				dataObject.direction=direction;
-				dataObject.store.fetch(dataObject);
+			// create a new query to prevent accidentally querying for a hidden
+			// value from FilteringSelect's keyField
+			var query = this.query;
+			this._lastQuery = query[this.searchAttr] = this._getQueryString(key);
+			var _this = this;
+			var dataObject = this.store.fetch({
+				queryOptions: {
+					ignoreCase: this.ignoreCase, 
+					deep: true
+				},
+				query: query,
+				onComplete: dojo.hitch(this, "_openResultList"), 
+				onError: function(errText){
+					console.error('dijit.form.ComboBox: ' + errText);
+					dojo.hitch(_this, "_hideResultList")();
+				},
+				start:0,
+				count:this.pageSize
+			});
+
+			var nextSearch = function(dataObject, direction){
+				dataObject.start += dataObject.count*direction;
+				// #4091:
+				//		tell callback the direction of the paging so the screen
+				//		reader knows which menu option to shout
+				dataObject.direction = direction;
+				this.store.fetch(dataObject);
 			}
-			this._nextSearch=this._popupWidget.onPage=dojo.hitch(this, nextSearch, dataObject);
+			this._nextSearch = this._popupWidget.onPage = dojo.hitch(this, nextSearch, dataObject);
 		},
 
 		_getValueField:function(){
@@ -508,21 +597,26 @@ dojo.declare(
 		/////////////// Event handlers /////////////////////
 
 		_arrowPressed: function(){
-			if(!this.disabled&&this.hasDownArrow){
+			if(!this.disabled && !this.readOnly && this.hasDownArrow){
 				dojo.addClass(this.downArrowNode, "dijitArrowButtonActive");
 			}
 		},
 
 		_arrowIdle: function(){
-			if(!this.disabled&&this.hasDownArrow){
+			if(!this.disabled && !this.readOnly && this.hasDownArrow){
 				dojo.removeClass(this.downArrowNode, "dojoArrowButtonPushed");
 			}
 		},
 
+		// FIXME: 
+		//		this is public so we can't remove until 2.0, but the name
+		//		SHOULD be "compositionEnd"
 		compositionend: function(/*Event*/ evt){
-			// summary: When inputting characters using an input method, such as Asian
-			// languages, it will generate this event instead of onKeyDown event
-			// Note: this event is only triggered in FF (not in IE)
+			// summary:
+			//		When inputting characters using an input method, such as
+			//		Asian languages, it will generate this event instead of
+			//		onKeyDown event Note: this event is only triggered in FF
+			//		(not in IE)
 			this.onkeypress({charCode:-1});
 		},
 
@@ -536,21 +630,41 @@ dojo.declare(
 				this.baseClass = "dijitTextBox";
 			}
 			if(!this.store){
-				// if user didn't specify store, then assume there are option tags
-				var items = this.srcNodeRef ? dojo.query("> option", this.srcNodeRef).map(function(node){
-					node.style.display="none";
-					return { value: node.getAttribute("value"), name: String(node.innerHTML) };
-				}) : {};
-				this.store = new dojo.data.ItemFileReadStore({data: {identifier:this._getValueField(), items:items}});
+				var srcNodeRef = this.srcNodeRef;
 
-				// if there is no value set and there is an option list,
-				// set the value to the first value to be consistent with native Select
-				if(items && items.length && !this.value){
-					// For <select>, IE does not let you set the value attribute of the srcNodeRef (and thus dojo.mixin does not copy it).
-					// IE does understand selectedIndex though, which is automatically set by the selected attribute of an option tag
-					this.value = items[this.srcNodeRef.selectedIndex != -1 ? this.srcNodeRef.selectedIndex : 0]
-						[this._getValueField()];
+				// if user didn't specify store, then assume there are option tags
+				this.store = new dijit.form._ComboBoxDataStore(srcNodeRef);
+
+				// if there is no value set and there is an option list, set
+				// the value to the first value to be consistent with native
+				// Select
+
+				// Firefox and Safari set value
+				// IE6 and Opera set selectedIndex, which is automatically set
+				// by the selected attribute of an option tag
+				// IE6 does not set value, Opera sets value = selectedIndex
+				if(	!this.value || (
+						(typeof srcNodeRef.selectedIndex == "number") && 
+						srcNodeRef.selectedIndex.toString() === this.value)
+				){
+					var item = this.store.fetchSelectedItem();
+					if(item){
+						this.value = this.store.getValue(item, this._getValueField());
+					}
 				}
+			}
+		},
+		
+		_postCreate:function(){
+			//find any associated label element and add to combobox node.
+			var label=dojo.query('label[for="'+this.id+'"]');
+			if(label.length){
+				label[0].id = (this.id+"_label");
+				var cn=this.comboNode;
+				dijit.setWaiState(cn, "labelledby", label[0].id);
+				dijit.setWaiState(cn, "autocomplete", "list"); // FYI: different meaning that autocomplete property of combobox
+				dijit.setWaiState(cn, "disabled", this.disabled);
+				
 			}
 		},
 
@@ -558,11 +672,14 @@ dojo.declare(
 			if(this._popupWidget){
 				this._hideResultList();
 				this._popupWidget.destroy()
-			};
+			}
 		},
 
 		_getMenuLabelFromItem:function(/*Item*/ item){
-			return {html:false, label:this.store.getValue(item, this.searchAttr)};
+			return {
+				html: false, 
+				label: this.store.getValue(item, this.searchAttr)
+			};
 		},
 
 		open:function(){
@@ -582,31 +699,32 @@ dojo.declare(
 
 	{
 		// summary:
-		//	Focus-less div based menu for internal use in ComboBox
+		//		Focus-less div based menu for internal use in ComboBox
 
-		templateString:"<div class='dijitMenu' dojoAttachEvent='onmousedown,onmouseup,onmouseover,onmouseout' tabIndex='-1' style='overflow:\"auto\";'>"
+		templateString: "<div class='dijitMenu' dojoAttachEvent='onmousedown,onmouseup,onmouseover,onmouseout' tabIndex='-1' style='overflow:\"auto\";'>"
 				+"<div class='dijitMenuItem dijitMenuPreviousButton' dojoAttachPoint='previousButton'></div>"
 				+"<div class='dijitMenuItem dijitMenuNextButton' dojoAttachPoint='nextButton'></div>"
 			+"</div>",
-		_messages:null,
+		_messages: null,
 
-		postMixInProperties:function(){
+		postMixInProperties: function(){
 			this._messages = dojo.i18n.getLocalization("dijit.form", "ComboBox", this.lang);
 			this.inherited("postMixInProperties", arguments);
 		},
 
-		setValue:function(/*Object*/ value){
-			this.value=value;
+		setValue: function(/*Object*/ value){
+			this.value = value;
 			this.onChange(value);
 		},
 
-		onChange:function(/*Object*/ value){},
-		onPage:function(/*Number*/ direction){},
+		// stubs
+		onChange: function(/*Object*/ value){},
+		onPage: function(/*Number*/ direction){},
 
 		postCreate:function(){
 			// fill in template with i18n messages
-			this.previousButton.innerHTML=this._messages["previousMessage"];
-			this.nextButton.innerHTML=this._messages["nextMessage"];
+			this.previousButton.innerHTML = this._messages["previousMessage"];
+			this.nextButton.innerHTML = this._messages["nextMessage"];
 			this.inherited("postCreate", arguments);
 		},
 
@@ -615,39 +733,46 @@ dojo.declare(
 		},
 
 		_createOption:function(/*Object*/ item, labelFunc){
-			// summary: creates an option to appear on the popup menu
-			// subclassed by FilteringSelect
+			// summary: 
+			//		creates an option to appear on the popup menu subclassed by
+			//		FilteringSelect
 
-			var labelObject=labelFunc(item);
-			var menuitem = document.createElement("div");
-			if(labelObject.html){menuitem.innerHTML=labelObject.label;}
-			else{menuitem.appendChild(document.createTextNode(labelObject.label));}
+			var labelObject = labelFunc(item);
+			var menuitem = dojo.doc.createElement("div");
+			if(labelObject.html){
+				menuitem.innerHTML = labelObject.label;
+			}else{
+				menuitem.appendChild(
+					dojo.doc.createTextNode(labelObject.label)
+				);
+			}
 			// #3250: in blank options, assign a normal height
-			if(menuitem.innerHTML==""){
-				menuitem.innerHTML="&nbsp;"
+			if(menuitem.innerHTML == ""){
+				menuitem.innerHTML = "&nbsp;";
 			}
 			menuitem.item=item;
 			return menuitem;
 		},
 
-		createOptions:function(results, dataObject, labelFunc){
+		createOptions: function(results, dataObject, labelFunc){
 			//this._dataObject=dataObject;
 			//this._dataObject.onComplete=dojo.hitch(comboBox, comboBox._openResultList);
 			// display "Previous . . ." button
-			this.previousButton.style.display=dataObject.start==0?"none":"";
-			// create options using _createOption function defined by parent ComboBox (or FilteringSelect) class
-			// #2309: iterate over cache nondestructively
-			var _this=this;
+			this.previousButton.style.display = (dataObject.start == 0) ? "none" : "";
+			// create options using _createOption function defined by parent
+			// ComboBox (or FilteringSelect) class
+			// #2309:
+			//		iterate over cache nondestructively
 			dojo.forEach(results, function(item){
-				var menuitem=_this._createOption(item, labelFunc);
+				var menuitem = this._createOption(item, labelFunc);
 				menuitem.className = "dijitMenuItem";
-				_this.domNode.insertBefore(menuitem, _this.nextButton);
-			});
+				this.domNode.insertBefore(menuitem, this.nextButton);
+			}, this);
 			// display "Next . . ." button
-			this.nextButton.style.display=dataObject.count==results.length?"":"none";
+			this.nextButton.style.display = (dataObject.count == results.length) ? "" : "none";
 		},
 
-		clearResultList:function(){
+		clearResultList: function(){
 			// keep the previous and next buttons of course
 			while(this.domNode.childNodes.length>2){
 				this.domNode.removeChild(this.domNode.childNodes[this.domNode.childNodes.length-2]);
@@ -655,19 +780,19 @@ dojo.declare(
 		},
 
 		// these functions are called in showResultList
-		getItems:function(){
+		getItems: function(){
 			return this.domNode.childNodes;
 		},
 
-		getListLength:function(){
+		getListLength: function(){
 			return this.domNode.childNodes.length-2;
 		},
 
-		onmousedown:function(/*Event*/ evt){
+		onmousedown: function(/*Event*/ evt){
 			dojo.stopEvent(evt);
 		},
 
-		onmouseup:function(/*Event*/ evt){
+		onmouseup: function(/*Event*/ evt){
 			if(evt.target === this.domNode){
 				return;
 			}else if(evt.target==this.previousButton){
@@ -675,24 +800,24 @@ dojo.declare(
 			}else if(evt.target==this.nextButton){
 				this.onPage(1);
 			}else{
-				var tgt=evt.target;
+				var tgt = evt.target;
 				// while the clicked node is inside the div
 				while(!tgt.item){
 					// recurse to the top
-					tgt=tgt.parentNode;
+					tgt = tgt.parentNode;
 				}
-				this.setValue({target:tgt}, true);
+				this.setValue({ target: tgt }, true);
 			}
 		},
 
-		onmouseover:function(/*Event*/ evt){
+		onmouseover: function(/*Event*/ evt){
 			if(evt.target === this.domNode){ return; }
-			var tgt=evt.target;
-			if(!(tgt==this.previousButton||tgt==this.nextButton)){
+			var tgt = evt.target;
+			if(!(tgt == this.previousButton || tgt == this.nextButton)){
 				// while the clicked node is inside the div
 				while(!tgt.item){
 					// recurse to the top
-					tgt=tgt.parentNode;
+					tgt = tgt.parentNode;
 				}
 			}
 			this._focusOptionNode(tgt);
@@ -726,10 +851,14 @@ dojo.declare(
 			// because each press of a button clears the menu,
 			// the highlighted option sometimes becomes detached from the menu!
 			// test to see if the option has a parent to see if this is the case.
+			var fc = this.domNode.firstChild;
 			if(!this.getHighlightedOption()){
-				this._focusOptionNode(this.domNode.firstChild.style.display=="none"?this.domNode.firstChild.nextSibling:this.domNode.firstChild);
-			}else if(this._highlighted_option.nextSibling&&this._highlighted_option.nextSibling.style.display!="none"){
-				this._focusOptionNode(this._highlighted_option.nextSibling);
+				this._focusOptionNode(fc.style.display=="none" ? fc.nextSibling : fc);
+			}else{
+				var ns = this._highlighted_option.nextSibling;
+				if(ns && ns.style.display!="none"){
+					this._focusOptionNode(ns);
+				}
 			}
 			// scrollIntoView is called outside of _focusOptionNode because in IE putting it inside causes the menu to scroll up on mouseover
 			dijit.scrollIntoView(this._highlighted_option);
@@ -748,30 +877,43 @@ dojo.declare(
 		},
 
 		_highlightPrevOption:function(){
-			// if nothing selected, highlight last option
-			// makes sense if you select Previous and try to keep scrolling up the list
+			// summary:
+			// 		if nothing selected, highlight last option makes sense if
+			// 		you select Previous and try to keep scrolling up the list
+			var lc = this.domNode.lastChild;
 			if(!this.getHighlightedOption()){
-				this._focusOptionNode(this.domNode.lastChild.style.display=="none"?this.domNode.lastChild.previousSibling:this.domNode.lastChild);
-			}else if(this._highlighted_option.previousSibling&&this._highlighted_option.previousSibling.style.display!="none"){
-				this._focusOptionNode(this._highlighted_option.previousSibling);
+				this._focusOptionNode(lc.style.display == "none" ? lc.previousSibling : lc);
+			}else{
+				var ps = this._highlighted_option.previousSibling;
+				if(ps && ps.style.display != "none"){
+					this._focusOptionNode(ps);
+				}
 			}
 			dijit.scrollIntoView(this._highlighted_option);
 		},
 
 		_page:function(/*Boolean*/ up){
-			var scrollamount=0;
-			var oldscroll=this.domNode.scrollTop;
-			var height=parseInt(dojo.getComputedStyle(this.domNode).height);
+			var scrollamount = 0;
+			var oldscroll = this.domNode.scrollTop;
+			var height = dojo.style(this.domNode, "height");
 			// if no item is highlighted, highlight the first option
-			if(!this.getHighlightedOption()){this._highlightNextOption();}
+			if(!this.getHighlightedOption()){
+				this._highlightNextOption();
+			}
 			while(scrollamount<height){
 				if(up){
 					// stop at option 1
-					if(!this.getHighlightedOption().previousSibling||this._highlighted_option.previousSibling.style.display=="none"){break;}
+					if(!this.getHighlightedOption().previousSibling ||
+						this._highlighted_option.previousSibling.style.display == "none"){
+						break;
+					}
 					this._highlightPrevOption();
 				}else{
 					// stop at last option
-					if(!this.getHighlightedOption().nextSibling||this._highlighted_option.nextSibling.style.display=="none"){break;}
+					if(!this.getHighlightedOption().nextSibling ||
+						this._highlighted_option.nextSibling.style.display == "none"){
+						break;
+					}
 					this._highlightNextOption();
 				}
 				// going backwards
@@ -781,21 +923,18 @@ dojo.declare(
 			}
 		},
 
-		pageUp:function(){
-			this._page(true);
-		},
+		pageUp: function(){ this._page(true); },
 
-		pageDown:function(){
-			this._page(false);
-		},
+		pageDown: function(){ this._page(false); },
 
-		getHighlightedOption:function(){
+		getHighlightedOption: function(){
 			// summary:
-			//	Returns the highlighted option.
-			return this._highlighted_option&&this._highlighted_option.parentNode ? this._highlighted_option : null;
+			//		Returns the highlighted option.
+			var ho = this._highlighted_option;
+			return (ho && ho.parentNode) ? ho : null;
 		},
 
-		handleKey:function(evt){
+		handleKey: function(evt){
 			switch(evt.keyCode){
 				case dojo.keys.DOWN_ARROW:
 					this._highlightNextOption();
@@ -819,10 +958,115 @@ dojo.declare(
 	[dijit.form.ValidationTextBox, dijit.form.ComboBoxMixin],
 	{
 		postMixInProperties: function(){
+			// this.inherited(arguments); // ??
 			dijit.form.ComboBoxMixin.prototype.postMixInProperties.apply(this, arguments);
 			dijit.form.ValidationTextBox.prototype.postMixInProperties.apply(this, arguments);
+		},
+
+		postCreate: function(){
+			dijit.form.ComboBoxMixin.prototype._postCreate.apply(this, arguments);
+			dijit.form.ValidationTextBox.prototype.postCreate.apply(this, arguments);
+		},
+		setAttribute: function(/*String*/ attr, /*anything*/ value){
+			dijit.form.ValidationTextBox.prototype.setAttribute.apply(this, arguments);
+			dijit.form.ComboBoxMixin.prototype._setAttribute.apply(this, arguments);
 		}
+		
 	}
 );
+
+dojo.declare("dijit.form._ComboBoxDataStore", null, {
+	//	summary:
+	//		Inefficient but small data store specialized for inlined combobox data like:
+	//		<select>
+	//			<option value="AL">Alabama</option>
+	//			...
+	//		Actually. just implements the subset of dojo.data.Read/Notification
+	//		needed for ComboBox and FilteringSelect to work.
+	//
+	//		Note that an item is just a pointer to the <option> DomNode.
+
+	constructor: function( /*DomNode*/ root){
+		this.root = root;
+/*
+		//	TODO: this was added in #3858 but unclear why/if it's needed;  doesn't seem to be.
+		//	If it is needed then can we just hide the select itself instead?
+		dojo.query("> option", root).forEach(function(node){
+			node.style.display="none";
+		});
+*/
+	},
+
+	getValue: function(	/* item */ item, 
+						/* attribute-name-string */ attribute, 
+						/* value? */ defaultValue){
+		return (attribute == "value") ? item.value : (item.innerText || item.textContent || '');
+	},
+
+	isItemLoaded: function(/* anything */ something) {
+		return true;
+	},
+
+	fetch: function(/* Object */ args){
+		//	summary:
+		//		Given a query like
+		//		{
+		// 			query: {name: "Cal*"},
+		//			start: 30,
+		//			count: 20,
+		//			ignoreCase: true,
+		//			onComplete: function(/* item[] */ items, /* Object */ args){...}
+		// 		}
+		//		will call onComplete() with the results of the query (and the argument to this method)
+
+		// convert query to regex (ex: convert "first\last*" to /^first\\last.*$/i) and get matching vals
+		var query = "^" + args.query.name
+				.replace(/([\\\|\(\)\[\{\^\$\+\?\.\<\>])/g, "\\$1")
+				.replace("*", ".*") + "$",
+			matcher = new RegExp(query, args.queryOptions.ignoreCase ? "i" : ""),
+			items = dojo.query("> option", this.root).filter(function(option){
+				return (option.innerText || option.textContent || '').match(matcher);
+			} );
+
+		var start = args.start || 0,
+			end = ("count" in args && args.count != Infinity) ? (start + args.count) : items.length ;
+		args.onComplete(items.slice(start, end), args);
+		return args;
+		// TODO: I don't need to return the length?
+	},
+
+	close: function(/*dojo.data.api.Request || args || null */ request){
+		return;
+	},
+
+	getLabel: function(/* item */ item){
+		return item.innerHTML;
+	},
+
+	getIdentity: function(/* item */ item){
+		return dojo.attr(item, "value");
+	},
+
+	fetchItemByIdentity: function(/* object */ args){
+		//	summary:
+		//		Given arguments like:
+		//			{identity: "CA", onItem: function(item){...}
+		//		Call onItem() with the DOM node <option value="CA">California</option>
+		var item = dojo.query("option[value='" + args.identity + "']", this.root)[0];
+		args.onItem(item);
+	},
+	
+	fetchSelectedItem: function(){
+		// summary
+		//		Get the option marked as selected, like <option selected>.
+		//		Not part of dojo.data API.
+		var root = this.root,
+			si = root.selectedIndex;
+		return dojo.query("> option:nth-child(" +
+			(si != -1 ? si+1 : 1) + ")",
+			root)[0];	// dojo.data.Item
+	}
+});
+
 
 }

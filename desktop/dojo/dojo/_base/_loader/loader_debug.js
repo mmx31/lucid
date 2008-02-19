@@ -14,13 +14,30 @@ dojo.provide = function(resourceName){
 		//Set a timeout so the module can be executed into existence. Normally the
 		//dojo.provide call in a module is the first line. Don't want to risk attaching
 		//another script tag until the current one finishes executing.
-		window.setTimeout("dojo._xdDebugFileLoaded('" + resourceName + "')", 1);
+		if(dojo.isAIR){
+			window.setTimeout(function(){dojo._xdDebugFileLoaded(resourceName);}, 1);
+		}else{
+			window.setTimeout(dojo._scopeName + "._xdDebugFileLoaded('" + resourceName + "')", 1);
+		}
 	}
 
 	return dojo.nonDebugProvide.apply(dojo, arguments);
 }
 
 dojo._xdDebugFileLoaded = function(resourceName){
+
+	if(!this._xdDebugScopeChecked){
+		//If using a scoped dojo, we need to expose dojo as a real global
+		//for the debugAtAllCosts stuff to work.
+		if(dojo._scopeName != "dojo"){
+			window.dojo = window[dojo.config.scopeMap[0][1]];
+			window.dijit = window[dojo.config.scopeMap[1][1]];
+			window.dojox = window[dojo.config.scopeMap[2][1]];
+		}
+
+		this._xdDebugScopeChecked = true;
+	}
+	
 	var dbgQueue = this._xdDebugQueue;
 	
 	if(resourceName && resourceName == dbgQueue.currentResourceName){
@@ -31,12 +48,14 @@ dojo._xdDebugFileLoaded = function(resourceName){
 		dbgQueue.currentResourceName = null;
 		this._xdNotifyLoaded();
 	}else{
-		dbgQueue.currentResourceName = dbgQueue[0].resourceName;
-		var element = document.createElement("script");
-		element.type = "text/javascript";
-		element.src = dbgQueue[0].resourcePath;
-		document.getElementsByTagName("head")[0].appendChild(element);
-	}		
+		if(resourceName == dbgQueue.currentResourceName){
+			dbgQueue.currentResourceName = dbgQueue[0].resourceName;
+			var element = document.createElement("script");
+			element.type = "text/javascript";
+			element.src = dbgQueue[0].resourcePath;
+			document.getElementsByTagName("head")[0].appendChild(element);
+		}
+	}
 }
 
 }

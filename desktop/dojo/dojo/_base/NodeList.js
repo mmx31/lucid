@@ -14,6 +14,18 @@ dojo.require("dojo._base.array");
 		return arr;
 	}
 
+	var _mapIntoDojo = function(func){
+		return function(){
+			var _a = arguments;
+			var aa = d._toArray(_a, 0, [null]);
+			var s = this.map(function(i){
+				aa[0] = i;
+				return d[func].apply(d, aa);
+			});
+			return ( (_a.length > 1) || !d.isString(_a[0]) ) ? this : s; // String||dojo.NodeList
+		}
+	};
+
 	dojo.NodeList = function(){
 		//	summary:
 		//		dojo.NodeList is as subclass of Array which adds syntactic 
@@ -185,10 +197,24 @@ dojo.require("dojo._base.array");
 			// 		Returns the box objects all elements in a node list as
 			// 		an Array (*not* a NodeList)
 			
-			return d.map(this, d.coords);
+			return d.map(this, d.coords); // Array
 		},
 
-		style: function(/*===== property, value =====*/){
+		/*=====
+		attr: function(property, value){
+			//	summary:
+			//		gets or sets the DOM attribute for every element in the
+			//		NodeList
+			//	property: String
+			//		the attribute to get/set
+			//	value: String?
+			//		optional. The value to set the property to
+			//	return:
+			//		if no value is passed, the result is an array of attribute values
+			//		If a value is passed, the return is this NodeList
+		},
+
+		style: function(property, value){
 			//	summary:
 			//		gets or sets the CSS property for every element in the NodeList
 			//	property: String
@@ -199,30 +225,10 @@ dojo.require("dojo._base.array");
 			//	return:
 			//		if no value is passed, the result is an array of strings.
 			//		If a value is passed, the return is this NodeList
-			var aa = d._toArray(arguments, 0, [null]);
-			var s = this.map(function(i){
-				aa[0] = i;
-				return d.style.apply(d, aa);
-			});
-			return (arguments.length > 1) ? this : s; // String||dojo.NodeList
 		},
-
-		styles: function(/*===== property, value =====*/){
-			//	summary:
-			//		Deprecated. Use NodeList.style instead. Will be removed in
-			//		Dojo 1.1. Gets or sets the CSS property for every element
-			//		in the NodeList
-			//	property: String
-			//		the CSS property to get/set, in JavaScript notation
-			//		("lineHieght" instead of "line-height") 
-			//	value: String?
-			//		optional. The value to set the property to
-			//	return:
-			//		if no value is passed, the result is an array of strings.
-			//		If a value is passed, the return is this NodeList
-			d.deprecated("NodeList.styles", "use NodeList.style instead", "1.1");
-			return this.style.apply(this, arguments);
-		},
+		=====*/
+		attr: _mapIntoDojo("attr"),
+		style: _mapIntoDojo("style"),
 
 		addClass: function(/*String*/ className){
 			// summary:
@@ -255,7 +261,7 @@ dojo.require("dojo._base.array");
 			//			"after"
 			// 		or an offset in the childNodes property
 			var item = d.query(queryOrNode)[0];
-			position = position||"last";
+			position = position || "last";
 
 			for(var x=0; x<this.length; x++){
 				d.place(this[x], item, position);
@@ -287,6 +293,8 @@ dojo.require("dojo._base.array");
 			// example:
 			//		attach foo.bar() to every odd div's onmouseover
 			//		|	dojo.query("div:nth-child(odd)").onclick("onmouseover", foo, "bar");
+
+			// FIXME: if we only get a function, should the scope be the node?
 			this.forEach(function(item){
 				d.connect(item, methodName, objOrFunc, funcName);
 			});
@@ -300,9 +308,9 @@ dojo.require("dojo._base.array");
 			//		NodeList.
 			//	simpleFilter: single-expression CSS filter
 			//	return: a dojo.NodeList of all of the elements orpahned
-			var orphans = (simpleFilter) ? d._filterQueryResult(this, simpleFilter) : this;
+			var orphans = simpleFilter ? d._filterQueryResult(this, simpleFilter) : this;
 			orphans.forEach(function(item){
-				if(item["parentNode"]){
+				if(item.parentNode){
 					item.parentNode.removeChild(item);
 				}
 			});
@@ -326,7 +334,7 @@ dojo.require("dojo._base.array");
 			//			"after"
 			// 		or an offset in the childNodes property
 			var item = this[0];
-			return d.query(queryOrListOrNode).forEach(function(ai){ d.place(ai, item, (position||"last")); }); // dojo.NodeList
+			return d.query(queryOrListOrNode).forEach(function(ai){ d.place(ai, item, position || "last"); }); // dojo.NodeList
 		},
 
 		// FIXME: do we need this?
@@ -336,13 +344,14 @@ dojo.require("dojo._base.array");
 			//		satisfy the passed query but use elements of the
 			//		current NodeList as query roots.
 
-			queryStr = queryStr||"";
+			if(!queryStr){ return this; }
 
 			// FIXME: probably slow
+			// FIXME: use map?
 			var ret = d.NodeList();
 			this.forEach(function(item){
 				d.query(queryStr, item).forEach(function(subItem){
-					if(typeof subItem != "undefined"){
+					if(subItem !== undefined){
 						ret.push(subItem);
 					}
 				});
@@ -369,7 +378,7 @@ dojo.require("dojo._base.array");
 			var _a = arguments;
 			var r = d.NodeList();
 			var rp = function(t){ 
-				if(typeof t != "undefined"){
+				if(t !== undefined){
 					r.push(t); 
 				}
 			}
@@ -380,13 +389,11 @@ dojo.require("dojo._base.array");
 					return items; // dojo.NodeList
 				}
 				// if we got a callback, run it over the filtered items
-				d.forEach(d.filter(items, _a[1], _a[2]), rp);
-				return r; // dojo.NodeList
+				_a.shift();
 			}
 			// handle the (callback, [thisObject]) case
 			d.forEach(d.filter(items, _a[0], _a[1]), rp);
 			return r; // dojo.NodeList
-
 		},
 		
 		/*
@@ -402,6 +409,20 @@ dojo.require("dojo._base.array");
 			//	summary:
 			//		add a node or some HTML as a string to every item in the list. 
 			//		Returns the original list.
+			//	description:
+			//		a copy of the HTML content is added to each item in the
+			//		list, with an optional position argument. If no position
+			//		argument is provided, the content is appended to the end of
+			//		each item.
+			//	example:
+			//		appends content to the end if the position is ommitted
+			//	|	dojo.query("h3 > p").addContent("hey there!");
+			//	example:
+			//		add something to the front of each element that has a "thinger" property:
+			//	|	dojo.query("[thinger]").addContent("...", "first");
+			//	example:
+			//		adds a header before each element of the list
+			//	|	dojo.query(".note").addContent("<h4>NOTE:</h4>", "before");
 			//	content:
 			//		the HTML in string format to add at position to every item
 			//	position:
@@ -417,7 +438,10 @@ dojo.require("dojo._base.array");
 			}else{
 				ta.appendChild(content);
 			}
-			var ct = ((position == "first")||(position == "after")) ? "lastChild" : "firstChild";
+			if(position === undefined){
+				position = "last";
+			}
+			var ct = (position == "first" || position == "after") ? "lastChild" : "firstChild";
 			this.forEach(function(item){
 				var tn = ta.cloneNode(true);
 				while(tn[ct]){
@@ -425,7 +449,20 @@ dojo.require("dojo._base.array");
 				}
 			});
 			return this; // dojo.NodeList
+		},
+		
+		instantiate: function(/*String|Object*/ declaredClass, /*Object?*/ properties){
+			// summary:
+			//		Create a new instance of a specified class, using the specified properties
+			//		and each node in the nodeList as a srcNodeRef
+			//
+			var c = d.isFunction(declaredClass) ? declaredClass : d.getObject(declaredClass);
+			this.forEach(function(i){
+				new c(properties||{},i);
+			})
+			return this; // dojo.NodeList
 		}
+
 	});
 
 	// syntactic sugar for DOM events

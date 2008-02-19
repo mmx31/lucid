@@ -22,7 +22,7 @@ dojo.declare("dojox.image.Gallery",
 	{
 	// summary:
 	//	Gallery widget that wraps a dojox.image.ThumbnailPicker and dojox.image.SlideShow widget
-	
+	//
 	// imageHeight: Number
 	//	Maximum height of an image in the SlideShow widget
 	imageHeight: 375,
@@ -69,13 +69,14 @@ dojo.declare("dojox.image.Gallery",
 	postCreate: function(){
 		// summary: Initializes the widget, creates the ThumbnailPicker and SlideShow widgets
 		this.widgetid = this.id;
-		this.inherited("postCreate",arguments)
+		this.inherited(arguments)
 		
 		this.thumbPicker = new dojox.image.ThumbnailPicker({
 			linkAttr: this.linkAttr,
 			imageLargeAttr: this.imageLargeAttr,
 			titleAttr: this.titleAttr,
-			useLoadNotifier: true
+			useLoadNotifier: true,
+			size: this.imageWidth
 		}, this.thumbPickerNode);
 		
 		

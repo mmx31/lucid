@@ -7,15 +7,16 @@ dojo.require("dijit._Container");
 dojo.require("dojo.dnd.move");
 dojo.require("dijit.form.Button");
 dojo.require("dojo.number");
+dojo.require("dojo._base.fx");
 
 dojo.declare(
 	"dijit.form.HorizontalSlider",
-	[dijit.form._FormWidget, dijit._Container],
+	[dijit.form._FormValueWidget, dijit._Container],
 {
 	// summary
 	//	A form widget that allows one to select a value with a horizontally draggable image
 
-	templateString:"<table class=\"dijit dijitReset dijitSlider\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" rules=\"none\"\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset\" colspan=\"2\"></td\n\t\t><td dojoAttachPoint=\"containerNode,topDecoration\" class=\"dijitReset\" style=\"text-align:center;width:100%;\"></td\n\t\t><td class=\"dijitReset\" colspan=\"2\"></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset dijitSliderButtonContainer dijitHorizontalSliderButtonContainer\"\n\t\t\t><div class=\"dijitHorizontalSliderDecrementIcon\" tabIndex=\"-1\" style=\"display:none\" dojoAttachPoint=\"decrementButton\" dojoAttachEvent=\"onclick: decrement\"><span class=\"dijitSliderButtonInner\">-</span></div\n\t\t></td\n\t\t><td class=\"dijitReset\"\n\t\t\t><div class=\"dijitSliderBar dijitSliderBumper dijitHorizontalSliderBumper dijitSliderLeftBumper dijitHorizontalSliderLeftBumper\"></div\n\t\t></td\n\t\t><td class=\"dijitReset\"\n\t\t\t><input dojoAttachPoint=\"valueNode\" type=\"hidden\" name=\"${name}\"\n\t\t\t/><div style=\"position:relative;\" dojoAttachPoint=\"sliderBarContainer\"\n\t\t\t\t><div dojoAttachPoint=\"progressBar\" class=\"dijitSliderBar dijitHorizontalSliderBar dijitSliderProgressBar dijitHorizontalSliderProgressBar\" dojoAttachEvent=\"onclick:_onBarClick\"\n\t\t\t\t\t><div dojoAttachPoint=\"sliderHandle,focusNode\" class=\"dijitSliderMoveable dijitHorizontalSliderMoveable\" dojoAttachEvent=\"onkeypress:_onKeyPress,onclick:_onHandleClick\" waiRole=\"slider\" valuemin=\"${minimum}\" valuemax=\"${maximum}\"\n\t\t\t\t\t\t><div class=\"dijitSliderImageHandle dijitHorizontalSliderImageHandle\"></div\n\t\t\t\t\t></div\n\t\t\t\t></div\n\t\t\t\t><div dojoAttachPoint=\"remainingBar\" class=\"dijitSliderBar dijitHorizontalSliderBar dijitSliderRemainingBar dijitHorizontalSliderRemainingBar\" dojoAttachEvent=\"onclick:_onBarClick\"></div\n\t\t\t></div\n\t\t></td\n\t\t><td class=\"dijitReset\"\n\t\t\t><div class=\"dijitSliderBar dijitSliderBumper dijitHorizontalSliderBumper dijitSliderRightBumper dijitHorizontalSliderRightBumper\"></div\n\t\t></td\n\t\t><td class=\"dijitReset dijitSliderButtonContainer dijitHorizontalSliderButtonContainer\" style=\"right:0px;\"\n\t\t\t><div class=\"dijitHorizontalSliderIncrementIcon\" tabIndex=\"-1\" style=\"display:none\" dojoAttachPoint=\"incrementButton\" dojoAttachEvent=\"onclick: increment\"><span class=\"dijitSliderButtonInner\">+</span></div\n\t\t></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset\" colspan=\"2\"></td\n\t\t><td dojoAttachPoint=\"containerNode,bottomDecoration\" class=\"dijitReset\" style=\"text-align:center;\"></td\n\t\t><td class=\"dijitReset\" colspan=\"2\"></td\n\t></tr\n></table>\n",
+	templateString:"<table class=\"dijit dijitReset dijitSlider\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" rules=\"none\"\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset\" colspan=\"2\"></td\n\t\t><td dojoAttachPoint=\"containerNode,topDecoration\" class=\"dijitReset\" style=\"text-align:center;width:100%;\"></td\n\t\t><td class=\"dijitReset\" colspan=\"2\"></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset dijitSliderButtonContainer dijitHorizontalSliderButtonContainer\"\n\t\t\t><div class=\"dijitHorizontalSliderDecrementIcon\" tabIndex=\"-1\" style=\"display:none\" dojoAttachPoint=\"decrementButton\" dojoAttachEvent=\"onclick: decrement\"><span class=\"dijitSliderButtonInner\">-</span></div\n\t\t></td\n\t\t><td class=\"dijitReset\"\n\t\t\t><div class=\"dijitSliderBar dijitSliderBumper dijitHorizontalSliderBumper dijitSliderLeftBumper dijitHorizontalSliderLeftBumper\" dojoAttachEvent=\"onclick:_onClkDecBumper\"></div\n\t\t></td\n\t\t><td class=\"dijitReset\"\n\t\t\t><input dojoAttachPoint=\"valueNode\" type=\"hidden\" name=\"${name}\"\n\t\t\t/><div waiRole=\"presentation\" style=\"position:relative;\" dojoAttachPoint=\"sliderBarContainer\"\n\t\t\t\t><div waiRole=\"presentation\" dojoAttachPoint=\"progressBar\" class=\"dijitSliderBar dijitHorizontalSliderBar dijitSliderProgressBar dijitHorizontalSliderProgressBar\" dojoAttachEvent=\"onclick:_onBarClick\"\n\t\t\t\t\t><div dojoAttachPoint=\"sliderHandle,focusNode\" class=\"dijitSliderMoveable dijitHorizontalSliderMoveable\" dojoAttachEvent=\"onkeypress:_onKeyPress,onmousedown:_onHandleClick\" waiRole=\"slider\" valuemin=\"${minimum}\" valuemax=\"${maximum}\"\n\t\t\t\t\t\t><div class=\"dijitSliderImageHandle dijitHorizontalSliderImageHandle\"></div\n\t\t\t\t\t></div\n\t\t\t\t></div\n\t\t\t\t><div waiRole=\"presentation\" dojoAttachPoint=\"remainingBar\" class=\"dijitSliderBar dijitHorizontalSliderBar dijitSliderRemainingBar dijitHorizontalSliderRemainingBar\" dojoAttachEvent=\"onclick:_onBarClick\"></div\n\t\t\t></div\n\t\t></td\n\t\t><td class=\"dijitReset\"\n\t\t\t><div class=\"dijitSliderBar dijitSliderBumper dijitHorizontalSliderBumper dijitSliderRightBumper dijitHorizontalSliderRightBumper\" dojoAttachEvent=\"onclick:_onClkIncBumper\"></div\n\t\t></td\n\t\t><td class=\"dijitReset dijitSliderButtonContainer dijitHorizontalSliderButtonContainer\" style=\"right:0px;\"\n\t\t\t><div class=\"dijitHorizontalSliderIncrementIcon\" tabIndex=\"-1\" style=\"display:none\" dojoAttachPoint=\"incrementButton\" dojoAttachEvent=\"onclick: increment\"><span class=\"dijitSliderButtonInner\">+</span></div\n\t\t></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset\" colspan=\"2\"></td\n\t\t><td dojoAttachPoint=\"containerNode,bottomDecoration\" class=\"dijitReset\" style=\"text-align:center;\"></td\n\t\t><td class=\"dijitReset\" colspan=\"2\"></td\n\t></tr\n></table>\n",
 	value: 0,
 
 	// showButtons: boolean
@@ -42,6 +43,10 @@ dojo.declare(
 	//	If clicking the progress bar changes the value or not
 	clickSelect: true,
 
+	// slideDuration: Number
+	//	The time in ms to take to animate the slider handle from 0% to 100%
+	slideDuration: 1000,
+
 	widgetsInTemplate: true,
 
 	attributeMap: dojo.mixin(dojo.clone(dijit.form._FormWidget.prototype.attributeMap),
@@ -58,7 +63,7 @@ dojo.declare(
 	_upsideDown: false,
 
 	_onKeyPress: function(/*Event*/ e){
-		if(this.disabled || e.altKey || e.ctrlKey){ return; }
+		if(this.disabled || this.readOnly || e.altKey || e.ctrlKey){ return; }
 		switch(e.keyCode){
 			case dojo.keys.HOME:
 				this.setValue(this.minimum, false);
@@ -77,14 +82,14 @@ dojo.declare(
 				this.decrement(e);
 				break;
 			default:
-				this.inherited("_onKeyPress", arguments);
+				this.inherited(arguments);
 				return;
 		}
 		dojo.stopEvent(e);
 	},
 
 	_onHandleClick: function(e){
-		if(this.disabled){ return; }
+		if(this.disabled || this.readOnly){ return; }
 		if(!dojo.isIE){
 			// make sure you get focus when dragging the handle
 			// (but don't do on IE because it causes a flicker on mouse up (due to blur then focus)
@@ -98,7 +103,7 @@ dojo.declare(
 	},
 
 	_onBarClick: function(e){
-		if(this.disabled || !this.clickSelect){ return; }
+		if(this.disabled || this.readOnly || !this.clickSelect){ return; }
 		dijit.focus(this.sliderHandle);
 		dojo.stopEvent(e);
 		var abspos = dojo.coords(this.sliderBarContainer, true);
@@ -107,7 +112,7 @@ dojo.declare(
 	},
 
 	_setPixelValue: function(/*Number*/ pixelValue, /*Number*/ maxPixels, /*Boolean, optional*/ priorityChange){
-		if(this.disabled){ return; }
+		if(this.disabled || this.readOnly){ return; }
 		pixelValue = pixelValue < 0 ? 0 : maxPixels < pixelValue ? maxPixels : pixelValue;
 		var count = this.discreteValues;
 		if(count <= 1 || count == Infinity){ count = maxPixels; }
@@ -119,14 +124,30 @@ dojo.declare(
 
 	setValue: function(/*Number*/ value, /*Boolean, optional*/ priorityChange){
 		this.valueNode.value = this.value = value;
-		this.inherited('setValue', arguments);
+		dijit.setWaiState(this.focusNode, "valuenow", value);
+		this.inherited(arguments);
 		var percent = (value - this.minimum) / (this.maximum - this.minimum);
-		this.progressBar.style[this._progressPixelSize] = (percent*100) + "%";
-		this.remainingBar.style[this._progressPixelSize] = ((1-percent)*100) + "%";
+		if(priorityChange && this.slideDuration > 0 && this.progressBar.style[this._progressPixelSize]){
+			// animate the slider
+			var _this = this;
+			var props = {};
+			var start = parseFloat(this.progressBar.style[this._progressPixelSize]);
+			var duration = this.slideDuration * (percent-start/100);
+			if(duration < 0){ duration = 0 - duration; }
+			props[this._progressPixelSize] = { start: start, end: percent*100, units:"%" };
+			dojo.animateProperty({ node: this.progressBar, duration: duration, 
+				onAnimate: function(v){_this.remainingBar.style[_this._progressPixelSize] = (100-parseFloat(v[_this._progressPixelSize])) + "%";},
+			        properties: props
+			}).play();
+		}
+		else{
+			this.progressBar.style[this._progressPixelSize] = (percent*100) + "%";
+			this.remainingBar.style[this._progressPixelSize] = ((1-percent)*100) + "%";
+		}
 	},
 
 	_bumpValue: function(signedChange){
-		if(this.disabled){ return; }
+		if(this.disabled || this.readOnly){ return; }
 		var s = dojo.getComputedStyle(this.sliderBarContainer);
 		var c = dojo._getContentBox(this.sliderBarContainer, s);
 		var count = this.discreteValues;
@@ -139,6 +160,12 @@ dojo.declare(
 		this.setValue(value, true);
 	},
 
+	_onClkIncBumper: function(){
+		this.setValue((this.isLeftToRight() || this._upsideDown)?this.maximum:this.minimum, true);
+	},
+	_onClkDecBumper: function(){
+		this.setValue((this.isLeftToRight() || this._upsideDown)?this.minimum:this.maximum, true);
+	},
 	decrement: function(e){
 		// summary
 		//	decrement slider by 1 unit
@@ -194,12 +221,15 @@ dojo.declare(
 		dojo.extend(mover, dijit.form._SliderMover.prototype);
 
 		this._movable = new dojo.dnd.Moveable(this.sliderHandle, {mover: mover});
-		this.inherited('postCreate', arguments);
+		dijit.setWaiState(this.focusNode, "valuemin", this.minimum);
+		dijit.setWaiState(this.focusNode, "valuemax", this.maximum);
+
+		this.inherited(arguments);
 	},
 
 	destroy: function(){
 		this._movable.destroy();
-		this.inherited('destroy', arguments);	
+		this.inherited(arguments);	
 	}
 });
 
@@ -210,14 +240,41 @@ dojo.declare(
 	// summary
 	//	A form widget that allows one to select a value with a vertically draggable image
 
-	templateString:"<table class=\"dijitReset dijitSlider\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" rules=\"none\"\n><tbody class=\"dijitReset\"\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset\"></td\n\t\t><td class=\"dijitReset dijitSliderButtonContainer dijitVerticalSliderButtonContainer\"\n\t\t\t><div class=\"dijitVerticalSliderIncrementIcon\" tabIndex=\"-1\" style=\"display:none\" dojoAttachPoint=\"incrementButton\" dojoAttachEvent=\"onclick: increment\"><span class=\"dijitSliderButtonInner\">+</span></div\n\t\t></td\n\t\t><td class=\"dijitReset\"></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset\"></td\n\t\t><td class=\"dijitReset\"\n\t\t\t><center><div class=\"dijitSliderBar dijitSliderBumper dijitVerticalSliderBumper dijitSliderTopBumper dijitVerticalSliderTopBumper\"></div></center\n\t\t></td\n\t\t><td class=\"dijitReset\"></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td dojoAttachPoint=\"leftDecoration\" class=\"dijitReset\" style=\"text-align:center;height:100%;\"></td\n\t\t><td class=\"dijitReset\" style=\"height:100%;\"\n\t\t\t><input dojoAttachPoint=\"valueNode\" type=\"hidden\" name=\"${name}\"\n\t\t\t/><center style=\"position:relative;height:100%;\" dojoAttachPoint=\"sliderBarContainer\"\n\t\t\t\t><div dojoAttachPoint=\"remainingBar\" class=\"dijitSliderBar dijitVerticalSliderBar dijitSliderRemainingBar dijitVerticalSliderRemainingBar\" dojoAttachEvent=\"onclick:_onBarClick\"></div\n\t\t\t\t><div dojoAttachPoint=\"progressBar\" class=\"dijitSliderBar dijitVerticalSliderBar dijitSliderProgressBar dijitVerticalSliderProgressBar\" dojoAttachEvent=\"onclick:_onBarClick\"\n\t\t\t\t\t><div dojoAttachPoint=\"sliderHandle,focusNode\" class=\"dijitSliderMoveable\" dojoAttachEvent=\"onkeypress:_onKeyPress,onclick:_onHandleClick\" style=\"vertical-align:top;\" waiRole=\"slider\" valuemin=\"${minimum}\" valuemax=\"${maximum}\"\n\t\t\t\t\t\t><div class=\"dijitSliderImageHandle dijitVerticalSliderImageHandle\"></div\n\t\t\t\t\t></div\n\t\t\t\t></div\n\t\t\t></center\n\t\t></td\n\t\t><td dojoAttachPoint=\"containerNode,rightDecoration\" class=\"dijitReset\" style=\"text-align:center;height:100%;\"></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset\"></td\n\t\t><td class=\"dijitReset\"\n\t\t\t><center><div class=\"dijitSliderBar dijitSliderBumper dijitVerticalSliderBumper dijitSliderBottomBumper dijitVerticalSliderBottomBumper\"></div></center\n\t\t></td\n\t\t><td class=\"dijitReset\"></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset\"></td\n\t\t><td class=\"dijitReset dijitSliderButtonContainer dijitVerticalSliderButtonContainer\"\n\t\t\t><div class=\"dijitVerticalSliderDecrementIcon\" tabIndex=\"-1\" style=\"display:none\" dojoAttachPoint=\"decrementButton\" dojoAttachEvent=\"onclick: decrement\"><span class=\"dijitSliderButtonInner\">-</span></div\n\t\t></td\n\t\t><td class=\"dijitReset\"></td\n\t></tr\n></tbody></table>\n",
+	templateString:"<table class=\"dijitReset dijitSlider\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" rules=\"none\"\n><tbody class=\"dijitReset\"\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset\"></td\n\t\t><td class=\"dijitReset dijitSliderButtonContainer dijitVerticalSliderButtonContainer\"\n\t\t\t><div class=\"dijitVerticalSliderIncrementIcon\" tabIndex=\"-1\" style=\"display:none\" dojoAttachPoint=\"incrementButton\" dojoAttachEvent=\"onclick: increment\"><span class=\"dijitSliderButtonInner\">+</span></div\n\t\t></td\n\t\t><td class=\"dijitReset\"></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset\"></td\n\t\t><td class=\"dijitReset\"\n\t\t\t><center><div class=\"dijitSliderBar dijitSliderBumper dijitVerticalSliderBumper dijitSliderTopBumper dijitVerticalSliderTopBumper\" dojoAttachEvent=\"onclick:_onClkIncBumper\"></div></center\n\t\t></td\n\t\t><td class=\"dijitReset\"></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td dojoAttachPoint=\"leftDecoration\" class=\"dijitReset\" style=\"text-align:center;height:100%;\"></td\n\t\t><td class=\"dijitReset\" style=\"height:100%;\"\n\t\t\t><input dojoAttachPoint=\"valueNode\" type=\"hidden\" name=\"${name}\"\n\t\t\t/><center waiRole=\"presentation\" style=\"position:relative;height:100%;\" dojoAttachPoint=\"sliderBarContainer\"\n\t\t\t\t><div waiRole=\"presentation\" dojoAttachPoint=\"remainingBar\" class=\"dijitSliderBar dijitVerticalSliderBar dijitSliderRemainingBar dijitVerticalSliderRemainingBar\" dojoAttachEvent=\"onclick:_onBarClick\"><!--#5629--></div\n\t\t\t\t><div waiRole=\"presentation\" dojoAttachPoint=\"progressBar\" class=\"dijitSliderBar dijitVerticalSliderBar dijitSliderProgressBar dijitVerticalSliderProgressBar\" dojoAttachEvent=\"onclick:_onBarClick\"\n\t\t\t\t\t><div dojoAttachPoint=\"sliderHandle,focusNode\" class=\"dijitSliderMoveable\" dojoAttachEvent=\"onkeypress:_onKeyPress,onmousedown:_onHandleClick\" style=\"vertical-align:top;\" waiRole=\"slider\" valuemin=\"${minimum}\" valuemax=\"${maximum}\"\n\t\t\t\t\t\t><div class=\"dijitSliderImageHandle dijitVerticalSliderImageHandle\"></div\n\t\t\t\t\t></div\n\t\t\t\t></div\n\t\t\t></center\n\t\t></td\n\t\t><td dojoAttachPoint=\"containerNode,rightDecoration\" class=\"dijitReset\" style=\"text-align:center;height:100%;\"></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset\"></td\n\t\t><td class=\"dijitReset\"\n\t\t\t><center><div class=\"dijitSliderBar dijitSliderBumper dijitVerticalSliderBumper dijitSliderBottomBumper dijitVerticalSliderBottomBumper\" dojoAttachEvent=\"onclick:_onClkDecBumper\"></div></center\n\t\t></td\n\t\t><td class=\"dijitReset\"></td\n\t></tr\n\t><tr class=\"dijitReset\"\n\t\t><td class=\"dijitReset\"></td\n\t\t><td class=\"dijitReset dijitSliderButtonContainer dijitVerticalSliderButtonContainer\"\n\t\t\t><div class=\"dijitVerticalSliderDecrementIcon\" tabIndex=\"-1\" style=\"display:none\" dojoAttachPoint=\"decrementButton\" dojoAttachEvent=\"onclick: decrement\"><span class=\"dijitSliderButtonInner\">-</span></div\n\t\t></td\n\t\t><td class=\"dijitReset\"></td\n\t></tr\n></tbody></table>\n",
 	_mousePixelCoord: "pageY",
 	_pixelCount: "h",
 	_startingPixelCoord: "y",
 	_startingPixelCount: "t",
 	_handleOffsetCoord: "top",
 	_progressPixelSize: "height",
-	_upsideDown: true
+	_upsideDown: true,
+
+	startup: function(){
+		if(this._started){ return; }
+
+		if(!dojo._isBodyLtr() && dojo.isMoz){
+			if(this.leftDecoration){this._rtlRectify(this.leftDecoration);}
+			if(this.rightDecoration){this._rtlRectify(this.rightDecoration);}
+		}
+
+		this.inherited(arguments);
+	},
+		
+	_rtlRectify:function(decorationNode/*NodeList*/){
+		// summary:
+		//      Rectify children nodes for left/right decoration in rtl case.
+		//		Simply switch the rule and label child for each decoration node.
+		var childNodes = [];
+		while(decorationNode.firstChild){
+				childNodes.push(decorationNode.firstChild);
+				decorationNode.removeChild(decorationNode.firstChild);
+		}
+		for(var i = childNodes.length-1; i >=0; i--){
+			if(childNodes[i]){
+				decorationNode.appendChild(childNodes[i]);
+			}
+		}
+	}
 });
 
 dojo.declare("dijit.form._SliderMover",
@@ -229,7 +286,7 @@ dojo.declare("dijit.form._SliderMover",
 		if(!c){
 			var container = widget.sliderBarContainer;
 			var s = dojo.getComputedStyle(container);
-			var c = dojo._getContentBox(container, s);
+			c = dojo._getContentBox(container, s);
 			c[widget._startingPixelCount] = 0;
 			this.constraintBox = c;
 		}
@@ -237,13 +294,13 @@ dojo.declare("dijit.form._SliderMover",
 		var pixelValue = widget._isReversed() ?
 			e[widget._mousePixelCoord] - dojo._abs(widget.sliderBarContainer).x : 
 			m[widget._startingPixelCount] + e[widget._mousePixelCoord];
-		dojo.hitch(widget, "_setPixelValue")(widget._isReversed() || widget._upsideDown? (c[widget._pixelCount]-pixelValue) : pixelValue, c[widget._pixelCount]);
+		dojo.hitch(widget, "_setPixelValue")(widget._isReversed() || widget._upsideDown? (c[widget._pixelCount]-pixelValue) : pixelValue, c[widget._pixelCount], false);
 	},
 	
 	destroy: function(e){
+		dojo.dnd.Mover.prototype.destroy.apply(this, arguments);
 		var widget = this.widget;
 		widget.setValue(widget.value, true);
-		dojo.dnd.Mover.prototype.destroy.call(this);
 	}
 });
 
@@ -277,19 +334,21 @@ dojo.declare("dijit.form.HorizontalRule", [dijit._Widget, dijit._Templated],
 	_isHorizontal: true,
 
 	postCreate: function(){
+		var innerHTML;
 		if(this.count==1){
-			var innerHTML = this._genHTML(50, 0);
+			innerHTML = this._genHTML(50, 0);
 		}else{
+			var i;
 			var interval = 100 / (this.count-1);
 			if(!this._isHorizontal || this.isLeftToRight()){
-				var innerHTML = this._genHTML(0, 0);
-				for(var i=1; i < this.count-1; i++){
+				innerHTML = this._genHTML(0, 0);
+				for(i=1; i < this.count-1; i++){
 					innerHTML += this._genHTML(interval*i, i);
 				}
 				innerHTML += this._genHTML(100, this.count-1);
 			}else{
-				var innerHTML = this._genHTML(100, 0);
-				for(var i=1; i < this.count-1; i++){
+				innerHTML = this._genHTML(100, 0);
+				for(i=1; i < this.count-1; i++){
 					innerHTML += this._genHTML(100-interval*i, i);
 				}
 				innerHTML += this._genHTML(0, this.count-1);
@@ -376,7 +435,7 @@ dojo.declare("dijit.form.HorizontalRuleLabels", dijit.form.HorizontalRule,
 	},
 
 	postMixInProperties: function(){
-		this.inherited('postMixInProperties', arguments);
+		this.inherited(arguments);
 		this.labels = this.getLabels();
 		this.count = this.labels.length;
 	}

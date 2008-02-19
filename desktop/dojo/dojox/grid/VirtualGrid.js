@@ -1,6 +1,7 @@
 if(!dojo._hasResource["dojox.grid.VirtualGrid"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.grid.VirtualGrid"] = true;
 dojo.provide("dojox.grid.VirtualGrid");
+
 dojo.require("dojox.grid._grid.lib");
 dojo.require("dojox.grid._grid.scroller");
 dojo.require("dojox.grid._grid.view");
@@ -15,7 +16,7 @@ dojo.require("dojox.grid._grid.publicEvents");
 
 dojo.declare('dojox.VirtualGrid', 
 	[ dijit._Widget, dijit._Templated ], 
-{
+	{
 	// summary:
 	// 		A grid widget with virtual scrolling, cell editing, complex rows,
 	// 		sorting, fixed columns, sizeable columns, etc.
@@ -53,55 +54,68 @@ dojo.declare('dojox.VirtualGrid',
 	//	|		structure="structure" 
 	//	|		dojoType="dojox.VirtualGrid"></div>
 
-	templateString: '<div class="dojoxGrid" hidefocus="hidefocus" role="wairole:grid"><div class="dojoxGrid-master-header" dojoAttachPoint="headerNode"></div><div class="dojoxGrid-master-view" dojoAttachPoint="viewsNode"></div><span dojoAttachPoint="lastFocusNode" tabindex="0"></span></div>',
-	// classTag: string
-	// css class applied to the grid's domNode
+	templateString:"<div class=\"dojoxGrid\" hidefocus=\"hidefocus\" role=\"wairole:grid\">\n\t<div class=\"dojoxGrid-master-header\" dojoAttachPoint=\"headerNode\"></div>\n\t<div class=\"dojoxGrid-master-view\" dojoAttachPoint=\"viewsNode\"></div>\n\t<span dojoAttachPoint=\"lastFocusNode\" tabindex=\"0\"></span>\n</div>\n",
+	
+	// classTag: String
+	// 		CSS class applied to the grid's domNode
 	classTag: 'dojoxGrid',
+
 	get: function(inRowIndex){
-		/* summary: Default data getter. 
-			description:
-				Provides data to display in a grid cell. Called in grid cell context.
-				So this.cell.index is the column index.
-			inRowIndex: integer
-				row for which to provide data
-			returns:
-				data to display for a given grid cell.
-		*/
+		// summary: Default data getter. 
+		// description:
+		//		Provides data to display in a grid cell. Called in grid cell context.
+		//		So this.cell.index is the column index.
+		// inRowIndex: Integer
+		//		Row for which to provide data
+		// returns:
+		//		Data to display for a given grid cell.
 	},
+	
 	// settings
-	// rowCount: int
-	//	Number of rows to display. 
+	// rowCount: Integer
+	//		Number of rows to display. 
 	rowCount: 5,
-	// keepRows: int
-	//	Number of rows to keep in the rendering cache.
-	keepRows: 75, 
-	// rowsPerPage: int
-	//	Number of rows to render at a time.
+
+	// keepRows: Integer
+	//		Number of rows to keep in the rendering cache.
+	keepRows: 75,
+	
+	// rowsPerPage: Integer
+	//		Number of rows to render at a time.
 	rowsPerPage: 25,
-	// autoWidth: boolean
-	//	If autoWidth is true, grid width is automatically set to fit the data.
+
+	// autoWidth: Boolean
+	//		If autoWidth is true, grid width is automatically set to fit the data.
 	autoWidth: false,
-	// autoHeight: boolean
-	//	If autoHeight is true, grid height is automatically set to fit the data.
+	
+	// autoHeight: Boolean
+	//		If autoHeight is true, grid height is automatically set to fit the data.
 	autoHeight: false,
-	// autoRender: boolean
-	//	If autoRender is true, grid will render itself after initialization.
+	
+	// autoRender: Boolean
+	//		If autoRender is true, grid will render itself after initialization.
 	autoRender: true,
-	// defaultHeight: string
-	//	default height of the grid, measured in any valid css unit.
+
+	// defaultHeight: String
+	//		default height of the grid, measured in any valid css unit.
 	defaultHeight: '15em',
-	// structure: object or string
-	//	View layout defintion. Can be set to a layout object, or to the (string) name of a layout object.
+
+	// structure: Object|String
+	//		View layout defintion. Can be set to a layout object, or to the (string) name of a layout object.
 	structure: '',
-	// elasticView: int
+
+	// elasticView: Integer
 	//	Override defaults and make the indexed grid view elastic, thus filling available horizontal space.
 	elasticView: -1,
+	
 	// singleClickEdit: boolean
-	//	Single-click starts editing. Default is double-click
+	//		Single-click starts editing. Default is double-click
 	singleClickEdit: false,
+	
 	// private
 	sortInfo: 0,
 	themeable: true,
+
 	// initialization
 	buildRendering: function(){
 		this.inherited(arguments);
@@ -126,6 +140,7 @@ dojo.declare('dojox.VirtualGrid',
 		this.styleChanged = this._styleChanged;
 		this.setStructure(this.structure);
 	},
+	
 	destroy: function(){
 		this.domNode.onReveal = null;
 		this.domNode.onSizeChange = null;
@@ -133,16 +148,20 @@ dojo.declare('dojox.VirtualGrid',
 		this.views.destroyViews();
 		this.inherited(arguments);
 	},
+	
 	styleChanged: function(){
 		this.setStyledClass(this.domNode, '');
 	},
+	
 	_styleChanged: function(){
 		this.styleChanged();
 		this.update();
 	},
+	
 	textSizeChanged: function(){
 		setTimeout(dojo.hitch(this, "_textSizeChanged"), 1);
 	},
+	
 	_textSizeChanged: function(){
 		if(this.domNode){
 			this.views.forEach(function(v){
@@ -151,16 +170,18 @@ dojo.declare('dojox.VirtualGrid',
 			this.render();
 		}
 	},
+	
 	sizeChange: function(){
 		dojox.grid.jobs.job(this.id + 'SizeChange', 50, dojo.hitch(this, "update"));
 	},
+	
 	renderOnIdle: function() {
 		setTimeout(dojo.hitch(this, "render"), 1);
 	},
-	// managers
+	
 	createManagers: function(){
 		// summary:
-		//	create grid managers for various tasks including rows, focus, selection, editing
+		//		create grid managers for various tasks including rows, focus, selection, editing
 		
 		// row manager
 		this.rows = new dojox.grid.rows(this);
@@ -171,35 +192,57 @@ dojo.declare('dojox.VirtualGrid',
 		// edit manager
 		this.edit = new dojox.grid.edit(this);
 	},
-	// virtual scroller
+
 	createScroller: function(){
+		// summary: Creates a new virtual scroller
 		this.scroller = new dojox.grid.scroller.columns();
 		this.scroller.renderRow = dojo.hitch(this, "renderRow");
 		this.scroller.removeRow = dojo.hitch(this, "rowRemoved");
 	},
-	// layout
+
 	createLayout: function(){
+		// summary: Creates a new Grid layout
 		this.layout = new dojox.grid.layout(this);
 	},
+
 	// views
 	createViews: function(){
 		this.views = new dojox.grid.views(this);
 		this.views.createView = dojo.hitch(this, "createView");
 	},
+	
 	createView: function(inClass){
-		var c = eval(inClass);
+		if(dojo.isAIR){
+			var obj = window;
+			var names = inClass.split('.');
+			for(var i=0;i<names.length;i++){
+				if(typeof obj[names[i]]=='undefined'){
+					var undefstring = names[0];
+					for(var j=1;j<=i;j++){
+						undefstring+="."+names[j];
+					}
+					throw new Error(undefstring+" is undefined");
+				}
+				obj = obj[names[i]];
+			}
+			var c = obj;
+		}else{
+			var c = eval(inClass);
+		}
 		var view = new c({ grid: this });
 		this.viewsNode.appendChild(view.domNode);
 		this.headerNode.appendChild(view.headerNode);
 		this.views.addView(view);
 		return view;
 	},
+
 	buildViews: function(){
 		for(var i=0, vs; (vs=this.layout.structure[i]); i++){
 			this.createView(vs.type || "dojox.GridView").setStructure(vs);
 		}
 		this.scroller.setContentNodes(this.views.getContentNodes());
 	},
+	
 	setStructure: function(inStructure){
 		// summary:
 		//		Install a new structure and rebuild the grid.
@@ -230,12 +273,18 @@ dojo.declare('dojox.VirtualGrid',
 		this.layout.setStructure(this.structure);
 		this._structureChanged();
 	},
+
 	_structureChanged: function() {
 		this.buildViews();
 		if(this.autoRender){
 			this.render();
 		}
 	},
+
+	hasLayout: function() {
+		return this.layout.cells.length;
+	},
+
 	// sizing
 	resize: function(){
 		// summary:
@@ -246,7 +295,7 @@ dojo.declare('dojox.VirtualGrid',
 		// to sort out.
 		
 		// if we have set up everything except the DOM, we cannot resize
-		if(!this.domNode.parentNode){
+		if(!this.domNode.parentNode || this.domNode.parentNode.nodeType != 1 || !this.hasLayout()){
 			return;
 		}
 		// useful measurement
@@ -267,9 +316,17 @@ dojo.declare('dojox.VirtualGrid',
 			var h = dojo._getContentBox(this.domNode.parentNode).h;
 			dojo.marginBox(this.domNode, { h: Math.max(0, h) });
 		}
-		// header height
-		var t = this.views.measureHeader();
-		this.headerNode.style.height = t + 'px';
+		var h = dojo._getContentBox(this.domNode).h;
+		if(h == 0){
+			// We need to hide the header, since the Grid is essentially hidden.
+			this.headerNode.style.display = "none";
+		}else{
+			// Otherwise, show the header and give it an appropriate height.
+			this.headerNode.style.display = "block";
+			// header height
+			var t = this.views.measureHeader();
+			this.headerNode.style.height = t + 'px';
+		}
 		// content extent
 		var l = 1, h = (this.autoHeight ? -1 : Math.max(this.domNode.clientHeight - t, 0) || 0);
 		if(this.autoWidth){
@@ -286,6 +343,7 @@ dojo.declare('dojox.VirtualGrid',
 		this.scroller.defaultRowHeight = this.rows.getDefaultHeightPx() + 1;
 		this.postresize();
 	},
+
 	resizeHeight: function(){
 		var t = this.views.measureHeader();
 		this.headerNode.style.height = t + 'px';
@@ -296,6 +354,7 @@ dojo.declare('dojox.VirtualGrid',
 		this.views.onEach('resizeHeight');
 		this.scroller.windowHeight = h; 
 	},
+
 	// render 
 	render: function(){
 		// summary:
@@ -303,6 +362,10 @@ dojo.declare('dojox.VirtualGrid',
 		// scrolling states, see Update.
 
 		if(!this.domNode){return;}
+		if(!this.hasLayout()) {
+			this.scroller.init(0, this.keepRows, this.rowsPerPage);
+			return;
+		}
 		//
 		this.update = this.defaultUpdate;
 		this.scroller.init(this.rowCount, this.keepRows, this.rowsPerPage);
@@ -310,42 +373,51 @@ dojo.declare('dojox.VirtualGrid',
 		this.setScrollTop(0);
 		this.postrender();
 	},
+
 	prerender: function(){
 		this.views.render();
 		this.resize();
 	},
+
 	postrender: function(){
 		this.postresize();
 		this.focus.initFocusView();
 		// make rows unselectable
 		dojo.setSelectable(this.domNode, false);
 	},
+
 	postresize: function(){
 		// views are position absolute, so they do not inflate the parent
 		if(this.autoHeight){
 			this.viewsNode.style.height = this.views.measureContent() + 'px';
 		}
 	},
-	// private, used internally to render rows
+
 	renderRow: function(inRowIndex, inNodes){
+		// summary: private, used internally to render rows
 		this.views.renderRow(inRowIndex, inNodes);
 	},
-	// private, used internally to remove rows
+
 	rowRemoved: function(inRowIndex){
+		// summary: private, used internally to remove rows
 		this.views.rowRemoved(inRowIndex);
 	},
+
 	invalidated: null,
+
 	updating: false,
+
 	beginUpdate: function(){
 		// summary:
-		//	Use to make multiple changes to rows while queueing row updating.
+		//		Use to make multiple changes to rows while queueing row updating.
 		// NOTE: not currently supporting nested begin/endUpdate calls
 		this.invalidated = [];
 		this.updating = true;
 	},
+
 	endUpdate: function(){
 		// summary:
-		//	Use after calling beginUpdate to render any changes made to rows.
+		//		Use after calling beginUpdate to render any changes made to rows.
 		this.updating = false;
 		var i = this.invalidated;
 		if(i.all){
@@ -359,9 +431,11 @@ dojo.declare('dojox.VirtualGrid',
 		}
 		this.invalidated = null;
 	},
+
 	// update
 	defaultUpdate: function(){
 		// note: initial update calls render and subsequently this function.
+		if(!this.domNode){return;}
 		if(this.updating){
 			this.invalidated.all = true;
 			return;
@@ -373,24 +447,27 @@ dojo.declare('dojox.VirtualGrid',
 		this.postrender();
 		//this.edit.restoreState(inRowIndex);
 	},
+
 	update: function(){
 		// summary:
-		//	Update the grid, retaining edit and scrolling states.
+		//		Update the grid, retaining edit and scrolling states.
 		this.render();
 	},
+
 	updateRow: function(inRowIndex){
 		// summary:
-		//	Render a single row.
-		// inRowIndex: int
-		//	index of the row to render
+		//		Render a single row.
+		// inRowIndex: Integer
+		//		Index of the row to render
 		inRowIndex = Number(inRowIndex);
 		if(this.updating){
 			this.invalidated[inRowIndex]=true;
-			return;
+		}else{
+			this.views.updateRow(inRowIndex, this.rows.getHeight(inRowIndex));
+			this.scroller.rowHeightChanged(inRowIndex);
 		}
-		this.views.updateRow(inRowIndex, this.rows.getHeight(inRowIndex));
-		this.scroller.rowHeightChanged(inRowIndex);
 	},
+
 	updateRowCount: function(inRowCount){
 		//summary: 
 		//	Change the number of rows.
@@ -398,43 +475,50 @@ dojo.declare('dojox.VirtualGrid',
 		//	Number of rows in the grid.
 		if(this.updating){
 			this.invalidated.rowCount = inRowCount;
-			return;
+		}else{
+			this.rowCount = inRowCount;
+			if(this.layout.cells.length){
+				this.scroller.updateRowCount(inRowCount);
+				this.setScrollTop(this.scrollTop);
+			}
+			this.resize();
 		}
-		this.rowCount = inRowCount;
-		this.scroller.updateRowCount(inRowCount);
-		this.setScrollTop(this.scrollTop);
-		this.resize();
 	},
+
 	updateRowStyles: function(inRowIndex){
 		// summary:
-		//	Update the styles for a row after it's state has changed.
-		
+		//		Update the styles for a row after it's state has changed.
 		this.views.updateRowStyles(inRowIndex);
 	},
+
 	rowHeightChanged: function(inRowIndex){
 		// summary: 
-		//	Update grid when the height of a row has changed. Row height is handled automatically as rows
-		//	are rendered. Use this function only to update a row's height outside the normal rendering process.
-		// inRowIndex: int
-		// index of the row that has changed height
+		//		Update grid when the height of a row has changed. Row height is handled automatically as rows
+		//		are rendered. Use this function only to update a row's height outside the normal rendering process.
+		// inRowIndex: Integer
+		// 		index of the row that has changed height
 		
 		this.views.renormalizeRow(inRowIndex);
 		this.scroller.rowHeightChanged(inRowIndex);
 	},
-	// fastScroll: boolean
-	//	flag modifies vertical scrolling behavior. Defaults to true but set to false for slower 
-	//	scroll performance but more immediate scrolling feedback
+	
+	// fastScroll: Boolean
+	//		flag modifies vertical scrolling behavior. Defaults to true but set to false for slower 
+	//		scroll performance but more immediate scrolling feedback
 	fastScroll: true,
+	
 	delayScroll: false,
+
 	// scrollRedrawThreshold: int
 	//	pixel distance a user must scroll vertically to trigger grid scrolling.
 	scrollRedrawThreshold: (dojo.isIE ? 100 : 50),
+
 	// scroll methods
 	scrollTo: function(inTop){
 		// summary:
-		//	Vertically scroll the grid to a given pixel position
-		// inTop: int
-		//	vertical position of the grid in pixels
+		//		Vertically scroll the grid to a given pixel position
+		// inTop: Integer
+		//		vertical position of the grid in pixels
 		if(!this.fastScroll){
 			this.setScrollTop(inTop);
 			return;
@@ -450,74 +534,87 @@ dojo.declare('dojox.VirtualGrid',
 			this.setScrollTop(inTop);
 		}
 	},
+	
 	finishScrollJob: function(){
 		this.delayScroll = false;
 		this.setScrollTop(this.scrollTop);
 	},
+	
 	setScrollTop: function(inTop){
 		this.scrollTop = this.views.setScrollTop(inTop);
 		this.scroller.scroll(this.scrollTop);
 	},
+	
 	scrollToRow: function(inRowIndex){
 		// summary:
-		//	Scroll the grid to a specific row.
-		// inRowIndex: int
-		// grid row index
+		//		Scroll the grid to a specific row.
+		// inRowIndex: Integer
+		// 		grid row index
 		this.setScrollTop(this.scroller.findScrollTop(inRowIndex) + 1);
 	},
+	
 	// styling (private, used internally to style individual parts of a row)
 	styleRowNode: function(inRowIndex, inRowNode){
 		if(inRowNode){
 			this.rows.styleRowNode(inRowIndex, inRowNode);
 		}
 	},
+
 	// cells
 	getCell: function(inIndex){
 		// summary:
-		//	retrieves the cell object for a given grid column.
-		// inIndex: int
-		// grid column index of cell to retrieve
+		//		Retrieves the cell object for a given grid column.
+		// inIndex: Integer
+		// 		Grid column index of cell to retrieve
 		// returns:
-		//	a grid cell
+		//		a grid cell
 		return this.layout.cells[inIndex];
 	},
+
 	setCellWidth: function(inIndex, inUnitWidth) {
 		this.getCell(inIndex).unitWidth = inUnitWidth;
 	},
+
 	getCellName: function(inCell){
-		return "Cell " + inCell.index;
+		// summary: Returns the cell name of a passed cell
+		return "Cell " + inCell.index; // String
 	},
+
 	// sorting
 	canSort: function(inSortInfo){
 		// summary:
-		//	determines if the grid can be sorted
-		// inSortInfo: int
-		//	Sort information, 1-based index of column on which to sort, positive for an ascending sort
-		// and negative for a descending sort
-		// returns:
-		//	true if grid can be sorted on the given column in the given direction
+		//		Determines if the grid can be sorted
+		// inSortInfo: Integer
+		//		Sort information, 1-based index of column on which to sort, positive for an ascending sort
+		// 		and negative for a descending sort
+		// returns: Boolean
+		//		True if grid can be sorted on the given column in the given direction
 	},
+	
 	sort: function(){
 	},
+	
 	getSortAsc: function(inSortInfo){
 		// summary:
-		//	returns true if grid is sorted in an ascending direction.
+		//		Returns true if grid is sorted in an ascending direction.
 		inSortInfo = inSortInfo == undefined ? this.sortInfo : inSortInfo;
-		return Boolean(inSortInfo > 0);
+		return Boolean(inSortInfo > 0); // Boolean
 	},
+	
 	getSortIndex: function(inSortInfo){
 		// summary:
-		//	returns the index of the column on which the grid is sorted
+		//		Returns the index of the column on which the grid is sorted
 		inSortInfo = inSortInfo == undefined ? this.sortInfo : inSortInfo;
-		return Math.abs(inSortInfo) - 1;
+		return Math.abs(inSortInfo) - 1; // Integer
 	},
+	
 	setSortIndex: function(inIndex, inAsc){
 		// summary:
-		// Sort the grid on a column in a specified direction
-		// inIndex: int
-		// Column index on which to sort.
-		// inAsc: boolean
-		// If true, sort the grid in ascending order, otherwise in descending order
+		// 		Sort the grid on a column in a specified direction
+		// inIndex: Integer
+		// 		Column index on which to sort.
+		// inAsc: Boolean
+		// 		If true, sort the grid in ascending order, otherwise in descending order
 		var si = inIndex +1;
 		if(inAsc != undefined){
 			si *= (inAsc ? 1 : -1);
@@ -526,6 +623,7 @@ dojo.declare('dojox.VirtualGrid',
 		}
 		this.setSortInfo(si);
 	},
+	
 	setSortInfo: function(inSortInfo){
 		if(this.canSort(inSortInfo)){
 			this.sortInfo = inSortInfo;
@@ -533,11 +631,13 @@ dojo.declare('dojox.VirtualGrid',
 			this.update();
 		}
 	},
+	
 	// DOM event handler
 	doKeyEvent: function(e){
 		e.dispatch = 'do' + e.type;
 		this.onKeyEvent(e);
 	},
+
 	// event dispatch
 	//: protected
 	_dispatch: function(m, e){
@@ -545,18 +645,23 @@ dojo.declare('dojox.VirtualGrid',
 			return this[m](e);
 		}
 	},
+
 	dispatchKeyEvent: function(e){
 		this._dispatch(e.dispatch, e);
 	},
+	
 	dispatchContentEvent: function(e){
 		this.edit.dispatchEvent(e) || e.sourceView.dispatchContentEvent(e) || this._dispatch(e.dispatch, e);
 	},
+	
 	dispatchHeaderEvent: function(e){
 		e.sourceView.dispatchHeaderEvent(e) || this._dispatch('doheader' + e.type, e);
 	},
+	
 	dokeydown: function(e){
 		this.onKeyDown(e);
 	},
+	
 	doclick: function(e){
 		if(e.cellNode){
 			this.onCellClick(e);
@@ -564,6 +669,7 @@ dojo.declare('dojox.VirtualGrid',
 			this.onRowClick(e);
 		}
 	},
+	
 	dodblclick: function(e){
 		if(e.cellNode){
 			this.onCellDblClick(e);
@@ -571,6 +677,7 @@ dojo.declare('dojox.VirtualGrid',
 			this.onRowDblClick(e);
 		}
 	},
+	
 	docontextmenu: function(e){
 		if(e.cellNode){
 			this.onCellContextMenu(e);
@@ -578,6 +685,7 @@ dojo.declare('dojox.VirtualGrid',
 			this.onRowContextMenu(e);
 		}
 	},
+	
 	doheaderclick: function(e){
 		if(e.cellNode){
 			this.onHeaderCellClick(e);
@@ -585,6 +693,7 @@ dojo.declare('dojox.VirtualGrid',
 			this.onHeaderClick(e);
 		}
 	},
+	
 	doheaderdblclick: function(e){
 		if(e.cellNode){
 			this.onHeaderCellDblClick(e);
@@ -592,6 +701,7 @@ dojo.declare('dojox.VirtualGrid',
 			this.onHeaderDblClick(e);
 		}
 	},
+	
 	doheadercontextmenu: function(e){
 		if(e.cellNode){
 			this.onHeaderCellContextMenu(e);
@@ -599,31 +709,38 @@ dojo.declare('dojox.VirtualGrid',
 			this.onHeaderContextMenu(e);
 		}
 	},
+	
 	// override to modify editing process
 	doStartEdit: function(inCell, inRowIndex){
 		this.onStartEdit(inCell, inRowIndex);
 	},
+	
 	doApplyCellEdit: function(inValue, inRowIndex, inFieldIndex){
 		this.onApplyCellEdit(inValue, inRowIndex, inFieldIndex);
 	},
+	
 	doCancelEdit: function(inRowIndex){
 		this.onCancelEdit(inRowIndex);
 	},
+	
 	doApplyEdit: function(inRowIndex){
 		this.onApplyEdit(inRowIndex);
 	},
+	
 	// row editing
 	addRow: function(){
 		// summary:
-		//	add a row to the grid.
+		//		Add a row to the grid.
 		this.updateRowCount(this.rowCount+1);
 	},
+	
 	removeSelectedRows: function(){
 		// summary:
-		//	remove the selected rows from the grid.
+		//		Remove the selected rows from the grid.
 		this.updateRowCount(Math.max(0, this.rowCount - this.selection.getSelected().length));
 		this.selection.clear();
 	}
+
 });
 
 dojo.mixin(dojox.VirtualGrid.prototype, dojox.grid.publicEvents);

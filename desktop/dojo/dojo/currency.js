@@ -4,8 +4,14 @@ dojo.provide("dojo.currency");
 
 dojo.require("dojo.number");
 dojo.require("dojo.i18n");
-dojo.requireLocalization("dojo.cldr", "currency", null, "ko,zh,ja,en,en-ca,en-au,ROOT,en-us,it,fr,pt,es,de");
+dojo.requireLocalization("dojo.cldr", "currency", null, "zh,en-ca,pt,en-us,de,ja,en,en-au,ROOT,fr,es,ko,zh-tw,it");
 dojo.require("dojo.cldr.monetary");
+
+/*=====
+dojo.currency = {
+	// summary: localized formatting and parsing routines for currencies
+}
+=====*/
 
 dojo.currency._mixInDefaults = function(options){
 	options = options || {};

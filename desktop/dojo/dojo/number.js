@@ -3,12 +3,16 @@ dojo._hasResource["dojo.number"] = true;
 dojo.provide("dojo.number");
 
 dojo.require("dojo.i18n");
-dojo.requireLocalization("dojo.cldr", "number", null, "zh-cn,en,en-ca,zh-tw,en-us,it,ja-jp,ROOT,de-de,es-es,fr,pt,ko-kr,es,de");
+dojo.requireLocalization("dojo.cldr", "number", null, "zh-cn,zh,ko-kr,pt,en-us,en-gb,de,ja,ja-jp,en,ROOT,en-au,fr,es,ko,zh-tw,it,es-es,de-de");
 dojo.require("dojo.string");
 dojo.require("dojo.regexp");
 
 
 /*=====
+dojo.number = {
+	// summary: localized formatting and parsing routines for Number
+}
+
 dojo.number.__formatOptions = function(kwArgs){
 	//	pattern: String?
 	//		override formatting pattern with this string (see

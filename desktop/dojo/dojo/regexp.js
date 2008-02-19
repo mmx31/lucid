@@ -2,6 +2,12 @@ if(!dojo._hasResource["dojo.regexp"]){ //_hasResource checks added by build. Do 
 dojo._hasResource["dojo.regexp"] = true;
 dojo.provide("dojo.regexp");
 
+/*=====
+dojo.regexp = {
+	// summary: Regular expressions and Builder resources
+};
+=====*/
+
 dojo.regexp.escapeString = function(/*String*/str, /*String?*/except){
 	//	summary:
 	//		Adds escape sequences for special characters in regular expressions

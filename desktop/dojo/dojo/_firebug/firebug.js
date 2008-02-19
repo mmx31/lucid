@@ -66,7 +66,7 @@ if(
 		(!("firebug" in console))
 	)&&
 	(
-		(djConfig["noFirebugLite"] !== true)
+		(dojo.config["noFirebugLite"] !== true)
 	)
 ){
 (function(){
@@ -82,6 +82,7 @@ if(
 	}catch(e){}
 
 	window.console = {
+		_connects: [],
 		log: function(){
 			// summary: 
 			//		Sends arguments to console.
@@ -130,12 +131,11 @@ if(
 		dir: function(object){
 			// summary: 
 			//		Traces object. Only partially implemented.
-			var html = [];
 						
 			var pairs = [];
-			for(var name in object){
+			for(var prop in object){
 				try{
-					pairs.push([name, object[name]]);
+					pairs.push([prop, object[prop]]);
 				}catch(e){
 					/* squelch */
 				}
@@ -145,7 +145,7 @@ if(
 				return a[0] < b[0] ? -1 : 1; 
 			});
 			
-			html.push('<table>');
+			var html = ['<table>'];
 			for(var i = 0; i < pairs.length; ++i){
 				var name = pairs[i][0], value = pairs[i][1];
 				
@@ -227,6 +227,7 @@ if(
 			// summary: 
 			//		Clears message console. Do not call this directly
 			consoleBody.innerHTML = "";
+			dojo.forEach(this._connects,dojo.disconnect);
 		},
 
 		open: function(){ 
@@ -286,7 +287,7 @@ if(
 		}
 	}
 	
-	openWin = function(){
+	function openWin(){
 		var win = window.open("","_firebug","status=0,menubar=0,resizable=1,width=640,height=480,scrollbars=1,addressbar=0");
 		var newDoc=win.document;
 		HTMLstring='<html><head><title>Firebug Lite</title></head>\n';
@@ -295,12 +296,10 @@ if(
 		/*HTMLstring+='<button onclick="(function(){ console.log(dojo.version.toString()); })()">Test Parent Dojo</button>\n';*/
 		HTMLstring+='<div id="fb"></div>';
 		HTMLstring+='</body></html>';
-	
-	
+
 		newDoc.write(HTMLstring);
 		newDoc.close();
 		return win;
-	
 	}
 	
 	function createFrame(){
@@ -308,19 +307,18 @@ if(
 			return;
 		}
 		
-		if(djConfig.popup){
+		var containerHeight = "100%";
+		if(dojo.config.popup){
 			_firebugWin = openWin();
 			_firebugDoc = _firebugWin.document;
-			djConfig.debugContainerId = 'fb';
-			var containerHeight = "100%";
+			dojo.config.debugContainerId = 'fb';
 			
 			// connecting popup
 			_firebugWin.console = window.console;
 			_firebugWin.dojo = window.dojo;
-
 		}else{
-			_firebugDoc = document;	
-			var containerHeight = (djConfig.debugHeight) ? djConfig.debugHeight + "px" :"300px";
+			_firebugDoc = document;
+			containerHeight = (dojo.config.debugHeight || 300) + "px";
 		}
 		
 		var styleElement = _firebugDoc.createElement("link");
@@ -340,8 +338,8 @@ if(
 			styleParent.appendChild(styleElement);
 		}
 		
-		if(typeof djConfig != "undefined" && djConfig["debugContainerId"]){
-			consoleFrame = _firebugDoc.getElementById(djConfig.debugContainerId);
+		if(dojo.config["debugContainerId"]){
+			consoleFrame = _firebugDoc.getElementById(dojo.config.debugContainerId);
 		}
 		if(!consoleFrame){
 			consoleFrame = _firebugDoc.createElement("div");
@@ -351,7 +349,7 @@ if(
 		consoleFrame.style.height = containerHeight;
 		consoleFrame.style.display = (frameVisible ? "block" : "none");	  
 		
-		var closeStr = (djConfig.popup) ? "" : '    <a href="#" onclick="console.close(); return false;">Close</a>';
+		var closeStr = (dojo.config.popup) ? "" : '    <a href="#" onclick="console.close(); return false;">Close</a>';
 		consoleFrame.innerHTML = 
 			  '<div id="firebugToolbar">'
 			+ '  <a href="#" onclick="console.clear(); return false;">Clear</a>'
@@ -359,7 +357,7 @@ if(
 			+ closeStr
 			+ '  </span>'
 			+ '</div>'
-			+ '<input type="text" id="firebugCommandLine">'
+			+ '<input type="text" id="firebugCommandLine" />'
 			+ '<div id="firebugLog"></div>'
 			+ '<div id="objectLog" style="display:none;"></div>';
 
@@ -380,6 +378,20 @@ if(
 	}
 
 	dojo.addOnLoad(createFrame);
+
+	function clearFrame(){
+		_firebugDoc = null;
+		_firebugWin.console.clear();
+		_firebugWin = null;
+		consoleFrame = null;
+		consoleBody = null;
+		consoleObjectInspector = null;
+		commandLine = null;
+		messageQueue = [];
+		groupStack = [];
+		timeMap = {};
+	}
+	dojo.addOnUnload(clearFrame);
 
 	function evalCommandLine(){
 		var text = commandLine.value;
@@ -452,11 +464,11 @@ if(
 	function pushGroup(message, className){
 		logFormatted(message, className);
 
-		var groupRow = consoleBody.ownerDocument.createElement("div");
-		groupRow.className = "logGroup";
+		//var groupRow = consoleBody.ownerDocument.createElement("div");
+		//groupRow.className = "logGroup";
 		var groupRowBox = consoleBody.ownerDocument.createElement("div");
 		groupRowBox.className = "logGroupBox";
-		groupRow.appendChild(groupRowBox);
+		//groupRow.appendChild(groupRowBox);
 		appendRow(groupRowBox);
 		groupStack.push(groupRowBox);
 	}
@@ -482,9 +494,8 @@ if(
 		
 		for(var i = 0; i < parts.length; ++i){
 			var part = parts[i];
-			if(part && typeof(part) == "object"){
-				var object = objects[++objIndex];
-				part.appender(object, html);
+			if(part && typeof part == "object"){
+				part.appender(objects[++objIndex], html);
 			}else{
 				appendText(part, html);
 			}
@@ -497,10 +508,15 @@ if(
 			appendText(" ", html);
 			
 			var object = objects[i];
-			if(!object){ continue; }
-			if(typeof(object) == "string"){
+			if(object === undefined || object === null ){
+				appendNull(object, html);
+
+			}else if(typeof(object) == "string"){
 				appendText(object, html);
-				
+		
+			}else if(object.nodeType == 9){
+				appendText("[ XmlDoc ]", html);
+
 			}else if(object.nodeType == 1){
 				// simple tracing of dom nodes
 				appendText("< "+object.tagName+" id=\""+ object.id+"\" />", html);
@@ -529,16 +545,14 @@ if(
 			// avoid parsing these objects unless necessary
 			btn.obj = obs[i];
 	
-			dojo.connect(btn, "onclick", function(){
+			_firebugWin.console._connects.push(dojo.connect(btn, "onclick", function(){
 				// hide rows
 				consoleBody.style.display = "none";
 				consoleObjectInspector.style.display = "block";
 				// create a back button
 				var bkBtn = '<a href="javascript:console.closeObjectInspector();">&nbsp;<<&nbsp;Back</a>';
 				consoleObjectInspector.innerHTML = bkBtn + "<pre>" + printObject( this.obj ) + "</pre>";
-													  
-			})
-
+			}));
 		}
 	}
 
@@ -579,7 +593,7 @@ if(
 					return "&quot;";
 			}
 			return "?";
-		};
+		}
 		return String(value).replace(/[<>&"']/g, replaceChars);
 	}
 
@@ -731,18 +745,16 @@ if(
 	}
 
 	function onError(msg, href, lineNo){
-		var html = [];
-		
 		var lastSlash = href.lastIndexOf("/");
 		var fileName = lastSlash == -1 ? href : href.substr(lastSlash+1);
-		
-		html.push(
+
+		var html = [
 			'<span class="errorMessage">', msg, '</span>', 
 			'<div class="objectBox-sourceLink">', fileName, ' (line ', lineNo, ')</div>'
-		);
-		
+		];
+
 		logRow(html, "error");
-	};
+	}
 
 
 	//After converting to div instead of iframe, now getting two keydowns right away in IE 6.
@@ -752,7 +764,7 @@ if(
 	function onKeyDown(event){
 		var timestamp = (new Date()).getTime();
 		if(timestamp > onKeyDownTime + 200){
-			var event = dojo.fixEvent(event);
+			event = dojo.fixEvent(event);
 			var keys = dojo.keys;
 			var ekc = event.keyCode;
 			onKeyDownTime = timestamp;
@@ -820,11 +832,16 @@ if(
 			commandLine.value = "";
 		}
 	}
+
+	function isArray(it){
+		return it && it instanceof Array || typeof it == "array";
+	}
+
 	//***************************************************************************************************
 	// Print Object Helpers
-	getAtts = function(o){
+	function getAtts(o){
 		//Get amount of items in an object
-		if(dojo.isArray(o)) { 
+		if(isArray(o)){
 			return "[array with " + o.length + " slots]"; 
 		}else{
 			var i = 0;
@@ -835,14 +852,13 @@ if(
 		}
 	}
 
-	printObject = function(o, i, txt){
-		
+	function printObject(o, i, txt){
 		// Recursively trace object, indenting to represent depth for display in object inspector
 		// TODO: counter to prevent overly complex or looped objects (will probably help with dom nodes)
 		var br = "\n"; // using a <pre>... otherwise we'd need a <br />
 		var ind = "  ";
-		txt = (txt) ? txt : "";
-		i = (i) ? i : ind;
+		txt = txt || "";
+		i = i || ind;
 		for(var nm in o){
 			if(typeof(o[nm]) == "object"){
 				txt += i+nm +" -> " + getAtts(o[nm]) + br;
@@ -853,9 +869,8 @@ if(
 		}
 		return txt;
 	}
-		
-		
-	getObjectAbbr = function(obj){
+
+	function getObjectAbbr(obj){
 		// Gets an abbreviation of an object for display in log
 		// X items in object, including id
 		// X items in an array
@@ -869,19 +884,15 @@ if(
 		var cnt = 0;
 
 		if(isError){
-			nm = "[ Error: "+(obj["message"]||obj["description"]||obj)+" ]";
-		}else if(dojo.isArray(obj)){
-			nm ="[";
-			for(var i=0;i<obj.length;i++){
-				nm+=obj[i]+","
-				if(i>arCnt){
-					nm+=" ... ("+obj.length+" items)";
-					break;
-				}
+			nm = "[ Error: "+(obj.message || obj.description || obj)+" ]";
+		}else if(isArray(obj)){
+			nm = "[" + obj.slice(0,arCnt).join(",");
+			if(obj.length > arCnt){
+				nm += " ... ("+obj.length+" items)";
 			}
-			nm+="]";
-		}else if((!dojo.isObject(obj))||dojo.isString(obj)){
-			nm = obj+"";
+			nm += "]";
+		}else if(typeof obj != "object" || typeof obj == "string"){
+			nm = obj + "";
 		}else{
 			nm = "{";
 			for(var i in obj){
@@ -901,7 +912,7 @@ if(
 	addEvent(document, dojo.isIE || dojo.isSafari ? "keydown" : "keypress", onKeyDown);
 	
 	if(	(document.documentElement.getAttribute("debug") == "true")||
-		(djConfig.isDebug)
+		(dojo.config.isDebug)
 	){
 		toggleConsole(true);
 	}

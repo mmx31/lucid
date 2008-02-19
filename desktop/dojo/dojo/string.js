@@ -2,6 +2,12 @@ if(!dojo._hasResource["dojo.string"]){ //_hasResource checks added by build. Do 
 dojo._hasResource["dojo.string"] = true;
 dojo.provide("dojo.string");
 
+/*=====
+dojo.string = { 
+	// summary: String utilities for Dojo
+};
+=====*/
+
 dojo.string.pad = function(/*String*/text, /*int*/size, /*String?*/ch, /*boolean?*/end){
 	// summary:
 	//		Pad a string to guarantee that it is at least 'size' length by

@@ -6,10 +6,10 @@ dojo.provide("dojox.image.SlideShow");
 // For a sample usage, see http://www.skynet.ie/~sos/photos.php
 //
 // @author  Copyright 2007 Shane O Sullivan (shaneosullivan1@gmail.com)
-// @license Licensed under the Academic Free License 3.0 http://www.opensource.org/licenses/afl-3.0.php
 //
 //	TODO: more cleanups
 //
+dojo.require("dojo.string");
 dojo.require("dojo.fx");
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
@@ -17,6 +17,8 @@ dojo.require("dijit._Templated");
 dojo.declare("dojox.image.SlideShow",
 	[dijit._Widget, dijit._Templated],
 	{
+	// summary: A Slideshow Widget
+
 	// imageHeight: Number
 	//	The maximum height of an image
 	imageHeight: 375,
@@ -30,13 +32,13 @@ dojo.declare("dojox.image.SlideShow",
 	title: "",
 
 	// titleTemplate: String
-	//	a way to customize the wording in the title. supported tags to be populated are:
-	//		@title = the passed title of the image
-	//		@current = the current index of the image
-	//		@total = the total number of images in the SlideShow
+	//	a way to customize the wording in the title. supported parameters to be populated are:
+	//		${title} = the passed title of the image
+	//		${current} = the current index of the image
+	//		${total} = the total number of images in the SlideShow
 	//
 	//	should add more?
-	titleTemplate: '@title <span class="slideShowCounterText">(@current of @total)</span>',
+	titleTemplate: '${title} <span class="slideShowCounterText">(${current} of ${total})</span>',
 
 	// noLink: Boolean
 	//	Prevents the slideshow from putting an anchor link around the displayed image
@@ -63,6 +65,10 @@ dojo.declare("dojox.image.SlideShow",
 	//	If true, then images are preloaded, before the user navigates to view them.
 	//	If false, an image is not loaded until the user views it.
 	autoLoad: true,
+
+	// autoStart: Boolean
+	//	If true, the SlideShow begins playing immediately
+	autoStart: false,
 	
 	// fixedHeight: Boolean
 	// If true, the widget does not resize itself to fix the displayed image.
@@ -96,7 +102,7 @@ dojo.declare("dojox.image.SlideShow",
 	
 	// _tempImgPath: URL
 	//	URL to the image to display when an image is not yet fully loaded.
-	_tempImgPath: dojo.moduleUrl("dojox.image", "resources/images/1pixel.gif"),
+	_tempImgPath: dojo.moduleUrl("dojo", "resources/blank.gif"),
 
 	// _imageCounter: Number
 	//	A counter to keep track of which index image is to be loaded next
@@ -113,7 +119,7 @@ dojo.declare("dojox.image.SlideShow",
 
 	postCreate: function(){
 		// summary: Initilizes the widget, sets up listeners and shows the first image
-		this.inherited("postCreate",arguments);
+		this.inherited(arguments);
 		var img = document.createElement("img");
 
 		// FIXME: should API be to normalize an image to fit in the specified height/width?
@@ -123,11 +129,11 @@ dojo.declare("dojox.image.SlideShow",
 		if(this.hasNav){
 			dojo.connect(this.outerNode, "onmouseover", function(evt){
 				try{_this._showNav();}
-				catch(e){}			
+				catch(e){} //TODO: remove try/catch
 			});		
 			dojo.connect(this.outerNode, "onmouseout", function(evt){
 				try{_this._hideNav(evt);}
-				catch(e){}
+				catch(e){} //TODO: remove try/catch
 			});
 		}
 		
@@ -137,8 +143,7 @@ dojo.declare("dojox.image.SlideShow",
 		var _this = this;
 		
 		this.largeNode.appendChild(img);
-		this._tmpImage = img;
-		this._currentImage = img;
+		this._tmpImage = this._currentImage = img;
 		this._fitSize(true);
 		
 		this._loadImage(0, function(){
@@ -160,10 +165,11 @@ dojo.declare("dojox.image.SlideShow",
 		//	data store.  The three attributes allowed are 'linkAttr', 'imageLargeAttr' and 'titleAttr'
 		this.reset();
 		var _this = this;
+		
 		this._request = {
 			query: {},
-			start: ((request.start) ? request.start : 0),
-			count: ((request.count) ? request.count : this.pageSize),
+			start: request.start || 0,
+			count: request.count || this.pageSize,
 			onBegin: function(count, request){
 				_this.maxPhotos = count;
 			}
@@ -173,10 +179,12 @@ dojo.declare("dojox.image.SlideShow",
 			this.imageLargeAttr = paramNames.imageLargeAttr;
 		}
 	
-		var _this = this;
 		var _complete = function(items){
 			_this.showImage(0); 
 			_this._request.onComplete = null;
+			if(_this.autoStart){
+				_this.toggleSlideShow(); 
+			}
 		};
 		
 		this.imageStore = dataStore;
@@ -195,35 +203,33 @@ dojo.declare("dojox.image.SlideShow",
 		while(this.hiddenNode.firstChild){
 			this.hiddenNode.removeChild(this.hiddenNode.firstChild);
 		}
-		var img;
-		for(var pos = 0; pos < this.images.length; pos++){
-			img = this.images[pos];
+		dojo.forEach(this.images, function(img){
 			if(img && img.parentNode){ img.parentNode.removeChild(img); }
-		}
+		});
 		this.images = [];
 		this.isInitialized = false;
 		this._imageCounter = 0;
 	},
 
-	isImageLoaded: function(idx){
+	isImageLoaded: function(index){
 		// summary: Returns true if image at the specified index is loaded, false otherwise.
-		// idx:
+		// index:
 		//	The number index in the data store to check if it is loaded.
-		return this.images && this.images.length > index && this.images[idx];
+		return this.images && this.images.length > index && this.images[index];
 	},
 
-	moveImageLoadingPointer: function(idx){
+	moveImageLoadingPointer: function(index){
 		// summary: If 'autoload' is true, this tells the widget to start loading
 		//	images from the specified pointer.
-		// idx:
+		// index:
 		//	The number index in the data store to start loading images from.
-		this._imageCounter = idx;
+		this._imageCounter = index;
 	},
 	
 	destroy: function(){
 		// summary: Cleans up the widget when it is being destroyed
 		if(this._slideId) { this._stop(); }
-		this.inherited("destroy",arguments);
+		this.inherited(arguments);
 	},
 
 	showNextImage: function(inTimer, forceLoop){
@@ -264,7 +270,7 @@ dojo.declare("dojox.image.SlideShow",
 		// summary: Returns the topic id published to when an image is shown
 		// description:
 		//	The information published is: index, title and url
-		return (this.widgetId ? this.widgetId : this.id) + "/imageShow";
+		return (this.widgetId || this.id) + "/imageShow";
 	},
 
 	getLoadTopicName: function(){
@@ -274,9 +280,9 @@ dojo.declare("dojox.image.SlideShow",
 		return (this.widgetId ? this.widgetId : this.id) + "/imageLoad";
 	},
 
-	showImage: function(idx, /* Function? */callback){
-		// summary: Shows the image at index 'idx'.
-		// idx: Number
+	showImage: function(index, /* Function? */callback){
+		// summary: Shows the image at index 'index'.
+		// index: Number
 		//	The position of the image in the data store to display
 		// callback: Function
 		//	Optional callback function to call when the image has finished displaying.
@@ -284,21 +290,21 @@ dojo.declare("dojox.image.SlideShow",
 		if(!callback && this._slideId){ this.toggleSlideShow(); }
 		var _this = this;
 		var current = this.largeNode.getElementsByTagName("div");
-		this.imageIndex = idx;
+		this.imageIndex = index;
 
 		var showOrLoadIt = function() {
 			//If the image is already loaded, then show it. 
-			if(_this.images[idx]){
+			if(_this.images[index]){
 				while(_this.largeNode.firstChild){
 					_this.largeNode.removeChild(_this.largeNode.firstChild);
 				}
-				_this.images[idx].style.opacity = 0;
-				_this.largeNode.appendChild(_this.images[idx]);
-				_this._currentImage = _this.images[idx]._img;
+				_this.images[index].style.opacity = 0;
+				_this.largeNode.appendChild(_this.images[index]);
+				_this._currentImage = _this.images[index]._img;
 				_this._fitSize();
 								
 			    var onEnd = function(a,b,c) {
-					var img = _this.images[idx].firstChild;
+					var img = _this.images[index].firstChild;
 					if(img.tagName.toLowerCase() != "img"){img = img.firstChild;}
 					title = img.getAttribute("title");
 					
@@ -306,7 +312,7 @@ dojo.declare("dojox.image.SlideShow",
 						_this._showNav(true);
 					}
 					dojo.publish(_this.getShowTopicName(), [{
-						index: idx,	
+						index: index,	
 						title: title,
 						url: img.getAttribute("src")
 					}]);
@@ -315,15 +321,15 @@ dojo.declare("dojox.image.SlideShow",
         		};
 				
 				dojo.fadeIn({
-					node: _this.images[idx],
+					node: _this.images[index],
 					duration: 300,
 					onEnd: onEnd
 				}).play();
 			}else{
 				//If the image is not loaded yet, load it first, then show it.
-				_this._loadImage(idx, function(){
-					dojo.publish(_this.getLoadTopicName(), [idx]);
-					_this.showImage(idx, callback);	
+				_this._loadImage(index, function(){
+					dojo.publish(_this.getLoadTopicName(), [index]);
+					_this.showImage(index, callback);	
 				});
 			}
 		};
@@ -372,23 +378,23 @@ dojo.declare("dojox.image.SlideShow",
 		this._loadImage(this._imageCounter);
 	},
 	
-	_loadImage: function(idx, callbackFn){
+	_loadImage: function(index, callbackFn){
 		// summary: Load image at specified index
 		// description:
-		//	This function loads the image at position 'idx' into the
+		//	This function loads the image at position 'index' into the
 		//	internal cache of images.  This does not cause the image to be displayed.
-		// idx:
+		// index:
 		//	The position in the data store to load an image from.
 		// callbackFn:
 		//	An optional function to execute when the image has finished loading.	
-		if(this.images[idx] || !this._request) { return; }
+		if(this.images[index] || !this._request) { return; }
 		
-		var pageStart = idx - (idx % this.pageSize);
+		var pageStart = index - (index % this.pageSize);
 
 		this._request.start = pageStart;		
 
 		this._request.onComplete = function(items){
-			var diff = idx - pageStart;
+			var diff = index - pageStart;
 			if(items && items.length > diff){
 				loadIt(items[diff]);
 			}else{ /* Squelch - console.log("Got an empty set of items"); */ }
@@ -411,13 +417,13 @@ dojo.declare("dojox.image.SlideShow",
 				a.appendChild(img);
 			}
 
-			div.setAttribute("id",_this.id + "_imageDiv" + idx);
+			div.setAttribute("id",_this.id + "_imageDiv" + index);
 			dojo.connect(img, "onload", function(){
 				_this._fitImage(img);
 				div.setAttribute("width",_this.imageWidth);
 				div.setAttribute("height",_this.imageHeight);				
 				
-				dojo.publish(_this.getLoadTopicName(), [idx]);
+				dojo.publish(_this.getLoadTopicName(), [index]);
 				_this._loadNextImage();
 				if(callbackFn){ callbackFn(); }
 			});
@@ -427,7 +433,7 @@ dojo.declare("dojox.image.SlideShow",
 			dojo.addClass(titleDiv, "slideShowTitle");
 			div.appendChild(titleDiv);
 		
-			_this.images[idx] = div;
+			_this.images[index] = div;
 			img.setAttribute("src", url);
 			
 			var title = _this.imageStore.getValue(item,_this.titleAttr);
@@ -438,7 +444,7 @@ dojo.declare("dojox.image.SlideShow",
 
 	_stop: function(){
 		// summary: Stops a running slide show.
-		if(this._slideId) { clearTimeout(this._slideId); }
+		if(this._slideId){ clearTimeout(this._slideId); }
 		this._slideId = null;
 		this._timerCancelled = true;
 		dojo.removeClass(this.domNode,"slideShowPaused");
@@ -447,7 +453,7 @@ dojo.declare("dojox.image.SlideShow",
 	_prev: function(){
 		// summary: Show the previous image.
 		// FIXME: either pull code from showNext/prev, or call it here
-		if(this.imageIndex < 1) { return;}
+		if(this.imageIndex < 1){ return; }
 		this.showImage(this.imageIndex - 1);
 	},
 
@@ -458,7 +464,8 @@ dojo.declare("dojox.image.SlideShow",
 
 	_startTimer: function(){
 		// summary: Starts a timeout to show the next image when a slide show is active
-		this._slideId = setTimeout("dijit.byId('"+this.id +"').showNextImage(true);", this.slideshowInterval * 1000);
+		var id = this.id;
+		this._slideId = setTimeout(function(){dijit.byId(id).showNextImage(true);}, this.slideshowInterval * 1000);
 	},
 	
 	_calcNavDimensions: function() {
@@ -467,7 +474,7 @@ dojo.declare("dojox.image.SlideShow",
 		dojo.style(this.navNode, "position", "absolute");
 		
 		//Place the navigation controls far off screen
-		dojo.style(this.navNode, "left", "-10000px");
+		dojo.style(this.navNode, "top", "-10000px");
 		
 		//Make the navigation controls visible
 		dojo._setOpacity(this.navNode, 99);
@@ -478,23 +485,22 @@ dojo.declare("dojox.image.SlideShow",
 		
 		dojo._setOpacity(this.navNode, 0);
 		dojo.style(this.navNode, "position", "");
-		dojo.style(this.navNode, "left", "");		
+		dojo.style(this.navNode, "top", "");		
 	},
 
 	_setTitle: function(title){
 		// summary: Sets the title of the image to be displayed
 		// title: String
 		//	The String title of the image
-		this.titleNode.innerHTML = this.titleTemplate.replace('@title',title)
-			.replace('@current', String(Number(this.imageIndex) + 1)) 
-			.replace('@total',String(this.maxPhotos));
+		this.titleNode.innerHTML = dojo.string.substitute(this.titleTemplate,
+			{ title: title, current: 1 + this.imageIndex, total: this.maxPhotos});
 	},
 	
 	_fitImage: function(img) {
 		// summary: Ensures that the image width and height do not exceed the maximum.
 		// img: Node
 		//	The image DOM node to optionally resize
-		var width = img.width
+		var width = img.width;
 		var height = img.height;
 		
 		if(width > this.imageWidth){

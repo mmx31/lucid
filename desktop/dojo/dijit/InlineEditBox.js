@@ -9,7 +9,7 @@ dojo.require("dijit._Container");
 dojo.require("dijit.form.Button");
 dojo.require("dijit.form.TextBox");
 
-dojo.requireLocalization("dijit", "common", null, "ko,zh,ja,zh-tw,ru,it,hu,fr,pt,ROOT,pl,es,de,cs");
+dojo.requireLocalization("dijit", "common", null, "zh,pt,ru,sv,de,ja,ROOT,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
 
 dojo.declare("dijit.InlineEditBox",
 	dijit._Widget,
@@ -98,10 +98,15 @@ dojo.declare("dijit.InlineEditBox",
 			this.displayNode.setAttribute("tabIndex", 0);
 		}
 
-		if(!this.value){
-			this.value = this.displayNode.innerHTML;
-		}
-		this._setDisplayValue(this.value);	// if blank, change to icon for "input needed"
+		this.setValue(this.value || this.displayNode.innerHTML);
+	},
+
+	setDisabled: function(/*Boolean*/ disabled){
+		// summary:
+		//		Set disabled state of widget.
+
+		this.disabled = disabled;
+		dijit.setWaiState(this.focusNode || this.domNode, "disabled", disabled);
 	},
 
 	_onMouseOver: function(){
@@ -134,7 +139,7 @@ dojo.declare("dijit.InlineEditBox",
 		// Placeholder for edit widget
 		// Put place holder (and eventually editWidget) before the display node so that it's positioned correctly
 		// when Calendar dropdown appears, which happens automatically on focus.
-		var placeholder = document.createElement("span");
+		var placeholder = dojo.doc.createElement("span");
 		dojo.place(placeholder, this.domNode, "before");
 
 		var ew = this.editWidget = new dijit._InlineEditor({
@@ -196,22 +201,27 @@ dojo.declare("dijit.InlineEditBox",
 		//		Focus on the display mode text
 		this.editing = false;
 
-		this.value = this.editWidget.getValue() + "";
-		if(this.renderAsHtml){
-			this.value = this.value.replace(/&/gm, "&amp;").replace(/</gm, "&lt;").replace(/>/gm, "&gt;").replace(/"/gm, "&quot;")
-				.replace("\n", "<br>");
+		var value = this.editWidget.getValue() + "";
+		if(!this.renderAsHtml){
+			value = value.replace(/&/gm, "&amp;").replace(/</gm, "&lt;").replace(/>/gm, "&gt;").replace(/"/gm, "&quot;")
+				.replace(/\n/g, "<br>");
 		}
-		this._setDisplayValue(this.value);
+		this.setValue(value);
 
 		// tell the world that we have changed
-		this.onChange(this.value);
+		this.onChange(value);
 
 		this._showText(focus);	
 	},
 
-	_setDisplayValue: function(/*String*/ val){
+	setValue: function(/*String*/ val){
 		// summary: inserts specified HTML value into this node, or an "input needed" character if node is blank
-		this.displayNode.innerHTML = val || this.noValueIndicator;
+		this.value = val;
+		this.displayNode.innerHTML = dojo.trim(val) || this.noValueIndicator;
+	},
+
+	getValue: function(){
+		return this.value;
 	},
 
 	cancel: function(/*Boolean*/ focus){
@@ -239,7 +249,7 @@ dojo.declare(
 	// value: String
 	//		Value as an HTML string or plain text string, depending on renderAsHTML flag
 
-	templateString:"<fieldset dojoAttachPoint=\"editNode\" waiRole=\"presentation\" style=\"position: absolute; visibility:hidden\" class=\"dijitReset dijitInline\"\n\tdojoAttachEvent=\"onkeypress: _onKeyPress\" \n\t><input dojoAttachPoint=\"editorPlaceholder\"\n\t/><span dojoAttachPoint=\"buttonContainer\"\n\t\t><button class='saveButton' dojoAttachPoint=\"saveButton\" dojoType=\"dijit.form.Button\" dojoAttachEvent=\"onClick:save\">${buttonSave}</button\n\t\t><button class='cancelButton' dojoAttachPoint=\"cancelButton\" dojoType=\"dijit.form.Button\" dojoAttachEvent=\"onClick:cancel\">${buttonCancel}</button\n\t></span\n></fieldset>\n",
+	templateString:"<fieldset dojoAttachPoint=\"editNode\" waiRole=\"presentation\" style=\"position: absolute; visibility:hidden\" class=\"dijitReset dijitInline\"\n\tdojoAttachEvent=\"onkeypress: _onKeyPress\" \n\t><input dojoAttachPoint=\"editorPlaceholder\"\n\t/><span dojoAttachPoint=\"buttonContainer\"\n\t\t><button class='saveButton' dojoAttachPoint=\"saveButton\" dojoType=\"dijit.form.Button\" dojoAttachEvent=\"onClick:save\" disabled=\"true\">${buttonSave}</button\n\t\t><button class='cancelButton' dojoAttachPoint=\"cancelButton\" dojoType=\"dijit.form.Button\" dojoAttachEvent=\"onClick:cancel\">${buttonCancel}</button\n\t></span\n></fieldset>\n",
 	widgetsInTemplate: true,
 
 	postMixInProperties: function(){
@@ -273,7 +283,12 @@ dojo.declare(
 			ew.domNode.style.width = this.width + (Number(this.width)==this.width ? "px" : "");			
 		}
 
-		this.connect(this.editWidget, "onChange", "_onChange");
+		this.connect(ew, "onChange", "_onChange");
+
+		// Monitor keypress on the edit widget.   Note that edit widgets do a stopEvent() on ESC key (to
+		// prevent Dialog from closing when the user just wants to revert the value in the edit widget),
+		// so this is the only way we can see the key press event.
+		this.connect(ew.focusNode || ew.domNode, "onkeypress", "_onKeyPress");
 
 		// setting the value of the edit widget will cause a possibly asynchronous onChange() call.
 		// we need to ignore it, since we are only interested in when the user changes the value.
@@ -307,6 +322,7 @@ dojo.declare(
 			return;
 		}
 		if(this.autoSave){
+			if(e.altKey || e.ctrlKey){ return; }
 			// If Enter/Esc pressed, treat as save/cancel.
 			if(e.keyCode == dojo.keys.ESCAPE){
 				dojo.stopEvent(e);
@@ -316,6 +332,9 @@ dojo.declare(
 				dojo.stopEvent(e);
 				this._exitInProgress = true;
 				this.save(true);
+			}else if(e.keyCode == dojo.keys.TAB){
+				this._exitInProgress = true;
+				this.save(false);
 			}
 		}else{
 			var _this = this;
@@ -323,7 +342,7 @@ dojo.declare(
 			// The delay gives the browser a chance to update the Textarea.
 			setTimeout(
 				function(){
-					_this.saveButton.setDisabled(_this.getValue() == _this._initialText);
+					_this.saveButton.setAttribute("disabled", _this.getValue() == _this._initialText);
 				}, 100);
 		}
 	},
@@ -356,7 +375,6 @@ dojo.declare(
 		// summary:
 		//	Called when the underlying widget fires an onChange event,
 		//	which means that the user has finished entering the value
-		
 		if(this._ignoreNextOnChange){
 			delete this._ignoreNextOnChange;
 			return;
@@ -373,7 +391,7 @@ dojo.declare(
 			// in case the keypress event didn't get through (old problem with Textarea that has been fixed
 			// in theory) or if the keypress event comes too quickly and the value inside the Textarea hasn't
 			// been updated yet)
-			this.saveButton.setDisabled((this.getValue() == this._initialText) || !this.enableSave());
+			this.saveButton.setAttribute("disabled", (this.getValue() == this._initialText) || !this.enableSave());
 		}
 	},
 	

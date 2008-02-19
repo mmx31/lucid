@@ -1,6 +1,7 @@
 if(!dojo._hasResource["dijit.layout.SplitContainer"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit.layout.SplitContainer"] = true;
 dojo.provide("dijit.layout.SplitContainer");
+dojo.deprecated("dijit.layout.SplitContainer is deprecated", "use BorderContainer with splitter instead", 2.0);
 
 //
 // FIXME: make it prettier
@@ -61,7 +62,7 @@ dojo.declare("dijit.layout.SplitContainer",
 				this.sizerWidth = parseInt(this.sizerWidth.toString());
 			}catch(e){ this.sizerWidth = 7; }
 		}
-		var sizer = this.virtualSizer = document.createElement('div');
+		var sizer = this.virtualSizer = dojo.doc.createElement('div');
 		sizer.style.position = 'relative';
 
 		// #1681: work around the dreaded 'quirky percentages in IE' layout bug
@@ -78,8 +79,14 @@ dojo.declare("dijit.layout.SplitContainer",
 		dojo.setSelectable(sizer, false);
 	},
 
+	destroy: function(){
+		delete this.virtualSizer;
+		dojo.forEach(this._ownconnects, dojo.disconnect);
+		this.inherited(arguments);
+	},
 	startup: function(){
 		if(this._started){ return; }
+
 		dojo.forEach(this.getChildren(), function(child, i, children){
 			// attach the children and create the draggers
 			this._injectChild(child);
@@ -92,8 +99,8 @@ dojo.declare("dijit.layout.SplitContainer",
 		if(this.persist){
 			this._restoreState();
 		}
-		this.inherited("startup",arguments); 
-		this._started = true;
+
+		this.inherited(arguments); 
 	},
 
 	_injectChild: function(child){
@@ -105,34 +112,37 @@ dojo.declare("dijit.layout.SplitContainer",
 		var i = this.sizers.length;
 
 		// TODO: use a template for this!!!
-		var sizer = this.sizers[i] = document.createElement('div');
+		var sizer = this.sizers[i] = dojo.doc.createElement('div');
+		this.domNode.appendChild(sizer);
+
 		sizer.className = this.isHorizontal ? 'dijitSplitContainerSizerH' : 'dijitSplitContainerSizerV';
 
 		// add the thumb div
-		var thumb = document.createElement('div');
+		var thumb = dojo.doc.createElement('div');
 		thumb.className = 'thumb';
 		sizer.appendChild(thumb);
 
 		// FIXME: are you serious? why aren't we using mover start/stop combo?
 		var self = this;
 		var handler = (function(){ var sizer_i = i; return function(e){ self.beginSizing(e, sizer_i); } })();
-		dojo.connect(sizer, "onmousedown", handler);
-
-		this.domNode.appendChild(sizer);
+		this.connect(sizer, "onmousedown", handler);
+		
 		dojo.setSelectable(sizer, false);
 	},
 
 	removeChild: function(widget){
 		// summary: Remove sizer, but only if widget is really our child and
 		// we have at least one sizer to throw away
-		if(this.sizers.length && dojo.indexOf(this.getChildren(), widget) != -1){
-			var i = this.sizers.length - 1;
-			dojo._destroyElement(this.sizers[i]);
-			this.sizers.length--;
+		if(this.sizers.length){
+			var i=dojo.indexOf(this.getChildren(), widget)
+			if(i != -1){
+				dojo._destroyElement(this.sizers[i]);
+				this.sizers.splice(i,1);
+			}
 		}
 
 		// Remove widget and repaint
-		this.inherited("removeChild",arguments); 
+		this.inherited(arguments); 
 		if(this._started){
 			this.layout();
 		}
@@ -377,9 +387,9 @@ dojo.declare("dijit.layout.SplitContainer",
 		//					
 		// attach mouse events
 		//
-		this._connects = [];
-		this._connects.push(dojo.connect(document.documentElement, "onmousemove", this, "changeSizing"));
-		this._connects.push(dojo.connect(document.documentElement, "onmouseup", this, "endSizing"));
+		this._ownconnects = [];
+		this._ownconnects.push(dojo.connect(dojo.doc.documentElement, "onmousemove", this, "changeSizing"));
+		this._ownconnects.push(dojo.connect(dojo.doc.documentElement, "onmouseup", this, "endSizing"));
 
 		dojo.stopEvent(e);
 	},
@@ -413,7 +423,7 @@ dojo.declare("dijit.layout.SplitContainer",
 			this._saveState(this);
 		}
 
-		dojo.forEach(this._connects,dojo.disconnect); 
+		dojo.forEach(this._ownconnects,dojo.disconnect); 
 	},
 
 	movePoint: function(){

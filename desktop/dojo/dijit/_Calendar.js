@@ -13,33 +13,34 @@ dojo.declare(
 	"dijit._Calendar",
 	[dijit._Widget, dijit._Templated],
 	{
-		/*
-		summary:
-			A simple GUI for choosing a date in the context of a monthly calendar.
-
-		description:
-			This widget is used internally by other widgets and is not accessible
-			as a standalone widget.
-			This widget can't be used in a form because it doesn't serialize the date to an
-			<input> field.  For a form element, use DateTextBox instead.
-
-			Note that the parser takes all dates attributes passed in the `RFC 3339` format:
-			http://www.faqs.org/rfcs/rfc3339.html (2005-06-30T08:05:00-07:00)
-			so that they are serializable and locale-independent.
-
-		usage:
-			var calendar = new dijit._Calendar({}, dojo.byId("calendarNode"));
-		 	-or-
-			<div dojoType="dijit._Calendar"></div>
-		*/
-		templateString:"<table cellspacing=\"0\" cellpadding=\"0\" class=\"dijitCalendarContainer\">\n\t<thead>\n\t\t<tr class=\"dijitReset dijitCalendarMonthContainer\" valign=\"top\">\n\t\t\t<th class='dijitReset' dojoAttachPoint=\"decrementMonth\">\n\t\t\t\t<span class=\"dijitInline dijitCalendarIncrementControl dijitCalendarDecrease\"><span dojoAttachPoint=\"decreaseArrowNode\" class=\"dijitA11ySideArrow dijitCalendarIncrementControl dijitCalendarDecreaseInner\">-</span></span>\n\t\t\t</th>\n\t\t\t<th class='dijitReset' colspan=\"5\">\n\t\t\t\t<div dojoAttachPoint=\"monthLabelSpacer\" class=\"dijitCalendarMonthLabelSpacer\"></div>\n\t\t\t\t<div dojoAttachPoint=\"monthLabelNode\" class=\"dijitCalendarMonth\"></div>\n\t\t\t</th>\n\t\t\t<th class='dijitReset' dojoAttachPoint=\"incrementMonth\">\n\t\t\t\t<div class=\"dijitInline dijitCalendarIncrementControl dijitCalendarIncrease\"><span dojoAttachPoint=\"increaseArrowNode\" class=\"dijitA11ySideArrow dijitCalendarIncrementControl dijitCalendarIncreaseInner\">+</span></div>\n\t\t\t</th>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<th class=\"dijitReset dijitCalendarDayLabelTemplate\"><span class=\"dijitCalendarDayLabel\"></span></th>\n\t\t</tr>\n\t</thead>\n\t<tbody dojoAttachEvent=\"onclick: _onDayClick\" class=\"dijitReset dijitCalendarBodyContainer\">\n\t\t<tr class=\"dijitReset dijitCalendarWeekTemplate\">\n\t\t\t<td class=\"dijitReset dijitCalendarDateTemplate\"><span class=\"dijitCalendarDateLabel\"></span></td>\n\t\t</tr>\n\t</tbody>\n\t<tfoot class=\"dijitReset dijitCalendarYearContainer\">\n\t\t<tr>\n\t\t\t<td class='dijitReset' valign=\"top\" colspan=\"7\">\n\t\t\t\t<h3 class=\"dijitCalendarYearLabel\">\n\t\t\t\t\t<span dojoAttachPoint=\"previousYearLabelNode\" class=\"dijitInline dijitCalendarPreviousYear\"></span>\n\t\t\t\t\t<span dojoAttachPoint=\"currentYearLabelNode\" class=\"dijitInline dijitCalendarSelectedYear\"></span>\n\t\t\t\t\t<span dojoAttachPoint=\"nextYearLabelNode\" class=\"dijitInline dijitCalendarNextYear\"></span>\n\t\t\t\t</h3>\n\t\t\t</td>\n\t\t</tr>\n\t</tfoot>\n</table>\t\n",
+	//	
+	//	summary:
+	//		A simple GUI for choosing a date in the context of a monthly calendar.
+	//
+	//	description:
+	//		This widget is used internally by other widgets and is not accessible
+	//		as a standalone widget.
+	//		This widget can't be used in a form because it doesn't serialize the date to an
+	//		<input> field.  For a form element, use DateTextBox instead.
+	//
+	//		Note that the parser takes all dates attributes passed in the `RFC 3339` format:
+	//		http://www.faqs.org/rfcs/rfc3339.html (2005-06-30T08:05:00-07:00)
+	//		so that they are serializable and locale-independent.
+	//
+	//	example:
+	//	|	var calendar = new dijit._Calendar({}, dojo.byId("calendarNode"));
+	//
+	//	example:
+	//	|	<div dojoType="dijit._Calendar"></div>
+	//	
+		templateString:"<table cellspacing=\"0\" cellpadding=\"0\" class=\"dijitCalendarContainer\">\n\t<thead>\n\t\t<tr class=\"dijitReset dijitCalendarMonthContainer\" valign=\"top\">\n\t\t\t<th class='dijitReset' dojoAttachPoint=\"decrementMonth\">\n\t\t\t\t<div class=\"dijitInline dijitCalendarIncrementControl dijitCalendarDecrease\"><span dojoAttachPoint=\"decreaseArrowNode\" class=\"dijitA11ySideArrow dijitCalendarIncrementControl dijitCalendarDecreaseInner\">-</span></div>\n\t\t\t</th>\n\t\t\t<th class='dijitReset' colspan=\"5\">\n\t\t\t\t<div dojoAttachPoint=\"monthLabelSpacer\" class=\"dijitCalendarMonthLabelSpacer\"></div>\n\t\t\t\t<div dojoAttachPoint=\"monthLabelNode\" class=\"dijitCalendarMonthLabel\"></div>\n\t\t\t</th>\n\t\t\t<th class='dijitReset' dojoAttachPoint=\"incrementMonth\">\n\t\t\t\t<div class=\"dijitInline dijitCalendarIncrementControl dijitCalendarIncrease\"><span dojoAttachPoint=\"increaseArrowNode\" class=\"dijitA11ySideArrow dijitCalendarIncrementControl dijitCalendarIncreaseInner\">+</span></div>\n\t\t\t</th>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<th class=\"dijitReset dijitCalendarDayLabelTemplate\"><span class=\"dijitCalendarDayLabel\"></span></th>\n\t\t</tr>\n\t</thead>\n\t<tbody dojoAttachEvent=\"onclick: _onDayClick\" class=\"dijitReset dijitCalendarBodyContainer\">\n\t\t<tr class=\"dijitReset dijitCalendarWeekTemplate\">\n\t\t\t<td class=\"dijitReset dijitCalendarDateTemplate\"><span class=\"dijitCalendarDateLabel\"></span></td>\n\t\t</tr>\n\t</tbody>\n\t<tfoot class=\"dijitReset dijitCalendarYearContainer\">\n\t\t<tr>\n\t\t\t<td class='dijitReset' valign=\"top\" colspan=\"7\">\n\t\t\t\t<h3 class=\"dijitCalendarYearLabel\">\n\t\t\t\t\t<span dojoAttachPoint=\"previousYearLabelNode\" class=\"dijitInline dijitCalendarPreviousYear\"></span>\n\t\t\t\t\t<span dojoAttachPoint=\"currentYearLabelNode\" class=\"dijitInline dijitCalendarSelectedYear\"></span>\n\t\t\t\t\t<span dojoAttachPoint=\"nextYearLabelNode\" class=\"dijitInline dijitCalendarNextYear\"></span>\n\t\t\t\t</h3>\n\t\t\t</td>\n\t\t</tr>\n\t</tfoot>\n</table>\t\n",
 
 		// value: Date
-		// the currently selected Date
+		// 	the currently selected Date
 		value: new Date(),
 
 		// dayWidth: String
-		// How to represent the days of the week in the calendar header. See dojo.date.locale
+		// 	How to represent the days of the week in the calendar header. See dojo.date.locale
 		dayWidth: "narrow",
 
 		setValue: function(/*Date*/ value){
@@ -61,7 +62,7 @@ dojo.declare(
 			while(node.firstChild){
 				node.removeChild(node.firstChild);
 			}
-			node.appendChild(document.createTextNode(text));
+			node.appendChild(dojo.doc.createTextNode(text));
 		},
 
 		_populateGrid: function(){
@@ -112,6 +113,11 @@ dojo.declare(
 					clazz = "dijitCalendarDisabledDate " + clazz;
 				}
 
+				var clazz2 = this.getClassForDate(date, this.lang);
+				if(clazz2){
+					clazz += clazz2 + " " + clazz;
+				}
+
 				template.className =  clazz + "Month dijitCalendarDateTemplate";
 				template.dijitDateValue = date.valueOf();
 				var label = dojo.query(".dijitCalendarDateLabel", template)[0];
@@ -124,9 +130,11 @@ dojo.declare(
 
 			// Fill in localized prev/current/next years
 			var y = month.getFullYear() - 1;
+			var d = new Date();
 			dojo.forEach(["previous", "current", "next"], function(name){
+				d.setFullYear(y++);
 				this._setText(this[name+"YearLabelNode"],
-					dojo.date.locale.format(new Date(y++, 0), {selector:'year', locale:this.lang}));
+					dojo.date.locale.format(d, {selector:'year', locale:this.lang}));
 			}, this);
 
 			// Set up repeating mouse behavior
@@ -142,9 +150,13 @@ dojo.declare(
 			typematic("previousYearLabelNode", "year", -1);
 		},
 
-		postCreate: function(){
-			dijit._Calendar.superclass.postCreate.apply(this);
+		goToToday: function(){
+			this.setValue(new Date());
+		},
 
+		postCreate: function(){
+			this.inherited(arguments);
+			
 			var cloneClass = dojo.hitch(this, function(clazz, n){
 				var template = dojo.query(clazz, this.domNode)[0];
 	 			for(var i=0; i<n; i++){
@@ -196,17 +208,29 @@ dojo.declare(
 		},
 
 		onValueSelected: function(/*Date*/date){
-			//summary: a date cell was selected.  It may be the same as the previous value.
+			// summary: a date cell was selected.  It may be the same as the previous value.
 		},
 
 		onChange: function(/*Date*/date){
-			//summary: called only when the selected date has changed
+			// summary: called only when the selected date has changed
 		},
 
 		isDisabledDate: function(/*Date*/dateObject, /*String?*/locale){
 			// summary:
 			//	May be overridden to disable certain dates in the calendar e.g. isDisabledDate=dojo.date.locale.isWeekend
+/*=====
 			return false; // Boolean
+=====*/
+		},
+
+		getClassForDate: function(/*Date*/dateObject, /*String?*/locale){
+			// summary:
+			//  May be overridden to return CSS classes to associate with the date entry for the given dateObject,
+			//  for example to indicate a holiday in specified locale.
+
+/*=====
+			return ""; // String
+=====*/
 		}
 	}
 );

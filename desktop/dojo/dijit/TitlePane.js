@@ -11,8 +11,26 @@ dojo.declare(
 	"dijit.TitlePane",
 	[dijit.layout.ContentPane, dijit._Templated],
 {
-	// summary
-	//		A pane with a title on top, that can be opened or collapsed.
+	// summary: A pane with a title on top, that can be opened or collapsed.
+	//
+	// description: An accessible container with a Title Heading, and a content
+	//	section that slides open and closed. TitlePane is an extension to 
+	//	ContentPane, providing all the usesful content-control aspects from.
+	//
+	// example:
+	// | 	// load a TitlePane from remote file:
+	// |	var foo = new dijit.TitlePane({ href: "foobar.html", title:"Title" });
+	// |	foo.startup();
+	//
+	// example:
+	// |	<!-- markup href example: -->
+	// |	<div dojoType="dijit.TitlePane" href="foobar.html" title="Title"></div>
+	// 
+	// example:
+	// |	<!-- markup with inline data -->
+	// | 	<div dojoType="dijit.TitlePane" title="Title">
+	// |		<p>I am content</p>
+	// |	</div>
 	//
 	// title: String
 	//		Title of the pane
@@ -27,7 +45,7 @@ dojo.declare(
 	duration: 250,
 
 	// baseClass: String
-	//	the root className to use for the various states of this widget
+	//	The root className to use for the various states of this widget
 	baseClass: "dijitTitlePane",
 
 	templateString:"<div class=\"dijitTitlePane\">\n\t<div dojoAttachEvent=\"onclick:toggle,onkeypress: _onTitleKey,onfocus:_handleFocus,onblur:_handleFocus\" tabindex=\"0\"\n\t\t\twaiRole=\"button\" class=\"dijitTitlePaneTitle\" dojoAttachPoint=\"focusNode\">\n\t\t<div dojoAttachPoint=\"arrowNode\" class=\"dijitInline dijitArrowNode\"><span dojoAttachPoint=\"arrowNodeInner\" class=\"dijitArrowNodeInner\"></span></div>\n\t\t<div dojoAttachPoint=\"titleNode\" class=\"dijitTitlePaneTextNode\"></div>\n\t</div>\n\t<div class=\"dijitTitlePaneContentOuter\" dojoAttachPoint=\"hideNode\">\n\t\t<div class=\"dijitReset\" dojoAttachPoint=\"wipeNode\">\n\t\t\t<div class=\"dijitTitlePaneContentInner\" dojoAttachPoint=\"containerNode\" waiRole=\"region\" tabindex=\"-1\">\n\t\t\t\t<!-- nested divs because wipeIn()/wipeOut() doesn't work right on node w/padding etc.  Put padding on inner div. -->\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n",
@@ -39,7 +57,7 @@ dojo.declare(
 		}
 		this._setCss();
 		dojo.setSelectable(this.titleNode, false);
-		this.inherited("postCreate",arguments);
+		this.inherited(arguments);
 		dijit.setWaiState(this.containerNode, "labelledby", this.titleNode.id);
 		dijit.setWaiState(this.focusNode, "haspopup", "true");
 
@@ -62,21 +80,21 @@ dojo.declare(
 	},
 
 	setContent: function(content){
-		// summary
+		// summary:
 		// 		Typically called when an href is loaded.  Our job is to make the animation smooth
-		if(this._wipeOut.status() == "playing"){
-			// we are currently *closing* the pane, so just let that continue
-			this.inherited("setContent",arguments);
+		if(!this.open || this._wipeOut.status() == "playing"){
+			// we are currently *closing* the pane (or the pane is closed), so just let that continue
+			this.inherited(arguments);
 		}else{
 			if(this._wipeIn.status() == "playing"){
 				this._wipeIn.stop();
 			}
 
 			// freeze container at current height so that adding new content doesn't make it jump
-			dojo.marginBox(this.wipeNode, {h: dojo.marginBox(this.wipeNode).h});
+			dojo.marginBox(this.wipeNode, { h: dojo.marginBox(this.wipeNode).h });
 
 			// add the new content (erasing the old content, if any)
-			this.inherited("setContent",arguments);
+			this.inherited(arguments);
 
 			// call _wipeIn.play() to animate from current height to new height
 			this._wipeIn.play();
@@ -116,12 +134,9 @@ dojo.declare(
 		// summary: callback when user hits a key
 		if(e.keyCode == dojo.keys.ENTER || e.charCode == dojo.keys.SPACE){
 			this.toggle();
-		}
-		else if(e.keyCode == dojo.keys.DOWN_ARROW){
-			if(this.open){
-				this.containerNode.focus();
-				e.preventDefault();
-			}
+		}else if(e.keyCode == dojo.keys.DOWN_ARROW && this.open){
+			this.containerNode.focus();
+			e.preventDefault();
 	 	}
 	},
 	
@@ -129,12 +144,12 @@ dojo.declare(
 		// summary: handle blur and focus for this widget
 		
 		// add/removeClass is safe to call without hasClass in this case
-		dojo[(e.type=="focus" ? "addClass" : "removeClass")](this.focusNode,this.baseClass+"Focused");
+		dojo[(e.type == "focus" ? "addClass" : "removeClass")](this.focusNode, this.baseClass + "Focused");
 	},
 
 	setTitle: function(/*String*/ title){
 		// summary: sets the text of the title
-		this.titleNode.innerHTML=title;
+		this.titleNode.innerHTML = title;
 	}
 });
 

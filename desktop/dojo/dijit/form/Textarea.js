@@ -8,38 +8,52 @@ dojo.requireLocalization("dijit", "Textarea", null, "ROOT");
 
 dojo.declare(
 	"dijit.form.Textarea",
-	dijit.form._FormWidget,
-{
-	// summary
+	dijit.form._FormValueWidget,
+	{
+	// summary: A resizing textarea widget
+	//
+	// description:
 	//	A textarea that resizes vertically to contain the data.
 	//	Takes nearly all the parameters (name, value, etc.) that a vanilla textarea takes.
 	//	Cols is not supported and the width should be specified with style width.
 	//	Rows is not supported since this widget adjusts the height.
-	// usage:
-	//	<textarea dojoType="dijit.form.TextArea">...</textarea>
+	//
+	// example:
+	// |	<textarea dojoType="dijit.form.TextArea">...</textarea>
+	//
 
-	attributeMap: dojo.mixin(dojo.clone(dijit.form._FormWidget.prototype.attributeMap),
+	attributeMap: dojo.mixin(dojo.clone(dijit.form._FormValueWidget.prototype.attributeMap),
 		{style:"styleNode", 'class':"styleNode"}),
 
-	templateString: (dojo.isIE || dojo.isSafari || dojo.isMozilla) ?
-				((dojo.isIE || dojo.isSafari) ? '<fieldset id="${id}" class="dijitInline dijitInputField dijitTextArea" dojoAttachPoint="styleNode" waiRole="presentation"><div dojoAttachPoint="editNode,focusNode,eventNode" dojoAttachEvent="onpaste:_changing,oncut:_changing" waiRole="textarea" style="text-decoration:none;_padding-bottom:16px;display:block;overflow:auto;" contentEditable="true"></div>'
+	templateString: (dojo.isIE || dojo.isSafari || dojo.isFF) ?
+				((dojo.isIE || dojo.isSafari || dojo.isFF >= 3) ? '<fieldset id="${id}" class="dijitInline dijitInputField dijitTextArea" dojoAttachPoint="styleNode" waiRole="presentation"><div dojoAttachPoint="editNode,focusNode,eventNode" dojoAttachEvent="onpaste:_changing,oncut:_changing" waiRole="textarea" style="text-decoration:none;display:block;overflow:auto;" contentEditable="true"></div>'
 					: '<span id="${id}" class="dijitReset">'+
 					'<iframe src="javascript:<html><head><title>${_iframeEditTitle}</title></head><body><script>var _postCreate=window.frameElement?window.frameElement.postCreate:null;if(_postCreate)_postCreate();</script></body></html>"'+
 							' dojoAttachPoint="iframe,styleNode" dojoAttachEvent="onblur:_onIframeBlur" class="dijitInline dijitInputField dijitTextArea"></iframe>')
 				+ '<textarea name="${name}" value="${value}" dojoAttachPoint="formValueNode" style="display:none;"></textarea>'
-				+ ((dojo.isIE || dojo.isSafari) ? '</fieldset>':'</span>')
-			: '<textarea id="${id}" name="${name}" value="${value}" dojoAttachPoint="formValueNode,editNode,focusNode,styleNode" class="dijitInputField dijitTextArea"></textarea>',
+				+ ((dojo.isIE || dojo.isSafari || dojo.isFF >= 3) ? '</fieldset>':'</span>')
+			: '<textarea id="${id}" name="${name}" value="${value}" dojoAttachPoint="formValueNode,editNode,focusNode,styleNode" class="dijitInputField dijitTextArea">'+dojo.isFF+'</textarea>',
+
+	setAttribute: function(/*String*/ attr, /*anything*/ value){
+		this.inherited(arguments);
+		switch(attr){
+			case "disabled":
+				this.formValueNode.disabled = this.disabled;
+			case "readOnly":
+				if(dojo.isIE || dojo.isSafari || dojo.isFF >= 3){
+					this.editNode.contentEditable = (!this.disabled && !this.readOnly);
+				}else if(dojo.isFF){
+					this.iframe.contentDocument.designMode = (this.disabled || this.readOnly)? "off" : "on";
+				}
+		}
+	},
 
 	focus: function(){
 		// summary: Received focus, needed for the InlineEditBox widget
-		if(!this.disabled){
+		if(!this.disabled && !this.readOnly){
 			this._changing(); // set initial height
 		}
-		if(dojo.isMozilla){
-			dijit.focus(this.iframe);
-		}else{
-			dijit.focus(this.focusNode);
-		}
+		dijit.focus(this.iframe || this.focusNode);
 	},
 
 	setValue: function(/*String*/ value, /*Boolean, optional*/ priorityChange){
@@ -51,13 +65,18 @@ dojo.declare(
 				var isFirst = true;
 				dojo.forEach(value.split("\n"), function(line){
 					if(isFirst){ isFirst = false; }
-					else {
-						editNode.appendChild(document.createElement("BR")); // preserve line breaks
+					else{
+						editNode.appendChild(dojo.doc.createElement("BR")); // preserve line breaks
 					}
-					editNode.appendChild(document.createTextNode(line)); // use text nodes so that imbedded tags can be edited
+					if(line){
+						editNode.appendChild(dojo.doc.createTextNode(line)); // use text nodes so that imbedded tags can be edited
+					}
 				});
-			}else{
-				editNode.appendChild(document.createTextNode(value));
+			}else if(value){
+				editNode.appendChild(dojo.doc.createTextNode(value));
+			}
+			if(!dojo.isIE){
+				editNode.appendChild(dojo.doc.createElement("BR")); // so that you see a cursor
 			}
 		}else{
 			// blah<BR>blah --> blah\nblah
@@ -69,10 +88,13 @@ dojo.declare(
 				value = value.replace(/<div><\/div>\r?\n?$/i,"");
 			}
 			value = value.replace(/\s*\r?\n|^\s+|\s+$|&nbsp;/g,"").replace(/>\s+</g,"><").replace(/<\/(p|div)>$|^<(p|div)[^>]*>/gi,"").replace(/([^>])<div>/g,"$1\n").replace(/<\/p>\s*<p[^>]*>|<br[^>]*>/gi,"\n").replace(/<[^>]*>/g,"").replace(/&amp;/gi,"\&").replace(/&lt;/gi,"<").replace(/&gt;/gi,">");
+			if(!dojo.isIE){
+				value = value.replace(/\n$/,""); // remove added <br>
+			}
 		}
 		this.value = this.formValueNode.value = value;
 		if(this.iframe){
-			var sizeNode = document.createElement('div');
+			var sizeNode = dojo.doc.createElement('div');
 			editNode.appendChild(sizeNode);
 			var newHeight = sizeNode.offsetTop;
 			if(editNode.scrollWidth > editNode.clientWidth){ newHeight+=16; } // scrollbar space needed?
@@ -87,11 +109,11 @@ dojo.declare(
 	},
 
 	getValue: function(){
-		return this.formValueNode.value.replace(/\r/g,"");
+		return this.value.replace(/\r/g,"");
 	},
 
 	postMixInProperties: function(){
-		dijit.form.Textarea.superclass.postMixInProperties.apply(this,arguments);
+		this.inherited(arguments);
 		// don't let the source text be converted to a DOM structure since we just want raw text
 		if(this.srcNodeRef && this.srcNodeRef.innerHTML != ""){
 			this.value = this.srcNodeRef.innerHTML;
@@ -102,7 +124,7 @@ dojo.declare(
 		}
 		if(!this.value){ this.value = ""; }
 		this.value = this.value.replace(/\r\n/g,"\n").replace(/&gt;/g,">").replace(/&lt;/g,"<").replace(/&amp;/g,"&");
-		if(dojo.isMozilla){
+		if(dojo.isFF == 2){
 			// In the case of Firefox an iframe is used and when the text gets focus,
 			// focus is fired from the document object.  There isn't a way to put a
 			// waiRole on the document object and as a result screen readers don't
@@ -120,7 +142,7 @@ dojo.declare(
 			// the cryptic name and will also convey the role information to the user.
 			// Because it is read directly to the user, the string must be localized.
 			// In addition, since a <label> element can not be associated with an iframe, if 
-			// this control has a label, insert the text into the title as well.
+			// this control has a label, insert the label text into the title as well.
 			var _nlsResources = dojo.i18n.getLocalization("dijit", "Textarea");
 			this._iframeEditTitle = _nlsResources.iframeEditTitle;
 			this._iframeFocusTitle = _nlsResources.iframeFocusTitle;
@@ -128,7 +150,7 @@ dojo.declare(
 			if(label.length){
 				this._iframeEditTitle = label[0].innerHTML + " " + this._iframeEditTitle;
 			}
-			var body = this.focusNode = this.editNode = document.createElement('BODY');
+			var body = this.focusNode = this.editNode = dojo.doc.createElement('BODY');
 			body.style.margin="0px";
 			body.style.padding="0px";
 			body.style.border="0px";
@@ -136,13 +158,14 @@ dojo.declare(
 	},
 
 	postCreate: function(){
-		if(dojo.isIE || dojo.isSafari){
+		if(dojo.isIE || dojo.isSafari || dojo.isFF >= 3){
 			this.domNode.style.overflowY = 'hidden';
-		}else if(dojo.isMozilla){
+		}else if(dojo.isFF){
 			var w = this.iframe.contentWindow;
+			var title = '';
 			try { // #4715: peeking at the title can throw a security exception during iframe setup
-				var title = this.iframe.contentDocument.title;
-			} catch(e) { var title = ''; }
+				title = this.iframe.contentDocument.title;
+			} catch(e) {}
 			if(!w || !title){
 				this.iframe.postCreate = dojo.hitch(this, this.postCreate);
 				return;
@@ -214,7 +237,7 @@ dojo.declare(
 			// If a widget is listening outside of the iframe, (like InlineEditBox)
 			// it will not hear anything.
 			// Create an equivalent event so everyone else knows what is going on.
-			var te = document.createEvent("KeyEvents");
+			var te = dojo.doc.createEvent("KeyEvents");
 			te.initKeyEvent("keypress", true, true, null, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, e.keyCode, e.charCode);
 			this.iframe.dispatchEvent(te);
 		}
@@ -228,10 +251,10 @@ dojo.declare(
 
 	_changed: function(e, priorityChange){
 		// summary: event handler for when a change has already happened
-		if(this.iframe && this.iframe.contentDocument.designMode != "on"){
+		if(this.iframe && this.iframe.contentDocument.designMode != "on" && !this.disabled && !this.readOnly){
 			this.iframe.contentDocument.designMode="on"; // in case this failed on init due to being hidden
 		}
-		this.setValue(null, priorityChange);
+		this.setValue(null, priorityChange || false);
 	}
 });
 

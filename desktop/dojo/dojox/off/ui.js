@@ -245,7 +245,7 @@ dojo.mixin(dojox.off.ui, {
 			// add parameters to URL so the Learn How page
 			// can customize itself and display itself
 			// correctly based on framework settings
-			var dojoPath = djConfig.baseRelativePath;
+			var dojoPath = dojo.config.baseRelativePath;
 			this.learnHowPath += "?appName=" + encodeURIComponent(this.appName)
 									+ "&hasOfflineCache=" + dojox.off.hasOfflineCache
 									+ "&runLink=" + encodeURIComponent(this.runLink)
@@ -603,7 +603,11 @@ dojo.mixin(dojox.off.ui, {
 			// synchronize, but pause for a few seconds
 			// so that the user can orient themselves
 			if(dojox.off.sync.autoSync){
-				window.setTimeout("dojox.off.sync.synchronize()", 1000);
+				if(dojo.isAIR){
+					window.setTimeout(function(){dojox.off.sync.synchronize();}, 1000);
+				}else{
+					window.setTimeout(dojox._scopeName + ".off.sync.synchronize()", 1000);
+				}
 			}
 		}
 	}

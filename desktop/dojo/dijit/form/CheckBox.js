@@ -24,7 +24,7 @@ dojo.declare(
 		// In case 2, the regular html inputs are invisible but still used by
 		// the user. They are turned quasi-invisible and overlay the background-image.
 
-		templateString:"<fieldset class=\"dijitReset dijitInline\" waiRole=\"presentation\"\n\t><input\n\t \ttype=\"${type}\" name=\"${name}\"\n\t\tclass=\"dijitReset dijitCheckBoxInput\"\n\t\tdojoAttachPoint=\"inputNode,focusNode\"\n\t \tdojoAttachEvent=\"onmouseover:_onMouse,onmouseout:_onMouse,onclick:_onClick\"\n/></fieldset>\n",
+		templateString:"<div class=\"dijitReset dijitInline\" waiRole=\"presentation\"\n\t><input\n\t \ttype=\"${type}\" name=\"${name}\"\n\t\tclass=\"dijitReset dijitCheckBoxInput\"\n\t\tdojoAttachPoint=\"focusNode\"\n\t \tdojoAttachEvent=\"onmouseover:_onMouse,onmouseout:_onMouse,onclick:_onClick\"\n/></div>\n",
 
 		baseClass: "dijitCheckBox",
 
@@ -36,24 +36,29 @@ dojo.declare(
 		//	the value when form is submitted)
 		value: "on",
 
+		setValue: function(/*String or Boolean*/ newValue){
+			// summary: set the value of the widget.
+			if(typeof newValue == "string"){
+				this.setAttribute('value', newValue);
+				newValue = true;
+			}
+			this.setAttribute('checked', newValue);
+		},
+
+		_getValueDeprecated: false, // remove when _FormWidget:_getValueDeprecated is removed
+		getValue: function(){
+			// summary: get the value of the widget.
+			return (this.checked ? this.value : false);
+		},
+
+		reset: function(){
+			this.inherited(arguments);
+			this.setAttribute('value', this._resetValueAttr);
+		},
+
 		postCreate: function(){
-			dojo.setSelectable(this.inputNode, false);
-			this.setChecked(this.checked);
 			this.inherited(arguments);
-		},
-
-		setChecked: function(/*Boolean*/ checked){
-			if(dojo.isIE){
-				if(checked){ this.inputNode.setAttribute('checked', 'checked'); }
-				else{ this.inputNode.removeAttribute('checked'); }
-			}else{ this.inputNode.checked = checked; }
-			this.inherited(arguments);
-		},
-
-		setValue: function(/*String*/ value){
-			if(value == null){ value = ""; }
-			this.inputNode.value = value;
-			dijit.form.CheckBox.superclass.setValue.call(this,value);
+			this._resetValueAttr = this.value;
 		}
 	}
 );
@@ -96,21 +101,24 @@ dojo.declare(
 			}, this);
 		},
 
-		setChecked: function(/*Boolean*/ checked){
+		setAttribute: function(/*String*/ attr, /*anything*/ value){
 			// If I am being checked then have to deselect currently checked radio button
-			if(checked){
-				dojo.forEach(this._groups[this.name], function(widget){
-					if(widget != this && widget.checked){
-						widget.setChecked(false);
+			this.inherited(arguments);
+			switch(attr){
+				case "checked":
+					if(this.checked){
+						dojo.forEach(this._groups[this.name], function(widget){
+							if(widget != this && widget.checked){
+								widget.setAttribute('checked', false);
+							}
+						}, this);
 					}
-				}, this);
 			}
-			this.inherited(arguments);			
 		},
 
 		_clicked: function(/*Event*/ e){
 			if(!this.checked){
-				this.setChecked(true);
+				this.setAttribute('checked', true);
 			}
 		}
 	}

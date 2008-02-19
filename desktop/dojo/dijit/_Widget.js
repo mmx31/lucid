@@ -119,23 +119,9 @@ dojo.declare("dijit._Widget", null, {
 		// cannot be processed this way as they are not mutable.
 		if(this.domNode){
 			for(var attr in this.attributeMap){
-				var mapNode = this[this.attributeMap[attr] || "domNode"];
 				var value = this[attr];
-				if(typeof value != "object" && (value !== "" || (params && params[attr]))){
-					switch(attr){
-					case "class":
-						dojo.addClass(mapNode, value);
-						break;
-					case "style":
-						if(mapNode.style.cssText){
-							mapNode.style.cssText += "; " + value;// FIXME: Opera
-						}else{
-							mapNode.style.cssText = value;
-						}
-						break;
-					default:
-						mapNode.setAttribute(attr, value);
-					}
+				if(typeof value != "object" && ((value !== "" && value !== false) || (params && params[attr]))){
+					this.setAttribute(attr, value);
 				}
 			}
 		}
@@ -173,9 +159,10 @@ dojo.declare("dijit._Widget", null, {
 	startup: function(){
 		// summary:
 		//		Called after a widget's children, and other widgets on the page, have been created.
-		//		Provides an opportunity to manipulate any children before they are displayed
-		//		This is useful for composite widgets that need to control or layout sub-widgets
-		//		Many layout widgets can use this as a wiring phase
+		//		Provides an opportunity to manipulate any children before they are displayed.
+		//		This is useful for composite widgets that need to control or layout sub-widgets.
+		//		Many layout widgets can use this as a wiring phase.
+		this._started = true;
 	},
 
 	//////////// DESTROY FUNCTIONS ////////////////////////////////
@@ -249,6 +236,34 @@ dojo.declare("dijit._Widget", null, {
 
 	////////////////// MISCELLANEOUS METHODS ///////////////////
 
+	setAttribute: function(/*String*/ attr, /*anything*/ value){
+		// summary:
+		//              Set native HTML attributes reflected in the widget,
+		//              such as readOnly, disabled, and maxLength in TextBox widgets.
+		var mapNode = this[this.attributeMap[attr]||'domNode'];
+		this[attr] = value;
+		switch(attr){
+			case "class":
+				dojo.addClass(mapNode, value);
+				break;
+			case "style":
+				if(mapNode.style.cssText){
+					mapNode.style.cssText += "; " + value;// FIXME: Opera
+				}else{
+					mapNode.style.cssText = value;
+				}
+				break;
+			default:
+				if(/^on[A-Z]/.test(attr)){ // eg. onSubmit needs to be onsubmit
+					attr = attr.toLowerCase();
+				}
+				if(typeof value == "function"){ // functions execute in the context of the widget
+					value = dojo.hitch(this, value);
+				}
+				dojo.attr(mapNode, attr, value);
+		}
+	},
+
 	toString: function(){
 		// summary:
 		//		returns a string that represents the widget. When a widget is
@@ -279,14 +294,13 @@ dojo.declare("dijit._Widget", null, {
 		//		Similar to dojo.connect() but takes three arguments rather than four.
 		var handles =[];
 		if(event == "ondijitclick"){
-			var w = this;
 			// add key based click activation for unsupported nodes.
 			if(!this.nodesWithKeyClick[obj.nodeName]){
 				handles.push(dojo.connect(obj, "onkeydown", this,
 					function(e){
 						if(e.keyCode == dojo.keys.ENTER){
 							return (dojo.isString(method))?
-								w[method](e) : method.call(w, e);
+								this[method](e) : method.call(this, e);
 						}else if(e.keyCode == dojo.keys.SPACE){
 							// stop space down as it causes IE to scroll
 							// the browser window
@@ -297,7 +311,7 @@ dojo.declare("dijit._Widget", null, {
 					function(e){
 						if(e.keyCode == dojo.keys.SPACE){
 							return dojo.isString(method) ?
-								w[method](e) : method.call(w, e);
+								this[method](e) : method.call(this, e);
 						}
 			 		}));
 			}

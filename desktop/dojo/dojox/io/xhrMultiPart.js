@@ -44,8 +44,8 @@ dojo.require("dojox.uuid.generateRandomUuid");
 	}
 
 	dojox.io.xhrMultiPart = function(args){
-		if(!args["file"] && !args["formNode"]){
-			throw new Error("file or formNode must be provided to dojox.io.xhrMultiPart's arguments");
+		if(!args["file"] && !args["form"]){
+			throw new Error("file or form must be provided to dojox.io.xhrMultiPart's arguments");
 		}
 
 		// unique guid as a boundary value for multipart posts
@@ -62,8 +62,8 @@ dojo.require("dojox.uuid.generateRandomUuid");
 			}
 		}
 
-		if(args["formNode"]){
-			tmp = tmp.concat(_partsFromNode(args["formNode"], boundary));
+		if(args["form"]){
+			tmp = tmp.concat(_partsFromNode(args["form"], boundary));
 		}
 
 		if(tmp.length){

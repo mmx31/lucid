@@ -11,7 +11,7 @@ dojo._xdReset = function(){
 	//to evaluate resources in order. If there is a xdomain resource followed by a xhr resource, we can't load
 	//the xhr resource until the one before it finishes loading. The text of the xhr resource will be converted
 	//to match the format for a xd resource and put in the xd load queue.
-	this._isXDomain = djConfig.useXDomain || false;
+	this._isXDomain = dojo.config.useXDomain || false;
 
 	this._xdTimer = 0;
 	this._xdInFlight = {};
@@ -47,7 +47,7 @@ dojo._xdCreateResource = function(/*String*/contents, /*String*/resourceName, /*
 
 	//Create resource object and the call to _xdResourceLoaded.
 	var output = [];
-	output.push("dojo._xdResourceLoaded({\n");
+	output.push(dojo._scopeName + "._xdResourceLoaded({\n");
 
 	//Add dependencies
 	if(deps.length > 0){
@@ -62,15 +62,15 @@ dojo._xdCreateResource = function(/*String*/contents, /*String*/resourceName, /*
 	}
 
 	//Add the contents of the file inside a function.
-	//Pass in dojo as an argument to the function to help with
-	//allowing multiple versions of dojo in a page.
-	output.push("\ndefineResource: function(dojo){");
-	
+	//Pass in scope arguments so we can support multiple versions of the
+	//same module on a page.
+	output.push("\ndefineResource: function(" + dojo._scopePrefixArgs + "){");
+
 	//Don't put in the contents in the debugAtAllCosts case
 	//since the contents may have syntax errors. Let those
 	//get pushed up when the script tags are added to the page
 	//in the debugAtAllCosts case.
-	if(!djConfig["debugAtAllCosts"] || resourceName == "dojo._base._loader.loader_debug"){
+	if(!dojo.config["debugAtAllCosts"] || resourceName == "dojo._base._loader.loader_debug"){
 		output.push(contents);
 	}
 	//Add isLocal property so we know if we have to do something different
@@ -124,7 +124,6 @@ dojo._loadPath = function(/*String*/relpath, /*String?*/module, /*Function?*/cb)
     	}
     }
 
-	if(djConfig.cacheBust && dojo.isBrowser) { uri += "?" + String(djConfig.cacheBust).replace(/\W+/g,""); }
 	try{
 		return ((!module || this._isXDomain) ? this._loadUri(uri, cb, currentIsXDomain, module) : this._loadUriAndCheck(uri, module, cb)); //Boolean
 	}catch(e){
@@ -162,7 +161,11 @@ dojo._loadUri = function(/*String*/uri, /*Function?*/cb, /*boolean*/currentIsXDo
 
 		//Start timer
 		if(!this._xdTimer){
-			this._xdTimer = setInterval("dojo._xdWatchInFlight();", 100);
+			if(dojo.isAIR){
+				this._xdTimer = setInterval(function(){dojo._xdWatchInFlight();}, 100);
+			}else{
+				this._xdTimer = setInterval(dojo._scopeName + "._xdWatchInFlight();", 100);
+			}
 		}
 		this._xdStartTime = (new Date()).getTime();
 	}
@@ -177,6 +180,10 @@ dojo._loadUri = function(/*String*/uri, /*Function?*/cb, /*boolean*/currentIsXDo
 		var xdUri = uri.substring(0, lastIndex) + ".xd";
 		if(lastIndex != uri.length - 1){
 			xdUri += uri.substring(lastIndex, uri.length);
+		}
+
+		if (dojo.isAIR){
+			xdUri = xdUri.replace("app:/", "/");
 		}
 
 		//Add to script src
@@ -207,8 +214,14 @@ dojo._loadUri = function(/*String*/uri, /*Function?*/cb, /*boolean*/currentIsXDo
 			var res = this._xdCreateResource(contents, module, uri);
 			dojo.eval(res);
 		}else{
-			if(cb){ contents = '('+contents+')'; }
-			var value = dojo.eval(contents);
+			if(cb){
+				contents = '('+contents+')';
+			}else{
+				//Only do the scoping if no callback. If a callback is specified,
+				//it is most likely the i18n bundle stuff.
+				contents = this._scopePrefix + contents + this._scopeSuffix;
+			}
+			var value = dojo["eval"](contents+"\r\n//@ sourceURL="+uri);
 			if(cb){
 				cb(value);
 			}
@@ -320,7 +333,7 @@ dojo._xdLoadFlattenedBundle = function(/*String*/moduleName, /*String*/bundleNam
 dojo._xdInitExtraLocales = function(){
 	// Simulate the extra locale work that dojo.requireLocalization does.
 
-	var extra = djConfig.extraLocale;
+	var extra = dojo.config.extraLocale;
 	if(extra){
 		if(!extra instanceof Array){
 			extra = [extra];
@@ -553,7 +566,7 @@ dojo._xdWatchInFlight = function(){
 	//Monitors in-flight requests for xd module resources.
 
 	var noLoads = "";
-	var waitInterval = (djConfig.xdWaitSeconds || 15) * 1000;
+	var waitInterval = (dojo.config.xdWaitSeconds || 15) * 1000;
 	var expired = (this._xdStartTime + waitInterval) < (new Date()).getTime();
 
 	//If any xdInFlight are true, then still waiting for something to load.
@@ -580,16 +593,15 @@ dojo._xdWatchInFlight = function(){
 	var defLength = this._xdDefList.length;
 	for(var i= 0; i < defLength; i++){
 		var content = dojo._xdDefList[i];
-		if(djConfig["debugAtAllCosts"] && content["resourceName"]){
+		if(dojo.config["debugAtAllCosts"] && content["resourceName"]){
 			if(!this["_xdDebugQueue"]){
 				this._xdDebugQueue = [];
 			}
 			this._xdDebugQueue.push({resourceName: content.resourceName, resourcePath: content.resourcePath});
 		}else{
 			//Evaluate the resource to bring it into being.
-			//Pass dojo in so that later, to support multiple versions of dojo
-			//in a page, we can pass which version of dojo to use.	
-			content(dojo);
+			//Pass in scope args to allow multiple versions of modules in a page.	
+			content.apply(dojo.global, dojo._scopeArgs);
 		}
 	}
 
@@ -597,12 +609,11 @@ dojo._xdWatchInFlight = function(){
 	//This normally shouldn't happen with proper dojo.provide and dojo.require
 	//usage, but providing it just in case. Note that these may not be executed
 	//in the original order that the developer intended.
-	//Pass dojo in so that later, to support multiple versions of dojo
-	//in a page, we can pass which version of dojo to use.
 	for(var i = 0; i < this._xdContents.length; i++){
 		var current = this._xdContents[i];
 		if(current.content && !current.isDefined){
-			current.content(dojo);
+			//Pass in scope args to allow multiple versions of modules in a page.	
+			current.content.apply(dojo.global, dojo._scopeArgs);
 		}
 	}
 

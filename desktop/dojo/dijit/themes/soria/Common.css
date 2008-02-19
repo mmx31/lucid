@@ -1,0 +1,21 @@
+
+.soria .dijitSliderDisabled *,
+.soria .dijitDisabledClickableRegion,	
+.soria .dijitSpinnerDisabled *,
+.soria .dijitButtonDisabled *,
+.soria .dijitDropDownButtonDisabled *,
+.soria .dijitComboButtonDisabled *,
+.soria .dijitComboBoxDisabled *
+{
+	cursor: not-allowed !important;
+}
+.soria .dojoDndAvatar			{font-size: 75%; color: black;}
+.soria .dojoDndAvatarHeader td	{padding:5px 20px;}
+.soria .dojoDndAvatarHeader	{background: #ccc;}
+.soria .dojoDndAvatarItem		{background: #eee;}
+.soria.dojoDndMove .dojoDndAvatarHeader	{background-image: url(images/dndNoMove.png); background-repeat: no-repeat;}
+.soria.dojoDndCopy .dojoDndAvatarHeader	{background-image: url(images/dndNoCopy.png); background-repeat: no-repeat;}
+.soria.dojoDndMove .dojoDndAvatarCanDrop .dojoDndAvatarHeader	{background-image: url(images/dndMove.png); background-repeat: no-repeat;}
+.soria.dojoDndCopy .dojoDndAvatarCanDrop .dojoDndAvatarHeader	{background-image: url(images/dndCopy.png); background-repeat: no-repeat;}
+.soria .dojoDndItem {
+}

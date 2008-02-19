@@ -9,31 +9,31 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 
 dojo.declare("dijit.ProgressBar", [dijit._Widget, dijit._Templated], {
-	// summary:
-	// a progress widget
+	// summary: A progress indication widget
 	//
-	// usage:
-	// <div dojoType="ProgressBar"
-	//   places="0"
-	//   progress="..." maximum="..."></div>
-
+	// example:
+	// |	<div dojoType="ProgressBar"
+	// |		 places="0"
+	// |		 progress="..." maximum="...">
+	// |	</div>
+	//
 	// progress: String (Percentage or Number)
-	// initial progress value.
-	// with "%": percentage value, 0% <= progress <= 100%
-	// or without "%": absolute value, 0 <= progress <= maximum
+	// 	initial progress value.
+	// 	with "%": percentage value, 0% <= progress <= 100%
+	// 	or without "%": absolute value, 0 <= progress <= maximum
 	progress: "0",
 
 	// maximum: Float
-	// max sample number
+	// 	max sample number
 	maximum: 100,
 
 	// places: Number
-	// number of places to show in values; 0 by default
+	// 	number of places to show in values; 0 by default
 	places: 0,
 
 	// indeterminate: Boolean
-	// false: show progress
-	// true: show that a process is underway but that the progress is unknown
+	// 	If false: show progress.
+	// 	If true: show that a process is underway but that the progress is unknown
 	indeterminate: false,
 
 	templateString:"<div class=\"dijitProgressBar dijitProgressBarEmpty\"\n\t><div waiRole=\"progressbar\" tabindex=\"0\" dojoAttachPoint=\"internalProgress\" class=\"dijitProgressBarFull\"\n\t\t><div class=\"dijitProgressBarTile\"></div\n\t\t><span style=\"visibility:hidden\">&nbsp;</span\n\t></div\n\t><div dojoAttachPoint=\"label\" class=\"dijitProgressBarLabel\" id=\"${id}_label\">&nbsp;</div\n\t><img dojoAttachPoint=\"inteterminateHighContrastImage\" class=\"dijitProgressBarIndeterminateHighContrastImage\"\n\t></img\n></div>\n",
@@ -87,7 +87,9 @@ dojo.declare("dijit.ProgressBar", [dijit._Widget, dijit._Templated], {
 		return dojo.number.format(percent, {type: "percent", places: this.places, locale: this.lang});
 	},
 
-	onChange: function(){}
+	onChange: function(){
+		// summary: User definable function fired when progress updates.
+	}
 });
 
 }

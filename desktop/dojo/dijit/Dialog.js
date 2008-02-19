@@ -9,27 +9,33 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit.layout.ContentPane");
 dojo.require("dijit.form.Form");
+dojo.requireLocalization("dijit", "common", null, "zh,pt,ru,sv,de,ja,ROOT,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
 
 dojo.declare(
 	"dijit.DialogUnderlay",
 	[dijit._Widget, dijit._Templated],
 	{
-		// summary: the thing that grays out the screen behind the dialog
-
+		// summary: The component that grays out the screen behind the dialog
+	
 		// Template has two divs; outer div is used for fade-in/fade-out, and also to hold background iframe.
 		// Inner div has opacity specified in CSS file.
-		templateString: "<div class=dijitDialogUnderlayWrapper id='${id}_underlay'><div class=dijitDialogUnderlay dojoAttachPoint='node'></div></div>",
+		templateString: "<div class='dijitDialogUnderlayWrapper' id='${id}_wrapper'><div class='dijitDialogUnderlay ${class}' id='${id}' dojoAttachPoint='node'></div></div>",
+
+		attributeMap: {},
 
 		postCreate: function(){
+			// summary: Append the underlay to the body
 			dojo.body().appendChild(this.domNode);
 			this.bgIframe = new dijit.BackgroundIframe(this.domNode);
 		},
 
 		layout: function(){
-			// summary
-			//		Sets the background to the size of the viewport (rather than the size
-			//		of the document) since we need to cover the whole browser window, even
-			//		if the document is only a few lines long.
+			// summary: Sets the background to the size of the viewport
+			//
+			// description:
+			//	Sets the background to the size of the viewport (rather than the size
+			//	of the document) since we need to cover the whole browser window, even
+			//	if the document is only a few lines long.
 
 			var viewport = dijit.getViewport();
 			var is = this.node.style,
@@ -48,6 +54,7 @@ dojo.declare(
 		},
 
 		show: function(){
+			// summary: Show the dialog underlay
 			this.domNode.style.display = "block";
 			this.layout();
 			if(this.bgIframe.iframe){
@@ -57,6 +64,7 @@ dojo.declare(
 		},
 
 		hide: function(){
+			// summary: hides the dialog underlay
 			this.domNode.style.display = "none";
 			if(this.bgIframe.iframe){
 				this.bgIframe.iframe.style.display = "none";
@@ -72,17 +80,55 @@ dojo.declare(
 	}
 );
 
+
+dojo.declare("dijit._DialogMixin", null,
+	{
+		attributeMap: dijit._Widget.prototype.attributeMap,
+
+		// execute: Function
+		//	User defined function to do stuff when the user hits the submit button
+		execute: function(/*Object*/ formContents){},
+
+		// onCancel: Function
+		//      Callback when user has canceled dialog, to notify container
+		//      (user shouldn't override)
+		onCancel: function(){},
+
+		// onExecute: Function
+		//	Callback when user is about to execute dialog, to notify container
+		//	(user shouldn't override)
+		onExecute: function(){},
+
+		_onSubmit: function(){
+			// summary: callback when user hits submit button
+			this.onExecute();	// notify container that we are about to execute
+			this.execute(this.getValues());
+		}
+	}
+);
+
 dojo.declare(
 	"dijit.Dialog",
-	[dijit.layout.ContentPane, dijit._Templated, dijit.form._FormMixin],
+	[dijit.layout.ContentPane, dijit._Templated, dijit.form._FormMixin, dijit._DialogMixin],
 	{
-		// summary:
-		//		Pops up a modal dialog window, blocking access to the screen
-		//		and also graying out the screen Dialog is extended from
-		//		ContentPane so it supports all the same parameters (href, etc.)
-
+		// summary: A modal dialog Widget
+		//
+		// description:
+		//	Pops up a modal dialog window, blocking access to the screen
+		//	and also graying out the screen Dialog is extended from
+		//	ContentPane so it supports all the same parameters (href, etc.)
+		//
+		// example:
+		// |	<div dojoType="dijit.Dialog" href="test.html"></div>
+		//
+		// example:
+		// |	<div id="test">test content</div>
+		// |	...
+		// |	var foo = new dijit.Dialog({ title: "test dialog" },dojo.byId("test"));
+		// |	foo.startup();
+		
 		templateString: null,
-		templateString:"<div class=\"dijitDialog\">\n\t<div dojoAttachPoint=\"titleBar\" class=\"dijitDialogTitleBar\" tabindex=\"0\" waiRole=\"dialog\">\n\t<span dojoAttachPoint=\"titleNode\" class=\"dijitDialogTitle\">${title}</span>\n\t<span dojoAttachPoint=\"closeButtonNode\" class=\"dijitDialogCloseIcon\" dojoAttachEvent=\"onclick: hide\">\n\t\t<span dojoAttachPoint=\"closeText\" class=\"closeText\">x</span>\n\t</span>\n\t</div>\n\t\t<div dojoAttachPoint=\"containerNode\" class=\"dijitDialogPaneContent\"></div>\n\t<span dojoAttachPoint=\"tabEnd\" dojoAttachEvent=\"onfocus:_cycleFocus\" tabindex=\"0\"></span>\n</div>\n",
+		templateString:"<div class=\"dijitDialog\" tabindex=\"-1\" waiRole=\"dialog\" waiState=\"labelledby-${id}_title\">\n\t<div dojoAttachPoint=\"titleBar\" class=\"dijitDialogTitleBar\">\n\t<span dojoAttachPoint=\"titleNode\" class=\"dijitDialogTitle\" id=\"${id}_title\">${title}</span>\n\t<span dojoAttachPoint=\"closeButtonNode\" class=\"dijitDialogCloseIcon\" dojoAttachEvent=\"onclick: onCancel\">\n\t\t<span dojoAttachPoint=\"closeText\" class=\"closeText\">x</span>\n\t</span>\n\t</div>\n\t\t<div dojoAttachPoint=\"containerNode\" class=\"dijitDialogPaneContent\"></div>\n</div>\n",
 
 		// open: Boolean
 		//		is True or False depending on state of dialog
@@ -92,39 +138,79 @@ dojo.declare(
 		//		The time in milliseconds it takes the dialog to fade in and out
 		duration: 400,
 
+		// refocus: Boolean
+		// 		A Toggle to modify the default focus behavior of a Dialog, which
+		// 		is to re-focus the element which had focus before being opened.
+		//		False will disable refocusing. Default: true
+		refocus: true,
+
+		// _firstFocusItem: DomNode
+		//		The pointer to the first focusable node in the dialog
+		_firstFocusItem:null,
+		
+		// _lastFocusItem: DomNode
+		//		The pointer to which node has focus prior to our dialog
 		_lastFocusItem:null,
+
+		// doLayout: Boolean
+		//		Don't change this parameter from the default value.
+		//		This ContentPane parameter doesn't make sense for Dialog, since Dialog
+		//		is never a child of a layout container, nor can you specify the size of
+		//		Dialog in order to control the size of an inner widget. 
+		doLayout: false,
 
 		attributeMap: dojo.mixin(dojo.clone(dijit._Widget.prototype.attributeMap),
 			{title: "titleBar"}),
 
 		postCreate: function(){
 			dojo.body().appendChild(this.domNode);
-			this.inherited("postCreate",arguments);
-			this.domNode.style.display="none";
+			this.inherited(arguments);
+			var _nlsResources = dojo.i18n.getLocalization("dijit", "common");
+			if(this.closeButtonNode){
+				this.closeButtonNode.setAttribute("title", _nlsResources.buttonCancel);
+			}
+			if(this.closeText){
+				this.closeText.setAttribute("title", _nlsResources.buttonCancel);
+			}
+			var s = this.domNode.style;
+			s.visibility = "hidden";
+			s.position = "absolute";
+			s.display = "";
+			s.top = "-9999px";
+
 			this.connect(this, "onExecute", "hide");
 			this.connect(this, "onCancel", "hide");
+			this._modalconnects = [];
 		},
 
 		onLoad: function(){
-			// summary: 
-			//		when href is specified we need to reposition the dialog after the data is loaded
+			// summary: when href is specified we need to reposition the dialog after the data is loaded
 			this._position();
-			this.inherited("onLoad",arguments);
+			this.inherited(arguments);
 		},
 
 		_setup: function(){
-			// summary:
+			// summary: 
 			//		stuff we need to do before showing the Dialog for the first
 			//		time (but we defer it until right beforehand, for
 			//		performance reasons)
-
-			this._modalconnects = [];
 
 			if(this.titleBar){
 				this._moveable = new dojo.dnd.Moveable(this.domNode, { handle: this.titleBar });
 			}
 
-			this._underlay = new dijit.DialogUnderlay();
+			this._underlay = new dijit.DialogUnderlay({
+				id: this.id+"_underlay",
+				"class": dojo.map(this["class"].split(/\s/), function(s){ return s+"_underlay"; }).join(" ")
+			});
+			
+			// find and store focusable Items
+			if (!this.firstFocusItem){
+				var focusItem = dijit.getFirstInTabbingOrder(this.domNode);
+				this._firstFocusItem = focusItem ? focusItem : this.domNode;
+				focusItem = dijit.getLastInTabbingOrder(this.domNode);
+				this._lastFocusItem = focusItem ? focusItem : this._firstFocusItem;
+			}
 
 			var node = this.domNode;
 			this._fadeIn = dojo.fx.combine(
@@ -145,7 +231,8 @@ dojo.declare(
 					node: node,
 					duration: this.duration,
 					onEnd: function(){
-						node.style.display="none";
+						node.style.visibility="hidden";
+						node.style.top = "-9999px";
 					}
 				 }),
 				 dojo.fadeOut({
@@ -158,6 +245,12 @@ dojo.declare(
 		},
 
 		uninitialize: function(){
+			if(this._fadeIn && this._fadeIn.status() == "playing"){
+				this._fadeIn.stop();
+			}
+			if(this._fadeOut && this._fadeOut.status() == "playing"){
+				this._fadeOut.stop();
+			}
 			if(this._underlay){
 				this._underlay.destroy();
 			}
@@ -175,28 +268,20 @@ dojo.declare(
 			style.top = Math.floor((viewport.t + (viewport.h - mb.h)/2)) + "px";
 		},
 
-		_findLastFocus: function(/*Event*/ evt){
-			// summary:  called from onblur of dialog container to determine the last focusable item
-			this._lastFocused = evt.target;
-		},
-
-		_cycleFocus: function(/*Event*/ evt){
-			// summary: when tabEnd receives focus, advance focus around to titleBar
-
-			// on first focus to tabEnd, store the last focused item in dialog
-			if(!this._lastFocusItem){
-				this._lastFocusItem = this._lastFocused;
-			}
-			this.titleBar.focus();
-		},
-
 		_onKey: function(/*Event*/ evt){
+			// summary: handles the keyboard events for accessibility reasons
 			if(evt.keyCode){
 				var node = evt.target;
-				// see if we are shift-tabbing from titleBar
-				if(node == this.titleBar && evt.shiftKey && evt.keyCode == dojo.keys.TAB){
-					if(this._lastFocusItem){
-						this._lastFocusItem.focus(); // send focus to last item in dialog if known
+				var singleFocusItem = (this._firstFocusItem == this._lastFocusItem);
+				// see if we are shift-tabbing from first focusable item on dialog
+				if(node == this._firstFocusItem && evt.shiftKey && evt.keyCode == dojo.keys.TAB){
+					if(!singleFocusItem){
+						dijit.focus(this._lastFocusItem); // send focus to last item in dialog
+					}
+					dojo.stopEvent(evt);
+				}else if(node == this._lastFocusItem && evt.keyCode == dojo.keys.TAB && !evt.shiftKey){
+					if (!singleFocusItem){
+						dijit.focus(this._firstFocusItem); // send focus to first item in dialog
 					}
 					dojo.stopEvent(evt);
 				}else{
@@ -215,10 +300,10 @@ dojo.declare(
 					if(evt.keyCode != dojo.keys.TAB){ // allow tabbing into the dialog for a11y
 						dojo.stopEvent(evt);
 					// opera won't tab to a div
-					}else if (!dojo.isOpera){
+					}else if(!dojo.isOpera){
 						try{
-							this.titleBar.focus();
-						}catch(e){/*squelch*/}
+							this._firstFocusItem.focus();
+						}catch(e){ /*squelch*/ }
 					}
 				}
 			}
@@ -227,6 +312,8 @@ dojo.declare(
 		show: function(){
 			// summary: display the dialog
 
+			if(this.open){ return; }
+			
 			// first time we show the dialog, there's some initialization stuff to do			
 			if(!this._alreadyInitialized){
 				this._setup();
@@ -238,14 +325,10 @@ dojo.declare(
 			}
 
 			this._modalconnects.push(dojo.connect(window, "onscroll", this, "layout"));
-			this._modalconnects.push(dojo.connect(document.documentElement, "onkeypress", this, "_onKey"));
-
-			// IE doesn't bubble onblur events - use ondeactivate instead
-			var ev = typeof(document.ondeactivate) == "object" ? "ondeactivate" : "onblur";
-			this._modalconnects.push(dojo.connect(this.containerNode, ev, this, "_findLastFocus"));
+			this._modalconnects.push(dojo.connect(dojo.doc.documentElement, "onkeypress", this, "_onKey"));
 
 			dojo.style(this.domNode, "opacity", 0);
-			this.domNode.style.display="block";
+			this.domNode.style.visibility="";
 			this.open = true;
 			this._loadCheck(); // lazy load trigger
 
@@ -257,13 +340,12 @@ dojo.declare(
 
 			// set timeout to allow the browser to render dialog
 			setTimeout(dojo.hitch(this, function(){
-				dijit.focus(this.titleBar);
+				dijit.focus(this._firstFocusItem);
 			}), 50);
 		},
 
 		hide: function(){
-			// summary
-			//		Hide the dialog
+			// summary: Hide the dialog
 
 			// if we haven't been initialized yet then we aren't showing and we can just return		
 			if(!this._alreadyInitialized){
@@ -280,67 +362,107 @@ dojo.declare(
 			}
 			dojo.forEach(this._modalconnects, dojo.disconnect);
 			this._modalconnects = [];
-
-			this.connect(this._fadeOut,"onEnd",dojo.hitch(this,function(){
-				dijit.focus(this._savedFocus);
-			}));
+			if(this.refocus){
+				this.connect(this._fadeOut,"onEnd",dojo.hitch(dijit,"focus",this._savedFocus));
+			}
 			this.open = false;
 		},
 
 		layout: function() {
 			// summary: position the Dialog and the underlay
-			if(this.domNode.style.display == "block"){
+			if(this.domNode.style.visibility != "hidden"){
 				this._underlay.layout();
 				this._position();
 			}
+		},
+		
+		destroy: function(){
+			dojo.forEach(this._modalconnects, dojo.disconnect);
+			if(this.refocus && this.open){
+				var fo = this._savedFocus;
+				setTimeout(dojo.hitch(dijit,"focus",fo),25);
+			}
+			this.inherited(arguments);			
 		}
 	}
 );
 
 dojo.declare(
 	"dijit.TooltipDialog",
-	[dijit.layout.ContentPane, dijit._Templated, dijit.form._FormMixin],
+	[dijit.layout.ContentPane, dijit._Templated, dijit.form._FormMixin, dijit._DialogMixin],
 	{
 		// summary:
 		//		Pops up a dialog that appears like a Tooltip
+		//
 		// title: String
 		// 		Description of tooltip dialog (required for a11Y)
 		title: "",
 
+		// doLayout: Boolean
+		//		Don't change this parameter from the default value.
+		//		This ContentPane parameter doesn't make sense for TooltipDialog, since TooltipDialog
+		//		is never a child of a layout container, nor can you specify the size of
+		//		TooltipDialog in order to control the size of an inner widget. 
+		doLayout: false,
+
+		// _firstFocusItem: DomNode
+		//		The pointer to the first focusable node in the dialog
+		_firstFocusItem:null,
+		
+		// _lastFocusItem: DomNode
+		//		The domNode that had focus before we took it.
 		_lastFocusItem: null,
 
 		templateString: null,
-		templateString:"<div class=\"dijitTooltipDialog\" >\n\t<div class=\"dijitTooltipContainer\">\n\t\t<div class =\"dijitTooltipContents dijitTooltipFocusNode\" dojoAttachPoint=\"containerNode\" tabindex=\"0\" waiRole=\"dialog\"></div>\n\t</div>\n\t<span dojoAttachPoint=\"tabEnd\" tabindex=\"0\" dojoAttachEvent=\"focus:_cycleFocus\"></span>\n\t<div class=\"dijitTooltipConnector\" ></div>\n</div>\n",
+		templateString:"<div class=\"dijitTooltipDialog\" >\n\t<div class=\"dijitTooltipContainer\">\n\t\t<div class =\"dijitTooltipContents dijitTooltipFocusNode\" dojoAttachPoint=\"containerNode\" tabindex=\"-1\" waiRole=\"dialog\"></div>\n\t</div>\n\t<div class=\"dijitTooltipConnector\" ></div>\n</div>\n",
 
 		postCreate: function(){
-			this.inherited("postCreate",arguments);
+			this.inherited(arguments);
 			this.connect(this.containerNode, "onkeypress", "_onKey");
-
-			// IE doesn't bubble onblur events - use ondeactivate instead
-			var ev = typeof(document.ondeactivate) == "object" ? "ondeactivate" : "onblur";
-			this.connect(this.containerNode, ev, "_findLastFocus");
-			this.containerNode.title=this.title;
+			this.containerNode.title = this.title;
 		},
 
-		orient: function(/*Object*/ corner){
+		orient: function(/*DomNode*/ node, /*String*/ aroundCorner, /*String*/ corner){
 			// summary: configure widget to be displayed in given position relative to the button
 			this.domNode.className="dijitTooltipDialog " +" dijitTooltipAB"+(corner.charAt(1)=='L'?"Left":"Right")+" dijitTooltip"+(corner.charAt(0)=='T' ? "Below" : "Above");
 		},
 
 		onOpen: function(/*Object*/ pos){
 			// summary: called when dialog is displayed
-			this.orient(pos.corner);
+			
+			// first time we show the dialog, there's some initialization stuff to do			
+			if(!this._alreadyInitialized){
+				this._setup();
+				this._alreadyInitialized = true;
+			}
+			
+			this.orient(this.domNode,pos.aroundCorner, pos.corner);
 			this._loadCheck(); // lazy load trigger
-			this.containerNode.focus();
+			dijit.focus(this._firstFocusItem);
+		},
+		
+		_setup: function(){
+			// find and store focusable Items
+			var focusItem = dijit.getFirstInTabbingOrder(this.containerNode);
+			this._firstFocusItem = focusItem ? focusItem : this.containerNode;
+			focusItem = dijit.getLastInTabbingOrder(this.containerNode);
+			this._lastFocusItem = focusItem ? focusItem : this._firstFocusItem;
 		},
 
 		_onKey: function(/*Event*/ evt){
 			// summary: keep keyboard focus in dialog; close dialog on escape key
+			var node = evt.target;
+			var singleFocusItem = (this._firstFocusItem == this._lastFocusItem);
 			if(evt.keyCode == dojo.keys.ESCAPE){
 				this.onCancel();
-			}else if(evt.target == this.containerNode && evt.shiftKey && evt.keyCode == dojo.keys.TAB){
-				if (this._lastFocusItem){
-					this._lastFocusItem.focus();
+			}else if(node == this._firstFocusItem && evt.shiftKey && evt.keyCode == dojo.keys.TAB){
+				if(!singleFocusItem){
+					dijit.focus(this._lastFocusItem); // send focus to last item in dialog
+				}
+				dojo.stopEvent(evt);
+			}else if(node == this._lastFocusItem && evt.keyCode == dojo.keys.TAB && !evt.shiftKey){
+				if(!singleFocusItem){
+					dijit.focus(this._firstFocusItem); // send focus to first item in dialog
 				}
 				dojo.stopEvent(evt);
 			}else if(evt.keyCode == dojo.keys.TAB){
@@ -348,21 +470,6 @@ dojo.declare(
 				// but we don't want the tab to propagate upwards
 				evt.stopPropagation();
 			}
-		},
-
-		_findLastFocus: function(/*Event*/ evt){
-			// summary: called from onblur of dialog container to determine the last focusable item
-			this._lastFocused = evt.target;
-		},
-
-		_cycleFocus: function(/*Event*/ evt){
-			// summary: when tabEnd receives focus, advance focus around to containerNode
-
-			// on first focus to tabEnd, store the last focused item in dialog
-			if(!this._lastFocusItem){
-				this._lastFocusItem = this._lastFocused;
-			}
-			this.containerNode.focus();
 		}
 	}	
 );

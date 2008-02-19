@@ -10,6 +10,12 @@ Project authors
 	Jared Jurkiewicz (jared.jurkiewicz@gmail.com)
 	Shane O'Sullivan (shaneosullivan1@gmail.com) (FlickrRestStore)
 	Wolfram Kriesing (wolfram@kriesing.de) (QueryReadStore)
+	Dustin Machi (dmachi@dojotolkit.org) (jsonPathStore);
+	Russell Jones (KeyValueStore) (CLA)
+	Benjamin Schell (KeyValueStore) (Corporate CLA)
+	Kurt Stutsman (kurt@snaplogic.org) (SnapLogicStore)
+
+
 -------------------------------------------------------------------------------
 Project description
 
@@ -53,6 +59,9 @@ Additional Notes:
 	dojox.data.HtmlTableStore - Implementation of an HTML Table reading 
 	datastore
 	
+	dojox.data.HtmlStore - Implementation of an HTML reading datastore.  Can 
+	handle tables, ordered and un-ordered lists, and lists of divs.
+	
 	dojox.data.OpmlStore - Store for reading OMPL formatted data
 	
 	dojox.data.XmlStore - datastore for XML based services or  
@@ -60,3 +69,11 @@ Additional Notes:
 
 	dojox.data.QueryReadStore - datastore to provide serverside URL query
 	matching.  Similar to the 0.4.X ComboBox dataUrl parameter.	         
+
+	dojox.data.jsonPathStore - datastore that takes an arbitrary js object
+	and uses it as the store. Pre-Alpha at the moment.
+
+	dojox.data.KeyValueStore - datastore that mimics a key/value property
+	file format.
+
+	dojox.data.SnapLogicStore - Store to interface to SnapLogic data services.

@@ -1,27 +1,24 @@
-// TODOC: HOW TO DOC THE BELOW?
-// @global: djConfig
-// summary:
-//		Application code can set the global 'djConfig' prior to loading
-//		the library to override certain global settings for how dojo works.
-// description:  The variables that can be set are as follows:
-//			- isDebug: false
-//			- libraryScriptUri: ""
-//			- locale: undefined
-//			- extraLocale: undefined
-//			- preventBackButtonFix: true
-// note:
-//		'djConfig' does not exist under 'dojo.*' so that it can be set before the
-//		'dojo' variable exists.
-// note:
-//		Setting any of these variables *after* the library has loaded does
-//		nothing at all.
+/*=====
+djConfig = {
+	// summary:
+	//		Application code can set the global 'djConfig' prior to loading
+	//		the library to override certain global settings for how dojo works.
+	// description:  The variables that can be set are as follows:
+	//			- isDebug: false
+	//			- libraryScriptUri: ""
+	//			- locale: undefined
+	//			- extraLocale: undefined
+	//			- preventBackButtonFix: true
+	// note:
+	//		'djConfig' does not exist under 'dojo.*' so that it can be set before the
+	//		'dojo' variable exists.
+	// note:
+	//		Setting any of these variables *after* the library has loaded does
+	//		nothing at all.
+}
+=====*/
 
 (function(){
-	// make sure djConfig is defined
-	if(typeof this["djConfig"] == "undefined"){
-		this.djConfig = {};
-	}
-
 	// firebug stubs
 	if((!this["console"])||(!console["firebug"])){
 		this.console = {};
@@ -41,47 +38,76 @@
 
 	//TODOC:  HOW TO DOC THIS?
 	// dojo is the root variable of (almost all) our public symbols -- make sure it is defined.
-	if(typeof this["dojo"] == "undefined"){
-		this.dojo = {};
+	if(typeof dojo == "undefined"){
+		this.dojo = {
+			_scopeName: "dojo",
+			_scopePrefix: "",
+			_scopePrefixArgs: "",
+			_scopeSuffix: "",
+			_scopeMap: {},
+			_scopeMapRev: {}
+		};
 	}
 
 	var d = dojo;
 
+	//Need placeholders for dijit and dojox for scoping code.
+	if(typeof dijit == "undefined"){
+		this.dijit = {_scopeName: "dijit"};
+	}
+	if(typeof dojox == "undefined"){
+		this.dojox = {_scopeName: "dojox"};
+	}
+	
+	if(!d._scopeArgs){
+		d._scopeArgs = [dojo, dijit, dojox];
+	}
+
+/*=====
+dojo.global = {
 	// summary:
-	//		return the current global context object
-	//		(e.g., the window object in a browser).
+	//		Alias for the global scope
+	//		(e.g. the window object in a browser).
 	// description:
 	//		Refer to 'dojo.global' rather than referring to window to ensure your
-	//		code runs correctly in contexts other than web browsers (eg: Rhino on a server).
-	dojo.global = this;
+	//		code runs correctly in contexts other than web browsers (e.g. Rhino on a server).
+}
+=====*/
+	d.global = this;
 
-	var _config =/*===== djConfig = =====*/{
+	d.config =/*===== djConfig = =====*/{
 		isDebug: false,
 		libraryScriptUri: "",
 		preventBackButtonFix: true,
 		delayMozLoadingFix: false
 	};
 
-	for(var option in _config){
-		if(typeof djConfig[option] == "undefined"){
-			djConfig[option] = _config[option];
+	if(typeof djConfig != "undefined"){
+		for(var opt in djConfig){
+			d.config[opt] = djConfig[opt];
 		}
 	}
 
 	var _platforms = ["Browser", "Rhino", "Spidermonkey", "Mobile"];
 	var t;
-	while(t=_platforms.shift()){
+	while((t=_platforms.shift())){
 		d["is"+t] = false;
 	}
 
+/*=====
 	// Override locale setting, if specified
-	dojo.locale = djConfig.locale;
+	dojo.locale = {
+		// summary: the locale as defined by Dojo (read-only)
+	};
+=====*/
+	dojo.locale = d.config.locale;
+	
+	var rev = "$Rev: 12504 $".match(/\d+/);
 
-	//TODOC:  HOW TO DOC THIS?
 	dojo.version = {
 		// summary: version number of this instance of dojo.
-		major: 1, minor: 0, patch: 2, flag: "",
-		revision: Number("$Rev: 11832 $".match(/[0-9]+/)[0]),
+		major: 1, minor: 1, patch: 0, flag: "b1",
+		revision: rev ? Number(rev[0]) : 999999,
 		toString: function(){
 			with(d.version){
 				return major + "." + minor + "." + patch + flag + " (" + revision + ")";	// String
@@ -91,7 +117,7 @@
 
 	// Register with the OpenAjax hub
 	if(typeof OpenAjax != "undefined"){
-		OpenAjax.hub.registerLibrary("dojo", "http://dojotoolkit.org", d.version.toString());
+		OpenAjax.hub.registerLibrary(dojo._scopeName, "http://dojotoolkit.org", d.version.toString());
 	}
 
 	dojo._mixin = function(/*Object*/ obj, /*Object*/ props){
@@ -131,6 +157,9 @@
 	dojo._getProp = function(/*Array*/parts, /*Boolean*/create, /*Object*/context){
 		var obj=context||d.global;
 		for(var i=0, p; obj&&(p=parts[i]); i++){
+			if(i == 0 && this._scopeMap[p]){
+				p = this._scopeMap[p];
+			}
 			obj = (p in obj ? obj[p] : (create ? obj[p]={} : undefined));
 		}
 		return obj; // mixed

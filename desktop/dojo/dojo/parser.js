@@ -4,8 +4,11 @@ dojo.provide("dojo.parser");
 dojo.require("dojo.date.stamp");
 
 dojo.parser = new function(){
+	// summary: The Dom/Widget parsing package
 
 	var d = dojo;
+	var dtName = d._scopeName + "Type";
+	var qry = "[" + dtName + "]";
 
 	function val2type(/*Object*/ value){
 		// summary:
@@ -126,7 +129,7 @@ dojo.parser = new function(){
 		var thelist = [];
 		d.forEach(nodes, function(node){
 			if(!node){ return; }
-			var type = node.getAttribute("dojoType");
+			var type = node.getAttribute(dtName);
 			if((!type)||(!type.length)){ return; }
 			var clsInfo = getClassInfo(type);
 			var clazz = clsInfo.cls;
@@ -157,6 +160,7 @@ dojo.parser = new function(){
 			// the widget on instantiation.
 			// <script type="dojo/method"> tags (with no event) are executed after instantiation
 			// <script type="dojo/connect" event="foo"> tags are dojo.connected after instantiation
+			// note: dojo/* script tags cannot exist in self closing widgets, like <input />
 			if(!ps){
 				var connects = [],	// functions to connect after instantiation
 					calls = [];		// functions to call after instantiation
@@ -193,10 +197,10 @@ dojo.parser = new function(){
 
 			// process connections and startup functions
 			if(!ps){
-				dojo.forEach(connects, function(connect){
-					dojo.connect(instance, connect.event, null, connect.func);
+				d.forEach(connects, function(connect){
+					d.connect(instance, connect.event, null, connect.func);
 				});
-				dojo.forEach(calls, function(func){
+				d.forEach(calls, function(func){
 					func.call(instance);
 				});
 			}
@@ -207,8 +211,9 @@ dojo.parser = new function(){
 		// (non-top level) children
 		d.forEach(thelist, function(instance){
 			if(	instance  && 
-				(instance.startup) && 
-				((!instance.getParent) || (!instance.getParent()))
+				instance.startup &&
+				!instance._started && 
+				(!instance.getParent || !instance.getParent())
 			){
 				instance.startup();
 			}
@@ -221,7 +226,7 @@ dojo.parser = new function(){
 		//		Search specified node (or root node) recursively for class instances,
 		//		and instantiate them Searches for
 		//		dojoType="qualified.class.name"
-		var list = d.query('[dojoType]', rootNode);
+		var list = d.query(qry, rootNode);
 		// go build the object instances
 		var instances = this.instantiate(list);
 		return instances;
@@ -233,7 +238,7 @@ dojo.parser = new function(){
 
 (function(){
 	var parseRunner = function(){ 
-		if(djConfig["parseOnLoad"] == true){
+		if(dojo.config["parseOnLoad"] == true){
 			dojo.parser.parse(); 
 		}
 	};

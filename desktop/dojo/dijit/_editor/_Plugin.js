@@ -13,6 +13,7 @@ dojo.declare("dijit._editor._Plugin", null, {
 		if(args){
 			dojo.mixin(this, args);
 		}
+		this._connects=[];
 	},
 
 	editor: null,
@@ -23,21 +24,27 @@ dojo.declare("dijit._editor._Plugin", null, {
 	commandArg: null,
 	useDefaultCommand: true,
 	buttonClass: dijit.form.Button,
-	updateInterval: 200, // only allow updates every two tenths of a second
-	_initButton: function(){
+	_initButton: function(props){
 		if(this.command.length){
 			var label = this.editor.commands[this.command];
-			var className = "dijitEditorIcon "+this.iconClassPrefix + this.command.charAt(0).toUpperCase() + this.command.substr(1);
+			var className = this.iconClassPrefix+" "+this.iconClassPrefix + this.command.charAt(0).toUpperCase() + this.command.substr(1);
 			if(!this.button){
-				var props = {
+				props = dojo.mixin({
 					label: label,
 					showLabel: false,
 					iconClass: className,
-					dropDown: this.dropDown
-				};
+					dropDown: this.dropDown,
+					tabIndex: "-1"
+				}, props || {});
 				this.button = new this.buttonClass(props);
 			}
 		}
+	},
+	destroy: function(f){
+		dojo.forEach(this._connects, dojo.disconnect);
+	},
+	connect: function(o, f, tf){
+		this._connects.push(dojo.connect(o, f, this, tf));
 	},
 	updateState: function(){
 		var _e = this.editor;
@@ -48,9 +55,9 @@ dojo.declare("dijit._editor._Plugin", null, {
 		if(this.button){
 			try{
 				var enabled = _e.queryCommandEnabled(_c);
-				this.button.setDisabled(!enabled);
-				if(this.button.setChecked){
-					this.button.setChecked(_e.queryCommandState(_c));
+				this.button.setAttribute('disabled', !enabled);
+				if(typeof this.button.checked == 'boolean'){
+					this.button.setAttribute('checked', _e.queryCommandState(_c));
 				}
 			}catch(e){
 				console.debug(e);
@@ -65,8 +72,8 @@ dojo.declare("dijit._editor._Plugin", null, {
 		this._initButton();
 
 		// FIXME: wire up editor to button here!
-		if(	(this.command.length) &&
-			(!this.editor.queryCommandAvailable(this.command))
+		if(this.command.length &&
+			!this.editor.queryCommandAvailable(this.command)
 		){
 			// console.debug("hiding:", this.command);
 			if(this.button){
@@ -74,11 +81,11 @@ dojo.declare("dijit._editor._Plugin", null, {
 			}
 		}
 		if(this.button && this.useDefaultCommand){
-			dojo.connect(this.button, "onClick",
+			this.connect(this.button, "onClick",
 				dojo.hitch(this.editor, "execCommand", this.command, this.commandArg)
 			);
 		}
-		dojo.connect(this.editor, "onNormalizedDisplayChanged", this, "updateState");
+		this.connect(this.editor, "onNormalizedDisplayChanged", "updateState");
 	},
 	setToolbar: function(/*Widget*/toolbar){
 		if(this.button){

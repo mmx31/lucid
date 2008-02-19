@@ -57,7 +57,7 @@ dojo.require("dojo._base.query");
 		var ret = {};
 		var iq = "input:not([type=file]):not([type=submit]):not([type=image]):not([type=reset]):not([type=button]), select, textarea";
 		_d.query(iq, formNode).filter(function(node){
-			return (!node.disabled);
+			return !node.disabled;
 		}).forEach(function(item){
 			var _in = item.name;
 			var type = (item.type||"").toLowerCase();
@@ -82,7 +82,7 @@ dojo.require("dojo._base.query");
 
 	dojo.objectToQuery = function(/*Object*/ map){
 		//	summary:
-		//		takes a key/value mapping object and returns a string representing
+		//		takes a name/value mapping object and returns a string representing
 		//		a URL-encoded version of that object.
 		//	example:
 		//		this object:
@@ -95,30 +95,28 @@ dojo.require("dojo._base.query");
 		//		|		]
 		//		|	};
 		//
-		//	yeilds the following query string:
+		//	yields the following query string:
 		//	
 		//	|	"blah=blah&multi=thud&multi=thonk"
 
-
 		// FIXME: need to implement encodeAscii!!
-		var ec = encodeURIComponent;
-		var ret = "";
+		var enc = encodeURIComponent;
+		var pairs = [];
 		var backstop = {};
-		for(var x in map){
-			if(map[x] != backstop[x]){
-				if(_d.isArray(map[x])){
-					for(var y=0; y<map[x].length; y++){
-						ret += ec(x) + "=" + ec(map[x][y]) + "&";
+		for(var name in map){
+			var value = map[name];
+			if(value != backstop[name]){
+				var assign = enc(name) + "=";
+				if(_d.isArray(value)){
+					for(var i=0; i < value.length; i++){
+						pairs.push(assign + enc(value[i]));
 					}
 				}else{
-					ret += ec(x) + "=" + ec(map[x]) + "&";
+					pairs.push(assign + enc(value));
 				}
 			}
 		}
-		if(ret.length && ret.charAt(ret.length-1) == "&"){
-			ret = ret.substr(0, ret.length-1);
-		}
-		return ret; // String
+		return pairs.join("&"); // String
 	}
 
 	dojo.formToQuery = function(/*DOMNode||String*/ formNode){
@@ -158,12 +156,12 @@ dojo.require("dojo._base.query");
 		// FIXME: should we grab the URL string if we're not passed one?
 		var ret = {};
 		var qp = str.split("&");
-		var dc = decodeURIComponent;
+		var dec = decodeURIComponent;
 		_d.forEach(qp, function(item){
 			if(item.length){
 				var parts = item.split("=");
-				var name = dc(parts.shift());
-				var val = dc(parts.join("="));
+				var name = dec(parts.shift());
+				var val = dec(parts.join("="));
 				if(_d.isString(ret[name])){
 					ret[name] = [ret[name]];
 				}
@@ -208,8 +206,8 @@ dojo.require("dojo._base.query");
 	dojo._contentHandlers = {
 		"text": function(xhr){ return xhr.responseText; },
 		"json": function(xhr){
-			if(!djConfig.usePlainJson){
-				console.debug("Consider using mimetype:text/json-comment-filtered"
+			if(!dojo.config.usePlainJson){
+				console.warn("Consider using mimetype:text/json-comment-filtered"
 					+ " to avoid potential security issues with JSON endpoints"
 					+ " (use djConfig.usePlainJson=true to turn off this message)");
 			}
@@ -233,18 +231,18 @@ dojo.require("dojo._base.query");
 			return _d.eval(xhr.responseText);
 		},
 		"xml": function(xhr){ 
-			if(_d.isIE && !xhr.responseXML){
-				_d.forEach(["MSXML2", "Microsoft", "MSXML", "MSXML3"], function(i){
+			var result = xhr.responseXML;
+			if(_d.isIE && (!result || window.location.protocol == "file:")){
+				_d.forEach(["MSXML2", "Microsoft", "MSXML", "MSXML3"], function(prefix){
 					try{
-						var doc = new ActiveXObject(prefixes[i]+".XMLDOM");
-						doc.async = false;
-						doc.loadXML(xhr.responseText);
-						return doc;	//	DOMDocument
-					}catch(e){ /* squelch */ };
+						var dom = new ActiveXObject(prefix + ".XMLDOM");
+						dom.async = false;
+						dom.loadXML(xhr.responseText);
+						result = dom;
+					}catch(e){ /* Not available. Squelch and try next one. */ }
 				});
-			}else{
-				return xhr.responseXML;
 			}
+			return result; // DOMDocument
 		}
 	};
 
@@ -430,8 +428,8 @@ dojo.require("dojo._base.query");
 		
 		dfd.canceled = true;
 		var xhr = dfd.ioArgs.xhr;
-		var _at = (typeof xhr.abort);
-		if((_at == "function")||(_at == "unknown")){
+		var _at = typeof xhr.abort;
+		if(_at == "function" || _at == "unknown"){
 			xhr.abort();
 		}
 		var err = new Error("xhr cancelled");
@@ -475,7 +473,7 @@ dojo.require("dojo._base.query");
 		if(!_d._blockAsync){
 			// we need manual loop because we often modify _inFlight (and therefore 'i') while iterating
 			// note: the second clause is an assigment on purpose, lint may complain
-			for(var i=0, tif; (i<_inFlight.length)&&(tif=_inFlight[i]); i++){
+			for(var i = 0, tif; i < _inFlight.length && (tif = _inFlight[i]); i++){
 				var dfd = tif.dfd;
 				try{
 					if(!dfd || dfd.canceled || !tif.validCheck(dfd)){
@@ -485,7 +483,7 @@ dojo.require("dojo._base.query");
 						tif.resHandle(dfd);
 					}else if(dfd.startTime){
 						//did we timeout?
-						if(dfd.startTime + (dfd.ioArgs.args.timeout||0) < now){
+						if(dfd.startTime + (dfd.ioArgs.args.timeout || 0) < now){
 							_inFlight.splice(i--, 1);
 							var err = new Error("timeout exceeded");
 							err.dojoType = "timeout";
@@ -495,7 +493,7 @@ dojo.require("dojo._base.query");
 						}
 					}
 				}catch(e){
-					// FIXME: make sure we errback!
+					// FIXME: make sure we errback! (fixed?  remove console.debug?)
 					console.debug(e);
 					dfd.errback(new Error("_watchInFlightError!"));
 				}
@@ -561,10 +559,14 @@ dojo.require("dojo._base.query");
 		return 4 == dfd.ioArgs.xhr.readyState; //boolean
 	}
 	var _resHandle = function(/*Deferred*/dfd){
-		if(_d._isDocumentOk(dfd.ioArgs.xhr)){
+		var xhr = dfd.ioArgs.xhr;
+		if(_d._isDocumentOk(xhr)){
 			dfd.callback(dfd);
 		}else{
-			dfd.errback(new Error("bad http response code:" + dfd.ioArgs.xhr.status));
+			var err = new Error("Unable to load " + dfd.ioArgs.url + " status:" + xhr.status);
+			err.status = xhr.status;
+			err.responseText = xhr.responseText;
+			dfd.errback(err);
 		}
 	}
 
@@ -584,7 +586,7 @@ dojo.require("dojo._base.query");
 			}
 		}
 		// FIXME: is this appropriate for all content types?
-		ioArgs.xhr.setRequestHeader("Content-Type", (args.contentType||_defaultContentType));
+		ioArgs.xhr.setRequestHeader("Content-Type", args.contentType || _defaultContentType);
 		// FIXME: set other headers here!
 		try{
 			ioArgs.xhr.send(ioArgs.query);
@@ -625,18 +627,30 @@ dojo.require("dojo._base.query");
 	}
 	=====*/
 
+	dojo.xhr = function(/*String*/ method, /*dojo.__xhrArgs*/ args, /*boolean?*/ hasBody){
+		//	summary: 
+		//		Sends an HTTP request with the given method. If the request has an 
+		//		HTTP body, then pass true for hasBody. The method argument should be uppercase.
+		//		Also look at dojo.xhrGet(), xhrPost(), xhrPut() and dojo.xhrDelete() for shortcuts
+		//		for those HTTP methods. There are also methods for "raw" PUT and POST methods
+		//		via dojo.rawXhrPut() and dojo.rawXhrPost() respectively.
+		var dfd = _makeXhrDeferred(args);
+		if(!hasBody){
+			_d._ioAddQueryToUrl(dfd.ioArgs);
+		}
+		return _doIt(method, dfd); // dojo.Deferred
+	}
+
 	dojo.xhrGet = function(/*dojo.__xhrArgs*/ args){
 		//	summary: 
 		//		Sends an HTTP GET request to the server.
-		var dfd = _makeXhrDeferred(args);
-		_d._ioAddQueryToUrl(dfd.ioArgs);
-		return _doIt("GET", dfd); // dojo.Deferred
+		return _d.xhr("GET", args); //dojo.Deferred
 	}
 
 	dojo.xhrPost = function(/*dojo.__xhrArgs*/ args){
 		//summary: 
 		//		Sends an HTTP POST request to the server.
-		return _doIt("POST", _makeXhrDeferred(args)); // dojo.Deferred
+		return _d.xhr("POST", args, true); // dojo.Deferred
 	}
 
 	dojo.rawXhrPost = function(/*dojo.__xhrArgs*/ args){
@@ -653,7 +667,7 @@ dojo.require("dojo._base.query");
 	dojo.xhrPut = function(/*dojo.__xhrArgs*/ args){
 		//	summary:
 		//		Sends an HTTP PUT request to the server.
-		return _doIt("PUT", _makeXhrDeferred(args)); // dojo.Deferred
+		return _d.xhr("PUT", args, true); // dojo.Deferred
 	}
 
 	dojo.rawXhrPut = function(/*dojo.__xhrArgs*/ args){
@@ -664,7 +678,7 @@ dojo.require("dojo._base.query");
 		//		String. The raw data to send in the body of the PUT request.
 		var dfd = _makeXhrDeferred(args);
 		var ioArgs = dfd.ioArgs;
-		if(args["putData"]){
+		if(args.putData){
 			ioArgs.query = args.putData;
 			args.putData = null;
 		}
@@ -674,9 +688,7 @@ dojo.require("dojo._base.query");
 	dojo.xhrDelete = function(/*dojo.__xhrArgs*/ args){
 		//	summary:
 		//		Sends an HTTP DELETE request to the server.
-		var dfd = _makeXhrDeferred(args);
-		_d._ioAddQueryToUrl(dfd.ioArgs);
-		return _doIt("DELETE", dfd); // dojo.Deferred
+		return _d.xhr("DELETE", args); //dojo.Deferred
 	}
 
 	/*

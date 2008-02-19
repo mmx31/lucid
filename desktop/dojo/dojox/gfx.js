@@ -6,8 +6,8 @@ dojo.require("dojox.gfx.matrix");
 dojo.require("dojox.gfx._base");
 
 (function(){
-	var renderers = (typeof djConfig["gfxRenderer"] == "string" ?
-		djConfig["gfxRenderer"] : "svg,vml,silverlight,canvas").split(",");
+	var renderers = (typeof dojo.config["gfxRenderer"] == "string" ?
+		dojo.config["gfxRenderer"] : "svg,vml,silverlight,canvas").split(",");
 	for(var i = 0; i < renderers.length; ++i){
 		switch(renderers[i]){
 			case "svg":
@@ -28,6 +28,7 @@ dojo.require("dojox.gfx._base");
 		}
 		if(dojox.gfx.renderer){ break; }
 	}
+	console.log("gfx renderer = " + dojox.gfx.renderer);
 })();
 
 // include a renderer conditionally

@@ -2,6 +2,12 @@ if(!dojo._hasResource["dojo.date"]){ //_hasResource checks added by build. Do no
 dojo._hasResource["dojo.date"] = true;
 dojo.provide("dojo.date");
 
+/*=====
+dojo.date = {
+	// summary: Date manipulation utilities
+}
+=====*/
+
 dojo.date.getDaysInMonth = function(/*Date*/dateObject){
 	//	summary:
 	//		Returns the number of days in the month used by dateObject
@@ -90,7 +96,7 @@ dojo.date.compare = function(/*Date*/date1, /*Date?*/date2, /*String?*/portion){
 	date1 = new Date(Number(date1));
 	date2 = new Date(Number(date2 || new Date()));
 
-	if(typeof portion !== "undefined"){
+	if(portion !== "undefined"){
 		if(portion == "date"){
 			// Ignore times and compare dates.
 			date1.setHours(0, 0, 0, 0);
@@ -127,13 +133,13 @@ dojo.date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
 		case "day":
 			break;
 		case "weekday":
-			//i18n FIXME: assumes Saturday/Sunday weekend, but even this is not standard.  There are CLDR entries to localize this.
-			var days, weeks;
-			var adj = 0;
+			//i18n FIXME: assumes Saturday/Sunday weekend, but this is not always true.  see dojo.cldr.supplemental
+
 			// Divide the increment time span into weekspans plus leftover days
 			// e.g., 8 days is one 5-day weekspan / and two leftover days
 			// Can't have zero leftover days, so numbers divisible by 5 get
 			// a days value of 5, and the remaining days make up the number of weeks
+			var days, weeks;
 			var mod = amount % 5;
 			if(!mod){
 				days = (amount > 0) ? 5 : -5;
@@ -146,6 +152,7 @@ dojo.date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
 			var strt = date.getDay();
 			// Orig date is Sat / positive incrementer
 			// Jump over Sun
+			var adj = 0;
 			if(strt == 6 && amount > 0){
 				adj = 1;
 			}else if(strt == 0 && amount < 0){
@@ -161,7 +168,7 @@ dojo.date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
 			}
 			// Increment by number of weeks plus leftover days plus
 			// weekend adjustments
-			amount = 7 * weeks + days + adj;
+			amount = (7 * weeks) + days + adj;
 			break;
 		case "year":
 			property = "FullYear";
@@ -184,7 +191,7 @@ dojo.date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
 		case "minute":
 		case "second":
 		case "millisecond":
-			property = "UTC" + interval.charAt(0).toUpperCase() + interval.substring(1) + "s";
+			property = "UTC"+interval.charAt(0).toUpperCase() + interval.substring(1) + "s";
 	}
 
 	if(property){

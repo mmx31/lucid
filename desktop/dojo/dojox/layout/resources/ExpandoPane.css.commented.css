@@ -1,0 +1,65 @@
+.dojoxExpandoPane {
+	overflow:hidden;
+	margin-top:1px;
+	border-top:1px solid #ccc;
+	z-index:440;
+	background:#fff;
+}
+.dojoxExpandoPane .dojoxExpandoWrapper {
+	overflow:hidden;
+}
+.dojoxExpandoIcon {
+	width:14px;
+	cursor:pointer;
+	background-position:-60px 0px;
+	height:14px;
+}
+
+.soria .dojoxExpandoIcon {
+	background:url('../../../dijit/themes/soria/images/spriteRoundedIconsSmall.png') no-repeat center center;
+}
+.nihilo .dojoxExpandoIcon {
+	background:url('../../../dijit/themes/nihilo/images/spriteRoundedIconsSmall.gif') no-repeat center center;
+}
+.dojoxExpandoClosed .dojoxExpandoIcon {
+	background-position:0px 0px;
+}
+.dojoxExpandoClosed .dojoxExpandoTitleNode {
+	visibility:hidden;
+}
+.dojoxExpandoTitleNode {
+	padding-right:6px; padding-left:6px;
+}
+.dojoxExpandoClosed .dijitContentPane {
+	overflow:hidden;
+}
+.dojoxExpandoIcon .a11yNode {
+	display:none;
+	visibility:hidden;
+}
+.dojoxExpandoPane .iconRight .dojoxExpandoIcon {
+	float:right;
+}
+.dojoxExpandoPane .iconLeft .dojoxExpandoIcon {
+	float:left;
+}
+
+.nihilo .dojoxExpandoTitle {
+	height:16px;
+	font-size:0.9em;
+	font-weight:bold;
+	padding:3px;
+	padding-top:7px;
+	padding-bottom:7px;
+	background:#fafafa url("../../../dijit/themes/nihilo/images/tabStripe.gif") repeat-x left bottom; 
+}
+
+.soria .dojoxExpandoTitle {
+	height:16px;
+	font-size:0.9em;
+	font-weight:bold;
+	padding:3px;
+	padding-top:7px;
+	padding-bottom:7px;
+	background:#f0f4fc url("../../../dijit/themes/soria/images/tabStripe.gif") repeat-x left bottom; 
+}

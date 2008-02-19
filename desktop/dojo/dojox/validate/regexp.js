@@ -137,8 +137,9 @@ dojox.regexp.ipAddress = function(/*Object?*/flags){
 
 dojox.regexp.host = function(/*Object?*/flags){
 	// summary: Builds a RE that matches a host
-	// description: A host is a domain name or an IP address, possibly followed by a port number.
+	// description: A host is a named host (A-z0-9_- but not starting with -), a domain name or an IP address, possibly followed by a port number.
 	// flags: An object.
+	//	  flags.allowNamed Allow a named host for local networks. Default is false.
 	//    flags.allowIP  Allow an IP address for hostname.  Default is true.
 	//    flags.allowLocal  Allow the host to be "localhost".  Default is false.
 	//    flags.allowPort  Allow a port number to be present.  Default is true.
@@ -150,18 +151,19 @@ dojox.regexp.host = function(/*Object?*/flags){
 	if(typeof flags.allowIP != "boolean"){ flags.allowIP = true; }
 	if(typeof flags.allowLocal != "boolean"){ flags.allowLocal = false; }
 	if(typeof flags.allowPort != "boolean"){ flags.allowPort = true; }
+	if(typeof flags.allowNamed != "boolean"){ flags.allowNamed = false; }
 
 	// Domain names can not end with a dash.
 	var domainNameRE = "([0-9a-zA-Z]([-0-9a-zA-Z]{0,61}[0-9a-zA-Z])?\\.)+" + dojox.regexp.tld(flags);
 
 	// port number RE
-	var portRE = ( flags.allowPort ) ? "(\\:" + dojox.regexp.integer({signed: false}) + ")?" : "";
+	var portRE = flags.allowPort ? "(\\:\\d+)?" : "";
 
 	// build host RE
 	var hostNameRE = domainNameRE;
 	if(flags.allowIP){ hostNameRE += "|" +  dojox.regexp.ipAddress(flags); }
 	if(flags.allowLocal){ hostNameRE += "|localhost"; }
-
+	if(flags.allowNamed){ hostNameRE += "|^[^-][a-zA-Z0-9_-]*"; }
 	return "(" + hostNameRE + ")" + portRE; // String
 }
 
@@ -177,7 +179,7 @@ dojox.regexp.url = function(/*Object?*/flags){
 
 	// assign default values to missing paramters
 	flags = (typeof flags == "object") ? flags : {};
-	if(typeof flags.scheme == "undefined"){ flags.scheme = [true, false]; }
+	if(!("scheme" in flags)){ flags.scheme = [true, false]; }
 
 	// Scheme RE
 	var protocolRE = dojo.regexp.buildGroupRE(flags.scheme,

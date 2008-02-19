@@ -16,16 +16,16 @@ dojo.declare(
 		// summary:
 		//		Holds a set of panes where every pane's title is visible, but only one pane's content is visible at a time,
 		//		and switching between panes is visualized by sliding the other panes up/down.
-		// usage:
-		// 	<div dojoType="dijit.layout.AccordionContainer">
-		// 		<div dojoType="dijit.layout.AccordionPane" title="pane 1">
-		// 			<div dojoType="dijit.layout.ContentPane">...</div>
-		//  	</div>
-		// 		<div dojoType="dijit.layout.AccordionPane" title="pane 2">
-		//			<p>This is some text</p>
-		// 		...
-		// 	</div>
-
+		// example:
+		// | 	<div dojoType="dijit.layout.AccordionContainer">
+		// |		<div dojoType="dijit.layout.AccordionPane" title="pane 1">
+		// |			<div dojoType="dijit.layout.ContentPane">...</div>
+		// | 	</div>
+		// |		<div dojoType="dijit.layout.AccordionPane" title="pane 2">
+		// |			<p>This is some text</p>
+		// ||		...
+		// |	</div>
+		//
 		// duration: Integer
 		//		Amount of time (in ms) it takes to slide panes
 		duration: 250,
@@ -51,8 +51,9 @@ dojo.declare(
 		},
 
 		layout: function(){
-			// summary
+			// summary: 
 			//		Set the height of the open pane based on what room remains
+
 			// get cumulative height of all the title bars, and figure out which pane is open
 			var totalCollapsedHeight = 0;
 			var openPane = this.selectedChildWidget;
@@ -123,20 +124,35 @@ inside the AccordionPane??
 
 		// note: we are treating the container as controller here
 		_onKeyPress: function(/*Event*/ e){
-			if(this.disabled || e.altKey ){ return; }
+			if(this.disabled || e.altKey || !(e._dijitWidget || e.ctrlKey)){ return; }
 			var k = dojo.keys;
+			var fromTitle = e._dijitWidget;
 			switch(e.keyCode){
 				case k.LEFT_ARROW:
 				case k.UP_ARROW:
+					if (fromTitle){
+						this._adjacent(false)._onTitleClick();
+						dojo.stopEvent(e);
+					}
+					break;
 				case k.PAGE_UP:
-					this._adjacent(false)._onTitleClick();
-					dojo.stopEvent(e);
+					if (e.ctrlKey){
+						this._adjacent(false)._onTitleClick();
+						dojo.stopEvent(e);
+					}
 					break;
 				case k.RIGHT_ARROW:
 				case k.DOWN_ARROW:
+					if (fromTitle){
+						this._adjacent(true)._onTitleClick();
+						dojo.stopEvent(e);
+					}
+					break;
 				case k.PAGE_DOWN:
-					this._adjacent(true)._onTitleClick();
-					dojo.stopEvent(e);
+					if (e.ctrlKey){
+						this._adjacent(true)._onTitleClick();
+						dojo.stopEvent(e);
+					}
 					break;
 				default:
 					if(e.ctrlKey && e.keyCode == k.TAB){
@@ -149,15 +165,16 @@ inside the AccordionPane??
 	}
 );
 
-dojo.declare(
-	"dijit.layout.AccordionPane",
+dojo.declare("dijit.layout.AccordionPane",
 	[dijit.layout.ContentPane, dijit._Templated, dijit._Contained],
-{
-	// summary
+	{
+	// summary:
 	//		AccordionPane is a ContentPane with a title that may contain another widget.
 	//		Nested layout widgets, such as SplitContainer, are not supported at this time.
+	// example: 
+	// | see dijit.layout.AccordionContainer
 
-	templateString:"<div class='dijitAccordionPane'\n\t><div dojoAttachPoint='titleNode,focusNode' dojoAttachEvent='ondijitclick:_onTitleClick,onkeypress:_onTitleKeyPress,onfocus:_handleFocus,onblur:_handleFocus'\n\t\tclass='dijitAccordionTitle' wairole=\"tab\"\n\t\t><div class='dijitAccordionArrow'></div\n\t\t><div class='arrowTextUp' waiRole=\"presentation\">&#9650;</div\n\t\t><div class='arrowTextDown' waiRole=\"presentation\">&#9660;</div\n\t\t><div dojoAttachPoint='titleTextNode' class='dijitAccordionText'>${title}</div></div\n\t><div><div dojoAttachPoint='containerNode' style='overflow: hidden; height: 1px; display: none'\n\t\tclass='dijitAccordionBody' wairole=\"tabpanel\"\n\t></div></div>\n</div>\n",
+	templateString:"<div class='dijitAccordionPane'\n\t><div dojoAttachPoint='titleNode,focusNode' dojoAttachEvent='ondijitclick:_onTitleClick,onkeypress:_onTitleKeyPress,onfocus:_handleFocus,onblur:_handleFocus'\n\t\tclass='dijitAccordionTitle' wairole=\"tab\"\n\t\t><div class='dijitAccordionArrow' waiRole=\"presentation\"></div\n\t\t><div class='arrowTextUp' waiRole=\"presentation\">&#9650;</div\n\t\t><div class='arrowTextDown' waiRole=\"presentation\">&#9660;</div\n\t\t><div waiRole=\"presentation\" dojoAttachPoint='titleTextNode' class='dijitAccordionText'>${title}</div></div\n\t><div><div dojoAttachPoint='containerNode' style='overflow: hidden; height: 1px; display: none'\n\t\tclass='dijitAccordionBody' wairole=\"tabpanel\"\n\t></div></div>\n</div>\n",
 
 	postCreate: function(){
 		this.inherited("postCreate",arguments)
@@ -186,13 +203,13 @@ dojo.declare(
 
 	_setSelectedState: function(/*Boolean*/ isSelected){
 		this.selected = isSelected;
-		dojo[(isSelected ? "addClass" : "removeClass")](this.domNode,"dijitAccordionPane-selected");
+		dojo[(isSelected ? "addClass" : "removeClass")](this.titleNode,"dijitAccordionTitle-selected");
 		this.focusNode.setAttribute("tabIndex", isSelected ? "0" : "-1");
 	},
 	
 	_handleFocus: function(/*Event*/e){
 		// summary: handle the blur and focus state of this widget
-		dojo[(e.type=="focus" ? "addClass" : "removeClass")](this.focusNode,"dijitAccordionPaneFocused");		
+		dojo[(e.type=="focus" ? "addClass" : "removeClass")](this.focusNode,"dijitAccordionFocused");		
 	},
 
 	setSelected: function(/*Boolean*/ isSelected){

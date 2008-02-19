@@ -7,12 +7,15 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated"); 
 dojo.require("dojo.fx"); 
 
-dojo.declare("dojox.layout.ResizeHandle", [dijit._Widget, dijit._Templated], {
-	// summary
+dojo.declare("dojox.layout.ResizeHandle",
+	[dijit._Widget, dijit._Templated],
+	{
+	// summary: A dragable handle used to resize an attached node.
+	// description:
 	//	The handle on the bottom-right corner of FloatingPane or other widgets that allows
 	//	the widget to be resized.
 	//	Typically not used directly.
-
+	//
 	// targetId: String
 	//	id of the Widget OR DomNode that I will size
 	targetId: '',
@@ -57,25 +60,27 @@ dojo.declare("dojox.layout.ResizeHandle", [dijit._Widget, dijit._Templated], {
 	//	smallest width in px resize node can be
 	minWidth: 100,
 
-	// resize handle template, fairly easy to override: 
 	templateString: '<div dojoAttachPoint="resizeHandle" class="dojoxResizeHandle"><div></div></div>',
-
-	// private propteries and holders
-	_isSizing: false,
-	_connects: [],
-	_activeResizeNode: null,	
-	_activeResizeLastEvent: null,
-	// defaults to match default resizeAxis. set resizeAxis variable to modify. 
-	_resizeX: true,
-	_resizeY: true,
-
 
 	postCreate: function(){
 		// summary: setup our one major listener upon creation
-		dojo.connect(this.resizeHandle, "onmousedown", this, "_beginSizing");
+		this.connect(this.resizeHandle, "onmousedown", "_beginSizing");
 		if(!this.activeResize){ 
-			this._activeResizeNode = document.createElement('div');
-			dojo.addClass(this._activeResizeNode,this.activeResizeClass); 
+			// there shall be only a single resize rubberbox that at the top
+			// level so that we can overlay it on anything whenever the user
+			// resizes something. Since there is only one mouse pointer he
+			// can't at once resize multiple things interactively.
+			this._resizeHelper = dijit.byId('dojoxGlobalResizeHelper');
+
+			if (!this._resizeHelper){
+				var tmpNode = document.createElement('div');
+				tmpNode.style.display = "none";
+				dojo.body().appendChild(tmpNode);
+				dojo.addClass(tmpNode,this.activeResizeClass);
+				this._resizeHelper = new dojox.layout._ResizeHelper({ 
+						id: 'dojoxGlobalResizeHelper'},tmpNode);
+				this._resizeHelper.startup();
+			}
 		}else{ this.animateSizing = false; } 	
 
 		if (!this.minSize) { 
@@ -108,20 +113,14 @@ dojo.declare("dojox.layout.ResizeHandle", [dijit._Widget, dijit._Templated], {
 
 		this.targetWidget = dijit.byId(this.targetId);
 
-		// FIXME: resizing widgets does weird things, disable virtual resizing for now:
-		if (this.targetWidget) { this.activeResize = true; } 
-
 		this.targetDomNode = this.targetWidget ? this.targetWidget.domNode : dojo.byId(this.targetId);
 		if (this.targetContainer) { this.targetDomNode = this.targetContainer; } 
-		if (!this.targetDomNode){ return; }
+		if (!this.targetDomNode){ return false; }
 
 		if (!this.activeResize) {
-			this.targetDomNode.appendChild(this._activeResizeNode); 
-			dojo.fadeIn({ node: this._activeResizeNode, duration:120, 
-				beforeBegin: dojo.hitch(this,function(){
-					this._activeResizeNode.style.display=''; 
-				})
-			}).play(); 
+			var c = dojo.coords(this.targetDomNode, true);
+			this._resizeHelper.resize({l: c.x, t: c.y, w: c.w, h: c.h});
+			this._resizeHelper.show();
 		}
 
 		this._isSizing = true;
@@ -131,9 +130,9 @@ dojo.declare("dojox.layout.ResizeHandle", [dijit._Widget, dijit._Templated], {
 		var mb = (this.targetWidget) ? dojo.marginBox(this.targetDomNode) : dojo.contentBox(this.targetDomNode);  
 		this.startSize  = { 'w':mb.w, 'h':mb.h };
 
-		this._connects = []; 
-		this._connects.push(dojo.connect(document,"onmousemove",this,"_updateSizing")); 
-		this._connects.push(dojo.connect(document,"onmouseup", this, "_endSizing"));
+		this._pconnects = []; 
+		this._pconnects.push(dojo.connect(document,"onmousemove",this,"_updateSizing")); 
+		this._pconnects.push(dojo.connect(document,"onmouseup", this, "_endSizing"));
 
 		e.preventDefault();
 	},
@@ -147,10 +146,9 @@ dojo.declare("dojox.layout.ResizeHandle", [dijit._Widget, dijit._Templated], {
 		}else{
 			var tmp = this._getNewCoords(e);	
 			if(tmp === false){ return; }
-			dojo.style(this._activeResizeNode,"width",tmp.width+"px");
-			dojo.style(this._activeResizeNode,"height",tmp.height+"px"); 
-			this._activeResizeNode.style.display=''; 
+			this._resizeHelper.resize(tmp);
 		}
+		e.preventDefault();
 	},
 
 	_getNewCoords: function(/* Event */ e){
@@ -181,7 +179,7 @@ dojo.declare("dojox.layout.ResizeHandle", [dijit._Widget, dijit._Templated], {
 				newH = this.minSize.h;
 			}
 		}
-		return {width:newW, height:newH};  // Object
+		return {w:newW, h:newH};  // Object
 	},
 	
 	_changeSizing: function(/*Event*/ e){
@@ -190,50 +188,84 @@ dojo.declare("dojox.layout.ResizeHandle", [dijit._Widget, dijit._Templated], {
 		if(tmp===false){ return; }
 
 		if(this.targetWidget && typeof this.targetWidget.resize == "function"){ 
-			this.targetWidget.resize({ w: tmp.width, h: tmp.height });
+			this.targetWidget.resize(tmp);
 		}else{
 			if(this.animateSizing){
 				var anim = dojo.fx[this.animateMethod]([
 					dojo.animateProperty({
 						node: this.targetDomNode,
 						properties: { 
-							width: { start: this.startSize.w, end: tmp.width, unit:'px' } 
+							width: { start: this.startSize.w, end: tmp.w, unit:'px' } 
 						},	
 						duration: this.animateDuration
 					}),
 					dojo.animateProperty({
 						node: this.targetDomNode,
 						properties: { 
-							height: { start: this.startSize.h, end: tmp.height, unit:'px' }
+							height: { start: this.startSize.h, end: tmp.h, unit:'px' }
 						},
 						duration: this.animateDuration
 					})
 				]);
 				anim.play();
 			}else{
-				dojo.style(this.targetDomNode,"width",tmp.width+"px"); 
-				dojo.style(this.targetDomNode,"height",tmp.height+"px");
+				dojo.style(this.targetDomNode,"width",tmp.w+"px"); 
+				dojo.style(this.targetDomNode,"height",tmp.h+"px");
 			}
 		}	
-		e.preventDefault();
 	},
 
 	_endSizing: function(/*Event*/ e){
 		// summary: disconnect listenrs and cleanup sizing
-		dojo.forEach(this._connects,function(c){
-			dojo.disconnect(c); 
-		});
+		dojo.forEach(this._pconnects,dojo.disconnect);
 		if(!this.activeResize){
-			dojo.fadeOut({ node:this._activeResizeNode, duration:250,
-				onEnd: dojo.hitch(this,function(){
-					this._activeResizeNode.style.display="none";
-				})
-			}).play();
+			this._resizeHelper.hide();
 			this._changeSizing(e);
 		}
 		this._isSizing = false;
+		this.onResize(e);
+	},
+	
+	onResize: function(e){
+		// summary: Stub fired when sizing is done, for things like Grid
 	}
+	
+});
 
+dojo.declare("dojox.layout._ResizeHelper",
+	dijit._Widget,
+	{
+	// summary: A global private resize helper shared between any resizeHandle with activeSizing='false;
+	
+	startup: function(){
+		if(this._started){ return; }	
+		this.inherited(arguments);
+	},
+
+	show: function(){
+		// summary: show helper to start resizing
+		dojo.fadeIn({ node: this.domNode, duration:120, 
+			beforeBegin: dojo.hitch(this,function(){
+				this.domNode.style.display=''; 
+			})
+		}).play();
+	},
+
+	hide: function(){
+		// summary: hide helper after resizing is complete
+		dojo.fadeOut({ node:this.domNode, duration:250,
+			onEnd: dojo.hitch(this,function(){
+				this.domNode.style.display="none";
+			})
+		}).play();
+	},
+	
+	resize: function(/* Object */dim){
+		// summary: size the widget and place accordingly
+		
+		// FIXME: this is off when padding present
+		dojo.marginBox(this.domNode, dim);
+	}
 });
 
 }

@@ -6,15 +6,23 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dojo.colors");
 dojo.require("dojo.i18n");
-dojo.requireLocalization("dojo", "colors", null, "ko,zh,ja,zh-tw,ru,it,hu,ROOT,fr,pt,pl,es,de,cs");
+dojo.requireLocalization("dojo", "colors", null, "zh,pt,cs,ru,es,fr,de,gr,ko,zh-tw,ja,pl,ROOT,hu,it");
 
-dojo.declare(
-		"dijit.ColorPalette",
-		[dijit._Widget, dijit._Templated],
-{
-	// summary
-	//		Grid showing various colors, so the user can pick a certain color
-
+dojo.declare("dijit.ColorPalette",
+	[dijit._Widget, dijit._Templated],
+	{
+	// summary: A keyboard accessible color-picking widget
+	// description:
+	//	Grid showing various colors, so the user can pick a certain color
+	//	Can be used standalone, or as a popup.
+	//
+	// example:
+	// |	<div dojoType="dijit.ColorPalette"></div>
+	//
+	// example:
+	// |    var picker = new dijit.ColorPalette({ },srcNode);
+	// |	picker.startup();
+	//
 	// defaultTimeout: Number
 	//		number of milliseconds before a held key or button becomes typematic
 	defaultTimeout: 500,
@@ -101,12 +109,12 @@ dojo.declare(
 		this.domNode.style.position = "relative";
 		this._highlightNodes = [];	
 		this.colorNames = dojo.i18n.getLocalization("dojo", "colors", this.lang);
-		var url= dojo.moduleUrl("dijit", "templates/blank.gif");
-		var colorObject = new dojo.Color(),
+		var url = dojo.moduleUrl("dojo", "resources/blank.gif"),
+            colorObject = new dojo.Color(),
 		    coords = this._paletteCoords;
 		for(var row=0; row < choices.length; row++){
 			for(var col=0; col < choices[row].length; col++) {
-                var highlightNode = document.createElement("img");
+                var highlightNode = dojo.doc.createElement("img");
                 highlightNode.src = url;
                 dojo.addClass(highlightNode, "dijitPaletteImg");
                 var color = choices[row][col],
@@ -238,7 +246,7 @@ dojo.declare(
 	},
 
 	_navigateByKey: function(increment, typeCount){
-		// summary:we
+		// summary:
 		// 	  	This is the callback for typematic.
 		// 		It changes the focus and the highlighed color.
 		// increment:

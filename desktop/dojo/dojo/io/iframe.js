@@ -23,12 +23,12 @@ dojo.io.iframe = {
 		var cframe = null;
 		var turi = uri;
 		if(!turi){
-			if(djConfig["useXDomain"] && !djConfig["dojoBlankHtmlUrl"]){
+			if(dojo.config["useXDomain"] && !dojo.config["dojoBlankHtmlUrl"]){
 				console.debug("dojo.io.iframe.create: When using cross-domain Dojo builds,"
 					+ " please save dojo/resources/blank.html to your domain and set djConfig.dojoBlankHtmlUrl"
 					+ " to the path on your domain to blank.html");
 			}
-			turi = (djConfig["dojoBlankHtmlUrl"]||dojo.moduleUrl("dojo", "resources/blank.html"));
+			turi = (dojo.config["dojoBlankHtmlUrl"]||dojo.moduleUrl("dojo", "resources/blank.html"));
 		}
 		var ifrstr = dojo.isIE ? '<iframe name="'+fname+'" src="'+turi+'" onload="'+onloadstr+'">' : 'iframe';
 		cframe = dojo.doc.createElement(ifrstr);
@@ -147,7 +147,7 @@ dojo.io.iframe = {
 		//This transport can only process one send() request at a time, so if send() is called
 		//multiple times, it will queue up the calls and only process one at a time.
 		if(!this["_frame"]){
-			this._frame = this.create(this._iframeName, "dojo.io.iframe._iframeOnload();");
+			this._frame = this.create(this._iframeName, dojo._scopeName + ".io.iframe._iframeOnload();");
 		}
 
 		//Set up the deferred.
@@ -231,7 +231,7 @@ dojo.io.iframe = {
 
 	_currentDfd: null,
 	_dfdQueue: [],
-	_iframeName: "dojoIoIframe",
+	_iframeName: dojo._scopeName + "IoIframe",
 
 	_fireNextRequest: function(){
 		//summary: Internal method used to fire the next request in the bind queue.

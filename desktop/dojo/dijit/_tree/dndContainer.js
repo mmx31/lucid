@@ -20,7 +20,7 @@ dojo.declare("dijit._tree.dndContainer",
 			this.current = null;
 	
 			// states
-			this.ContainerState = "";
+			this.containerState = "";
 			dojo.addClass(this.node, "dojoDndContainer");
 			
 			// mark up children
@@ -103,16 +103,13 @@ dojo.declare("dijit._tree.dndContainer",
 			this[state] = newState;
 		},
 
-                _getChildByEvent: function(e){
-                        // summary: gets a child, which is under the mouse at the moment, or null
-                        // e: Event: a mouse event
-                        var node = e.target;
-
-                        if (node && dojo.hasClass(node,"dijitTreeLabel")){
-                                return node;
-                        }
-                        return null;
-                },
+		_getChildByEvent: function(e){
+			// summary: gets a child, which is under the mouse at the moment, or null
+			// e: Event: a mouse event
+			var node = e.target;
+			if (node && dojo.hasClass(node, "dijitTreeLabel")){ return node; }
+			return null;
+		},
 
 		markupFactory: function(tree, params){
 			params._skipStartup = true;

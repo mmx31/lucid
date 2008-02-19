@@ -7,7 +7,7 @@ dojo.require("dijit.layout._LayoutWidget");
 
 dojo.require("dojo.parser");
 dojo.require("dojo.string");
-dojo.requireLocalization("dijit", "loading", null, "ko,zh,ja,zh-tw,ru,it,ROOT,hu,fr,pt,pl,es,de,cs");
+dojo.requireLocalization("dijit", "loading", null, "zh,pt,ru,sv,ROOT,de,ja,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
 
 dojo.declare(
 	"dijit.layout.ContentPane",
@@ -73,7 +73,16 @@ dojo.declare(
 
 	// class: String
 	//	Class name to apply to ContentPane dom nodes
+	// TODO: this should be called "baseClass" like in the other widgets
 	"class": "dijitContentPane",
+
+	// doLayout: String/Boolean
+	//	false - don't adjust size of children
+	//	true - looks for the first sizable child widget (ie, having resize() method) and sets it's size to
+	//			however big the ContentPane is (TODO: implement)
+	//	auto - if there is a single sizable child widget (ie, having resize() method), set it's size to
+	//			however big the ContentPane is
+	doLayout: "auto",
 
 	postCreate: function(){
 		// remove the title attribute so it doesn't show up when i hover
@@ -87,6 +96,10 @@ dojo.declare(
 		var messages = dojo.i18n.getLocalization("dijit", "loading", this.lang);
 		this.loadingMessage = dojo.string.substitute(this.loadingMessage, messages);
 		this.errorMessage = dojo.string.substitute(this.errorMessage, messages);
+		var curRole = dijit.getWaiRole(this.domNode);
+		if (!curRole){
+			dijit.setWaiRole(this.domNode, "group");
+		}
 
 		// for programatically created ContentPane (with <span> tag), need to muck w/CSS
 		// or it's as though overflow:visible is set
@@ -95,18 +108,23 @@ dojo.declare(
 
 	startup: function(){
 		if(this._started){ return; }
-		this._checkIfSingleChild();
-		if(this._singleChild){
-			this._singleChild.startup();
+		if(this.doLayout != "false" && this.doLayout !== false){
+			this._checkIfSingleChild();
+			if(this._singleChild){
+				this._singleChild.startup();
+			}
 		}
 		this._loadCheck();
-		this._started = true;
+		this.inherited(arguments);
 	},
 
 	_checkIfSingleChild: function(){
 		// summary:
 		// 	Test if we have exactly one widget as a child, and if so assume that we are a container for that widget,
 		//	and should propogate startup() and resize() calls to it.
+
+		// TODO: if there are two child widgets (a data store and a TabContainer, for example),
+		//	should still find the TabContainer
 		var childNodes = dojo.query(">", this.containerNode || this.domNode),
 			childWidgets = childNodes.filter("[widgetId]");
 
@@ -163,9 +181,12 @@ dojo.declare(
 			this._createSubWidgets();
 		}
 
-		this._checkIfSingleChild();
-		if(this._singleChild && this._singleChild.resize){
-			this._singleChild.resize(this._contentBox);
+		if(this.doLayout != "false" && this.doLayout !== false){
+			this._checkIfSingleChild();
+			if(this._singleChild && this._singleChild.resize){
+				this._singleChild.startup();
+				this._singleChild.resize(this._contentBox || dojo.contentBox(this.containerNode || this.domNode));
+			}
 		}
 
 		this._onLoadHandler();

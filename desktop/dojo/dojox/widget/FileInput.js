@@ -7,7 +7,7 @@ dojo.require("dijit.form._FormWidget");
 dojo.require("dijit._Templated"); 
 
 dojo.declare("dojox.widget.FileInput",
-	[dijit.form._FormWidget,dijit._Templated],
+	dijit.form._FormWidget,
 	{
 	// summary: A styled input type="file"
 	//
@@ -27,11 +27,10 @@ dojo.declare("dojox.widget.FileInput",
 	//	ugh, this should be pulled from this.domNode
 	name: "uploadFile",
 
-	templateString:"<div class=\"dijitFileInput\">\n\t<input id=\"${id}\" class=\"dijitFileInputReal\" type=\"file\" dojoAttachPoint=\"fileInput\" name=\"${name}\" />\n\t<div class=\"dijitFakeInput\">\n\t\t<input class=\"dijitFileInputVisible\" type=\"text\" dojoAttachPoint=\"focusNode, inputNode\" />\n\t\t<span class=\"dijitFileInputText\" dojoAttachPoint=\"titleNode\">${label}</span>\n\t\t<span class=\"dijitFileInputButton\" dojoAttachPoint=\"cancelNode\" \n\t\t\tdojoAttachEvent=\"onclick:_onClick\">${cancelText}</span>\n\t</div>\n</div>\n",
+	templateString:"<div class=\"dijitFileInput\">\n\t<input id=\"${id}\" class=\"dijitFileInputReal\" type=\"file\" dojoAttachPoint=\"fileInput\" name=\"${name}\" />\n\t<div class=\"dijitFakeInput\">\n\t\t<input class=\"dijitFileInputVisible\" type=\"text\" dojoAttachPoint=\"focusNode, inputNode\" />\n\t\t<div class=\"dijitInline dijitFileInputText\" dojoAttachPoint=\"titleNode\">${label}</div>\n\t\t<div class=\"dijitInline dijitFileInputButton\" dojoAttachPoint=\"cancelNode\" \n\t\t\tdojoAttachEvent=\"onclick:_onClick\">${cancelText}</div>\n\t</div>\n</div>\n",
 	
 	startup: function(){
 		// summary: listen for changes on our real file input
-		this.inherited("startup",arguments);
 		this._listener = dojo.connect(this.fileInput,"onchange",this,"_matchValue");
 		this._keyListener = dojo.connect(this.fileInput,"onkeyup",this,"_matchValue");
 	},

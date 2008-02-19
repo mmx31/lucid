@@ -1,13 +1,14 @@
 if(!dojo._hasResource["dijit._editor.plugins.FontChoice"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dijit._editor.plugins.FontChoice"] = true;
 dojo.provide("dijit._editor.plugins.FontChoice");
+dojo.experimental("dijit._editor.plugins.FontChoice");
 
 dojo.require("dijit._editor._Plugin");
 dojo.require("dijit.form.FilteringSelect");
 dojo.require("dojo.data.ItemFileReadStore");
 dojo.require("dojo.i18n");
 
-dojo.requireLocalization("dijit._editor", "FontChoice", null, "ROOT");
+dojo.requireLocalization("dijit._editor", "FontChoice", null, "ROOT,gr");
 
 dojo.declare("dijit._editor.plugins.FontChoice",
 	dijit._editor._Plugin,
@@ -17,8 +18,6 @@ dojo.declare("dijit._editor.plugins.FontChoice",
 		buttonClass: dijit.form.FilteringSelect,
 
 		_initButton: function(){
-			this.inherited("_initButton", arguments);
-
 			//TODO: do we need nls for font names?  provide css font lists? or otherwise make this more configurable?
 			var names = {
 				fontName: ["serif", "sans-serif", "monospaced", "cursive", "fantasy"],
@@ -27,19 +26,20 @@ dojo.declare("dijit._editor.plugins.FontChoice",
 			var strings = dojo.i18n.getLocalization("dijit._editor", "FontChoice");
 			var items = dojo.map(names, function(x){ return { name: strings[x], value: x }; });
 			items.push({name:"", value:""}); // FilteringSelect doesn't like unmatched blank strings
-			this.button.store = new dojo.data.ItemFileReadStore(
-				{ data: { identifier: "value",
-					items: items }
-				});
+
+			dijit._editor.plugins.FontChoice.superclass._initButton.apply(this, [{ store: new dojo.data.ItemFileReadStore(
+				{ data: { identifier: "value", items: items } })}]);
+
 			this.button.setValue("");
 
-			dojo.connect(this.button, "onChange", this, function(choice){
+			this.connect(this.button, "onChange", function(choice){
 				this.editor.execCommand(this.command, choice);
+				dijit.focus(this._focusHandle);
 			});
 		},
 
 		updateState: function(){
-			this.inherited("updateState", arguments);
+			this.inherited(arguments);
 			var _e = this.editor;
 			var _c = this.command;
 			if(!_e || !_e.isLoaded || !_c.length){ return; }
@@ -47,10 +47,13 @@ dojo.declare("dijit._editor.plugins.FontChoice",
 				var value = _e.queryCommandValue(_c);
 				this.button.setValue(value);
 			}
+
+			this._focusHandle = dijit.getFocus(this.editor.iframe);
+console.log("focushandle: "+this._focusHandle);
 		},
 
 		setToolbar: function(){
-			this.inherited("setToolbar", arguments);
+			this.inherited(arguments);
 
 			var forRef = this.button;
 			if(!forRef.id){ forRef.id = "dijitEditorButton-"+this.command+(this._uniqueId++); } //TODO: is this necessary?  FilteringSelects always seem to have an id?

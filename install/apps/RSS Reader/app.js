@@ -162,7 +162,6 @@ this.removeFeed = function(t) {
 this.addFeedDialog = function()
  {
     dialog = new dijit.TooltipDialog({});
-	dojox.regexp.integer = dojo.number._integerRegexp; //workaround, remove when dojo 1.1 comes
     this._form = {
         title: new dijit.form.TextBox({required: true}),
 	isCategory: new dijit.form.CheckBox({

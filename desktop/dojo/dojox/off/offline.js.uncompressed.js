@@ -156,9 +156,9 @@ dojo.declare("dojox.storage.Provider", null, {
 		console.warn("dojox.storage.get not implemented");
 	},
 
-	hasKey: function(/*string*/ key, /*string?*/ namespace){ /*Boolean*/
+	hasKey: function(/*string*/ key, /*string?*/ namespace){
 		// summary: Determines whether the storage has the given key. 
-		return (this.get(key) != null);
+		return !!this.get(key, namespace); // Boolean
 	},
 
 	getKeys: function(/*string?*/ namespace){ /*Array*/
@@ -285,17 +285,14 @@ dojo.declare("dojox.storage.Provider", null, {
 	},
 	
 	isValidKeyArray: function( keys) {
-		if(keys === null || typeof keys === "undefined" || ! keys instanceof Array){
+		if(keys === null || keys === undefined || !dojo.isArray(keys)){
 			return false;
 		}
-		
+
 		//	JAC: This could be optimized by running the key validity test directly over a joined string
-		for(var k=0;k<keys.length;k++){
-			if(!this.isValidKey(keys[k])){
-				return false;
-			}
-		}
-		return true;
+		return !dojo.some(keys, function(key){
+			return !this.isValidKey(key);
+		}); // Boolean
 	},
 
 	hasSettingsUI: function(){ /*Boolean*/
@@ -320,7 +317,7 @@ dojo.declare("dojox.storage.Provider", null, {
 		//		in a consistent way across different storage providers. We use
 		//		the lowest common denominator for key values allowed: only
 		//		letters, numbers, and underscores are allowed. No spaces. 
-		if((keyName == null)||(typeof keyName == "undefined")){
+		if(keyName === null || keyName === undefined){
 			return false;
 		}
 			
@@ -421,7 +418,7 @@ dojox.storage.manager = new function(){
 		// a flag to force the storage manager to use a particular 
 		// storage provider type, such as 
 		// djConfig = {forceStorageProvider: "dojox.storage.WhatWGStorageProvider"};
-		var forceProvider = djConfig["forceStorageProvider"]||false;
+		var forceProvider = dojo.config["forceStorageProvider"]||false;
 
 		// go through each provider, seeing if it can be used
 		var providerToUse;
@@ -1621,7 +1618,7 @@ if(dojo.isGears){
 			
 			initialize: function(){
 				//console.debug("dojox.storage.GearsStorageProvider.initialize");
-				if(djConfig["disableGearsStorage"] == true){
+				if(dojo.config["disableGearsStorage"] == true){
 					return;
 				}
 				
@@ -2111,7 +2108,7 @@ dojox.off.files = {
 		//	with details on errors encountered. If no error occured then message is
 		//	empty array with length 0.
 		try{
-			if(djConfig.isDebug){
+			if(dojo.config.isDebug){
 				this.printURLs();
 			}
 			
@@ -2120,8 +2117,8 @@ dojox.off.files = {
 			if(this.versionURL){
 				this._getVersionInfo(function(oldVersion, newVersion, justDebugged){
 					//console.warn("getVersionInfo, oldVersion="+oldVersion+", newVersion="+newVersion
-					//				+ ", justDebugged="+justDebugged+", isDebug="+djConfig.isDebug);
-					if(djConfig.isDebug || !newVersion || justDebugged 
+					//				+ ", justDebugged="+justDebugged+", isDebug="+dojo.config.isDebug);
+					if(dojo.config.isDebug || !newVersion || justDebugged 
 							|| !oldVersion || oldVersion != newVersion){
 						console.warn("Refreshing offline file list");
 						this._doRefresh(callback, newVersion);
@@ -2342,7 +2339,7 @@ dojox.off.files = {
 					dojox.storage.put("oldVersion", newVersion, null,
 									dojox.off.STORAGE_NAMESPACE);
 				}
-				dojox.storage.put("justDebugged", djConfig.isDebug, null,
+				dojox.storage.put("justDebugged", dojo.config.isDebug, null,
 									dojox.off.STORAGE_NAMESPACE);
 				callback(false, []);
 			}
@@ -3361,7 +3358,7 @@ dojo.mixin(dojox.off, {
 		// FIXME: need to pull in the firebug lite files here!
 		// workaround or else we will get an error on page load
 		// from Dojo that it can't find 'console.debug' for optimized builds
-		// dojox.off.files.cache(djConfig.baseRelativePath + "src/debug.js");
+		// dojox.off.files.cache(dojo.config.baseRelativePath + "src/debug.js");
 		
 		// make sure that resources needed by all of our underlying
 		// Dojo Storage storage providers will be available
@@ -3890,7 +3887,7 @@ dojo.mixin(dojox.off.ui, {
 			// add parameters to URL so the Learn How page
 			// can customize itself and display itself
 			// correctly based on framework settings
-			var dojoPath = djConfig.baseRelativePath;
+			var dojoPath = dojo.config.baseRelativePath;
 			this.learnHowPath += "?appName=" + encodeURIComponent(this.appName)
 									+ "&hasOfflineCache=" + dojox.off.hasOfflineCache
 									+ "&runLink=" + encodeURIComponent(this.runLink)
@@ -4248,7 +4245,11 @@ dojo.mixin(dojox.off.ui, {
 			// synchronize, but pause for a few seconds
 			// so that the user can orient themselves
 			if(dojox.off.sync.autoSync){
-				window.setTimeout("dojox.off.sync.synchronize()", 1000);
+				if(dojo.isAIR){
+					window.setTimeout(function(){dojox.off.sync.synchronize();}, 1000);
+				}else{
+					window.setTimeout(dojox._scopeName + ".off.sync.synchronize()", 1000);
+				}
 			}
 		}
 	}

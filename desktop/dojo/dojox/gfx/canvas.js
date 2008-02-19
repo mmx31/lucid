@@ -15,7 +15,7 @@ dojo.experimental("dojox.gfx.canvas");
 		m = g.matrix, mp = m.multiplyPoint, twoPI = 2 * Math.PI;
 	
 	dojo.extend(g.Shape, {
-		render: function(/* Object */ ctx){
+		_render: function(/* Object */ ctx){
 			// summary: render the shape
 			ctx.save();
 			this._renderTransform(ctx);
@@ -141,14 +141,14 @@ dojo.experimental("dojox.gfx.canvas");
 		constructor: function(){
 			gs.Container._init.call(this);
 		},
-		render: function(/* Object */ ctx){
+		_render: function(/* Object */ ctx){
 			// summary: render the group
 			ctx.save();
 			this._renderTransform(ctx);
 			this._renderFill(ctx);
 			this._renderStroke(ctx);
 			for(var i = 0; i < this.children.length; ++i){
-				this.children[i].render(ctx);
+				this.children[i]._render(ctx);
 			}
 			ctx.restore();
 		}
@@ -236,6 +236,7 @@ dojo.experimental("dojox.gfx.canvas");
 		// summary: a polyline/polygon shape (Canvas)
 		setShape: function(){
 			g.Polyline.superclass.setShape.apply(this, arguments);
+			// dojo.inherited("setShape", arguments);
 			// prepare Canvas-specific structures
 			var p = this.shape.points, f = p[0], r = [], c, i;
 			if(p.length){
@@ -259,6 +260,7 @@ dojo.experimental("dojox.gfx.canvas");
 			return this;
 		},
 		_renderShape: function(/* Object */ ctx){
+			// console.debug("Polyline::_renderShape");
 			var p = this.canvasPolyline;
 			if(p.length){
 				ctx.beginPath();
@@ -565,14 +567,14 @@ dojo.experimental("dojox.gfx.canvas");
 			// summary: returns an object with properties "width" and "height"
 			return this.rawNode ? {width:  this.rawNode.width, height: this.rawNode.height} : null;	// Object
 		},
-		render: function(){
+		_render: function(){
 			// summary: render the all shapes
 			if(this.pendingImageCount){ return; }
 			var ctx = this.rawNode.getContext("2d");
 			ctx.save();
 			ctx.clearRect(0, 0, this.rawNode.width, this.rawNode.height);
 			for(var i = 0; i < this.children.length; ++i){
-				this.children[i].render(ctx);
+				this.children[i]._render(ctx);
 			}
 			ctx.restore();
 			if("pendingRender" in this){
@@ -583,7 +585,7 @@ dojo.experimental("dojox.gfx.canvas");
 		makeDirty: function(){
 			// summary: internal method, which is called when we may need to redraw
 			if(!this.pendingImagesCount && !("pendingRender" in this)){
-				this.pendingRender = setTimeout(dojo.hitch(this, this.render), 0);
+				this.pendingRender = setTimeout(dojo.hitch(this, this._render), 0);
 			}
 		},
 		downloadImage: function(img, url){
@@ -604,7 +606,7 @@ dojo.experimental("dojox.gfx.canvas");
 			img.src = url;
 		},
 		onImageLoad: function(){
-			if(!--this.pendingImageCount){ this.render(); }
+			if(!--this.pendingImageCount){ this._render(); }
 		},
 
 		// events are not implemented

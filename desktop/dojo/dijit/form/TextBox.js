@@ -6,7 +6,7 @@ dojo.require("dijit.form._FormWidget");
 
 dojo.declare(
 	"dijit.form.TextBox",
-	dijit.form._FormWidget,
+	dijit.form._FormValueWidget,
 	{
 		// summary:
 		//		A generic textbox field.
@@ -32,10 +32,10 @@ dojo.declare(
 		//		HTML INPUT tag maxLength declaration.
 		maxLength: "",
 
-		templateString:"<input class=\"dojoTextBox\" dojoAttachPoint='textbox,focusNode' name=\"${name}\"\n\tdojoAttachEvent='onmouseenter:_onMouse,onmouseleave:_onMouse,onfocus:_onMouse,onblur:_onMouse,onkeyup,onkeypress:_onKeyPress'\n\tautocomplete=\"off\" type=\"${type}\"\n\t/>\n",
+		templateString:"<input class=\"dijit dijitReset dijitLeft\" dojoAttachPoint='textbox,focusNode' name=\"${name}\"\n\tdojoAttachEvent='onmouseenter:_onMouse,onmouseleave:_onMouse,onfocus:_onMouse,onblur:_onMouse,onkeyup,onkeypress:_onKeyPress'\n\tautocomplete=\"off\" type=\"${type}\"\n\t/>\n",
 		baseClass: "dijitTextBox",
 
-		attributeMap: dojo.mixin(dojo.clone(dijit.form._FormWidget.prototype.attributeMap),
+		attributeMap: dojo.mixin(dojo.clone(dijit.form._FormValueWidget.prototype.attributeMap),
 			{maxLength:"focusNode"}),
 
 		getDisplayedValue: function(){
@@ -48,7 +48,7 @@ dojo.declare(
 
 		setValue: function(value, /*Boolean, optional*/ priorityChange, /*String, optional*/ formattedValue){
 			var filteredValue = this.filter(value);
-			if((typeof filteredValue == typeof value) && (formattedValue == null || formattedValue == undefined)){
+			if((((typeof filteredValue == typeof value) && (value !== undefined/*#5317*/)) || (value === null/*#5329*/)) && (formattedValue == null || formattedValue == undefined)){
 				formattedValue = this.format(filteredValue, this.constraints);
 			}
 			if(formattedValue != null && formattedValue != undefined){
@@ -60,10 +60,6 @@ dojo.declare(
 		setDisplayedValue: function(/*String*/value){
 			this.textbox.value = value;
 			this.setValue(this.getValue(), true);
-		},
-
-		forWaiValuenow: function(){
-			return this.getDisplayedValue();
 		},
 
 		format: function(/* String */ value, /* Object */ constraints){
@@ -82,28 +78,16 @@ dojo.declare(
 			this.textbox.setAttribute("value", this.getDisplayedValue());
 			this.inherited('postCreate', arguments);
 
-			if(this.srcNodeRef){
+			/*#5297:if(this.srcNodeRef){
 				dojo.style(this.textbox, "cssText", this.style);
 				this.textbox.className += " " + this["class"];
-			}
+			}*/
 			this._layoutHack();
-		},
-
-		_layoutHack: function(){
-			// summary: work around table sizing bugs on FF2 by forcing redraw
-			if(dojo.isFF == 2 && this.domNode.tagName=="TABLE"){
-				var node=this.domNode;
-				var old = node.style.opacity;
-				node.style.opacity = "0.999";
-				setTimeout(function(){
-					node.style.opacity = old;
-				}, 0);
-			}			
 		},
 
 		filter: function(val){
 			// summary: Apply various filters to textbox value
-			if(val == undefined || val == null){ return ""; }
+			if(val === null){ return ""; } // undefined should return undefined
 			else if(typeof val != "string"){ return val; }
 			if(this.trim){
 				val = dojo.trim(val);
