@@ -17,6 +17,11 @@ desktop.config = {
 		api.xhr({
 	        backend: "core.config.stream.load",
 	        load: function(data, ioArgs) {
+				if(data == "") {
+					desktop.config.apply();
+					if(cback) cback();
+					return;
+				}
 				desktop.config = dojo.mixin(desktop.config, data);
 				for(var a=0;a<desktop.config.startupapps.length;a++) {
 					desktop.app.launch(desktop.config.startupapps[a]);
