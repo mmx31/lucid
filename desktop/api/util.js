@@ -1,4 +1,5 @@
 api.util = {};
+if(typeof djConfig == "undefined") djConfig = {};
 djConfig.usePlainJson=true;
 
 api.xhr = function(/*dojo.__ioArgs|String*/args) {
