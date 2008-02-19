@@ -88,9 +88,8 @@ var desktop = {
 			dojo.require("dijit.form.Form");
 			dojo.require("dijit.form.TextBox");
 			dojo.require("dijit.form.CheckBox");
-			desktop.elements.loginform = new dijit.form.Form({}, dojo.byId(desktop.formid));
+			desktop.elements.loginform = new dijit.form.Form({onSubmit: dojo.hitch(desktop, desktop.login)}, dojo.byId(desktop.formid));
 			desktop.elements.loginform.domNode.innerHTML = desktop.loginForm;
-			desktop.elements.onExecuteForm = dojo.connect(desktop.elements.loginform, "execute", desktop, desktop.login);
 			new dijit.form.TextBox({
 				name: "username"
 			}, desktop.elements.loginform.domNode.username);
@@ -110,8 +109,9 @@ var desktop = {
 		}
 		else {setTimeout(desktop.setOnLoad, 10);}
 	},
-	login: function(contents)
+	login: function()
 	{
+		var contents = desktop.elements.loginform.getValues();
 		dojo.byId("desktop_formerror").innerHTML = "";
 		dijit.byId(desktop.formid).domNode.submit.disabled=true;
 		if(contents.username && contents.password)
@@ -170,6 +170,7 @@ var desktop = {
 			dojo.byId("desktop_formerror").innerHTML = "Please provide both a username and a password";
 			dijit.byId(desktop.formid).domNode.submit.disabled=false;
 		}
+		return false;
 	},
 	loggedin: function()
 	{
@@ -177,7 +178,6 @@ var desktop = {
 		else {
 			dijit.byId(desktop.formid).domNode.submit.disabled=false;
 			dojo.byId("desktop_formerror").innerHTML = "";
-			desktop.elements.onExecuteForm = dojo.connect(desktop.elements.loginform, "execute", desktop, desktop.login);
 		}
 		
 	},
@@ -199,19 +199,8 @@ var desktop = {
 		var div = dojo.doc.createElement("div");
 		div.setAttribute("class", "tundra");
 		div.style.backgroundColor="white";
-		desktop.elements.registerDialogForm = new dijit.form.Form({});
-		desktop.elements.registerDialogForm.domNode.innerHTML = desktop.registerForm;
-		
-		new dijit.form.TextBox({name: "username"}, desktop.elements.registerDialogForm.domNode.username);
-		new dijit.form.TextBox({name: "email"}, desktop.elements.registerDialogForm.domNode.email);
-		new dijit.form.TextBox({name: "password", type: "password"}, desktop.elements.registerDialogForm.domNode.password);
-		new dijit.form.TextBox({name: "confPassword", type: "password"}, desktop.elements.registerDialogForm.domNode.confPassword);
-		
-		div.appendChild(desktop.elements.registerDialogForm.domNode);
-		dojo.doc.body.appendChild(div);
-		desktop.elements.registerDialog = new dijit.Dialog({title: "Register"}, div);
-		desktop.elements.registerDialog.show();
-		dojo.connect(desktop.elements.registerDialogForm, "execute", desktop, function(contents){
+		desktop.elements.registerDialogForm = new dijit.form.Form({onSubmit: dojo.hitch(desktop, function(){
+			var contents = desktop.elements.registerDialogForm.getValues();
 			desktop.elements.registerDialogForm.domNode.submit.disabled=true;
 			dojo.byId("desktop_registerformerror").innerHTML = "";
 			if(contents.username && contents.email && contents.password && contents.confPassword)
@@ -261,24 +250,27 @@ var desktop = {
 				dojo.byId("desktop_registerformerror").innerHTML = "Please fill in all fields";
 				desktop.elements.registerDialogForm.domNode.submit.disabled=false;
 			}
-		});
+			return false;
+		})});
+		desktop.elements.registerDialogForm.domNode.innerHTML = desktop.registerForm;
+		
+		new dijit.form.TextBox({name: "username"}, desktop.elements.registerDialogForm.domNode.username);
+		new dijit.form.TextBox({name: "email"}, desktop.elements.registerDialogForm.domNode.email);
+		new dijit.form.TextBox({name: "password", type: "password"}, desktop.elements.registerDialogForm.domNode.password);
+		new dijit.form.TextBox({name: "confPassword", type: "password"}, desktop.elements.registerDialogForm.domNode.confPassword);
+		
+		div.appendChild(desktop.elements.registerDialogForm.domNode);
+		dojo.doc.body.appendChild(div);
+		desktop.elements.registerDialog = new dijit.Dialog({title: "Register"}, div);
+		desktop.elements.registerDialog.show();
 	},
 	forgotPassDialog: function() {
 		dojo.require("dijit.Dialog");
 		var div = dojo.doc.createElement("div");
 		div.setAttribute("class", "tundra");
 		div.style.backgroundColor="white";
-		desktop.elements.forgotDialogForm = new dijit.form.Form({});
-		desktop.elements.forgotDialogForm.domNode.innerHTML = desktop.forgotForm;
-		
-		new dijit.form.TextBox({name: "user"}, desktop.elements.forgotDialogForm.domNode.user);
-		new dijit.form.TextBox({name: "email"}, desktop.elements.forgotDialogForm.domNode.email);
-			
-		div.appendChild(desktop.elements.forgotDialogForm.domNode);
-		dojo.doc.body.appendChild(div);
-		desktop.elements.forgotDialog = new dijit.Dialog({title: "Reset Password"}, div);
-		desktop.elements.forgotDialog.show();
-		dojo.connect(desktop.elements.forgotDialogForm, "execute", desktop, function(contents){
+		desktop.elements.forgotDialogForm = new dijit.form.Form({onSubmit: dojo.hitch(desktop, function(){
+			var contents = desktop.elements.forgotDialogForm.getValues();
 			desktop.elements.forgotDialogForm.domNode.submit.disabled=true;
 			dojo.byId("desktop_forgotformerror").innerHTML = "";
 			if(contents.email && contents.user)
@@ -319,7 +311,17 @@ var desktop = {
 				dojo.byId("desktop_forgotformerror").innerHTML = "Please fill out all fields";
 				desktop.elements.forgotDialogForm.domNode.submit.disabled=false;
 			}
-		});
+			return false;
+		})});
+		desktop.elements.forgotDialogForm.domNode.innerHTML = desktop.forgotForm;
+		
+		new dijit.form.TextBox({name: "user"}, desktop.elements.forgotDialogForm.domNode.user);
+		new dijit.form.TextBox({name: "email"}, desktop.elements.forgotDialogForm.domNode.email);
+			
+		div.appendChild(desktop.elements.forgotDialogForm.domNode);
+		dojo.doc.body.appendChild(div);
+		desktop.elements.forgotDialog = new dijit.Dialog({title: "Reset Password"}, div);
+		desktop.elements.forgotDialog.show();
 	}
 };
 desktop.init();
