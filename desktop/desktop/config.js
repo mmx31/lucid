@@ -22,14 +22,14 @@ desktop.config = {
 					if(cback) cback();
 					return;
 				}
+				data = dojo.fromJson(data);
 				desktop.config = dojo.mixin(desktop.config, data);
 				for(var a=0;a<desktop.config.startupapps.length;a++) {
 					desktop.app.launch(desktop.config.startupapps[a]);
 				}
 				desktop.config.apply();
 				if(cback) cback();
-			},
-			handleAs: "json"
+			}
         });
 	},
 	/*
