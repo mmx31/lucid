@@ -23,6 +23,7 @@ this.init = function(args)
 	this.feedStore = new api.registry({
 		appid: this.id,
 		name: "rssFeeds",
+		identifier: "title",
 		data: {
 			label: "label",
 			items: [
@@ -235,12 +236,11 @@ this.addFeedDialog = function()
     });
 	var div = document.createElement("div");
 	dojo.style(div, "color", "red");
-    dojo.connect(button, "onClick", this, 
-    function(e) {
-		if(this._form.title.getValue() == "") return;
-		if(!this._form.url.isValid() && this._form.isCategory.checked) return;
-		if(!this._form.category.isValid() && this._form.isCategory.checked) return;
-		if(!this._form.icon.isValid()) return;
+    dojo.connect(button, "onClick", this, function(e) {
+	if(this._form.title.getValue() == "") return;
+	if(!this._form.url.isValid() && this._form.isCategory.checked) return;
+	if(!this._form.isCategory.checked && this._form.category.isValid()) return;
+	if(!this._form.icon.isValid()) return;
 	this.feedStore.fetch({query: {title: this._form.title.getValue()}, onComplete: dojo.hitch(this, function(f) {
 		if(typeof f[0] != "undefined") {
 			div.innerHTML = "An item with that name already exists";
