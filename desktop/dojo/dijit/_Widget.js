@@ -98,6 +98,7 @@ dojo.declare("dijit._Widget", null, {
 		//mixin our passed parameters
 		if(this.srcNodeRef && (typeof this.srcNodeRef.id == "string")){ this.id = this.srcNodeRef.id; }
 		if(params){
+			this.params = params;
 			dojo.mixin(this,params);
 		}
 		this.postMixInProperties();
@@ -229,17 +230,46 @@ dojo.declare("dijit._Widget", null, {
 
 	uninitialize: function(){
 		// summary:
-		//		stub function. Over-ride to implement custom widget tear-down
+		//		stub function. Override to implement custom widget tear-down
 		//		behavior.
 		return false;
 	},
 
 	////////////////// MISCELLANEOUS METHODS ///////////////////
 
-	setAttribute: function(/*String*/ attr, /*anything*/ value){
+	onFocus: function(){
 		// summary:
-		//              Set native HTML attributes reflected in the widget,
-		//              such as readOnly, disabled, and maxLength in TextBox widgets.
+		//		stub function. Override or connect to this method to receive
+		//		notifications for when the widget moves into focus.
+	},
+
+	onBlur: function(){
+		// summary:
+		//		stub function. Override or connect to this method to receive
+		//		notifications for when the widget moves out of focus.
+	},
+
+	_hasBeenBlurred: false,
+
+	_onFocus: function(e){
+		this.onFocus();
+	},
+
+	_onBlur: function(){
+		this._hasBeenBlurred = true;
+		this.onBlur();
+	},
+
+	setAttribute: function(/*String*/ attr, /*anything*/ value){
+		// summary
+		//		Set native HTML attributes reflected in the widget,
+		//		such as readOnly, disabled, and maxLength in TextBox widgets.
+		// description
+		//		In general, a widget's "value" is controlled via setValue()/getValue(), 
+		//		rather than this method.  The exception is for widgets where the
+		//		end user can't adjust the value, such as Button and CheckBox;
+		//		in the unusual case that you want to change the value attribute of
+		//		those widgets, use setAttribute().
 		var mapNode = this[this.attributeMap[attr]||'domNode'];
 		this[attr] = value;
 		switch(attr){

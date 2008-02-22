@@ -134,8 +134,11 @@ dojo.require("dojox.dtl._base");
 		_watchParent: function(node){
 			var children = node.childNodes;
 			if(children.length){
-				var last = node.childNodes[node.childNodes.length - 1];
-				if(this._isEmpty(last)){
+				while(node.childNodes.length){
+					var last = node.childNodes[node.childNodes.length - 1];
+					if(!this._isEmpty(last)){
+						return;
+					}
 					node.removeChild(last);
 				}
 			}

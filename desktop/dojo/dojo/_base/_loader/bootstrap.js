@@ -102,11 +102,11 @@ dojo.global = {
 =====*/
 	dojo.locale = d.config.locale;
 	
-	var rev = "$Rev: 12504 $".match(/\d+/);
+	var rev = "$Rev: 12616 $".match(/\d+/);
 
 	dojo.version = {
 		// summary: version number of this instance of dojo.
-		major: 1, minor: 1, patch: 0, flag: "b1",
+		major: 1, minor: 1, patch: 0, flag: "b2",
 		revision: rev ? Number(rev[0]) : 999999,
 		toString: function(){
 			with(d.version){

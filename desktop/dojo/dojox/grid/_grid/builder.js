@@ -76,7 +76,7 @@ dojo.declare("dojox.grid.Builder",
 	
 	findCellTarget: function(inSourceNode, inTopNode){
 		var n = inSourceNode;
-		while(n && !this.isCellNode(n) && (n!=inTopNode)){
+		while(n && (!this.isCellNode(n) || (dojox.grid.gridViewTag in n.offsetParent.parentNode && n.offsetParent.parentNode[dojox.grid.gridViewTag] != this.view)) && (n!=inTopNode)){
 			n = n.parentNode;
 		}
 		return n!=inTopNode ? n : null 
@@ -95,7 +95,7 @@ dojo.declare("dojox.grid.Builder",
 	// event dispatch
 	findTarget: function(inSource, inTag){
 		var n = inSource;
-		while(n && !(inTag in n) && (n!=this.domNode)){
+		while(n && (n!=this.domNode) && (!(inTag in n) || (dojox.grid.gridViewTag in n && n[dojox.grid.gridViewTag] != this.view))){
 			n = n.parentNode;
 		}
 		return (n != this.domNode) ? n : null; 
@@ -486,5 +486,6 @@ dojo.declare("dojox.grid.tableMap",
 });
 
 dojox.grid.rowIndexTag = "gridRowIndex";
+dojox.grid.gridViewTag = "gridView";
 
 }

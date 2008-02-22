@@ -116,7 +116,7 @@
 	float: left;
 }
 .dijitRtl .dijitSpinner .dijitInputLayoutContainer .dijitArrowButton {
-	right: none;
+	right: auto;
 	left: 0;
 	border-width: 0 1px 0 0 !important;
 }
@@ -188,6 +188,9 @@
 	right:auto;
 	left:3px;
 }
+.dijitRtl .dijitAccordionArrow {
+	background-position: -30px top;
+}
 .dijitRtl .dijitHorizontalSliderProgressBar,
 .dijitRtl .dijitHorizontalSliderRemainingBar,
 .dijitRtl .dijitHorizontalSliderLeftBumper,
@@ -253,6 +256,12 @@
 .dijitRtl .dijitTreeContainer .dijitTreeExpandoLeaf {
 	background: url(images/spriteTree_rtl.gif) no-repeat -36px top;
 }
+.dijitRtl .dijitTitlePane .dijitClosed .dijitArrowNode {
+	background-position: -30px top;
+}
+.dj_ie6 .dijitRtl .dijitTitlePane .dijitClosed .dijitArrowNode {
+	background-position: -30px top;
+}
 .dijitRtl .dijitCalendarDecrease {
 	background-position: -30px top;
 }
@@ -264,9 +273,6 @@
 }
 .dj_ie6 .dijitRtl .dijitCalendarDecrease {
 	background-position: -30px top;
-}
-.dijitRtl .dijitToolbar .dijitToolbarSeparator {
-	background-image: url(images/editor_rtl.gif);
 }
 .dijitRtl .dijitDialogTitleBar .dijitDialogCloseIcon {
 	background-position: -60px top;
@@ -300,4 +306,7 @@
 }
 .dijitRtl .dijitEditorIcon {
 	background-image: url(images/editor_rtl.gif); 
+}
+.dijitRtl .dijitToolbar .dijitToolbarSeparator {
+	background-image: url(images/editor_rtl.gif);
 }

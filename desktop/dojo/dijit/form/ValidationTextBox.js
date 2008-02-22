@@ -17,7 +17,7 @@ dojo.declare(
 		//		A subclass of TextBox.
 		//		Over-ride isValid in subclasses to perform specific kinds of validation.
 
-		templateString:"<div class=\"dijit dijitReset dijitInlineTable dijitLeft\"\n\tid=\"widget_${id}\"\n\tdojoAttachEvent=\"onmouseenter:_onMouse,onmouseleave:_onMouse,onmousedown:_onMouse\" waiRole=\"presentation\"\n\t><div style=\"overflow:hidden;\"\n\t\t><div class=\"dijitReset dijitValidationIcon\"><br></div\n\t\t><div class=\"dijitReset dijitValidationIconText\">&Chi;</div\n\t\t><div class=\"dijitReset dijitInputField\"\n\t\t\t><input class=\"dijitReset\" dojoAttachPoint='textbox,focusNode' dojoAttachEvent='onfocus,onblur:_onMouse,onkeyup,onkeypress:_onKeyPress' autocomplete=\"off\"\n\t\t\ttype='${type}' name='${name}'\n\t\t/></div\n\t></div\n></div>\n",
+		templateString:"<div class=\"dijit dijitReset dijitInlineTable dijitLeft\"\n\tid=\"widget_${id}\"\n\tdojoAttachEvent=\"onmouseenter:_onMouse,onmouseleave:_onMouse,onmousedown:_onMouse\" waiRole=\"presentation\"\n\t><div style=\"overflow:hidden;\"\n\t\t><div class=\"dijitReset dijitValidationIcon\"><br></div\n\t\t><div class=\"dijitReset dijitValidationIconText\">&Chi;</div\n\t\t><div class=\"dijitReset dijitInputField\"\n\t\t\t><input class=\"dijitReset\" dojoAttachPoint='textbox,focusNode' dojoAttachEvent='onfocus:_update,onkeyup:_update,onblur:_onMouse,onkeypress:_onKeyPress' autocomplete=\"off\"\n\t\t\ttype='${type}' name='${name}'\n\t\t/></div\n\t></div\n></div>\n",
 		baseClass: "dijitTextBox",
 
 		// default values for new subclass properties
@@ -57,7 +57,7 @@ dojo.declare(
 
 		setValue: function(){
 			this.inherited(arguments);
-			this.validate(false);
+			this.validate(this._focused);
 		},
 
 		validator: function(value,constraints){
@@ -124,22 +124,13 @@ dojo.declare(
 			}
 		},
 
-		_hasBeenBlurred: false,
-
-		_onBlur: function(){
-			this._hasBeenBlurred = true;
-			this.validate(false);
-			this.inherited(arguments);
+		_refreshState: function(){
+			this.validate(this._focused);
 		},
 
 		_update: function(/*Event*/e){
-			this.validate(true);
+			this._refreshState();
 			this._onMouse(e);	// update CSS classes
-		},
-
-		reset: function(){
-			this.inherited(arguments);
-			this._hasBeenBlurred = false;
 		},
 
 		//////////// INITIALIZATION METHODS ///////////////////////////////////////
@@ -155,10 +146,6 @@ dojo.declare(
 			if(this.invalidMessage == "$_unset_$"){ this.invalidMessage = this.messages.invalidMessage; }
 			var p = this.regExpGen(this.constraints);
 			this.regExp = p;
-			// make value a string for all types so that form reset works well
-
-			this.connect(this, "onfocus", this._update);
-			this.connect(this, "onkeyup", this._update);
 		}
 	}
 );

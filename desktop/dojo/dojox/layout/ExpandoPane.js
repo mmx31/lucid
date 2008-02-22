@@ -18,6 +18,10 @@ dojo.declare("dojox.layout.ExpandoPane",
 	//		command, and supports having Layout Children as direct descendants
 	//		via a custom "attachParent" attribute
 
+	maxHeight:"",
+	maxWidth:"",
+	splitter:"",
+
 	tamplateString:null,
 	templateString:"<div class=\"dojoxExpandoPane\" dojoAttachEvent=\"ondblclick:toggle\" >\n\t<div dojoAttachPoint=\"titleWrapper\" class=\"dojoxExpandoTitle\">\n\t\t<div class=\"dojoxExpandoIcon\" dojoAttachPoint=\"iconNode\" dojoAttachEvent=\"onclick:toggle\"><span class=\"a11yNode\">X</span></div>\t\t\t\n\t\t<span class=\"dojoxExpandoTitleNode\" dojoAttachPoint=\"titleNode\">${title}</span>\n\t</div>\n\t<div class=\"dojoxExpandoWrapper\" dojoAttachPoint=\"cwrapper\" dojoAttachEvent=\"ondblclick:_trap\">\n\t\t<div class=\"dojoxExpandoContent\" dojoAttachPoint=\"containerNode\"></div>\n\t</div>\n</div>\n",
 
@@ -33,87 +37,154 @@ dojo.declare("dojox.layout.ExpandoPane",
 	// duration: Integer
 	//		duration to run show/hide animations
 	duration:420,
-
+	
 	postCreate:function(){
 
 		this.inherited(arguments);
 		this._animConnects = [];
+
+		this._isHorizontal = true;
+		
 		this._container = this.getParent();
-		this._titleHeight = dojo._getBorderBox(this.titleWrapper).h + 2;
+		this._closedSize = this._titleHeight = dojo.marginBox/*_getBorderBox*/(this.titleWrapper).h;
 	
-		// FIXME: should be check both?
-		if(typeof this.easeIn == "string"){
+		if(typeof this.easeOut == "string"){
 			this.easeOut = dojo.getObject(this.easeOut);
+		}
+		if(typeof this.easeIn == "string"){
 			this.easeIn = dojo.getObject(this.easeIn); 
 		}
 	
+		var thisClass = "";
 		if(this.region){
 			// FIXME: add suport for alternate region types?
 			switch(this.region){
 				case "right" :
-					dojo.addClass(this.titleWrapper,"iconLeft");
+					thisClass = "Right";
 					break;
 				case "left" :
-					dojo.addClass(this.titleWrapper,"iconRight");
+					thisClass = "Left";
+					break;
+				case "top" :
+					thisClass = "Top";
+					break;
+				case "bottom" :
+					thisClass = "Bottom"; 
 					break;
 			}
+			dojo.addClass(this.domNode,"dojoxExpando"+thisClass);
+			this._isHorizontal = !/top|bottom/.test(this.region);
 		}
+		dojo.style(this.domNode,"overflow","hidden");
+	},
+	
+	startup: function(){
+		this.inherited(arguments);
+		if(this.splitter){
+			// find our splitter and tie into it's drag logic
+			var myid = this.id;
+			dijit.registry.filter(function(w){
+				return w && w.child && w.child.id == myid;
+			}).forEach(dojo.hitch(this,function(w){
+				this.connect(w,"_stopDrag","_afterResize");
+			}));
+		}
+		this._currentSize = dojo.marginBox(this.domNode);
+		this._showSize = this._currentSize[(this._isHorizontal ? "w":"h")];
 		this._setupAnims();
+	},
+	
+	_afterResize: function(e){
+		var tmp = this._currentSize;
+		this._currentSize = dojo.marginBox(this.domNode);
+		var n = this._currentSize[(this._isHorizontal ? "w" : "h")] 
+		if(n> this._titleHeight){
+			if(!this._showing){
+				console.log('done being dragged:',e);			
+				this._showing = !this._showing; 
+				this._showEnd();
+			}
+			this._showSize = n;
+			this._setupAnims();
+		}else{
+			this._showSize = tmp[(this._isHorizontal ? "w" : "h")];
+			this._showing = false;
+			this._hideWrapper();
+			this._hideAnim.gotoPercent(89,true);
+		}
+
 	},
 	
 	_setupAnims:function(){
 		// summary: create the show and hide animations
 		dojo.forEach(this._animConnects,dojo.disconnect);
+		
 		var _common = {
 			node:this.domNode,
 			duration:this.duration
 		};
+
+		var isHorizontal = this._isHorizontal;
+		var showProps = {};
+		var hideProps = {};
+
+		var dimension = isHorizontal ? "width" : "height"; 
+		showProps[dimension] = { 
+			end: this._showSize, 
+			unit:"px" 
+		};
+		hideProps[dimension] = { 
+			end: this._closedSize, 
+			unit:"px"
+		};
+
 		this._showAnim = dojo.animateProperty(dojo.mixin(_common,{
 			easing:this.easeIn,
-			properties: {
-				width:{ end:this.maxWidth||275, unit:"px" }
-			}
+			properties: showProps 
 		}));
 		this._hideAnim = dojo.animateProperty(dojo.mixin(_common,{
 			easing:this.easeOut,
-			properties: {
-				width:{
-					end: (this._titleHeight - 6), unit:"px"
-				}
-			}
+			properties: hideProps
 		}));
 
 		this._animConnects = [
-			dojo.connect(this._showAnim,"onEnd",this,"_setEnd"),
-			dojo.connect(this._hideAnim,"onEnd",this,"_setEnd")
+			dojo.connect(this._showAnim,"onEnd",this,"_showEnd"),
+			dojo.connect(this._hideAnim,"onEnd",this,"_hideEnd")
 		];
 	},
 	
 	toggle:function(e){
 		// summary: toggle this pane's visibility
 		if(this._showing){
-			dojo.style(this.cwrapper,{
-				"visibility":"hidden",
-				"opacity":"0"
-			});
+			this._hideWrapper();
 			if(this._showAnim && this._showAnim.stop()){}
 			this._hideAnim.play();
 		}else{
 			if(this._hideAnim && this._hideAnim.stop()){}
 			this._showAnim.play();
-			
 		}
-		dojo[(this._showing ? "addClass" : "removeClass")](this.domNode,"dojoxExpandoClosed");
+		this._showing = !this._showing;
 	},
 	
-	_setEnd: function(){
+	_hideWrapper:function(){
+		dojo.style(this.cwrapper,{
+				"visibility":"hidden",
+				"opacity":"0",
+				"overflow":"hidden"
+		});
+	},
+	
+	_showEnd: function(){
 		// summary: common animation onEnd code
-		this._showing = !this._showing;
-		if(this._showing){
-			dojo.style(this.cwrapper,{ "visibility":"visible" });
-			dojo.fadeIn({ node:this.cwrapper, duration:227 }).play(1);
-		}
-		setTimeout(dojo.hitch(this._container,"layout"),50);
+		dojo.style(this.cwrapper,{ "opacity":"0", "visibility":"visible" });
+		dojo.fadeIn({ node:this.cwrapper, duration:227 }).play(1);
+		dojo.removeClass(this.domNode,"dojoxExpandoClosed");
+		setTimeout(dojo.hitch(this._container,"layout"),15);
+	},
+	
+	_hideEnd: function(){
+		dojo.addClass(this.domNode,"dojoxExpandoClosed");
+		setTimeout(dojo.hitch(this._container,"layout"),15);
 	},
 	
 	resize: function(){
@@ -121,8 +192,7 @@ dojo.declare("dojox.layout.ExpandoPane",
 		var size = dojo.marginBox(this.domNode);
 		// FIXME: do i even need to do this query/forEach? why not just set the containerHeight always
 		dojo.query("[attachParent]",this.domNode).forEach(function(n){
-			var dij = dijit.byNode(n);
-			if(dij){
+			if(dijit.byNode(n)){
 				var h = size.h - this._titleHeight;
 				dojo.style(this.containerNode,"height", h +"px");
 			}

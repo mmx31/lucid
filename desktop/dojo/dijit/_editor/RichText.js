@@ -785,6 +785,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		this.onDisplayChanged(e);
 	},
 	_onBlur: function(e){
+		this.inherited(arguments);
 		var _c=this.getValue(true);
 		if(_c!=this.savedContent){
 			this.onChange(_c);
@@ -799,6 +800,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 	_onFocus: function(/*Event*/e){
 //			console.info('_onFocus')
 		// summary: Fired on focus
+		this.inherited(arguments);
 		if(dojo.isMoz && this._initialFocus){
 			this._initialFocus = false;
 			if(this.editNode.innerHTML.replace(/^\s+|\s+$/g, "") == "&nbsp;"){

@@ -65,7 +65,9 @@ dojo.declare(
 	_setupChild: function(/*Widget*/child){
 		var region = child.region;
 		if(region){
-			dojo.addClass(child.domNode, "dijitBorderContainerPane");
+//			dojo.addClass(child.domNode, "dijitBorderContainerPane");
+			child.domNode.style.position = "absolute"; // bill says not to set this in CSS, since we can't keep others
+				// from destroying the class list
 
 			var ltr = dojo._isBodyLtr();
 			if(region == "leading"){ region = ltr ? "left" : "right"; }
@@ -80,11 +82,15 @@ dojo.declare(
 					oppNode: oppNodeList[0], live: this.liveSplitters });
 				this._splitters[region] = splitter.domNode;
 				dojo.place(splitter.domNode, child.domNode, "after");
-				this._splitterThickness[region] =
-					dojo.marginBox(this._splitters[region])[/top|bottom/.test(region) ? 'h' : 'w'];
+				this._computeSplitterThickness(region);
 			}
 			child.region = region;
 		}
+	},
+
+	_computeSplitterThickness: function(region){
+		this._splitterThickness[region] =
+			dojo.marginBox(this._splitters[region])[/top|bottom/.test(region) ? 'h' : 'w'];
 	},
 
 	layout: function(){
@@ -151,14 +157,17 @@ dojo.declare(
 		var rightSplitterThickness = splitterThickness.right || 0;
 		var bottomSplitterThickness = splitterThickness.bottom || 0;
 
-/*
 		// Check for race condition where CSS hasn't finished loading, so
 		// the splitter width == the viewport width (#5824)
 		if(leftSplitterThickness > 50 || rightSplitterThickness > 50){
-			setTimeout(dojo.hitch(this, "_layoutChildren"), 50);
+			setTimeout(dojo.hitch(this, function(){
+				for(var region in this._splitters){
+					this._computeSplitterThickness(region);
+				}
+				this._layoutChildren();
+			}), 50);
 			return false;
 		}
-*/
 
 		var splitterBounds = {
 			left: (sidebarLayout ? leftWidth + leftSplitterThickness: "0") + "px",
@@ -223,7 +232,7 @@ dojo.declare(
 				var me = dojo._getMarginExtents(n, s);
 				dojo._setMarginBox(n, b.l, b.t, b.w + me.w, b.h + me.h, s);
 				return null;
-			}
+			};
 
 //TODO: use dim passed in? and make borderBox setBorderBox?
 			var thisBorderBox = borderBox(this.domNode);
@@ -371,7 +380,6 @@ dojo.declare("dijit.layout._Splitter", [ dijit._Widget, dijit._Templated ],
 	},
 
 	_computeMaxSize: function(){
-	console.log("computemax");
 		var dim = this.horizontal ? 'h' : 'w';
 		var available = dojo.contentBox(this.container.domNode)[dim] - (this.oppNode ? dojo.marginBox(this.oppNode)[dim] : 0);
 		this._maxSize = Math.min(this.child.maxSize, available);
@@ -399,18 +407,18 @@ dojo.declare("dijit.layout._Splitter", [ dijit._Widget, dijit._Templated ],
 		//Performance: load data info local vars for onmousevent function closure
 		var factor = this._factor,
 			max = this._maxSize,
-			min = this._minSize || 10,
-			axis = this.horizontal ? "pageY" : "pageX",
-			pageStart = e[axis],
-			splitterStyle = this.domNode.style,
-			dim = this.horizontal ? 'h' : 'w',
-			childStart = dojo.marginBox(this.child.domNode)[dim],
-			splitterStart = parseInt(this.domNode.style[this.region]),
-			resize = this._resize,
-			region = this.region,
-			mb = {},
-			childNode = this.child.domNode,
-			layoutFunc = dojo.hitch(this.container, this.container._layoutChildren);
+			min = this._minSize || 10;
+		var axis = this.horizontal ? "pageY" : "pageX";
+		var pageStart = e[axis];
+		var splitterStyle = this.domNode.style;
+		var dim = this.horizontal ? 'h' : 'w';
+		var childStart = dojo.marginBox(this.child.domNode)[dim];
+		var splitterStart = parseInt(this.domNode.style[this.region]);
+		var resize = this._resize;
+		var region = this.region;
+		var mb = {};
+		var childNode = this.child.domNode;
+		var layoutFunc = dojo.hitch(this.container, this.container._layoutChildren);
 
 		var de = dojo.doc.body;
 		this._handlers = (this._handlers || []).concat([

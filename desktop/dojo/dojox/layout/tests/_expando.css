@@ -100,7 +100,7 @@ table.dojoTabular tfoot tr td {
 }
 		
 body {
-	background:#fff url(../dijit/tests/images/testsBodyBg.gif) repeat-x top left;
+	background:#fff url(../../../dijit/tests/images/testsBodyBg.gif) repeat-x top left;
 	padding:2em 2em 2em 2em;
 }
 h1.testTitle {
@@ -108,7 +108,7 @@ h1.testTitle {
 	margin:0 0 1em 0;
 }
 .plusIcon, .plusBlockIcon {
-	background-image: url(../dijit/tests/images/plus.gif);
+	background-image: url(../../../dijit/tests/images/plus.gif);
 	background-repeat: no-repeat; 
 	width: 16px;
 	height: 16px;
@@ -117,13 +117,13 @@ h1.testTitle {
 	display: block;
 }
 .noteIcon {
-	background-image: url(../dijit/tests/images/note.gif);
+	background-image: url(../../../dijit/tests/images/note.gif);
 	background-repeat: no-repeat; 
 	width: 20px;
 	height: 20px;
 }
 .flatScreenIcon {
-	background-image: url(../dijit/tests/images/flatScreen.gif);
+	background-image: url(../../../dijit/tests/images/flatScreen.gif);
 	background-repeat: no-repeat; 
 	width: 32px;
 	height: 32px;
@@ -150,7 +150,7 @@ h1.testTitle {
 	visibility:visible; 
 }
 .customFolderOpenedIcon, .customFolderClosedIcon {
-	background-image: url(../dijit/tests/css/demos/mail/icons.png); 
+	background-image: url(../../../dijit/tests/../demos/mail/icons.png); 
 	background-repeat: no-repeat;
 	width: 16px;
 	height: 16px;
@@ -159,7 +159,7 @@ h1.testTitle {
     background-position: -44px;
 }
 .dj_ie6 .customFolderOpenedIcon, .dj_ie6 .customFolderClosedIcon {
-	background-image: url(../dijit/tests/css/demos/mail/icons.gif);
+	background-image: url(../../../dijit/tests/../demos/mail/icons.gif);
 }
 .customFolderClosedIcon {
     background-position: -154px;
@@ -186,14 +186,14 @@ body .medium {
 	white-space: nowrap;
 }
 .soria .dojoxFloatingPaneTitle {
-	background:#fff url(../dijit/themes/soria/images/titleBar.png) repeat-x top left;
+	background:#fff url(../../../dijit/themes/soria/images/titleBar.png) repeat-x top left;
 	border:1px solid #b1badf;
 	font-size: 0.9em;
 	font-weight: bold;
 	line-height:1.2em;
 }
 .tundra .dojoxFloatingPaneTitle {
-	background:#fafafa url(../dijit/themes/tundra/images/titleBarBg.gif) repeat-x bottom left;
+	background:#fafafa url(../../../dijit/themes/tundra/images/titleBarBg.gif) repeat-x bottom left;
 	border:1px solid #bfbfbf;
 	color:#000; 	
 }
@@ -205,29 +205,29 @@ body .medium {
 	float:right; 
 }
 .dojoxFloatingMinimizeIcon {
-	background:url(../dijit/themes/tundra/images/arrowDown.png) no-repeat center center; 
+	background:url(../../../dijit/themes/tundra/images/arrowDown.png) no-repeat center center; 
 	width:16px;
 	height:16px; 
 	overflow:hidden;
 	float:right; 
 }
 .soria .dojoxFloatingMinimizeIcon {
-		background:url(../dijit/themes/soria/images/spriteRoundedIconsSmallBl.png) no-repeat -15px top;
+		background:url(../../../dijit/themes/soria/images/spriteRoundedIconsSmallBl.png) no-repeat -15px top;
 }
 .floatingPaneMaximized .dojoxFloatingMaximizeIcon { display:none; }
 .dojoxFloatingMaximizeIcon {
-	background:url(../dijit/themes/tundra/images/arrowUp.png) no-repeat center center;
+	background:url(../../../dijit/themes/tundra/images/arrowUp.png) no-repeat center center;
 	width:16px;
 	height:16px;
 	overflow:hidden;
 	float:right;	
 }
 .soria .dojoxFloatingMaximizeIcon {
-	background:url(../dijit/themes/soria/images/spriteRoundedIconsSmallBl.png) no-repeat -45px top;
+	background:url(../../../dijit/themes/soria/images/spriteRoundedIconsSmallBl.png) no-repeat -45px top;
 }
 .floatingPaneMaximized .dojoxFloatingRestoreIcon { display:inline; }
 .dojoxFloatingRestoreIcon {
-	background:url(../dijit/themes/tundra/images/arrowDown.png) no-repeat center center;
+	background:url(../../../dijit/themes/tundra/images/arrowDown.png) no-repeat center center;
 	width:16px; height:16px;
 	overflow:hidden; 
 	float:right;
@@ -250,10 +250,10 @@ body .medium {
 	cursor:pointer;
 }
 .soria .dojoxFloatingCloseIcon {
-	background:url(../dijit/themes/soria/images/spriteRoundedIconsSmallBl.png) no-repeat -60px top;
+	background:url(../../../dijit/themes/soria/images/spriteRoundedIconsSmallBl.png) no-repeat -60px top;
 }
 .tundra .dojoxFloatingCloseIcon {
-	background:url(../dijit/themes/tundra/images/tabClose.png) no-repeat center center; 	
+	background:url(../../../dijit/themes/tundra/images/tabClose.png) no-repeat center center; 	
 }
 .dojoxFloatingDockDefault {
 	position:absolute;
@@ -273,14 +273,14 @@ body .medium {
 	margin: 0px;
 }
 .dojoxDockRestoreButton {
-	background:url(../dijit/themes/tundra/images/arrowUp.png) no-repeat center center;
+	background:url(../../../dijit/themes/tundra/images/arrowUp.png) no-repeat center center;
 	width:16px; height:16px;
 	overflow:hidden; 
 	float:left;
 	margin-top:2px; 
 }
 .soria .dojoxDockRestoreButton {
-	background:url(../dijit/themes/soria/images/spriteRoundedIconsSmallBl.png) no-repeat -45px top;
+	background:url(../../../dijit/themes/soria/images/spriteRoundedIconsSmallBl.png) no-repeat -45px top;
 }
 .dojoxDockTitleNode {
 	overflow:hidden;
@@ -308,7 +308,7 @@ body .medium {
 	background: #fafafa url(../resources/images/floatTitleBarBg.gif) repeat-x bottom left;
 }
 .soria .dojoxDockNode {
-	background:#b7cdee url(../dijit/themes/soria/images/titleBar.png) repeat-x;
+	background:#b7cdee url(../../../dijit/themes/soria/images/titleBar.png) repeat-x;
 }
 .dojoxFloatingPaneContent {
 	overflow: auto;
@@ -336,10 +336,10 @@ body .medium {
 	height:14px;
 }
 .soria .dojoxExpandoIcon {
-	background:url(../dijit/themes/soria/images/spriteRoundedIconsSmall.png) no-repeat center center;
+	background:url(../../../dijit/themes/soria/images/spriteRoundedIconsSmall.png) no-repeat center center;
 }
 .nihilo .dojoxExpandoIcon {
-	background:url(../dijit/themes/nihilo/images/spriteRoundedIconsSmall.gif) no-repeat center center;
+	background:url(../../../dijit/themes/nihilo/images/spriteRoundedIconsSmall.gif) no-repeat center center;
 }
 .dojoxExpandoClosed .dojoxExpandoIcon {
 	background-position:0px 0px;
@@ -357,29 +357,40 @@ body .medium {
 	display:none;
 	visibility:hidden;
 }
-.dojoxExpandoPane .iconRight .dojoxExpandoIcon {
+.dojoxExpandoBottom .dojoxExpandoIcon,
+.dojoxExpandoTop .dojoxExpandoIcon,
+.dojoxExpandoLeft .dojoxExpandoIcon {
 	float:right;
 }
-.dojoxExpandoPane .iconLeft .dojoxExpandoIcon {
+.dojoxExpandoRight .dojoxExpandoIcon {
 	float:left;
 }
 .nihilo .dojoxExpandoTitle {
-	height:16px;
+	height:18px;
 	font-size:0.9em;
 	font-weight:bold;
 	padding:3px;
 	padding-top:7px;
 	padding-bottom:7px;
-	background:#fafafa url(../dijit/themes/nihilo/images/tabStripe.gif) repeat-x left bottom; 
+	background:#fafafa url(../../../dijit/themes/nihilo/images/tabStripe.gif) repeat-x left bottom;
+	
+}
+.nihilo .dojoxExpandoTop {
+	border-bottom:1px solid #ccc;
+	border-left:1px solid #ccc;
+	border-right:1px solid #ccc; 
+}
+.soria .dojoxExpandoTop {
+	
 }
 .soria .dojoxExpandoTitle {
-	height:16px;
+	height:18px;
 	font-size:0.9em;
 	font-weight:bold;
 	padding:3px;
 	padding-top:7px;
 	padding-bottom:7px;
-	background:#f0f4fc url(../dijit/themes/soria/images/tabStripe.gif) repeat-x left bottom; 
+	background:#f0f4fc url(../../../dijit/themes/soria/images/tabStripe.gif) repeat-x left bottom; 
 }
 		body, html { margin:0; padding:0;
 			width:100%; height:100%;

@@ -8,6 +8,7 @@
 			parameters: [
 				{ name: "name", type: "string", optional: false },
 				{ name: "exact", type: "boolean", optional: true },
+				{ name: "recursion", type: "boolean", optional: true },
 				{ name: "resource", type: "string", optional: true },
 				{ name: "project", type: "string", optional: true },
 				{ name: "version", type: "string", optional: true },
@@ -19,6 +20,7 @@
 			parameters: [
 				{ name: "names", type: "array", optional: false },
 				{ name: "exact", type: "boolean", optional: true },
+				{ name: "recursion", type: "boolean", optional: true },
 				{ name: "project", type: "string", optional: true },
 				{ name: "version", type: "string", optional: true },
 				{ name: "attributes", type: "array", optional: false }

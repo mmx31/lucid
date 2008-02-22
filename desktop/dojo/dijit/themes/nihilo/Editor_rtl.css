@@ -2,3 +2,6 @@
 .dijitRtl .dijitEditorIcon {
 	background-image: url('images/editor_rtl.gif'); 
 }
+.dijitRtl .dijitToolbar .dijitToolbarSeparator {
+	background-image: url('images/editor_rtl.gif');
+}

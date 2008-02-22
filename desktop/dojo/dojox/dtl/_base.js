@@ -143,7 +143,7 @@ dojo.require("dojox.string.tokenize");
 			return ddt._resolveLazy(arg, sync);
 		},
 		_isTemplate: function(arg){
-			return dojo.isString(arg) && (arg.match(/^\s*[<{]/) || arg.indexOf(" ") != -1);
+			return (typeof arg == "undefined") || (dojo.isString(arg) && (arg.match(/^\s*[<{]/) || arg.indexOf(" ") != -1));
 		},
 		_resolveContextArg: function(arg, sync){
 			if(arg.constructor == Object){
@@ -179,7 +179,7 @@ dojo.require("dojox.string.tokenize");
 		// template:
 		//		The string or location of the string to
 		//		use as a template
-		var str = ddt._resolveTemplateArg(template, true);
+		var str = ddt._resolveTemplateArg(template, true) || "";
 		var tokens = ddt.tokenize(str);
 		var parser = new dd._Parser(tokens);
 		this.nodelist = parser.parse();
@@ -218,12 +218,19 @@ dojo.require("dojox.string.tokenize");
 		// summary: Uses a string to find (and manipulate) a variable
 		if(!token) throw new Error("Filter must be called with variable name");
 		this.contents = token;
-		this.key = null;
-		this.filters = [];
 
-		dojox.string.tokenize(token, this._re, this._tokenize, this);
+		var cache = this._cache[token];
+		if(cache){
+			this.key = cache[0];
+			this.filters = cache[1];
+		}else{
+			this.filters = [];
+			dojox.string.tokenize(token, this._re, this._tokenize, this);
+			this._cache[token] = [this.key, this.filters];
+		}
 	},
 	{
+		_cache: {},
 		_re: /(?:^_\("([^\\"]*(?:\\.[^\\"])*)"\)|^"([^\\"]*(?:\\.[^\\"]*)*)"|^([a-zA-Z0-9_.]+)|\|(\w+)(?::(?:_\("([^\\"]*(?:\\.[^\\"])*)"\)|"([^\\"]*(?:\\.[^\\"]*)*)"|([a-zA-Z0-9_.]+)|'([^\\']*(?:\\.[^\\']*)*)'))?|^'([^\\']*(?:\\.[^\\']*)*)')/g,
 		_values: {
 			0: '"', // _("text")
@@ -319,6 +326,7 @@ dojo.require("dojox.string.tokenize");
 						if(current.get && dojo.isFunction(current.get)){
 							current = current.get(part);
 						}else if(typeof current[part] == "undefined"){
+							current = current[part];
 							break;
 						}else{
 							current = current[part];

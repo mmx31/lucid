@@ -32,7 +32,7 @@ dojo.declare("dijit.form.Button",
 
 	type: "button",
 	baseClass: "dijitButton",
-	templateString:"<div class=\"dijit dijitReset dijitLeft dijitInline\"\n\tdojoAttachEvent=\"onclick:_onButtonClick,onmouseenter:_onMouse,onmouseleave:_onMouse,onmousedown:_onMouse\"\n\twaiRole=\"presentation\"\n\t><button class=\"dijitReset dijitStretch dijitButtonNode dijitButtonContents\" dojoAttachPoint=\"focusNode,titleNode\"\n\t\ttype=\"${type}\" waiRole=\"button\" waiState=\"labelledby-${id}_label\"\n\t\t><span class=\"dijitReset dijitInline ${iconClass}\" dojoAttachPoint=\"iconNode\" \n \t\t\t><span class=\"dijitReset dijitToggleButtonIconChar\">&#10003</span \n\t\t></span\n\t\t><div class=\"dijitReset dijitInline\"><center class=\"dijitReset dijitButtonText\" id=\"${id}_label\" dojoAttachPoint=\"containerNode\">${label}</center></div\n\t></button\n></div>\n",
+	templateString:"<div class=\"dijit dijitReset dijitLeft dijitInline\"\n\tdojoAttachEvent=\"onclick:_onButtonClick,onmouseenter:_onMouse,onmouseleave:_onMouse,onmousedown:_onMouse\"\n\twaiRole=\"presentation\"\n\t><button class=\"dijitReset dijitStretch dijitButtonNode dijitButtonContents\" dojoAttachPoint=\"focusNode,titleNode\"\n\t\ttype=\"${type}\" waiRole=\"button\" waiState=\"labelledby-${id}_label\"\n\t\t><span class=\"dijitReset dijitInline ${iconClass}\" dojoAttachPoint=\"iconNode\" \n \t\t\t><span class=\"dijitReset dijitToggleButtonIconChar\">&#10003;</span \n\t\t></span\n\t\t><div class=\"dijitReset dijitInline\"><center class=\"dijitReset dijitButtonText\" id=\"${id}_label\" dojoAttachPoint=\"containerNode\">${label}</center></div\n\t></button\n></div>\n",
 
 	// TODO: set button's title to this.containerNode.innerText
 
@@ -51,7 +51,7 @@ dojo.declare("dijit.form.Button",
 		if(this._onClick(e) === false){ // returning nothing is same as true
 			dojo.stopEvent(e);
 		}else if(this.type=="submit"){ // see if a nonform widget needs to be signalled
-			for(var node=this.domNode; node; node=node.parentNode){
+			for(var node=this.domNode; node.parentNode/*#5935*/; node=node.parentNode){
 				var widget=dijit.byNode(node);
 				if(widget && typeof widget._onSubmit == "function"){
 					widget._onSubmit(e);
@@ -196,6 +196,7 @@ dojo.declare("dijit.form.DropDownButton", [dijit.form.Button, dijit._Container],
 		// summary: called magically when focus has shifted away from this widget and it's dropdown
 		this._closeDropDown();
 		// don't focus on button.  the user has explicitly focused on something else.
+		this.inherited(arguments);
 	},
 
 	_toggleDropDown: function(){
@@ -358,7 +359,7 @@ dojo.declare("dijit.form.ComboButton", dijit.form.DropDownButton, {
 		this._focusedNode = evt.currentTarget;
 	},
 
-	_onBlur: function(evt){
+	_onBlur: function(){
 		this.inherited(arguments);
 		this._focusedNode = null;
 	}

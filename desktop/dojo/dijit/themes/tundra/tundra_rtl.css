@@ -115,7 +115,7 @@
 	float: left;
 }
 .dijitRtl .dijitSpinner .dijitInputLayoutContainer .dijitArrowButton {
-	right: none;
+	right: auto;
 	left: 0;
 	border-width: 0 1px 0 0 !important;
 }
@@ -168,15 +168,15 @@
 .dijitRtl .dijitEditorIcon {
 	background-image: url(images/editor_rtl.gif); 
 }
+.dijitRtl .dijitToolbar .dijitToolbarSeparator {
+	background-image: url(images/editor_rtl.gif);
+}
 .dijitRtl .dijitMenuItem .dijitMenuItemIcon {
 	padding-left: 3px;
 	padding-right: 0px;
 }
 .dijitRtl .dijitMenuItem .dijitMenuExpandEnabled {
 	background-image:url(images/arrowLeft.gif);
-}
-.dijitRtl .dijitToolbar .dijitToolbarSeparator {
-	background-image: url(images/editor_rtl.gif);
 }
 .dijitRtl .dijitTreeContainer .dijitTreeNode {
     background-image : url(images/i_rtl.gif);
@@ -207,5 +207,87 @@
 .dijitRtl .dijitTreeContainer .dijitTreeExpandoLeaf {
 	background-image: url(images/treeExpand_leaf_rtl.gif);
 }
-@import url("TabContainer_rtl.css");
-@import url("Slider_rtl.css");
+.dijitRtl .dijitTitlePane .dijitClosed .dijitArrowNode {
+	background:url(images/arrowRight.png) no-repeat center center;
+}
+.dj_ie6 .dijitRtl .dijitTitlePane .dijitClosed .dijitArrowNode {
+	background-image:url(images/arrowRight.gif);
+}
+.dijitRtl .dijitTab {
+	margin-right:0;
+	margin-left:5px;		
+}
+.dijitRtl .dijitTab .dijitTabInnerDiv {
+	border-left:none;
+	border-right:1px solid #fff;
+}
+.dijitRtl .dijitTab .dijitClosable {
+	padding: 6px 10px 4px 20px;
+}
+.dijitRtl .dijitTab .closeImage {
+	position:static;
+	padding: 0px 12px 0px 0px;
+}
+.dj_gecko .dijitTab .closeImage {
+	position:relative;
+	float:none;
+	padding:0;
+}
+.dijitRtl .dijitTab .dijitClosable .closeImage {
+	right:auto;
+	left:3px;
+	background-position: left top;
+}
+.dj_ie .dijitRtl .dijitTab .dijitClosable .closeImage {
+	width:12px !important;
+}
+.dijitRtl .dijitAlignLeft .dijitTab,
+.dijitRtl .dijitAlignRight .dijitTab {
+	margin-left:0px;
+}
+.dijitRtl .dijitAlignBottom .dijitTab .dijitClosable .closeImage {
+	right:auto;
+	left:3px;
+}
+.dijitRtl .dijitAlignRight .dijitTab .dijitTabInnerDiv {
+	padding-left:10px;
+	padding-right:20px;
+}
+.dijitRtl .dijitAlignLeft .dijitTab .dijitTabInnerDiv {
+	padding-left:20px;
+	padding-right:10px;
+}
+.dijitRtl .dijitAlignRight .dijitTab .dijitClosable .closeImage {
+	left:auto;
+	right:3px;
+}
+.dijitRtl .dijitAlignLeft .dijitTab .dijitClosable .closeImage {
+	right:auto;
+	left:3px;
+}
+.dijitRtl .dijitHorizontalSliderProgressBar,
+.dijitRtl .dijitHorizontalSliderRemainingBar,
+.dijitRtl .dijitHorizontalSliderLeftBumper,
+.dijitRtl .dijitHorizontalSliderRightBumper,
+.dijitRtl .dijitVerticalSliderTopBumper {
+	background-position: top right;
+}
+.dijitRtl .dijitVerticalSliderProgressBar,
+.dijitRtl .dijitVerticalSliderRemainingBar,
+.dijitRtl .dijitVerticalSliderBottomBumper {
+	background-position: bottom right;
+}
+.dijitRtl .dijitHorizontalSliderLeftBumper {
+	border-left-width: 0px;
+	border-right-width: 1px;
+}
+.dijitRtl .dijitHorizontalSliderRightBumper {
+	border-left-width: 1px;
+	border-right-width: 0px;
+}
+.dijitRtl .dijitHorizontalSliderIncrementIcon {
+	background-image:url(form/images/arrowLeft.png);
+}
+.dijitRtl .dijitHorizontalSliderDecrementIcon {
+	background-image:url(form/images/arrowRight.png);
+}

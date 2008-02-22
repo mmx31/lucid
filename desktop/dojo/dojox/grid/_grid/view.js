@@ -128,7 +128,7 @@ dojo.declare('dojox.GridView',
 		if(inCell.index != inCell.grid.getSortIndex()){
 			return n;
 		}
-		return [ '<div class="', inCell.grid.sortInfo > 0 ? 'dojoxGrid-sort-down' : 'dojoxGrid-sort-up', '">', n, '</div>' ].join('');
+		return [ '<div class="', inCell.grid.sortInfo > 0 ? 'dojoxGrid-sort-down' : 'dojoxGrid-sort-up', '"><div class="gridArrowButtonChar">', inCell.grid.sortInfo > 0 ? '&#9660;' : '&#9650;', '</div>', n, '</div>' ].join('');
 	},
 
 	resize: function(){
@@ -191,6 +191,7 @@ dojo.declare('dojox.GridView',
 	createRowNode: function(inRowIndex){
 		var node = document.createElement("div");
 		node.className = this.classTag + '-row';
+		node[dojox.grid.gridViewTag] = this;
 		node[dojox.grid.rowIndexTag] = inRowIndex;
 		this.rowNodes[inRowIndex] = node;
 		return node;

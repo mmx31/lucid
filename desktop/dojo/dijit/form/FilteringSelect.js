@@ -40,6 +40,8 @@ dojo.declare(
 
 		_isvalid:true,
 
+		_lastDisplayedValue: "",
+
 		isValid:function(){
 			return this._isvalid;
 		},
@@ -62,10 +64,10 @@ dojo.declare(
 				//#3268: do nothing on bad input
 				//this._setValue("", "");
 				//#3285: change CSS to indicate error
-				if(!this._hasFocus){ this.valueNode.value=""; }
-				dijit.form.TextBox.superclass.setValue.call(this, undefined, !this._hasFocus);
+				if(!this._focused){ this.valueNode.value=""; }
+				dijit.form.TextBox.superclass.setValue.call(this, undefined, !this._focused);
 				this._isvalid=false;
-				this.validate(this._hasFocus);
+				this.validate(this._focused);
 			}else{
 				this._setValueFromItem(result[0], priorityChange);
 			}
@@ -151,15 +153,6 @@ dojo.declare(
 			return store.getValue(item, this.searchAttr);
 		},
 
-		onkeyup: function(/*Event*/ evt){
-			// summary: internal function
-
-			// FilteringSelect needs to wait for the complete label before
-			// committing to a reverse lookup
-
-			//this.setDisplayedValue(this.textbox.value);
-		},
-
 		_doSelect: function(/*Event*/ tgt){
 			// summary:
 			//		ComboBox's menu callback function
@@ -228,6 +221,14 @@ dojo.declare(
 		setAttribute: function(/*String*/ attr, /*anything*/ value){
 			dijit.form.MappedTextBox.prototype.setAttribute.apply(this, arguments);
 			dijit.form.ComboBoxMixin.prototype._setAttribute.apply(this, arguments);
+		},
+
+		undo: function(){
+			this.setDisplayedValue(this._lastDisplayedValue);
+		},
+
+		_valueChanged: function(){
+			return this.getDisplayedValue()!=this._lastDisplayedValue;
 		}
 	}
 );

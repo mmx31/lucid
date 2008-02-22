@@ -45,8 +45,9 @@ dojox.cometd = new function(){
 	this._messageQ=[];
 	this.handleAs="json-comment-optional";
 	this._advice={};
-	this._maxInterval=30000;
-	this._backoffInterval=1000;
+	this._backoffInterval=0;
+	this._backoffIncrement=1000;
+	this._backoffMax=60000;
 	this._deferredSubscribes={};
 	this._deferredUnsubscribes={};
 	this._subscriptions=[];
@@ -133,10 +134,12 @@ dojox.cometd = new function(){
 			handleAs: this.handleAs,
 			content: { "message": dojo.toJson([props]) },
 			load: dojo.hitch(this,function(msg){
+				this._backon();
 				this._finishInit(msg);
 			}),
 			error: dojo.hitch(this,function(e){
 				console.debug("handshake error!:",e);
+				this._backoff();
 				this._finishInit([{}]);
 			})
 		};
@@ -348,20 +351,32 @@ dojox.cometd = new function(){
 	}
 	
 	this._backoff = function(){
-		if(!this._advice || !this._advice.interval){
-			this._advice={reconnect:"retry",interval:0}; // TODO Is this good advice?
+		if(!this._advice){
+			this._advice={reconnect:"retry",interval:0};
 		}
-		if(this._advice.interval<this._maxInterval){
-			this._advice.interval+=this._backoffInterval;
+		else if(!this._advice.interval){
+			this._advice.interval=0;
 		}
+		if(this._backoffInterval<this._backoffMax){
+			this._backoffInterval+=this._backoffIncrement;
+		}
+	}
+	
+	this._backon = function(){
+		this._backoffInterval=0;
+	}
+
+	this._interval = function(){
+		var i=this._backoffInterval+(this._advice?(this._advice.interval?this._advice.interval:0):0);
+		if (i>0)
+			console.debug("Retry in interval+backoff="+this._advice.interval+"+"+this._backoffInterval+"="+i+"ms");
+		return i;
 	}
 
 	this._finishInit = function(data){
 		//	summary:
 		//		Handle the handshake return from the server and initialize
 		//		connection if all is OK
-		console.debug("_finishInit():", data);
-		// data = data.length ? data[0] : data;
 		data = data[0];
 		this.handshakeReturn = data;
 		
@@ -401,17 +416,11 @@ dojox.cometd = new function(){
 		// If there is a problem
 		if(!successful){
 			console.debug("cometd init failed");
-			this._backoff();
 			// follow advice
 			if(this._advice && this._advice["reconnect"]=="none"){
 				console.debug("cometd reconnect: none");
-			}else if(this._advice && this._advice["interval"] && this._advice.interval>0 ){
-				setTimeout(
-					dojo.hitch(this, "init", this.url, this._props),
-					this._advice.interval
-				);
 			}else{
-				this.init(this.url,this._props);
+				setTimeout(dojo.hitch(this, "init", this.url, this._props),this._interval());
 			}
 		}
 	}
@@ -532,7 +541,7 @@ dojox.cometd = new function(){
 	}
 
 	this.endBatch = function(){
-		if(--this.batch <= 0 && this.currentTransport){ // && this._connected){
+		if(--this.batch <= 0 && this.currentTransport && this._connected){
 			this.batch=0;
 
 			var messages=this._messageQ;
@@ -620,19 +629,11 @@ dojox.cometd.longPollTransport = new function(){
 		
 		if(!this._cometd._initialized){ return; }
 			
-		if(this._cometd._advice){
-			if(this._cometd._advice["reconnect"]=="none"){
-				return;
-			}
-			if(	(this._cometd._advice["interval"])&&
-				(this._cometd._advice.interval>0) ){
-				setTimeout(dojo.hitch(this,function(){ this._connect(); }),this._cometd._advice.interval);
-			}else{
-				this._connect();
-			}
-		}else{
-			this._connect();
+		if(this._cometd._advice && this._cometd._advice["reconnect"]=="none"){
+			console.debug("cometd reconnect: none");
+			return;
 		}
+		setTimeout(dojo.hitch(this,function(){ this._connect(); }),this._cometd._interval());
 	}
 
 	this._connect = function(){
@@ -642,9 +643,7 @@ dojox.cometd.longPollTransport = new function(){
 			return;
 		}
 			
-		if(	(this._cometd._advice) &&
-			(this._cometd._advice["reconnect"]=="handshake")
-		){
+		if((this._cometd._advice) && (this._cometd._advice["reconnect"]=="handshake")){
 			this._cometd._connected=false;
 			this._initialized = false;
 			this._cometd.init(this._cometd.url,this._cometd._props);
@@ -671,12 +670,13 @@ dojox.cometd.longPollTransport = new function(){
 			content: content,
 			handleAs: this._cometd.handleAs,
 			load: dojo.hitch(this, function(data){
-				this._cometd._polling = false;
+				this._cometd._polling=false;
 				this._cometd.deliver(data);
+				this._cometd._backon();
 				this.tunnelCollapse();
 			}),
 			error: dojo.hitch(this, function(err){
-				this._cometd._polling = false;
+				this._cometd._polling=false;
 				console.debug("tunnel opening failed:", err);
 				dojo.publish("/cometd/meta", [{cometd:this._cometd,action:"connect",successful:false,state:this._cometd.state()}]);
 				this._cometd._backoff();
@@ -695,6 +695,9 @@ dojox.cometd.longPollTransport = new function(){
 			url: this._cometd.url||dojo.config["cometdRoot"],
 			handleAs: this._cometd.handleAs,
 			load: dojo.hitch(this._cometd, "deliver"),
+			error: dojo.hitch(this, function(err){
+				console.debug('dropped messages: ',messages);
+			}),
 			content: {
 				message: dojo.toJson(messages)
 			}
@@ -753,12 +756,13 @@ dojox.cometd.callbackPollTransport = new function(){
 		this._cometd._polling = true;
 		dojo.io.script.get({
 			load: dojo.hitch(this, function(data){
-				this._cometd._polling = false;
+				this._cometd._polling=false;
 				this._cometd.deliver(data);
+				this._cometd._backon();
 				this.tunnelCollapse();
 			}),
 			error: dojo.hitch(this, function(err){
-				this._cometd._polling = false;
+				this._cometd._polling=false;
 				console.debug("tunnel opening failed:", err);
 				dojo.publish("/cometd/meta", [{cometd:this._cometd,action:"connect",successful:false,state:this._cometd.state()}]);
 				this._cometd._backoff();

@@ -8,34 +8,6 @@ dojo.require("dojox.dtl.Context");
 (function(){
 	var dd = dojox.dtl;
 
-	dd._ObjectMap = dojo.extend(function(){
-		this.contents = [];
-	},
-	{
-		get: function(key){
-			var contents = this.contents;
-			for(var i = 0, content; content = contents[i]; i++){
-				if(content[0] === key){
-					return content[1];
-				}
-			}
-		},
-		put: function(key, value){
-			var contents = this.contents;
-			for(var i = 0, content; content = contents[i]; i++){
-				if(content[0] === key){
-					if(arguments.length == 1){
-						contents.splice(i, 1);
-						return;
-					}
-					content[1] = value;
-					return;
-				}
-			}
-			contents.push([key, value]);
-		}
-	});
-
 	var ddt = dd.text;
 	var ddh = dd.html = {
 		types: dojo.mixin({change: -11, attr: -12, custom: -13, elem: 1, text: 3}, ddt.types),
@@ -58,22 +30,45 @@ dojo.require("dojox.dtl.Context");
 			}
 
 			var match;
-
+			var pairs = [
+				[true, "select", "option"],
+				[dojo.isSafari, "tr", "th"],
+				[dojo.isSafari, "tr", "td"],
+				[dojo.isSafari, "thead", "tr", "th"],
+				[dojo.isSafari, "tbody", "tr", "td"]
+			];
 			// Some tags can't contain text. So we wrap the text in tags that they can have.
-			if(text.indexOf("<select") != -1 || text.indexOf("<SELECT") != -1){
-				var selectRe = /<select[\s\S]*?>([\s\S]+?)<\/select>/ig;
-				while(match = selectRe.exec(text)){
-					var replace = [];
-					// Do it like this to make sure we don't double-wrap
-					var tokens = dojox.string.tokenize(match[1], /(<option[\s\S]*?>[\s\S]*?<\/option>)/ig, function(option){ return {data: option}; });
-					for(var i = 0; i < tokens.length; i++) {
-						if(dojo.isObject(tokens[i])){
-							replace.push(tokens[i].data);
-						}else{
-							replace.push('<option iscomment="true">' + dojo.trim(tokens[i]) + "</option>");
+			for(var i = 0, pair; pair = pairs[i]; i++){
+				if(!pair[0]){
+					continue;
+				}
+				if(text.indexOf("<" + pair[1]) != -1){
+					var selectRe = new RegExp("<" + pair[1] + "[\\s\\S]*?>([\\s\\S]+?)</" + pair[1] + ">", "ig");
+					while(match = selectRe.exec(text)){
+						// Do it like this to make sure we don't double-wrap
+						var found = false;
+						var tokens = dojox.string.tokenize(match[1], new RegExp("(<" + pair[2] + "[\\s\\S]*?>[\\s\\S]*?</" + pair[2] + ">)", "ig"), function(child){ found = true; return {data: child}; });
+						if(found){
+							var replace = [];
+							for(var j = 0; j < tokens.length; j++) {
+								if(dojo.isObject(tokens[j])){
+									replace.push(tokens[j].data);
+								}else{
+									var close = pair[pair.length - 1];
+									var k, replacement = "";
+									for(k = 2; k < pair.length - 1; k++){
+										replacement += "<" + pair[k] + ">";
+									}
+									replacement += "<" + close + ' iscomment="true">' + dojo.trim(tokens[j]) + "</" + close + ">";
+									for(k = 2; k < pair.length - 1; k++){
+										replacement += "</" + pair[k] + ">";
+									}
+									replace.push(replacement);
+								}
+							}
+							text = text.replace(match[1], replace.join(""));
 						}
 					}
-					text = text.replace(match[1], replace.join(""));
 				}
 			}
 
@@ -200,8 +195,9 @@ dojo.require("dojox.dtl.Context");
 
 			if(node.parentNode && node.parentNode.tagName){
 				if(change){
-					tokens.push([types.change, node.parentNode, true]);
+					tokens.push([types.change, node, true]);
 				}
+				tokens.push([types.change, node.parentNode]);
 				node.parentNode.removeChild(node);
 			}else{
 				// If this node is parentless, it's a base node, so we have to "up" change to itself
@@ -283,14 +279,13 @@ dojo.require("dojox.dtl.Context");
 		render: function(context, buffer){
 			buffer = buffer || this.getBuffer();
 			this.rootNode = null;
-			var onSetParent = dojo.connect(buffer, "onSetParent", this, function(node){
-				if(!this.rootNode){
-					this.rootNode = node || true;
-				}
-			});
 			var output = this.nodelist.render(context || new dd.Context({}), buffer);
-			dojo.disconnect(onSetParent);
-			buffer._flushCache();
+			this.rootNode = buffer.getRootNode();
+			for(var i = 0, node; node = buffer._cache[i]; i++){
+				if(node._cache){
+					node._cache.length = 0;
+				}
+			}
 			return output;
 		},
 		unrender: function(context, buffer){
@@ -308,7 +303,12 @@ dojo.require("dojox.dtl.Context");
 	},
 	{
 		concat: function(/*DOMNode*/ node){
-			if(!this._parent){
+			var parent = this._parent;
+			if(node.parentNode && node.parentNode.tagName && !parent._dirty){
+				return this;
+			}
+
+			if(!parent){
 				if(node.nodeType == 3 && dojo.trim(node.data)){
 					throw new Error("Text should not exist outside of the root node in template");
 				}
@@ -317,21 +317,26 @@ dojo.require("dojox.dtl.Context");
 			if(this._closed && (node.nodeType != 3 || dojo.trim(node.data))){
 				throw new Error("Content should not exist outside of the root node in template");
 			}
-			if(node.nodeType){
-				var caches = this._getCache(this._parent);
-				if(node.parentNode === this._parent){
-					// If we reach a node that already existed, fill in the cache for this same parent
-					for(var i = 0, cache; cache = caches[i]; i++){
-						this.onAddNode(node);
-						this._parent.insertBefore(cache, node);
-						this.onAddNodeComplete(node);
+			if(parent._dirty){
+				if(node._drawn && node.parentNode == parent){
+					var caches = parent._cache;
+					if(caches){
+						for(var i = 0, cache; cache = caches[i]; i++){
+							this.onAddNode(cache);
+							parent.insertBefore(cache, node);
+							this.onAddNodeComplete(cache);
+						}
+						caches.length = 0;
 					}
-					caches.length = 0;
 				}
-				if(!node.parentNode || !node.parentNode.tagName){
-					caches.push(node);
-				}
+				parent._dirty = false;
 			}
+			if(!parent._cache){
+				parent._cache = [];
+				this._cache.push(parent);
+			}
+			parent._dirty = true;
+			parent._cache.push(node);
 			return this;
 		},
 		remove: function(obj){
@@ -371,16 +376,20 @@ dojo.require("dojox.dtl.Context");
 				this._closed = true;
 			}
 
-			var caches = this._getCache(this._parent);
-			if(caches && caches.length && up){
-				for(var i = 0, cache; cache = caches[i]; i++){
-					if(cache !== this._parent && (!cache.parentNode || !cache.parentNode.tagName)){
-						this.onAddNode(cache);
-						this._parent.appendChild(cache);
-						this.onAddNodeComplete(cache);
+			if(up){
+				var parent = this._parent;
+				if(parent._dirty){
+					var caches = this._parent._cache;
+					for(var i = 0, cache; cache = caches[i]; i++){
+						if(cache !== this._parent){
+							this.onAddNode(cache);
+							this._parent.appendChild(cache);
+							this.onAddNodeComplete(cache);
+						}
 					}
+					caches.length = 0;
+					parent._dirty = false;
 				}
-				caches.length = 0;
 			}
 
 			this.onSetParent(node, up);
@@ -390,8 +399,14 @@ dojo.require("dojox.dtl.Context");
 		getParent: function(){
 			return this._parent;
 		},
-		onSetParent: function(){
+		getRootNode: function(){
+			return this.rootNode;
+		},
+		onSetParent: function(node){
 			// summary: Stub called when setParent is used.
+			if(!this.rootNode){
+				this.rootNode = node || true;
+			}
 		},
 		onAddNode: function(node){
 			// summary: Stub called before new nodes are added
@@ -407,16 +422,6 @@ dojo.require("dojox.dtl.Context");
 		},
 		onAddEvent: function(/*DOMNode*/ node, /*String*/ type, /*String*/ description){
 			// summary: Stub to call when you're adding an event
-		},
-		_getCache: function(node){
-			this._cache.push(node);
-			node._cache = node._cache || [];
-			return node._cache;
-		},
-		_flushCache: function(){
-			for(var i = 0, node; node = this._cache[i]; i++){
-				node._cache = null;
-			}
 		}
 	});
 
@@ -426,9 +431,17 @@ dojo.require("dojox.dtl.Context");
 	},
 	{
 		render: function(context, buffer){
+			if(this._rendered){
+				return buffer;
+			}
+			this._rendered = true;
 			return buffer.concat(this.contents);
 		},
 		unrender: function(context, buffer){
+			if(!this._rendered){
+				return buffer;
+			}
+			this._rendered = false;
 			return buffer.remove(this.contents);
 		},
 		clone: function(buffer){
@@ -445,7 +458,6 @@ dojo.require("dojox.dtl.Context");
 		this.contents = nodes || [];
 	},
 	{
-		parents: new dd._ObjectMap(),
 		push: function(node){
 			this.contents.push(node);
 		},
@@ -473,20 +485,24 @@ dojo.require("dojox.dtl.Context");
 			var div = document.createElement("div");
 
 			var parent = buffer.getParent();
-			var old = this.parents.get(parent);
-			this.parents.put(parent, div);
+			var old = parent._clone;
+			// Tell the clone system to attach itself to our new div
+			parent._clone = div;
 			var nodelist = this.clone(buffer, div);
 			if(old){
-				this.parents.put(parent, old);
+				// Restore state if there was a previous clone
+				parent._clone = old;
 			}else{
-				this.parents.put(parent);
+				// Remove if there was no clone
+				parent._clone = null;
 			}
 
 			buffer = dd.HtmlTemplate.prototype.getBuffer();
 			nodelist.unshift(new dd.ChangeNode(div));
 			nodelist.push(new dd.ChangeNode(div, true));
 			nodelist.render(context, buffer);
-			return div.innerHTML;
+			var html = div.innerHTML;
+			return (dojo.isIE) ? html.replace(/\s*_(dirty|clone)="[^"]*"/g, "") : html;
 		},
 		unrender: function(context, buffer){
 			for(var i = 0; i < this.contents.length; i++){
@@ -505,22 +521,22 @@ dojo.require("dojox.dtl.Context");
 			for(var i = 0; i < contents.length; i++){
 				var clone = contents[i].clone(buffer);
 				if(clone instanceof dd.ChangeNode || clone instanceof dd._HtmlNode){
-					var item = this.parents.get(clone.contents);
+					var item = clone.contents._clone;
 					if(item){
 						clone.contents = item;
-					}else if(parent !== clone.contents && clone instanceof dd._HtmlNode){
+					}else if(parent != clone.contents && clone instanceof dd._HtmlNode){
 						var node = clone.contents;
 						clone.contents = clone.contents.cloneNode(false);
 						buffer.onClone(node, clone.contents);
 						cloned.push(node);
-						this.parents.put(node, clone.contents);
+						node._clone = clone.contents;
 					}
 				}
 				nodelist.push(clone);
 			}
 
 			for(var i = 0, clone; clone = cloned[i]; i++){
-				this.parents.put(clone);
+				clone._clone = null;
 			}
 
 			return nodelist;
@@ -538,6 +554,7 @@ dojo.require("dojox.dtl.Context");
 	{
 		render: function(context, buffer){
 			this._rendered = true;
+
 			var str = this.contents.resolve(context);
 			if(str && str.render && str.getRootNode){
 				var root = this._curr = str.getRootNode();
@@ -552,20 +569,22 @@ dojo.require("dojox.dtl.Context");
 				}
 				return list.render(context, buffer);
 			}else{
-				if(!this._txt) this._txt = document.createTextNode(str);
-				if(this._txt.data != str) this._txt.data = str;
+				if(!this._txt){
+					this._txt = document.createTextNode(str);
+				}
+				this._txt.data = str;
 				return buffer.concat(this._txt);
 			}
-			return buffer;
 		},
 		unrender: function(context, buffer){
-			if(this._rendered){
-				this._rendered = false;
-				if(this._curr){
-					return this._lists[this._curr].unrender(context, buffer);
-				}else if(this._txt){
-					return buffer.remove(this._txt);
-				}
+			if(!this._rendered){
+				return buffer;
+			}
+			this._rendered = false;
+			if(this._curr){
+				return this._lists[this._curr].unrender(context, buffer);
+			}else if(this._txt){
+				return buffer.remove(this._txt);
 			}
 			return buffer;
 		},
@@ -577,12 +596,12 @@ dojo.require("dojox.dtl.Context");
 	dd.ChangeNode = dojo.extend(function(node, /*Boolean?*/ up, /*Bookean*/ root){
 		// summary: Changes the parent during render/unrender
 		this.contents = node;
-		this._up = up;
-		this._root = root;
+		this.up = up;
+		this.root = root;
 	},
 	{
 		render: function(context, buffer){
-			return buffer.setParent(this.contents, this._up, this._root);
+			return buffer.setParent(this.contents, this.up, this.root);
 		},
 		unrender: function(context, buffer){
 			if(!this.contents.parentNode){
@@ -593,22 +612,23 @@ dojo.require("dojox.dtl.Context");
 			}
 			return buffer.setParent(this.contents);
 		},
-		clone: function(buffer){
-			return new this.constructor(this.contents, this._up, this._root);
+		clone: function(){
+			return new this.constructor(this.contents, this.up, this.root);
 		}
 	});
 
-	dd.AttributeNode = dojo.extend(function(key, value){
+	dd.AttributeNode = dojo.extend(function(key, value, nodelist){
 		// summary: Works on attributes
-		this._key = key;
-		this._value = value;
-		this._tpl = new dd.Template(value);
+		this.key = key;
+		this.value = value;
+		this.nodelist = nodelist || (new dd.Template(value)).nodelist;
+
 		this.contents = "";
 	},
 	{
 		render: function(context, buffer){
-			var key = this._key;
-			var value = this._tpl.render(context);
+			var key = this.key;
+			var value = this.nodelist.dummyRender(context);
 			if(this._rendered){
 				if(value != this.contents){
 					this.contents = value;
@@ -622,15 +642,10 @@ dojo.require("dojox.dtl.Context");
 			return buffer;
 		},
 		unrender: function(context, buffer){
-			if(this._rendered){
-				this._rendered = false;
-				this.contents = "";
-				return buffer.remove(this.contents);
-			}
-			return buffer;
+			return buffer.remove(this.key);
 		},
-		clone: function(){
-			return new dd.AttributeNode(this._key, this._value);
+		clone: function(buffer){
+			return new this.constructor(this.key, this.value, this.nodelist.clone(buffer));
 		}
 	});
 
@@ -661,6 +676,7 @@ dojo.require("dojox.dtl.Context");
 		this.contents = tokens;
 	},
 	{
+		i: 0,
 		parse: function(/*Array?*/ stop_at){
 			var types = ddh.types;
 			var terminators = {};
@@ -672,14 +688,16 @@ dojo.require("dojox.dtl.Context");
 				terminators[stop_at[i]] = true;
 			}
 			var nodelist = new dd._HtmlNodeList();
-			while(tokens.length){
-				var token = tokens.shift();
+			while(this.i < tokens.length){
+				var token = tokens[this.i++];
 				var type = token[0];
 				var value = token[1];
 				if(type == types.custom){
 					nodelist.push(value);
 				}else if(type == types.change){
-					nodelist.push(new dd.ChangeNode(value, token[2], token[3]));
+					var changeNode = new dd.ChangeNode(value, token[2], token[3]);
+					value[changeNode.attr] = changeNode;
+					nodelist.push(changeNode);
 				}else if(type == types.attr){
 					var fn = ddt.getTag("attr:" + token[2], true);
 					if(fn && token[3]){
@@ -701,7 +719,7 @@ dojo.require("dojox.dtl.Context");
 					nodelist.push(new dd._HtmlTextNode(value.data || value));
 				}else if(type == types.tag){
 					if(terminators[value]){
-						tokens.unshift(token);
+						--this.i;
 						return nodelist;
 					}
 					var cmd = value.split(/\s+/g);
@@ -727,7 +745,7 @@ dojo.require("dojox.dtl.Context");
 		},
 		next: function(){
 			// summary: Used by tags to discover what token was found
-			var token = this.contents.shift();
+			var token = this.contents[this.i++];
 			return {type: token[0], text: token[1]};
 		},
 		skipPast: function(endtag){
