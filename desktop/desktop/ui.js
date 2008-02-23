@@ -66,7 +66,6 @@ desktop.ui = {
 			var args = {
 				thickness: panel.thickness,
 				span: panel.span,
-				orientation: panel.orientation,
 				placement: panel.placement,
 				opacity: panel.opacity
 			}
@@ -94,7 +93,6 @@ desktop.ui = {
 				thickness: wid.thickness,
 				span: wid.span,
 				locked: wid.locked,
-				orientation: wid.orientation,
 				placement: wid.placement,
 				opacity: wid.opacity,
 				applets: wid.dump()
@@ -346,8 +344,7 @@ desktop.ui = {
 		/*
 		 * Method: appearance
 		 *  
-		 * Summary:
-		 * 		Shows the appearance configuration dialog
+		 * Shows the appearance configuration dialog
 		 */
 		appearance: function(e) {
 			if(this.wallWin) return this.wallWin.bringToFront();
@@ -370,8 +367,7 @@ desktop.ui = {
 		/*
 		 * Method: account
 		 *  
-		 * Summary:
-		 * 		Shows the account configuration dialog
+		 * Shows the account configuration dialog
 		 */
 		account: function() {
 			if(this.accountWin) return this.accountWin.bringToFront();
@@ -476,6 +472,11 @@ desktop.ui = {
 			win.show();
 			win.startup();
 		},
+		/*
+		 * Method: password
+		 * 
+		 * Shows the password change dialog
+		 */
 		password: function() {
 			if(this.passwordWin) return this.passwordWin.bringToFront();
 			var win = this.passwordWin = new api.window({
@@ -593,10 +594,10 @@ dojo.require("dojo.data.ItemFileReadStore");
  * Class: desktop.ui.area
  *  
  * Summary:
- * 		the main UI area
+ * 		the main UI area of the desktop. This is where panels, wallpaper, and most other things are drawn.
  */
 dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Container], {
-	templateString: "<div class=\"uiArea\"><div dojoAttachPoint=\"widgetNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10; display: none;\"></div><div dojoAttachPoint=\"containerNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10;\"></div><div dojoAttachPoint=\"wallpaperNode\" class=\"wallpaper\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 1;\"></div></div>",
+	templateString: "<div class=\"uiArea\"><div dojoAttachPoint=\"containerNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10;\"></div><div dojoAttachPoint=\"wallpaperNode\" class=\"wallpaper\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 1;\"></div></div>",
 	drawn: false,
 	postCreate: function() {
 		var filearea = this.filearea = new api.filearea({path: "/Desktop/", forDesktop: true, subdirs: false, style: "position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;", overflow: "hidden"});
@@ -606,14 +607,18 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 		filearea.refresh();
 		dojo.style(filearea.domNode, "zIndex", 1);
 		this.containerNode.appendChild(filearea.domNode);
-		dojo.addClass(this.widgetNode, "widgetLayer");
-		this.widgetLayer = new desktop.ui.widgetArea({}, this.widgetNode);
 		
 		if(dojo.isIE){
 			dojo.connect(this.domNode,'onresize', this,"resize");
 		}
 		dojo.connect(window,'onresize',this,"resize");
 	},
+	/*
+	 * Method: getBox
+	 * 
+	 * gets the ammount of space the panels are taking up on each side of the screen.
+	 * Used to calculate the size of the windows when maximized.
+	 */
 	getBox: function() {
 		var thicknesses = {BR: 0, BL: 0, BC: 0, TR: 0, TL: 0, TC: 0, LT: 0, LC: 0, LB: 0, RT: 0, RC: 0, RB: 0};
 		dojo.query(".desktopPanel").forEach(function(panel, i) {
@@ -641,6 +646,12 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 		}
 		return max;
 	},
+	/*
+	 * Method: resize
+	 * 
+	 * Does some cleanup when the window is resized. For example it moves the filearea.
+	 * Also called when a panel is moved.
+	 */
 	resize: function(e) {
 		var max = this.getBox();
 		var viewport = dijit.getViewport();
@@ -656,6 +667,11 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 			if(c.t > viewport.h - max.B && ((max.B > 0 || e.type=="resize") || (max.B > 0 && e.type=="resize"))) dojo.style(win, "top", (viewport.h - 20 - max.B)+"px");
 		}, this);
 	},
+	/*
+	 * Method: updateWallpaper
+	 * 
+	 * Updates the wallpaper. Called when the configuration is applied.
+	 */
 	updateWallpaper: function() {
 		var image = desktop.config.wallpaper.image;
 		var color = desktop.config.wallpaper.color;
@@ -697,50 +713,51 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 		rules[0].style.backgroundColor = desktop.config.wallpaper.color;
 	}
 });
-
-dojo.require("dijit.layout.TabContainer");
-dojo.require("dijit.layout.ContentPane");
-dojo.declare("desktop.ui.widgetArea", dijit.layout.TabContainer, {
-	restoreWidgets: function() {
-		if(!this.drawn) {
-			this.drawn = true;
-			var widgets = desktop.config.widgets;
-			for(i in widgets) {
-				var pane = new dijit.layout.ContentPane({title: i});
-			}
-		}
-	},
-	dump: function() {
-		var obj = {};
-		dojo.forEach(this.getChildren(), function(c) {
-			
-		});
-	}
-});
 dojo.require("dijit.layout.LayoutContainer");
 dojo.require("dijit.layout.ContentPane");
 dojo.require("dijit.form.Form");
 dojo.require("dijit.form.Slider");
 dojo.require("dijit.form.NumberSpinner");
+/*
+ * Class: desktop.ui.panel
+ * 
+ * A customizable toolbar that you can reposition and add/remove/reposition applets on
+ * 
+ * Parameters:
+ * 		span - a number between 0 and 1 indicating how far the panel should span accross (1 being the whole screen, 0 being none)
+ * 		opacity - a number between 0 and 1 indicating how opaque the panel should be (1 being visible, 0 being completely transparent)
+ * 		thickness - how thick the panel should be in pixels
+ * 		locked - are the applets and the panel itself be repositionable?
+ * 		placement - where the panel should be placed on the screen. 
+ * 					acceptible values are "BL", "BR", "BC", "TL", "TR", "TC", "LT", "LB", "LC", "RT", "RB", or "RC".
+ * 					The first character indicates the side, the second character indicates the placement.
+ * 					R = right, L = left, T = top, and B = bottom.
+ * 					So LT would be on the left side on the top corner. 
+ */
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {
-	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick, oncontextmenu:_onRightClick, ondragstart:_stopSelect, onselectstart:_stopSelect\"><div class=\"desktopPanel-start\"><div class=\"desktopPanel-end\"><div class=\"desktopPanel-middle\" dojoAttachPoint=\"containerNode\"></div></div></div></div>",
+	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick, oncontextmenu:_onRightClick\"><div class=\"desktopPanel-start\"><div class=\"desktopPanel-end\"><div class=\"desktopPanel-middle\" dojoAttachPoint=\"containerNode\"></div></div></div></div>",
 	span: 1,
 	opacity: 1,
 	thickness: 24,
 	locked: false,
-	orientation: "horizontal",
 	placement: "BL",
-	_stopSelect: function(e) {
-		dojo.stopEvent(e);
+	getOrientation: function() {
+		var s = this.placement.charAt(0);
+		return (s == "B" || s == "T") ? "horizontal" : "vertical";
 	},
-	_onClick: function() {
+	_onClick: function(e) {
 		if(!this.locked) {
 			this._docMouseUpEvent = dojo.connect(document, "onmouseup", this, "_onRelease");
 			this._onOutEvent = dojo.connect(this.domNode, "onmouseout", this, function(){
 				dojo.disconnect(this._onOutEvent);
 				this._onDragEvent = dojo.connect(document, "onmousemove", this, "_onMove");
+				this._docEvents = [
+					dojo.connect(document, "ondragstart", dojo, "stopEvent"),
+					dojo.connect(document, "onselectstart", dojo, "stopEvent")
+				];
 				this._docMouseUpEvent = dojo.connect(document, "onmouseup", this, "_onRelease");
 			});
+			dojo.stopEvent(e);
 		}
 	},
 	_onRightClick: function(e) {
@@ -806,7 +823,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 					style: "width: 60px;",
 					onChange: dojo.hitch(this, function(value) {
 						this.thickness = value;
-						dojo.style(this.domNode, this.orientation == "horizontal" ? "width" : "height", this.thickness+"px");
+						dojo.style(this.domNode, this.getOrientation() == "horizontal" ? "width" : "height", this.thickness+"px");
 						this._place();
 					})
 				}
@@ -916,6 +933,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		dojo.disconnect(this._onDragEvent);
 		dojo.disconnect(this._docMouseUpEvent);
 		dojo.disconnect(this._onOutEvent); //just to be sure...
+		dojo.forEach(this._docEvents, dojo.disconnect);
 	},
 	_onMove: function(e) {
 		//get nearest edge, move the panel there if we're not allready, re-orient ourself
@@ -956,6 +974,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			desktop.ui._area.resize();
 			this._place();
 		}
+		dojo.stopEvent(e);
 	},
 	uninitialize: function() {
 		dojo.forEach(this.getChildren(), function(item) {
@@ -1028,8 +1047,8 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 					count += panel.thickness;
 			}
 		}));
-		if(this.placement.charAt(0) == "L" || this.placement.charAt(0) == "T") s[this.orientation == "horizontal" ? "top" : "left"] += count;
-		else s[this.orientation == "horizontal" ? "top" : "left"] -= count;
+		if(this.placement.charAt(0) == "L" || this.placement.charAt(0) == "T") s[this.getOrientation() == "horizontal" ? "top" : "left"] += count;
+		else s[this.getOrientation() == "horizontal" ? "top" : "left"] -= count;
 		if(desktop.config.fx) {
 			var props = {};
 			for(key in s) {
@@ -1053,20 +1072,18 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	},
 	resize: function() {
 		var viewport = dijit.getViewport();
-		dojo.style(this.domNode, (this.orientation == "horizontal" ? "width" : "height"), this.span*viewport[(this.orientation == "horizontal" ? "w" : "h")]);
-		dojo.style(this.domNode, (this.orientation == "vertical" ? "width" : "height"), this.thickness);
+		dojo.style(this.domNode, (this.getOrientation() == "horizontal" ? "width" : "height"), this.span*viewport[(this.getOrientation() == "horizontal" ? "w" : "h")]);
+		dojo.style(this.domNode, (this.getOrientation() == "vertical" ? "width" : "height"), this.thickness);
 		dojo.forEach(this.getChildren(), function(item) {
 			item.resize();
 		});
 	},
 	_makeVertical: function() {
-		this.orientation="vertical";
 		dojo.removeClass(this.domNode, "desktopPanelHorizontal");
 		dojo.addClass(this.domNode, "desktopPanelVertical");
 		this.resize();
 	},
 	_makeHorizontal: function() {
-		this.orientation="horizontal";
 		dojo.removeClass(this.domNode, "desktopPanelVertical");
 		dojo.addClass(this.domNode, "desktopPanelHorizontal");
 		this.resize();
@@ -1088,8 +1105,8 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		var myw = dojo.style(this.domNode, "width"), myh = dojo.style(this.domNode, "height");
 		dojo.forEach(this.getChildren(), dojo.hitch(this, function(item) {
 			var left=dojo.style(item.domNode, "left"), top=dojo.style(item.domNode, "top");
-			var pos = (this.orientation == "horizontal" ? left : top);
-			pos = pos / (this.orientation == "horizontal" ? myw : myh);
+			var pos = (this.getOrientation() == "horizontal" ? left : top);
+			pos = pos / (this.getOrientation() == "horizontal" ? myw : myh);
 			var applet = {
 				settings: item.settings,
 				pos: pos,
@@ -1100,7 +1117,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		return applets;
 	},
 	restore: function(applets) {
-		var size = dojo.style(this.domNode, this.orientation == "horizontal" ? "width" : "height");
+		var size = dojo.style(this.domNode, this.getOrientation() == "horizontal" ? "width" : "height");
 		dojo.forEach(applets, dojo.hitch(this, function(applet) {
 			var construct = eval(applet.declaredClass);
 			var a = new construct({settings: applet.settings, pos: applet.pos});
@@ -1137,7 +1154,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				dojo.style(this.domNode, "left", (viewport.w - this.domNode.offsetWidth)+"px");
 			}
 			else {
-				if(this.orientation == "horizontal")
+				if(this.getOrientation() == "horizontal")
 					dojo.style(this.domNode, "left", (( viewport.w - (viewport.w*this.span))/2)+"px");
 				else
 					dojo.style(this.domNode, "top", ((viewport.h - (this.span*viewport.h)) / 2)+"px");
@@ -1150,7 +1167,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		}
 		dojo.connect(window,'onresize',this,"_place");
 		this._place();
-		//if(this.orientation == "horizontal") this._makeHorizontal();
+		//if(this.getOrientation() == "horizontal") this._makeHorizontal();
 		//else this._makeVertical();
 	}
 });
@@ -1180,7 +1197,7 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 			handle: this.handleNode,
 			constraints: dojo.hitch(this, function() {
 				var c = {};
-				if (this.getParent().orientation == "horizontal") {
+				if (this.getParent().getOrientation() == "horizontal") {
 					var c = {
 						t: 0,
 						l: 0,
@@ -1200,8 +1217,8 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 			})
 		});
 		this._moveable.onMoved = dojo.hitch(this, function(e, f) {
-			var pos = dojo.style(this.domNode, (this.getParent().orientation == "horizontal" ? "left" : "top"));
-			var barSize = dojo.style(this.getParent().domNode, (this.getParent().orientation == "horizontal" ? "width" : "height"));
+			var pos = dojo.style(this.domNode, (this.getParent().getOrientation() == "horizontal" ? "left" : "top"));
+			var barSize = dojo.style(this.getParent().domNode, (this.getParent().getOrientation() == "horizontal" ? "width" : "height"));
 			this.pos = pos/barSize;
 			dojo.forEach(this.getParent().getChildren(), function(item) {
 				item._calcSpan();
@@ -1227,14 +1244,14 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 		//TODO: get it so that applets don't overlap eachother
 	},
 	resize: function() {
-		var size = dojo.style(this.getParent().domNode, this.getParent().orientation == "horizontal" ? "width" : "height");
-		dojo.style(this.domNode, (this.getParent().orientation == "horizontal" ? "left" : "top"), this.pos*size);
-		dojo.style(this.domNode, (this.getParent().orientation != "horizontal" ? "left" : "top"), 0);
+		var size = dojo.style(this.getParent().domNode, this.getParent().getOrientation() == "horizontal" ? "width" : "height");
+		dojo.style(this.domNode, (this.getParent().getOrientation() == "horizontal" ? "left" : "top"), this.pos*size);
+		dojo.style(this.domNode, (this.getParent().getOrientation() != "horizontal" ? "left" : "top"), 0);
 		this._calcSpan(size);
 	},
 	_calcSpan: function(size) {
 		if(this.fullspan) {
-			if(!size) size = dojo.style(this.getParent().domNode, this.getParent().orientation == "horizontal" ? "width" : "height");
+			if(!size) size = dojo.style(this.getParent().domNode, this.getParent().getOrientation() == "horizontal" ? "width" : "height");
 			var nextApplet = size;
 			var children = this.getParent().getChildren();
 			for(a in children) {
@@ -1244,8 +1261,8 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 					break;
 				}
 			}
-			dojo.style(this.domNode, this.getParent().orientation == "horizontal" ? "width" : "height", (nextApplet - (this.pos*size)) - 1);
-			dojo.style(this.domNode, this.getParent().orientation == "horizontal" ? "height" : "width", "100%");
+			dojo.style(this.domNode, this.getParent().getOrientation() == "horizontal" ? "width" : "height", (nextApplet - (this.pos*size)) - 1);
+			dojo.style(this.domNode, this.getParent().getOrientation() == "horizontal" ? "height" : "width", "100%");
 		}
 	},
 	uninitalize: function() {
@@ -1350,7 +1367,7 @@ dojo.declare("desktop.ui.applets.clock", desktop.ui.applet, {
 				clock_seconds = "0" + clock_seconds;
 			}
 			var p = clock_hours + ":" + clock_minutes + ":" + clock_seconds + " " + clock_suffix;
-			if(this.getParent().orientation == "vertical") {
+			if(this.getParent().getOrientation() == "vertical") {
 				var v = "";
 				dojo.forEach(p, function(e) {
 					v += e + "<br />";
@@ -1384,7 +1401,7 @@ dojo.declare("desktop.ui.task", null, {
 		this.onClick = params.onClick;
 		dojo.query(".desktopTaskbarApplet").forEach(function(item) {
 			var p = dijit.byNode(item.parentNode);
-			var div = this._makeNode(p.getParent().orientation);
+			var div = this._makeNode(p.getParent().getOrientation());
 			dojo.style(div, "opacity", 0);
 			item.appendChild(div);
 			dojo.connect(div, "onclick", null, this.onClick);
