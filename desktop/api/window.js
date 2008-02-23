@@ -28,15 +28,13 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	/*
 	 * Property: closed
 	 * 
-	 * Summary:
-	 * 		Is the window closed?
+	 * Is the window closed?
 	 */
 	closed: false,
 	/*
 	 * Property: onClose
 	 * 
-	 * Summary:
-	 * 		What to do on destroying of the window
+	 * What to do on destroying of the window
 	 */
 	onClose: function() {
 		
@@ -44,8 +42,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	/*
 	 * Property: onResize
 	 * 
-	 * Summary:
-	 * 		What to do on the resizing of the window
+	 * What to do on the resizing of the window
 	 */
 	onResize: function() {
 		
@@ -53,8 +50,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	/*
 	 * Property: onMinimize
 	 * 
-	 * Summary:
-	 * 		What to do on the minimizing of the window
+	 * What to do on the minimizing of the window
 	 */
 	onMinimize: function() {
 		
@@ -62,8 +58,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	/*
 	 * Property: onMaximize
 	 * 
-	 * Summary:
-	 * 		What to do upon maximize of window
+	 * What to do upon maximize of window
 	 */
 	onMaximize: function() {
 		
@@ -71,66 +66,61 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	/*
 	 * Property: showMaximize
 	 * 
-	 * Summary:
-	 * 		Show whether or not to show the maximize button
+	 * Show whether or not to show the maximize button
 	 */
 	showMaximize: true,
 	/*
 	 * Property: showMinimize
 	 * 
-	 * Summary:
-	 * 		Show whether or not to show the minimize button
+	 * Show whether or not to show the minimize button
 	 */
 	showMinimize: true,
 	/*
 	 * Property: showClose
 	 * 
-	 * Summary:
-	 * 		Show whether or not to show the close button
+	 * Show whether or not to show the close button
 	 */
 	showClose: true,
 	/*
 	 * Property: maximized
 	 * 
-	 * Summary:
-	 * 		Whether or not the window is maximized
-	 * 		To set this after window creation, use <window.setBodyWidget>
+	 * Whether or not the window is maximized
 	 */
 	maximized: false,
+	/*
+	 * Property: minimized
+	 * 
+	 * Whether or not the window is minimized
+	 */
 	minimized: false,
 	/*
 	 * Property: height
 	 * 
-	 * Summary:
-	 * 		The window's height in px, or %.
+	 * The window's height in px, or %.
 	 */
 	height: "400px",
 	/*
 	 * Property: width
 	 * 
-	 * Summary:
-	 * 		The window's width in px, or %.
+	 * The window's width in px, or %.
 	 */
 	width: "500px",
 	/*
 	 * Property: title
 	 * 
-	 * Summary:
-	 * 		The window's title
+	 * The window's title
 	 */
 	title: "",
 	/*
 	 * Property: resizable
 	 * 
-	 * Summary:
-	 * 		Weather or not the window is resizable.
+	 * Weather or not the window is resizable.
 	 */
 	resizable: true,
 	/*
 	 * Property: pos
 	 * 
-	 * Summary:
-	 * 		Internal variable used by the window maximizer
+	 * Internal variable used by the window maximizer
 	 */
 	pos: {},
 	postCreate: function() {
@@ -161,8 +151,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	/*
 	 * Method: show
 	 *  
-	 * Summary:
-	 * 		Shows the window
+	 * Shows the window
 	 */
 	show: function()
 	{
@@ -219,8 +208,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	/*
 	 * Method: makeResizer
 	 * 
-	 * Summary:
-	 * 		Internal method that makes a resizer for the window.
+	 * Internal method that makes a resizer for the window.
 	 */
 	makeResizer: function() {
 		dojo.style(this.sizeHandle.domNode, "display", "block");
@@ -228,8 +216,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	/*
 	 * Method: killResizer
 	 * 
-	 * Summary:
-	 * 		Internal method that gets rid of the resizer on the window.
+	 * Internal method that gets rid of the resizer on the window.
 	 */
 	killResizer: function()
 	{
@@ -242,8 +229,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	/* 
 	 * Method: minimize
 	 * 
-	 * Summary:
-	 * 		Minimizes the window to the taskbar
+	 * Minimizes the window to the taskbar
 	 */
 	minimize: function()
 	{
@@ -286,8 +272,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	/*
 	 * Method: restore
 	 * 
-	 * Summary:
-	 * 		Restores the window from the taskbar
+	 * Restores the window from the taskbar
 	 */
 	restore: function()
 	{
@@ -317,8 +302,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	/*
 	 * Method: maximize
 	 * 
-	 * Summary:
-	 * 		Maximizes the window
+	 * Maximizes the window
 	 */
 	maximize: function()
 	{
@@ -417,8 +401,8 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	},
 	/*
 	 * Method: unmaximize
-	 * Summary:
-	 * 		UnMaximizes the window
+	 * 
+	 * UnMaximizes the window
 	 */
 	unmaximize: function()
 	{
@@ -465,8 +449,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	/*
 	 * Method: bringToFront
 	 * 
-	 * Summary:
-	 * 		Brings the window to the front of the stack
+	 * Brings the window to the front of the stack
 	 * 
 	 * Returns:	
 	 * 		false - it had to be rased
@@ -502,8 +485,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	/* 
 	 * Method: close
 	 * 
-	 * Summary:
-	 * 		closes the window
+	 * closes the window
 	 */
 	close: function()
 	{
@@ -528,14 +510,15 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			}
 		}
 	},
-	resize: function(args){
-		// summary:
-		//		Explicitly set this widget's size (in pixels),
-		//		and then call layout() to resize contents (and maybe adjust child widgets)
-		//	
-		// args: Object?
-		//		{w: int, h: int, l: int, t: int}
-
+	/*
+	 * Method: resize
+	 * 
+	 * Explicitly set the window's size (in pixels)
+	 * 
+	 * Arguments:
+	 * 		args - {w: int, h: int, l: int, t: int}
+	 */
+	resize: function(/*Object?*/args){
 		var node = this.domNode;
 
 		// set margin box size, unless it wasn't specified, in which case use current size
@@ -557,23 +540,49 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		// Callback for widget to adjust size of it's children
 		this.layout();
 	},
+	/*
+	 * Method: layout
+	 * 
+	 * Layout the widget
+	 */
 	layout: function(){
 		dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());
 	},
-
+	/*
+	 * Method: addChild
+	 * 
+	 * Add a child to the window
+	 * 
+	 * Arguments:
+	 * 		child - the child to add
+	 * 		insertIndex - at what index to insert the widget (optional)
+	 */
 	addChild: function(/*Widget*/ child, /*Integer?*/ insertIndex){
 		dijit._Container.prototype.addChild.apply(this, arguments);
 		if(this._started){
 			dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());
 		}
 	},
-
+	/*
+	 * Method: removeChild
+	 * 
+	 * Remove a child from the widget
+	 * 
+	 * Arguments:
+	 * 		widget - the widget to remove
+	 */
 	removeChild: function(/*Widget*/ widget){
 		dijit._Container.prototype.removeChild.apply(this, arguments);
 		if(this._started){
 			dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());
 		}
 	},
+	/*
+	 * Method: _onResize
+	 * 
+	 * Event handler
+	 * Resizes the window when the screen is resized.
+	 */
 	_onResize: function(e) {
 		if (this.maximized && !this.minimized) {
 			var max = desktop.ui._area.getBox();
@@ -590,6 +599,11 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		}
 		this.resize();
 	},
+	/*
+	 * Method: startup
+	 * 
+	 * starts the widget up
+	 */
 	startup: function() {
 		this.inherited("startup", arguments);
 		this.resize();
