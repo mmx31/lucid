@@ -438,7 +438,7 @@ desktop.ui = {
 			var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
 			var close = new dijit.form.Button({
 				label: "Close",
-				onClick: dojo.hitch(win, win.destroy),
+				onClick: dojo.hitch(win, win.destroy)
 			});
 			var p=document.createElement("div");
 			dojo.addClass(p, "floatRight");
