@@ -15,11 +15,19 @@
 	with this program; if not, write to the Free Software Foundation, Inc.,
 	51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
-desktop.theme = new function()
-{
-	this.fileList = ["theme", "window", "icons", "dijit"];
-	this.draw = function()
+/*
+ * Class: desktop.theme
+ * 
+ * Takes care of themes
+ */
+desktop.theme = {
+	/*
+	 * Property: fileList
+	 * 
+	 * The different CSS files to load for each theme
+	 */
+	fileList: ["theme", "window", "icons", "dijit"],
+	draw: function()
 	{
 		dojo.addClass(document.body, "dijit");
 		dojo.forEach(this.fileList, function(e)
@@ -35,15 +43,31 @@ desktop.theme = new function()
 		dojo.subscribe("configApply", this, function(conf) {
 			desktop.theme.set(conf.theme);
 		});
-	}
-	this.set = function(theme)
+	},
+	/*
+	 * Method: set
+	 * 
+	 * Sets the theme
+	 * 
+	 * Arguments:
+	 * 		theme - the theme to use
+	 */
+	set: function(/*String*/theme)
 	{
 		desktop.config.theme = theme;
 		dojo.forEach(this.fileList, function(e) {
 			dojo.byId("desktop_theme_"+e).href ="./themes/"+desktop.config.theme+"/"+e+".css";
 		});
-	}
-	this.list = function(callback)
+	},
+	/*
+	 * Method: list
+	 * 
+	 * Pases a list of the themes to the callback provided
+	 * 
+	 * Arguments:
+	 * 		callback - a callback function
+	 */
+	list: function(/*Function*/callback)
 	{
 		api.xhr({
 			backend: "core.theme.get.list",
