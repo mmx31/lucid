@@ -1,37 +1,40 @@
-/**
-* Contains all the app functions of the desktop
-* 
-* @classDescription	Contains all the app functions of the desktop
-* @memberOf desktop
-* @constructor	
-*/
+/*
+ * Class: desktop.app
+ * 
+ * Contains all the app functions of the desktop
+ */
 desktop.app = new function()
 {
-	/**
+	/*
+	 * Property: apps
+	 * 
 	 * Contains a cache of each app
-	 * 
-	 * @type {Array}
-	 * @alias desktop.app.apps
-	 * @memberOf desktop.app
 	 */
-	this.apps = new Array();
-	this.appList = [];
-	/**
-	 * Contains each instance of all apps
+	this.apps = [];
+	/*
+	 * Property: appList
 	 * 
-	 * @type {Array}
-	 * @alias desktop.app.instances
-	 * @memberOf desktop.app
+	 * Contains a list of each app's information
+	 * (loaded on startup)
+	 */
+	this.appList = [];
+	/*
+	 * Property: instances
+	 * 
+	 * Contains each instance of all apps
 	 */
 	this.instances = new Array();
-	/**
-	 * A counter for making new instances of apps
+	/*
+	 * Property: instanceCount
 	 * 
-	 * @type {Integer}
-	 * @alias desktop.app.instanceCount
-	 * @memberOf desktop.app
+	 * A counter for making new instances of apps
 	 */
 	this.instanceCount = 0;
+	/*
+	 * Method: init
+	 * 
+	 * Loads the app list from the server
+	 */
 	this.init = function() {
 		this.onConfigApply = dojo.subscribe("configApply", this, this.startupApps);
 		api.xhr({
@@ -42,6 +45,11 @@ desktop.app = new function()
 			handleAs: "json"
 		});
 	}
+	/*
+	 * Method: startupApps
+	 * 
+	 * Launches the apps specified in desktop.config to launch on startup
+	 */
 	this.startupApps = function() {
 		dojo.unsubscribe(this.onConfigApply);
 		g = desktop.config.startupapps;
@@ -51,14 +59,16 @@ desktop.app = new function()
 			desktop.app.launch(g[f]);
 		}
 	}
-	/** 
-	* Fetches an app and stores it into the cache
-	* @param {String} appID	The appID to store into the cache
-	* @param {Function} callback	A callback to call once the app has been loaded into the cache
-	* @param {String} args	used internally when the callback is desktop.app.launch
-	* @memberOf desktop.app
-	* @alias desktop.app.fetchApp
-	*/
+	/*
+	 * Method: fetchApp
+	 * 
+	 * Fetches an app and stores it into the cache
+	 * 
+	 * Arguments:
+	 * 		appID - the app's ID
+	 * 		callback - a callback function (once the app has been fetched)
+	 * 		args - an argument to be passed to the callback
+	 */
 	this.fetchApp = function(appID, callback, args)
 	{
 		//fetch an app, put it into the cache
