@@ -2,6 +2,18 @@ api.util = {};
 if(typeof djConfig == "undefined") djConfig = {};
 djConfig.usePlainJson=true;
 
+/*
+ * Class: api
+ * Method: xhr
+ * 
+ * an extention of dojo's XHR utilities, but with some extra params to make life easy
+ * 
+ * Arguments:
+ * 		args -	When you give a string such as "api.fs.io.read", you will get the backend's url returned.
+ * 				You can also give an object as you would in dojo's XHR methods. However there are two extra params.
+ * 				backend - a backend string as described above
+ * 				xsite - when true, it makes the call using the server-side proxy (so you can make cross-domain requests)
+ */
 api.xhr = function(/*dojo.__ioArgs|String*/args) {
 	var backend = function(str) {
 		var mod=str.split(".");
@@ -44,6 +56,18 @@ api.xhr = function(/*dojo.__ioArgs|String*/args) {
 	return dojo.xhrPost(args);
 }
 
+/*
+ * Class: api
+ * Method: addDojoCss
+ * 
+ * Adds an additional dojo CSS file (usefull for the dojox modules)
+ * 
+ * Arguments:
+ * 		path - the path to the css file (the path to dojo is placed in front)
+ * 
+ * Example:
+ * 		api.addDojoCss("/dojox/widget/somewidget/foo.css");
+ */
 api.addDojoCss = function(path)
 {
 	var element = document.createElement("link");
