@@ -1878,5 +1878,5 @@ dojo.declare("desktop.ui.applets.menubar", desktop.ui.applets.menu, {
 			b.domNode.style.height="100%";
 			b.startup();
 		});
-	},
+	}
 });
