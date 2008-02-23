@@ -722,29 +722,53 @@ dojo.require("dijit.form.NumberSpinner");
  * Class: desktop.ui.panel
  * 
  * A customizable toolbar that you can reposition and add/remove/reposition applets on
- * 
- * Parameters:
- * 		span - a number between 0 and 1 indicating how far the panel should span accross (1 being the whole screen, 0 being none)
- * 		opacity - a number between 0 and 1 indicating how opaque the panel should be (1 being visible, 0 being completely transparent)
- * 		thickness - how thick the panel should be in pixels
- * 		locked - are the applets and the panel itself be repositionable?
- * 		placement - where the panel should be placed on the screen. 
- * 					acceptible values are "BL", "BR", "BC", "TL", "TR", "TC", "LT", "LB", "LC", "RT", "RB", or "RC".
- * 					The first character indicates the side, the second character indicates the placement.
- * 					R = right, L = left, T = top, and B = bottom.
- * 					So LT would be on the left side on the top corner. 
  */
 dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Container], {
 	templateString: "<div class=\"desktopPanel\" dojoAttachEvent=\"onmousedown:_onClick, oncontextmenu:_onRightClick\"><div class=\"desktopPanel-start\"><div class=\"desktopPanel-end\"><div class=\"desktopPanel-middle\" dojoAttachPoint=\"containerNode\"></div></div></div></div>",
+	/*
+	 * Property: span
+	 * a number between 0 and 1 indicating how far the panel should span accross (1 being the whole screen, 0 being none)
+	 */
 	span: 1,
+	/*
+	 * Property: opacity
+	 * a number between 0 and 1 indicating how opaque the panel should be (1 being visible, 0 being completely transparent)
+	 */
 	opacity: 1,
+	/*
+	 * Property: thickness
+	 * how thick the panel should be in pixels
+	 */
 	thickness: 24,
+	/*
+	 * Property: locked
+	 * are the applets and the panel itself be repositionable?
+	 */
 	locked: false,
+	/*
+	 * Property: placement
+	 * where the panel should be placed on the screen. 
+	 * acceptible values are "BL", "BR", "BC", "TL", "TR", "TC", "LT", "LB", "LC", "RT", "RB", or "RC".
+	 * The first character indicates the side, the second character indicates the placement.
+	 * R = right, L = left, T = top, and B = bottom.
+	 * So LT would be on the left side on the top corner. 
+	 */
 	placement: "BL",
+	/*
+	 * Method: getOrientation
+	 * 
+	 * Gets the orientation of the panel
+	 * Returns "horizontal" or "vertical"
+	 */
 	getOrientation: function() {
 		var s = this.placement.charAt(0);
 		return (s == "B" || s == "T") ? "horizontal" : "vertical";
 	},
+	/*
+	 * Method: _onClick
+	 * 
+	 * Event handler for when the mouse is pressed. Makes various event connections.
+	 */
 	_onClick: function(e) {
 		if(!this.locked) {
 			this._docMouseUpEvent = dojo.connect(document, "onmouseup", this, "_onRelease");
@@ -757,9 +781,14 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				];
 				this._docMouseUpEvent = dojo.connect(document, "onmouseup", this, "_onRelease");
 			});
-			dojo.stopEvent(e);
 		}
+		dojo.stopEvent(e);
 	},
+	/*
+	 * Method: _onRightClick
+	 * 
+	 * Event handler for when the right mouse button is pressed. Shows the panel's context menu.
+	 */
 	_onRightClick: function(e) {
 		if(this.menu) this.menu.destroy();
 		this.menu = new dijit.Menu({});
@@ -782,10 +811,15 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			desktop.ui._area.domNode.appendChild(p.domNode);
 			p.startup();
 		})}));
-		this.onRightClick(this.locked);
 		this.menu._contextMouse();
 		this.menu._openMyself(e);
+		//TODO: destroy menu when blurred?
 	},
+	/*
+	 * Method: propertiesDialog
+	 * 
+	 * Shows a small properties dialog for the panel.
+	 */
 	propertiesDialog: function() {
 		if(this.propertiesWin) {
 			this.propertiesWin.bringToFront();
@@ -861,6 +895,11 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		win.show();
 		win.startup();
 	},
+	/*
+	 * Method: addDialog
+	 * 
+	 * Shows the "Add to panel" dialog so the user can add applets
+	 */
 	addDialog: function() {
 		if(this.window) {
 			this.window.bringToFront();
@@ -926,18 +965,25 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		win.show();
 		win.startup();
 	},
-	onRightClick: function(lock) {
-		//This is a hook for third party panels to add stuff to the right click menu of the panel
-	},
+	/*
+	 * Method: _onRelease
+	 * 
+	 * Disconnects the event handlers that were created in _onClick
+	 */
 	_onRelease: function() {
 		dojo.disconnect(this._onDragEvent);
 		dojo.disconnect(this._docMouseUpEvent);
 		dojo.disconnect(this._onOutEvent); //just to be sure...
 		dojo.forEach(this._docEvents, dojo.disconnect);
 	},
+	/*
+	 * Method: _onMove
+	 * 
+	 * Event handler for when the panel is being dragged.
+	 * gets nearest edge, moves the panel there if we're not allready, and re-orients itself
+	 * also checks for any panels allready placed on that edge
+	 */
 	_onMove: function(e) {
-		//get nearest edge, move the panel there if we're not allready, re-orient ourself
-		//also check for any panels allready placed on that edge
 		var viewport = dijit.getViewport();
 		var newPos;
 
@@ -981,6 +1027,11 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			item.destroy();
 		});
 	},
+	/*
+	 * Method: _place
+	 * 
+	 * Updates the position and size of the panel
+	 */
 	_place: function() {
 		var viewport = dijit.getViewport();
 		var s = {};
@@ -1070,6 +1121,11 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		});
 		desktop.ui.save();
 	},
+	/*
+	 * Method: resize
+	 * 
+	 * Called when the window is resized. Resizes the panel to the new window height
+	 */
 	resize: function() {
 		var viewport = dijit.getViewport();
 		dojo.style(this.domNode, (this.getOrientation() == "horizontal" ? "width" : "height"), this.span*viewport[(this.getOrientation() == "horizontal" ? "w" : "h")]);
@@ -1078,28 +1134,53 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			item.resize();
 		});
 	},
+	/*
+	 * Method: _makeVertical
+	 * 
+	 * Orients the panel's applets vertically
+	 */
 	_makeVertical: function() {
 		dojo.removeClass(this.domNode, "desktopPanelHorizontal");
 		dojo.addClass(this.domNode, "desktopPanelVertical");
 		this.resize();
 	},
+	/*
+	 * Method: _makeHorizontal
+	 * 
+	 * Orients the panel's applets horizontally
+	 */
 	_makeHorizontal: function() {
 		dojo.removeClass(this.domNode, "desktopPanelVertical");
 		dojo.addClass(this.domNode, "desktopPanelHorizontal");
 		this.resize();
 	},
+	/*
+	 * Method: lock
+	 * 
+	 * Locks the panel
+	 */
 	lock: function() {
 		this.locked = true;
 		dojo.forEach(this.getChildren(), function(item) {
 			item.lock();
 		});
 	},
+	/*
+	 * Method: unlock
+	 * 
+	 * Unlocks the panel
+	 */
 	unlock: function() {
 		this.locked = false;
 		dojo.forEach(this.getChildren(), function(item) {
 			item.unlock();
 		});
 	},
+	/*
+	 * Method: dump
+	 * 
+	 * Returns a javascript object that can be used to restore the panel using the restore method
+	 */
 	dump: function() {
 		var applets = [];
 		var myw = dojo.style(this.domNode, "width"), myh = dojo.style(this.domNode, "height");
@@ -1116,6 +1197,11 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		}));
 		return applets;
 	},
+	/*
+	 * Method: restore
+	 * 
+	 * Restores the panel's configuration from a javascript object created by the dump method
+	 */
 	restore: function(applets) {
 		var size = dojo.style(this.domNode, this.getOrientation() == "horizontal" ? "width" : "height");
 		dojo.forEach(applets, dojo.hitch(this, function(applet) {
@@ -1172,6 +1258,11 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	}
 });
 
+/*
+ * Class: desktop.ui._appletMoveable
+ * 
+ * A subclassed dojo.dnd.move.constrainedMoveable for desktop.ui.applet
+ */
 dojo.declare("desktop.ui._appletMoveable", dojo.dnd.move.constrainedMoveable, {
 	onMove: function(/* dojo.dnd.Mover */ mover, /* Object */ leftTop){
 		// summary: called during every move notification,
@@ -1184,6 +1275,11 @@ dojo.declare("desktop.ui._appletMoveable", dojo.dnd.move.constrainedMoveable, {
 	}
 });
 dojo.require("dijit.Menu");
+/*
+ * Class: desktop.ui.applet
+ * 
+ * An applet that can be added to a panel
+ */
 dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Container, dijit._Contained], {
 	templateString: "<div class=\"desktopApplet\" dojoAttachEvent=\"onmouseover:_mouseover,onmouseout:_mouseout\"><div class=\"desktopAppletHandle\" dojoAttachPoint=\"handleNode\"></div><div class=\"desktopAppletContent\" dojoAttachPoint=\"containerNode\"></div></div>",
 	settings: {},
