@@ -67,40 +67,37 @@ desktop.app = new function()
 	 * Arguments:
 	 * 		appID - the app's ID
 	 * 		callback - a callback function (once the app has been fetched)
-	 * 		args - an argument to be passed to the callback
+	 * 		args - an argument to be passed to the callback function
 	 */
-	this.fetchApp = function(appID, callback, args)
+	this.fetchApp = function(/*Integer*/appID, /*Function*/callback, /*anything?*/args)
 	{
-		//fetch an app, put it into the cache
 		api.xhr({
 		    backend: "core.app.fetch.full",
 			content: {
 				id: parseInt(appID)
 			},
-		    load: dojo.hitch(this, function(data, ioArgs)
+		    load: dojo.hitch(this, function(app, ioArgs)
 			{
-				this._fetchApp(data, callback, args);
+				this.apps[app.id] = new Function("\tthis.id = "+app.id+";\n\tthis.name = \""+app.name+"\";\n\tthis.version = \""+app.version+"\";\n\tthis.instance = -1;\n"+app.code);
+				if(callback)
+				{
+					if(typeof args == "undefined") args = {};
+					callback(parseInt(app.id), args);
+				}
 			}),
 			handleAs: "json"
 		});
 	}
-	this._fetchApp = function(app, callback, args)
-	{
-		this.apps[app.id] = new Function("\tthis.id = "+app.id+";\n\tthis.name = \""+app.name+"\";\n\tthis.version = \""+app.version+"\";\n\tthis.instance = -1;\n"+app.code);
-		if(callback)
-		{
-			if(typeof args == "undefined") args = {};
-			callback(parseInt(app.id), args);
-		}
-	}
-	/** 
-	* Fetches an app and stores it into the cache
-	* @param {Integer} name	The name of the app to launch
-	* @param {Object} args	The args to pass to the 'init' function of the app
-	* @memberOf desktop.app
-	* @alias desktop.app.fetchApp
-	*/
-	this.launchByName = function(name, args)
+	/*
+	 * Method: launchByName
+	 * 
+	 * Fetches an app by name and stores it into the cache
+	 * 
+	 * Arguments:
+	 * 		name - the name of the app
+	 * 		args - arguments to pass to the app (optional)
+	 */
+	this.launchByName = function(/*String*/name, /*Object?*/args)
 	{
 		api.log("translating app name "+name+" to id...");
 		api.xhr({
@@ -116,7 +113,21 @@ desktop.app = new function()
 			handleAs: "json"
 		});
 	}
-	this.launchHandler = function(file, args, format) {
+	/*
+	 * Method: launchHandler
+	 * 
+	 * Launches an app to open a certain file
+	 * 
+	 * Arguments:
+	 * 		file - the full path to the file (Optional)
+	 * 		args - arguments to pass to the app (Optional)
+	 * 		format - the mimetype of the file to save bandwidth checking it on the server (Optional)
+	 * 
+	 * Note:
+	 * 		You must specify either the file *or* it's format
+	 * 		You must also manually pass the app the file's path through the arguments if you want it to actually open it.
+	 */
+	this.launchHandler = function(/*String?*/file, /*Object?*/args, /*String?*/format) {
 		if(!args) args = {};
 		var l = file.lastIndexOf(".");
 		var ext = file.substring(l + 1, file.length);
@@ -142,7 +153,20 @@ desktop.app = new function()
 			}
 		}
 	}
-	this._launchHandler = function(file, type, args) {
+	/*
+	 * Method: _launchHandler
+	 * 
+	 * Internal method that is used by the main launchHandler method.
+	 * This is what actually launches the app.
+	 * 
+	 * Arguments:
+	 * 		file - the full path to the file
+	 * 		type - the file's mimetype
+	 * 		args - arguments to pass to the app (Optional)
+	 * 		
+	 * Note: See launchHandler's note, it works the same way
+	 */
+	this._launchHandler = function(/*String*/file, /*String*/type, /*Object?*/args) {
 		if (type == "text/directory") {
 			for (app in this.appList) {
 				for (key in this.appList[app].filetypes) {
@@ -172,14 +196,17 @@ desktop.app = new function()
 			message: "Cannot open " + file + ", no app associated with " + type
 		});
 	}
-	/** 
-	* Fetches an app and stores it into the cache
-	* @param {Integer} id	The id of the app to launch
-	* @param {Object} args	The args to pass to the 'init' function of the app
-	* @memberOf desktop.app
-	* @alias desktop.app.fetchApp
-	*/
-	this.launch = function(id, args)
+	/*
+	 * Method: launch
+	 * 
+	 * Fetches an app if it's not in the cache, then launches it
+	 * otherwise, it launches the app
+	 * 
+	 * Arguments:
+	 * 		id - the app's id
+	 * 		args - the arguments to pass to the app (Optional)
+	 */
+	this.launch = function(/*Integer*/id, /*Object?*/args)
 	{
 		api.log("launching app "+id);
 		if(typeof this.apps[id] == "undefined")
@@ -234,6 +261,15 @@ desktop.app = new function()
 		}
 	}
 	//PROCESS MANAGEMENT FUNCTIONS
+	/*
+	 * Method: getInstances
+	 * 
+	 * Returns an array of the current instances
+	 * 
+	 * TODO: 
+	 * 		this behaves way too differently from getInstance.
+	 * 		it returns different keys, and does not return an array with references to the actual instance.
+	 */
 	this.getInstances = function() {
 		this.returnObject = new Array();
 		for(var x = 1; x<desktop.app.instances.length; x++){
@@ -250,10 +286,26 @@ desktop.app = new function()
 		}
 		return this.returnObject;
 	}
-	this.getInstance= function(instance) {
+	/*
+	 * Method: getInstance
+	 * 
+	 * Returns an instance
+	 * 
+	 * Arguments:
+	 * 		instance - the instance ID to fetch
+	 */
+	this.getInstance= function(/*Integer*/instance) {
 		return desktop.app.instances[instance];
 	}
-	this.kill = function(instance) {
+	/*
+	 * Method: kill
+	 * 
+	 * Kills an instance
+	 * 
+	 * Arguments:
+	 * 		instance - the instance ID to kill
+	 */
+	this.kill = function(/*Integer*/instance) {
 		try {
 			desktop.app.instances[instance].kill();
 			return true;
