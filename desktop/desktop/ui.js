@@ -1282,11 +1282,43 @@ dojo.require("dijit.Menu");
  */
 dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Container, dijit._Contained], {
 	templateString: "<div class=\"desktopApplet\" dojoAttachEvent=\"onmouseover:_mouseover,onmouseout:_mouseout\"><div class=\"desktopAppletHandle\" dojoAttachPoint=\"handleNode\"></div><div class=\"desktopAppletContent\" dojoAttachPoint=\"containerNode\"></div></div>",
+	/*
+	 * Property: settings
+	 * 
+	 * An object with settings for the applet. This is persistant.
+	 */
 	settings: {},
+	/*
+	 * Property: locked
+	 * 
+	 * Weather or not the applet is locked on the panel.
+	 */
 	locked: false,
+	/*
+	 * Property: pos
+	 * 
+	 * The position of the applet on the panel.
+	 * Horizontally, 0 would be on the left, and 1 would be on the right.
+	 * Vertically, 0 would be on the top, 1 would be on the bottom.
+	 */
 	pos: 0,
+	/*
+	 * Property: fullspan
+	 * 
+	 * When set to true, the applet will take up as much space as possible without overlapping the next applet.
+	 */
 	fullspan: false,
+	/*
+	 * Property: dispName
+	 * 
+	 * The name that is displayed on the "Add to panel" dialog.
+	 */
 	dispName: "Applet",
+	/*
+	 * Property: appletIcon
+	 * 
+	 * The applet's iconClass on the "Add to panel" dialog.
+	 */
 	appletIcon: "icon-32-categories-applications-other",
 	postCreate: function() {
 		this._moveable = new desktop.ui._appletMoveable(this.domNode, {
@@ -1339,12 +1371,23 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 		});
 		//TODO: get it so that applets don't overlap eachother
 	},
+	/*
+	 * Method: resize
+	 * 
+	 * fixes orientation and size of the applet
+	 */
 	resize: function() {
 		var size = dojo.style(this.getParent().domNode, this.getParent().getOrientation() == "horizontal" ? "width" : "height");
 		dojo.style(this.domNode, (this.getParent().getOrientation() == "horizontal" ? "left" : "top"), this.pos*size);
 		dojo.style(this.domNode, (this.getParent().getOrientation() != "horizontal" ? "left" : "top"), 0);
 		this._calcSpan(size);
 	},
+	/*
+	 * Method: _calcSpan
+	 * 
+	 * If the fullspan property is true, this calculates the width or height of the applet,
+	 * so that it is as big as possible without overlapping the next applet
+	 */
 	_calcSpan: function(size) {
 		if(this.fullspan) {
 			if(!size) size = dojo.style(this.getParent().domNode, this.getParent().getOrientation() == "horizontal" ? "width" : "height");
@@ -1364,23 +1407,55 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 	uninitalize: function() {
 		this._moveable.destroy();
 	},
+	/*
+	 * Method: _mouseover
+	 * 
+	 * Event handler for when the onmouseover event
+	 * Shows the repositioning handle if the applet is unlocked
+	 */
 	_mouseover: function() {
 		if(!this.locked) dojo.addClass(this.handleNode, "desktopAppletHandleShow");
 	},
+	/*
+	 * Method: _mouseout
+	 * 
+	 * Event handler for the onmouseout event
+	 * Hides the repositioning handle
+	 */
 	_mouseout: function() {
 		dojo.removeClass(this.handleNode, "desktopAppletHandleShow");
 	},
+	/*
+	 * Method: lock
+	 * 
+	 * Locks the applet
+	 */
 	lock: function() {
 		this.locked=true;
 	},
+	/*
+	 * Method: unlock
+	 * 
+	 * Unlocks the applet
+	 */
 	unlock: function() {
 		this.locked=false;
 	},
+	/*
+	 * Method: setOrientation
+	 * 
+	 * add any special things you need to do in order to change orientation in this function
+	 * the orientation parameter will either be "horizontal" or "vertical"
+	 */
 	setOrientation: function(orientation) {
-		//add any special things you need to do in order to change orientation in this function
 	}
 });
-
+/*
+ * Property: desktop.ui.appletList
+ * 
+ * A object where the keys are applet categories, and their values are an array of applet names.
+ * These are used when showing the "Add to panel" dialog
+ */
 desktop.ui.appletList = {
 		"Accessories": ["clock"],
 		"Desktop & Windows": ["taskbar"],
@@ -1388,6 +1463,11 @@ desktop.ui.appletList = {
 		"Utilities": ["menu", "menubar", "seperator"]
 }
 
+/*
+ * Class: desktop.ui.applets.seperator
+ * 
+ * A basic seperator applet
+ */
 dojo.declare("desktop.ui.applets.seperator", desktop.ui.applet, {
 	dispName: "Seperator",
 	postCreate: function() {
@@ -1398,7 +1478,11 @@ dojo.declare("desktop.ui.applets.seperator", desktop.ui.applet, {
 		this.inherited("postCreate", arguments);
 	}
 });
-
+/*
+ * Class: desktop.ui.applets.netmonitor
+ * 
+ * A network monitor applet that blinks when an xhr is made
+ */
 dojo.declare("desktop.ui.applets.netmonitor", desktop.ui.applet, {
 	dispName: "Network Monitor",
 	appletIcon: "icon-32-status-network-transmit-receive",
@@ -1419,6 +1503,11 @@ dojo.declare("desktop.ui.applets.netmonitor", desktop.ui.applet, {
 		}); 
 		this.inherited("postCreate", arguments);
 	},
+	/*
+	 * Method: removeClasses
+	 * 
+	 * Removes all icon classes from the icon node
+	 */
 	removeClasses: function() {
 		dojo.removeClass(this.containerNode, "icon-22-status-network-receive");
 		dojo.removeClass(this.containerNode, "icon-22-status-network-transmit");
@@ -1434,6 +1523,11 @@ dojo.declare("desktop.ui.applets.netmonitor", desktop.ui.applet, {
 
 dojo.require("dijit.form.Button");
 dojo.require("dijit._Calendar");
+/*
+ * Class: desktop.ui.applets.clock
+ * 
+ * A clock applet with a popup calendar
+ */
 dojo.declare("desktop.ui.applets.clock", desktop.ui.applet, {
 	dispName: "Clock",
 	postCreate: function() {
@@ -1480,6 +1574,11 @@ dojo.declare("desktop.ui.applets.clock", desktop.ui.applet, {
 	}
 });
 
+/*
+ * Class: desktop.ui.applets.taskbar
+ * 
+ * A window list applet that you can minimize windows to
+ */
 dojo.declare("desktop.ui.applets.taskbar", desktop.ui.applet, {
 	dispName: "Window List",
 	fullspan: true,
@@ -1488,7 +1587,11 @@ dojo.declare("desktop.ui.applets.taskbar", desktop.ui.applet, {
 		this.inherited("postCreate", arguments);
 	}
 });
-
+/*
+ * Class: desktop.ui.task
+ * 
+ * A task button that is used in desktop.ui.applets.taskbar
+ */
 dojo.declare("desktop.ui.task", null, {
 	constructor: function(params) {
 		this.icon = params.icon;
@@ -1505,6 +1608,11 @@ dojo.declare("desktop.ui.task", null, {
 			this.nodes.push(div);
 		}, this);
 	},
+	/*
+	 * Method: _makeNode
+	 * 
+	 * Makes a node for the task button based on the applet's orientation
+	 */
 	_makeNode: function(orientation) {
 		domNode=document.createElement("div");
 		dojo.addClass(domNode, "taskBarItem");
@@ -1521,8 +1629,12 @@ dojo.declare("desktop.ui.task", null, {
 		domNode.innerHTML += v;
 		return domNode;
 	},
+	/*
+	 * Method: onClick
+	 * 
+	 * hook for onClick event
+	 */
 	onClick: function() {
-		//hook for onClick event
 	},
 	destroy: function() {
 		dojo.forEach(this.nodes, function(node){
@@ -1545,6 +1657,11 @@ dojo.declare("desktop.ui.task", null, {
 	}
 });
 
+/*
+ * Class: desktop.ui.applets.menu
+ * 
+ * A simple menu applet
+ */
 dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 	dispName: "Main Menu",
 	postCreate: function() {
@@ -1559,6 +1676,11 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 		if(this._menu) this._menu.destroy();
 		this.inherited("uninitialize", arguments);
 	},
+	/*
+	 * Method: _makePrefsMenu
+	 * 
+	 * Creates a preferences menu and returns it
+	 */
 	_makePrefsMenu: function() {
 		var pMenu = new dijit.Menu();
 		dojo.forEach([
@@ -1577,6 +1699,11 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 		});
 		return pMenu;
 	},
+	/*
+	 * Method: _drawButton
+	 * 
+	 * Creates a drop down button for the applet.
+	 */
 	_drawButton: function() {
 		dojo.require("dijit.form.Button");
 		if (this._menubutton) {
@@ -1602,11 +1729,15 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 		}, div);
 		dojo.addClass(b.domNode, "menuApplet");
 		dojo.style(b.focusNode, "border", "0px");
-		dojo.query(".dijitA11yDownArrow", b.focusNode).style("display", "none");
 		b.domNode.style.height="100%";
 		b.startup();
 		this._menubutton = b;
 	},
+	/*
+	 * Method: _getApps
+	 * 
+	 * Gets the app list from the server and makes a menu for them
+	 */
 	_getApps: function() {
 		api.xhr({
 			backend: "core.app.fetch.list",
@@ -1657,6 +1788,11 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
 		});
 	}
 });
+/*
+ * Class: desktop.ui.applets.menubar
+ * 
+ * An extention of desktop.ui.applets.menu except it seperates the application, places, and system menus into their own buttons
+ */
 dojo.declare("desktop.ui.applets.menubar", desktop.ui.applets.menu, {
 	dispName: "Menu Bar",
 	_makeSystemMenu: function() {
