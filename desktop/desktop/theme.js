@@ -71,16 +71,8 @@ desktop.theme = {
 	{
 		api.xhr({
 			backend: "core.theme.get.list",
-<<<<<<< .mine
 			load: callback,
 			handleAs: "json"
-=======
-			load: function(data, ioArgs)
-			{
-				callback(data);
-			},
-			handleAs: "json"
->>>>>>> .r1209
 		});
 	}
 }
