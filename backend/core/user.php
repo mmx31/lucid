@@ -20,10 +20,20 @@
 	import("models.user");
 	if($_GET['section'] == "info")
 	{
-		$user = $User->get_current();
-		if($user != false)
+		if ($_GET['action'] == "get") {
+			if($_POST['id'] == "0") { $user = $User->get_current(); }
+			else { $user = $User->get($_POST['id']); }
+			$out = new jsonOutput();
+			$out->append("id", $user->id);
+			$out->append("name", $user->name);
+			$out->append("username", $user->username);
+			$out->append("email", $user->email);
+			$out->append("level", $user->level);
+		}
+		if($_GET['action'] == "save")
 		{
-			if($_GET['action'] == "save")
+			$user = $User->get_current();
+			if($user != false)
 			{
 				$user->email = $_POST['email'];
 				if(isset($_POST['password']))
@@ -33,7 +43,6 @@
 				$user->save();
 			}
 		}
-		else { die("user not found"); }
 	}
 	if($_GET['section'] == "auth")
 	{

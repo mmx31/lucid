@@ -449,7 +449,7 @@ desktop.ui = {
 				win.addChild(wid);
 				wid.startup();
 			}, this);
-			api.user.get({callback: function(info) {
+			desktop.user.get({callback: function(info) {
 				elems["Name"].setValue(info.name);
 				elems["Email"].setValue(info.email);
 				usernameSpan.textContent = info.username

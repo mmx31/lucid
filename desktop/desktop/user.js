@@ -5,30 +5,17 @@ desktop.user = new function() {
 			desktop.user.logout(true);
 		});
 	}
-	this.changeUserPassword = function(obj) {
+	this.get = function(options) {
+		if(!options.id) { options.id = "0"; }
 		api.xhr({
-			backend: "api.misc.user.changePassword",
+	        backend: "core.user.info.get",
 			content: {
-				"old": obj.old,
-				"new": obj.newpass
+				id: options.id
 			},
 	        load: function(data, ioArgs) {
-				if(obj.callback) { obj.callback(data); }
+				data = dojo.fromJson(data);
+	        	if(options.callback) { options.callback(data); }
 			}
-        });
-	}
-	this.changeUserEmail = function(obj) {
-		api.xhr({
-        backend: "api.misc.user.changeEmail",
-		content: {
-			pass: obj.old,
-			email: obj.newemail
-		},
-        load: function(data, ioArgs) {
-			if(obj.callback) { obj.callback(data); }
-		},
-        error: function(error, ioArgs) { api.log("Error in AJAX call: "+error.message); },
-		mimetype: "text/plain"
         });
 	}
 	this.logout = function(sync)
