@@ -26,6 +26,7 @@
 		var $level = array('type' => 'text');
 		var $permissions = array('type' => 'array');
 		var $groups = array('type' => 'array');
+		var $lastauth = array('type' => 'timestamp');
 		
 		function get_current()
 		{
@@ -65,6 +66,8 @@
 			$_SESSION['userlevel'] = $this->level;
 			$_SESSION['userloggedin'] = TRUE;
 			$this->logged = 1;
+			MDB2::loadFile('Date');
+			$this->lastauth = MDB2_Date::mdbNow();
 			$this->make_userdir();
 			$this->save();
 		}

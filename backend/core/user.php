@@ -29,25 +29,56 @@
 			$out->append("username", $user->username);
 			$out->append("email", $user->email);
 			$out->append("level", $user->level);
+			$out->append("lastauth", $user->lastauth);
 		}
-		if($_GET['action'] == "save")
-		{
-			$user = $User->get_current();
-			if($user != false)
-			{
-				$user->email = $_POST['email'];
-				if(isset($_POST['password']))
-				{
-					$user->set_password($_POST['password']);
-				}
-				$user->save();
+		if($_GET['action'] == "set") {
+			$id = $_POST['id'];
+			$info = array();
+			$cur = $User->get_current();
+			if(is_numeric($id) && $cur->level == "admin") {
+				$user = $User->get($id);
+				if($user === false) internal_error("generic_err");
 			}
+			else if(is_numeric($id)) internal_error("permission_denied");
+			else $user = $cur;
+			foreach($_POST as $key => $val){
+				if($key == "id"
+				|| ($key == "level" && $cur->level != "admin")
+				|| ($key == "permissions" && $cur->level != "admin")
+				|| ($key == "groups" && $cur->level != "admin")
+				|| $key == "username"
+				|| $key == "logged"
+				|| $key == "lastAuth") continue;
+				if($key == "password" && $cur->level != "admin") {
+					//this is handled a bit differently...
+					//the user had to auth themselves in the past 5 minuites
+					if(!$user->lastAuth) continue; //this user has never logged in. wait, how's that possible?
+					MDB2::loadFile('Date');
+					$now = MDB2_Date::mdbNow();
+					$lauth = $user->lastauth;
+					if($now['year'] == $lauth['year']
+					&& $now['month'] == $lauth['month']
+					&& $now['day'] == $lauth['day']
+					&& $now['hour'] == $lauth['hour']
+					&& ((($now['minuite']*60)+$now['second']) - (($lauth['minuite']*60)+$lauth['second'])) < 5*60) {
+						$user->set_password($val);
+					}
+					continue;
+				}
+				//decode object fields
+				if($key == "permissions" || $key == "groups") $val = json_decode($val);
+				$user->$key = $val;
+			}
+			$user->save();
+			$out = new intOutput("ok");
 		}
 	}
 	if($_GET['section'] == "auth")
 	{
 		if($_GET['action'] == "login")
 		{
+			$cur = $User->get_current();
+			if(!isset($_POST['username'])) $_POST['username'] = $cur->username;
 			$p = $User->authenticate($_POST['username'], $_POST['password']);
 			if($p != FALSE) {
 				if($p->has_permission("core.user.auth.login")) {

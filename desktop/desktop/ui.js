@@ -451,6 +451,7 @@ desktop.ui = {
 				usernameSpan.textContent = info.username
 			}});
 			dojo.connect(win, "onClose", this, function() {
+				var args = {};
 				for(key in elems) {
 					var elem = elems[key];
 					if(typeof elem.isValid != "undefined") {
@@ -458,11 +459,12 @@ desktop.ui = {
 					}
 					switch(key) {
 						case "Name":
-							
+							args.name = elem.getValue();
 						case "Email":
-						
+							args.email = elem.getValue();
 					}
 				}
+				desktop.user.set(args);
 			});
 			
 			win.show();
@@ -481,6 +483,7 @@ desktop.ui = {
 				height: "350px",
 				onClose: dojo.hitch(this, function() {
 					this.passwordWin = false;
+					clearTimeout(this._authTimeout);
 				})
 			});
 			var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding: 20px;"});
@@ -512,18 +515,36 @@ desktop.ui = {
 			row1.innerHTML = "Current password:&nbsp;";
 			var current = new dijit.form.TextBox({type: "password", style: "width: 125px;"});
 			row1.appendChild(current.domNode);
+			var resetForm = dojo.hitch(this, function() {
+					current.setValue("");
+					newpasswd.setValue("");
+					confpasswd.setValue("");
+					current.setDisabled(false);
+					this.authButton.setDisabled(false);
+					newpasswd.setDisabled(true);
+					confpasswd.setDisabled(true);
+					this.chPasswdButton.setDisabled(true);
+			});
 			var authButton = this.authButton = new dijit.form.Button({
 				label: "Authenticate",
 				onClick: dojo.hitch(this, function() {
 					current.setDisabled(true);
 					this.authButton.setDisabled(true);
 					
-					var data = "0"; //simulated response
-					current.setDisabled(data == "0");
-					authButton.setDisabled(data == "0");
-					newpasswd.setDisabled(data != "0");
-					confpasswd.setDisabled(data != "0");
-					row4.textContent = (data == "0" ? "Authentication was successful" : "Authentication failed");
+					api.xhr({
+						backend: "core.user.auth.login",
+						content: {
+							password: current.getValue()
+						},
+						load: dojo.hitch(this, function(data) {
+							current.setDisabled(data == "0");
+							authButton.setDisabled(data == "0");
+							newpasswd.setDisabled(data != "0");
+							confpasswd.setDisabled(data != "0");
+							row4.textContent = (data == "0" ? "Authentication was successful" : "Authentication failed");
+							this._authTimeout = setTimeout(resetForm, 5*60*1000);
+						})
+					})
 				})
 			})
 			row1.appendChild(authButton.domNode);
@@ -552,16 +573,14 @@ desktop.ui = {
 					confpasswd.setDisabled(true);
 					this.chPasswdButton.setDisabled(true);
 					
-					//xhr, response, yadda yadda yadda
-					current.setValue("");
-					newpasswd.setValue("");
-					confpasswd.setValue("");
-					current.setDisabled(false);
-					this.authButton.setDisabled(false);
-					newpasswd.setDisabled(true);
-					confpasswd.setDisabled(true);
-					this.chPasswdButton.setDisabled(true);
-					row4.textContent = "Password change successful";
+					desktop.user.set({
+						password: newpasswd.getValue(),
+						callback: function() {
+							resetForm();
+							row4.textContent = "Password change successful";
+							clearTimeout(this._authTimeout);
+						}
+					})
 				})
 			})).domNode);
 			bottom.setContent(div);

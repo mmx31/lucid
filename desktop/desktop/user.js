@@ -18,6 +18,17 @@ desktop.user = new function() {
 			}
         });
 	}
+	this.set = function(op) {
+		var callback = op.callback || false;
+		delete op.callback;
+		api.xhr({
+			backend: "core.user.info.set",
+			content: op,
+			load: function(data) {
+				if(callback) callback(data);
+			}
+		})		
+	}
 	this.logout = function(sync)
 	{
 		if(desktop.reload) { return false; }
