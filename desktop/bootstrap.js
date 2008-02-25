@@ -42,7 +42,6 @@ var bootstrap = {
 		"api.mail",
 		"api.sound",
 		"api.ui",
-		"api.user",
 		"api.util",
 		"api.window",
 	    'desktop.admin',
