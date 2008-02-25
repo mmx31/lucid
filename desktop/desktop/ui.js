@@ -270,11 +270,7 @@ desktop.ui = {
 				area.appendChild(p);
 			}
 			desktop.theme.list(function(list) {
-				dojo.forEach(list, function(theme) {
-					//Change this when theme metadata works
-					makeThumb({name: theme.name."by ".theme.author, thumb: theme.preview});
-					//makeThumb(theme);
-				});
+				dojo.forEach(list, makeThumb);
 			});
 			m.setContent(area);
 			p.addChild(m);
