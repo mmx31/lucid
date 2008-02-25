@@ -73,10 +73,9 @@ desktop.theme = {
 			backend: "core.theme.get.list",
 			load: function(data, ioArgs)
 			{
-				data = data.split("\n");
-				delete data[data.length-1];
 				callback(data);
-			}
+			},
+			handleAs: "json"
 		});
 	}
 }

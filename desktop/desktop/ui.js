@@ -272,7 +272,7 @@ desktop.ui = {
 			desktop.theme.list(function(list) {
 				dojo.forEach(list, function(theme) {
 					//Change this when theme metadata works
-					makeThumb({name: theme, thumb: "about:blank"});
+					makeThumb({name: theme.name."by ".theme.author, thumb: theme.preview});
 					//makeThumb(theme);
 				});
 			});
