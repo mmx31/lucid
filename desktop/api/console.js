@@ -2,6 +2,11 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
 dojo.provide("api.console");
+/*
+ * Class: api.console
+ * 
+ * A console widget that you can embed in an app
+ */
 dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained], {
 	templateString: "<div class=\"console\" dojoAttachEvent=\"onclick:focus\"><div class='consoleoutput' dojoAttachEvent=\"onclick:focus\" dojoAttachPoint=\"stdout\"></div><form dojoAttachEvent=\"onsubmit:execute, onkeydown:key\"><b><span class='consolepath' dojoAttachPoint=\"_path\">~</span>$&nbsp;</b><input type='text' class='consoleinput' dojoAttachPoint=\"_input\" /></form></div>",
 	path: "/",
