@@ -250,7 +250,7 @@ desktop.ui = {
 				var img = document.createElement("img");
 				dojo.style(img, "width", "100%");
 				dojo.style(img, "height", "100%");
-				img.src = item.thumb;
+				img.src = "./themes/"+item.sysname+"/"+item.preview;
 				img.name = item.name;
 				img.title = item.name;
 				p.appendChild(img);
