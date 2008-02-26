@@ -112,7 +112,7 @@ desktop.ui = {
 		 */
 		_wallpaper: function() {
 			var wallpaper = new dijit.layout.LayoutContainer({title: "Wallpaper"});
-			var c = new dijit.layout.ContentPane({});
+			var c = new dijit.layout.ContentPane({layoutAlign: "client"});
 			var cbody = document.createElement("div");
 			dojo.style(cbody, "width", "100%");
 			dojo.style(cbody, "height", "100%");
