@@ -491,23 +491,21 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	{
 		if (!this.closed) {
 			this.closed = true;
-			this.onClose();
+			var onEnd = dojo.hitch(this, function() {
+				this.onClose();
+				this.domNode.parentNode.removeChild(this.domNode);
+				this.destroy();
+			})
 			if (desktop.config.fx) {
 				dojo.style(this.containerNode, "display", "none");
 				var anim = dojo.fadeOut({
 					node: this.domNode,
 					duration: desktop.config.window.animSpeed
 				});
-				dojo.connect(anim, "onEnd", this, function(){
-					this.domNode.parentNode.removeChild(this.domNode);
-					this.destroy();
-				});
+				dojo.connect(anim, "onEnd", this, onEnd);
 				anim.play();
 			}
-			else {
-				this.domNode.parentNode.removeChild(this.domNode);
-				this.destroy();
-			}
+			else onEnd();
 		}
 	},
 	/*
