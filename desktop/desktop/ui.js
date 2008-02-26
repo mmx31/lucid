@@ -258,7 +258,7 @@ desktop.ui = {
 				subtitle.textContent = item.name
 				dojo.style(subtitle, "textAlign", "center");
 				p.appendChild(subtitle);
-				if(desktop.config.theme == item.name) dojo.addClass(p, "selectedItem");
+				if(desktop.config.theme == item.sysname) dojo.addClass(p, "selectedItem");
 				dojo.connect(p, "onclick", null, function() {
 					if(desktop.config.wallpaper.image != item) {
 						dojo.query(".selectedItem", m.domNode).removeClass("selectedItem");
