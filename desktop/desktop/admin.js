@@ -1,14 +1,44 @@
+/*
+ * Class: desktop.admin
+ * 
+ * Contains administration functions
+ * 
+ * 
+ */
 desktop.admin = new function()
 {
-	this.diskspace = function(callback) {
+	/*
+	 * Method: diskspace
+	 * 
+	 * Gets the amount of free space on the server
+	 * 
+	 * Arguments:
+	 * 		callback - a callback function. Passes an object as an argument with two properties: 'free', and 'total'
+	 */
+	this.diskspace = function(/*Function*/callback) {
 		api.xhr({
 			backend: "core.administration.general.diskspace",
 			load: callback,
 			handleAs: "json"
 		});
 	}
+	/*
+	 * Class: desktop.admin.users
+	 * 
+	 * Some user management functions
+	 * 
+	 * Note: for modifying user information see <desktop.user>
+	 */
 	this.users = {
-		list: function(callback) {
+		/*
+		 * Method: list
+		 * 
+		 * List all users
+		 * 
+		 * Arguments:
+		 * 		callback - 
+		 */
+		list: function(/*Function*/callback) {
 			api.xhr({
 				backend: ("core.administration.users.list"),
 				load: function(data, ioArgs) {

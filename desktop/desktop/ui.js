@@ -260,19 +260,26 @@ desktop.ui = {
 				p.appendChild(subtitle);
 				if(desktop.config.theme == item.sysname) dojo.addClass(p, "selectedItem");
 				dojo.connect(p, "onclick", null, function() {
-					if(desktop.config.wallpaper.image != item) {
+					if(desktop.config.theme != item.sysname) {
 						dojo.query(".selectedItem", m.domNode).removeClass("selectedItem");
 						dojo.addClass(p, "selectedItem");
 						desktop.config.theme = item.sysname;
-						desktop.config.wallpaper.image = "./themes/"+item.sysname+"/"+item.wallpaper;
 						desktop.config.apply();
 					}
 				})
 				area.appendChild(p);
+				
+				if(!item.wallpaper) return;
+				var wallimg = "./themes/"+item.sysname+"/"+item.wallpaper;
+				for(i in desktop.config.wallpaper.storedList){
+					var p = desktop.config.wallpaper.storedList[i];
+					if(p == wallimg) return;
+				}
+				desktop.config.wallpaper.storedList.push(wallimg);
 			}
 			desktop.theme.list(function(list) {
 				dojo.forEach(list, makeThumb);
-			});
+			}, true);
 			m.setContent(area);
 			p.addChild(m);
 			return p;
@@ -354,8 +361,9 @@ desktop.ui = {
 				})
 			});
 			var tabs = new dijit.layout.TabContainer({layoutAlign: "client"});
+			var themes = desktop.ui.config._themes(); //so we can get any theme wallpaper first
 			tabs.addChild(desktop.ui.config._wallpaper());
-			tabs.addChild(desktop.ui.config._themes());
+			tabs.addChild(themes);
 			tabs.addChild(desktop.ui.config._effects());
 			win.addChild(tabs);
 			win.show();
