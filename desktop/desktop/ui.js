@@ -255,7 +255,7 @@ desktop.ui = {
 				img.title = item.name;
 				p.appendChild(img);
 				var subtitle = document.createElement("div");
-				subtitle.textContent = item.name
+				subtitle.textContent = item.name;
 				dojo.style(subtitle, "textAlign", "center");
 				p.appendChild(subtitle);
 				if(desktop.config.theme == item.sysname) dojo.addClass(p, "selectedItem");
@@ -272,8 +272,8 @@ desktop.ui = {
 				if(!item.wallpaper) return;
 				var wallimg = "./themes/"+item.sysname+"/"+item.wallpaper;
 				for(i in desktop.config.wallpaper.storedList){
-					var p = desktop.config.wallpaper.storedList[i];
-					if(p == wallimg) return;
+					var litem = desktop.config.wallpaper.storedList[i];
+					if(litem == wallimg) return;
 				}
 				desktop.config.wallpaper.storedList.push(wallimg);
 			}
