@@ -47,14 +47,27 @@
 			if($_GET['action'] == "list")
 			{
 				$p = $User->all();
-				$pl = count($p)-1;
-				echo "[";
+				$out = new jsonOutput();
+				$val = array();
 				foreach($p as $d => $v)
 				{
-					echo $v->make_json();
-					if($d < $pl) { echo ",\n"; }
+					$o = array();
+					foreach(array(
+						"id",
+						"username",
+						"name",
+						"logged",
+						"email",
+						"level",
+						"permissions",
+						"groups",
+						"lastauth"
+					) as $key) {
+						$o[$key] = $v[$key];
+					}
+					
 				}
-				echo "]";
+				$out->set($val);
 			}
 			if($_GET['action'] == "online")
 			{

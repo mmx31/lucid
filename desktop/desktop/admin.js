@@ -36,7 +36,21 @@ desktop.admin = new function()
 		 * List all users
 		 * 
 		 * Arguments:
-		 * 		callback - 
+		 * 		callback - a callback function. Gets passed an array of user objects
+		 * 
+		 * Note:
+		 * 		This is what each user object consists of:
+		 * 		> {
+		 * 		> 	id: (integer), //user's numerical id. This is NOT their username!
+		 * 		> 	name: (string), //user's real name
+		 * 		> 	username: (string), //user's username
+		 * 		> 	logged: (bool), //is the user logged in?
+		 * 		> 	email: (string), //the user's email
+		 * 		> 	level: (string), //the user's level (can be "admin", "developer", or "user")
+		 * 		> 	permissions: (array), //array of user's permissions
+		 * 		> 	groups: (array), //array of the user's groups
+		 * 		>	lastauth: (string) //the time that the user last logged in
+		 * 		> }
 		 */
 		list: function(/*Function*/callback) {
 			api.xhr({
@@ -46,6 +60,15 @@ desktop.admin = new function()
 				}
 			});
 		},
+		/*
+		 * Method: remove
+		 * 
+		 * Permanently removes (deletes) a user from the system
+		 * 
+		 * Arguments:
+		 * 		id - the id of the user to delete (NOT the username)
+		 * 		callback - a callback function once the process is complete. passes a single parameter. If it's false the user's deletion failed. If true, it was successful.
+		 */
 		remove: function(id, callback)
 		{
 			api.xhr({
@@ -53,13 +76,24 @@ desktop.admin = new function()
 				content: {
 					id: id
 				},
-				dsktp_callback: callback,
 				load: function(data, ioArgs)
 				{
-					ioArgs.args.dsktp_callback(data == "0");
+					callback(data == "0");
 				}
 			});
 		},
+		/*
+		 * Method: online
+		 * 
+		 * Gets the number of users currently using the system.
+		 * 
+		 * Arguments:
+		 * 		callback - a callback function. Passes a single object as a parameter:
+		 * 					> {
+		 * 					> 	total: (int), //Total users registered in the system
+		 * 					> 	online: (int) //Total users currently online
+		 * 					> }
+		 */
 		online: function(callback) {
 			api.xhr({
 				backend: "core.administration.users.online",

@@ -68,7 +68,7 @@ desktop.theme = {
 	 * 		callback - a callback function
 	 * 		sync - should the call be syncronous? (defaults to false)
 	 */
-	list: function(/*Function*/callback, /*Boolean*/sync)
+	list: function(/*Function*/callback, /*Boolean?*/sync)
 	{
 		api.xhr({
 			backend: "core.theme.get.list",
