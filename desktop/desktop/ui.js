@@ -264,6 +264,7 @@ desktop.ui = {
 						dojo.query(".selectedItem", m.domNode).removeClass("selectedItem");
 						dojo.addClass(p, "selectedItem");
 						desktop.config.theme = item.sysname;
+						desktop.config.wallpaper.image = "./themes/"+item.sysname+"/"+item.wallpaper;
 						desktop.config.apply();
 					}
 				})
