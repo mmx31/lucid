@@ -67,6 +67,10 @@
 				}
 				//decode object fields
 				if($key == "permissions" || $key == "groups") $val = json_decode($val);
+				if($key == "password") {
+					$user->set_password($val);
+					continue;
+				}
 				$user->$key = $val;
 			}
 			$user->save();
