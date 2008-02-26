@@ -263,7 +263,7 @@ desktop.ui = {
 					if(desktop.config.wallpaper.image != item) {
 						dojo.query(".selectedItem", m.domNode).removeClass("selectedItem");
 						dojo.addClass(p, "selectedItem");
-						desktop.config.theme = item.name;
+						desktop.config.theme = item.sysname;
 						desktop.config.apply();
 					}
 				})

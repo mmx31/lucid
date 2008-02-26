@@ -34,7 +34,7 @@ if($_GET['section'] == "get")
 				if(is_dir("../../desktop/themes/" . $file)){
 					$xml = new Xml;
 					$in = $xml->parse('../../desktop/themes/'.$file.'/themeMeta.xml', 'FILE');
-					$p[] = array("name" => $in["name"], "author" => $in["author"], "email" => $in["email"], "version" => $in["version"], "wallpaper" => $in["wallpaper"], "preview" => $in["preview"]);
+					$p[] = array("sysname" => $file, "name" => $in["name"], "author" => $in["author"], "email" => $in["email"], "version" => $in["version"], "wallpaper" => $in["wallpaper"], "preview" => $in["preview"]);
 					/*
 					$blah->append("name", $in["name"]);
 					$blah->append("author", $in["author"]);
