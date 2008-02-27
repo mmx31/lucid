@@ -66,8 +66,7 @@
 			$_SESSION['userlevel'] = $this->level;
 			$_SESSION['userloggedin'] = TRUE;
 			$this->logged = 1;
-			MDB2::loadFile('Date');
-			//$this->lastauth = MDB2_Date::mdbNow(); - commented it out - causes unknown error on login: "<b>Fatal error</b>:  Class 'MDB2_Date' not found in <b>C:\xampp\htdocs\private\psych\backend\models\user.php</b> on line <b>70</b><br />"
+			$this->lastauth = date('Y-m-d H:i:s');
 			$this->make_userdir();
 			$this->save();
 		}

@@ -53,8 +53,7 @@
 					//this is handled a bit differently...
 					//the user had to auth themselves in the past 5 minuites
 					if(!$user->lastAuth) continue; //this user has never logged in. wait, how's that possible?
-					MDB2::loadFile('Date');
-					$now = MDB2_Date::mdbNow();
+					$now = date('Y-m-d H:i:s');
 					$lauth = $user->lastauth;
 					if($now['year'] == $lauth['year']
 					&& $now['month'] == $lauth['month']
