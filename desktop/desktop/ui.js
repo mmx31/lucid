@@ -1844,7 +1844,7 @@ dojo.declare("desktop.ui.applets.menubar", desktop.ui.applets.menu, {
 					api.ui.alert({
 						title: "About",
 						style: "width: 400px;",
-						message: "<h2>Psych Desktop</h2><b>Version SVN</b><br /><br />Brought to you by:<ul style='padding: 0px;'><li>Will \"Psychcf\" Riley</li><li>Jay Macdonald</li><li>Dave \"mmx\"</li></ul>"
+						message: "<h2>Psych Desktop</h2><b>Version SVN</b><br /><br />Brought to you by:<ul style='padding: 0px;'><li>Will \"Psychcf\" Riley<div style=\"font-size: 10pt;\">Developer/Project Manager</div></li><li>Jay Macdonald<div style=\"font-size: 10pt;\">Developer/Assistant Project Manager</div></li><li>David \"mmx\" Clayton<div style=\"font-size: 10pt;\">UI Designer/Lead Artist</div></li></ul>"
 					})
 				}
 			}),

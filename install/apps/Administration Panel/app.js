@@ -73,7 +73,7 @@ this.pages = {
 			for(field in data[0]) {
 				if(field != "password") layout[0].cells[0][layout[0].cells[0].length] = {name: field, field: i};
 				i++;
-			} console.log(layout);
+			}
 			//make values
 			var griddata = [];
 			dojo.forEach(data, function(item) {
@@ -85,8 +85,7 @@ this.pages = {
 				}
 				griddata[griddata.length] = myitem;
 			});
-			console.log(griddata);
-			this._userGrid = new dojox.Grid({
+			var grid = this._userGrid = new dojox.Grid({
 				structure: layout,
 				model: new dojox.grid.data.Table(null, griddata)
 			});
@@ -98,6 +97,11 @@ this.pages = {
 					label: "Delete",
 					onClick: dojo.hitch(this, function(e) {
 						var row = this._userGrid.model.getRow(this.__rowIndex);
+						//TODO: ask for confirmation
+						//desktop.admin.users.remove(row[0], function() {
+						//	grid.model.remove(this.__rowIndex);
+						//});
+						//commented out because it may not work and I can't test it ATM
 					})
 				}
 			], function(item) {

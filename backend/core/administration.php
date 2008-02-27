@@ -44,6 +44,13 @@
 		}
 		if($_GET['section'] == "users")
 		{
+			if($_GET['action'] == "delete") {
+				$p = $User->get($_POST['id']);
+				$cur = $User->get_current();
+				if($p !== false && $p->id != $cur->id) {
+					$p->delete();
+				}
+			}
 			if($_GET['action'] == "list")
 			{
 				$p = $User->all();
@@ -63,9 +70,9 @@
 						"groups",
 						"lastauth"
 					) as $key) {
-						$o[$key] = $v[$key];
+						$o[$key] = $v->$key;
 					}
-					
+					array_push($val, $o);
 				}
 				$out->set($val);
 			}
