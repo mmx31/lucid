@@ -167,14 +167,14 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			if(this.maximized == true) this.maximize();
 			dojo.style(this.domNode, "display", "block");
 			if (desktop.config.fx) {
-				if (desktop.config.fx == 1) dojo.style(this.containerNode, "display", "none");
+				if (desktop.config.fx >= 1) dojo.style(this.containerNode, "display", "none");
 				dojo.style(this.domNode, "opacity", 0);
 				var anim = dojo.fadeIn({
 					node: this.domNode,
 					duration: desktop.config.window.animSpeed
 				});
 				dojo.connect(anim, "onEnd", this, function() {
-					if (desktop.config.fx == 1) dojo.style(this.containerNode, "display", "block");
+					if (desktop.config.fx >= 1) dojo.style(this.containerNode, "display", "block");
 					this.resize();
 				});
 				anim.play();
