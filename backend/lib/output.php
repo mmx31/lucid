@@ -16,6 +16,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+import('lib.Json.Json');
+
 class objOutput {
 	var $output = Array();
 	var $dooutput = false;
@@ -101,7 +103,7 @@ class jsonOutput extends objOutput {
 			{
 				$this->append("sqlerror", $php_errormsg);
 			}
-			$json = json_encode($this->output);
+			$json = Zend_Json::encode($this->output);
 			//comment filtering is tricky in certain cases...
 			//$json = json_comment_filter($json);
 			echo $json;
@@ -117,7 +119,7 @@ class textareaOutput extends jsonOutput {
 			{
 				$this->append("sqlerror", $php_errormsg);
 			}
-			echo "<textarea>" . json_encode($this->output) . "</textarea>";
+			echo "<textarea>" . Zend_Json::encode($this->output) . "</textarea>";
 		}
 	}
 }

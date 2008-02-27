@@ -66,7 +66,10 @@
 					continue;
 				}
 				//decode object fields
-				if($key == "permissions" || $key == "groups") $val = json_decode($val);
+				if($key == "permissions" || $key == "groups"){
+					import("lib.Json.Json");
+					$val = Zend_Json::decode($val);
+				}
 				if($key == "password") {
 					$user->set_password($val);
 					continue;

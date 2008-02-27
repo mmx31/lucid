@@ -121,6 +121,7 @@
 	{
 		$out = new jsonOutput();
 		import("models.app");
+		import("lib.Json.Json");
 		$App->truncate();
 		$out->append("Establishing connection to database...", "...done");
 		require("../backend/lib.xml.php");
@@ -142,7 +143,7 @@
 				$app->version = $in[version];
 				$app->maturity = $in[maturity];
 				$app->category = $in[category];
-				$app->filetypes = json_decode($in['filetypes']);
+				$app->filetypes = Zend_Json::decode($in['filetypes']);
 				$installfile = $in[installFile];
 				$message = $in[installMessage];
 				$message2 = $in[installedMessage];
