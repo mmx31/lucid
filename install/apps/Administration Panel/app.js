@@ -35,14 +35,6 @@ this.init = function(args)
 						       iconClass: "icon-16-mimetypes-x-office-spreadsheet",
 						       onClick: dojo.hitch(this, this.pages.registry)});
 			menu.addChild(item);
-			var item = new dijit.MenuItem({label: "Crosstalk",
-						       iconClass: "icon-16-devices-network-wired",
-						       onClick: dojo.hitch(this, this.pages.crosstalk)});
-			menu.addChild(item);
-			var item = new dijit.MenuItem({label: "Filesystem",
-						       iconClass: "icon-16-devices-drive-harddisk",
-						       onClick: dojo.hitch(this, this.pages.filesystem)});
-			menu.addChild(item);
 		pane.setContent(menu.domNode);
 	split.addChild(pane);
 	var layout = new dijit.layout.LayoutContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
@@ -129,12 +121,4 @@ this.pages = {
 		this.toolbar.destroyDescendants();
 		this.main.setContent("This is the registry page");
 	},
-	crosstalk: function() {
-		this.toolbar.destroyDescendants();
-		this.main.setContent("This is the crosstalk page");
-	},
-	filesystem: function() {
-		this.toolbar.destroyDescendants();
-		this.main.setContent("This is the filesystem page");
-	}
 }
