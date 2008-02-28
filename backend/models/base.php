@@ -315,7 +315,8 @@
 			{ $dec = $parent->$key;
 				if($dec["type"] == "array") {
 					import("lib.Json.Json");
-					$value = Zend_Json::decode($value);
+					if(is_null($value)) $value = array();
+					else $value = Zend_Json::decode($value);
 				}
 				$p->$key = $value;
 			}
