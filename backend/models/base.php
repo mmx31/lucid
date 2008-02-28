@@ -39,11 +39,12 @@
 				$return = $p->get($this->$var) or null;
 			}
 			elseif($type == "array") {
-				if(!is_array($this->$var)) $val = json_decode($this->$var, true);
-				if(is_array($val)) $return = $val or null;
+				import("lib.Json.Json");
+				if(!is_array($this->$var)) $val = Zend_Json::decode($this->$var);
+				if(is_array($val)) $return = $val;
 			}
 			else {
-				$return = $this->$var or null;
+				$return = $this->$var;
 			}
 			if(is_null($return)) {
 				$return = $parent->$var['default'] or ($type == "array" ? array() : null);
@@ -155,7 +156,8 @@
 					$return = $p->get($this->$var['id']) or null;
 				}
 				elseif($type == "array") {
-					if(!is_array($this->$var)) $val = json_decode($this->$var, true);
+					import("lib.Json.Json");
+					if(!is_array($this->$var)) $val = Zend_Json::decode($this->$var);
 					if(is_array($val)) $return = $val or null;
 				}
 				else {
@@ -196,7 +198,8 @@
 					else {
 						if($info['type'] == "array") {
 							if(is_null($value)) $value = array();
-							$value = json_encode($value);
+							import("lib.Json.Json");
+							$value = Zend_Json::encode($value);
 						}
 						
 						if($info['type'] == "foreignkey") {
@@ -311,7 +314,8 @@
 			foreach ($line as $key => $value)
 			{ $dec = $parent->$key;
 				if($dec["type"] == "array") {
-					$value = json_decode($value, true);
+					import("lib.Json.Json");
+					$value = Zend_Json::decode($value);
 				}
 				$p->$key = $value;
 			}
@@ -343,7 +347,8 @@
 					}
 				}
 			}
-			return json_encode($list);
+			import("lib.Json.Json");
+			return Zend_Json::encode($list);
 		}
 		function delete()
 		{
@@ -370,7 +375,6 @@
 					}
 					if($v['type'] == "array") {
 						$v['type'] = "text";
-						//$v['default'] = $v['default'] ? json_encode($v['default']) : "[]";
 					}
 					$list[$key] = $v;
 				}

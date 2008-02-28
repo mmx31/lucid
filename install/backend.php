@@ -143,7 +143,7 @@
 				$app->version = $in[version];
 				$app->maturity = $in[maturity];
 				$app->category = $in[category];
-				$app->filetypes = Zend_Json::decode($in['filetypes']);
+				$app->filetypes = Zend_Json::decode($in['filetypes'] ? $in['filetypes'] : "[]");
 				$installfile = $in[installFile];
 				$message = $in[installMessage];
 				$message2 = $in[installedMessage];
