@@ -28,30 +28,17 @@ dojo.declare("api.sound", dijit._Widget, {
 				});
 			}
 		})
-	},
-	getId3: function() {
-		return this.backend.getId3();
-	},
-	setVolume: function(val) {
-		return this.volume.setVolume(val);
-	},
-	getVolume: function(val) {
-		return this.backend.getVolume();
-	},
-	play: function() {
-		return this.backend.play();
-	},
-	getPosition: function() {
-		return this.backend.getPosition();
-	},
-	getDuration: function() {
-		return this.backend.getDuration();
-	},
-	pause: function() {
-		return this.backend.pause();
-	},
-	stop: function() {
-		return this.backend.stop();
+		
+		dojo.forEach([
+			"id3",
+			"volume",
+			"play",
+			"pause",
+			"stop",
+			"position"
+		], function(i) {
+			this[i] = dojo.hitch(this.backend, i);
+		})
 	},
 	uninitialize: function() {
 		this.backend.uninitialize();
@@ -80,16 +67,13 @@ dojo.declare("api.sound._backend", null, {
 		this.loop = args.loop || false;
 		this.autoStart = args.autoStart || false;
 		this.startup();
-		if(this.autoStart) this.play();
 	},
 	play: function() {},
 	pause: function() {},
 	stop: function() {},
 	uninitialize: function() {},
-	getVolume: function() {},
-	setVolume: function() {},
-	getPosition: function() {},
-	setPosition: function() {},
+	volume: function() {},
+	position: function() {},
 	getDuration: function() {},
 	testCompat: function() {
 		//test for compatiblility
@@ -104,41 +88,81 @@ dojo.declare("api.sound.html", api.sound._backend, {
 	},
 	startup: function() {
 		this.htmlSound = new Audio(this.src);
+		if(this.autoStart) this.htmlSound.autoPlay = true;
 	},
 	play: function() {
 		this.htmlSound.play();
+	},
+	pause: function() {
+		this.htmlSound.pause();
+	},
+	stop: function() {
+		this.htmlSound.stop();
+	},
+	position: function(v) {
+		if(v) this.htmlSound.currentTime = v;
+		return this.htmlSound.currentTime;
+	},
+	duration: function() {
+		return this.htmlSound.duration;
+	},
+	volume: function(l) {
+		if(l) this.htmlSound.volume = l;
+		return this.htmlSound.volume;
 	}
 });
 	
 dojo.declare("api.sound.flash", api.sound._backend, {
 	_startPos: 0,
-	flReady: false,
+	id: 0,
 	play: function() {
-		if(this.flReady) return this.flSound.getDuration();
+		this.flSound.callFunction(this.id, "start", [this._startPos]);
 	},
 	pause: function() {
-		this.flSound.stop();
-		this._startPos = this.getPosition() / 1000;
+		this.flSound.callFunction(this.id, "stop");
+		this._startPos = this.position() / 1000;
 	},
 	stop: function() {
 		this._startPos = 0;
-		this.flSound.stop();
+		this.flSound.callFunction(this.id, "stop");
 	},
-	getPosition: function() {
-		return this.flSound.getPosition();
+	position: function(v) {
+		if(v) this.flSound.setValue(this.id, "position", v);
+		else {
+			var ret;
+			this.flSound.getValue(this.id, "position", function(a) {
+				ret = a;
+			})
+			return ret;
+		}
 	},
-	getDuration: function() {
-		if(this.flReady) return this.flSound.getDuration();
+	duration: function(v) {
+		if(v) this.flSound.setValue(this.id, "duration", v);
+		else {
+			var ret;
+			this.flSound.getValue(this.id, "duration", function(a) {
+				ret = a;
+			})
+			return ret;
+		}
 	},
-	
-	getId3: function() {
-		if(this.flReady) return this.flSound.getId3();
+	id3: function() {
+		var ret;
+		this.flSound.getValue(this.id, "id3", function(a) {
+			ret = a;
+		});
+		return ret;
 	},
-	setVolume: function(val) {
-		if(this.flReady) return this.flSound.setVolume(val);
-	},
-	getVolume: function(val) {
-		if(this.flReady) return this.flSound.getVolume(val);
+	volume: function(val) {
+		if(val) 
+			this.flSound.setValue(this.id, "volume", val);
+		else {
+			var ret;
+			this.flSound.getValue(this.id, "volume", function(getVal){
+				ret = getVal;
+			});
+			return ret;
+		}
 	},
 	checkCompat: function() {
 		
