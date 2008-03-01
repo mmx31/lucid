@@ -1,20 +1,21 @@
 class objManager {
 	var objects = new Object();
+	public static function main():Void
+	{
+	}
 	function objManager(){
 		DojoExternalInterface.initialize();
 
 		DojoExternalInterface.addCallback("makeObj", this, this.makeObj);
 		DojoExternalInterface.addCallback("getValue", this, this.getValue);
 		DojoExternalInterface.addCallback("setValue", this, this.setValue);
-		DojoExternalInterface.addCallback("attachEvent", this, this.attachEvent;
+		DojoExternalInterface.addCallback("attachEvent", this, this.attachEvent);
 		DojoExternalInterface.addCallback("callFunction", this, this.callFunction);
 			
 		DojoExternalInterface.loaded();
 	}
 	function makeObj(id, objectType, args) {
-		var json = new JSON();
-		var obj = null;
-		args = json.parse(args);
+		args = this.parse(args);
 		if(args.length == 1)
 			var obj = new (eval(objectType))();
 		else if(args.length == 2)
@@ -45,46 +46,21 @@ class objManager {
 	function attachEvent(id, method, callback) {
 		var evtClass = new Object();
 		evtClass[method] = function() {
-			var json = new JSON();
-			DojoExternalInterface.call(callback, null, json.stringify(arguments));
+			DojoExternalInterface.call(callback, null, this.stringify(arguments));
 		}
 		this.objects[id].addListener(evtClass);
 	}
 	function getValue(id, key, callback) {
-		DojoExternalInterface.call(callback, null, json.stringify(this.objects[id][key]));
+		DojoExternalInterface.call(callback, null, this.stringify(this.objects[id][key]));
 	}
 	function setValue(id, key, value) {
-		this.objects[id][key] = json.parse(value);
+		this.objects[id][key] = this.parse(value);
 	}
 	function callFunction(id, method, args, callback) {
-		var json = new JSON();
-		var p = this.objects[id][method].apply(this.objects[id], json.parse(args));
-		if(callback) DojoExternalInterface.call(callback, null, json.stringify(p));
+		var p = this.objects[id][method].apply(this.objects[id], this.parse(args));
+		if(callback) DojoExternalInterface.call(callback, null, this.stringify(p));
 	}
-}
-//The notice below only applies to the JSON class...
-/*
-Copyright (c) 2005 JSON.org
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The Software shall be used for Good, not Evil.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-class JSON {
-            var ch:String = '';
+	            var ch:String = '';
             var at:Number = 0;
             var t,u;
             var text:String;
@@ -409,3 +385,24 @@ class JSON {
         return value();
     }
 }
+//The notice below only applies to the JSON functions...
+/*
+Copyright (c) 2005 JSON.org
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The Software shall be used for Good, not Evil.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
