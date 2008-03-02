@@ -2,6 +2,7 @@ class objManager {
 	var objects = new Object();
 	public static function main():Void
 	{
+		var p = new objManager();
 	}
 	function objManager(){
 		DojoExternalInterface.initialize();

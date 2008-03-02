@@ -166,17 +166,11 @@ dojo.declare("api.sound.flash", api.sound._backend, {
 		}
 	},
 	checkCompat: function() {
-		dojo.require("dojox.flash");
-		return dojo.flash.info.commVersion != -1;
+		return dojox.flash.info.commVersion != -1;
 	},
 	startup: function() {
-		dojo.require("dojox.flash");
-		var basepath = "./api/flash/objman";
-		dojox.flash.setSwf({flash6: basepath+"_version6.swf", flash8: basepath+"_version8.swf", visible: false});
-		this.loadEvt = dojo.connect(dojox.flash, "loaded", this, function() {
-			dojox.flash.comm.makeObj(this.id, "sound");
-			//dojox.flash.comm.attachEvent(this.id, "onLoad");
-		});
+		dojox.flash.comm.makeObj(this.id, "sound");
+		//dojox.flash.comm.attachEvent(this.id, "onLoad");
 	}
 });
 	
