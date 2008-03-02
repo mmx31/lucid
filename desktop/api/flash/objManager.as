@@ -1,21 +1,21 @@
-class objManager {
-	var objects = new Object();
-	public static function main():Void
-	{
-		var p = new objManager();
-	}
-	function objManager(){
-		DojoExternalInterface.initialize();
+import DojoExternalInterface;
 
-		DojoExternalInterface.addCallback("makeObj", this, this.makeObj);
-		DojoExternalInterface.addCallback("getValue", this, this.getValue);
-		DojoExternalInterface.addCallback("setValue", this, this.setValue);
-		DojoExternalInterface.addCallback("attachEvent", this, this.attachEvent);
-		DojoExternalInterface.addCallback("callFunction", this, this.callFunction);
-			
+class objManager {
+	public var objects = new Object();
+	public function objManager(){
+		DojoExternalInterface.initialize();
+		DojoExternalInterface.addCallback("makeObj", this, makeObj);
+		DojoExternalInterface.addCallback("getValue", this, getValue);
+		DojoExternalInterface.addCallback("setValue", this, setValue);
+		DojoExternalInterface.addCallback("attachEvent", this, attachEvent);
+		DojoExternalInterface.addCallback("callFunction", this, callFunction);
 		DojoExternalInterface.loaded();
+		//getURL("javascript:console.debug('DojoExternalInterface: "+DojoExternalInterface+"')");
+		//for(var p in DojoExternalInterface) {
+		//	getURL("javascript:console.debug('DojoExternalInterface."+p+" = "+DojoExternalInterface[p]+"')");
+		//}
 	}
-	function makeObj(id, objectType, args) {
+	public function makeObj(id, objectType, args) {
 		args = this.parse(args);
 		if(args.length == 1)
 			var obj = new (eval(objectType))();
@@ -44,20 +44,20 @@ class objManager {
 			
 		if(obj) this.objects[id] = obj;		
 	}
-	function attachEvent(id, method, callback) {
+	public function attachEvent(id, method, callback) {
 		var evtClass = new Object();
 		evtClass[method] = function() {
 			DojoExternalInterface.call(callback, null, this.stringify(arguments));
 		}
 		this.objects[id].addListener(evtClass);
 	}
-	function getValue(id, key, callback) {
+	public function getValue(id, key, callback) {
 		DojoExternalInterface.call(callback, null, this.stringify(this.objects[id][key]));
 	}
-	function setValue(id, key, value) {
+	public function setValue(id, key, value) {
 		this.objects[id][key] = this.parse(value);
 	}
-	function callFunction(id, method, args, callback) {
+	public function callFunction(id, method, args, callback) {
 		var p = this.objects[id][method].apply(this.objects[id], this.parse(args));
 		if(callback) DojoExternalInterface.call(callback, null, this.stringify(p));
 	}
@@ -66,7 +66,7 @@ class objManager {
             var t,u;
             var text:String;
 
-    function stringify(arg):String {
+    public function stringify(arg):String {
 
         var c, i, l, s = '', v;
 
@@ -379,12 +379,16 @@ class objManager {
                     return ch >= '0' && ch <= '9' ? this.num() : this.word();
             }
         }
-    function parse(_text:String):Object {
+    public function parse(_text:String):Object {
         text = _text;
             at = 0;
         ch = ' ';
         return value();
     }
+	public static function main():Void
+	{
+		_root.app = new objManager();
+	}
 }
 //The notice below only applies to the JSON functions...
 /*
