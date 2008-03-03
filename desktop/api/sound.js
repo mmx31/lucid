@@ -19,7 +19,7 @@ dojo.declare("api.sound", dijit._Widget, {
 		this.domNode.style.top="-999px";
 		document.body.appendChild(this.domNode);
 		
-		dojo.forEach(["html", "flash", "embed"], function(i) {
+		dojo.forEach(["html", /*"flash",*/ "embed"], function(i) {
 			if(api.sound[i].prototype.testCompat() === true) {
 				this.backend = new api.sound[i]({
 					id: this.id,
