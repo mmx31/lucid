@@ -1,17 +1,49 @@
 /* 
- * Group: api
+ * Class: api.sound
  * 
- * Package: sound
- * 
- * Summary:
- * 		An API that allows an app to play audio content.
+ * An API that allows an app to play audio content.
+ * Abstracts between HTML5 audio tags, flash-based audio, and embed tags
  */
 dojo.require("dijit._Widget");
 dojo.provide("api.sound");
 dojo.declare("api.sound", dijit._Widget, {
+	/*
+	 * Property: src
+	 * 
+	 * The path to the sound file to play. (not on the filesystem, just a URL)
+	 */
 	src: "",
+	/*
+	 * Property: loop
+	 * 
+	 * Should the sound loop?
+	 */
 	loop: false,
+	/*
+	 * Property: autoStart
+	 * 
+	 * Should the sound start playing once it's loaded?
+	 */
 	autoStart: false,
+	/*
+	 * Property: capabilities
+	 * 
+	 * What can the current backend do/have access to?
+	 */
+	capabilities: {
+		play: true,
+		pause: true,
+		stop: true,
+		duration: true,
+		position: true,
+		volume: true,
+		id3: true
+	},
+	/*
+	 * Property: backend
+	 * 
+	 * The current backend being used. Meant to be used internally
+	 */
 	backend: null,
 	postCreate: function() {
 		this.domNode.style.position="absolute";
@@ -47,17 +79,95 @@ dojo.declare("api.sound", dijit._Widget, {
 			this[i] = dojo.hitch(this.backend, i);
 		}, this)
 	},
+	/*
+	 * Method: play
+	 * 
+	 * Play the sound
+	 */
+	play: function() {},
+	/*
+	 * Method: pause
+	 * 
+	 * Pause the sound
+	 */
+	pause: function() {},
+	/*
+	 * Method: stop
+	 * 
+	 * Stop the sound
+	 */
+	stop: function() {},
+	/*
+	 * Method: volume
+	 * Set or get the volume
+	 * 
+	 * Arguments:
+	 * 		volume - the new volume (1 being the highest, 0 being the lowest)
+	 * 		
+	 * 		When the volume argument is skipped, it will return the current volume
+	 */
+	volume: function(/*Integer?*/volume) {},
+	/*
+	 * Method: position
+	 * Set or get the position
+	 * 
+	 * Arguments:
+	 * 		position - the new position (in miliseconds)
+	 * 		
+	 * 		When the position argument is skipped, it will return the current position
+	 */
+	position: function(/*Integer?*/position) {},
+	/*
+	 * Method: duration
+	 * Returns the duration of the file (in miliseconds)
+	 */
+	duration: function() {},
+	/*
+	 * Method: id3
+	 * Returns id3 information
+	 */
+	id3: function() {},
 	uninitialize: function() {
 		this.backend.uninitialize();
 		document.body.removeChild(this.domNode);
 	}
 });
 
+/*
+ * Class: api.sound._backend
+ * 
+ * The base sound backend class
+ */
 dojo.declare("api.sound._backend", null, {
+	/*
+	 * Property: domNode
+	 * 
+	 * A domNode that things like embed elements can be added to
+	 */
 	domNode: null,
+	/*
+	 * Property: src
+	 * 
+	 * The path to the sound file to play. (not on the filesystem, just a URL)
+	 */
 	src: "",
+	/*
+	 * Property: loop
+	 * 
+	 * Should the sound loop?
+	 */
 	loop: false,
+	/*
+	 * Property: autoStart
+	 * 
+	 * Should the sound start playing once it's loaded?
+	 */
 	autoStart: false,
+	/*
+	 * Property: capabilities
+	 * 
+	 * What can this backend do/have access to?
+	 */
 	capabilities: {
 		play: true,
 		pause: true,
@@ -67,28 +177,92 @@ dojo.declare("api.sound._backend", null, {
 		volume: true,
 		id3: true
 	},
+	/*
+	 * Method: startup
+	 * 
+	 * do startup tasks here such as embedding an applet
+	 */
 	startup: function() {
-		//do startup tasks here such as embedding an applet
 	},
 	constructor: function(args) {
 		this.src = args.src;
 		this.loop = args.loop || false;
 		this.autoStart = args.autoStart || false;
 	},
+	/*
+	 * Method: play
+	 * 
+	 * Play the sound
+	 */
 	play: function() {},
+	/*
+	 * Method: pause
+	 * 
+	 * Pause the sound
+	 */
 	pause: function() {},
+	/*
+	 * Method: stop
+	 * 
+	 * Stop the sound
+	 */
 	stop: function() {},
+	/*
+	 * Method: uninitailize
+	 * 
+	 * cleanup for when the class is destroyed
+	 */
 	uninitialize: function() {},
-	volume: function() {},
-	position: function() {},
+	/*
+	 * Method: volume
+	 * Set or get the volume
+	 * 
+	 * Arguments:
+	 * 		volume - the new volume (1 being the highest, 0 being the lowest)
+	 * 		
+	 * 		When the volume argument is skipped, it will return the current volume
+	 */
+	volume: function(/*Integer?*/volume) {},
+	/*
+	 * Method: position
+	 * Set or get the position
+	 * 
+	 * Arguments:
+	 * 		position - the new position (in miliseconds)
+	 * 		
+	 * 		When the position argument is skipped, it will return the current position
+	 */
+	position: function(/*Integer?*/position) {},
+	/*
+	 * Method: duration
+	 * Returns the duration of the file (in miliseconds)
+	 */
 	duration: function() {},
+	/*
+	 * Method: id3
+	 * Returns id3 information
+	 */
 	id3: function() {},
+	/*
+	 * Method: testCompat
+	 * 
+	 * test for compatiblility
+	 * Returns:
+	 * 		true - the backend is compatible with the environment (and will work)
+	 * 		false - the backend is incompatible with the environment (and will not work)
+	 */
 	testCompat: function() {
-		//test for compatiblility
 		return true;
 	}
 });
 	
+/*
+ * Class: api.sound.html
+ * 
+ * Sound backend for the HTML5 audio tag
+ * 
+ * See: <api.sound._backend>
+ */
 dojo.declare("api.sound.html", api.sound._backend, {
 	htmlSound: null,
 	testCompat: function() {
@@ -120,6 +294,13 @@ dojo.declare("api.sound.html", api.sound._backend, {
 	}
 });
 	
+/*
+ * Class: api.sound.flash
+ * 
+ * Sound backend for a flash player
+ * 
+ * See: <api.sound._backend>
+ */
 dojo.declare("api.sound.flash", api.sound._backend, {
 	_startPos: 0,
 	id: 0,
@@ -181,6 +362,13 @@ dojo.declare("api.sound.flash", api.sound._backend, {
 	}
 });
 	
+/*
+ * Class: api.sound.html
+ * 
+ * Sound backend for embed tags
+ * 
+ * See: <api.sound._backend>
+ */
 dojo.declare("api.sound.embed", api.sound._backend, {
 	capabilities: {
 		play: true,
