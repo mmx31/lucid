@@ -1828,6 +1828,11 @@ dojo.declare("desktop.ui.applets.menu", desktop.ui.applet, {
  */
 dojo.declare("desktop.ui.applets.menubar", desktop.ui.applets.menu, {
 	dispName: "Menu Bar",
+	/*
+	 * Method: _makeSystemMenu
+	 * 
+	 * Makes the system menu
+	 */
 	_makeSystemMenu: function() {
 		var m = new dijit.Menu();
 		dojo.forEach([
@@ -1857,6 +1862,11 @@ dojo.declare("desktop.ui.applets.menubar", desktop.ui.applets.menu, {
 		], m.addChild, m);
 		return m;
 	},
+	/*
+	 * Method: _makePlacesMenu
+	 * 
+	 * Makes the places menu
+	 */
 	_makePlacesMenu: function() {
 		var m = new dijit.Menu();
 		dojo.forEach([
@@ -1877,6 +1887,11 @@ dojo.declare("desktop.ui.applets.menubar", desktop.ui.applets.menu, {
 		], m.addChild, m);
 		return m;
 	},
+	/*
+	 * Method: _drawButton
+	 * 
+	 * Draws the button for the applet
+	 */
 	_drawButton: function() {
 		dojo.require("dijit.Toolbar");
 		dojo.require("dijit.form.Button");
