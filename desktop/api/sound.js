@@ -18,28 +18,34 @@ dojo.declare("api.sound", dijit._Widget, {
 		this.domNode.style.left="-999px";
 		this.domNode.style.top="-999px";
 		document.body.appendChild(this.domNode);
-		
-		dojo.forEach(["html", /*"flash",*/ "embed"], function(i) {
-			if(api.sound[i].prototype.testCompat() === true) {
-				this.backend = new api.sound[i]({
-					id: this.id,
-					src: this.src,
-					loop: this.loop,
-					autoStart: this.autoStart
-				});
+		var backends = ["html", /*"flash",*/ "embed"];
+		for(k in backends) {
+			var i = backends[k];
+			var backend = new api.sound[i]({
+				id: this.id,
+				src: this.src,
+				loop: this.loop,
+				autoStart: this.autoStart
+			});
+			if(backend.testCompat() === true) {
+				this.backend = backend;
+				this.capabilities = backend.capabilities;
+				backend.domNode = this.domNode;
+				this.backend.startup();
+				break;
 			}
-		})
-		
+		}
 		dojo.forEach([
 			"id3",
 			"volume",
 			"play",
 			"pause",
 			"stop",
-			"position"
+			"position",
+			"duration"
 		], function(i) {
 			this[i] = dojo.hitch(this.backend, i);
-		})
+		}, this)
 	},
 	uninitialize: function() {
 		this.backend.uninitialize();
@@ -48,6 +54,7 @@ dojo.declare("api.sound", dijit._Widget, {
 });
 
 dojo.declare("api.sound._backend", null, {
+	domNode: null,
 	src: "",
 	loop: false,
 	autoStart: false,
@@ -67,7 +74,6 @@ dojo.declare("api.sound._backend", null, {
 		this.src = args.src;
 		this.loop = args.loop || false;
 		this.autoStart = args.autoStart || false;
-		this.startup();
 	},
 	play: function() {},
 	pause: function() {},
@@ -75,7 +81,8 @@ dojo.declare("api.sound._backend", null, {
 	uninitialize: function() {},
 	volume: function() {},
 	position: function() {},
-	getDuration: function() {},
+	duration: function() {},
+	id3: function() {},
 	testCompat: function() {
 		//test for compatiblility
 		return true;
@@ -85,7 +92,7 @@ dojo.declare("api.sound._backend", null, {
 dojo.declare("api.sound.html", api.sound._backend, {
 	htmlSound: null,
 	testCompat: function() {
-		return typeof Audio != "undefined";
+			return typeof Audio != "undefined";
 	},
 	startup: function() {
 		this.htmlSound = new Audio(this.src);
