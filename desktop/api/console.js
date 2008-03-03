@@ -9,9 +9,37 @@ dojo.provide("api.console");
  */
 dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained], {
 	templateString: "<div class=\"console\" dojoAttachEvent=\"onclick:focus\"><div class='consoleoutput' dojoAttachEvent=\"onclick:focus\" dojoAttachPoint=\"stdout\"></div><form dojoAttachEvent=\"onsubmit:execute, onkeydown:key\"><b><span class='consolepath' dojoAttachPoint=\"_path\">~</span>$&nbsp;</b><input type='text' class='consoleinput' dojoAttachPoint=\"_input\" /></form></div>",
+	/*
+	 * Property: path
+	 * 
+	 * The full path that the console is at (can be set at creation, but cannot be changed after)
+	 */
 	path: "/",
+	/*
+	 * Property: history
+	 * 
+	 * The command history
+	 */
 	history: [" "],
+	/*
+	 * Property: hist
+	 * 
+	 * internal variable used for history browsing
+	 */
 	hist: 1,
+	/*
+	 * Property: aliases
+	 * 
+	 * A JSON object with command aliases. You can add a method to this and it will be a command
+	 * Each command is passed a 'params' string which is anything that comes after the command.
+	 * Your command must parse the arguments it's passed.
+	 * 
+	 * Example:
+	 * 		> myConsole.aliases.foo = function(params) {
+	 * 		> 	if(params == "bar") this.stdout.innerHTML += "baz!";
+	 * 		> 	else this.stdout.innerHTML += "bar!";
+	 * 		> }
+	 */
 	aliases: {
 		clear: function(params)
 		{
@@ -134,20 +162,37 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 				this.stdout.innerHTML +="cat: need a file!<br />";
 			}
 			else {
-			api.fs.read({path: this.path + params, callback: dojo.hitch(this, function(array)
-			{
-				this.stdout.innerHTML += array[0].contents.replace("\n", "<br />")+"<br />";
-			})});
+				api.fs.read({path: this.path + params, callback: dojo.hitch(this, function(array)
+				{
+					this.stdout.innerHTML += array[0].contents.replace("\n", "<br />")+"<br />";
+				})});
+			}
 		}
-	} },
+	},
+	/*
+	 * Method: focus
+	 * 
+	 * Focuses the widget
+	 */
 	focus: function() {
 		this._input.focus();
 	},
+	/*
+	 * Method: getPath
+	 * 
+	 * Updates the path displayed, and returns the current path
+	 */
 	getPath: function()
 	{
 		this._path.innerHTML = this.path+"$";
 		return this.path;
 	},
+	/*
+	 * Method: key
+	 * 
+	 * Event handler
+	 * Processes key presses, such as the up and down arrows for browsing history
+	 */
 	key: function(e)
 	{
 		if(e.keyCode == "38") //up arrow
@@ -178,6 +223,12 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 			}
 		}
 	},
+	/*
+	 * Method: execute
+	 * 
+	 * Event handler
+	 * Called when the user presses the enter/return key
+	 */
 	execute: function(e)
 	{
 		dojo.stopEvent(e);
@@ -218,6 +269,12 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 	}
 });
 
+/*
+ * Class: api
+ * Method: log
+ * 
+ * logs a string onto any console that is open
+ */
 api.log = function(str) {
 	str = dojo.toJson(str);
 	dojo.query(".consoleoutput").forEach(function(elem) {
