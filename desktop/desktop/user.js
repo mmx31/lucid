@@ -64,7 +64,7 @@ desktop.user = new function() {
 	 *      >       email: string //the user's new email. Stays the same when not provided.
 	 *      >       permissions: array //the user's new permissions. Stays the same when not provided.
 	 *      >       groups: array //the user's new groups. Stays the same when not provided.
-	 *      >	callback: function //a callback function. Not required.
+	 *      >		callback: function //a callback function. Not required.
 	 *      > }
 	 */
 	this.set = function(/*Object*/op) {
@@ -85,6 +85,7 @@ desktop.user = new function() {
 	 *
 	 * Arguments:
 	 * 	sync - should the logout call be synchronous? defaults to false.
+	 */
 	this.logout = function(/*Boolean?*/sync)
 	{
 		if(desktop.reload) { return false; }
