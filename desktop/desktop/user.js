@@ -1,3 +1,8 @@
+/*
+ * Class: desktop.user
+ *
+ * functions that can be used to do user-related tasks
+ */
 desktop.user = new function() {
 	this.init = function() {
 		this.beforeUnloadEvent = dojo.addOnUnload(function(e)
@@ -5,7 +10,31 @@ desktop.user = new function() {
 			desktop.user.logout(true);
 		});
 	}
-	this.get = function(options) {
+	/*
+	 * Method: get
+	 *
+	 * Gets the information of a certain user
+	 *
+	 * Arguments:
+	 * 	options - an object
+	 *
+	 * Note:
+	 * 	The options argument has two keys; id and callback.
+	 * 	callback - a callback function
+	 * 	id - the id of the user to get. If this is not provided then the current user's information will be fetched.
+	 *
+	 * 	The callback function gets passed an object with the following info
+	 * 	> {
+	 * 	>	id: integer //the user's id
+	 * 	>	name: string //the user's name
+	 * 	>	username: string //the user's username
+	 * 	>	email: string //the user's email
+	 * 	>	permissions: array //the user's permissions
+	 * 	>	groups: array //the user's groups
+	 * 	>	lastAuth: string //a timestamp from when the user last logged in
+	 * 	> }
+	 */
+	this.get = function(/*Object*/options) {
 		if(!options.id) { options.id = "0"; }
 		api.xhr({
 	        backend: "core.user.info.get",
