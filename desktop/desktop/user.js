@@ -47,7 +47,27 @@ desktop.user = new function() {
 			}
         });
 	}
-	this.set = function(op) {
+	/*
+	 * Method: set
+	 *
+	 * changes a user's information
+	 *
+	 * Arguments:
+	 * 	op - an object with some arguments. See notes
+	 *
+	 * Notes:
+	 * 	The op argument can have the following keys.
+	 *      > {
+	 *      >       id: integer //the user's id. If excluded, the current user will be used
+	 *      >       name: string //the user's new name. Stays the same when not provided.
+	 *      >       username: string //the user's username. Cannot change if you're not the admin. Stays the same when not provided.
+	 *      >       email: string //the user's new email. Stays the same when not provided.
+	 *      >       permissions: array //the user's new permissions. Stays the same when not provided.
+	 *      >       groups: array //the user's new groups. Stays the same when not provided.
+	 *      >	callback: function //a callback function. Not required.
+	 *      > }
+	 */
+	this.set = function(/*Object*/op) {
 		var callback = op.callback || false;
 		delete op.callback;
 		api.xhr({
@@ -58,7 +78,14 @@ desktop.user = new function() {
 			}
 		})		
 	}
-	this.logout = function(sync)
+	/*
+	 * Method: logout
+	 *
+	 * logs a user out
+	 *
+	 * Arguments:
+	 * 	sync - should the logout call be synchronous? defaults to false.
+	this.logout = function(/*Boolean?*/sync)
 	{
 		if(desktop.reload) { return false; }
 		if(typeof sync == "undefined") sync=false;
