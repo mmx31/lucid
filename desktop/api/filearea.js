@@ -285,7 +285,7 @@ dojo.declare(
 	 * Arguments:
 	 * 		path - the path to the file
 	 */
-	onItem: function(path)
+	onItem: function(/*String*/path)
 	{
 		desktop.app.launchHandler(path);
 	},
@@ -297,7 +297,7 @@ dojo.declare(
 	 * Arguments:
 	 * 		path - the path to the file
 	 */
-	onHighlight: function(path)
+	onHighlight: function(/*String*/path)
 	{
 	},
 	/*
@@ -308,7 +308,7 @@ dojo.declare(
 	 * Arguments:
 	 * 		path - the path to the file
 	 */
-	onPathChange: function(path)
+	onPathChange: function(/*String*/path)
 	{
 	},
 	startup: function()
