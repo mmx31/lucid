@@ -180,7 +180,15 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 				anim.play();
 			} else this.resize();
 	},
-	_getPoints: function(box) {
+	/*
+	 * Method: _getPoints
+	 * 
+	 * Get the points of a box (as if it were on an xy plane)
+	 * 
+	 * Arguments:
+	 * 		box - the box. {x: 24 (x position), y: 25 (y position), w: 533 (width), h: 435 (height)}
+	 */
+	_getPoints: function(/*Object*/box) {
 		return {
 			tl: {x: box.x, y: box.y},
 			tr: {x: box.x+box.w, y: box.y},
@@ -188,6 +196,12 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			br: {x: box.x+box.w, y: box.y+box.h}
 		}
 	},
+	/*
+	 * Method: _onTaskClick
+	 * 
+	 * Called when the task button on a panel is clicked on
+	 * Minimizes/restores the window
+	 */
 	_onTaskClick: function()
 	{
 		var s = this.domNode.style.display;
@@ -201,6 +215,11 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			if(!this.bringToFront()) this.minimize();
 		}
 	},
+	/*
+	 * Method: _toggleMaximize
+	 * 
+	 * Toggles the window being maximized
+	 */
 	_toggleMaximize: function() {
 		if(this.maximized == true) this.unmaximize();
 		else this.maximize();
@@ -351,6 +370,12 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			this.resize();
 		}
 	},
+	/*
+	 * Method: _showBorders
+	 * 
+	 * Show the borders of the window
+	 * Used when unmaximizing the window
+	 */
 	_showBorders: function() {
 		dojo.forEach([
 			"win-tr",
@@ -364,6 +389,12 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			dojo.query("."+item+"-hidden", this.domNode).addClass(item).removeClass(item+"-hidden");
 		});
 	},
+	/*
+	 * Method: _hideBorders
+	 * 
+	 * Hide the borders of the window
+	 * Used when maximizing the window
+	 */
 	_hideBorders: function() {
 		dojo.forEach([
 			"win-tr",
@@ -377,6 +408,11 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			dojo.query("."+item, this.domNode).addClass(item+"-hidden").removeClass(item);
 		});
 	},
+	/*
+	 * Method: makeDragger
+	 * 
+	 * internal method to make the window moveable
+	 */
 	makeDragger: function()
 	{
 		if(desktop.config.window.constrain) 
