@@ -10,23 +10,54 @@ dojo.require("dojo.dnd.Source");
 dojo.require("dijit.Menu");
 
 /*
- * Class: filearea
+ * Class: api.filearea
  * 
- * Scope: api
+ * The file area widget
  * 
- * Summary:
- * 		The file area widget
- * 
+ * TODO:
+ * 		The DnD code in this should be completely redone, and shouldn't really use dojo's DnD system
+ * 		Also this whole thing is just a mess. I think I should redo it some time.
  */
 dojo.declare(
 	"api.filearea",
 	[dijit._Widget, dijit._Templated, dijit._Container, dijit._Contained],
 {
+	/*
+	 * Property: path
+	 * 
+	 * The current path. You can set this during creation, but not afterword.
+	 */
 	path: "/",
+	/*
+	 * Property: operation
+	 * 
+	 * I forgot what this does. Oh noes.
+	 */
 	operation: [],
+	/*
+	 * Property: iconStyle
+	 * 
+	 * This doesn't do anything yet.
+	 */
 	iconStyle: "list",
+	/*
+	 * Property: overflow
+	 * 
+	 * What should be done when the area is full. Values are just like in CSS (auto, scroll, none, etc)
+	 */
 	overflow: "scroll",
+	/*
+	 * Property: subdirs
+	 * 
+	 * Can the user navigate through subdirectories?
+	 * if not then they open in new browser windows
+	 */
 	subdirs: true,
+	/*
+	 * Property: forDesktop
+	 * 
+	 * I actually think this doesn't do anything anymore. It used to be set to true so it acted like the one on the desktop.
+	 */
 	forDesktop: false,
 	templateString: "<div class='desktopFileArea' dojoAttachEvent='onclick:_onClick, oncontextmenu:_onRightClick' dojoAttachPoint='focusNode,containerNode' style='overflow-x: hidden; overflow-y: ${overflow};'></div></div>",
 	postCreate: function() {
@@ -63,6 +94,11 @@ dojo.declare(
 			}
 		});
 	},
+	/*
+	 * Method: refresh
+	 * 
+	 * Refreshes the file list
+	 */
 	refresh: function()
 	{
 		this.source.selectAll().deleteSelectedNodes();
@@ -99,30 +135,75 @@ dojo.declare(
 			})
 		});
 	},
+	/*
+	 * Method: _makeFolder
+	 * 
+	 * Makes a folder in the current dir
+	 * 
+	 * TODO:
+	 * 		Alert the user if that dir allready exists
+	 */
 	_makeFolder: function() {
-		api.fs.mkdir({
-			path: this.path+"/New Folder",
-			callback: dojo.hitch(this, this.refresh)
+		api.ui.inputDialog({
+			title: "New Folder",
+			message: "Enter the new folder's name.<br />Be careful, providing an existing name will overwrite that folder.",
+			callback: dojo.hitch(this, function(dirname) {
+				if(dirname == "") return;
+				api.fs.mkdir({
+					path: this.path+"/"+escape(dirname),
+					callback: dojo.hitch(this, this.refresh)
+				});
+			})
 		});
-		//TODO: this should numerate them if it exists allready, for example New Folder 1, New Folder 2, etc.
 	},
+	/*
+	 * Method: _makeFile
+	 * 
+	 * Makes a file in the current dir
+	 * 
+	 * TODO:
+	 * 		Alert the user if that file allready exists
+	 */
 	_makeFile: function() {
-		api.fs.write({
-			path: this.path+"/New File.txt",
-			callback: dojo.hitch(this, this.refresh)
+		api.ui.inputDialog({
+			title: "New File",
+			message: "Enter the new file's name.<br />Be careful, providing an existing name will overwrite that file.",
+			callback: dojo.hitch(this, function(filename) {
+				if(filename == "") return;
+				api.fs.write({
+					path: this.path+"/"+escape(filename),
+					callback: dojo.hitch(this, this.refresh)
+				});
+			})
 		});
-		//TODO: this should numerate them if it exists allready, for example New File 1, New File 2, etc.
 	},
+	/*
+	 * Method: clearSelection
+	 * 
+	 * Clears the current selection
+	 */
 	clearSelection: function()
 	{
 		this.source.selectNone();
 		this.unhighlightChildren();
 	},
+	/*
+	 * Method: unhighlightChildren
+	 * 
+	 * unhilight the widget's children
+	 * 
+	 * TODO: Doesn't the above function do this allready???
+	 */
 	unhighlightChildren: function() {
 		dojo.forEach(this.getChildren(), function(c) {
 			c.unhighlight();
 		});
 	},
+	/*
+	 * Method: up
+	 * 
+	 * Navigates up one directory
+	 */
 	up: function()
 	{
 		if (this.path != "/") {
@@ -134,6 +215,11 @@ dojo.declare(
 			else this.setPath("/"+dirs.join("/")+"/");
 		}
 	},
+	/*
+	 * Method: setPath
+	 * 
+	 * Sets the current path
+	 */
 	setPath: function(path)
 	{
 		if (this.subdirs) {
@@ -143,6 +229,12 @@ dojo.declare(
 		}
 		else desktop.app.launchHandler(path);
 	},
+	/*
+	 * Method: _onClick
+	 * 
+	 * Event handler
+	 * passes click event to the appropriate child widget's event
+	 */
 	_onClick: function(e)
 	{
 		var w = dijit.getEnclosingWidget(e.target);
@@ -162,6 +254,13 @@ dojo.declare(
 			this.clearSelection();
 		}
 	},
+	/*
+	 * Method: _onRightClick
+	 * 
+	 * Event handler
+	 * passes click event to the appropriate child widget
+	 * if a widget wasn't clicked on, we open our own menu
+	 */
 	_onRightClick: function(e)
 	{
 		var w = dijit.getEnclosingWidget(e.target);
@@ -176,19 +275,41 @@ dojo.declare(
 			this.menu._openMyself(e);
 		}
 	},
+	/*
+	 * Method: onItem
+	 * 
+	 * Called when an item is open
+	 * You can overwrite this with your own function.
+	 * Defaults to opening the file
+	 * 
+	 * Arguments:
+	 * 		path - the path to the file
+	 */
 	onItem: function(path)
 	{
-		//this is a hook to use when an item is opened
-		//this defaults to opening the file
 		desktop.app.launchHandler(path);
 	},
+	/*
+	 * Method: onHighlight
+	 * 
+	 * hook for when an icon is highlighted
+	 * 
+	 * Arguments:
+	 * 		path - the path to the file
+	 */
 	onHighlight: function(path)
 	{
-		//hook for highlight
 	},
+	/*
+	 * Method: onPathChange
+	 * 
+	 * Event hook for when the path changes
+	 * 
+	 * Arguments:
+	 * 		path - the path to the file
+	 */
 	onPathChange: function(path)
 	{
-		//this is a hook to use when the path changes.
 	},
 	startup: function()
 	{
@@ -198,18 +319,61 @@ dojo.declare(
 	}
 });
 
+/*
+ * Class: api.filearea._item
+ * 
+ * A file icon that is used in the filearea widget
+ */
 dojo.declare(
 	"api.filearea._item",
 	[dijit._Widget, dijit._Templated, dijit._Contained],
 {
+	/*
+	 * Property: iconClass
+	 * 
+	 * The icon class to use
+	 */
 	iconClass: "",
+	/*
+	 * Property: label
+	 * 
+	 * The label to be shown underneath the icon
+	 */
 	label: "file",
+	/*
+	 * Property: highlighted
+	 * 
+	 * readonly property that is true if the item is highlighted
+	 * 
+	 * Note:
+	 * 		This is actually used for double click handling, not visual highlighting (I know, it's confusing)
+	 */
 	highlighted: false,
+	/*
+	 * Property: isDir
+	 * 
+	 * will be true if this file is a directory
+	 */
 	isDir: false,
+	/*
+	 * Property: textShadow
+	 * 
+	 * Should there be a shadow behind the label?
+	 */
 	textShadow: false,
+	/*
+	 * Property: floatLeft
+	 * 
+	 * Should the files be floating left?
+	 */
 	floatLeft: false,
+	/*
+	 * Property: _timeouts
+	 * 
+	 * An array of setTimeout handles for when the icon is clicked on (to handle double-clicking)
+	 */
 	_timeouts: [],
-	templateString: "<div class='desktopFileItem' style='width: 80px; padding: 10px;' dojoAttachPoint='focusNode'><div class='desktopFileItemIcon ${iconClass}'></div><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px; text-align: center;'><div dojoAttachPoint='textFront' class='desktopFileItemTextFront'>${label}</div><div dojoAttachPoint='textBack' class='desktopFileItemTextBack'>${label}</div></div></div>",
+	templateString: "<div class='desktopFileItem' style='width: 80px; height: 50px; padding: 10px;' dojoAttachPoint='focusNode'><div class='desktopFileItemIcon ${iconClass}'></div><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px; text-align: center;'><div dojoAttachPoint='textFront' class='desktopFileItemTextFront'>${label}</div><div dojoAttachPoint='textBack' class='desktopFileItemTextBack'>${label}</div></div></div>",
 	postCreate: function() {
 		/*if(!this.textShadow)
 		{
@@ -222,22 +386,44 @@ dojo.declare(
 			dojo.addClass(this.domNode, "desktopFileItemInline");
 		}*/
 	},
+	/*
+	 * Method: _delete_file
+	 * 
+	 * Delete the file on the filesystem this instance represents
+	 */
 	_delete_file: function(e)
 	{
 		var parent = this.getParent();
 		if(this.isDir === true) api.fs.rmdir({path: this.path, callback: dojo.hitch(parent, parent.refresh)});
 		else api.fs.rm({path: this.path, callback: dojo.hitch(parent, parent.refresh)});
 	},
+	/*
+	 * Method: _rename_file
+	 * 
+	 * Rename the file on the filesystem this instance represents
+	 */
 	_rename_file: function(e)
 	{
 		this.parent = this.getParent();
 		api.ui.inputDialog({title: "Rename File/Folder", message: "Rename file/folder (currently \""+this.fileName+"\") to:", callback: dojo.hitch(this, function(newv) { api.fs.rename({path: this.path, newname: newv, callback: dojo.hitch(this, function() {this.parent.refresh();})}); })});
 	},
+	/*
+	 * Method: onClick
+	 * 
+	 * Event handler
+	 * called when the icon is double-clicked
+	 */
 	onClick: function()
 	{
 		this.getParent().unhighlightChildren();
 		return this.getParent().onItem(this.path);
 	},
+	/*
+	 * Method: _onIconClick
+	 * 
+	 * Event handler
+	 * called when the icon is clicked on
+	 */
 	_onIconClick: function(e) {
 		if(this.highlighted == false)
 		{
@@ -256,6 +442,11 @@ dojo.declare(
 			this._onOpen();
 		}
 	},
+	/*
+	 * Method: _onOpen
+	 * 
+	 * Called when the file is opened
+	 */
 	_onOpen: function() {
 		if (this.isDir) {
 			this.getParent().setPath(this.path + "/");
@@ -265,6 +456,11 @@ dojo.declare(
 			this.unhighlight();
 		}
 	},
+	/*
+	 * Method: _onTextClick
+	 * 
+	 * Called when the label of the widget is clicked on
+	 */
 	_onTextClick: function(e) {
 		if(this.highlighted == false)
 		{
@@ -276,9 +472,25 @@ dojo.declare(
 			api.log("item renaming started");
 		}
 	},
+	/*
+	 * Method: highlight
+	 * 
+	 * Highlight the icon
+	 * 
+	 * Note:
+	 * 		This is actually used for double click handling, not visual highlighting (I know, it's confusing)
+	 */
 	highlight: function() {
 		this.highlighted = true;
 	},
+	/*
+	 * Method: unhighlight
+	 * 
+	 * Unhighlight the icon
+	 * 
+	 * Note:
+	 * 		This is actually used for double click handling, not visual highlighting (I know, it's confusing)
+	 */
 	unhighlight: function() {
 		this.highlighted = false;
 	},
