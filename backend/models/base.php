@@ -355,6 +355,7 @@
 		{
 			if(is_numeric($this->id))
 			{
+				$this->_connect();
 				$this->cleanup();
 				$this->_query("DELETE FROM " . $this->_link->quoteIdentifier($this->_get_tablename()) . " WHERE ID=" . $this->id . " LIMIT 1");
 			}

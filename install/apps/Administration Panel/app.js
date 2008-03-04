@@ -102,9 +102,11 @@ this.pages = {
 							message: "Are you sure you want to delete "+row.username+" from the system?",
 							callback: dojo.hitch(this, function(a) {
 								if(a == false) return;
-								desktop.admin.users.remove(row[0], function() {
-									grid.model.remove(this.__rowIndex);
-								});
+								desktop.admin.users.remove(row[0], dojo.hitch(this, function() {
+									this._userGrid.selection.clear();
+									this._userGrid.selection.select(this.__rowIndex);
+									this._userGrid.removeSelectedRows();
+								}));
 							})
 						})
 					})
