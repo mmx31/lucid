@@ -51,6 +51,32 @@ api.ui = new function() {
 		this.dialog.show();
 		this.dialog.startup();
 	}
+	this.yesnoDialog = function(object)
+	{
+		//api.ui.yesnoDialog({title: "UI Test", message: "Did you sign your NDA?", callback: api.log});
+		this.dialog = new api.window();
+		this.dialog.title = object.title;	
+		this.dialog.width = "400px";
+		this.dialog.height = "150px";
+		this.details = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
+		all = document.createElement("div");
+		this.blah = new dijit.form.Button({label: "Yes", onClick: dojo.hitch(this, function() { object.callback(true); this.dialog.destroy(); })});
+		this.ablah = new dijit.form.Button({label: "No", onClick: dojo.hitch(this, function() { object.callback(false); this.dialog.destroy(); })});
+		var line = document.createElement("div");
+        var p = document.createElement("span");
+		var q = document.createElement("span");
+		p.innerHTML = "<center>"+object.message+"</center>";
+		line.appendChild(p);
+		all.appendChild(line);
+		all.style.textAlign = "center";
+		all.appendChild(this.blah.domNode);
+		all.appendChild(this.ablah.domNode);
+		this.details.setContent(all);
+		this.dialog.addChild(this.details);
+		this.dialog.showClose = false;
+		this.dialog.show();
+		this.dialog.startup();
+	}
 	this.fileDialog = function(object)
 	{
 		dojo.require("dijit.layout.SplitContainer");

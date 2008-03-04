@@ -97,11 +97,16 @@ this.pages = {
 					label: "Delete",
 					onClick: dojo.hitch(this, function(e) {
 						var row = this._userGrid.model.getRow(this.__rowIndex);
-						//TODO: ask for confirmation
-						//desktop.admin.users.remove(row[0], function() {
-						//	grid.model.remove(this.__rowIndex);
-						//});
-						//commented out because it may not work and I can't test it ATM
+						api.ui.yesnoDialog({
+							title: "User deletion confirmation",
+							message: "Are you sure you want to delete "+row.username+" from the system?",
+							callback: dojo.hitch(this, function(a) {
+								if(a == false) return;
+								desktop.admin.users.remove(row[0], function() {
+									grid.model.remove(this.__rowIndex);
+								});
+							})
+						})
 					})
 				}
 			], function(item) {
