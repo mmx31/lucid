@@ -117,19 +117,14 @@ this.play = function() {
 	}
 }
 this.pause = function() {
-	if(this.sound) {
-		if (this.sound.flReady || !this.sound.flash) {
-			this.is_playing = false;
-			this.sound.pause();
-			dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
-			dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
-			this.ui.play.setLabel("Play");
-			this.ui.play.onClick = dojo.hitch(this, this.play);
-			this.stopTicker();
-		}
-		else {
-			setTimeout(dojo.hitch(this, this.pause), 100);
-		}
+	if(this.sound && this.sound.capabilities.pause) {
+		this.is_playing = false;
+		this.sound.pause();
+		dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
+		dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
+		this.ui.play.setLabel("Play");
+		this.ui.play.onClick = dojo.hitch(this, this.play);
+		this.stopTicker();
 	}
 }
 this.skip = function(value) {
