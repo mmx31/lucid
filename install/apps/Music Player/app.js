@@ -23,7 +23,7 @@ this.init = function(args) {
 	this.win.addChild(toolbar);
 	var volume = new dijit.form.VerticalSlider({
 		onChange: dojo.hitch(this, function(val) {
-			this.sound.setVolume(val);
+			this.sound.volume(val);
 			dojo.removeClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-high");
 			dojo.removeClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-medium");
 			dojo.removeClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-low");
@@ -134,7 +134,7 @@ this.pause = function() {
 }
 this.skip = function(value) {
 	if (!this.ignoreOnChange && this.sound) {
-		var d = this.sound.getDuration();
+		var d = this.sound.duration();
 		this.sound._startPos = ((value / 100) * (d/1000));
 		if(this.is_playing) {
 			this.sound.play();
@@ -183,8 +183,13 @@ this.stopTicker = function() {
 	this.__ticker = false;
 }
 this.updateTicker = function() {
-	var p = this.sound.getPosition();
-	var d = this.sound.getDuration();
+	var c = this.sound.capabilities;
+	if(!(c.position && c.duration)) {
+	this.box.domNode.innerHTML = "&nbsp;" + this.filename + "&nbsp;&nbsp;" + "unable to retrieve data" + "&nbsp;";
+	return;
+	}
+	var p = this.sound.position();
+	var d = this.sound.duration();
 	if(d==0) d = p+1;
 	if(p == d) this.stop();
 	this.ignoreOnChange=true;
