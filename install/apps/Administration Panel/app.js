@@ -77,15 +77,30 @@ this.pages = {
 			}];
 			//make headers
 			for(field in data[0]) {
-				layout[0].cells[0].push({name: field, field: field});
+				if(field == "permissions" || field == "groups") continue;
+				var name = field.charAt(0).toUpperCase() + field.substr(1).toLowerCase();
+				var editor;
+				var options;
+				if(field == "name" || field == "username") editor = dojox.grid.editors.TextBox
+				if(field == "level") {
+					editor = dojox.grid.editors.Select;
+					options = ["admin", "developer", "user"];
+				}
+				layout[0].cells[0].push({name: name, field: field, editor: editor, options: options});
 			}
 			var grid = this._userGrid = new dojox.Grid({
 				structure: layout,
 				model: new dojox.grid.data.DojoData(null, null, {store: this._userStore, query: {id: "*"}})
 			});
 			dojo.connect(this._userStore, "onDelete", this, function(a) {
-				console.log(a);
 				desktop.admin.users.remove(a.id[0]); //that feels really hackish
+			})
+			dojo.connect(this._userStore, "onSet", this, function(item, attribute, oldVal, newVal) {
+				var id = this._userStore.getValue(item, "id");
+				if(id == false) return;
+				var args = {id: id};
+				args[attribute] = newVal;
+				desktop.user.set(args);
 			})
 			this.main.setContent(this._userGrid.domNode);
 			this._userGrid.render();

@@ -141,19 +141,14 @@ this.skip = function(value) {
 }
 this.stop = function() {
 	if(this.sound) {
-		if (this.sound.flReady || !this.sound.flash) {
-			this.is_playing = false;
-			dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
-			dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
-			this.ui.play.setLabel("Play");
-			this.ui.play.onClick = dojo.hitch(this, this.play);
-			this.sound.stop();
-			this.stopTicker();
-			this.ui.slider.setValue(0);
-		}
-		else {
-			setTimeout(dojo.hitch(this, this.stop), 100);
-		}
+		this.is_playing = false;
+		dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
+		dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
+		this.ui.play.setLabel("Play");
+		this.ui.play.onClick = dojo.hitch(this, this.play);
+		this.sound.stop();
+		this.stopTicker();
+		this.ui.slider.setValue(0);
 	}
 }
 this.openDialog = function() {
