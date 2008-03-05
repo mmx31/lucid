@@ -108,10 +108,12 @@ this.play = function() {
 	if(this.sound) {
 		this.is_playing=true;
 		this.sound.play();
-		dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
-		dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
-		this.ui.play.setLabel("Pause");
-		this.ui.play.onClick = dojo.hitch(this, this.pause);
+		if(this.sound.capabilities.pause) {
+			dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
+			dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
+			this.ui.play.setLabel("Pause");
+			this.ui.play.onClick = dojo.hitch(this, this.pause);
+		}
 		this.ui.play.startup();
 		this.startTicker();
 	}
