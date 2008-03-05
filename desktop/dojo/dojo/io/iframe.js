@@ -246,7 +246,7 @@ dojo.io.iframe = {
 			var args = ioArgs.args;
 
 			ioArgs._contentToClean = [];
-			var fn = args["form"];
+			var fn = dojo.byId(args["form"]);
 			var content = args["content"] || {};
 			if(fn){
 				if(content){
@@ -318,7 +318,7 @@ dojo.io.iframe = {
 
 		var ioArgs = dfd.ioArgs;
 		var args = ioArgs.args;
-		var fNode = args.form;
+		var fNode = dojo.byId(args.form);
 	
 		if(fNode){
 			// remove all the hidden content inputs

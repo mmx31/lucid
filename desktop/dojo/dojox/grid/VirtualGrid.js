@@ -54,7 +54,7 @@ dojo.declare('dojox.VirtualGrid',
 	//	|		structure="structure" 
 	//	|		dojoType="dojox.VirtualGrid"></div>
 
-	templateString:"<div class=\"dojoxGrid\" hidefocus=\"hidefocus\" role=\"wairole:grid\">\n\t<div class=\"dojoxGrid-master-header\" dojoAttachPoint=\"headerNode\"></div>\n\t<div class=\"dojoxGrid-master-view\" dojoAttachPoint=\"viewsNode\"></div>\n\t<span dojoAttachPoint=\"lastFocusNode\" tabindex=\"0\"></span>\n</div>\n",
+	templateString:"<div class=\"dojoxGrid\" hidefocus=\"hidefocus\" role=\"wairole:grid\">\n\t<div class=\"dojoxGrid-master-header\" dojoAttachPoint=\"viewsHeaderNode\"></div>\n\t<div class=\"dojoxGrid-master-view\" dojoAttachPoint=\"viewsNode\"></div>\n\t<span dojoAttachPoint=\"lastFocusNode\" tabindex=\"0\"></span>\n</div>\n",
 	
 	// classTag: String
 	// 		CSS class applied to the grid's domNode
@@ -111,6 +111,9 @@ dojo.declare('dojox.VirtualGrid',
 	// singleClickEdit: boolean
 	//		Single-click starts editing. Default is double-click
 	singleClickEdit: false,
+
+	// Used to store the last two clicks, to ensure double-clicking occurs based on the intended row
+	_click: null,
 	
 	// private
 	sortInfo: 0,
@@ -139,6 +142,7 @@ dojo.declare('dojox.VirtualGrid',
 		// replace stock styleChanged with one that triggers an update
 		this.styleChanged = this._styleChanged;
 		this.setStructure(this.structure);
+		this._click = [];
 	},
 	
 	destroy: function(){
@@ -196,6 +200,7 @@ dojo.declare('dojox.VirtualGrid',
 	createScroller: function(){
 		// summary: Creates a new virtual scroller
 		this.scroller = new dojox.grid.scroller.columns();
+		this.scroller._pageIdPrefix = this.id + '-';
 		this.scroller.renderRow = dojo.hitch(this, "renderRow");
 		this.scroller.removeRow = dojo.hitch(this, "rowRemoved");
 	},
@@ -231,7 +236,7 @@ dojo.declare('dojox.VirtualGrid',
 		}
 		var view = new c({ grid: this });
 		this.viewsNode.appendChild(view.domNode);
-		this.headerNode.appendChild(view.headerNode);
+		this.viewsHeaderNode.appendChild(view.headerNode);
 		this.views.addView(view);
 		return view;
 	},
@@ -286,14 +291,21 @@ dojo.declare('dojox.VirtualGrid',
 	},
 
 	// sizing
-	resize: function(){
-		// summary:
+	resize: function(sizeBox){
+	// summary:
 		//		Update the grid's rendering dimensions and resize it
+		// sizeBox: Object?
+		//		{w: int, h: int, l: int, t: int}
 		
 		// FIXME: If grid is not sized explicitly, sometimes bogus scrollbars 
 		// can appear in our container, which may require an extra call to 'resize'
 		// to sort out.
-		
+		this._sizeBox = sizeBox;
+		this._resize();
+		this.sizeChange();
+	},
+	
+	_resize: function(){
 		// if we have set up everything except the DOM, we cannot resize
 		if(!this.domNode.parentNode || this.domNode.parentNode.nodeType != 1 || !this.hasLayout()){
 			return;
@@ -312,20 +324,23 @@ dojo.declare('dojox.VirtualGrid',
 				this.fitTo = "parent";
 			}
 		}
-		if(this.fitTo == "parent"){
+		// if we are given dimensions, size the grid's domNode to those dimensions
+		if(this._sizeBox){
+			dojo.contentBox(this.domNode, this._sizeBox);
+		}else if(this.fitTo == "parent"){
 			var h = dojo._getContentBox(this.domNode.parentNode).h;
 			dojo.marginBox(this.domNode, { h: Math.max(0, h) });
 		}
 		var h = dojo._getContentBox(this.domNode).h;
-		if(h == 0){
+		if(h == 0 && !this.autoHeight){
 			// We need to hide the header, since the Grid is essentially hidden.
-			this.headerNode.style.display = "none";
+			this.viewsHeaderNode.style.display = "none";
 		}else{
 			// Otherwise, show the header and give it an appropriate height.
-			this.headerNode.style.display = "block";
+			this.viewsHeaderNode.style.display = "block";
 			// header height
 			var t = this.views.measureHeader();
-			this.headerNode.style.height = t + 'px';
+			this.viewsHeaderNode.style.height = t + 'px';
 		}
 		// content extent
 		var l = 1, h = (this.autoHeight ? -1 : Math.max(this.domNode.clientHeight - t, 0) || 0);
@@ -346,7 +361,7 @@ dojo.declare('dojox.VirtualGrid',
 
 	resizeHeight: function(){
 		var t = this.views.measureHeader();
-		this.headerNode.style.height = t + 'px';
+		this.viewsHeaderNode.style.height = t + 'px';
 		// content extent
 		var h = (this.autoHeight ? -1 : Math.max(this.domNode.clientHeight - t, 0) || 0);
 		//this.views.arrange(0, 0, 0, h);
@@ -362,6 +377,7 @@ dojo.declare('dojox.VirtualGrid',
 		// scrolling states, see Update.
 
 		if(!this.domNode){return;}
+		
 		if(!this.hasLayout()) {
 			this.scroller.init(0, this.keepRows, this.rowsPerPage);
 			return;
@@ -375,8 +391,11 @@ dojo.declare('dojox.VirtualGrid',
 	},
 
 	prerender: function(){
+		// if autoHeight, make sure scroller knows not to virtualize; everything must be rendered.
+		this.keepRows = this.autoHeight ? 0 : this.constructor.prototype.keepRows;
+		this.scroller.setKeepInfo(this.keepRows);
 		this.views.render();
-		this.resize();
+		this._resize();
 	},
 
 	postrender: function(){
@@ -481,7 +500,7 @@ dojo.declare('dojox.VirtualGrid',
 				this.scroller.updateRowCount(inRowCount);
 				this.setScrollTop(this.scrollTop);
 			}
-			this.resize();
+			this._resize();
 		}
 	},
 

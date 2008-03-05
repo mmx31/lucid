@@ -15,8 +15,8 @@ tests.register("tests.currency",
 			setUp: function(){
 				var partLocaleList = ["en-us", "en-ca", "de-de"];
 				for(var i = 0 ; i < partLocaleList.length; i ++){
-					dojo.requireLocalization("dojo.cldr","currency",partLocaleList[i], "zh,en-ca,pt,en-us,de,ja,en,en-au,ROOT,fr,es,ko,zh-tw,it");
-					dojo.requireLocalization("dojo.cldr","number",partLocaleList[i], "zh-cn,zh,ko-kr,pt,en-us,en-gb,de,ja,ja-jp,en,ROOT,en-au,fr,es,ko,zh-tw,it,es-es,de-de");
+					dojo.requireLocalization("dojo.cldr","currency",partLocaleList[i], "ko,zh,ja,en,en-ca,en-au,ROOT,zh-tw,en-us,it,fr,pt,es,de");
+					dojo.requireLocalization("dojo.cldr","number",partLocaleList[i], "ko,zh-cn,zh,ja,en,en-au,zh-tw,en-us,it,ja-jp,en-gb,ROOT,de-de,es-es,fr,pt,ko-kr,es,de");
 				}
 			},
 			runTest: function(t){

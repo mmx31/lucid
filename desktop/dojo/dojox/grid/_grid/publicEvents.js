@@ -131,6 +131,15 @@ dojox.grid.publicEvents = {
 		//		Decorated event object that contains reference to grid, cell, and rowIndex
 		e.rowIndex == -1 ? this.onHeaderCellMouseOut(e) : this.onCellMouseOut(e);
 	},
+	
+	onMouseDown: function(e){
+		// summary:
+		//		Event fired when mouse is down inside grid.
+		// e: Event
+		//		Decorated event object that contains reference to grid, cell, and rowIndex
+		e.rowIndex == -1 ? this.onHeaderCellMouseDown(e) : this.onCellMouseDown(e);
+	},
+	
 	onMouseOverRow: function(e){
 		// summary:
 		//		Event fired when mouse is over any row (data or header).
@@ -153,6 +162,15 @@ dojox.grid.publicEvents = {
 			this.onRowMouseOut(e);
 		}
 	},
+	
+	onMouseDownRow: function(e){
+		// summary:
+		//		Event fired when mouse is down inside grid row
+		// e: Event
+		//		Decorated event object that contains reference to grid, cell, and rowIndex
+		if(e.rowIndex != -1)
+			this.onRowMouseDown(e);
+	},
 
 	// cell events
 	onCellMouseOver: function(e){
@@ -170,12 +188,21 @@ dojox.grid.publicEvents = {
 		//		Decorated event object which contains reference to grid, cell, and rowIndex
 		dojo.removeClass(e.cellNode, this.cellOverClass);
 	},
+	
+	onCellMouseDown: function(e){
+		// summary:
+		//		Event fired when mouse is down in a header cell.
+		// e: Event
+		// 		Decorated event object which contains reference to grid, cell, and rowIndex
+	},
 
 	onCellClick: function(e){
 		// summary:
 		//		Event fired when a cell is clicked.
 		// e: Event
 		//		Decorated event object which contains reference to grid, cell, and rowIndex
+		this._click[0] = this._click[1];
+		this._click[1] = e;
 		if(!this.edit.isEditCell(e.rowIndex, e.cellIndex)){
 			this.focus.setFocusCell(e.cell, e.rowIndex);
 		}
@@ -187,7 +214,13 @@ dojox.grid.publicEvents = {
 		//		Event fired when a cell is double-clicked.
 		// e: Event
 		//		Decorated event object contains reference to grid, cell, and rowIndex
-		this.edit.setEditCell(e.cell, e.rowIndex); 
+		if(dojo.isIE){
+			this.edit.setEditCell(this._click[1].cell, this._click[1].rowIndex);
+		}else if(this._click[0].rowIndex != this._click[1].rowIndex){
+			this.edit.setEditCell(this._click[0].cell, this._click[0].rowIndex);
+		}else{
+			this.edit.setEditCell(e.cell, e.rowIndex);
+		}
 		this.onRowDblClick(e);
 	},
 
@@ -239,6 +272,13 @@ dojox.grid.publicEvents = {
 		// e: Event
 		// 		Decorated event object contains reference to grid, cell, and rowIndex
 	},
+	
+	onRowMouseDown: function(e){
+		// summary:
+		//		Event fired when mouse is down in a row.
+		// e: Event
+		// 		Decorated event object which contains reference to grid, cell, and rowIndex
+	},
 
 	onRowContextMenu: function(e){
 		// summary:
@@ -277,6 +317,13 @@ dojox.grid.publicEvents = {
 		// e: Event
 		// 		Decorated event object which contains reference to grid, cell, and rowIndex
 		dojo.removeClass(e.cellNode, this.cellOverClass);
+	},
+	
+	onHeaderCellMouseDown: function(e) {
+		// summary:
+		//		Event fired when mouse is down in a header cell.
+		// e: Event
+		// 		Decorated event object which contains reference to grid, cell, and rowIndex
 	},
 
 	onHeaderClick: function(e){

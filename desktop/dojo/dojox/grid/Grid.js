@@ -4,6 +4,10 @@ dojo.provide("dojox.grid.Grid");
 dojo.require("dojox.grid.VirtualGrid");
 dojo.require("dojox.grid._data.model");
 dojo.require("dojox.grid._data.editors");
+dojo.require("dojox.grid._data.dijitEditors");
+
+// FIXME: 
+//		we are at the wrong location! 
 
 dojo.declare('dojox.Grid', dojox.VirtualGrid, {
 	//	summary:
@@ -209,12 +213,8 @@ dojo.declare('dojox.Grid', dojox.VirtualGrid, {
 	},
 
 	doStartEdit: function(inCell, inRowIndex){
-		var edit = this.canEdit(inCell, inRowIndex);
-		if(edit){
-			this.model.beginModifyRow(inRowIndex);
-			this.onStartEdit(inCell, inRowIndex);
-		}
-		return edit;
+		this.model.beginModifyRow(inRowIndex);
+		this.onStartEdit(inCell, inRowIndex);
 	},
 
 	doApplyCellEdit: function(inValue, inRowIndex, inFieldIndex){
@@ -255,5 +255,8 @@ dojo.declare('dojox.Grid', dojox.VirtualGrid, {
 	junk: 0
 
 });
+
+// alias us to the right location
+dojox.grid.Grid = dojox.Grid;
 
 }

@@ -34,6 +34,7 @@ dojo.declare("dijit.form.Button",
 	baseClass: "dijitButton",
 	templateString:"<div class=\"dijit dijitReset dijitLeft dijitInline\"\n\tdojoAttachEvent=\"onclick:_onButtonClick,onmouseenter:_onMouse,onmouseleave:_onMouse,onmousedown:_onMouse\"\n\twaiRole=\"presentation\"\n\t><button class=\"dijitReset dijitStretch dijitButtonNode dijitButtonContents\" dojoAttachPoint=\"focusNode,titleNode\"\n\t\ttype=\"${type}\" waiRole=\"button\" waiState=\"labelledby-${id}_label\"\n\t\t><span class=\"dijitReset dijitInline ${iconClass}\" dojoAttachPoint=\"iconNode\" \n \t\t\t><span class=\"dijitReset dijitToggleButtonIconChar\">&#10003;</span \n\t\t></span\n\t\t><div class=\"dijitReset dijitInline\"><center class=\"dijitReset dijitButtonText\" id=\"${id}_label\" dojoAttachPoint=\"containerNode\">${label}</center></div\n\t></button\n></div>\n",
 
+	_onChangeMonitor: '',
 	// TODO: set button's title to this.containerNode.innerText
 
 	_onClick: function(/*Event*/ e){
@@ -205,7 +206,7 @@ dojo.declare("dijit.form.DropDownButton", [dijit.form.Button, dijit._Container],
 		dijit.focus(this.popupStateNode);
 		var dropDown = this.dropDown;
 		if(!dropDown){ return; }
-		if(!dropDown.isShowingNow){
+		if(!this._opened){
 			// If there's an href, then load that first, so we don't get a flicker
 			if(dropDown.href && !dropDown.isLoaded){
 				var self = this;

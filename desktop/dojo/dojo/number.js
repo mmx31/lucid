@@ -3,7 +3,7 @@ dojo._hasResource["dojo.number"] = true;
 dojo.provide("dojo.number");
 
 dojo.require("dojo.i18n");
-dojo.requireLocalization("dojo.cldr", "number", null, "zh-cn,zh,ko-kr,pt,en-us,en-gb,de,ja,ja-jp,en,ROOT,en-au,fr,es,ko,zh-tw,it,es-es,de-de");
+dojo.requireLocalization("dojo.cldr", "number", null, "ko,zh-cn,zh,ja,en,en-au,zh-tw,en-us,it,ja-jp,en-gb,ROOT,de-de,es-es,fr,pt,ko-kr,es,de");
 dojo.require("dojo.string");
 dojo.require("dojo.regexp");
 
@@ -13,7 +13,7 @@ dojo.number = {
 	// summary: localized formatting and parsing routines for Number
 }
 
-dojo.number.__formatOptions = function(kwArgs){
+dojo.number.__FormatOptions = function(){
 	//	pattern: String?
 	//		override formatting pattern with this string (see
 	//		dojo.number._applyPattern)
@@ -23,7 +23,7 @@ dojo.number.__formatOptions = function(kwArgs){
 	//	places: Number?
 	//		fixed number of decimal places to show.  This overrides any
 	//		information in the provided pattern.
-	//	round: NUmber?
+	//	round: Number?
 	//		5 rounds to nearest .5; 0 rounds to nearest whole (default). -1
 	//		means don't round.
 	//	currency: String?
@@ -32,17 +32,24 @@ dojo.number.__formatOptions = function(kwArgs){
 	//		localized currency symbol
 	//	locale: String?
 	//		override the locale used to determine formatting rules
+	this.pattern = pattern;
+	this.type = type;
+	this.places = places;
+	this.round = round;
+	this.currency = currency;
+	this.symbol = symbol;
+	this.locale = locale;
 }
 =====*/
 
-dojo.number.format = function(/*Number*/value, /*dojo.number.__formatOptions?*/options){
+dojo.number.format = function(/*Number*/value, /*dojo.number.__FormatOptions?*/options){
 	// summary:
 	//		Format a Number as a String, using locale-specific settings
 	// description:
 	//		Create a string from a Number using a known localized pattern.
 	//		Formatting patterns appropriate to the locale are chosen from the
-	//		CLDR http://unicode.org/cldr as well as the appropriate symbols and
-	//		delimiters.  See http://www.unicode.org/reports/tr35/#Number_Elements
+	//		[CLDR](http://unicode.org/cldr) as well as the appropriate symbols and
+	//		delimiters.  See <http://www.unicode.org/reports/tr35/#Number_Elements>
 	// value:
 	//		the number to be formatted.  If not a valid JavaScript number,
 	//		return null.
@@ -59,17 +66,17 @@ dojo.number.format = function(/*Number*/value, /*dojo.number.__formatOptions?*/o
 //dojo.number._numberPatternRE = /(?:[#0]*,?)*[#0](?:\.0*#*)?/; // not precise, but good enough
 dojo.number._numberPatternRE = /[#0,]*[#0](?:\.0*#*)?/; // not precise, but good enough
 
-dojo.number._applyPattern = function(/*Number*/value, /*String*/pattern, /*dojo.number.__formatOptions?*/options){
+dojo.number._applyPattern = function(/*Number*/value, /*String*/pattern, /*dojo.number.__FormatOptions?*/options){
 	// summary:
 	//		Apply pattern to format value as a string using options. Gives no
 	//		consideration to local customs.
 	// value:
 	//		the number to be formatted.
 	// pattern:
-	//		a pattern string as described in
-	//		http://www.unicode.org/reports/tr35/#Number_Format_Patterns
-	// options: dojo.number.__formatOptions?
-	//		_applyPattern is usually called via dojo.number.format() which
+	//		a pattern string as described by
+	//		[unicode.org TR35](http://www.unicode.org/reports/tr35/#Number_Format_Patterns)
+	// options: dojo.number.__FormatOptions?
+	//		_applyPattern is usually called via `dojo.number.format()` which
 	//		populates an extra property in the options parameter, "customs".
 	//		The customs object specifies group and decimal parameters if set.
 
@@ -137,7 +144,7 @@ dojo.number.round = function(/*Number*/value, /*Number*/places, /*Number?*/multi
 }
 
 /*=====
-dojo.number.__formatAbsoluteOptions = function(kwArgs){
+dojo.number.__FormatAbsoluteOptions = function(){
 	//	decimal: String?
 	//		the decimal separator
 	//	group: String?
@@ -147,17 +154,21 @@ dojo.number.__formatAbsoluteOptions = function(kwArgs){
 	//	round: Number?
 	//		5 rounds to nearest .5; 0 rounds to nearest whole (default). -1
 	//		means don't round.
+	this.decimal = decimal;
+	this.group = group;
+	this.places = places;
+	this.round = round;
 }
 =====*/
 
-dojo.number._formatAbsolute = function(/*Number*/value, /*String*/pattern, /*dojo.number.__formatAbsoluteOptions?*/options){
+dojo.number._formatAbsolute = function(/*Number*/value, /*String*/pattern, /*dojo.number.__FormatAbsoluteOptions?*/options){
 	// summary: 
 	//		Apply numeric pattern to absolute value using options. Gives no
 	//		consideration to local customs.
 	// value:
 	//		the number to be formatted, ignores sign
 	// pattern:
-	//		the number portion of a pattern (e.g. #,##0.00)
+	//		the number portion of a pattern (e.g. `#,##0.00`)
 	options = options || {};
 	if(options.places === true){options.places=0;}
 	if(options.places === Infinity){options.places=6;} // avoid a loop; pick a limit
@@ -230,7 +241,7 @@ dojo.number._formatAbsolute = function(/*Number*/value, /*String*/pattern, /*doj
 };
 
 /*=====
-dojo.number.__regexpOptions = function(kwArgs){
+dojo.number.__RegexpOptions = function(){
 	//	pattern: String?
 	//		override pattern with this string.  Default is provided based on
 	//		locale.
@@ -244,9 +255,14 @@ dojo.number.__regexpOptions = function(kwArgs){
 	//	places: Number|String?
 	//		number of decimal places to accept: Infinity, a positive number, or
 	//		a range "n,m".  By default, defined by pattern.
+	this.pattern = pattern;
+	this.type = type;
+	this.locale = locale;
+	this.strict = strict;
+	this.places = places;
 }
 =====*/
-dojo.number.regexp = function(/*dojo.number.__regexpOptions?*/options){
+dojo.number.regexp = function(/*dojo.number.__RegexpOptions?*/options){
 	//	summary:
 	//		Builds the regular needed to parse a number
 	//	description:
@@ -296,7 +312,7 @@ dojo.number._parseInfo = function(/*Object?*/options){
 			var places = options.places;
 			if(parts.length == 1 || places === 0){flags.fractional = false;}
 			else{
-				if(typeof places == "undefined"){ places = parts[1].lastIndexOf('0')+1; }
+				if(places === undefined){ places = parts[1].lastIndexOf('0')+1; }
 				if(places && options.fractional == undefined){flags.fractional = true;} // required fractional, unless otherwise specified
 				if(!options.places && (places < parts[1].length)){ places += "," + parts[1].length; }
 				flags.places = places;
@@ -335,7 +351,7 @@ dojo.number._parseInfo = function(/*Object?*/options){
 }
 
 /*=====
-dojo.number.__parseOptions = function(kwArgs){
+dojo.number.__ParseOptions = function(){
 	//	pattern: String
 	//		override pattern with this string.  Default is provided based on
 	//		locale.
@@ -348,17 +364,22 @@ dojo.number.__parseOptions = function(kwArgs){
 	//		strict parsing, false by default
 	//	currency: Object
 	//		object with currency information
+	this.pattern = pattern;
+	this.type = type;
+	this.locale = locale;
+	this.strict = strict;
+	this.currency = currency;
 }
 =====*/
-dojo.number.parse = function(/*String*/expression, /*dojo.number.__parseOptions?*/options){
+dojo.number.parse = function(/*String*/expression, /*dojo.number.__ParseOptions?*/options){
 	// summary:
 	//		Convert a properly formatted string to a primitive Number, using
 	//		locale-specific settings.
 	// description:
 	//		Create a Number from a string using a known localized pattern.
-	//		Formatting patterns are chosen appropriate to the locale.
-	//		Formatting patterns are implemented using the syntax described at
-	//		*URL*
+	//		Formatting patterns are chosen appropriate to the locale
+	//		and follow the syntax described by
+	//		[unicode.org TR35](http://www.unicode.org/reports/tr35/#Number_Format_Patterns)
 	// expression:
 	//		A string representation of a Number
 	var info = dojo.number._parseInfo(options);
@@ -386,7 +407,7 @@ dojo.number.parse = function(/*String*/expression, /*dojo.number.__parseOptions?
 };
 
 /*=====
-dojo.number.__realNumberRegexpFlags = function(kwArgs){
+dojo.number.__RealNumberRegexpFlags = function(){
 	//	places: Number?
 	//		The integer number of decimal places or a range given as "n,m".  If
 	//		not given, the decimal part is optional and the number of places is
@@ -406,23 +427,27 @@ dojo.number.__realNumberRegexpFlags = function(kwArgs){
 	//		false, or [true, false].  Default is [true, false], (i.e. will
 	//		match if it is signed or unsigned).  flags in regexp.integer can be
 	//		applied.
+	this.places = places;
+	this.decimal = decimal;
+	this.fractional = fractional;
+	this.exponent = exponent;
+	this.eSigned = eSigned;
 }
 =====*/
 
-dojo.number._realNumberRegexp = function(/*dojo.number.__realNumberRegexpFlags?*/flags){
+dojo.number._realNumberRegexp = function(/*dojo.number.__RealNumberRegexpFlags?*/flags){
 	// summary:
 	//		Builds a regular expression to match a real number in exponential
 	//		notation
-	// flags:
-	//		An object
 
 	// assign default values to missing paramters
 	flags = flags || {};
-	if(typeof flags.places == "undefined"){ flags.places = Infinity; }
+	//TODO: use mixin instead?
+	if(!("places" in flags)){ flags.places = Infinity; }
 	if(typeof flags.decimal != "string"){ flags.decimal = "."; }
-	if(typeof flags.fractional == "undefined" || /^0/.test(flags.places)){ flags.fractional = [true, false]; }
-	if(typeof flags.exponent == "undefined"){ flags.exponent = [true, false]; }
-	if(typeof flags.eSigned == "undefined"){ flags.eSigned = [true, false]; }
+	if(!("fractional" in flags) || /^0/.test(flags.places)){ flags.fractional = [true, false]; }
+	if(!("exponent" in flags)){ flags.exponent = [true, false]; }
+	if(!("eSigned" in flags)){ flags.eSigned = [true, false]; }
 
 	// integer RE
 	var integerRE = dojo.number._integerRegexp(flags);
@@ -460,34 +485,36 @@ dojo.number._realNumberRegexp = function(/*dojo.number.__realNumberRegexpFlags?*
 };
 
 /*=====
-dojo.number.__integerRegexpFlags = function(kwArgs){
+dojo.number.__IntegerRegexpFlags = function(){
 	//	signed: Boolean?
-	//		The leading plus-or-minus sign. Can be true, false, or [true,
-	//		false]. Default is [true, false], (i.e. will match if it is signed
+	//		The leading plus-or-minus sign. Can be true, false, or `[true,false]`.
+	//		Default is `[true, false]`, (i.e. will match if it is signed
 	//		or unsigned).
 	//	separator: String?
 	//		The character used as the thousands separator. Default is no
-	//		separator. For more than one symbol use an array, e.g. [",", ""],
+	//		separator. For more than one symbol use an array, e.g. `[",", ""]`,
 	//		makes ',' optional.
 	//	groupSize: Number?
 	//		group size between separators
-	//	flags.groupSize2: Number?
-	//		second grouping (for India)
+	//	groupSize2: Number?
+	//		second grouping, where separators 2..n have a different interval than the first separator (for India)
+	this.signed = signed;
+	this.separator = separator;
+	this.groupSize = groupSize;
+	this.groupSize2 = groupSize2;
 }
 =====*/
 
-dojo.number._integerRegexp = function(/*dojo.number.__integerRegexpFlags?*/flags){
+dojo.number._integerRegexp = function(/*dojo.number.__IntegerRegexpFlags?*/flags){
 	// summary: 
 	//		Builds a regular expression that matches an integer
-	// flags: 
-	//		An object
 
 	// assign default values to missing paramters
 	flags = flags || {};
-	if(typeof flags.signed == "undefined"){ flags.signed = [true, false]; }
-	if(typeof flags.separator == "undefined"){
+	if(!("signed" in flags)){ flags.signed = [true, false]; }
+	if(!("separator" in flags)){
 		flags.separator = "";
-	}else if(typeof flags.groupSize == "undefined"){
+	}else if(!("groupSize" in flags)){
 		flags.groupSize = 3;
 	}
 	// build sign RE

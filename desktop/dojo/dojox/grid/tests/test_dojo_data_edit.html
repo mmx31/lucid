@@ -39,7 +39,6 @@
 		djConfig="isDebug: true, debugAtAllCosts: false, parseOnLoad: true"></script>
 	<script type="text/javascript">
 		dojo.require("dojox.grid.Grid");
-		dojo.require("dojox.grid._data.model");
 		dojo.require("dojo.data.ItemFileWriteStore");
 		dojo.require("dojo.parser");
 	</script>
@@ -84,6 +83,8 @@
 </h2>
 <div id="controls">
 	<button onclick="grid.refresh()">Refresh</button>&nbsp;&nbsp;&nbsp;
+	<button onclick="dataModel.clearData(true)">Clear Data (Model)</button>&nbsp;&nbsp;&nbsp;
+	<button onclick="dataModel.refresh()">Refresh (Model)</button>&nbsp;&nbsp;&nbsp;
 	<button onclick="grid.edit.focusEditor()">Focus Editor</button>
 	<button onclick="grid.focus.next()">Next Focus</button>&nbsp;&nbsp;&nbsp;
 	<button onclick="addItem()">Add</button>
@@ -118,5 +119,6 @@
 </div>
 </body>
 </html>
+
 
 

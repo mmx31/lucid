@@ -39,13 +39,17 @@ dojo.declare('dojox.grid.scroller.base', null, {
 		this.defaultPageHeight = this.defaultRowHeight * this.rowsPerPage;
 		//this.defaultPageHeight = this.defaultRowHeight * Math.min(this.rowsPerPage, this.rowCount);
 		this.pageCount = Math.ceil(this.rowCount / this.rowsPerPage);
-		this.keepPages = Math.max(Math.ceil(this.keepRows / this.rowsPerPage), 2);
+		this.setKeepInfo(this.keepRows);
 		this.invalidate();
 		if(this.scrollboxNode){
 			this.scrollboxNode.scrollTop = 0;
 			this.scroll(0);
 			this.scrollboxNode.onscroll = dojo.hitch(this, 'onscroll');
 		}
+	},
+	setKeepInfo: function(inKeepRows){
+		this.keepRows = inKeepRows;
+		this.keepPages = !this.keepRows ? this.keepRows : Math.max(Math.ceil(this.keepRows / this.rowsPerPage), 2);
 	},
 	// updating
 	invalidate: function(){
@@ -191,7 +195,7 @@ dojo.declare('dojox.grid.scroller.base', null, {
 	needPage: function(inPageIndex, inPos){
 		var h = this.getPageHeight(inPageIndex), oh = h;
 		if(!this.pageExists(inPageIndex)){
-			this.buildPage(inPageIndex, (this.keepPages)&&(this.stack.length >= this.keepPages), inPos);
+			this.buildPage(inPageIndex, this.keepPages&&(this.stack.length >= this.keepPages), inPos);
 			h = this.measurePage(inPageIndex) || h;
 			this.pageHeights[inPageIndex] = h;
 			if(h && (oh != h)){
@@ -305,7 +309,7 @@ dojo.declare('dojox.grid.scroller', dojox.grid.scroller.base, {
 	preparePageNode: function(inPageIndex, inReusePageIndex, inNodes){
 		var p = (inReusePageIndex === null ? this.createPageNode() : this.invalidatePageNode(inReusePageIndex, inNodes));
 		p.pageIndex = inPageIndex;
-		p.id = 'page-' + inPageIndex;
+		p.id = (this._pageIdPrefix || "") + 'page-' + inPageIndex;
 		inNodes[inPageIndex] = p;
 	},
 	// implementation for page manager

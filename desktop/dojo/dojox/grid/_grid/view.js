@@ -35,7 +35,7 @@ dojo.declare('dojox.GridView',
 
 	postCreate: function(){
 		this.connect(this.scrollboxNode,"onscroll","doscroll");
-		dojox.grid.funnelEvents(this.contentNode, this, "doContentEvent", [ 'mouseover', 'mouseout', 'click', 'dblclick', 'contextmenu' ]);
+		dojox.grid.funnelEvents(this.contentNode, this, "doContentEvent", [ 'mouseover', 'mouseout', 'click', 'dblclick', 'contextmenu', 'mousedown' ]);
 		dojox.grid.funnelEvents(this.headerNode, this, "doHeaderEvent", [ 'dblclick', 'mouseover', 'mouseout', 'mousemove', 'mousedown', 'click', 'contextmenu' ]);
 		this.content = new dojox.grid.contentBuilder(this);
 		this.header = new dojox.grid.headerBuilder(this);
@@ -191,7 +191,7 @@ dojo.declare('dojox.GridView',
 	createRowNode: function(inRowIndex){
 		var node = document.createElement("div");
 		node.className = this.classTag + '-row';
-		node[dojox.grid.gridViewTag] = this;
+		node[dojox.grid.gridViewTag] = this.id;
 		node[dojox.grid.rowIndexTag] = inRowIndex;
 		this.rowNodes[inRowIndex] = node;
 		return node;
@@ -258,20 +258,29 @@ dojo.declare('dojox.GridView',
 
 	// scrolling
 	lastTop: 0,
-	firstScroll:false,
+	firstScroll:0,
 
 	doscroll: function(inEvent){
-		if(!dojo._isBodyLtr() && !this.firstScroll){
-			var s = dojo.marginBox(this.headerNodeContainer);
-			if(dojo.isIE){
-				this.headerNodeContainer.style.width = s.w + this.getScrollbarWidth() + 'px';	
-			}else if(dojo.isMoz){
-				//TODO currently only for FF, not sure for safari and opera
-				this.headerNodeContainer.style.width = s.w - this.getScrollbarWidth() + 'px';
-				//set scroll to right in FF
-				this.scrollboxNode.scrollLeft = this.scrollboxNode.scrollWidth - this.scrollboxNode.clientWidth;
+		//var s = dojo.marginBox(this.headerContentNode.firstChild);
+		var isLtr = dojo._isBodyLtr();
+		if(this.firstScroll < 2){
+			if((!isLtr && this.firstScroll == 1) || (isLtr && this.firstScroll == 0)){
+				var s = dojo.marginBox(this.headerNodeContainer);
+				if(dojo.isIE){
+					this.headerNodeContainer.style.width = s.w + this.getScrollbarWidth() + 'px';
+				}else if(dojo.isMoz){
+					//TODO currently only for FF, not sure for safari and opera
+					this.headerNodeContainer.style.width = s.w - this.getScrollbarWidth() + 'px';
+					//this.headerNodeContainer.style.width = s.w + 'px';
+					//set scroll to right in FF
+					if(isLtr){
+						this.scrollboxNode.scrollLeft = this.scrollboxNode.scrollWidth - this.scrollboxNode.clientWidth;
+					}else{
+						this.scrollboxNode.scrollLeft = this.scrollboxNode.clientWidth - this.scrollboxNode.scrollWidth;
+					}
+				}
 			}
-			this.firstScroll = true;
+			this.firstScroll++;
 		}
 		this.headerNode.scrollLeft = this.scrollboxNode.scrollLeft;
 		// 'lastTop' is a semaphore to prevent feedback-loop with setScrollTop below
@@ -320,6 +329,7 @@ dojo.declare('dojox.GridView',
 		this.content.update();
 		this.grid.update();
 		this.scrollboxNode.scrollLeft = left;
+		this.headerNode.scrollLeft = left;
 	}
 });
 

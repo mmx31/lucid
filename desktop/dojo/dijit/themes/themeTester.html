@@ -3,31 +3,14 @@
 <html>
 <head>
 	<title>Dijit Theme Tester</title>
-	<script type="text/javascript" src="../../dojo/dojo.js" 
-		djConfig="parseOnLoad: false, isDebug: true"></script>
-	<!--
-	<script type="text/javascript" src="http://prototypejs.org/assets/2007/10/16/prototype.js"></script>
-	-->
-	<script type="text/javascript" src="../dijit.js"></script>
-	<script type="text/javascript" src="../dijit-all.js"></script>
-	<script type="text/javascript">
-		// this is just a list of 'official' dijit themes, you can use ?theme=String 
-		// for 'un-supported' themes, too. (eg: yours) 
-		var availableThemes = [
-			{ theme:"tundra", author:"Dojo", baseUri:"../themes/" },
-			{ theme:"soria", author:"nikolai", baseUri:"../themes/" },
-			//{ theme:"noir", author:"owen", baseUri:"../themes/"},
-			{ theme:"nihilo", author:"nikolai", baseUri:"../themes/" }
-		];
-	</script>
+
 	<style type="text/css">
 		@import "../../dojo/resources/dojo.css";
 		@import "../tests/css/dijitTests.css";
-		@import "../../dojo/tests/dnd/dndDefault.css";
 
 		html, body { height: 100%; width: 100%; padding: 0; border: 0; }
 		#main { height: 100%; width: 100%; padding: 0; border: 0; }
-		#header, #mainSplit { margin: 10px; }
+/*		#header, #mainSplit { margin: 10px; } */
 		#leftAccordion { width: 25%; }
 		#bottomTabs { height: 40%; }
 		#main .dijitSplitterHorizontal { height: 7px }
@@ -56,7 +39,37 @@
 		}
 
 		hr.spacer { border:0; background-color:#ededed; width:80%; height:1px; } 
+
+		/* for custom menu buttons, do not appear to have any effect */
+		.myCustomTheme .dijitButtonNode {
+			border:1px solid #000;
+			vertical-align: middle;
+			padding: 0.2em 0.2em;
+			background: url("themeTesterImages/blackButtonEnabled.gif") repeat-x bottom left #474747;
+			color:#fff;
+		}
+		
+		.myCustomTheme .dijitButtonHover .dijitButtonNode,
+		.myCustomTheme .dijitToggleButtonHover .dijitButtonNode {
+			background: url("themeTesterImages/blackButtonHover.gif") repeat-x bottom left #3b3b3b !important;
+		}
 	</style>
+
+	<script type="text/javascript">
+		window.__globalList = {dojo: true, dijit: true, dojox: true, djConfig: true};
+		for(var i in window){
+			window.__globalList[i] = true;
+		}
+	</script>
+
+	<script type="text/javascript" src="../../dojo/dojo.js" 
+		djConfig="parseOnLoad: false, isDebug: true"></script>
+	<!--
+	<script type="text/javascript" src="http://prototypejs.org/assets/2007/10/16/prototype.js"></script>
+	-->
+	<script type="text/javascript" src="../dijit.js"></script>
+	<script type="text/javascript" src="../dijit-all.js"></script>
+
 	<script type="text/javascript" src="../tests/_testCommon.js"></script>
 	<script type="text/javascript"> // dojo.requires()
 
@@ -112,18 +125,18 @@
 		// for the calendar
 		function myHandler(id,newValue){
 			console.debug("onChange for id = " + id + ", value: " + newValue);
-		};
-
-		function hideLoader(){
-			var loader = dojo.byId('loader'); 
-			dojo.fadeOut({ node: loader, duration:500,
-				onEnd: function(){ 
-					loader.style.display = "none"; 
-				}
-			}).play();
 		}
 
 		dojo.addOnLoad(function() {
+
+			// this is just a list of 'official' dijit themes, you can use ?theme=String 
+			// for 'un-supported' themes, too. (eg: yours) 
+			var availableThemes = [
+				{ theme:"tundra", author:"Dojo", baseUri:"../themes/" },
+				{ theme:"soria", author:"nikolai", baseUri:"../themes/" },
+				//{ theme:"noir", author:"owen", baseUri:"../themes/"},
+				{ theme:"nihilo", author:"nikolai", baseUri:"../themes/" }
+			];
 
 			var holder = dojo.byId('themeData');
 			var tmpString='';
@@ -134,31 +147,27 @@
 
 			var start = new Date().getTime();
 			dojo.parser.parse(dojo.byId('container')); 
-			console.log("Total parse time: " + (new Date().getTime() - start) + "ms");
+			console.info("Total parse time: " + (new Date().getTime() - start) + "ms");
 
 			dojo.byId('loaderInner').innerHTML += " done.";
-			setTimeout(function(){hideLoader();},250);
-			
+			setTimeout(function hideLoader(){
+				var loader = dojo.byId('loader'); 
+				dojo.fadeOut({ node: loader, duration:500,
+					onEnd: function(){ 
+						loader.style.display = "none"; 
+					}
+				}).play();
+			}, 250);
+
+			var strayGlobals = [];
+			for(var i in window){
+				if(!window.__globalList[i]){ strayGlobals.push(i); }
+			}
+			if(strayGlobals.length){
+				console.warn("Stray globals: "+strayGlobals.join(", "));
+			}
 		});
 
-	</script>
-	<style type="text/css">
-		/* for custom menu buttons, do not appear to have any effect */
-		.myCustomTheme .dijitButtonNode {
-			border:1px solid #000;
-			vertical-align: middle;
-			padding: 0.2em 0.2em;
-			background: url("themeTesterImages/blackButtonEnabled.gif") repeat-x bottom left #474747;
-			color:#fff;
-		}
-		
-		.myCustomTheme .dijitButtonHover .dijitButtonNode,
-		.myCustomTheme .dijitToggleButtonHover .dijitButtonNode {
-			background: url("themeTesterImages/blackButtonHover.gif") repeat-x bottom left #3b3b3b !important;
-		}
-	
-	</style>
-	<script>
 		/***
 		dojo.addOnLoad(function(){
 			// use "before advice" to print log message each time resize is called on a layout widget
@@ -290,7 +299,7 @@
 				<div dojoType="dijit.layout.AccordionPane" title="Dojo Tree from Store">
 					<!-- tree widget -->
 					<div dojoType="dijit.Tree" store="continentStore" query="{type:'continent'}"
-						labelAttr="name" typeAttr="type" label="Continents">
+						label="Continents">
 					</div>
 				</div>
 	
@@ -675,7 +684,7 @@
 					style="padding:10px; display:none;  ">
 					<div style="float:left; margin:5px; ">
 						<h3>Source 1</h3>
-						<div dojoType="dojo.dnd.Source" class="container">
+						<div dojoType="dojo.dnd.Source" style="border:3px solid #ccc; padding: 1em 3em; ">
 							<div class="dojoDndItem">Item <strong>X</strong></div>
 							<div class="dojoDndItem">Item <strong>Y</strong></div>
 							<div class="dojoDndItem">Item <strong>Z</strong></div>
@@ -683,7 +692,7 @@
 					</div>
 					<div style="float:left; margin:5px; ">
 						<h3>Source 2</h3>
-						<div dojoType="dojo.dnd.Source" class="container">
+						<div dojoType="dojo.dnd.Source" style="border:3px solid #ccc; padding: 1em 3em; ">
 							<div class="dojoDndItem">Item <strong>1</strong></div>
 							<div class="dojoDndItem">Item <strong>2</strong></div>
 							<div class="dojoDndItem">Item <strong>3</strong></div>

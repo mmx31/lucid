@@ -206,7 +206,7 @@ dojo.declare("dijit.layout.AccordionPane",
 		dojo[(isSelected ? "addClass" : "removeClass")](this.titleNode,"dijitAccordionTitle-selected");
 		this.focusNode.setAttribute("tabIndex", isSelected ? "0" : "-1");
 	},
-	
+
 	_handleFocus: function(/*Event*/e){
 		// summary: handle the blur and focus state of this widget
 		dojo[(e.type=="focus" ? "addClass" : "removeClass")](this.focusNode,"dijitAccordionFocused");		
@@ -215,7 +215,10 @@ dojo.declare("dijit.layout.AccordionPane",
 	setSelected: function(/*Boolean*/ isSelected){
 		// summary: change the selected state on this pane
 		this._setSelectedState(isSelected);
-		if(isSelected){ this.onSelected(); }
+		if(isSelected){
+			this.onSelected();
+			this._loadCheck(true); // if href specified, trigger load
+		}
 	},
 
 	onSelected: function(){

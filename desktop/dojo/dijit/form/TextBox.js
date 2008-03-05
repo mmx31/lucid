@@ -57,9 +57,9 @@ dojo.declare(
 			dijit.form.TextBox.superclass.setValue.call(this, filteredValue, priorityChange);
 		},
 
-		setDisplayedValue: function(/*String*/value){
+		setDisplayedValue: function(/*String*/value, /*Boolean, optional*/ priorityChange){
 			this.textbox.value = value;
-			this.setValue(this.getValue(), true);
+			this.setValue(this.getValue(), priorityChange);
 		},
 
 		format: function(/* String */ value, /* Object */ constraints){
@@ -87,7 +87,7 @@ dojo.declare(
 
 		filter: function(val){
 			// summary: Apply various filters to textbox value
-			if(val === null){ return ""; } // undefined should return undefined
+			if(val === null || val === undefined){ return ""; }
 			else if(typeof val != "string"){ return val; }
 			if(this.trim){
 				val = dojo.trim(val);

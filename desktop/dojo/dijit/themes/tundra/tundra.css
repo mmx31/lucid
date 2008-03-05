@@ -10,16 +10,24 @@
 {
 	cursor: not-allowed !important;
 }
-.tundra .dojoDndAvatar			{font-size: 75%; color: black;}
-.tundra .dojoDndAvatarHeader td	{padding:5px 20px;}
-.tundra .dojoDndAvatarHeader	{background: #ccc;}
-.tundra .dojoDndAvatarItem		{background: #eee;}
-.tundra.dojoDndMove .dojoDndAvatarHeader	{background-image: url(images/dndNoMove.png); background-repeat: no-repeat;}
-.tundra.dojoDndCopy .dojoDndAvatarHeader	{background-image: url(images/dndNoCopy.png); background-repeat: no-repeat;}
-.tundra.dojoDndMove .dojoDndAvatarCanDrop .dojoDndAvatarHeader	{background-image: url(images/dndMove.png); background-repeat: no-repeat;}
-.tundra.dojoDndCopy .dojoDndAvatarCanDrop .dojoDndAvatarHeader	{background-image: url(images/dndCopy.png); background-repeat: no-repeat;}
-.tundra .dojoDndItem {
+.tundra .dojoDndItemBefore {
+	border-top: 2px solid #369;
 }
+.tundra .dojoDndItemAfter {
+	border-bottom: 2px solid #369;
+}
+.tundra .dojoDndItemOver {
+	cursor:pointer;
+}
+.tundra table.dojoDndAvatar { -moz-border-radius: 0; border: 1px solid #ccc; border-collapse: collapse; background-color: #fff; font-size: 75%; color: black;}
+.tundra .dojoDndAvatar td	{ border: none; }
+.tundra .dojoDndAvatar tr	{ border: none; }
+.tundra .dojoDndAvatarHeader td	{ height: 20px; padding: 0 0 0 21px; }
+.tundra .dojoDndAvatarItem td { padding: 2px;}
+.tundra.dojoDndMove .dojoDndAvatarHeader	{background-color: #f58383; background-image: url(images/dndNoMove.png); background-repeat: no-repeat; background-position: 2px center;}
+.tundra.dojoDndCopy .dojoDndAvatarHeader	{background-color: #f58383; background-image: url(images/dndNoCopy.png); background-repeat: no-repeat; background-position: 2px center;}
+.tundra.dojoDndMove .dojoDndAvatarCanDrop .dojoDndAvatarHeader	{background-color: #97e68d; background-image: url(images/dndMove.png); background-repeat: no-repeat; background-position: 2px center;}
+.tundra.dojoDndCopy .dojoDndAvatarCanDrop .dojoDndAvatarHeader	{background-color: #97e68d; background-image: url(images/dndCopy.png); background-repeat: no-repeat; background-position: 2px center;}
 .tundra .dijitTabPaneWrapper {
 	
 	background:#fff;
@@ -476,8 +484,8 @@
 }
 .tundra .dijitTextArea {
 	
-	background:#fff url(form/images/validationInputBg.png) repeat-x top left;
-	#background:#fff url(form/images/validationInputBg.gif) repeat-x top left;
+	background:#fff url(images/validationInputBg.png) repeat-x top left;
+	#background:#fff url(images/validationInputBg.gif) repeat-x top left;
 	border:1px solid #b3b3b3;
 	line-height: normal;
 }
@@ -868,8 +876,9 @@
 	font-weight:normal;
 }
 .tundra .dijitToolbar {
+	padding: 3px 0 1px 3px;	
 	border-bottom: 1px solid #ccc;
-	background:#fafafa url(images/titleBar.png) repeat-x top left;
+	background:#eaeaea url(images/titleBar.png) repeat-x top left;
 }
 .tundra .dijitToolbar * {
 	padding: 0;
@@ -908,8 +917,11 @@
 	border-color: #aec6e7;
 	
 	_border: 1px solid #366dba;
-	_margin: -1px 0 0 0;
+	_margin: 0 0 0 0;
 	_padding: 0;
+}
+.tundra .dijitToolbar label {	
+	padding: 3px 3px 0 6px;
 }
 .tundra .dijitDialog {
 	background: #fff;
@@ -1016,10 +1028,10 @@
 	bottom: -3px;
 }
 .tundra .dijitTooltipLeft {
-	padding-right: 13px;
+	padding-right: 14px;
 }
 .dj_ie6 .tundra .dijitTooltipLeft {
-	padding-right: 15px;
+	padding-left: 15px;
 }
 .tundra .dijitTooltipLeft .dijitTooltipConnector {
 	
@@ -1033,7 +1045,7 @@
 	background-image: url(images/tooltipConnectorRight.gif);
 }
 .tundra .dijitTooltipRight {
-	padding-left: 13px;
+	padding-left: 14px;
 }
 .tundra .dijitTooltipRight .dijitTooltipConnector {
 	

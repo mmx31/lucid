@@ -8,27 +8,27 @@ dojo.declare(
 	"dijit.form.FilteringSelect",
 	[dijit.form.MappedTextBox, dijit.form.ComboBoxMixin],
 	{
-		/*
-		 * summary
-		 *	Enhanced version of HTML's <select> tag.
-		 *
-		 *	Similar features:
-		 *  - There is a drop down list of possible values.
-		 *	- You can only enter a value from the drop down list.  (You can't
-		 *	  enter an arbitrary value.)
-		 *	- The value submitted with the form is the hidden value (ex: CA),
-		 *	  not the displayed value a.k.a. label (ex: California)
-		 *
-		 *	Enhancements over plain HTML version:
-		 *	- If you type in some text then it will filter down the list of
-		 *	  possible values in the drop down list.
-		 *	- List can be specified either as a static list or via a javascript
-		 *	  function (that can get the list from a server)
-		 */
-
+		// summary
+		// An enhanced version of the HTML SELECT tag, but is populated dynamically. It works
+		// very nicely with very large data sets because it can load and page data as needed.
+		// It also resembles ComboBox, but does not allow values outside of the provided ones.
+		//  
+		// Similar features:
+		// - There is a drop down list of possible values.
+		//	- You can only enter a value from the drop down list.  (You can't
+		//	  enter an arbitrary value.)
+		//	- The value submitted with the form is the hidden value (ex: CA),
+		//	  not the displayed value a.k.a. label (ex: California)
+		// 
+		//	Enhancements over plain HTML version:
+		//	- If you type in some text then it will filter down the list of
+		//	  possible values in the drop down list.
+		//	- List can be specified either as a static list or via a javascript
+		//	  function (that can get the list from a server)
+		//
 		// searchAttr: String
 		//		Searches pattern match against this field
-
+		//
 		// labelAttr: String
 		//		Optional.  The text that actually appears in the drop down.
 		//		If not specified, the searchAttr text is used instead.
@@ -46,9 +46,9 @@ dojo.declare(
 			return this._isvalid;
 		},
 
-		_callbackSetLabel: function(/*Array*/ result, 
-									/*Object*/ dataObject, 
-									/*Boolean?*/ priorityChange){
+		_callbackSetLabel: function(	/*Array*/ result, 
+						/*Object*/ dataObject, 
+						/*Boolean?*/ priorityChange){
 			// summary:
 			//		Callback function that dynamically sets the label of the
 			//		ComboBox
@@ -94,8 +94,8 @@ dojo.declare(
 		},
 
 		_setValue:function(	/*String*/ value, 
-							/*String*/ displayedValue, 
-							/*Boolean?*/ priorityChange){
+					/*String*/ displayedValue, 
+					/*Boolean?*/ priorityChange){
 			this.valueNode.value = value;
 			dijit.form.FilteringSelect.superclass.setValue.call(this, value, priorityChange, displayedValue);
 			this._lastDisplayedValue = displayedValue;
@@ -129,7 +129,7 @@ dojo.declare(
 			this.store.fetchItemByIdentity({
 				identity: value, 
 				onItem: function(item){
-					handleFetchByIdentity(item, priorityChange)
+					handleFetchByIdentity(item, priorityChange);
 				}
 			});
 		},
@@ -163,7 +163,7 @@ dojo.declare(
 			this._setValueFromItem(tgt.item, true);
 		},
 
-		setDisplayedValue:function(/*String*/ label){
+		setDisplayedValue:function(/*String*/ label, /*Boolean, optional*/ priorityChange){
 			// summary:
 			//		Set textbox to display label. Also performs reverse lookup
 			//		to set the hidden value. Used in InlineEditBox
@@ -184,7 +184,9 @@ dojo.declare(
 						ignoreCase: this.ignoreCase, 
 						deep: true
 					}, 
-					onComplete: dojo.hitch(this, "_callbackSetLabel"),
+					onComplete: function(result, dataObject){
+						        dojo.hitch(_this, "_callbackSetLabel")(result, dataObject, priorityChange);
+					},
 					onError: function(errText){
 						console.error('dijit.form.FilteringSelect: ' + errText);
 						dojo.hitch(_this, "_setValue")(undefined, label, false);

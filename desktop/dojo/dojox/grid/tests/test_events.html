@@ -39,7 +39,6 @@
 	<script type="text/javascript" src="../../../dojo/dojo.js" djConfig="isDebug:false, parseOnLoad: true"></script>
 	<script type="text/javascript">
 		dojo.require("dojox.grid.Grid");
-		dojo.require("dojox.grid._data.model");
 		dojo.require("dojo.parser");
 	</script>
 	<script type="text/javascript">
@@ -51,14 +50,17 @@
 			{ name: 'onRowDblClick', properties: ['rowIndex'] },
 			{ name: 'onCellMouseOver' },
 			{ name: 'onCellMouseOut' },
+			{ name: 'onCellMouseDown' },
 			{ name: 'onRowMouseOver' },
 			{ name: 'onRowMouseOut' },
+			{ name: 'onRowMouseDown' },
 			{ name: 'onHeaderCellClick' },
 			{ name: 'onHeaderClick', properties: ['rowIndex'] },
 			{ name: 'onHeaderCellDblClick' },
 			{ name: 'onHeaderDblClick', properties: ['rowIndex'] },
 			{ name: 'onHeaderCellMouseOver' },
 			{ name: 'onHeaderCellMouseOut' },
+			{ name: 'onHeaderCellMouseDown' },
 			{ name: 'onHeaderMouseOver' },
 			{ name: 'onHeaderMouseOut' },
 			{ name: 'onKeyDown', properties: ['keyCode'] },

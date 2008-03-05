@@ -29,7 +29,7 @@ if(!dojo.config["useXDomain"] || dojo.config["allowXdRichTextSave"]){
 		})();
 	}else{
 		//dojo.body() is not available before onLoad is fired
-		try {
+		try{
 			dojo.doc.write('<textarea id="' + dijit._scopeName + '._editor.RichText.savedContent" ' +
 				'style="display:none;position:absolute;top:-100px;left:-100px;height:3px;width:3px;overflow:hidden;"></textarea>');
 		}catch(e){ }
@@ -330,7 +330,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		this.isClosed = false;
 		// Safari's selections go all out of whack if we do it inline,
 		// so for now IE is our only hero
-		//if (typeof dojo.doc.body.contentEditable != "undefined") {
+		//if(typeof dojo.doc.body.contentEditable != "undefined"){
 		if(dojo.isIE || dojo.isSafari || dojo.isOpera){ // contentEditable, easy
 			var ifr = this.iframe = dojo.doc.createElement('iframe');
 			ifr.id=this.id;
@@ -379,7 +379,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 
 	_getIframeDocTxt: function(/* String */ html){
 		var _cs = dojo.getComputedStyle(this.domNode);
-		if(!this.height && !dojo.isMoz){
+		if(dojo.isIE || (!this.height && !dojo.isMoz)){
 			html="<div>"+html+"</div>";
 		}
 		var font = [ _cs.fontWeight, _cs.fontSize, _cs.fontFamily ].join(" ");
@@ -612,7 +612,12 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 	_mozSettingProps: ['styleWithCSS','insertBrOnReturn'],
 	setDisabled: function(/*Boolean*/ disabled){
 		if(dojo.isIE || dojo.isSafari || dojo.isOpera){
-			this.editNode.contentEditable=!disabled;
+			if(dojo.isIE){ this.editNode.unselectable = "on"; } // prevent IE from setting focus
+                        this.editNode.contentEditable=!disabled;
+			if(dojo.isIE){
+				var _this = this;
+				setTimeout(function(){ _this.editNode.unselectable = "off"; }, 0);
+			}
 		}else{ //moz
 			if(disabled){
 				//AP: why isn't this set in the constructor, or put in mozSettingProps as a hash?
@@ -644,10 +649,20 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			this.window.__registeredWindow=true;
 			dijit.registerWin(this.window);
 		}
-		if(this.height || dojo.isMoz){
+		if(!dojo.isIE && (this.height || dojo.isMoz)){
 			this.editNode=this.document.body;
 		}else{
 			this.editNode=this.document.body.firstChild;
+			var _this = this;
+			if(dojo.isIE){ // #4996 IE wants to focus the BODY tag
+				this.editNode.parentNode.onfocus =
+					function(){
+						if(!_this.editNode.blurring){
+							_this.editNode.focus();
+						}
+						_this.editNode.blurring = false;
+					}
+			}
 		}
 
 		try{
@@ -677,11 +692,12 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			// FIXME: when scrollbars appear/disappear this needs to be fired
 		}else{ // IE contentEditable
 			// give the node Layout on IE
+			this.connect(this.document, "onmousedown", "_onMouseDown"); // #4996 fix focus
 			this.editNode.style.zoom = 1.0;
 		}
 
 		if(this.focusOnLoad){
-			this.focus();
+			setTimeout(dojo.hitch(this, "focus"), 0); // have to wait for IE to set unselectable=off
 		}
 
 		this.onDisplayChanged(e);
@@ -693,26 +709,27 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 	onKeyDown: function(/* Event */ e){
 		// summary: Fired on keydown
 
-//		 console.info("onkeydown:", e.keyCode);
-
 		// we need this event at the moment to get the events from control keys
 		// such as the backspace. It might be possible to add this to Dojo, so that
 		// keyPress events can be emulated by the keyDown and keyUp detection.
 		if(dojo.isIE){
-			if(e.keyCode === dojo.keys.BACKSPACE && this.document.selection.type === "Control"){
+			if(e.keyCode == dojo.keys.TAB && e.shiftKey && !e.ctrlKey && !e.altKey){
+				// focus the BODY so the browser will tab away from it instead
+				this.editNode.blurring = true;
+				this.editNode.parentNode.focus();
+			}else if(e.keyCode === dojo.keys.BACKSPACE && this.document.selection.type === "Control"){
 				// IE has a bug where if a non-text object is selected in the editor,
 		  // hitting backspace would act as if the browser's back button was
 		  // clicked instead of deleting the object. see #1069
 				dojo.stopEvent(e);
 				this.execCommand("delete");
-			}else if(	(65 <= e.keyCode&&e.keyCode <= 90) ||
+			}else if((65 <= e.keyCode&&e.keyCode <= 90) ||
 				(e.keyCode>=37&&e.keyCode<=40) // FIXME: get this from connect() instead!
 			){ //arrow keys
 				e.charCode = e.keyCode;
 				this.onKeyPress(e);
 			}
-		}
-		else if (dojo.isMoz){
+		}else if(dojo.isMoz){
 			if(e.keyCode == dojo.keys.TAB && !e.shiftKey && !e.ctrlKey && !e.altKey && this.iframe){
 				// update iframe document title for screen reader
 				this.iframe.contentDocument.title = this._localizedIframeTitles.iframeFocusTitle;
@@ -721,9 +738,9 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 				// on the correct control.
 				this.iframe.focus();  // this.focus(); won't work
 				dojo.stopEvent(e);
-			}else if (e.keyCode == dojo.keys.TAB && e.shiftKey){
+			}else if(e.keyCode == dojo.keys.TAB && e.shiftKey){
 				// if there is a toolbar, set focus to it, otherwise ignore
-				if (this.toolbar){
+				if(this.toolbar){
 					this.toolbar.focus();
 				}
 				dojo.stopEvent(e);
@@ -741,8 +758,6 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 
 	onKeyPress: function(e){
 		// summary: Fired on keypress
-
-//		 console.info("onkeypress:", e.keyCode);
 
 		// handle the various key events
 		var modifiers = e.ctrlKey ? this.KEY_CTRL : 0 | e.shiftKey?this.KEY_SHIFT : 0;
@@ -784,6 +799,13 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 //		console.info('onClick',this._tryDesignModeOn);
 		this.onDisplayChanged(e);
 	},
+
+	_onMouseDown: function(/*Event*/e){ // IE only to prevent 2 clicks to focus
+		if(!this._focused && !this.disabled){
+			this.focus();
+		}
+	},
+
 	_onBlur: function(e){
 		this.inherited(arguments);
 		var _c=this.getValue(true);
@@ -794,11 +816,9 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		if(dojo.isMoz && this.iframe){
 			this.iframe.contentDocument.title = this._localizedIframeTitles.iframeEditTitle;
 		} 
-//			console.info('_onBlur')
 	},
 	_initialFocus: true,
 	_onFocus: function(/*Event*/e){
-//			console.info('_onFocus')
 		// summary: Fired on focus
 		this.inherited(arguments);
 		if(dojo.isMoz && this._initialFocus){
@@ -977,18 +997,25 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			}
 		}
 		if(command == "inserthtml"){
-			//TODO: we shall probably call _preDomFilterContent here as well
 			argument=this._preFilterContent(argument);
 			if(dojo.isIE){
 				var insertRange = this.document.selection.createRange();
-				insertRange.pasteHTML(argument);
+				if(this.document.selection.type.toUpperCase()=='CONTROL'){
+					var n=insertRange.item(0);
+					while(insertRange.length){
+						insertRange.remove(insertRange.item(0));
+					}
+					n.outerHTML=argument;
+				}else{
+					insertRange.pasteHTML(argument);
+				}
 				insertRange.select();
 				//insertRange.collapse(true);
 				returnValue=true;
 			}else if(dojo.isMoz && !argument.length){
 				//mozilla can not inserthtml an empty html to delete current selection
 				//so we delete the selection instead in this case
-				dojo.withGlobal(this.window,'remove',dijit._editor.selection); // FIXME
+				dojo.withGlobal(this.window,'remove',dijit._editor.selection);
 				returnValue=true;
 			}else{
 				returnValue=this.document.execCommand(command, false, argument);
@@ -1303,7 +1330,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		var changed = (this.savedContent != this._content);
 
 		// line height is squashed for iframes
-		// FIXME: why was this here? if (this.iframe){ this.domNode.style.lineHeight = null; }
+		// FIXME: why was this here? if(this.iframe){ this.domNode.style.lineHeight = null; }
 
 		if(this.interval){ clearInterval(this.interval); }
 

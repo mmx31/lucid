@@ -6,7 +6,7 @@ dojo.require("dijit.Toolbar");
 dojo.require("dijit._editor._Plugin");
 dojo.require("dijit._Container");
 dojo.require("dojo.i18n");
-dojo.requireLocalization("dijit._editor", "commands", null, "zh,pt,ru,de,ja,cs,fr,es,gr,ko,zh-tw,pl,it,hu,ROOT");
+dojo.requireLocalization("dijit._editor", "commands", null, "ko,zh,ja,gr,zh-tw,ru,it,hu,fr,pt,pl,es,ROOT,de,cs");
 
 dojo.declare(
 	"dijit.Editor",
@@ -178,7 +178,7 @@ dojo.declare(
 			}
 		},
 		_moveToBookmark: function(b){
-			var bookmark;
+			var bookmark=b;
 			if(dojo.isIE){
 				if(dojo.isArray(b)){//IE CONTROL
 					bookmark=[];
@@ -347,14 +347,15 @@ dojo.declare(
 /* the following code is to registered a handler to get default plugins */
 dojo.subscribe(dijit._scopeName + ".Editor.getPlugin",null,function(o){
 	if(o.plugin){ return; }
-	var args=o.args, p;
+	var args = o.args, p;
 	var _p = dijit._editor._Plugin;
-	var name=args.name;
+	var name = args.name;
 	switch(name){
 		case "undo": case "redo": case "cut": case "copy": case "paste": case "insertOrderedList":
 		case "insertUnorderedList": case "indent": case "outdent": case "justifyCenter":
 		case "justifyFull": case "justifyLeft": case "justifyRight": case "delete":
 		case "selectAll": case "removeFormat":
+		case "insertHorizontalRule":
 			p = new _p({ command: name });
 			break;
 
@@ -364,18 +365,6 @@ dojo.subscribe(dijit._scopeName + ".Editor.getPlugin",null,function(o){
 			break;
 		case "|":
 			p = new _p({ button: new dijit.ToolbarSeparator() });
-			break;
-		case "createLink": case "insertImage":
-			p = new dijit._editor.plugins.LinkDialog({ command: name });
-			break;
-		case "foreColor": case "hiliteColor":
-			p = new dijit._editor.plugins.TextColor({ command: name });
-			break;
-		case "fontName": case "fontSize": case "formatBlock":
-			p = new dijit._editor.plugins.FontChoice({ command: name });
-			break;
-		case "toggleDir":
-			p = new dijit._editor.plugins.ToggleDir({ command: name});
 	}
 //	console.log('name',name,p);
 	o.plugin=p;

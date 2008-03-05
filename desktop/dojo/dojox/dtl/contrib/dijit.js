@@ -48,8 +48,20 @@ dojo.require("dojo.parser");
 				if(!this._clear){
 					buffer.getParent()[type] = null;
 				}
-				if(!this._rendered.length){
-					this._rendered.push(buffer.addEvent(context, type, this.contents[i]));
+				var fn = this.contents[i];
+				var args;
+				if(dojo.isArray(fn)){
+					if(this._rendered[i]){
+						dojo.disconnect(this._rendered[i]);
+						this._rendered[i] = false;
+					}
+					args = dojo.map(fn.slice(1), function(item){
+						return new dd._Filter(item).resolve(context);
+					});
+					fn = fn[0];
+				}
+				if(!this._rendered[i]){
+					this._rendered[i] = buffer.addEvent(context, type, fn, args);
 				}
 			}
 			this._clear = true;
@@ -128,7 +140,7 @@ dojo.require("dojo.parser");
 		on: function(parser, text){
 			// summary: Associates an event type to a function (on the current widget) by name
 			var parts = text.split(" ");
-			return new ddcd.EventNode([parts[0]], [parts[1]]);
+			return new ddcd.EventNode([parts[0]], [parts.slice(1)]);
 		}
 	});
 

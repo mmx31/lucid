@@ -7,7 +7,7 @@ dojo.require("dojo.i18n");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.Tooltip");
 
-dojo.requireLocalization("dijit.form", "validate", null, "zh-cn,zh,pt,ru,de,ja,ROOT,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
+dojo.requireLocalization("dijit.form", "validate", null, "ko,zh-cn,zh,ja,gr,zh-tw,ru,it,hu,ROOT,fr,pt,pl,es,de,cs");
 
 dojo.declare(
 	"dijit.form.ValidationTextBox",
@@ -107,6 +107,7 @@ dojo.declare(
 				}
 			}
 			this.displayMessage(message);
+			return isValid;
 		},
 
 		// currently displayed message
@@ -171,7 +172,7 @@ dojo.declare(
 
 		validate: function(){
 			this.valueNode.value = this.toString();
-			this.inherited(arguments);
+			return this.inherited(arguments);
 		},
 
 		setAttribute: function(/*String*/ attr, /*anything*/ value){

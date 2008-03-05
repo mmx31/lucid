@@ -21,4 +21,12 @@ dojo.declare("dijit._editor.plugins.TextColor",
 	}
 );
 
+dojo.subscribe(dijit._scopeName + ".Editor.getPlugin",null,function(o){
+	if(o.plugin){ return; }
+	switch(o.args.name){
+	case "foreColor": case "hiliteColor":
+		o.plugin = new dijit._editor.plugins.TextColor({command: o.args.name});
+	}
+});
+
 }

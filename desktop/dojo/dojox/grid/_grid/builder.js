@@ -76,7 +76,7 @@ dojo.declare("dojox.grid.Builder",
 	
 	findCellTarget: function(inSourceNode, inTopNode){
 		var n = inSourceNode;
-		while(n && (!this.isCellNode(n) || (dojox.grid.gridViewTag in n.offsetParent.parentNode && n.offsetParent.parentNode[dojox.grid.gridViewTag] != this.view)) && (n!=inTopNode)){
+		while(n && (!this.isCellNode(n) || (dojox.grid.gridViewTag in n.offsetParent.parentNode && n.offsetParent.parentNode[dojox.grid.gridViewTag] != this.view.id)) && (n!=inTopNode)){
 			n = n.parentNode;
 		}
 		return n!=inTopNode ? n : null 
@@ -95,7 +95,7 @@ dojo.declare("dojox.grid.Builder",
 	// event dispatch
 	findTarget: function(inSource, inTag){
 		var n = inSource;
-		while(n && (n!=this.domNode) && (!(inTag in n) || (dojox.grid.gridViewTag in n && n[dojox.grid.gridViewTag] != this.view))){
+		while(n && (n!=this.domNode) && (!(inTag in n) || (dojox.grid.gridViewTag in n && n[dojox.grid.gridViewTag] != this.view.id))){
 			n = n.parentNode;
 		}
 		return (n != this.domNode) ? n : null; 
@@ -147,6 +147,12 @@ dojo.declare("dojox.grid.Builder",
 				this.grid.onMouseOutRow(e);
 			}
 		}
+	},
+	
+	domousedown: function(e){
+		if (e.cellNode)
+			this.grid.onMouseDown(e);
+		this.grid.onMouseDownRow(e)
 	}
 
 });
@@ -270,6 +276,9 @@ dojo.declare("dojox.grid.headerBuilder",
 		if(dojo.isMoz){
 			var n = dojox.grid.ascendDom(e.target, dojox.grid.makeNotTagName("th"));
 			x -= (n && n.offsetLeft) || 0;
+			var t = e.sourceView.getScrollbarWidth();
+			if(!dojo._isBodyLtr() && e.sourceView.headerNode.scrollLeft < t)
+				x -= t;
 			//x -= getProp(ascendDom(e.target, mkNotTagName("td")), "offsetLeft") || 0;
 		}
 		var n = dojox.grid.ascendDom(e.target, function(){
@@ -295,9 +304,9 @@ dojo.declare("dojox.grid.headerBuilder",
 
 	// event handlers
 	// resizing
-	prepareLeftResize: function(e){
+	prepareResize: function(e, mod){
 		var i = dojox.grid.getTdIndex(e.cellNode);
-		e.cellNode = (i ? e.cellNode.parentNode.cells[i-1] : null);
+		e.cellNode = (i ? e.cellNode.parentNode.cells[i+mod] : null);
 		e.cellIndex = (e.cellNode ? this.getCellNodeIndex(e.cellNode) : -1);
 		return Boolean(e.cellNode);
 	},
@@ -311,11 +320,17 @@ dojo.declare("dojox.grid.headerBuilder",
 	},
 
 	overLeftResizeArea: function(e){
-		return (e.cellIndex>0) && (e.cellX < this.overResizeWidth) && this.prepareLeftResize(e);
+		if(dojo._isBodyLtr()){
+			return (e.cellIndex>0) && (e.cellX < this.overResizeWidth) && this.prepareResize(e, -1);
+		}
+		return t = e.cellNode && (e.cellX < this.overResizeWidth);
 	},
 
 	overRightResizeArea: function(e){
-		return e.cellNode && (e.cellX >= e.cellNode.offsetWidth - this.overResizeWidth);
+		if(dojo._isBodyLtr()){
+			return e.cellNode && (e.cellX >= e.cellNode.offsetWidth - this.overResizeWidth);
+		}
+		return (e.cellIndex>0) && (e.cellX >= e.cellNode.offsetWidth - this.overResizeWidth) && this.prepareResize(e, -1);
 	},
 
 	domousemove: function(e){
@@ -333,6 +348,9 @@ dojo.declare("dojox.grid.headerBuilder",
 		if(!dojox.grid.drag.dragging){
 			if((this.overRightResizeArea(e) || this.overLeftResizeArea(e)) && this.canResize(e)){
 				this.beginColumnResize(e);
+			}else{
+				this.grid.onMouseDown(e);
+				this.grid.onMouseOverRow(e);
 			}
 			//else{
 			//	this.beginMoveColumn(e);
@@ -356,6 +374,7 @@ dojo.declare("dojox.grid.headerBuilder",
 			//console.log("spanner: " + this.getCellNodeIndex(cell));
 		}
 		var drag = {
+			scrollLeft: e.sourceView.headerNode.scrollLeft,
 			view: e.sourceView,
 			node: e.cellNode,
 			index: e.cellIndex,
@@ -367,16 +386,28 @@ dojo.declare("dojox.grid.headerBuilder",
 	},
 
 	doResizeColumn: function(inDrag, inEvent){
-		var w = inDrag.w + inEvent.deltaX;
+		var isLtr = dojo._isBodyLtr();
+		if(isLtr){
+			var w = inDrag.w + inEvent.deltaX;
+		}else{
+			var w = inDrag.w - inEvent.deltaX;
+		}
 		if(w >= this.minColWidth){
 			for(var i=0, s, sw; (s=inDrag.spanners[i]); i++){
-				sw = s.width + inEvent.deltaX;
+				if(isLtr){
+					sw = s.width + inEvent.deltaX;
+				}else{
+					sw = s.width - inEvent.deltaX;
+				}
 				s.node.style.width = sw + 'px';
 				inDrag.view.setColWidth(s.index, sw);
 				//console.log('setColWidth', '#' + s.index, sw + 'px');
 			}
 			inDrag.node.style.width = w + 'px';
 			inDrag.view.setColWidth(inDrag.index, w);
+			if(!isLtr){
+				inDrag.view.headerNode.scrollLeft = (inDrag.scrollLeft - inEvent.deltaX);
+			}
 		}
 		if(inDrag.view.flexCells && !inDrag.view.testFlexCells()){
 			var t = dojox.grid.findTable(inDrag.node);

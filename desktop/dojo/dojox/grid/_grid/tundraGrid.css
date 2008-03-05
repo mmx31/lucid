@@ -4,6 +4,8 @@
 	font-size: 0.85em; 
 	-moz-outline-style: none;
 	outline: none;
+	overflow: hidden;
+	height: 0;
 }
 .tundra .dojoxGrid table {
 	padding: 0;
@@ -189,7 +191,16 @@
 	top: -1000px;
 	height: 0px, width: 0px;
 }
-.dijit_a11y .dojoxGrid-rowbar-selected * .dojoxGrid-rowbar-inner {
+.dijit_a11y .dojoxGrid-rowbar-selected { 
+	border-top: 1px solid white;
+	border-bottom: 1px dashed black;
+	border-top: 0;
 	background: none;
-	border: 4px white solid !important;
+}
+.dijit_a11y .dojoxGrid-rowbar-selected .dojoxGrid-rowbar-inner {
+	border: 0;
+	border-top: 1px solid white;
+}
+.dijit_a11y .dojoxGrid-row-selected {
+	border-bottom: 1px dashed black;
 }

@@ -3,7 +3,11 @@
 <head>
 	<title>dijit.layout.BorderContainer Test - complex layout</title>
 
-	<link rel="stylesheet" href="../css/dijitTests.css" />
+	<style type="text/css">
+		@import "../../../dojo/resources/dojo.css";
+		@import "../css/dijitTests.css";
+	</style>
+
 	<script type="text/javascript" src="../../../dojo/dojo.js"
 		djConfig="isDebug: true, parseOnLoad: true"></script>
 	<script type="text/javascript" src="../_testCommon.js"></script>
@@ -15,10 +19,10 @@
 		dojo.require("dijit.layout.LinkPane");
 		dojo.require("dijit.Tooltip");
 		dojo.require("dijit.layout.BorderContainer");
+		dojo.require("dijit.layout.SplitContainer");
 		dojo.require("dijit.layout.ContentPane");
 		dojo.require("dijit.form.FilteringSelect");
 	</script>
-
 </head>
 <body>
 

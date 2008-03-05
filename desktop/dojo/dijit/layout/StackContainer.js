@@ -6,7 +6,7 @@ dojo.require("dijit._Templated");
 dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dijit.form.Button");
 dojo.require("dijit.Menu");
-dojo.requireLocalization("dijit", "common", null, "zh,pt,ru,sv,de,ja,ROOT,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
+dojo.requireLocalization("dijit", "common", null, "ko,zh,sv,ja,gr,zh-tw,ru,it,hu,fr,pt,ROOT,pl,es,de,cs");
 
 dojo.declare(
 	"dijit.layout.StackContainer",
@@ -20,7 +20,7 @@ dojo.declare(
 	// 	A container for widgets (ContentPanes, for example) That displays
 	//	only one Widget at a time.
 	//	
-	//	Publishes topics <widgetId>-addChild, <widgetId>-removeChild, and <widgetId>-selectChild
+	//	Publishes topics [widgetId]-addChild, [widgetId]-removeChild, and [widgetId]-selectChild
 	//
 	//	Can be base class for container, Wizard, Show, etc.
 	// 
@@ -299,8 +299,12 @@ dojo.declare(
            		closeMenu.addChild(mItem);
 			}
 			if(!this._currentChild){ // put the first child into the tab order
-				button.focusNode.setAttribute("tabIndex","0");
+				button.focusNode.setAttribute("tabIndex", "0");
 				this._currentChild = page;
+			}
+			//make sure all tabs have the same length
+			if(!dojo._isBodyLtr() && dojo.isIE && this._rectifyRtlTabList){
+				this._rectifyRtlTabList();
 			}
 		},
 
@@ -357,7 +361,7 @@ dojo.declare(
 		
 		// TODO: this is a bit redundant with forward, back api in StackContainer
 		adjacent: function(/*Boolean*/ forward){
-			if(!this.isLeftToRight()){ forward = !forward; }
+			if(!this.isLeftToRight() && (!this.tabPosition || /top|bottom/.test(this.tabPosition))){ forward = !forward; }
 			// find currently focused button in children array
 			var children = this.getChildren();
 			var current = dojo.indexOf(children, this.pane2button[this._currentChild]);
@@ -410,7 +414,7 @@ dojo.declare(
 						}
 				}
 				// handle page navigation
-				if(forward != null){
+				if(forward !== null){
 					this.adjacent(forward).onClick();
 					dojo.stopEvent(e);
 				}

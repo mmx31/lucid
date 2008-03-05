@@ -7,7 +7,7 @@ dojo.require("dijit.layout._LayoutWidget");
 
 dojo.require("dojo.parser");
 dojo.require("dojo.string");
-dojo.requireLocalization("dijit", "loading", null, "zh,pt,ru,sv,ROOT,de,ja,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
+dojo.requireLocalization("dijit", "loading", null, "ko,zh,sv,ja,gr,zh-tw,ru,it,ROOT,hu,fr,pt,pl,es,de,cs");
 
 dojo.declare(
 	"dijit.layout.ContentPane",
@@ -88,6 +88,11 @@ dojo.declare(
 		// remove the title attribute so it doesn't show up when i hover
 		// over a node
 		this.domNode.title = "";
+
+		if(!this.containerNode){
+			// make getDescendants() work
+			this.containerNode = this.domNode;
+		}
 
 		if(this.preload){
 			this._loadCheck();
@@ -238,7 +243,17 @@ dojo.declare(
 		this._loadCheck(forceLoad);
 	},
 
-	_loadCheck: function(forceLoad){
+	_isShown: function(){
+		// summary: returns true if the content is currently shown
+		if("open" in this){
+			return this.open;		// for TitlePane, etc.
+		}else{
+			var node = this.domNode;
+			return (node.style.display != 'none')  && (node.style.visibility != 'hidden');
+		}
+	},
+
+	_loadCheck: function(/*Boolean*/ forceLoad){
 		// call this when you change onShow (onSelected) status when selected in parent container
 		// it's used as a trigger for href download when this.domNode.display != 'none'
 
@@ -251,7 +266,7 @@ dojo.declare(
 		// else -> load when download not in progress, if this.open !== false (undefined is ok) AND
 		//						domNode display != 'none', isLoaded must be false
 
-		var displayState = ((this.open !== false) && (this.domNode.style.display != 'none'));
+		var displayState = this._isShown();
 
 		if(this.href &&	
 			(forceLoad ||

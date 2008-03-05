@@ -4,6 +4,8 @@
 	font-family: Geneva, Arial, Helvetica, sans-serif;
 	-moz-outline-style: none;
 	outline: none;
+	overflow: hidden;
+	height: 0;
 }
 .dojoxGrid table {
 	padding: 0;

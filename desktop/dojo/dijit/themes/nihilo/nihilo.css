@@ -10,16 +10,24 @@
 {
 	cursor: not-allowed !important;
 }
-.nihilo .dojoDndAvatar			{font-size: 75%; color: black;}
-.nihilo .dojoDndAvatarHeader td	{padding:5px 20px;}
-.nihilo .dojoDndAvatarHeader	{background: #ccc;}
-.nihilo .dojoDndAvatarItem		{background: #eee;}
-.nihilo.dojoDndMove .dojoDndAvatarHeader	{background-image: url(images/dndNoMove.png); background-repeat: no-repeat;}
-.nihilo.dojoDndCopy .dojoDndAvatarHeader	{background-image: url(images/dndNoCopy.png); background-repeat: no-repeat;}
-.nihilo.dojoDndMove .dojoDndAvatarCanDrop .dojoDndAvatarHeader	{background-image: url(images/dndMove.png); background-repeat: no-repeat;}
-.nihilo.dojoDndCopy .dojoDndAvatarCanDrop .dojoDndAvatarHeader	{background-image: url(images/dndCopy.png); background-repeat: no-repeat;}
-.nihilo .dojoDndItem {
+.nihilo .dojoDndItemBefore {
+	border-top: 2px solid #369;
 }
+.nihilo .dojoDndItemAfter {
+	border-bottom: 2px solid #369;
+}
+.nihilo .dojoDndItemOver {
+	cursor:pointer;
+}
+.nihilo table.dojoDndAvatar { -moz-border-radius: 0; border: 1px solid #ccc; border-collapse: collapse; background-color: #fff; font-size: 75%; color: black;}
+.nihilo .dojoDndAvatar td	{ border: none; }
+.nihilo .dojoDndAvatar tr	{ border: none; }
+.nihilo .dojoDndAvatarHeader td	{ height: 20px; padding: 0 0 0 21px; }
+.nihilo .dojoDndAvatarItem td { padding: 2px;}
+.nihilo.dojoDndMove .dojoDndAvatarHeader	{background-color: #f58383; background-image: url(images/dndNoMove.png); background-repeat: no-repeat; background-position: 2px center;}
+.nihilo.dojoDndCopy .dojoDndAvatarHeader	{background-color: #f58383; background-image: url(images/dndNoCopy.png); background-repeat: no-repeat; background-position: 2px center;}
+.nihilo.dojoDndMove .dojoDndAvatarCanDrop .dojoDndAvatarHeader	{background-color: #97e68d; background-image: url(images/dndMove.png); background-repeat: no-repeat; background-position: 2px center;}
+.nihilo.dojoDndCopy .dojoDndAvatarCanDrop .dojoDndAvatarHeader	{background-color: #97e68d; background-image: url(images/dndCopy.png); background-repeat: no-repeat; background-position: 2px center;}
  
  
 .nihilo .dijitTabPaneWrapper { 
@@ -518,12 +526,10 @@
 .nihilo .dijitArrowButtonInner {
 	background:url(images/spriteArrows.png) no-repeat left top;
 	width: 11px;
-	margin: 0 auto 0 auto;
 }
 .nihilo .dijitUpArrowButton .dijitArrowButtonInner { 
 	background:url(images/spriteArrows.png) no-repeat -22px top; 
 	width: 11px;
-	margin: 0 auto 2px auto;
 }
 .dj_ie6 .nihilo .dijitArrowButtonInner {
 	background:url(images/spriteArrows.gif) no-repeat left top;
@@ -1034,8 +1040,9 @@
 	font-weight:normal;
 }
 .nihilo .dijitToolbar {
+	padding: 3px 0 1px 3px;	
 	border-bottom: 1px solid #ccc;
-	background:#fafafa url(images/titleBar.png) repeat-x top left;
+	background:#fdfdfd url(images/titleBar.png) repeat-x top left;
 }
 .nihilo .dijitToolbar * {
 	padding: 0;
@@ -1074,9 +1081,12 @@
 	border-color: #f7c95c;
 	background-color: #ffe284 !important;
 	
-	_border: 1px solid #366dba;
-	_margin: -1px 0 0 0;
+	_border: 1px solid #F7C95C;
+	_margin: 0 0 0 0;
 	_padding: 0;
+}
+.nihilo .dijitToolbar label {	
+	padding: 3px 3px 0 6px;
 }
 .nihilo .dijitDialog {
 	background: #eee;
@@ -1182,13 +1192,13 @@
 }
 .dj_ie6 .nihilo .dijitTooltipAbove .dijitTooltipConnector {
 	background-image: url(images/tooltipConnectorDown.gif);
-	bottom: -3px;
+	bottom: -5px;
 }
 .nihilo .dijitTooltipLeft {
 	padding-right: 10px;
 }
 .dj_ie6 .nihilo .dijitTooltipLeft {
-	padding-right: 12px;
+	padding-left: 11px;
 }
 .nihilo .dijitTooltipLeft .dijitTooltipConnector {
 	

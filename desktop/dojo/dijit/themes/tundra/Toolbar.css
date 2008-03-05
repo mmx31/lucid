@@ -1,6 +1,7 @@
 .tundra .dijitToolbar {
+	padding: 3px 0 1px 3px;	
 	border-bottom: 1px solid #ccc;
-	background:#fafafa url("images/titleBar.png") repeat-x top left;
+	background:#eaeaea url("images/titleBar.png") repeat-x top left;
 }
 .tundra .dijitToolbar * {
 	padding: 0;
@@ -39,6 +40,9 @@
 	border-color: #aec6e7;
 	
 	_border: 1px solid #366dba;
-	_margin: -1px 0 0 0;
+	_margin: 0 0 0 0;
 	_padding: 0;
+}
+.tundra .dijitToolbar label {	
+	padding: 3px 3px 0 6px;
 }

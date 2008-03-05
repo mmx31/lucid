@@ -4,19 +4,6 @@
 	<head>
 		<title>Test TextBox Validation Widgets</title>
 
-
-		<script type="text/javascript" src="../../../dojo/dojo.js"
-			djConfig="isDebug: true, parseOnLoad: true, extraLocale: ['de-de', 'en-us']"></script>
-		<script type="text/javascript" src="../_testCommon.js"></script>
-
-		<script type="text/javascript">
-			dojo.require("dijit.form.TextBox");
-			dojo.require("dijit.form.ValidationTextBox");
-			dojo.require("dijit.form.NumberTextBox");
-			dojo.require("dijit.form.CurrencyTextBox");
-			dojo.require("dojo.currency");
-			dojo.require("dojo.parser");	// scan page for widgets and instantiate them
-		</script>
 		<style type="text/css">
 			@import "../../../dojo/resources/dojo.css";
 			@import "../css/dijitTests.css";
@@ -28,16 +15,16 @@
 				border:1px solid #bfbfbf;
 			}
 
-			.small {
+			body .small {
 				width: 3em;
 			}
-			.medium {
+			body .medium {
 				width: 10em;
 			}
-			.long {
+			body .long {
 				width: 20em;
 			}
-			.verylong {
+			body .verylong {
 				width: 90%;
 			}
 
@@ -51,6 +38,19 @@
 				font-weight:bold;
 			}
 		</style>
+
+		<script type="text/javascript" src="../../../dojo/dojo.js"
+			djConfig="isDebug: true, parseOnLoad: true, extraLocale: ['de-de', 'en-us']"></script>
+		<script type="text/javascript" src="../_testCommon.js"></script>
+
+		<script type="text/javascript">
+			dojo.require("dijit.form.TextBox");
+			dojo.require("dijit.form.ValidationTextBox");
+			dojo.require("dijit.form.NumberTextBox");
+			dojo.require("dijit.form.CurrencyTextBox");
+			dojo.require("dojo.currency");
+			dojo.require("dojo.parser");	// scan page for widgets and instantiate them
+		</script>
 	</head>
 
 	<body>
@@ -93,7 +93,7 @@
 				<input id="q03" type="text" name="age" tabIndex=1
 					dojoType="dijit.form.NumberTextBox"
 					promptMessage="(optional) Enter an age between 0 and 120"
-					maxLength=3
+					maxLength="3"
 					class="small"
 					constraints="{places:0,min:0,max:120}"
 					onChange="console.debug('onChange fired for widget id = ' + this.id + ' with value = ' + arguments[0]);"

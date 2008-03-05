@@ -1,6 +1,7 @@
 .nihilo .dijitToolbar {
+	padding: 3px 0 1px 3px;	
 	border-bottom: 1px solid #ccc;
-	background:#fafafa url("images/titleBar.png") repeat-x top left;
+	background:#fdfdfd url("images/titleBar.png") repeat-x top left;
 }
 .nihilo .dijitToolbar * {
 	padding: 0;
@@ -39,7 +40,10 @@
 	border-color: #f7c95c;
 	background-color: #ffe284 !important;
 	
-	_border: 1px solid #366dba;
-	_margin: -1px 0 0 0;
+	_border: 1px solid #F7C95C;
+	_margin: 0 0 0 0;
 	_padding: 0;
+}
+.nihilo .dijitToolbar label {	
+	padding: 3px 3px 0 6px;
 }

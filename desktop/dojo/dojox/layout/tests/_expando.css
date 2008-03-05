@@ -114,7 +114,7 @@ h1.testTitle {
 	height: 16px;
 }
 .plusBlockIcon {
-	display: block;
+	display: block !important;
 }
 .noteIcon {
 	background-image: url(../../../dijit/tests/images/note.gif);

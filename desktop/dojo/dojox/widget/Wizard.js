@@ -7,8 +7,8 @@ dojo.require("dijit.layout.ContentPane");
 dojo.require("dijit.form.Button");
 
 dojo.require("dojo.i18n"); 
-dojo.requireLocalization("dijit", "common", null, "zh,pt,ru,sv,de,ja,ROOT,cs,fr,es,gr,ko,zh-tw,pl,it,hu"); 
-dojo.requireLocalization("dojox.widget", "Wizard", null, "sv,ROOT"); 
+dojo.requireLocalization("dijit", "common", null, "ko,zh,sv,ja,gr,zh-tw,ru,it,hu,fr,pt,ROOT,pl,es,de,cs"); 
+dojo.requireLocalization("dojox.widget", "Wizard", null, "ROOT,sv"); 
 
 dojo.declare(
 	"dojox.widget.WizardContainer",

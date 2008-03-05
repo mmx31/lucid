@@ -50,7 +50,7 @@ dojo.mixin(dijit,
 		var _document = dojo.doc;
 		if(_document.selection){ // IE
 			return !_document.selection.createRange().text; // Boolean
-		}else if(_window.getSelection){
+		}else{
 			var selection = _window.getSelection();
 			if(dojo.isString(selection)){ // Safari
 				return !selection; // Boolean
@@ -66,7 +66,15 @@ dojo.mixin(dijit,
 		if(selection){ // IE
 			var range = selection.createRange();
 			if(selection.type.toUpperCase()=='CONTROL'){
-				bookmark = range.length ? dojo._toArray(range) : null;
+				if(range.length){
+					bookmark=[];
+					var i=0,len=range.length;
+					while(i<len){
+						bookmark.push(range.item(i++));
+					}
+				}else{
+					bookmark=null;
+				}
 			}else{
 				bookmark = range.getBookmark();
 			}
@@ -74,11 +82,11 @@ dojo.mixin(dijit,
 			if(window.getSelection){
 				selection = dojo.global.getSelection();
 				if(selection){
-					var range = selection.getRangeAt(0);
+					range = selection.getRangeAt(0);
 					bookmark = range.cloneRange();
 				}
 			}else{
-				console.debug("No idea how to store the current selection for this browser!");
+				console.warn("No idea how to store the current selection for this browser!");
 			}
 		}
 		return bookmark; // Array
@@ -86,13 +94,13 @@ dojo.mixin(dijit,
 
 	moveToBookmark: function(/*Object*/bookmark){
 		// summary: Moves current selection to a bookmark
-		// bookmark: this should be a returned object from dojo.html.selection.getBookmark()
+		// bookmark: This should be a returned object from dojo.html.selection.getBookmark()
 		var _document = dojo.doc;
 		if(_document.selection){ // IE
 			var range;
 			if(dojo.isArray(bookmark)){
 				range = _document.body.createControlRange();
-				dojo.forEach(bookmark, range.addElement);
+				dojo.forEach(bookmark, "range.addElement(item)"); //range.addElement does not have call/apply method, so can not call it directly
 			}else{
 				range = _document.selection.createRange();
 				range.moveToBookmark(bookmark);
@@ -104,7 +112,7 @@ dojo.mixin(dijit,
 				selection.removeAllRanges();
 				selection.addRange(bookmark);
 			}else{
-				console.debug("No idea how to restore selection for this browser!");
+				console.warn("No idea how to restore selection for this browser!");
 			}
 		}
 	},
@@ -116,13 +124,13 @@ dojo.mixin(dijit,
 		//	or when a toolbar/menubar receives focus
 		//
 		// menu:
-		//	the menu that's being opened
+		//	The menu that's being opened
 		//
 		// openedForWindow:
 		//	iframe in which menu was opened
 		//
 		// returns:
-		//	a handle to restore focus/selection
+		//	A handle to restore focus/selection
 
 		return {
 			// Node to return focus to
@@ -174,14 +182,15 @@ dojo.mixin(dijit,
 				openedForWindow.focus();
 			}
 			try{
-				dojo.withGlobal(openedForWindow||dojo.global, moveToBookmark, null, [bookmark]);
+				dojo.withGlobal(openedForWindow||dojo.global, dijit.moveToBookmark, null, [bookmark]);
 			}catch(e){
 				/*squelch IE internal error, see http://trac.dojotoolkit.org/ticket/1984 */
 			}
 		}
 	},
 
-	// List of currently active widgets (focused widget and it's ancestors)
+	// _activeStack: Array
+	//		List of currently active widgets (focused widget and it's ancestors)
 	_activeStack: [],
 
 	registerWin: function(/*Window?*/targetWindow){
@@ -239,11 +248,14 @@ dojo.mixin(dijit,
 			clearTimeout(dijit._clearActiveWidgetsTimer);
 		}
 		dijit._clearActiveWidgetsTimer = setTimeout(function(){
-			delete dijit._clearActiveWidgetsTimer; dijit._setStack([]); }, 100);
+			delete dijit._clearActiveWidgetsTimer;
+			dijit._setStack([]);
+			dijit._prevFocus = null;
+		}, 100);
 	},
 
 	_onTouchNode: function(/*DomNode*/ node){
-		// summary
+		// summary:
 		//		Callback when node is focused or mouse-downed
 
 		// ignore the recent blurNode event
@@ -287,8 +299,11 @@ dojo.mixin(dijit,
 			return;
 		}
 		dijit._onTouchNode(node);
+
 		if(node==dijit._curFocus){ return; }
-		dijit._prevFocus = dijit._curFocus;
+		if(dijit._curFocus){
+			dijit._prevFocus = dijit._curFocus;
+		}
 		dijit._curFocus = node;
 		dojo.publish("focusNode", [node]);
 	},
@@ -312,6 +327,7 @@ dojo.mixin(dijit,
 			var widget = dijit.byId(oldStack[i]);
 			if(widget){
 				widget._focused = false;
+				widget._hasBeenBlurred = true;
 				if(widget._onBlur){
 					widget._onBlur();
 				}
@@ -323,8 +339,8 @@ dojo.mixin(dijit,
 		}
 
 		// for all element that have come into focus, send focus event
-		for(var i=nCommon; i<newStack.length; i++){
-			var widget = dijit.byId(newStack[i]);
+		for(i=nCommon; i<newStack.length; i++){
+			widget = dijit.byId(newStack[i]);
 			if(widget){
 				widget._focused = true;
 				if(widget._onFocus){
@@ -407,7 +423,7 @@ dijit.getUniqueId = function(/*String*/widgetType){
 	var id;
 	do{
 		id = widgetType + "_" +
-			(dijit._widgetTypeCtr[widgetType] !== undefined ?
+			(widgetType in dijit._widgetTypeCtr ?
 				++dijit._widgetTypeCtr[widgetType] : dijit._widgetTypeCtr[widgetType] = 0);
 	}while(dijit.byId(id));
 	return id; // String
@@ -458,6 +474,13 @@ dijit._tabElements = {
 	textarea: true
 };
 
+dijit._isElementShown = function(/*Element*/elem){
+	var style = dojo.style(elem);
+	return (style.visibility != "hidden")
+		&& (style.visibility != "collapsed")
+		&& (style.display != "none");
+}
+
 dijit.isTabNavigable = function(/*Element*/elem){
 	// summary:
 	//		Tests if an element is tab-navigable
@@ -481,31 +504,36 @@ dijit._getTabNavigable = function(/*DOMNode*/root){
 	//		Finds the following descendants of the specified root node:
 	//		* the first tab-navigable element in document order
 	//		  without a tabindex or with tabindex="0"
-	//		* the last tab-nagibale element in document order
+	//		* the last tab-navigable element in document order
 	//		  without a tabindex or with tabindex="0"
 	//		* the first element in document order with the lowest
 	//		  positive tabindex value
 	//		* the last element in document order with the highest
 	//		  positive tabindex value
 	var first, last, lowest, lowestTabindex, highest, highestTabindex;
-	dojo.query('*', root).forEach(function(elem){
-		if(dijit.isTabNavigable(elem)){
-			var tabindex = dojo.attr(elem, "tabindex");
-			if(!dojo.hasAttr(elem, "tabindex") || tabindex == 0){
-				if(!first){ first = elem; }
-				last = elem;
-			}else if(tabindex > 0){
-				if(!lowest || tabindex < lowestTabindex){
-					lowestTabindex = tabindex;
-					lowest = elem;
-				}
-				if(!highest || tabindex >= highestTabindex){
-					highestTabindex = tabindex;
-					highest = elem;
+	var walkTree = function(/*DOMNode*/parent){
+		dojo.query("> *", parent).forEach(function(child){
+			var isShown = dijit._isElementShown(child);
+			if(isShown && dijit.isTabNavigable(child)){
+				var tabindex = dojo.attr(child, "tabindex");
+				if(!dojo.hasAttr(child, "tabindex") || tabindex == 0){
+					if(!first){ first = child; }
+					last = child;
+				}else if(tabindex > 0){
+					if(!lowest || tabindex < lowestTabindex){
+						lowestTabindex = tabindex;
+						lowest = child;
+					}
+					if(!highest || tabindex >= highestTabindex){
+						highestTabindex = tabindex;
+						highest = child;
+					}
 				}
 			}
-		}
-	});
+			if(isShown){ walkTree(child) }
+		});
+	};
+	if(dijit._isElementShown(root)){ walkTree(root) }
 	return { first: first, last: last, lowest: lowest, highest: highest };
 }
 
@@ -1305,9 +1333,8 @@ dijit.wai = {
 		// registers its onload function after this function.
 		// DO NOT USE "this" within this function.
 
-		var div;
 		// create div for testing if high contrast mode is on or images are turned off
-		div = dojo.doc.createElement("div");
+		var div = dojo.doc.createElement("div");
 		div.id = "a11yTestNode";
 		div.style.cssText = 'border: 1px solid;'
 			+ 'border-color:red green;'
@@ -1339,11 +1366,7 @@ dojo.mixin(dijit,
 	hasWaiRole: function(/*Element*/ elem){
 		// summary: Determines if an element has a role.
 		// returns: true if elem has a role attribute and false if not.
-		if(elem.hasAttribute){
-			return elem.hasAttribute("role");
-		}else{
-			return elem.getAttribute("role") ? true : false;
-		}
+		return elem.hasAttribute ? elem.hasAttribute("role") : !!elem.getAttribute("role");
 	},
 
 	getWaiRole: function(/*Element*/ elem){
@@ -1365,11 +1388,7 @@ dojo.mixin(dijit,
 		// description:
 		//		On Firefox 2 and below, "wairole:" is
 		//		prepended to the provided role value.
-		if(dojo.isFF && dojo.isFF < 3){
-			elem.setAttribute("role", "wairole:"+role);
-		}else{
-			elem.setAttribute("role", role);
-		}
+		elem.setAttribute("role", (dojo.isFF && dojo.isFF < 3) ? "wairole:" + role : role);
 	},
 
 	removeWaiRole: function(/*Element*/ elem){
@@ -1388,14 +1407,9 @@ dojo.mixin(dijit,
 		//		true if elem has a value for the given state and
 		//		false if it does not.
 		if(dojo.isFF && dojo.isFF < 3){
-			var val = elem.hasAttributeNS("http://www.w3.org/2005/07/aaa", state);
-			return val;
+			return elem.hasAttributeNS("http://www.w3.org/2005/07/aaa", state);
 		}else{
-			if(elem.hasAttribute){
-				return elem.hasAttribute("aria-"+state);
-			}else{
-				return elem.getAttribute("aria-"+state) ? true : false;
-			}
+			return elem.hasAttribute ? elem.hasAttribute("aria-"+state) : !!elem.getAttribute("aria-"+state);
 		}
 	},
 
@@ -1410,10 +1424,9 @@ dojo.mixin(dijit,
 		//		The value of the requested state on elem
 		//		or an empty string if elem has no value for state.
 		if(dojo.isFF && dojo.isFF < 3){
-			var val = elem.getAttributeNS("http://www.w3.org/2005/07/aaa", state);
-			return val;
+			return elem.getAttributeNS("http://www.w3.org/2005/07/aaa", state);
 		}else{
-			var value =  elem.getAttribute("aria-"+state);
+			var value = elem.getAttribute("aria-"+state);
 			return value ? value : "";
 		}
 	},
@@ -1479,18 +1492,20 @@ dojo.date.stamp.fromISOString = function(/*String*/formattedString, /*Number?*/d
 	//
 	//	description:
 	//		Accepts a string formatted according to a profile of ISO8601 as defined by
-	//		RFC3339 (http://www.ietf.org/rfc/rfc3339.txt), except that partial input is allowed.
-	//		Can also process dates as specified by http://www.w3.org/TR/NOTE-datetime
+	//		[RFC3339](http://www.ietf.org/rfc/rfc3339.txt), except that partial input is allowed.
+	//		Can also process dates as specified [by the W3C](http://www.w3.org/TR/NOTE-datetime)
 	//		The following combinations are valid:
-	// 			* dates only
-	//				yyyy
-	//				yyyy-MM
-	//				yyyy-MM-dd
+	//
+	//			* dates only
+	//			|	* yyyy
+	//			|	* yyyy-MM
+	//			|	* yyyy-MM-dd
 	// 			* times only, with an optional time zone appended
-	//				THH:mm
-	//				THH:mm:ss
-	//				THH:mm:ss.SSS
+	//			|	* THH:mm
+	//			|	* THH:mm:ss
+	//			|	* THH:mm:ss.SSS
 	// 			* and "datetimes" which could be any combination of the above
+	//
 	//		timezones may be specified as Z (for UTC) or +/- followed by a time expression HH:mm
 	//		Assumes the local time zone if not specified.  Does not validate.  Improperly formatted
 	//		input may return null.  Arguments which are out of bounds will be handled
@@ -1549,23 +1564,32 @@ dojo.date.stamp.fromISOString = function(/*String*/formattedString, /*Number?*/d
 	return result; // Date or null
 }
 
-dojo.date.stamp.toISOString = function(/*Date*/dateObject, /*Object?*/options){
+/*=====
+	dojo.date.stamp.__Options = function(){
+		//	selector: String
+		//		"date" or "time" for partial formatting of the Date object.
+		//		Both date and time will be formatted by default.
+		//	zulu: Boolean
+		//		if true, UTC/GMT is used for a timezone
+		//	milliseconds: Boolean
+		//		if true, output milliseconds
+		this.selector = selector;
+		this.zulu = zulu;
+		this.milliseconds = milliseconds;
+	}
+=====*/
+
+dojo.date.stamp.toISOString = function(/*Date*/dateObject, /*dojo.date.stamp.__Options?*/options){
 	//	summary:
 	//		Format a Date object as a string according a subset of the ISO-8601 standard
 	//
 	//	description:
-	//		When options.selector is omitted, output follows RFC3339 (http://www.ietf.org/rfc/rfc3339.txt)
+	//		When options.selector is omitted, output follows [RFC3339](http://www.ietf.org/rfc/rfc3339.txt)
 	//		The local time zone is included as an offset from GMT, except when selector=='time' (time without a date)
 	//		Does not check bounds.  Only years between 100 and 9999 are supported.
 	//
 	//	dateObject:
 	//		A Date object
-	//
-	//	object {selector: string, zulu: boolean, milliseconds: boolean}
-	//		selector- "date" or "time" for partial formatting of the Date object.
-	//			Both date and time will be formatted by default.
-	//		zulu- if true, UTC/GMT is used for a timezone
-	//		milliseconds- if true, output milliseconds
 
 	var _ = function(n){ return (n < 10) ? "0" + n : n; };
 	options = options || {};
@@ -1883,10 +1907,10 @@ dojo.provide("dijit._Widget");
 
 
 dojo.declare("dijit._Widget", null, {
-	// summary:
+	//	summary:
 	//		The foundation of dijit widgets. 	
 	//
-	// id: String
+	//	id: String
 	//		a unique, opaque ID string that can be assigned by users or by the
 	//		system. If the developer passes an ID which is known not to be
 	//		unique, the specified ID is ignored and the system-generated ID is
@@ -1949,18 +1973,18 @@ dojo.declare("dijit._Widget", null, {
 		//		they are fired, along with notes about what they do and if/when
 		//		you should over-ride them in your widget:
 		//			
-		//			postMixInProperties:
-		//				a stub function that you can over-ride to modify
-		//				variables that may have been naively assigned by
-		//				mixInProperties
-		//			# widget is added to manager object here
-		//			buildRendering
-		//				Subclasses use this method to handle all UI initialization
-		//				Sets this.domNode.  Templated widgets do this automatically
-		//				and otherwise it just uses the source dom node.
-		//			postCreate
-		//				a stub function that you can over-ride to modify take
-		//				actions once the widget has been placed in the UI
+		//		|	* postMixInProperties
+		//		|		a stub function that you can over-ride to modify
+		//		|		variables that may have been naively assigned by
+		//		|		mixInProperties
+		//		|	# widget is added to manager object here
+		//		|	* buildRendering
+		//		|		Subclasses use this method to handle all UI initialization
+		//		|		Sets this.domNode.  Templated widgets do this automatically
+		//		|		and otherwise it just uses the source dom node.
+		//		|	* postCreate
+		//		|		a stub function that you can over-ride to modify take
+		//		|		actions once the widget has been placed in the UI
 
 		// store pointer to original dom tree
 		this.srcNodeRef = dojo.byId(srcNodeRef);
@@ -2066,10 +2090,15 @@ dojo.declare("dijit._Widget", null, {
 		// finalize: Boolean
 		//		is this function being called part of global environment
 		//		tear-down?
+
 		this.uninitialize();
 		dojo.forEach(this._connects, function(array){
 			dojo.forEach(array, dojo.disconnect);
 		});
+
+		// destroy widgets created as part of template, etc.
+		dojo.forEach(this._supportingWidgets || [], function(w){ w.destroy(); });
+		
 		this.destroyRendering(finalize);
 		dijit.registry.remove(this.id);
 	},
@@ -2127,14 +2156,11 @@ dojo.declare("dijit._Widget", null, {
 		//		notifications for when the widget moves out of focus.
 	},
 
-	_hasBeenBlurred: false,
-
 	_onFocus: function(e){
 		this.onFocus();
 	},
 
 	_onBlur: function(){
-		this._hasBeenBlurred = true;
 		this.onBlur();
 	},
 
@@ -2183,9 +2209,13 @@ dojo.declare("dijit._Widget", null, {
 
 	getDescendants: function(){
 		// summary:
-		//	return all the descendant widgets
-		var list = dojo.query('[widgetId]', this.domNode);
-		return list.map(dijit.byNode);		// Array
+		//	Returns all the widgets that contained by this, i.e., all widgets underneath this.containerNode.
+		if(this.containerNode){
+			var list= dojo.query('[widgetId]', this.containerNode);
+			return list.map(dijit.byNode);		// Array
+		}else{
+			return [];
+		}
 	},
 
 	nodesWithKeyClick : ["input", "button"],
@@ -2254,7 +2284,7 @@ dojo.declare("dijit._Widget", null, {
 		//		'dir' attribute until one is found, otherwise left to right mode is assumed.
 		//		See HTML spec, DIR attribute for more information.
 
-		if(typeof this._ltr == "undefined"){
+		if(!("_ltr" in this)){
 			this._ltr = dojo.getComputedStyle(this.domNode).direction != "rtl";
 		}
 		return this._ltr; //Boolean
@@ -2282,8 +2312,8 @@ dojo.string = {
 
 dojo.string.pad = function(/*String*/text, /*int*/size, /*String?*/ch, /*boolean?*/end){
 	// summary:
-	//		Pad a string to guarantee that it is at least 'size' length by
-	//		filling with the character 'c' at either the start or end of the
+	//		Pad a string to guarantee that it is at least `size` length by
+	//		filling with the character `ch` at either the start or end of the
 	//		string. Pads at the start, by default.
 	// text: the string to pad
 	// size: length to provide padding
@@ -2305,7 +2335,7 @@ dojo.string.pad = function(/*String*/text, /*int*/size, /*String?*/ch, /*boolean
 };
 
 dojo.string.substitute = function(	/*String*/template, 
-									/*Object or Array*/map, 
+									/*Object|Array*/map, 
 									/*Function?*/transform, 
 									/*Object?*/thisObject){
 	// summary:
@@ -2314,14 +2344,14 @@ dojo.string.substitute = function(	/*String*/template,
 	// description:
 	//		For example,
 	//		|	dojo.string.substitute("File '${0}' is not found in directory '${1}'.",["foo.html","/temp"]);
-	//		|	dojo.string.substitute("File '${name}' is not found in directory '${info.dir}'.",{name: "foo.html", info: {dir: "/temp"}});
+	//		|	dojo.string.substitute("File '${name}' is not found in directory '${info.dir}'.",
+	//		|		{name: "foo.html", info: {dir: "/temp"}});
 	//		both return
-	//			"File 'foo.html' is not found in directory '/temp'."
+	//		|	"File 'foo.html' is not found in directory '/temp'."
 	// template: 
-	//		a string with expressions in the form ${key} to be replaced or
-	//		${key:format} which specifies a format function.  NOTE syntax has
-	//		changed from %{key}
-	// map: where to look for substitutions
+	//		a string with expressions in the form `${key}` to be replaced or
+	//		`${key:format}` which specifies a format function.
+	// map: hash to search for substitutions
 	// transform: 
 	//		a function to process all parameters before substitution takes
 	//		place, e.g. dojo.string.encodeXML
@@ -2340,10 +2370,9 @@ dojo.string.substitute = function(	/*String*/template,
 dojo.string.trim = function(/*String*/ str){
 	// summary: trims whitespaces from both sides of the string
 	// description:
-	//	This version of trim() was taken from Steven Levithan's blog: 
-	//	http://blog.stevenlevithan.com/archives/faster-trim-javascript.
-	//	The short yet good-performing version of this function is 
-	//	dojo.trim(), which is part of the base.
+	//	This version of trim() was taken from [Steven Levithan's blog](http://blog.stevenlevithan.com/archives/faster-trim-javascript).
+	//	The short yet performant version of this function is 
+	//	dojo.trim(), which is part of Dojo base.
 	str = str.replace(/^\s+/, '');
 	for(var i = str.length - 1; i > 0; i--){
 		if(/\S/.test(str.charAt(i))){
@@ -2367,8 +2396,9 @@ dojo.provide("dijit._Templated");
 dojo.declare("dijit._Templated",
 	null,
 	{
-		// summary: Mixin for widgets that are instantiated from a template
-
+		//	summary:
+		//		Mixin for widgets that are instantiated from a template
+		// 
 		// templateNode: DomNode
 		//		a node that represents the widget template. Pre-empts both templateString and templatePath.
 		templateNode: null,
@@ -2448,8 +2478,8 @@ dojo.declare("dijit._Templated",
 
 			this.domNode = node;
 			if(this.widgetsInTemplate){
-				var childWidgets = dojo.parser.parse(node);
-				this._attachTemplateNodes(childWidgets, function(n,p){
+				var cw = this._supportingWidgets  = dojo.parser.parse(node);
+				this._attachTemplateNodes(cw, function(n,p){
 					return n[p];
 				});
 			}
@@ -2498,7 +2528,7 @@ dojo.declare("dijit._Templated",
 				var attachPoint = getAttrFunc(baseNode, "dojoAttachPoint");
 				if(attachPoint){
 					var point, points = attachPoint.split(/\s*,\s*/);
-					while(point = points.shift()){
+					while((point = points.shift())){
 						if(dojo.isArray(this[point])){
 							this[point].push(baseNode);
 						}else{
@@ -2514,7 +2544,7 @@ dojo.declare("dijit._Templated",
 					// "domEvent: nativeEvent; ..."
 					var event, events = attachEvent.split(/\s*,\s*/);
 					var trim = dojo.trim;
-					while(event = events.shift()){
+					while((event = events.shift())){
 						if(event){
 							var thisFunc = null;
 							if(event.indexOf(":") != -1){
@@ -3460,12 +3490,10 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 
 	reset: function(){
 		this._hasBeenBlurred = false;
-		if(this._resetValue !== undefined){
-			if(this.setValue && !this._getValueDeprecated){
-				this.setValue(this._resetValue, true);
-			}else{
-				this.setAttribute(this._onChangeMonitor, this._resetValue);
-			}
+		if(this.setValue && !this._getValueDeprecated){
+			this.setValue(this._resetValue, true);
+		}else if(this._onChangeMonitor){
+			this.setAttribute(this._onChangeMonitor, (this._resetValue !== undefined && this._resetValue !== null)? this._resetValue : '');
 		}
 	},
 
@@ -3476,8 +3504,9 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 	},
 	
 	destroy: function(){
-		if(this._layoutHackHandle)
+		if(this._layoutHackHandle){
 			clearTimeout(this._layoutHackHandle);
+		}
 		this.inherited(arguments);
 	},
 
@@ -3495,14 +3524,13 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 	_layoutHack: function(){
 		// summary: work around table sizing bugs on FF2 by forcing redraw
 		if(dojo.isFF == 2){
-			this._layoutHackHandle = setTimeout(dojo.hitch(this, function() {
-				var node=this.domNode;
-				var old = node.style.opacity;
-				node.style.opacity = "0.999";
-				setTimeout(function(){
-					node.style.opacity = old;
-				}, 0);
-			}), 50);
+			var node=this.domNode;
+			var old = node.style.opacity;
+			node.style.opacity = "0.999";
+			this._layoutHackHandle = setTimeout(dojo.hitch(this, function(){
+				this._layoutHackHandle = null;
+				node.style.opacity = old;
+			}), 0);
 		}
 	}
 });

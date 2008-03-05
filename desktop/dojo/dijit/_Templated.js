@@ -9,8 +9,9 @@ dojo.require("dojo.parser");
 dojo.declare("dijit._Templated",
 	null,
 	{
-		// summary: Mixin for widgets that are instantiated from a template
-
+		//	summary:
+		//		Mixin for widgets that are instantiated from a template
+		// 
 		// templateNode: DomNode
 		//		a node that represents the widget template. Pre-empts both templateString and templatePath.
 		templateNode: null,
@@ -90,8 +91,8 @@ dojo.declare("dijit._Templated",
 
 			this.domNode = node;
 			if(this.widgetsInTemplate){
-				var childWidgets = dojo.parser.parse(node);
-				this._attachTemplateNodes(childWidgets, function(n,p){
+				var cw = this._supportingWidgets  = dojo.parser.parse(node);
+				this._attachTemplateNodes(cw, function(n,p){
 					return n[p];
 				});
 			}
@@ -140,7 +141,7 @@ dojo.declare("dijit._Templated",
 				var attachPoint = getAttrFunc(baseNode, "dojoAttachPoint");
 				if(attachPoint){
 					var point, points = attachPoint.split(/\s*,\s*/);
-					while(point = points.shift()){
+					while((point = points.shift())){
 						if(dojo.isArray(this[point])){
 							this[point].push(baseNode);
 						}else{
@@ -156,7 +157,7 @@ dojo.declare("dijit._Templated",
 					// "domEvent: nativeEvent; ..."
 					var event, events = attachEvent.split(/\s*,\s*/);
 					var trim = dojo.trim;
-					while(event = events.shift()){
+					while((event = events.shift())){
 						if(event){
 							var thisFunc = null;
 							if(event.indexOf(":") != -1){

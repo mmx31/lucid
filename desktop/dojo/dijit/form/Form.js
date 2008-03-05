@@ -35,6 +35,29 @@ dojo.declare("dijit.form._FormMixin", null,
 			});
 		},
 
+		validate: function(){
+			// summary: returns if the form is valid - same as isValid - but
+			//			provides a few additional (ui-specific) features.
+			//			1 - it will highlight any sub-widgets that are not
+			//				valid
+			//			2 - it will call focus() on the first invalid 
+			//				sub-widget
+			var didFocus = false;
+			return dojo.every(dojo.map(this.getDescendants(), function(widget){
+				// Need to set this so that "required" widgets get their 
+				// state set.
+				widget._hasBeenBlurred = true;
+				var valid = !widget.validate || widget.validate();
+				if (!valid && !didFocus) {
+					// Set focus of the first non-valid widget
+					dijit.scrollIntoView(widget.containerNode||widget.domNode);
+					widget.focus();
+					didFocus = true;
+				}
+	 			return valid;
+	 		}), "return item;");
+		},
+		
 		setValues: function(/*object*/obj){
 			// summary: fill in form values from a JSON structure
 
@@ -238,9 +261,9 @@ dojo.declare("dijit.form._FormMixin", null,
 			return obj;
 		},
 
+		// TODO: ComboBox might need time to process a recently input value.  This should be async?
 	 	isValid: function(){
-	 		// TODO: ComboBox might need time to process a recently input value.  This should be async?
-	 		// make sure that every widget that has a validator function returns true
+	 		// summary: make sure that every widget that has a validator function returns true
 	 		return dojo.every(this.getDescendants(), function(widget){
 	 			return !widget.isValid || widget.isValid();
 	 		});
@@ -251,6 +274,9 @@ dojo.declare(
 	"dijit.form.Form",
 	[dijit._Widget, dijit._Templated, dijit.form._FormMixin],
 	{
+		// summary:
+		// Adds conveniences to regular HTML form
+
 		// HTML <FORM> attributes
 		name: "",
 		action: "",
@@ -322,8 +348,8 @@ dojo.declare(
 		onSubmit: function(){ return this.isValid(); },
 
 		submit: function(){
-			// summary: programatically submit form
-			if(this.onSubmit() !== false){ // form submit() does not call onsubmit
+			// summary: programmatically submit form
+			if(this.onSubmit() !== false){ // form submit() does not call onsubmit //FIXME: what does this mean?  and why not just check for 'truthiness'?
 				this.containerNode.submit();
 			}
 		}

@@ -15,8 +15,8 @@ dojo.declare("dijit.layout.TabContainer",
 	//	one pane at a time.  There are a set of tabs corresponding to each pane,
 	//	where each tab has the title (aka title) of the pane, and optionally a close button.
 	//
-	//	Publishes topics <widgetId>-addChild, <widgetId>-removeChild, and <widgetId>-selectChild
-	//	(where <widgetId> is the id of the TabContainer itself.
+	//	Publishes topics [widgetId]-addChild, [widgetId]-removeChild, and [widgetId]-selectChild
+	//	(where [widgetId] is the id of the TabContainer itself.
 	//
 	// tabPosition: String
 	//   Defines where tabs go relative to tab content.
@@ -26,21 +26,25 @@ dojo.declare("dijit.layout.TabContainer",
 	templateString: null,	// override setting in StackContainer
 	templateString:"<div class=\"dijitTabContainer\">\n\t<div dojoAttachPoint=\"tablistNode\"></div>\n\t<div class=\"dijitTabPaneWrapper\" dojoAttachPoint=\"containerNode\"></div>\n</div>\n",
 
+	// _controllerWidget: String
+	//		An optional parameter to overrider the default TabContainer controller used.
+	_controllerWidget: "dijit.layout.TabController",
+
 	postCreate: function(){	
-		dijit.layout.TabContainer.superclass.postCreate.apply(this, arguments);
+		this.inherited(arguments);
 		// create the tab list that will have a tab (a.k.a. tab button) for each tab panel
-		this.tablist = new dijit.layout.TabController(
-			{
-				id: this.id + "_tablist",
-				tabPosition: this.tabPosition,
-				doLayout: this.doLayout,
-				containerId: this.id
-			}, this.tablistNode);		
+		var TabController = dojo.getObject(this._controllerWidget);
+		this.tablist = new TabController({
+			id: this.id + "_tablist",
+			tabPosition: this.tabPosition,
+			doLayout: this.doLayout,
+			containerId: this.id
+		}, this.tablistNode);		
 	},
 
 	_setupChild: function(/* Widget */tab){
 		dojo.addClass(tab.domNode, "dijitTabPane");
-		this.inherited("_setupChild",arguments);
+		this.inherited(arguments);
 		return tab; // Widget
 	},
 
@@ -49,7 +53,7 @@ dojo.declare("dijit.layout.TabContainer",
 
 		// wire up the tablist and its tabs
 		this.tablist.startup();
-		this.inherited("startup",arguments);
+		this.inherited(arguments);
 
 		if(dojo.isSafari){
 			// sometimes safari 3.0.3 miscalculates the height of the tab labels, see #4058
@@ -78,10 +82,10 @@ dojo.declare("dijit.layout.TabContainer",
 		if(!this.doLayout){ return; }
 
 		// position and size the titles and the container node
-		var titleAlign=this.tabPosition.replace(/-h/,"");
+		var titleAlign = this.tabPosition.replace(/-h/,"");
 		var children = [
-			{domNode: this.tablist.domNode, layoutAlign: titleAlign},
-			{domNode: this.containerNode, layoutAlign: "client"}
+			{ domNode: this.tablist.domNode, layoutAlign: titleAlign },
+			{ domNode: this.containerNode, layoutAlign: "client" }
 		];
 		dijit.layout.layoutChildren(this.domNode, this._contentBox, children);
 
@@ -101,7 +105,7 @@ dojo.declare("dijit.layout.TabContainer",
 		if(this.tablist){
 			this.tablist.destroy();
 		}
-		this.inherited("destroy",arguments);
+		this.inherited(arguments);
 	}
 });
 
@@ -128,12 +132,27 @@ dojo.declare("dijit.layout.TabController",
 	doLayout: true,
 
 	// buttonWidget: String
-	//	the name of the tab widget to create to correspond to each page
+	//	The name of the tab widget to create to correspond to each page
 	buttonWidget: "dijit.layout._TabButton",
 
 	postMixInProperties: function(){
 		this["class"] = "dijitTabLabels-" + this.tabPosition + (this.doLayout ? "" : " dijitTabNoLayout");
-		this.inherited("postMixInProperties",arguments);
+		this.inherited(arguments);
+	},
+	
+	_rectifyRtlTabList: function(){
+		//Summary: Rectify the length of all tabs in rtl, otherwise the tab lengths are different in IE
+		if(0 >= this.tabPosition.indexOf('-h')){ return; }
+		if(!this.pane2button){ return; }
+
+		var maxLen = 0;
+		for(var pane in this.pane2button){
+			maxLen = Math.max(maxLen, dojo.marginBox(this.pane2button[pane].innerDiv).w);
+		}
+		//unify the length of all the tabs
+		for(pane in this.pane2button){
+			this.pane2button[pane].innerDiv.style.width = maxLen + 'px';
+		}	
 	}
 });
 
@@ -148,15 +167,15 @@ dojo.declare("dijit.layout._TabButton",
 
 	baseClass: "dijitTab",
 
-	templateString:"<div waiRole=\"presentation\" dojoAttachEvent='onclick:onClick,onmouseenter:_onMouse,onmouseleave:_onMouse'>\n    <div waiRole=\"presentation\" class='dijitTabInnerDiv' dojoAttachPoint='innerDiv'>\n        <div waiRole=\"presentation\" class='dijitTabContent' dojoAttachPoint='tabContent'>\n\t        <span dojoAttachPoint='containerNode,focusNode'>${!label}</span>\n\t        <span dojoAttachPoint='closeButtonNode' class='closeImage' dojoAttachEvent='onmouseenter:_onMouse, onmouseleave:_onMouse, onclick:onClickCloseButton' stateModifier='CloseButton'>\n\t            <span dojoAttachPoint='closeText' class='closeText'>x</span>\n\t        </span>\n        </div>\n    </div>\n</div>\n",
+	templateString:"<div waiRole=\"presentation\" dojoAttachEvent='onclick:onClick,onmouseenter:_onMouse,onmouseleave:_onMouse'>\n    <div waiRole=\"presentation\" class='dijitTabInnerDiv' dojoAttachPoint='innerDiv'>\n        <div waiRole=\"presentation\" class='dijitTabContent' dojoAttachPoint='tabContent'>\n\t        <span dojoAttachPoint='containerNode,focusNode' class='tabLabel'>${!label}</span>\n\t        <span dojoAttachPoint='closeButtonNode' class='closeImage' dojoAttachEvent='onmouseenter:_onMouse, onmouseleave:_onMouse, onclick:onClickCloseButton' stateModifier='CloseButton'>\n\t            <span dojoAttachPoint='closeText' class='closeText'>x</span>\n\t        </span>\n        </div>\n    </div>\n</div>\n",
 
 	postCreate: function(){
 		if(this.closeButton){
 			dojo.addClass(this.innerDiv, "dijitClosable");
-		} else {
+		}else{
 			this.closeButtonNode.style.display="none";
 		}
-		this.inherited("postCreate",arguments); 
+		this.inherited(arguments); 
 		dojo.setSelectable(this.containerNode, false);
 	}
 });

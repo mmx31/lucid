@@ -237,12 +237,10 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 
 	reset: function(){
 		this._hasBeenBlurred = false;
-		if(this._resetValue !== undefined){
-			if(this.setValue && !this._getValueDeprecated){
-				this.setValue(this._resetValue, true);
-			}else{
-				this.setAttribute(this._onChangeMonitor, this._resetValue);
-			}
+		if(this.setValue && !this._getValueDeprecated){
+			this.setValue(this._resetValue, true);
+		}else if(this._onChangeMonitor){
+			this.setAttribute(this._onChangeMonitor, (this._resetValue !== undefined && this._resetValue !== null)? this._resetValue : '');
 		}
 	},
 
@@ -253,8 +251,9 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 	},
 	
 	destroy: function(){
-		if(this._layoutHackHandle)
+		if(this._layoutHackHandle){
 			clearTimeout(this._layoutHackHandle);
+		}
 		this.inherited(arguments);
 	},
 
@@ -272,14 +271,13 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 	_layoutHack: function(){
 		// summary: work around table sizing bugs on FF2 by forcing redraw
 		if(dojo.isFF == 2){
-			this._layoutHackHandle = setTimeout(dojo.hitch(this, function() {
-				var node=this.domNode;
-				var old = node.style.opacity;
-				node.style.opacity = "0.999";
-				setTimeout(function(){
-					node.style.opacity = old;
-				}, 0);
-			}), 50);
+			var node=this.domNode;
+			var old = node.style.opacity;
+			node.style.opacity = "0.999";
+			this._layoutHackHandle = setTimeout(dojo.hitch(this, function(){
+				this._layoutHackHandle = null;
+				node.style.opacity = old;
+			}), 0);
 		}
 	}
 });

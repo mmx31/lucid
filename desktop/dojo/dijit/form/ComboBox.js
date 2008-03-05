@@ -3,26 +3,12 @@ dojo._hasResource["dijit.form.ComboBox"] = true;
 dojo.provide("dijit.form.ComboBox");
 
 dojo.require("dijit.form.ValidationTextBox");
-dojo.requireLocalization("dijit.form", "ComboBox", null, "zh,pt,ROOT,ru,de,ja,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
+dojo.requireLocalization("dijit.form", "ComboBox", null, "ko,zh,ja,gr,zh-tw,ru,it,hu,ROOT,fr,pt,pl,es,de,cs");
 
 dojo.declare(
 	"dijit.form.ComboBoxMixin",
 	null,
 	{
-		// summary:
-		//		Auto-completing text box, and base class for FilteringSelect widget.
-		//
-		//		The drop down box's values are populated from an class called
-		//		a data provider, which returns a list of values based on the characters
-		//		that the user has typed into the input box.
-		//
-		//		Some of the options to the ComboBox are actually arguments to the data
-		//		provider.
-		//
-		//		You can assume that all the form widgets (and thus anything that mixes
-		//		in ComboBoxMixin) will inherit from _FormWidget and thus the "this"
-		//		reference will also "be a" _FormWidget.
-
 		// item: Object
 		//		This is the item returned by the dojo.data.store implementation that
 		//		provides the data for this cobobox, it's the currently selected item.
@@ -282,7 +268,7 @@ dojo.declare(
 			if(doSearch){
 				// need to wait a tad before start search so that the event
 				// bubbles through DOM and we have value visible
-				this.searchTimer = setTimeout(dojo.hitch(this, "_startSearchFromInput"), this.searchDelay);
+				setTimeout(dojo.hitch(this, "_startSearchFromInput"),1);
 			}
 		},
 
@@ -536,33 +522,37 @@ dojo.declare(
 			}
 			// create a new query to prevent accidentally querying for a hidden
 			// value from FilteringSelect's keyField
-			var query = this.query;
+			var query = dojo.clone(this.query); // #5970
 			this._lastQuery = query[this.searchAttr] = this._getQueryString(key);
-			var _this = this;
-			var dataObject = this.store.fetch({
-				queryOptions: {
-					ignoreCase: this.ignoreCase, 
-					deep: true
-				},
-				query: query,
-				onComplete: dojo.hitch(this, "_openResultList"), 
-				onError: function(errText){
-					console.error('dijit.form.ComboBox: ' + errText);
-					dojo.hitch(_this, "_hideResultList")();
-				},
-				start:0,
-				count:this.pageSize
-			});
+			// #5970: set _lastQuery, *then* start the timeout
+			// otherwise, if the user types and the last query returns before the timeout,
+			// _lastQuery won't be set and their input gets rewritten
+			this.searchTimer=setTimeout(dojo.hitch(this, function(query, _this){
+				var dataObject = this.store.fetch({
+					queryOptions: {
+						ignoreCase: this.ignoreCase, 
+						deep: true
+					},
+					query: query,
+					onComplete: dojo.hitch(this, "_openResultList"), 
+					onError: function(errText){
+						console.error('dijit.form.ComboBox: ' + errText);
+						dojo.hitch(_this, "_hideResultList")();
+					},
+					start:0,
+					count:this.pageSize
+				});
 
-			var nextSearch = function(dataObject, direction){
-				dataObject.start += dataObject.count*direction;
-				// #4091:
-				//		tell callback the direction of the paging so the screen
-				//		reader knows which menu option to shout
-				dataObject.direction = direction;
-				this.store.fetch(dataObject);
-			}
-			this._nextSearch = this._popupWidget.onPage = dojo.hitch(this, nextSearch, dataObject);
+				var nextSearch = function(dataObject, direction){
+					dataObject.start += dataObject.count*direction;
+					// #4091:
+					//		tell callback the direction of the paging so the screen
+					//		reader knows which menu option to shout
+					dataObject.direction = direction;
+					this.store.fetch(dataObject);
+				}
+				this._nextSearch = this._popupWidget.onPage = dojo.hitch(this, nextSearch, dataObject);
+			}, query, this), this.searchDelay);
 		},
 
 		_getValueField:function(){
@@ -586,6 +576,7 @@ dojo.declare(
 		// FIXME: 
 		//		this is public so we can't remove until 2.0, but the name
 		//		SHOULD be "compositionEnd"
+
 		compositionend: function(/*Event*/ evt){
 			// summary:
 			//		When inputting characters using an input method, such as
@@ -596,6 +587,7 @@ dojo.declare(
 		},
 
 		//////////// INITIALIZATION METHODS ///////////////////////////////////////
+
 		constructor: function(){
 			this.query={};
 		},
@@ -931,6 +923,20 @@ dojo.declare(
 	"dijit.form.ComboBox",
 	[dijit.form.ValidationTextBox, dijit.form.ComboBoxMixin],
 	{
+		// summary:
+		//		Auto-completing text box, and base class for FilteringSelect widget.
+		// 
+		//		The drop down box's values are populated from an class called
+		//		a data provider, which returns a list of values based on the characters
+		//		that the user has typed into the input box.
+		// 
+		//		Some of the options to the ComboBox are actually arguments to the data
+		//		provider.
+		// 
+		//		You can assume that all the form widgets (and thus anything that mixes
+		//		in ComboBoxMixin) will inherit from _FormWidget and thus the "this"
+		//		reference will also "be a" _FormWidget.
+
 		postMixInProperties: function(){
 			// this.inherited(arguments); // ??
 			dijit.form.ComboBoxMixin.prototype.postMixInProperties.apply(this, arguments);
@@ -1041,8 +1047,5 @@ dojo.declare("dijit.form._ComboBoxDataStore", null, {
 			root)[0];	// dojo.data.Item
 	}
 });
-
-
-
 
 }

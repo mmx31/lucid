@@ -10,7 +10,7 @@ dojo.require("dijit.form.Button");
 dojo.require("dijit.form.ValidationTextBox");
 dojo.require("dojo.i18n");
 dojo.require("dojo.string");
-dojo.requireLocalization("dijit._editor", "LinkDialog", null, "zh,pt,ru,de,ROOT,ja,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
+dojo.requireLocalization("dijit._editor", "LinkDialog", null, "ko,zh,ja,gr,zh-tw,ru,it,ROOT,hu,fr,pt,pl,es,de,cs");
 
 dojo.declare("dijit._editor.plugins.LinkDialog",
 	dijit._editor._Plugin,
@@ -32,7 +32,7 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 			"</td></tr></table>"
 		].join(""),
 
-		constructor: function(){
+		_initButton: function(){
 			var _this = this;
 			this.tag = this.command == 'insertImage' ? 'img' : 'a';
 			var messages = dojo.i18n.getLocalization("dijit._editor", "LinkDialog", this.lang);
@@ -49,9 +49,15 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 				onClose: dojo.hitch(this, "_onCloseDialog")
 			}));
 			messages.urlRegExp = this.urlRegExp;
-			messages.id = dijit.getUniqueId(this.declaredClass.replace(/\./g,"_"));
-			dropDown.setContent(dropDown.title + "<hr>" + dojo.string.substitute(this.linkDialogTemplate, messages));
+			messages.id = dijit.getUniqueId(this.editor.id);
+			this._setContent(dropDown.title + "<div style='border-bottom: 1px black solid;padding-bottom:2pt;margin-bottom:4pt'></div>" + dojo.string.substitute(this.linkDialogTemplate, messages));
 			dropDown.startup();
+
+			this.inherited(arguments);
+		},
+
+		_setContent: function(staticPanel){
+			this.dropDown.setContent(staticPanel);
 		},
 
 		setValue: function(args){
@@ -80,9 +86,7 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 					var b = this._savedSelection;
 					delete this._savedSelection;
 					this.editor.focus();
-					var range = this.editor.document.selection.createRange();
-					range.moveToBookmark(b);
-					range.select();
+					this.editor._moveToBookmark(b);
 				}
 			}else{
 				this.editor.focus();
@@ -101,7 +105,7 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 			}
 			// FIXME: IE is *really* b0rken
 			if(dojo.isIE){
-				this._savedSelection = this.editor.document.selection.createRange().getBookmark();
+				this._savedSelection = this.editor._getBookmark();
 			}
 			this.dropDown.reset();
 			this.dropDown.setValues({urlInput: url || '', textInput: text || ''});
@@ -123,5 +127,13 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 */
 	}
 );
+
+dojo.subscribe(dijit._scopeName + ".Editor.getPlugin",null,function(o){
+	if(o.plugin){ return; }
+	switch(o.args.name){
+	case "createLink": case "insertImage":
+		o.plugin = new dijit._editor.plugins.LinkDialog({command: o.args.name});
+	}
+});
 
 }
