@@ -11,6 +11,7 @@ this.init = function(args)
 	dojo.require("dijit.Toolbar");
 	dojo.require("dijit.form.Button");
 	dojo.require("dojox.grid.Grid");
+	dojo.require("dojo.data.ItemFileWriteStore");
 	dojo.require("dijit.Menu");
 	api.addDojoCss("dojox/grid/_grid/Grid.css");
 	//make window
@@ -65,30 +66,27 @@ this.pages = {
 		this.toolbar.destroyDescendants();
 		this.main.setContent("loading...");
 		desktop.admin.users.list(dojo.hitch(this, function(data) {
+			this._userStore = new dojo.data.ItemFileWriteStore({
+				data: {
+					identifier: "id",
+					items: data
+				}
+			});
 			var layout = [{
 				cells: [[]]
 			}];
 			//make headers
-			var i = 0;
 			for(field in data[0]) {
-				if(field != "password") layout[0].cells[0][layout[0].cells[0].length] = {name: field, field: i};
-				i++;
+				layout[0].cells[0].push({name: field, field: field});
 			}
-			//make values
-			var griddata = [];
-			dojo.forEach(data, function(item) {
-				var myitem = [];
-				var i = 0;
-				for(field in item) {
-					if(field != "password") myitem[i] = item[field];
-					i++;
-				}
-				griddata[griddata.length] = myitem;
-			});
 			var grid = this._userGrid = new dojox.Grid({
 				structure: layout,
-				model: new dojox.grid.data.Table(null, griddata)
+				model: new dojox.grid.data.DojoData(null, null, {store: this._userStore, query: {id: "*"}})
 			});
+			dojo.connect(this._userStore, "onDelete", this, function(a) {
+				console.log(a);
+				desktop.admin.users.remove(a.id[0]); //that feels really hackish
+			})
 			this.main.setContent(this._userGrid.domNode);
 			this._userGrid.render();
 			var menu = this._userMenu = new dijit.Menu({});
@@ -99,14 +97,10 @@ this.pages = {
 						var row = this._userGrid.model.getRow(this.__rowIndex);
 						api.ui.yesnoDialog({
 							title: "User deletion confirmation",
-							message: "Are you sure you want to delete "+row.username+" from the system?",
+							message: "Are you sure you want to permanently delete "+row.username+" from the system?",
 							callback: dojo.hitch(this, function(a) {
 								if(a == false) return;
-								desktop.admin.users.remove(row[0], dojo.hitch(this, function() {
-									this._userGrid.selection.clear();
-									this._userGrid.selection.select(this.__rowIndex);
-									this._userGrid.removeSelectedRows();
-								}));
+								this._userStore.deleteItem(row.__dojo_data_item);
 							})
 						})
 					})
