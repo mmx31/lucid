@@ -1,14 +1,32 @@
 dojo.require("dojo.io.iframe");
-/** 
-* An API that interacts with the filesystem
-* TODO: document this. Also condense it so all the callbacks are not seperate functions.
-* 
-* @classDescription An API that interacts with the filesystem
-* @memberOf api
-*/
+/*
+ * Class: api.fs
+ *
+ * A server-side virtual filesystem
+ *
+ * TODO: this code should be refactored a little bit. Other then that it's fine.
+ */
 api.fs = new function()
 { 
-   this.ls = function(object)
+   /*
+    * Method: ls
+    *
+    * Lists the files/folders of a given path
+    *
+    * Arguments:
+    * 		object - an object containing a few extra parameters:
+    * 		> {
+    * 		> 	path: string, //the path to list
+    * 		> 	callback: function(array) //a callback function
+    * 		> }
+    *		The callback will recive an array as it's first argument.
+    *		In this array are objects with the file information:
+    *		> {
+    *		> 	isDir: bool, //is this file a directory?
+    *		> 	file: string //the file's name
+    *		> }
+    */
+   this.ls = function(/*Object*/object)
     {
         api.xhr({
         backend: "api.fs.io.getFolder",
@@ -38,7 +56,24 @@ api.fs = new function()
         mimetype: "text/xml"
         });
     }
-   this.read = function(object)
+   /*
+    * Method: read
+    *
+    * Reads a file's contents
+    *
+    * Arguments:
+    * 		object - an object taking the following parameters:
+    * 		> {
+    * 		> 	path: string, //the path to the file
+    * 		> 	callback: function //a callback function
+    * 		> }
+    * 		The callback function gets an object as it's first argument with these values:
+    * 		> {
+    * 		> 	path: string, //the path to the file
+    * 		> 	contents: string //the contents of the file
+    * 		> }
+    */
+   this.read = function(/*Object*/object)
     {
         api.xhr({
         backend: "api.fs.io.getFile",
@@ -70,9 +105,25 @@ api.fs = new function()
         mimetype: "text/xml"
         });
     }
-   this.write = function(object)
+   /*
+    * Method: write
+    *
+    * Writes data to a file
+    *
+    * TODO: add modes such as append only, replace the whole file, etc.
+    *
+    * Arguments:
+    * 		object - an object containing some parameters
+    * 		> {
+    * 		> 	content: string, //a string with the data to write to the server
+    * 		> 	path: string, //the path to the file
+    * 		> 	callback: function //a callback once the saving is complete.
+    * 		> 			   //First argument is true if successful, false if it failed
+    * 		> }
+    */
+   this.write = function(/*Object*/object)
    {
-		try {
+		/*try {
 		object.content = object.content.replace(/</gi, "&lt;");
 		object.content = object.content.replace(/>/gi, "&gt;");
 		object.content = object.content.replace(/&/gi, "&amp;");
@@ -81,52 +132,72 @@ api.fs = new function()
 		}
 		catch(e) {
 		object.content = "";
-		}
+		}*/
         api.xhr({
         backend: "api.fs.io.writeFile",
 		content: {
 			path: object.path,
 			content: object.content
 		},
-		dsktp_callback: object.callback,
 		load: function(data, ioArgs)
 		{
-			ioArgs.args.dsktp_callback(data);
+			callback(data);
 		},
-        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
+        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); },
         mimetype: "text/html"
         });
     }
-	this.move = function(object)
+    /*
+     * Method: move
+     *
+     * Moves or renames a file
+     *
+     * Arguments:
+     * 		object - an object with additional parameters
+     * 		> {
+     * 		> 	newpath: string, //the path to move it to (optional)
+     * 		> 	newname: string, //the new filename (optional)
+     * 		> 	path: string, //the file to rename/move
+     * 		> 	callback: function //a callback that gets called when the operation is complete.
+     * 		> 			   //the first argument is true when successful, false when it failed.
+     * 		> }
+     *		if newname is provided, the file does not move to a different directory
+     *		if newpath is provided, the file will be moved to that path
+     *		if newname is provided, the newpath argument is ignored.
+     */
+    this.move = function(/*Object*/object)
     {
-		if(object.newname) {
-		newpath_ = object.path.lastIndexOf("/");
-		newpath = object.path.substring(0, newpath_);
+	if(object.newname) {
+		var newpath_ = object.path.lastIndexOf("/");
+		var newpath = object.path.substring(0, newpath_);
 		newpath = newpath + "/" + object.newname;
-		}
-		else {
-		newpath = object.newpath;
-		}
+	} else {
+		var newpath = object.newpath;
+	}
         api.xhr({
         backend: "api.fs.io.renameFile",
 		content: {
 			path: object.path,
 			newpath: newpath
 		},
-		dsktp_callback: object.callback,
 		load: function(data, ioArgs)
 		{
-			ioArgs.args.dsktp_callback(data);
+			callback(data);
 		},
         error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
     }
-	this.rename = function(object)
-	{
+    /*
+     * Method: rename
+     *
+     * See: <api.fs.move>
+     */
+    this.rename = function(object)
+    {
 		api.log("renaming a file is the same as moving it, technically. - try not to use api.fs.rename.");
 		this.move(object);
-	}
+    }
     this.mkdir = function(object)
     {
         api.xhr({
