@@ -42,6 +42,46 @@
 				$p->append("total", $total);
 			}
 		}
+		if($_GET['section'] == "permissions") {
+			if($_GET['action'] == "list") {
+				import("models.permission");
+				$list = $Permission->all();
+				$out = new jsonOutput();
+				foreach($list as $perm) {
+					$out->append(array(
+						name => $perm->name,
+						description => $perm->description,
+						initial => $perm->initial
+					));
+				}
+			}
+			if($_GET['action'] == "setDefault") {
+				//TODO:
+			}
+		}
+		if($_GET['section'] == "groups") {
+			if($_GET['action'] == "list") {
+				import("models.group");
+				$list = $Group->all();
+				$out = new jsonOutput();
+				foreach($list as $group) {
+					$out->append(array(
+						name => $group->name,
+						description => $group->description,
+						permissions => $group->permissions
+					));
+				}
+			}
+			if($_GET['action'] == "new") {
+				//TODO:
+			}
+			if($_GET['action'] == "modify") {
+				//TODO:
+			}
+			if($_GET['action'] == "delete") {
+				//TODO:
+			}
+		}
 		if($_GET['section'] == "users")
 		{
 			if($_GET['action'] == "delete") {

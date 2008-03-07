@@ -3,7 +3,8 @@
  * 
  * Contains administration functions
  * 
- * 
+ * The user must be an administrator to use these, otherwise the
+ * server-side code will prevent any action from being taken.
  */
 desktop.admin = new function()
 {
@@ -21,6 +22,36 @@ desktop.admin = new function()
 			load: callback,
 			handleAs: "json"
 		});
+	}
+	/*
+	 * Class: desktop.admin.permission
+	 * 
+	 * Permission/group management
+	 */
+	this.permissions = {
+		/*
+		 * Method: list
+		 * 
+		 * List the permissions on the system
+		 * 
+		 * Arguments:
+		 * 		callback - a callback function to pass the results to.
+		 * 
+		 * 		The callback will get a single array of values as it's first argument.
+		 * 		Each slot in the array will be an object with the permission's information:
+		 * 		> {
+		 * 		> 	name: string, //the permission's name
+		 * 		> 	description: string, //what this permission restricts
+		 * 		> 	initial: bool //the default value if it's not specified by the user's groups/permissions
+		 * 		> }
+		 */
+		list: function(/*Function*/callback) {
+			api.xhr({
+				backend: "core.administration.permissions.list",
+				load: callback,
+				handleAs: "json"
+			})
+		}
 	}
 	/*
 	 * Class: desktop.admin.users
