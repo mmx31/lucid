@@ -241,7 +241,7 @@ api.fs = new function()
     * 		> 			   //first param is true if successful, false if failed
     * 		> }
     */
-   this.rm = function(object)
+   this.rm = function(/*Object*/object)
     {
         api.xhr({
         backend: "api.fs.io.removeFile",
@@ -255,7 +255,20 @@ api.fs = new function()
         mimetype: "text/html"
         });
     }
-   this.copy = function(object)
+	/*
+	 * Method: copy
+	 * 
+	 * Copies a file
+	 * 
+	 * Arguments:
+	 * 		object - an object containing additional parameters
+	 * 		> {
+	 * 		> 	to: string, //the path of the new copy of the file
+	 * 		> 	from: string, //the path to the original file
+	 * 		> 	callback: function //a callback function. First param is true if successful, false if it failed.
+	 * 		> }
+	 */
+   this.copy = function(/*Object*/object)
     {
         api.xhr({
         backend: "api.fs.io.copyFile",
@@ -263,15 +276,27 @@ api.fs = new function()
 			path: object.from,
 			newpath: object.to
 		},
-		dsktp_callback: object.callback,
 		load: function(data, ioArgs) {
-			ioArgs.args.dsktp_callback(data);
+			object.callback(data);
 		},
         error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
     }
-   this.rmdir = function(object)
+   /*
+    * Method: rmdir
+    *
+    * removes a directory recursivly
+    *
+    * Arguments:
+    * 		object - an object with additional parameters
+    * 		> {
+    * 		> 	path: string, //the path to the directory to be removed
+    * 		> 	callback: function //a callback function once the operation is completed
+    * 		> 			   //first param is true if successful, false if failed
+    * 		> }
+    */
+   this.rmdir = function(/*Object*/object)
     {
         api.xhr({
 	        backend: "api.fs.io.removeDir",
@@ -286,27 +311,78 @@ api.fs = new function()
 	        mimetype: "text/html"
         });
     }
-	this.download = function(path) {
+	/*
+	 * Method: download
+	 * 
+	 * Points the browser to the file and forces the browser to download it.
+	 * 
+	 * Arguments:
+	 * 		path - the path to the file that needs to be downloaded
+	 */
+	this.download = function(/*String*/path) {
 		var url = api.xhr("api.fs.io.download") + "&path=" + path;
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	}
-	this.downloadFolder = function(path, as) {
+	/*
+	 * Method: downloadFolder
+	 * 
+	 * Compresses a folder into an archive and forces the browser to download it.
+	 * 
+	 * Arguments:
+	 * 		path - the path to the folder to be compressed and downloaded
+	 * 		as - the archive format. Defaults to a zip archive. Can be "zip", "gzip", or "bzip"
+	 */
+	this.downloadFolder = function(/*String*/path, /*String*/as) {
 		if(as == null) { as = "zip" }
 		var url = api.xhr("api.fs.io.downloadFolder") + "&path=" + path + "&as=" + as;
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	}
-	this.compressDownload = function(path, as) {
+	/*
+	 * Method: compressDownload
+	 * 
+	 * Takes the same arguments as <api.fs.downloadFolder>, but the 'path' argument takes a file instead of a folder.
+	 * 
+	 * See: <api.fs.downloadFolder>
+	 */
+	this.compressDownload = function(/*String*/path, /*String*/as) {
 		if(as == null) { as = "zip" }
 		var url = api.xhr("api.fs.io.compressDownload") + "&path=" + path + "&as=" + as;
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	}
-	this.embed = function(path) {
+	/*
+	 * Method: embed
+	 * 
+	 * Generates a URL that you can use in an img tag or an embed tag.
+	 * 
+	 * Arguments:
+	 * 		path - the path to the file on the filesystem
+	 * 
+	 * Returns:
+	 * 		a string containing a url
+	 */
+	this.embed = function(/*String*/path) {
 		return api.xhr("api.fs.io.display") + "&path=" + path;
 	}
-	this.info = function(path, callback) {
+	/*
+	 * Method: info
+	 * 
+	 * fetches information about a file
+	 * 
+	 * Arguments:
+	 * 		path - the path to the file
+	 * 		callback - a callback function. First argument is an object with the file's information:
+	 * 		> {
+	 * 		> 	file: bool, //will be true if the path is a file
+	 * 		> 	dir: bool, //will be true if the path is a directory
+	 * 		> 	size: int, //the size of the file. Not given for directories.
+	 * 		> 	last_modified: string, //a timestamp of when the file was last modified (F d Y H:i:s.). Not provided for directories.
+	 * 		> 	mimetype: string //the mimetype of the file. will be "text/directory" for directories.
+	 * 		> }
+	 */
+	this.info = function(/*String*/path, /*Function*/callback) {
 		api.xhr({
 			backend: "api.fs.io.info",
 			content: {
