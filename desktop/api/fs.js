@@ -141,7 +141,7 @@ api.fs = new function()
 		},
 		load: function(data, ioArgs)
 		{
-			callback(data);
+			object.callback(data);
 		},
         error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); },
         mimetype: "text/html"
@@ -182,7 +182,7 @@ api.fs = new function()
 		},
 		load: function(data, ioArgs)
 		{
-			callback(data);
+			object.callback(data);
 		},
         error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
@@ -190,30 +190,57 @@ api.fs = new function()
     }
     /*
      * Method: rename
+     * 
+     * depreciated
      *
      * See: <api.fs.move>
      */
-    this.rename = function(object)
+    this.rename = function(/*Object*/object)
     {
 		api.log("renaming a file is the same as moving it, technically. - try not to use api.fs.rename.");
 		this.move(object);
     }
-    this.mkdir = function(object)
+    /*
+     * Method: mkdir
+     *
+     * Creates a directory
+     *
+     * Arguments:
+     * 		object - a object with additional parameters
+     * 		> {
+     * 		> 	path: string, //the path to the folder to create
+     * 		> 	callback: function //an optional callback once the process has completed
+     * 		> 			   //first param is true if successful, false if it failed
+     * 		> }
+     */
+    this.mkdir = function(/*Object*/object)
     {
         api.xhr({
         backend: "api.fs.io.createDirectory",
 		content: {
 			path: object.path
 		},
-		dsktp_callback: object.callback,
 		load: function(data, ioArgs)
 		{
-			ioArgs.args.dsktp_callback(data);
+			object.callback(data);
 		},
         error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
         });
     }
+   /*
+    * Method: rm
+    *
+    * removes a file
+    *
+    * Arguments:
+    * 		object - an object with additional parameters
+    * 		> {
+    * 		> 	path: string, //the path to the file to be removed
+    * 		> 	callback: function //a callback function once the operation is completed
+    * 		> 			   //first param is true if successful, false if failed
+    * 		> }
+    */
    this.rm = function(object)
     {
         api.xhr({
@@ -221,9 +248,8 @@ api.fs = new function()
 		content: {
 			path: object.path
 		},
-		dsktp_callback: object.callback,
 		load: function(data, ioArgs) {
-			ioArgs.args.dsktp_callback(data);
+			object.callback(data);
 		},
         error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
         mimetype: "text/html"
