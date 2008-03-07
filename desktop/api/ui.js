@@ -1,18 +1,25 @@
 dojo.require("dijit.layout.ContentPane");
 
-/** 
-* An API that provides things like dialogs and such
-* 
-* @classDescription An API that provides things like dialogs and such
-* @memberOf api
-*/
+/* 
+ * Class: api.ui
+ * 
+ * An API that provides things like dialogs and such
+ */
 api.ui = new function() {
-	this.alert = function(object)
-	{
-		this.alertDialog(object);
-		api.log("api.ui.alertDialog is depreciated and will expire in v1.0! use api.ui.alertDialog instead!");
-	}
-	this.alertDialog = function(object)
+	/*
+	 * Method: alertDialog
+	 * 
+	 * Shows a simple alert dialog
+	 * 
+	 * Arguments:
+	 * 		object - an object containing additional parameters
+	 * 		> {
+	 * 		> 	title: string, //the title of the window
+	 * 		> 	message: string, //the message to be shown in the body of the window
+	 * 		> 	callback: function //a callback that is called when the dialog is closed
+	 * 		> }
+	 */
+	this.alertDialog = function(/*Object*/object)
 	{
 		dojo.require("dijit.Dialog");
 		var div = dojo.doc.createElement("div");
@@ -23,18 +30,34 @@ api.ui = new function() {
 			dojo.connect(box, 'onUnload', object.callback);
 		}
 	}
-	this.inputDialog = function(object)
+	/*
+	 * Method: inputDialog
+	 * 
+	 * A dialog with a text field
+	 * 
+	 * Arguments:
+	 * 		object - an object containing additional parameters
+	 * 		> {
+	 * 		> 	title: string, //the title of the dialog's window
+	 * 		> 	message: string, //a message to display above the text field and buttons
+	 * 		> 	callback: function //a callback function. The first argument is the inputted string if the user clicked OK, but false if the user clicked cancel or closed the window.
+	 * 		> }
+	 * 
+	 * Example:
+	 * 		> api.ui.inputDialog({title: "UI Test", message: "What is your name?", callback: api.log});
+	 */
+	this.inputDialog = function(/*Object*/object)
 	{
-		//api.ui.inputDialog({title: "UI Test", message: "What is your name?", callback: api.log});
-		this.dialog = new api.window();
-		this.dialog.title = object.title;	
-		this.dialog.width = "400px";
-		this.dialog.height = "150px";
+		var dialog = new api.window();
+		dialog.title = object.title;	
+		dialog.width = "400px";
+		dialog.height = "150px";
+		var onClose = dojo.connect(dialog, "onClose", null, function() {object.callback(false)});
 		this.details = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
 		this.text = new dijit.form.TextBox({value: ""});
 		all = document.createElement("div");
-		this.blah = new dijit.form.Button({label: "OK", onClick: dojo.hitch(this, function() { a = this.text.getValue(); object.callback(a); this.dialog.destroy(); })});
-		this.ablah = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(this, function() { object.callback(false); this.dialog.destroy(); })});
+		this.blah = new dijit.form.Button({label: "OK", onClick: dojo.hitch(this, function() {  dojo.disconnect(onClose); object.callback(this.text.getValue()); dialog.close(); })});
+		this.ablah = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(this, function() {  dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
 		var line = document.createElement("div");
         var p = document.createElement("span");
 		var q = document.createElement("span");
@@ -46,22 +69,41 @@ api.ui = new function() {
 		all.appendChild(this.blah.domNode);
 		all.appendChild(this.ablah.domNode);
 		this.details.setContent(all);
-		this.dialog.addChild(this.details);
-		this.dialog.showClose = false;
-		this.dialog.show();
-		this.dialog.startup();
+		dialog.addChild(this.details);
+		dialog.showClose = false;
+		dialog.show();
+		dialog.startup();
 	}
-	this.yesnoDialog = function(object)
+	/*
+	 * Method: yesnoDialog
+	 * 
+	 * A yes or no dialog
+	 * 
+	 * Arguments:
+	 * 		object - an object containing additional parameters
+	 * 		> {
+	 * 		> 	title: string, //the title of the dialog's window
+	 * 		> 	message: string, //a message to display above the yes/no buttons
+	 * 		> 	callback: function //a callback function. The first argument is true if the user clicked yes, and false if the user clicked no or closed the window.
+	 * 		> }
+	 * 
+	 * Example:
+	 * 		> api.ui.yesnoDialog({title: "UI Test", message: "Did you sign your NDA?", callback: function(p) {
+	 * 		> 	if(p) alert("Good for you!");
+	 * 		> 	else alert("Then sign it allready!");
+	 * 		> });
+	 */
+	this.yesnoDialog = function(/*Object*/object)
 	{
-		//api.ui.yesnoDialog({title: "UI Test", message: "Did you sign your NDA?", callback: api.log});
-		this.dialog = new api.window();
-		this.dialog.title = object.title;	
-		this.dialog.width = "400px";
-		this.dialog.height = "150px";
+		var dialog = new api.window();
+		dialog.title = object.title;	
+		dialog.width = "400px";
+		dialog.height = "150px";
+		var onClose = dojo.connect(dialog, "onClose", null, function() {object.callback(false)});
 		this.details = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
 		all = document.createElement("div");
-		this.blah = new dijit.form.Button({label: "Yes", onClick: dojo.hitch(this, function() { object.callback(true); this.dialog.destroy(); })});
-		this.ablah = new dijit.form.Button({label: "No", onClick: dojo.hitch(this, function() { object.callback(false); this.dialog.destroy(); })});
+		this.blah = new dijit.form.Button({label: "Yes", onClick: dojo.hitch(this, function() { dojo.disconnect(onClose); object.callback(true); dialog.close(); })});
+		this.ablah = new dijit.form.Button({label: "No", onClick: dojo.hitch(this, function() { dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
 		var line = document.createElement("div");
         var p = document.createElement("span");
 		var q = document.createElement("span");
@@ -72,22 +114,34 @@ api.ui = new function() {
 		all.appendChild(this.blah.domNode);
 		all.appendChild(this.ablah.domNode);
 		this.details.setContent(all);
-		this.dialog.addChild(this.details);
-		this.dialog.showClose = false;
-		this.dialog.show();
-		this.dialog.startup();
+		dialog.addChild(this.details);
+		dialog.showClose = false;
+		dialog.show();
+		dialog.startup();
 	}
-	this.fileDialog = function(object)
+	/*
+	 * Method: fileDialog
+	 * 
+	 * Shows a file selector dialog
+	 * 
+	 * Arguments:
+	 * 		object - an object containing additional parameters
+	 * 		> {
+	 * 		> 	title: string, //the title of the dialog's windows
+	 * 		> 	callback: function //a callback function. returns the path to the file/folder selected as a string
+	 * 		> }
+	 */
+	this.fileDialog = function(/*Object*/object)
 	{
 		dojo.require("dijit.layout.SplitContainer");
 		dojo.require("dijit.layout.LayoutContainer");
 		dojo.require("dijit.Toolbar");
 		dojo.require("dijit.Menu");
-		this.dialog = new api.window(); //Make the window
-		this.dialog.title = object.title;
-		this.dialog.width = "500px";
-		this.dialog.height = "300px";
-		this.file = new api.filearea({onItem: dojo.hitch(this, function(path) { object.callback(path); this.dialog.destroy(); })}); //Make the fileArea
+		var dialog = new api.window(); //Make the window
+		dialog.title = object.title;
+		dialog.width = "500px";
+		dialog.height = "300px";
+		this.file = new api.filearea({onItem: dojo.hitch(this, function(path) { object.callback(path); dialog.close(); })}); //Make the fileArea
 		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
 		var layout = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
 		var button = new dijit.form.Button({
@@ -110,7 +164,7 @@ api.ui = new function() {
 			label: "Refresh"
 		});
 		this.toolbar.addChild(button);
-		this.dialog.addChild(this.toolbar);
+		dialog.addChild(this.toolbar);
 		this.client = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 70, layoutAlign: "client"});
 		this.pane = new dijit.layout.ContentPane({}, document.createElement("div"));
 		this.details = new dijit.layout.ContentPane({layoutAlign: "bottom"}, document.createElement("div"));
@@ -130,8 +184,8 @@ api.ui = new function() {
 		menu.addChild(item);
 		this.pane.setContent(menu.domNode);
         this.address = new dijit.form.TextBox({value: "/"});
-		this.button = new dijit.form.Button({label: "Load/Save", onClick: dojo.hitch(this, function() { p = this.address.getValue(); object.callback(p); this.dialog.destroy(); })});
-		this.ablah = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(this, function() { object.callback(false); this.dialog.destroy(); })});
+		this.button = new dijit.form.Button({label: "Load/Save", onClick: dojo.hitch(this, function() { p = this.address.getValue(); object.callback(p); dialog.close(); })});
+		this.ablah = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(this, function() { object.callback(false); dialog.close(); })});
 		var all = document.createElement("div");
 		var line = document.createElement("div");
         var p = document.createElement("span");
@@ -147,14 +201,22 @@ api.ui = new function() {
 		this.client.addChild(this.pane);
 		layout.addChild(this.file);
 		this.client.addChild(layout);
-		this.dialog.addChild(this.client);
-		this.dialog.addChild(this.details);
-		this.dialog.showClose = false;
-		this.dialog.show();
+		dialog.addChild(this.client);
+		dialog.addChild(this.details);
+		dialog.showClose = false;
+		dialog.show();
 		this.file.refresh();
-		this.dialog.startup();
+		dialog.startup();
 	}
-	this.notify = function(message)
+	/*
+	 * Method: notify
+	 * 
+	 * Show a toaster popup
+	 * 
+	 * Arguments:
+	 * 		message - the message to show
+	 */
+	this.notify = function(/*String*/message)
 	{
 		dojo.publish("notification", [message]);
 	}
