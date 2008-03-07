@@ -28,17 +28,22 @@
 		}
 		if ($_GET['action'] == "checkForEvents")
 	    {
-		    header('Content-type: text/xml');
 			$result = $Crosstalk->filter("userid", $_SESSION['userid']);
+			$array = array();
 			$output = "<" . "?xml version='1.0' encoding='utf-8' ?" . ">\r\n" . "<crosstalkEvents>";
 			if($result != false)
 			{
 				foreach($result as $row) {
-					$output .=  "\r\n" . '<event id="'. $row->id .'" sender="'. $row->sender . '" appid="'. $row->appid .'" instance="'. $row->instance .'">'. $row->message .'</event>';
+					array_push($array, array(
+						id => $row->id,
+						sender => $row->sender,
+						appid => $row->appid,
+						instance => $row->instance,
+						message => $row->message
+					));
 				}
-			}		
-			$output .=  "\r\n" . "</crosstalkEvents>";	
-			echo $output;
+			}
+			$out = new jsonOutput($array);
 		}
 	    if ($_GET['action'] == "SendEvent")
 	    {

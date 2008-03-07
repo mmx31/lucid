@@ -74,7 +74,7 @@ api.crosstalk = new function()
 		//api.log("Crosstalk API: Checking for events...");
         	api.xhr({
 	        	backend: "api.crosstalk.io.checkForEvents",
-				handleAs: "xml",
+				handleAs: "json",
 	        	load: dojo.hitch(this, this._internalCheck2),
 	        	error: function(type, error) { api.log("Error in Crosstalk call: "+error.message); }
         	});
@@ -124,49 +124,39 @@ api.crosstalk = new function()
 	 */
 	this._internalCheck2 = function(data, ioArgs)
 	{	// JayM: I tried to optimize the thing as much as possible, add more optimization if needed. 
-		if(data != "")
-		{
-			// No events here. (Screwed up code)
-			var results = data.getElementsByTagName('event');
-			var handled = false;
-			for(var i = 0; i<results.length; i++)
-			{	
-				for(var x = 0; x<api.crosstalk.session.length; x++)
+		if(data == "") return;
+		// No events here. (Screwed up code)
+		var handled = false;
+		dojo.forEach(results, function(result) {
+			for(var x = 0; x<api.crosstalk.session.length; x++)
+			{
+				if(api.crosstalk.session[x].suspended != true)
 				{
-					if(api.crosstalk.session[x].suspended != true)
+					if(result.appid == api.crosstalk.session[x].appid)
 					{
-						if(results[i].getAttribute("appid") == api.crosstalk.session[x].appid)
+						if(result.instance == api.crosstalk.session[x].instance || result.instance == 0)
 						{
-							if(results[i].getAttribute("instance") == api.crosstalk.session[x].instance || results[i].getAttribute("instance") == 0)
-							{
-								api.log("Found handler, appid: "+results[i].getAttribute("appid"));
-								var id = results[i].getAttribute("id"); //id of the event in database.
-								api.crosstalk.session[x].callback({ message: results[i].firstChild.nodeValue, appid: results[i].getAttribute("appid"), instance: results[i].getAttribute("instance"), sender: results[i].getAttribute("sender")});
-								//remove the event, now. it has been handled.
-						        api.xhr({
-						        	backend: "api.crosstalk.io.removeEvent",
-									content: {
-										id: id
-									},
-									handleAs: "xml",
-						        	error: function(type, error) { alert("Error in CrosstalkRemoval call: "+error.message); },
-						        	mimetype: "text/xml"
-						        });
-								handled = true;
-							}
+							api.log("Found handler, appid: "+result.appid);
+							var id = result.id; //id of the event in database.
+							api.crosstalk.session[x].callback({ message: results[i].firstChild.nodeValue, appid: result.appid, instance: result.instance, sender: result.sender});
+							//remove the event, now. it has been handled.
+					        api.xhr({
+					        	backend: "api.crosstalk.io.removeEvent",
+								content: {
+									id: id
+								},
+					        	error: function(type, error) { alert("Error in CrosstalkRemoval call: "+error.message); }
+					        });
+							handled = true;
 						}
 					}
 				}
-				if(handled != true) {
-					//Found unhandled code. Do NOT remove, it may be useful later on.
-					//api.log("Crosstalk API: Unhandled event, appid: "+results[i].getAttribute("appid")+" instance: "+results[i].getAttribute("instance")+" message: "+results[i].firstChild.nodeValue);
-				}
 			}
-		}
-		else
-		{
-			api.log("No events for user.");
-		}
+			if(handled != true) {
+				//Found unhandled code. Do NOT remove, it may be useful later on.
+				//api.log("Crosstalk API: Unhandled event, appid: "+result.appid")+" instance: "+result.instance+" message: "+results[i].firstChild.nodeValue);
+			}
+		});
 		this.setup_timer();
 	}
 	/*
