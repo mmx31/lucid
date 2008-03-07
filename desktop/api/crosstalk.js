@@ -1,56 +1,70 @@
 /* 
- * Group: api
+ * Class: api.crosstalk
  * 
- * Package: crosstalk
- * 
- * Summary:
- * 		An API that allows an app to communicate with other applications on a system-wide level. 
+ * An API that allows an app to communicate with other applications on a system-wide level. 
  */
 api.crosstalk = new function()
 {
-	this.session = new Array();	// handler storage
-	this.assignid = 0;		// ids for storage
-	/** 
-	* register an event handler
-	* 
-	* @alias api.crosstalk.registerHandler
-	* @param {Integer} instance	The current instance ID
-	* @param {Function} callback	A callback to pass the data to
-	* @memberOf api.crosstalk
-	*/
-	this.registerHandler = function(params)
+	/*
+	 * Property: session
+	 * 
+	 * handler storage
+	 */
+	this.session = new Array();
+	/*
+	 * Property: assignid
+	 * 
+	 * ids for storage
+	 */
+	this.assignid = 0;
+	/*
+	 * Method: subscribe
+	 * 
+	 * register an event handler
+	 * 
+	 * Arguments:
+	 * 		params - an object containing extra parameters
+	 * 		> {
+	 * 		> 	instance: integer, //your app's instance ID (this.instance)
+	 * 		> 	callback: function //a callback function to be called when this instance gets a crosstalk message
+	 * 		> }
+	 * 
+	 * Returns:
+	 * 		a handle that you can use to unregister the handler (see <api.crosstalk.unregisterHandler>)
+	 */
+	this.subscribe = function(/*Object*/params)
     		{
 			/*
 			*OMG this code is super-fucked.
 			* infact, it's more of a mess than code
 			*but hey, it works.
 			*/
-		api.crosstalk.session[api.crosstalk.assignid] = new Object();
-		api.crosstalk.session[api.crosstalk.assignid].suspended = false;
-		api.crosstalk.session[api.crosstalk.assignid].appid = desktop.app.instances[params.instance].id;
-                api.crosstalk.session[api.crosstalk.assignid].callback = params.callback;
-                api.crosstalk.session[api.crosstalk.assignid].instance = params.instance;
+		var p = api.crosstalk.session[api.crosstalk.assignid] = new Object();
+		p.suspended = false;
+		p.appid = desktop.app.instances[params.instance].id;
+        p.callback = params.callback;
+        p.instance = params.instance;
 		id = api.crosstalk.assignid;
-		api.crosstalk.assignid = api.crosstalk.assignid + 1;
+		api.crosstalk.assignid++;
 		return id;
 		}
-	/** 
-	* unregister an event handler
-	* 
-	* @alias api.crosstalk.unregisterHandler
-	* @param {Integer} id	The current registered ID
-	* @memberOf api.crosstalk
-	*/
-		this.unregisterHandler = function(id)
-    		{
-			api.crosstalk.session[id].suspended = true;
-			}
-	/** 
-	* the crosstalk api checker, called every somewhat or so seconds, internally. then will handle it from the registered crap...
-	* 
-	* @alias api.crosstalk.internalCheck
-	* @memberOf api.crosstalk
-	*/
+	/*
+	 * Method: unsubscribe
+	 * 
+	 * unregister an event handler
+	 * 
+	 * Arguments:
+	 * 		id - a handle that was returned from <api.crosstalk.registerHandler>
+	 */
+	this.unsubscribe = function(/*Integer*/id)
+	{
+		api.crosstalk.session[id].suspended = true;
+	}
+	/* 
+	 * Method: _internalCheck
+	 * 
+	 * the crosstalk api checker, called every somewhat or so seconds, internally. then will handle it from the registered crap...
+	 */
 	this._internalCheck = function()
 		{
 		if (api.crosstalk.session.length == 0) { // no data in array (no handlers registered)
@@ -67,13 +81,21 @@ api.crosstalk = new function()
 		}
 		}
 		
-	/** 
-	* the crosstalk api checker, called every 20 or so seconds, internally. then will handle it from the registered crap...
-	* 
-	* @alias api.crosstalk.internalCheck
-	* @memberOf api.crosstalk
-	*/
-	this.sendEvent = function(params)
+	/* 
+	 * Method: publish
+	 * 
+	 * publish an event to be sent via crosstalk
+	 * 
+	 * Arguments:
+	 * 		params - an object containing additional parameters:
+	 * 		> {
+	 * 		> 	userid: integer, //the user to send the info to
+	 * 		> 	appid: integer, //the app id to send it to.
+	 * 		> 	instance: integer, //the specific instance to send it to. Optional.
+	 * 		> 	message: string //the message to send. Use in conjunction with dojo.toJson and dojo.fromJson for objects and arrays
+	 * 		> }
+	 */
+	this.publish = function(/*Object*/params)
 		{
         	api.xhr({
         	backend: "api.crosstalk.io.sendEvent",
@@ -93,12 +115,13 @@ api.crosstalk = new function()
 		}
 
 
-	/** 
-	* the crosstalk api checker, stage2, compare the results with the handled handlers ;)
-	* 
-	* @alias api.crosstalk.internalCheck2
-	* @memberOf api.crosstalk
-	*/
+	/* 
+	 * Method: _internalCheck2
+	 * 
+	 * the crosstalk api checker, stage2, compare the results with the handled handlers ;)
+	 * 
+	 * See: <api.crosstalk._internalCheck>
+	 */
 	this._internalCheck2 = function(data, ioArgs)
 	{	// JayM: I tried to optimize the thing as much as possible, add more optimization if needed. 
 		if(data != "")
@@ -146,63 +169,66 @@ api.crosstalk = new function()
 		}
 		this.setup_timer();
 	}
-	/** 
-	* handle system messages
-	* 
-	* @alias api.crosstalk.handleSystemMessage
-	* @memberOf api.crosstalk
-	*/
-	this.handleSystemMessage = function(object) {
-	api.ui.alertDialog({title: "Psych Desktop", message: "<center> <b> System Message (senderID: "+object.sender+") </b> <br> "+object.message+" </center>"});
+	/*
+	 * Method: handleSystemMessage
+	 *  
+	 * handle system messages (internal, do not use)
+	 * 
+	 * Arguments:
+	 * 		object - an object containing additional parameters
+	 * 		> {
+	 * 		> 	sender: string, //who sent the message
+	 * 		> 	message: string //what to send
+	 * 		> }
+	 */
+	this.handleSystemMessage = function(/*Object*/object) {
+		api.ui.alertDialog({title: "Psych Desktop", message: "<center> <b> System Message (senderID: "+object.sender+") </b> <br> "+object.message+" </center>"});
 	}
-	/** 
-	* send system messages
-	* 
-	* @alias api.crosstalk.sendSystemMessage
-	* @memberOf api.crosstalk
-	*/
-	this.sendSystemMessage = function(ooo) {
-	//api.ui.alertDialog("<center> <b> System Message </b> <br> "+message" </center>");
-	api.crosstalk.sendEvent({ userid: ooo.userid, appid: 0, instance: 0, message: ooo.message });
+	/*
+	 * Method: sendSystemMessage
+	 * 
+	 * send system messages
+	 * The current user must be an admin to use this.
+	 * 
+	 * Arguments:
+	 * 		ooo - an object containing additional parameters:
+	 * 		> {
+	 * 		> 	userid: integer, //who to send the message to. 0 for everybody
+	 * 		> 	message: string //the message to be sent
+	 * 		> }
+	 */
+	this.sendSystemMessage = function(/*Object*/ooo) {
+		api.crosstalk.sendEvent({ userid: ooo.userid, appid: 0, instance: 0, message: ooo.message });
 	}
-	/** 
-	* the crosstalk timer starter
-	* 
-	* @alias api.crosstalk.init
-	* @memberOf api.crosstalk
-	*/
 	this.init = function()
 	{
-		if(typeof(this.alreadyDone) == "undefined") {
-			// Hack into the API
-			api.crosstalk.session[api.crosstalk.assignid] = new Object();
-			api.crosstalk.session[api.crosstalk.assignid].suspended = false;
-			api.crosstalk.session[api.crosstalk.assignid].appid = 0;
-	        api.crosstalk.session[api.crosstalk.assignid].callback = api.crosstalk.handleSystemMessage;
-	        api.crosstalk.session[api.crosstalk.assignid].instance = 0;
-			id = api.crosstalk.assignid;
-			api.crosstalk.assignid = api.crosstalk.assignid + 1;
-			this.alreadyDone = true;
-			api.log("Crosstalk API: Init complete.");
-		}
+		var p = api.crosstalk.session[api.crosstalk.assignid] = new Object();
+		p.suspended = false;
+		p.appid = 0;
+        p.callback = api.crosstalk.handleSystemMessage;
+        p.instance = 0;
+		id = api.crosstalk.assignid;
+		api.crosstalk.assignid++;
 		// start checking for events
 		this.setup_timer();
 	}
+	/*
+	 * Method: setup_timer
+	 * 
+	 * Starts checking the server for messages
+	 */
 	this.setup_timer = function()
 	{
 		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), desktop.config.crosstalkPing);
 	}
-	/** 
-	* the crosstalk timer stopper
-	* 
-	* @alias api.crosstalk.stop
-	* @memberOf api.crosstalk
-	*/
+	/*
+	 * Method: stop
+	 * 
+	 * Stops crosstalk from checking the server for messages
+	 */
 	this.stop = function()
 	{
 		// stop checking for events
 		clearTimeout(this.timer);
 	}
-
-		
 }
