@@ -32,10 +32,6 @@ this.init = function(args)
 						       iconClass: "icon-16-categories-applications-other",
 						       onClick: dojo.hitch(this, this.pages.apps)});
 			menu.addChild(item);
-			var item = new dijit.MenuItem({label: "Registry",
-						       iconClass: "icon-16-mimetypes-x-office-spreadsheet",
-						       onClick: dojo.hitch(this, this.pages.registry)});
-			menu.addChild(item);
 		pane.setContent(menu.domNode);
 	split.addChild(pane);
 	var layout = new dijit.layout.LayoutContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
@@ -136,9 +132,5 @@ this.pages = {
 	apps: function() {
 		this.toolbar.destroyDescendants();
 		this.main.setContent("This is the apps page");
-	},
-	registry: function() {
-		this.toolbar.destroyDescendants();
-		this.main.setContent("This is the registry page");
-	},
+	}
 }
