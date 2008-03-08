@@ -261,7 +261,8 @@ dojo.declare("api.sound._backend", null, {
  * 
  * Sound backend for the HTML5 audio tag
  * 
- * See: <api.sound._backend>
+ * See:
+ * 		<_backend>
  */
 dojo.declare("api.sound.html", api.sound._backend, {
 	htmlSound: null,
@@ -299,7 +300,8 @@ dojo.declare("api.sound.html", api.sound._backend, {
  * 
  * Sound backend for a flash player
  * 
- * See: <api.sound._backend>
+ * See:
+ * 		<_backend>
  */
 dojo.declare("api.sound.flash", api.sound._backend, {
 	_startPos: 0,
@@ -367,7 +369,8 @@ dojo.declare("api.sound.flash", api.sound._backend, {
  * 
  * Sound backend for embed tags
  * 
- * See: <api.sound._backend>
+ * See:
+ * 		<_backend>
  */
 dojo.declare("api.sound.embed", api.sound._backend, {
 	capabilities: {

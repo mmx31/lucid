@@ -4,6 +4,7 @@ djConfig.usePlainJson=true;
 
 /*
  * Class: api
+ * 
  * Method: xhr
  * 
  * an extention of dojo's XHR utilities, but with some extra params to make life easy
@@ -57,7 +58,6 @@ api.xhr = function(/*dojo.__ioArgs|String*/args) {
 }
 
 /*
- * Class: api
  * Method: addDojoCss
  * 
  * Adds an additional dojo CSS file (usefull for the dojox modules)
@@ -68,7 +68,7 @@ api.xhr = function(/*dojo.__ioArgs|String*/args) {
  * Example:
  * 		api.addDojoCss("/dojox/widget/somewidget/foo.css");
  */
-api.addDojoCss = function(path)
+api.addDojoCss = function(/*String*/path)
 {
 	var element = document.createElement("link");
 	element.rel = "stylesheet";
@@ -76,4 +76,19 @@ api.addDojoCss = function(path)
 	element.media = "screen";
 	element.href = "./dojo/"+path;
 	document.getElementsByTagName("head")[0].appendChild(element);
+}
+
+/*
+ * Method: log
+ * 
+ * logs a string onto any console that is open
+ * 
+ * Arguments:
+ * 		str - the string to log onto the consoles
+ */
+api.log = function(/*String*/str) {
+	str = dojo.toJson(str);
+	dojo.query(".consoleoutput").forEach(function(elem) {
+		elem.innerHTML += "<br />"+str;
+	});
 }

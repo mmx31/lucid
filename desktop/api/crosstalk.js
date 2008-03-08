@@ -30,7 +30,7 @@ api.crosstalk = new function()
 	 * 		> }
 	 * 
 	 * Returns:
-	 * 		a handle that you can use to unregister the handler (see <api.crosstalk.unregisterHandler>)
+	 * 		a handle that you can use to unregister the handler (see <unregisterHandler>)
 	 */
 	this.subscribe = function(/*Object*/params)
     		{
@@ -54,7 +54,7 @@ api.crosstalk = new function()
 	 * unregister an event handler
 	 * 
 	 * Arguments:
-	 * 		id - a handle that was returned from <api.crosstalk.registerHandler>
+	 * 		id - a handle that was returned from <registerHandler>
 	 */
 	this.unsubscribe = function(/*Integer*/id)
 	{
@@ -120,7 +120,8 @@ api.crosstalk = new function()
 	 * 
 	 * the crosstalk api checker, stage2, compare the results with the handled handlers ;)
 	 * 
-	 * See: <api.crosstalk._internalCheck>
+	 * See:
+	 * 		<_internalCheck>
 	 */
 	this._internalCheck2 = function(data, ioArgs)
 	{	// JayM: I tried to optimize the thing as much as possible, add more optimization if needed. 

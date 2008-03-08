@@ -268,16 +268,3 @@ dojo.declare("api.console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		return false;
 	}
 });
-
-/*
- * Class: api
- * Method: log
- * 
- * logs a string onto any console that is open
- */
-api.log = function(str) {
-	str = dojo.toJson(str);
-	dojo.query(".consoleoutput").forEach(function(elem) {
-		elem.innerHTML += "<br />"+str;
-	});
-}

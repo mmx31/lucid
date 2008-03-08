@@ -1,5 +1,6 @@
 this.kill = function() {
 	if(!this.win.closed) { this.win.close(); }
+	if(!this.permWin || !this.permWin.closed) this.permWin.close();
 	if(this._userMenu) { this._userMenu.destroy(); }
 }
 this.init = function(args)
@@ -32,6 +33,10 @@ this.init = function(args)
 						       iconClass: "icon-16-categories-applications-other",
 						       onClick: dojo.hitch(this, this.pages.apps)});
 			menu.addChild(item);
+			var item = new dijit.MenuItem({label: "Groups",
+						       iconClass: "icon-16-apps-system-users",
+						       onClick: dojo.hitch(this, this.pages.groups)});
+			menu.addChild(item);
 		pane.setContent(menu.domNode);
 	split.addChild(pane);
 	var layout = new dijit.layout.LayoutContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
@@ -47,6 +52,10 @@ this.init = function(args)
 	setTimeout(dojo.hitch(this, this.pages.home), 100);
 }
 
+this.userPermDialog = function() {
+	if(this.permWin) return this.permWin.bringToFront();
+}
+
 this.pages = {
 	home: function() {
 		this.toolbar.destroyDescendants();
@@ -60,6 +69,13 @@ this.pages = {
 	},
 	users: function() {
 		this.toolbar.destroyDescendants();
+		dojo.forEach([
+			{
+				label: "Edit user permissions/groups"
+			}
+		], function(e) {
+			this.toolbar.addChild(new dijit.form.Button(e));
+		}, this);
 		this.main.setContent("loading...");
 		desktop.admin.users.list(dojo.hitch(this, function(data) {
 			this._userStore = new dojo.data.ItemFileWriteStore({
@@ -131,6 +147,10 @@ this.pages = {
 	},
 	apps: function() {
 		this.toolbar.destroyDescendants();
-		this.main.setContent("This is the apps page");
+		this.main.setContent("Here you will be able to manage apps");
+	},
+	groups: function() {
+		this.toolbar.destroyDescendants();
+		this.main.setContent("Here you will be able to manage the user groups");
 	}
 }

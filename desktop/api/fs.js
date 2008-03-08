@@ -4,7 +4,8 @@ dojo.require("dojo.io.iframe");
  *
  * A server-side virtual filesystem
  *
- * TODO: this code should be refactored a little bit. Other then that it's fine.
+ * TODO:
+ * 		this code should be refactored a little bit. Other then that it's fine.
  */
 api.fs = new function()
 { 
@@ -158,7 +159,8 @@ api.fs = new function()
      * 
      * depreciated
      *
-     * See: <api.fs.move>
+     * See:
+     * 		<move>
      */
     this.rename = function(/*Object*/object)
     {
@@ -303,9 +305,10 @@ api.fs = new function()
 	/*
 	 * Method: compressDownload
 	 * 
-	 * Takes the same arguments as <api.fs.downloadFolder>, but the 'path' argument takes a file instead of a folder.
+	 * Takes the same arguments as <downloadFolder>, but the 'path' argument takes a file instead of a folder.
 	 * 
-	 * See: <api.fs.downloadFolder>
+	 * See:
+	 * 		<downloadFolder>
 	 */
 	this.compressDownload = function(/*String*/path, /*String*/as) {
 		if(as == null) { as = "zip" }
