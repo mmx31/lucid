@@ -33,27 +33,17 @@ api.fs = new function()
 		content: {
 			path: object.path
 		},
-		handleAs: "xml",
+		handleAs: "json",
         load: function(data, ioArgs) {
-			var results = data.getElementsByTagName('file');
-			if (api.fs.lsArray) {
-				delete api.fs.lsArray;
-			}
-			api.fs.lsArray = [];
-			for(var i = 0; i<results.length; i++){
-			api.fs.lsArray[i] = new Object();
-			if(results[i].getAttribute("type") == "folder") {
-			api.fs.lsArray[i].isDir = true;
-			}
-			else {
-			api.fs.lsArray[i].isDir = false;
-			}
-			api.fs.lsArray[i].file = results[i].firstChild.nodeValue;
-			}
-	        if(object.callback) { object.callback(api.fs.lsArray); }
+			var lsArray = [];
+			dojo.forEach(data, function(f) {
+				var e = lsArray.push({});
+				e.isDir = f.type == "folder";
+				e.file = f.name;
+			})
+	        if(object.callback) { object.callback(lsArray); }
 		},
-        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
-        mimetype: "text/xml"
+        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
         });
     }
    /*
@@ -80,29 +70,15 @@ api.fs = new function()
 		content: {
 			path: object.path
 		},
-		handleAs: "xml",
+		handleAs: "json",
         load: function(data, ioArgs) {
-			if(!data) { if(object.onError) { object.onError(); } else { api.ui.alertDialogDialog({title: "Error", message: "Sorry! We couldn't open \""+object.path+"\". Check the file exists and try again."}); } }
-			var results = data.getElementsByTagName('file');
-			try {
-			content = results[0].firstChild.nodeValue;
-			content = content.replace(/&lt;/gi, "<");
-			content = content.replace(/&gt;/gi, ">");
-			content = content.replace(/&amp;/gi, "&");
-			content = content.replace(/&apos;/gi, "'");
-			content = content.replace(/&quot;/gi, "\"");
-			}
-			catch(e) {
-			content = "";
-			}
 			var file = {
 				path: object.path,
-				contents: content
+				contents: data.contents
 			};
 	        if(object.callback) { object.callback(file); }
 		},
-        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
-        mimetype: "text/xml"
+        error: function(error, ioArgs) { api.log("Error in fs call: "+error.message); }
         });
     }
    /*
@@ -123,17 +99,7 @@ api.fs = new function()
     */
    this.write = function(/*Object*/object)
    {
-		/*try {
-		object.content = object.content.replace(/</gi, "&lt;");
-		object.content = object.content.replace(/>/gi, "&gt;");
-		object.content = object.content.replace(/&/gi, "&amp;");
-		object.content = object.content.replace(/'/gi, "&apos;");
-		object.content = object.content.replace(/"/gi, "&quot;");
-		}
-		catch(e) {
-		object.content = "";
-		}*/
-        api.xhr({
+		api.xhr({
         backend: "api.fs.io.writeFile",
 		content: {
 			path: object.path,
@@ -143,8 +109,7 @@ api.fs = new function()
 		{
 			object.callback(data);
 		},
-        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); },
-        mimetype: "text/html"
+        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
         });
     }
     /*
@@ -184,8 +149,7 @@ api.fs = new function()
 		{
 			object.callback(data);
 		},
-        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
-        mimetype: "text/html"
+        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
         });
     }
     /*
@@ -224,8 +188,7 @@ api.fs = new function()
 		{
 			object.callback(data);
 		},
-        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
-        mimetype: "text/html"
+        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
         });
     }
    /*
@@ -251,8 +214,7 @@ api.fs = new function()
 		load: function(data, ioArgs) {
 			object.callback(data);
 		},
-        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
-        mimetype: "text/html"
+        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
         });
     }
 	/*
@@ -279,8 +241,7 @@ api.fs = new function()
 		load: function(data, ioArgs) {
 			object.callback(data);
 		},
-        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
-        mimetype: "text/html"
+        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
         });
     }
    /*
@@ -307,8 +268,7 @@ api.fs = new function()
 			load: function(data, ioArgs) {
 				ioArgs.args.dsktp_callback(data);
 			},
-	        error: function(error, ioArgs) { api.log("Error in Crosstalk call: "+error.message); },
-	        mimetype: "text/html"
+	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
         });
     }
 	/*

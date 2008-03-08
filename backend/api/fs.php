@@ -63,7 +63,7 @@ if($_GET['section'] == "io")
 				$out = new intOutput();
 				$out->set("generic_err", true);
 			} else {
-				$output = "<" . "?xml version='1.0' encoding='utf-8' ?" . ">" . "\r\n" . "<getFolderResponse path=\"" . $_REQUEST['path'] . "\">";
+				$arr = array();
 				while(($file = readdir($dir)) !== false){
 					if($file == '..' || $file == '.'){
 						continue;
@@ -74,36 +74,23 @@ if($_GET['section'] == "io")
 						} else {
 							$type = 'file';
 						}
-						$output .=  "\r\n" . '<file type="' . $type . '">' . $file . '</file>';
+						array_push($arr, array(
+							name => $file,
+							type => $type
+						));
 					}
 				}
-				$output .=  "\r\n" . '</getFolderResponse>';
-				header('Content-type: text/xml');
-				echo $output;
+				$out = new jsonOutput($arr);
 			}
 	}
 		if ($_GET['action'] == "getFile") {
 					$odir = $_POST['path'];
 				    	$dir = "../../files/".$username."/$odir";
 					$file = file_get_contents($dir);
-					$file = str_replace("<", "&lt;", $file);
-					$file = str_replace(">", "&gt;", $file);
-					$file = str_replace("&", "&amp;", $file);
-					$file = str_replace("'", "&apos;", $file);
-					$file = str_replace("\"", "&quot;", $file);
-					$output = "<" . "?xml version='1.0' encoding='utf-8' ?" .">\r\n" . "<getFileResponse path=\"" . $_REQUEST['path'] . "\">";
-					$output .=  "\r\n" . '<file>' . $file . '</file>';
-					$output .= '</getFileResponse>';
-					header('Content-type: text/xml');
-					echo $output;
+					$out = new jsonOutput(array(contents => $file));
 	}
 		if ($_GET['action'] == "writeFile") {
 					$content = $_POST['content'];
-					$content = str_replace("&lt;", "<", $content);
-					$content = str_replace("&gt;", ">", $content);
-					$content = str_replace("&amp;", "&", $content);
-					$content = str_replace("&apos;", "'", $content);
-					$content = str_replace("&quot;", "\"", $content);
 					$odir = $_POST['path'];
 				    	$dir = "../../files/".$username."/$odir";
 					$file = file_put_contents($dir, $content);
