@@ -31,6 +31,77 @@ api.ui = new function() {
 		}
 	}
 	/*
+	 * Method: authenticationDialog
+	 * 
+	 * Shows a simple authentication dialog
+	 * 
+	 * Arguments:
+	 * 		object - an object containing additional parameters
+	 * 		> {
+	 * 		> 	permission: string, //The permission to authenticate
+	 * 		> 	program: string, //The program that wants this authentication (for UI only)
+	 * 		> 	callback: function //Will return 0 or 1 to this when authenticated
+	 * 		> }
+	 */
+	this.authenticationDialog = function(/*Object*/object)
+	{
+			if(this.authenticationWin) this.authenticationWin.bringToFront();
+			else {
+			if(!object.program) { object.program = "(unknown)"; }
+			var win = this.authenticationWin = new api.window({
+				title: "Authentication required",
+				width: "450px",
+				height: "350px",
+				onClose: dojo.hitch(this, function() {
+					this.authenticationWin = false;
+				})
+			});
+			this.times = 3;
+			var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding: 20px;"});
+			top.setContent("An application is attempting to perform an action which requires privileges. Authentication is required to perform this action.");
+			var client = new dijit.layout.ContentPane({layoutAlign: "client", style: "padding: 40px;"});
+			var row1 = document.createElement("div");
+			row1.innerHTML = "Password:&nbsp;";
+			var current = new dijit.form.TextBox({type: "password", style: "width: 125px;"});
+			row1.appendChild(current.domNode);
+			var row2 = document.createElement("div");
+			var authButton = this.authButton = new dijit.form.Button({
+				label: "Authenticate",
+				onClick: dojo.hitch(this, function() {	
+					desktop.user.authentication({
+						permission: object.permission,
+						action: "set",
+						password: current.getValue(),
+						callback: dojo.hitch(this, function(data) {
+							if(data == 1 && (this.times - 1) != 0) { this.times--; this.row3.innerHTML = this.times; }
+							else { object.callback(data); win.close(); }
+						})
+					})
+				})
+			})
+			var closeButton = this.authButton = new dijit.form.Button({
+				label: "Close",
+				onClick: dojo.hitch(win, win.close)
+			});
+			row2.appendChild(authButton.domNode);
+			row2.appendChild(closeButton.domNode);
+			this.row3 = document.createElement("div");
+			this.row3.innerHTML = this.times;
+			var row4 = document.createElement("div");
+			row4.innerHTML = "attempt(s) remaining";
+			var main = document.createElement("div"); main.appendChild(row1); main.appendChild(row2); main.appendChild(this.row3); main.appendChild(row4);
+			client.setContent(main);
+			var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom", style: "padding: 20px;"});
+			bottom.setContent("Program: "+object.program+"<br />Action: "+object.permission+"<br />Vendor:  (unknown)");
+			dojo.forEach([top, bottom, client], function(e) {
+				win.addChild(e);
+			});
+			win.show();
+			win.startup();
+			}
+				
+}
+	/*
 	 * Method: inputDialog
 	 * 
 	 * A dialog with a text field

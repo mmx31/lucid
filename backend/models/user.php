@@ -184,7 +184,6 @@
 			if($p[0]->staticPer == true) { $this->permissions[$perm] = true; $this->permissionsExpiry[$perm] = 0; return true; }
 			$time = $p[0]->timeout;
 			$expiry = time() - ($time * 60);
-			echo("test-$expiry");
 			$this->permissionsExpiry[$perm] = $expiry;
 			$this->permissions[$perm] = true;
 			$this->save();
