@@ -84,13 +84,14 @@
 		if($_GET['action'] == "get")
 		{
 			$cur = $User->get_current();
-			if($cur->has_permission($_GET["permission"])) { $out = new intOutput("ok"); }
+			if($cur->has_permission($_POST["permission"])) { $out = new intOutput("ok"); }
 			else { $out = new intOutput("generic_err");; }
 		}
 		if($_GET['action'] == "set")
 		{
 			$cur = $User->get_current();
-			if($cur->check_password($_GET["password"])) { $cur->add_permission($_GET["permission"]); $out = new intOutput("ok"); }
+			$_POST["password"] = crypt($_POST["password"], $GLOBALS['conf']['salt']);
+			if($_POST["password"] == $cur->password) { $cur->add_permission($_POST["permission"]); $out = new intOutput("ok"); }
 			else { $out = new intOutput("generic_err"); }
 		}
 	}

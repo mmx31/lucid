@@ -52,7 +52,7 @@
 				'description' => 'Can change password',
 				'initial' => false,
 				'staticPer' => false,
-				'interval' => 5
+				'timeout' => 5
 			)
 		) as $args) {
 			$out->append("Adding " . $args['name'] . " permission...", "...done");
@@ -118,11 +118,11 @@
 			}
 			$class = str_replace(".php", "", $file);
 			import("models." . $class);
+			$out->append("Creating table for '$class' class...", "...done");
 			$class = ucfirst($class);
 			$class = new $class(array(), true);
 			$class->_create_table();
 		}
-		$out->append("Creating database tables...", "...done");
 	}
 	if($act == "installprograms")
 	{

@@ -179,10 +179,10 @@
 			$p = $Permission->filter("name", $perm);
 			if($p == false) return false;
 			if($p[0]->staticPer != true || !$p[0]->staticPer) { $this->permissions[$perm] = true; return true; }
-			$time = $p[0]->interval;
+			$time = $p[0]->timeout;
 			$expiry = time() - ($time * 60);
 			$this->permissions[$perm] = true;
-			$this->permissionsExpiry[$perm] = expiry;
+			$this->permissionsExpiry[$perm] = $expiry;
 			return true;
 		}
 	}
