@@ -54,9 +54,14 @@ api.ui = new function() {
 				height: "350px",
 				onClose: dojo.hitch(this, function() {
 					this.authenticationWin = false;
-				})
+					if(this.success != 0) { object.callback(1); }
+				}),
+				showClose: false,
+				showMinimize: false,
+				showMaximize: false
 			});
 			this.times = 3;
+			this.success = 1;
 			var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding: 20px;"});
 			top.setContent("An application is attempting to perform an action which requires privileges. Authentication is required to perform this action.");
 			var client = new dijit.layout.ContentPane({layoutAlign: "client", style: "padding: 40px;"});
@@ -74,7 +79,7 @@ api.ui = new function() {
 						password: current.getValue(),
 						callback: dojo.hitch(this, function(data) {
 							if(data == 1 && (this.times - 1) != 0) { this.times--; this.row3.innerHTML = this.times; }
-							else { object.callback(data); win.close(); }
+							else { object.callback(data); this.success = data; win.close(); }
 						})
 					})
 				})
