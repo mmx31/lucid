@@ -55,11 +55,11 @@
 					if(!$user->lastAuth) continue; //this user has never logged in. wait, how's that possible?
 					$now = date('Y-m-d H:i:s');
 					$lauth = $user->lastauth;
-					if($now['year'] == $lauth['year']
+					if(/*$now['year'] == $lauth['year']
 					&& $now['month'] == $lauth['month']
 					&& $now['day'] == $lauth['day']
 					&& $now['hour'] == $lauth['hour']
-					&& ((($now['minuite']*60)+$now['second']) - (($lauth['minuite']*60)+$lauth['second'])) < 5*60) {
+					&& ((($now['minuite']*60)+$now['second']) - (($lauth['minuite']*60)+$lauth['second'])) < 5*60*/$user->has_permission("core.user.set.password")) {
 						$user->set_password($val);
 					}
 					continue;
@@ -77,6 +77,21 @@
 			}
 			$user->save();
 			$out = new intOutput("ok");
+		}
+	}
+	if($_GET['section'] == "authentication")
+	{
+		if($_GET['action'] == "get")
+		{
+			$cur = $User->get_current();
+			if($cur->has_permission($_GET["permission"])) { $out = new intOutput("ok"); }
+			else { $out = new intOutput("generic_err");; }
+		}
+		if($_GET['action'] == "set")
+		{
+			$cur = $User->get_current();
+			if($cur->check_password($_GET["password"])) { $cur->add_permission($_GET["permission"]); $out = new intOutput("ok"); }
+			else { $out = new intOutput("generic_err"); }
 		}
 	}
 	if($_GET['section'] == "auth")

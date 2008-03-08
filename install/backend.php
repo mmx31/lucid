@@ -46,6 +46,13 @@
 			array(
 				'name' => 'core.user.auth.login',
 				'description' => 'Can login'
+			),
+			array(
+				'name' => 'core.user.set.password',
+				'description' => 'Can change password',
+				'initial' => false,
+				'staticPer' => false,
+				'interval' => 5
 			)
 		) as $args) {
 			$out->append("Adding " . $args['name'] . " permission...", "...done");

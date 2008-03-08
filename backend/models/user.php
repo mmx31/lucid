@@ -25,6 +25,7 @@
 		var $email = array('type' => 'text');
 		var $level = array('type' => 'text');
 		var $permissions = array('type' => 'array');
+		var $permissionsExpiry = array('type' => 'array');
 		var $groups = array('type' => 'array');
 		var $lastauth = array('type' => 'timestamp');
 		
@@ -141,13 +142,16 @@
 		}
 		function clear_permission($perm) {
 			unset($this->permissions[$perm]);
+			unset($this->permissionsExpiry[$perm]);
 		}
 		function remove_permission($perm) {
 			$this->permissions[$perm] = false;
 		}
 		function has_permission($perm) {
 			if(!isset($this->permissions[$perm]) && !is_null($this->permissions[$perm])) {
-				return $this->permissions[$perm];
+				if(!isset($this->permissionsExpiry[$perm])) { return $this->permissions[$perm]; }
+				if(time() < $this->permissionsExpiry[$perm]) { return $this->permissions[$perm]; }
+				$this->clear_permission($perm);
 			}
 			$groupPerms = array();
 			if(!empty($this->groups)) {
@@ -170,7 +174,16 @@
 			return $p[0]->initial;
 		}
 		function add_permission($perm) {
+			import("models.permission");
+			global $Permission;
+			$p = $Permission->filter("name", $perm);
+			if($p == false) return false;
+			if($p[0]->staticPer != true || !$p[0]->staticPer) { $this->permissions[$perm] = true; return true; }
+			$time = $p[0]->interval;
+			$expiry = time() - ($time * 60);
 			$this->permissions[$perm] = true;
+			$this->permissionsExpiry[$perm] = expiry;
+			return true;
 		}
 	}
 	global $User;

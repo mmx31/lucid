@@ -20,6 +20,8 @@
 		var $name = array('type' => "text");
 		var $description = array('type' => "text");
 		var $initial = array('type' => "boolean", "default" => true);
+		var $staticPer = array('type' => "boolean", "default" => true);
+		var $interval = array('type' => "integer", "default" => 0);
 		function cleanup() {
 			import("models.user");
 			$users = $User->all();

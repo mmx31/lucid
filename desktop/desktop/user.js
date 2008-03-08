@@ -48,6 +48,33 @@ desktop.user = new function() {
         });
 	}
 	/*
+	 * Method: authentication
+	 *
+	 * changes/retrieves a user's authentication information
+	 *
+	 * Arguments:
+	 * 	op - an object with some arguments. See notes
+	 *
+	 * Notes:
+	 * 	The op argument can have the following keys.
+	 *      > {
+	 *      >       action: string //The action (get or set)
+	 *      >       permission: string //The permission to get or set
+	 *      >       password: string //Only required if setting a permission
+	 *      > }
+	 */
+	this.authentication = function(/*Object*/op) {
+		var callback = op.callback || false;
+		delete op.callback;
+		api.xhr({
+			backend: "core.user.authentication."+op.action,
+			content: op,
+			load: function(data) {
+				if(callback) callback(data);
+			}
+		})		
+	}
+	/*
 	 * Method: set
 	 *
 	 * changes a user's information

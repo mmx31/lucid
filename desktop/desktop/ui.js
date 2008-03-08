@@ -540,12 +540,11 @@ desktop.ui = {
 					current.setDisabled(true);
 					this.authButton.setDisabled(true);
 					
-					api.xhr({
-						backend: "core.user.auth.login",
-						content: {
-							password: current.getValue()
-						},
-						load: dojo.hitch(this, function(data) {
+					desktop.user.authentication({
+						permission: "core.user.set.password",
+						action: "set",
+						password: current.getValue(),
+						callback: dojo.hitch(this, function(data) {
 							current.setDisabled(data == "0");
 							authButton.setDisabled(data == "0");
 							newpasswd.setDisabled(data != "0");
