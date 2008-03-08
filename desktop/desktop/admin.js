@@ -58,7 +58,8 @@ desktop.admin = new function()
 	 * 
 	 * Some user management functions
 	 * 
-	 * Note: for modifying user information see <desktop.user>
+	 * Note:
+	 * 		for modifying user information see <desktop.user>
 	 */
 	this.users = {
 		/*
