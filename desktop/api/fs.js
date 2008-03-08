@@ -37,9 +37,10 @@ api.fs = new function()
         load: function(data, ioArgs) {
 			var lsArray = [];
 			dojo.forEach(data, function(f) {
-				var e = lsArray.push({});
-				e.isDir = f.type == "folder";
-				e.file = f.name;
+				lsArray.push({
+					isDir: f.type == "folder",
+					file: f.name
+				});
 			})
 	        if(object.callback) { object.callback(lsArray); }
 		},
