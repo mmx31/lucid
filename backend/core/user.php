@@ -91,7 +91,7 @@
 		{
 			$cur = $User->get_current();
 			$_POST["password"] = crypt($_POST["password"], $GLOBALS['conf']['salt']);
-			if($_POST["password"] == $cur->password) { $cur->add_permission($_POST["permission"]); $out = new intOutput("ok"); }
+			if($_POST["password"] == $cur->password) { $cur->add_permission($_POST["permission"]); $cur->save(); $out = new intOutput("ok"); }
 			else { $out = new intOutput("generic_err"); }
 		}
 	}

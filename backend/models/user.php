@@ -146,12 +146,15 @@
 		}
 		function remove_permission($perm) {
 			$this->permissions[$perm] = false;
+			$this->permissionsExpiry[$perm] = 0;
 		}
 		function has_permission($perm) {
 			if(!isset($this->permissions[$perm]) && !is_null($this->permissions[$perm])) {
 				if(!isset($this->permissionsExpiry[$perm])) { return $this->permissions[$perm]; }
 				if(time() < $this->permissionsExpiry[$perm]) { return $this->permissions[$perm]; }
 				$this->clear_permission($perm);
+				$this->save();
+				return false;
 			}
 			$groupPerms = array();
 			if(!empty($this->groups)) {
@@ -178,11 +181,13 @@
 			global $Permission;
 			$p = $Permission->filter("name", $perm);
 			if($p == false) return false;
-			if($p[0]->staticPer != true || !$p[0]->staticPer) { $this->permissions[$perm] = true; return true; }
+			if($p[0]->staticPer == true) { $this->permissions[$perm] = true; $this->permissionsExpiry[$perm] = 0; return true; }
 			$time = $p[0]->timeout;
 			$expiry = time() - ($time * 60);
-			$this->permissions[$perm] = true;
+			echo("test-$expiry");
 			$this->permissionsExpiry[$perm] = $expiry;
+			$this->permissions[$perm] = true;
+			$this->save();
 			return true;
 		}
 	}
