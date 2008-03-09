@@ -88,7 +88,8 @@ api.fs = new function()
     *
     * Writes data to a file
     *
-    * TODO: add modes such as append only, replace the whole file, etc.
+    * TODO:
+    *		add modes such as append only, replace the whole file, etc.
     *
     * Arguments:
     * 		object - an object containing some parameters

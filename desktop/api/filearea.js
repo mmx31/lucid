@@ -192,7 +192,8 @@ dojo.declare(
 	 * 
 	 * unhilight the widget's children
 	 * 
-	 * TODO: Doesn't the above function do this allready???
+	 * TODO:
+	 * 		Doesn't the above function do this allready???
 	 */
 	unhighlightChildren: function() {
 		dojo.forEach(this.getChildren(), function(c) {
