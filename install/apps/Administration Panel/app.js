@@ -59,22 +59,22 @@ this.userPermDialog = function() {
 	var win = new api.window({
 		title: "Permissions for "+this._userStore.getValue(row, "username")
 	});
-	var left = new dijit.layout.ContentPane({layoutAlign: "left"});
-	var right = new dijit.layout.ContentPane({layoutAlign: "right"});
+	var left = new dijit.layout.ContentPane({layoutAlign: "left", style: "width: 50%;"});
+	var right = new dijit.layout.ContentPane({layoutAlign: "right", style: "width: 50%;"});
 	win.addChild(left);
 	win.addChild(right);
-	
 	desktop.admin.permissions.list(function(list) {
 		dojo.forEach(list, function(perm, e) {
-			for(i=0;i<=perms.length;i++) {
+			for(i=0;i<perms.length;i++) {
 				if(perm == perms[i]) list.splice(i, 1);
 			}
 		});
-		var availablePerms = new dojo.dnd.Source(left.domNode);
-		availablePerms.insertNodes(list);
-		var userPerms = new dojo.dnd.Source(right.domNode);
-		userPerms.insertNodes(perms);
 		
+		var availablePerms = new dojo.dnd.Source(left.domNode);
+		availablePerms.insertNodes(false, list);
+		var userPerms = new dojo.dnd.Source(right.domNode);
+		userPerms.insertNodes(false, perms);
+		console.log("showWin");
 		win.show();
 	});
 }
@@ -94,16 +94,10 @@ this.pages = {
 		this.toolbar.destroyDescendants();
 		this.main.setContent("loading...");
 		desktop.admin.users.list(dojo.hitch(this, function(data) {
-			//for(i in data) {
-			//	data[i].permissions = dojo.toJson(data[i].permissions);
-			//	data[i].groups = dojo.toJson(data[i].groups);
-			//};
-			this._userStore = new dojo.data.ItemFileWriteStore({
-				data: {
-					identifier: "id",
-					items: data
-				}
-			});
+			for(i=0;i<data.length;i++) {
+				data[i].permissions = dojo.toJson(data[i].permissions);
+				data[i].groups = dojo.toJson(data[i].groups);
+			};
 			var layout = [{
 				cells: [[]]
 			}];
@@ -120,6 +114,13 @@ this.pages = {
 				}
 				layout[0].cells[0].push({name: name, field: field, editor: editor, options: options});
 			}
+			
+			this._userStore = new dojo.data.ItemFileWriteStore({
+				data: {
+					identifier: "id",
+					items: data
+				}
+			});
 			var grid = this._userGrid = new dojox.Grid({
 				structure: layout,
 				model: new dojox.grid.data.DojoData(null, null, {store: this._userStore, query: {id: "*"}})
