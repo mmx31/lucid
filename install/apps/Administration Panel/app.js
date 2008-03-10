@@ -52,29 +52,16 @@ this.init = function(args)
 }
 
 this.userPermDialog = function() {
-	dojo.require("dojo.dnd.Source");
 	var row = this._userGrid.model.getRow(this.__rowIndex).__dojo_data_item;
 	this.__rowIndex = null;
 	var perms = dojo.fromJson(this._userStore.getValue(row, "permissions"));
 	var win = new api.window({
 		title: "Permissions for "+this._userStore.getValue(row, "username")
 	});
-	var left = new dijit.layout.ContentPane({layoutAlign: "left", style: "width: 50%;"});
-	var right = new dijit.layout.ContentPane({layoutAlign: "right", style: "width: 50%;"});
-	win.addChild(left);
-	win.addChild(right);
+	var main = new dijit.layout.ContentPane({layoutAlign: "client"});
+	win.addChild(main);
 	desktop.admin.permissions.list(function(list) {
-		dojo.forEach(list, function(perm, e) {
-			for(i=0;i<perms.length;i++) {
-				if(perm == perms[i]) list.splice(i, 1);
-			}
-		});
-		
-		var availablePerms = new dojo.dnd.Source(left.domNode);
-		availablePerms.insertNodes(false, list);
-		var userPerms = new dojo.dnd.Source(right.domNode);
-		userPerms.insertNodes(false, perms);
-		console.log("showWin");
+		//TODO: show table with each perm. The options for each perm are 'default', 'allow', and 'deny'
 		win.show();
 	});
 }
