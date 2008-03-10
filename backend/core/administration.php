@@ -46,14 +46,15 @@
 			if($_GET['action'] == "list") {
 				import("models.permission");
 				$list = $Permission->all();
-				$out = new jsonOutput();
+				$outList = array();
 				foreach($list as $perm) {
-					$out->append(array(
+					array_push($outList, array(
 						name => $perm->name,
 						description => $perm->description,
 						initial => $perm->initial
 					));
 				}
+				$out = new jsonOutput($outList);
 			}
 			if($_GET['action'] == "setDefault") {
 				//TODO:

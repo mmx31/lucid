@@ -1,6 +1,5 @@
 this.kill = function() {
 	if(!this.win.closed) { this.win.close(); }
-	if(!this.permWin || !this.permWin.closed) this.permWin.close();
 	if(this._userMenu) { this._userMenu.destroy(); }
 }
 this.init = function(args)
@@ -53,7 +52,31 @@ this.init = function(args)
 }
 
 this.userPermDialog = function() {
-	if(this.permWin) return this.permWin.bringToFront();
+	dojo.require("dojo.dnd.Source");
+	var row = this._userGrid.model.getRow(this.__rowIndex).__dojo_data_item;
+	this.__rowIndex = null;
+	var perms = dojo.fromJson(this._userStore.getValue(row, "permissions"));
+	var win = new api.window({
+		title: "Permissions for "+this._userStore.getValue(row, "username")
+	});
+	var left = new dijit.layout.ContentPane({layoutAlign: "left"});
+	var right = new dijit.layout.ContentPane({layoutAlign: "right"});
+	win.addChild(left);
+	win.addChild(right);
+	
+	desktop.admin.permissions.list(function(list) {
+		dojo.forEach(list, function(perm, e) {
+			for(i=0;i<=perms.length;i++) {
+				if(perm == perms[i]) list.splice(i, 1);
+			}
+		});
+		var availablePerms = new dojo.dnd.Source(left.domNode);
+		availablePerms.insertNodes(list);
+		var userPerms = new dojo.dnd.Source(right.domNode);
+		userPerms.insertNodes(perms);
+		
+		win.show();
+	});
 }
 
 this.pages = {
@@ -69,15 +92,12 @@ this.pages = {
 	},
 	users: function() {
 		this.toolbar.destroyDescendants();
-		dojo.forEach([
-			{
-				label: "Edit user permissions/groups"
-			}
-		], function(e) {
-			this.toolbar.addChild(new dijit.form.Button(e));
-		}, this);
 		this.main.setContent("loading...");
 		desktop.admin.users.list(dojo.hitch(this, function(data) {
+			//for(i in data) {
+			//	data[i].permissions = dojo.toJson(data[i].permissions);
+			//	data[i].groups = dojo.toJson(data[i].groups);
+			//};
 			this._userStore = new dojo.data.ItemFileWriteStore({
 				data: {
 					identifier: "id",
@@ -131,6 +151,10 @@ this.pages = {
 							})
 						})
 					})
+				},
+				{
+					label: "Alter permissions",
+					onClick: dojo.hitch(this, "userPermDialog")
 				}
 			], function(item) {
 				var menuItem = new dijit.MenuItem(item);

@@ -83,7 +83,6 @@ this.saved = function(id)
 		this.editor.selectionEnd = endPos+1;
 		this.editor.scrollTop = scroll;
 		//api.ui.alertDialog({title:"Katana IDE", message:"Save Sucessful"});
-		desktop.menu.getApplications();
 		delete this.app.callback;
 	}));
 }
