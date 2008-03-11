@@ -166,15 +166,15 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			});
 			if(this.maximized == true) this.maximize();
 			dojo.style(this.domNode, "display", "block");
-			if (desktop.config.fx) {
-				if (desktop.config.fx >= 1) dojo.style(this.containerNode, "display", "none");
+			if (desktop.config.fx >= 2) {
+				if (desktop.config.fx < 3) dojo.style(this.containerNode, "display", "none");
 				dojo.style(this.domNode, "opacity", 0);
 				var anim = dojo.fadeIn({
 					node: this.domNode,
 					duration: desktop.config.window.animSpeed
 				});
 				dojo.connect(anim, "onEnd", this, function() {
-					if (desktop.config.fx >= 1) dojo.style(this.containerNode, "display", "block");
+					if (desktop.config.fx < 3) dojo.style(this.containerNode, "display", "block");
 					this.resize();
 				});
 				anim.play();
@@ -253,9 +253,8 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	minimize: function()
 	{
 		this.onMinimize();
-		if(desktop.config.fx == true)
+		if(desktop.config.fx <= 2)
 		{
-			dojo.style(this.containerNode, "display", "none");
 			var pos = dojo.coords(this.domNode, true);
 			this.left = pos.x;
 			this.top = pos.y;
@@ -296,7 +295,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	restore: function()
 	{
 		this.domNode.style.display = "inline";
-		if(desktop.config.fx == true)
+		if(desktop.config.fx <= 2)
 		{
 			var anim = dojo.animateProperty({
 				node: this.domNode,
@@ -311,7 +310,6 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 				easing: dojox.fx.easing.easeOut
 			});
 			dojo.connect(anim, "onEnd", this, function() {
-				dojo.style(this.containerNode, "display", "block");
 				this.resize();
 			});
 			anim.play();
@@ -337,7 +335,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		this.pos.height = dojo.style(this.domNode, "height");
 		var win = this.domNode;
 		
-		if(desktop.config.fx == true)
+		if(desktop.config.fx <= 2)
 		{
 			//api.log("maximizing... (in style!)");
 			dojo.style(this.containerNode, "display", "none");
@@ -448,10 +446,9 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			this.makeResizer();
 		}
 		var win = this.domNode;
-		if(desktop.config.fx == true)
+		if(desktop.config.fx <= 2)
 		{
 			this._showBorders();
-			dojo.style(this.containerNode, "display", "none");
 			var anim = dojo.animateProperty({
 				node: this.domNode,
 				properties: {
@@ -463,7 +460,6 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 				duration: desktop.config.window.animSpeed
 			});
 			dojo.connect(anim, "onEnd", this, function(e) {
-				dojo.style(this.containerNode, "display", "block");
 				this.resize();
 			});
 			void(anim); //fixes a weird ass IE bug. Don't ask me why :D
@@ -532,8 +528,8 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 				this.domNode.parentNode.removeChild(this.domNode);
 				this.destroy();
 			})
-			if (desktop.config.fx) {
-				dojo.style(this.containerNode, "display", "none");
+			if (desktop.config.fx <= 2) {
+				if(desktop.config.fx <= 3) dojo.style(this.containerNode, "display", "none");
 				var anim = dojo.fadeOut({
 					node: this.domNode,
 					duration: desktop.config.window.animSpeed
