@@ -50,7 +50,7 @@ dojo.declare("api.sound", dijit._Widget, {
 		this.domNode.style.left="-999px";
 		this.domNode.style.top="-999px";
 		document.body.appendChild(this.domNode);
-		var backends = ["html", /*"flash",*/ "embed"];
+		var backends = ["html", /*flash",/**/ "embed"];
 		for(k in backends) {
 			var i = backends[k];
 			var backend = new api.sound[i]({
@@ -139,6 +139,7 @@ dojo.declare("api.sound", dijit._Widget, {
  * The base sound backend class
  */
 dojo.declare("api.sound._backend", null, {
+	id: 0,
 	/*
 	 * Property: domNode
 	 * 
@@ -305,7 +306,6 @@ dojo.declare("api.sound.html", api.sound._backend, {
  */
 dojo.declare("api.sound.flash", api.sound._backend, {
 	_startPos: 0,
-	id: 0,
 	play: function() {
 		dojox.flash.comm.callFunction(this.id, "start", [this._startPos]);
 	},
@@ -321,27 +321,39 @@ dojo.declare("api.sound.flash", api.sound._backend, {
 		if(v) dojox.flash.comm.setValue(this.id, "position", v);
 		else {
 			var ret;
-			dojox.flash.comm.getValue(this.id, "position", function(a) {
+			var called = false;
+			window["func_"+this.id+"_pos_callback"] = function(a) {
 				ret = a;
-			})
+			called = true;
+			}
+			dojox.flash.comm.getValue(this.id, "position", "func_"+this.id+"_pos_callback");
+			while(called == false) {}
+			delete window["func_"+this.id+"_pos_callback"];
 			return ret;
 		}
 	},
-	duration: function(v) {
-		if(v) dojox.flash.comm.setValue(this.id, "duration", v);
-		else {
-			var ret;
-			dojox.flash.comm.getValue(this.id, "duration", function(a) {
-				ret = a;
-			})
-			return ret;
+	duration: function() {
+		var ret;
+		var called = false;
+		window["func_"+this.id+"_duration_callback"] = function(getVal){
+			ret = getVal;
+			called = true;
 		}
+		dojox.flash.comm.getValue(this.id, "duration", "func_"+this.id+"_duration_callback");
+		while(called == false) {}
+		delete window["func_"+this.id+"_duration_callback"];
+		return ret;
 	},
 	id3: function() {
 		var ret;
-		dojox.flash.comm.getValue(this.id, "id3", function(a) {
-			ret = a;
-		});
+		var called = false;
+		window["func_"+this.id+"_id3_callback"] = function(getVal){
+			ret = getVal;
+			called = true;
+		}
+		dojox.flash.comm.getValue(this.id, "id3", "func_"+this.id+"_id3_callback");
+		while(called == false) {}
+		delete window["func_"+this.id+"_id3_callback"];
 		return ret;
 	},
 	volume: function(val) {
@@ -349,9 +361,14 @@ dojo.declare("api.sound.flash", api.sound._backend, {
 			dojox.flash.comm.setValue(this.id, "volume", val);
 		else {
 			var ret;
-			dojox.flash.comm.getValue(this.id, "volume", function(getVal){
+			var called = false;
+			window["func_"+this.id+"_vol_callback"] = function(getVal){
 				ret = getVal;
-			});
+				called = true;
+			}
+			dojox.flash.comm.getValue(this.id, "volume", "func_"+this.id+"_vol_callback");
+			while(called == false) {}
+			delete window["func_"+this.id+"_vol_callback"];
 			return ret;
 		}
 	},
@@ -359,15 +376,17 @@ dojo.declare("api.sound.flash", api.sound._backend, {
 		return dojox.flash.info.commVersion != -1;
 	},
 	startup: function() {
-		dojox.flash.comm.makeObj(this.id, "sound");
+		dojox.flash.comm.makeObj(this.id, "Sound");
 		//dojox.flash.comm.attachEvent(this.id, "onLoad");
 	}
 });
 	
 /*
- * Class: api.sound.html
+ * Class: api.sound.embed
  * 
- * Sound backend for embed tags
+ * Sound backend for embed tags.
+ * There is a known issue where XHRs are cut off when the embed tag is created.
+ * We have no clue why this happens. If you know, please get in touch with us.
  * 
  * See:
  * 		<_backend>

@@ -10,10 +10,6 @@ class objManager {
 		DojoExternalInterface.addCallback("attachEvent", this, attachEvent);
 		DojoExternalInterface.addCallback("callFunction", this, callFunction);
 		DojoExternalInterface.loaded();
-		//getURL("javascript:console.debug('DojoExternalInterface: "+DojoExternalInterface+"')");
-		//for(var p in DojoExternalInterface) {
-		//	getURL("javascript:console.debug('DojoExternalInterface."+p+" = "+DojoExternalInterface[p]+"')");
-		//}
 	}
 	public function makeObj(id, objectType, args) {
 		var obj = false;
@@ -52,13 +48,16 @@ class objManager {
 		this.objects[id].addListener(evtClass);
 	}
 	public function getValue(id, key, callback) {
-		DojoExternalInterface.call(callback, null, this.objects[id][key]);
+		var obj = this.objects[id];
+		DojoExternalInterface.call(callback, null, obj[key]);
 	}
 	public function setValue(id, key, value) {
-		this.objects[id][key] = value;
+		var obj = this.objects[id]
+		obj[key] = value;
 	}
 	public function callFunction(id, method, args, callback) {
-		var p = this.objects[id][method].apply(this.objects[id], args);
+		var obj = this.objects[id];
+		var p = obj[method].apply(this.objects[id], args);
 		if(callback) DojoExternalInterface.call(callback, null, p);
 	}
 	public static function main():Void

@@ -177,7 +177,7 @@ this.stopTicker = function() {
 this.updateTicker = function() {
 	var c = this.sound.capabilities;
 	if(!(c.position && c.duration)) {
-	this.box.domNode.innerHTML = "&nbsp;" + this.filename + "&nbsp;&nbsp;" + "unable to retrieve data" + "&nbsp;";
+	this.box.domNode.innerHTML = "&nbsp;" + this.filename + "&nbsp;&nbsp;" + "?:??/?:??" + "&nbsp;";
 	return;
 	}
 	var p = this.sound.position();
