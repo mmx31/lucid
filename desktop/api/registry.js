@@ -10,6 +10,7 @@ dojo.require("dojo.data.ItemFileWriteStore");
  * 
  * Arguments:
  * 		Asside from the regular arguments you'd feed to a datastore, we've added these:
+ * 
  * 		name - the name of the store
  * 		appid - the current app's ID. (this.id)
  * 		data - this argument differs from a regular datastore; if the database exists on the server then it is ignored and the server-side data is used.
