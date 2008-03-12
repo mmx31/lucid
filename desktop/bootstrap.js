@@ -33,7 +33,8 @@ dojo.require("dijit.ProgressBar");
 */
 var bootstrap = {
     modules: [
-	    	'api.console',
+		"api._base",
+    	'api.console',
 		"api.crosstalk",
 		"api.registry",
 		"api.filearea",
@@ -42,7 +43,6 @@ var bootstrap = {
 		"api.mail",
 		"api.sound",
 		"api.ui",
-		"api.util",
 		"api.window",
 	    'desktop.admin',
 	    'desktop.app',

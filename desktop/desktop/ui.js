@@ -1845,10 +1845,10 @@ dojo.declare("desktop.ui.applets.menubar", desktop.ui.applets.menu, {
 				label: "About Psych Desktop",
 				iconClass: "icon-16-apps-help-browser",
 				onClick: function() {
-					api.ui.alert({
-						title: "About",
+					api.ui.alertDialog({
+						title: "About Psych Desktop",
 						style: "width: 400px;",
-						message: "<h2>Psych Desktop</h2><b>Version SVN</b><br /><br />Brought to you by:<ul style='padding: 0px;'><li>Will \"Psychcf\" Riley<div style=\"font-size: 10pt;\">Developer/Project Manager</div></li><li>Jay Macdonald<div style=\"font-size: 10pt;\">Developer/Assistant Project Manager</div></li><li>David \"mmx\" Clayton<div style=\"font-size: 10pt;\">UI Designer/Lead Artist</div></li></ul>"
+						message: "<h2>Psych Desktop</h2><b>Version "+desktop.version+"</b><br /><br />Brought to you by:<ul style='padding: 0px;'><li>Will \"Psychcf\" Riley<div style=\"font-size: 10pt;\">Developer/Project Manager</div></li><li>Jay Macdonald<div style=\"font-size: 10pt;\">Developer/Assistant Project Manager</div></li><li>David \"mmx\" Clayton<div style=\"font-size: 10pt;\">UI Designer/Lead Artist</div></li></ul>"
 					})
 				}
 			}),

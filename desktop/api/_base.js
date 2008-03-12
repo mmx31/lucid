@@ -1,4 +1,4 @@
-api.util = {};
+api._base = {};
 if(typeof djConfig == "undefined") djConfig = {};
 djConfig.usePlainJson=true;
 

@@ -1,4 +1,13 @@
 /*
+ * Class: desktop
+ * 
+ * Property: version
+ * 
+ * The version of the desktop
+ */
+desktop.version = "SVN";
+
+/*
  * Class: desktop.config
  * 
  * Contains configuraton for the desktop.
