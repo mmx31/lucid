@@ -529,7 +529,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 				this.destroy();
 			})
 			if (desktop.config.fx <= 2) {
-				if(desktop.config.fx <= 3) dojo.style(this.containerNode, "display", "none");
+				if(desktop.config.fx < 3) dojo.style(this.containerNode, "display", "none");
 				var anim = dojo.fadeOut({
 					node: this.domNode,
 					duration: desktop.config.window.animSpeed

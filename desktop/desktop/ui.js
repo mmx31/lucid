@@ -1670,21 +1670,32 @@ dojo.declare("desktop.ui.task", null, {
 	},
 	destroy: function() {
 		dojo.forEach(this.nodes, function(node){
-			var fade = dojo.fadeOut({ node: node, duration: 200 });
-			var slide = dojo.animateProperty({
-				node: node,
-				duration: 1000,
-				properties: {
-					width: {end: 0},
-					height: {end: 0}
-				}
-			});
-			var anim = dojo.fx.chain([fade, slide]);
-			dojo.connect(slide, "onEnd", null, function() {
+			var onEnd = function() {
 				node.parentNode.removeChild(node);
 				node=null;
-			});
-			anim.play();
+			}
+			if (desktop.config.fx >= 1) {
+				var fade = dojo.fadeOut({
+					node: node,
+					duration: 200
+				});
+				var slide = dojo.animateProperty({
+					node: node,
+					duration: 1000,
+					properties: {
+						width: {
+							end: 0
+						},
+						height: {
+							end: 0
+						}
+					}
+				});
+				var anim = dojo.fx.chain([fade, slide]);
+				dojo.connect(slide, "onEnd", null, onEnd);
+				anim.play();
+			}
+			else onEnd();
 		});
 	}
 });
