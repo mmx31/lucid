@@ -50,15 +50,15 @@ dojo.declare("api.sound", dijit._Widget, {
 		this.domNode.style.left="-999px";
 		this.domNode.style.top="-999px";
 		document.body.appendChild(this.domNode);
-		var backends = ["html", /*flash",/**/ "embed"];
+		var backends = ["html", "flash",/**/ "embed"];
 		for(k in backends) {
 			var i = backends[k];
 			var backend = new api.sound[i]({
-				id: this.id,
 				src: this.src,
 				loop: this.loop,
 				autoStart: this.autoStart
 			});
+			backend.id = this.id;
 			if(backend.testCompat() === true) {
 				this.backend = backend;
 				this.capabilities = backend.capabilities;
@@ -139,7 +139,7 @@ dojo.declare("api.sound", dijit._Widget, {
  * The base sound backend class
  */
 dojo.declare("api.sound._backend", null, {
-	id: 0,
+	id: "",
 	/*
 	 * Property: domNode
 	 * 
@@ -318,65 +318,26 @@ dojo.declare("api.sound.flash", api.sound._backend, {
 		dojox.flash.comm.callFunction(this.id, "stop");
 	},
 	position: function(v) {
-		if(v) dojox.flash.comm.setValue(this.id, "position", v);
+		if(v) return dojox.flash.comm.setValue(this.id, "position", v);
 		else {
-			var ret;
-			var called = false;
-			window["func_"+this.id+"_pos_callback"] = function(a) {
-				ret = a;
-			called = true;
-			}
-			dojox.flash.comm.getValue(this.id, "position", "func_"+this.id+"_pos_callback");
-			while(called == false) {}
-			delete window["func_"+this.id+"_pos_callback"];
-			return ret;
+			return dojox.flash.comm.getValue(this.id, "position");
 		}
 	},
 	duration: function() {
-		var ret;
-		var called = false;
-		window["func_"+this.id+"_duration_callback"] = function(getVal){
-			ret = getVal;
-			called = true;
-		}
-		dojox.flash.comm.getValue(this.id, "duration", "func_"+this.id+"_duration_callback");
-		while(called == false) {}
-		delete window["func_"+this.id+"_duration_callback"];
-		return ret;
+		return dojox.flash.comm.getValue(this.id, "duration");
 	},
 	id3: function() {
-		var ret;
-		var called = false;
-		window["func_"+this.id+"_id3_callback"] = function(getVal){
-			ret = getVal;
-			called = true;
-		}
-		dojox.flash.comm.getValue(this.id, "id3", "func_"+this.id+"_id3_callback");
-		while(called == false) {}
-		delete window["func_"+this.id+"_id3_callback"];
-		return ret;
+		return dojox.flash.comm.getValue(this.id, "id3");
 	},
 	volume: function(val) {
-		if(val) 
-			dojox.flash.comm.setValue(this.id, "volume", val);
-		else {
-			var ret;
-			var called = false;
-			window["func_"+this.id+"_vol_callback"] = function(getVal){
-				ret = getVal;
-				called = true;
-			}
-			dojox.flash.comm.getValue(this.id, "volume", "func_"+this.id+"_vol_callback");
-			while(called == false) {}
-			delete window["func_"+this.id+"_vol_callback"];
-			return ret;
-		}
+		return dojox.flash.comm.callFunction(this.id, "setVolume", [val]);
 	},
 	checkCompat: function() {
 		return dojox.flash.info.commVersion != -1;
 	},
 	startup: function() {
 		dojox.flash.comm.makeObj(this.id, "Sound");
+		dojox.flash.comm.callFunction(this.id, "loadSound", [this.src, true])
 		//dojox.flash.comm.attachEvent(this.id, "onLoad");
 	}
 });
