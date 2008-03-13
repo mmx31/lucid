@@ -1050,6 +1050,8 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		dojo.forEach(this.getChildren(), function(item) {
 			item.destroy();
 		});
+		setTimeout(dojo.hitch(desktop.ui._area, "resize"), 1000);
+		if(this.window) this.window.destroy();
 	},
 	/*
 	 * Method: _place
