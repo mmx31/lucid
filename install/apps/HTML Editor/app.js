@@ -110,6 +110,7 @@ this.processOpen = function() {
     this.other.setContent("Opened file dialog");
     api.ui.fileDialog({
         title: "Choose a file to open",
+	types: [{type: ".html"}],
         callback: dojo.hitch(this, this._processOpen)
     });
 
@@ -143,7 +144,7 @@ this.processSave = function() {
     if (this.editing) {
         api.fs.write({
             path: this.fileEditing,
-            content: this.editor.getValue()
+            content: "<html>"+this.editor.getValue()+"</html>"
         });
         this.other.setContent("File saved!");
 

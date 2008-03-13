@@ -204,6 +204,7 @@ api.ui = new function() {
 	 * 		object - an object containing additional parameters
 	 * 		> {
 	 * 		> 	title: string, //the title of the dialog's windows
+	 *		>	types: array, //array which contains an object. e.g types[0].type = "txt"; types[0].typeShown = ".txt (Text)";
 	 * 		> 	callback: function //a callback function. returns the path to the file/folder selected as a string
 	 * 		> }
 	 */
@@ -211,6 +212,7 @@ api.ui = new function() {
 	{
 		dojo.require("dijit.layout.SplitContainer");
 		dojo.require("dijit.layout.LayoutContainer");
+		dojo.require("dijit.form.FilteringSelect");
 		dojo.require("dijit.Toolbar");
 		dojo.require("dijit.Menu");
 		var dialog = new api.window(); //Make the window
@@ -242,7 +244,7 @@ api.ui = new function() {
 		this.toolbar.addChild(button);
 		dialog.addChild(this.toolbar);
 		this.client = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 70, layoutAlign: "client"});
-		this.pane = new dijit.layout.ContentPane({}, document.createElement("div"));
+		this.pane = new dijit.layout.ContentPane({sizeMin: 30}, document.createElement("div"));
 		this.details = new dijit.layout.ContentPane({layoutAlign: "bottom"}, document.createElement("div"));
 		var menu = new dijit.Menu({});
 		menu.domNode.style.width="100%";
@@ -260,7 +262,15 @@ api.ui = new function() {
 		menu.addChild(item);
 		this.pane.setContent(menu.domNode);
         this.address = new dijit.form.TextBox({value: "/"});
-		this.button = new dijit.form.Button({label: "Load/Save", onClick: dojo.hitch(this, function() { p = this.address.getValue(); object.callback(p); dialog.close(); })});
+		if(object.types) {
+		this.internalStore = new dojo.data.ItemFileWriteStore({});
+		for(a=0;a<object.types.length;a++) {
+		this.internalStore.newItem({type: object.types[a].type});
+		}
+		this.internalStore.newItem({type: ""});
+		this.select = new dijit.form.FilteringSelect({store: this.internalStore, searchAttr: "type"});
+		}
+		this.button = new dijit.form.Button({label: "Load/Save", onClick: dojo.hitch(this, function() { p = this.address.getValue(); f = ""; if(object.types) { f = this.select.getValue(); } object.callback(p+f); dialog.close(); })});
 		this.ablah = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(this, function() { object.callback(false); dialog.close(); })});
 		var all = document.createElement("div");
 		var line = document.createElement("div");
@@ -268,6 +278,7 @@ api.ui = new function() {
 		p.innerHTML = "Address:";
 		line.appendChild(p);
 		line.appendChild(this.address.domNode);
+		if(object.types) line.appendChild(this.select.domNode);
 		line.appendChild(this.button.domNode);
 		line.appendChild(this.ablah.domNode);
 		all.appendChild(line);
