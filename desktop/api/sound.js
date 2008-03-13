@@ -307,7 +307,7 @@ dojo.declare("api.sound.html", api.sound._backend, {
 dojo.declare("api.sound.flash", api.sound._backend, {
 	_startPos: 0,
 	play: function() {
-		dojox.flash.comm.callFunction(this.id, "start", [this._startPos]);
+		dojox.flash.comm.callFunction(this.id, "start", [this._startPos, this.loop]);
 	},
 	pause: function() {
 		dojox.flash.comm.callFunction(this.id, "stop");
@@ -330,7 +330,7 @@ dojo.declare("api.sound.flash", api.sound._backend, {
 		return dojox.flash.comm.getValue(this.id, "id3");
 	},
 	volume: function(val) {
-		return dojox.flash.comm.callFunction(this.id, "setVolume", [val]);
+		return dojox.flash.comm.callFunction(this.id, "setVolume", [val*100]);
 	},
 	checkCompat: function() {
 		return dojox.flash.info.commVersion != -1;
