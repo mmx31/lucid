@@ -333,7 +333,7 @@ dojo.declare("api.sound.flash", api.sound._backend, {
 		return dojox.flash.comm.callFunction(this.id, "setVolume", [val*100]);
 	},
 	checkCompat: function() {
-		return dojox.flash.info.commVersion != -1;
+		return dojox.flash.info.capable;
 	},
 	startup: function() {
 		dojox.flash.comm.makeObj(this.id, "Sound");
