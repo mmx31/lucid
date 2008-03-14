@@ -4,8 +4,8 @@ if (dojox.flash.info.commVersion != -1) {
 		console.log("js:flash loaded");
 	});
 	dojox.flash.Embed.prototype = {
-		width: "1px",
-		height: "1px"
+		width: 1,
+		height: 1
 	};
 	dojox.flash.setSwf("./api/flash/objManager.swf", false);
 }
