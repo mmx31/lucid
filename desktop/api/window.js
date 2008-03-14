@@ -338,12 +338,11 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		this.pos.width = dojo.style(this.domNode, "width");
 		this.pos.height = dojo.style(this.domNode, "height");
 		var win = this.domNode;
-		
+		var max = desktop.ui._area.getBox();
 		if(desktop.config.fx >= 2)
 		{
 			//api.log("maximizing... (in style!)");
 			if(desktop.config.fx < 3) dojo.style(this.containerNode, "display", "none");
-			var max = desktop.ui._area.getBox();
 			var anim = dojo.animateProperty({
 				node: this.domNode,
 				properties: {
@@ -364,10 +363,10 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		else
 		{
 			//api.log("maximizing...");
-			win.style.top = "0px";
-			win.style.left = "0px";
-			win.style.width = dojo.style(this.domNode.parentNode, "width");
-			win.style.height = dojo.style(this.domNode.parentNode, "height");
+			win.style.top = max.T;
+			win.style.left = max.L;
+			win.style.width = dojo.style(this.domNode.parentNode, "width") - max.R;
+			win.style.height = dojo.style(this.domNode.parentNode, "height") - max.B;
 			this._hideBorders();
 			this.resize();
 		}
