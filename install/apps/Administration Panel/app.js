@@ -59,9 +59,21 @@ this.userPermDialog = function() {
 		title: "Permissions for "+this._userStore.getValue(row, "username")
 	});
 	var main = new dijit.layout.ContentPane({layoutAlign: "client"});
-	win.addChild(main);
+	var tab = document.createElement("table");
+	dojo.style(tab, "width", "100%");
+	dojo.style(tab, "height", "100%");
+	dojo.style(tab, "overflow-y", "auto");
+	tab.innerHTML = "<thead><tr><td>Name</td><td>Description</td><td>Allow</td><td>Deny</td><td>Default</td></tr></thead>";
+	var body = document.createElement("tbody");
+	tab.appendChild(body);
 	desktop.admin.permissions.list(function(list) {
-		//TODO: show table with each perm. The options for each perm are 'default', 'allow', and 'deny'
+		dojo.forEach(list, function(item) {
+			var tr = document.createElement("tr");
+			console.log(item);
+			body.appendChild(tr);
+		});
+		main.setContent(tab);
+		win.addChild(main);
 		win.show();
 	});
 }
