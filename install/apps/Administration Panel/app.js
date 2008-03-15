@@ -10,6 +10,7 @@ this.init = function(args)
 	dojo.require("dijit.ProgressBar");
 	dojo.require("dijit.Toolbar");
 	dojo.require("dijit.form.Button");
+	dojo.require("dijit.form.CheckBox");
 	dojo.require("dojox.grid.Grid");
 	dojo.require("dojo.data.ItemFileWriteStore");
 	dojo.require("dijit.Menu");
@@ -55,22 +56,50 @@ this.userPermDialog = function() {
 	var row = this._userGrid.model.getRow(this.__rowIndex).__dojo_data_item;
 	this.__rowIndex = null;
 	var perms = dojo.fromJson(this._userStore.getValue(row, "permissions"));
+	var usersname = this._userStore.getValue(row, "username");
 	var win = new api.window({
-		title: "Permissions for "+this._userStore.getValue(row, "username")
+		title: "Permissions for "+usersname
 	});
 	var main = new dijit.layout.ContentPane({layoutAlign: "client"});
 	var tab = document.createElement("table");
 	dojo.style(tab, "width", "100%");
 	dojo.style(tab, "height", "100%");
 	dojo.style(tab, "overflow-y", "auto");
-	tab.innerHTML = "<thead><tr><td>Name</td><td>Description</td><td>Allow</td><td>Deny</td><td>Default</td></tr></thead>";
-	var body = document.createElement("tbody");
-	tab.appendChild(body);
+	tab.innerHTML = "<tr><th>Name</td><th>Description</th><th>Allow</th><th>Deny</th><th>Default</th></tr>";
 	desktop.admin.permissions.list(function(list) {
 		dojo.forEach(list, function(item) {
 			var tr = document.createElement("tr");
-			console.log(item);
-			body.appendChild(tr);
+			
+			var td = document.createElement("td");
+			td.textContent = item.name;
+			tr.appendChild(td);
+			var td = document.createElement("td");
+			td.textContent = item.description;
+			tr.appendChild(td);
+			
+			var td = document.createElement("td");
+			var allow = new dijit.form.RadioButton({
+				name: item.name+this.instance+usersname
+			});
+			allow.setChecked(perms[item.name] == true);
+			td.appendChild(allow.domNode);
+			tr.appendChild(td);
+			var td = document.createElement("td");
+			var deny = new dijit.form.RadioButton({
+				name: item.name+this.instance+usersname,
+			});
+			deny.setChecked(perms[item.name] == false);
+			td.appendChild(deny.domNode);
+			tr.appendChild(td);
+			var td = document.createElement("td");
+			var def = new dijit.form.RadioButton({
+				name: item.name+this.instance+usersname
+			});
+			def.setChecked(typeof perms[item.name] == "undefined");
+			td.appendChild(def.domNode);
+			tr.appendChild(td);
+			
+			tab.appendChild(tr);
 		});
 		main.setContent(tab);
 		win.addChild(main);
