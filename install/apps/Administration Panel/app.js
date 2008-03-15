@@ -165,15 +165,16 @@ this.pages = {
 			//make headers
 			for(field in data[0]) {
 				if(field == "permissions" || field == "groups") continue;
-				var name = field.charAt(0).toUpperCase() + field.substr(1).toLowerCase();
-				var editor;
-				var options;
-				if(field == "name" || field == "username") editor = dojox.grid.editors.TextBox
+				var args = {
+					name: field.charAt(0).toUpperCase() + field.substr(1).toLowerCase(),
+					field: field
+				};
+				if(field == "name" || field == "username") args.editor = dojox.grid.editors.TextBox;
 				if(field == "level") {
-					editor = dojox.grid.editors.Select;
-					options = ["admin", "developer", "user"];
+					args.editor = dojox.grid.editors.Select;
+					args.options = ["admin", "developer", "user"];
 				}
-				layout[0].cells[0].push({name: name, field: field, editor: editor, options: options});
+				layout[0].cells[0].push(args);
 			}
 			
 			this._userStore = new dojo.data.ItemFileWriteStore({
