@@ -66,7 +66,8 @@ this.userPermDialog = function() {
 	dojo.style(tab, "height", "100%");
 	dojo.style(tab, "overflow-y", "auto");
 	tab.innerHTML = "<tr><th>Name</td><th>Description</th><th>Allow</th><th>Deny</th><th>Default</th></tr>";
-	desktop.admin.permissions.list(function(list) {
+	var radioWidgets = {};
+	desktop.admin.permissions.list(dojo.hitch(this, function(list) {
 		dojo.forEach(list, function(item) {
 			var tr = document.createElement("tr");
 			
@@ -100,11 +101,43 @@ this.userPermDialog = function() {
 			tr.appendChild(td);
 			
 			tab.appendChild(tr);
-		});
+			radioWidgets[item.name] = {
+				def: def,
+				deny: deny,
+				allow: allow
+			};
+		}, this);
 		main.setContent(tab);
 		win.addChild(main);
+		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
+		var cont = document.createElement("div");
+		var cancel = new dijit.form.Button({
+			label: "Cancel",
+			onClick: dojo.hitch(win, "close")
+		})
+		cont.appendChild(cancel.domNode);
+		var save = new dijit.form.Button({
+			label: "Save",
+			onClick: dojo.hitch(this, function() {
+				var newPerms = {};
+				dojo.forEach(list, function(item) {
+					if(radioWidgets[item.name].def.checked == true) return;
+					if(radioWidgets[item.name].deny.checked == true) newPerms[item.name] = false;
+					if(radioWidgets[item.name].allow.checked == true) newPerms[item.name] = true;
+				});
+				desktop.user.set({
+					id: this._userStore.getValue(row, "id"),
+					permissions: dojo.toJson(newPerms)
+				})
+				win.close();
+			})
+		})
+		cont.appendChild(save.domNode);
+		dojo.addClass(cont, "floatRight");
+		bottom.setContent(cont);
+		win.addChild(bottom);
 		win.show();
-	});
+	}));
 }
 
 this.pages = {
