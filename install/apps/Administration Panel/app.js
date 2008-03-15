@@ -1,7 +1,11 @@
 this.kill = function() {
 	if(!this.win.closed) { this.win.close(); }
 	if(this._userMenu) { this._userMenu.destroy(); }
+	dojo.forEach(this.windows, function(win) {
+		if(!win.closed) win.close();
+	})
 }
+this.windows = [];
 this.init = function(args)
 {
 	dojo.require("dijit.layout.SplitContainer");
@@ -60,6 +64,7 @@ this.userPermDialog = function() {
 	var win = new api.window({
 		title: "Permissions for "+usersname
 	});
+	this.windows.push(win);
 	var main = new dijit.layout.ContentPane({layoutAlign: "client"});
 	var tab = document.createElement("table");
 	dojo.style(tab, "width", "100%");
