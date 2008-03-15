@@ -97,6 +97,8 @@ desktop.user = new function() {
 	this.set = function(/*Object*/op) {
 		var callback = op.callback || false;
 		delete op.callback;
+		if(typeof op.permissions != "undefined") op.permissions = dojo.toJson(op.permissions);
+		if(typeof op.groups != "undefined") op.groups = dojo.toJson(op.groups);
 		api.xhr({
 			backend: "core.user.info.set",
 			content: op,

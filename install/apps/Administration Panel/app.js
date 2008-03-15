@@ -127,7 +127,7 @@ this.userPermDialog = function() {
 				});
 				desktop.user.set({
 					id: this._userStore.getValue(row, "id"),
-					permissions: dojo.toJson(newPerms)
+					permissions: newPerms
 				})
 				win.close();
 			})
