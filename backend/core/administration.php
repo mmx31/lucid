@@ -71,7 +71,7 @@
 				$list = $Group->all();
 				$out = array();
 				foreach($list as $group) {
-					$out->append(array(
+					array_push($out, array(
 						id => $group->id,
 						name => $group->name,
 						description => $group->description,
@@ -80,14 +80,28 @@
 				}
 				$output = new jsonOutput($out);
 			}
-			if($_GET['action'] == "new") {
-				//TODO:
+			if($_GET['action'] == "add") {
+				import("models.group");
+				import("lib.Json.Json");
+				$perms = Zend_Json::decode($_POST['permissions']);
+				$p = new $Group(array(
+					name => $_POST['name'],
+					description => $_POST['description'],
+					permissions => $perms
+				));
+				$p->save();
+				$out = new jsonOutput(array(
+					id => $p->id
+				));
 			}
 			if($_GET['action'] == "set") {
 				//TODO:
 			}
 			if($_GET['action'] == "delete") {
-				//TODO:
+				import("models.group");
+				$p = $Group->get($_POST['id']);
+				$p->delete();
+				$out = new intOutput("ok");
 			}
 		}
 		if($_GET['section'] == "users")

@@ -268,7 +268,7 @@ this.pages = {
 				model: new dojox.grid.data.DojoData(null, null, {store: this._groupStore, query: {id: "*"}})
 			});
 			dojo.connect(this._groupStore, "onDelete", this, function(a) {
-				desktop.admin.users.remove(a.id[0]); //that feels really hackish
+				desktop.admin.groups.remove(a.id[0]); //that feels really hackish
 			})
 			dojo.connect(this._groupStore, "onSet", this, function(item, attribute, oldVal, newVal) {
 				var id = this._groupStore.getValue(item, "id");
@@ -527,7 +527,7 @@ this.createGroupDialog = function() {
 			desktop.admin.groups.add({
 				name: n,
 				description: d,
-				callback: function(id) {
+				callback: dojo.hitch(this, function(id) {
 					name.setValue("");
 					description.setValue("");
 					this._groupStore.newItem({
@@ -535,7 +535,7 @@ this.createGroupDialog = function() {
 						name: n,
 						description: d
 					})
-				}
+				})
 			})
 		})
 	});

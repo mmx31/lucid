@@ -102,11 +102,42 @@ desktop.admin = new function()
 				handleAs: "json"
 			});
 		},
+		/*
+		 * Method: add
+		 * 
+		 * Creates a new group
+		 * 
+		 * Arguments:
+		 * 		args - an object containing additional arguments:
+		 * 		> {
+		 * 		> 	name: string, //the name of the new group
+		 * 		> 	description: string, //the description for the new group
+		 * 		> 	permissions: object //the permissions for the group. example: {"some.permission": true, "other.permission": false}
+		 * 		> }
+		 */
 		add: function(/*Object*/args) {
-			//TODO:
+			var callback = args.callback;
+			delete args.callback;
+			args.permissions = dojo.toJson(args.permissions || {});
+			api.xhr({
+				backend: "core.administration.groups.add",
+				content: args,
+				load: function(data) {
+					callback(data.id);
+				},
+				handleAs: "json"
+			})
 		},
 		remove: function(/*Integer*/id, /*Function?*/callback) {
-			//TODO:
+			api.xhr({
+				backend: "core.administration.groups.delete",
+				content: {
+					id: id
+				},
+				load: function(data) {
+					if(callback) callback(data == "0");
+				}
+			});
 		},
 		set: function(/*Object*/args) {
 			//TODO:
