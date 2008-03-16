@@ -1,5 +1,5 @@
 dojo.require("dojox.flash");
-if (dojox.flash.info.commVersion != -1) {
+if (dojox.flash.info.capable == true) {
 	dojox.flash.addLoadedListener(function() {
 		console.log("js:flash loaded");
 	});
