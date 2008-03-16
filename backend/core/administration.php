@@ -49,34 +49,41 @@
 				$outList = array();
 				foreach($list as $perm) {
 					array_push($outList, array(
+						id => $perm->id,
 						name => $perm->name,
 						description => $perm->description,
-						initial => $perm->initial
+						initial => ($perm->initial == 1)
 					));
 				}
 				$out = new jsonOutput($outList);
 			}
 			if($_GET['action'] == "setDefault") {
-				//TODO:
+				import("models.permission");
+				$perm = $Permission->get($_POST['id']);
+				$perm->initial = ($_POST['value'] == "true" ? TRUE : FALSE);
+				$perm->save();
+				$out = new intOutput("ok");
 			}
 		}
 		if($_GET['section'] == "groups") {
 			if($_GET['action'] == "list") {
 				import("models.group");
 				$list = $Group->all();
-				$out = new jsonOutput();
+				$out = array();
 				foreach($list as $group) {
 					$out->append(array(
+						id => $group->id,
 						name => $group->name,
 						description => $group->description,
 						permissions => $group->permissions
 					));
 				}
+				$output = new jsonOutput($out);
 			}
 			if($_GET['action'] == "new") {
 				//TODO:
 			}
-			if($_GET['action'] == "modify") {
+			if($_GET['action'] == "set") {
 				//TODO:
 			}
 			if($_GET['action'] == "delete") {

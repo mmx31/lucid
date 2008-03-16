@@ -22,7 +22,7 @@ this.init = function(args)
 	api.addDojoCss("dojox/grid/_grid/Grid.css");
 	api.addDojoCss("dojox/widget/FileInput/FileInput.css");
 	//make window
-	this.win = new api.window({title: "Administration Panel", width: "500px", height: "400px", onClose: dojo.hitch(this, this.kill)});
+	this.win = new api.window({title: "Administration Panel", width: "500px", height: "400px", onClose: dojo.hitch(this, "kill")});
 	var split = new dijit.layout.SplitContainer({sizerWidth: 7, orientation: "horizontal", layoutAlign: "client"});
 	var pane = new dijit.layout.ContentPane({sizeMin: 10, sizeShare: 20}, document.createElement("div"));
 		var menu = new dijit.Menu({});
@@ -31,17 +31,21 @@ this.init = function(args)
 						       iconClass: "icon-22-actions-go-home",
 						       onClick: dojo.hitch(this, this.pages.home)});
 			menu.addChild(item);
-			var item = new dijit.MenuItem({label: "Users",
-						       iconClass: "icon-16-apps-system-users",
-						       onClick: dojo.hitch(this, this.pages.users)});
-			menu.addChild(item);
 			var item = new dijit.MenuItem({label: "Apps",
 						       iconClass: "icon-16-categories-applications-other",
 						       onClick: dojo.hitch(this, this.pages.apps)});
 			menu.addChild(item);
+			var item = new dijit.MenuItem({label: "Users",
+						       iconClass: "icon-16-apps-system-users",
+						       onClick: dojo.hitch(this, this.pages.users)});
+			menu.addChild(item);
 			var item = new dijit.MenuItem({label: "Groups",
 						       iconClass: "icon-16-apps-system-users",
 						       onClick: dojo.hitch(this, this.pages.groups)});
+			menu.addChild(item);
+			var item = new dijit.MenuItem({label: "Permissions",
+						       iconClass: "icon-16-apps-system-users",
+						       onClick: dojo.hitch(this, this.pages.permissions)});
 			menu.addChild(item);
 		pane.setContent(menu.domNode);
 	split.addChild(pane);
@@ -135,7 +139,21 @@ this.pages = {
 				},
 				{
 					label: "Alter permissions",
-					onClick: dojo.hitch(this, "userPermDialog")
+					onClick: dojo.hitch(this, "permDialog",
+						dojo.hitch(this, function(row){
+							this._userStore.getValue(row, "username");
+						}),
+						dojo.hitch(this, function(row){
+							return dojo.fromJson(this._userStore.getValue(row, "permissions"));
+						}),
+						dojo.hitch(this, function(row, newPerms) {
+							this._userStore.setValue(row, "permissions", dojo.toJson(newPerms));
+							desktop.user.set({
+								id: this._userStore.getValue(row, "id"),
+								permissions: newPerms
+							})
+						})
+					)
 				}
 			], function(item) {
 				var menuItem = new dijit.MenuItem(item);
@@ -220,7 +238,130 @@ this.pages = {
 	},
 	groups: function() {
 		this.toolbar.destroyDescendants();
-		this.main.setContent("Here you will be able to manage the user groups");
+		//TODO: create menu item to add a group
+		this.main.setContent("loading...");
+		desktop.admin.groups.list(dojo.hitch(this, function(data) {
+			for(i=0;i<data.length;i++) {
+				data[i].permissions = dojo.toJson(data[i].permissions);
+			};
+			//make headers (need to do it manually unfortunatly)
+			var layout = [{
+				cells: [[
+					{name: "Name", field: "name", editor: dojox.grid.editors.TextBox},
+					{name: "Description", field: "description", editor: dojox.grid.editors.TextBox}
+				]]
+			}];
+			this._groupStore = new dojo.data.ItemFileWriteStore({
+				data: {
+					identifier: "id",
+					items: data
+				}
+			});
+			var grid = this._groupGrid = new dojox.Grid({
+				structure: layout,
+				model: new dojox.grid.data.DojoData(null, null, {store: this._groupStore, query: {id: "*"}})
+			});
+			dojo.connect(this._groupStore, "onDelete", this, function(a) {
+				desktop.admin.users.remove(a.id[0]); //that feels really hackish
+			})
+			dojo.connect(this._groupStore, "onSet", this, function(item, attribute, oldVal, newVal) {
+				var id = this._groupStore.getValue(item, "id");
+				if(id == false) return;
+				var args = {id: id};
+				args[attribute] = newVal;
+				desktop.admin.groups.set(args);
+			})
+			this.main.setContent(this._groupGrid.domNode);
+			this._groupGrid.render();
+			var menu = this._groupMenu = new dijit.Menu({});
+			dojo.forEach([
+				{
+					label: "Delete",
+					onClick: dojo.hitch(this, function(e) {
+						var row = this._groupGrid.model.getRow(this.__rowIndex);
+						api.ui.yesnoDialog({
+							title: "Group deletion confirmation",
+							message: "Are you sure you want to permanently delete "+row.name+" from the system?",
+							callback: dojo.hitch(this, function(a) {
+								if(a == false) return;
+								this._groupStore.deleteItem(row.__dojo_data_item);
+							})
+						})
+					})
+				},
+				{
+					label: "Alter permissions",
+					onClick: dojo.hitch(this, "permDialog",
+						dojo.hitch(this, function(row) {
+							return this._groupStore.getValue(row, "name");
+						}),
+						dojo.hitch(this, function(row) {
+							return dojo.fromJson(this._groupStore.getValue(row, "permissions"));
+						}),
+						dojo.hitch(this, function(row, newPerms){
+							this._groupStore.setValue(row, "permissions", dojo.toJson(newPerms));
+							desktop.admin.groups.set({
+								id: this._groupStore.getValue(row, "id"),
+								permissions: newPerms
+							})
+						})
+					)
+				}
+				//TODO: add an item for managing group members
+			], function(item) {
+				var menuItem = new dijit.MenuItem(item);
+				menu.addChild(menuItem);
+			});
+			this._groupGrid.onRowContextMenu = dojo.hitch(this, function(e) {
+				this.__rowIndex = e.rowIndex;
+				this._groupMenu._contextMouse();
+				this._groupMenu._openMyself(e);
+			});
+			document.body.appendChild(menu.domNode);
+			this.win.startup();
+		}));
+	},
+	permissions: function() {
+		this.toolbar.destroyDescendants();
+		this.main.setContent("loading...");
+		this.toolbar.destroyDescendants();
+		
+		desktop.admin.permissions.list(dojo.hitch(this, function(data) {
+			var layout = [{
+				cells: [[]]
+			}];
+			//make headers
+			for(field in data[0]) {
+				var args = {
+					name: field.charAt(0).toUpperCase() + field.substr(1).toLowerCase(),
+					field: field
+				};
+				if(field == "initial") {
+					args.editor = dojox.grid.editors.Bool;
+					args.name = "Allow by default";
+				}
+				layout[0].cells[0].push(args);
+			}
+			
+			this._permStore = new dojo.data.ItemFileWriteStore({
+				data: {
+					identifier: "id",
+					items: data
+				}
+			});
+			dojo.connect(this._permStore, "onSet", this, function(item, attribute, oldVal, newVal) {
+				var id = this._permStore.getValue(item, "id");
+				if(id == false || attribute != "initial") return;
+				desktop.admin.permissions.setDefault(id, newVal);
+			})
+			var grid = this._permGrid = new dojox.Grid({
+				structure: layout,
+				model: new dojox.grid.data.DojoData(null, null, {store: this._permStore, query: {id: "*"}})
+			});
+			this.main.setContent(this._permGrid.domNode);
+			this._permGrid.render();
+			this.win.startup();
+		}));
 	}
 }
 
@@ -264,13 +405,12 @@ this.installPackage = function() {
 	uploader.startup();
 }
 
-this.userPermDialog = function() {
+this.permDialog = function(lbl, permissions, callback) {
 	var row = this._userGrid.model.getRow(this.__rowIndex).__dojo_data_item;
+	var perms = permissions(row);
 	this.__rowIndex = null;
-	var perms = dojo.fromJson(this._userStore.getValue(row, "permissions"));
-	var usersname = this._userStore.getValue(row, "username");
 	var win = new api.window({
-		title: "Permissions for "+usersname
+		title: "Permissions for "+lbl(row)
 	});
 	this.windows.push(win);
 	var main = new dijit.layout.ContentPane({layoutAlign: "client"});
@@ -293,21 +433,21 @@ this.userPermDialog = function() {
 			
 			var td = document.createElement("td");
 			var allow = new dijit.form.RadioButton({
-				name: item.name+this.instance+usersname
+				name: item.name+this.instance+lbl(row)
 			});
 			allow.setChecked(perms[item.name] == true);
 			td.appendChild(allow.domNode);
 			tr.appendChild(td);
 			var td = document.createElement("td");
 			var deny = new dijit.form.RadioButton({
-				name: item.name+this.instance+usersname,
+				name: item.name+this.instance+lbl(row),
 			});
 			deny.setChecked(perms[item.name] == false);
 			td.appendChild(deny.domNode);
 			tr.appendChild(td);
 			var td = document.createElement("td");
 			var def = new dijit.form.RadioButton({
-				name: item.name+this.instance+usersname
+				name: item.name+this.instance+lbl(row)
 			});
 			def.setChecked(typeof perms[item.name] == "undefined");
 			td.appendChild(def.domNode);
@@ -338,10 +478,7 @@ this.userPermDialog = function() {
 					if(radioWidgets[item.name].deny.checked == true) newPerms[item.name] = false;
 					if(radioWidgets[item.name].allow.checked == true) newPerms[item.name] = true;
 				});
-				desktop.user.set({
-					id: this._userStore.getValue(row, "id"),
-					permissions: newPerms
-				})
+				callback(row, newPerms);
 				win.close();
 			})
 		})

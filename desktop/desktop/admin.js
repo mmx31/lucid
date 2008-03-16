@@ -51,6 +51,65 @@ desktop.admin = new function()
 				load: callback,
 				handleAs: "json"
 			})
+		},
+		/*
+		 * Method: setDefault
+		 * 
+		 * Set the default value of a permission
+		 * 
+		 * Arguments:
+		 * 		permission - the id of the permission to modify
+		 * 		value - the default value of the permission
+		 * 		callback - a callback function once the operation is completed
+		 */
+		setDefault: function(/*String*/permission, /*Boolean*/value, /*Function?*/callback) {
+			api.xhr({
+				backend: "core.administration.permissions.setDefault",
+				content: {
+					id: permission,
+					value: value
+				},
+				load: function(data) {
+					callback(data == "0");
+				}
+			});
+		}
+	}
+	/*
+	 * Class: desktop.admin.groups
+	 * 
+	 * Group management functions
+	 */
+	this.groups = {
+		/*
+		 * Method: list
+		 * 
+		 * Lists groups on the server
+		 * 
+		 * Arguments:
+		 * 		callback - a callback function. First arg is an array with group objects:
+		 * 		> {
+		 * 		> 	id: integer, //the group's ID
+		 * 		> 	name: string, //the group's name
+		 * 		> 	description: string, //the group's description
+		 * 		> 	permissions: array //the group's permissions
+		 * 		> }
+		 */
+		list: function(/*Function*/callback) {
+			api.xhr({
+				backend: "core.administration.groups.list",
+				load: callback|| function(){},
+				handleAs: "json"
+			});
+		},
+		add: function(/*Object*/args) {
+			//TODO:
+		},
+		remove: function(/*Integer*/id, /*Function?*/callback) {
+			//TODO:
+		},
+		set: function(/*Object*/args) {
+			//TODO:
 		}
 	}
 	/*
