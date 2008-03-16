@@ -95,7 +95,13 @@
 				));
 			}
 			if($_GET['action'] == "set") {
-				//TODO:
+				import("lib.Json.Json");
+				import("models.group");
+				$p = $Group->get($_POST['id']);
+				foreach(array("name", "description", "permissions") as $key) {
+					if($key == "permissions") $_POST[$key] = Zend_Json::decode($_POST[$key]);
+					$p->$key = $_POST[$key];
+				}
 			}
 			if($_GET['action'] == "delete") {
 				import("models.group");

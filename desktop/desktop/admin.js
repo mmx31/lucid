@@ -140,7 +140,15 @@ desktop.admin = new function()
 			});
 		},
 		set: function(/*Object*/args) {
-			//TODO:
+			var callback = args.callback;
+			delete args.callback;
+			api.xhr({
+				backend: "core.administration.groups.set",
+				content: args,
+				load: function(data) {
+					callback(data == "0");
+				}
+			})
 		}
 	}
 	/*
