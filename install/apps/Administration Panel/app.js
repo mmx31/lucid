@@ -15,9 +15,11 @@ this.init = function(args)
 	dojo.require("dijit.Toolbar");
 	dojo.require("dijit.form.Button");
 	dojo.require("dijit.form.CheckBox");
+	dojo.require("dijit.form.TextBox");
 	dojo.require("dojox.grid.Grid");
 	dojo.require("dojo.data.ItemFileWriteStore");
 	dojo.require("dijit.Menu");
+	dojo.require("dijit.Dialog");
 	dojo.require("dojox.widget.FileInputAuto");
 	api.addDojoCss("dojox/grid/_grid/Grid.css");
 	api.addDojoCss("dojox/widget/FileInput/FileInput.css");
@@ -238,7 +240,11 @@ this.pages = {
 	},
 	groups: function() {
 		this.toolbar.destroyDescendants();
-		//TODO: create menu item to add a group
+		var button = new dijit.form.DropDownButton({
+			label: "Create new group",
+			dropDown: this.createGroupDialog()
+		});
+		this.toolbar.addChild(button);
 		this.main.setContent("loading...");
 		desktop.admin.groups.list(dojo.hitch(this, function(data) {
 			for(i=0;i<data.length;i++) {
@@ -488,4 +494,53 @@ this.permDialog = function(lbl, permissions, callback) {
 		win.addChild(bottom);
 		win.show();
 	}));
+}
+
+this.createGroupDialog = function() {
+	var dialog = new dijit.TooltipDialog({
+		title: "Create a new group"
+	});
+	
+	var line = document.createElement("div");
+    var p = document.createElement("span");
+    p.innerHTML = "Name: ";
+    line.appendChild(p);
+	var name = new dijit.form.TextBox({});
+	line.appendChild(name.domNode);
+	dialog.containerNode.appendChild(line);
+	
+	var line = document.createElement("div");
+    var p = document.createElement("span");
+    p.innerHTML = "Description: ";
+    line.appendChild(p);
+	var description = new dijit.form.TextBox({});
+	line.appendChild(description.domNode);
+	dialog.containerNode.appendChild(line);
+	
+	var line = document.createElement("div");
+    var p = document.createElement("span");
+	var button = new dijit.form.Button({
+		label: "Add",
+		onClick: dojo.hitch(this, function() {
+			var n = name.getValue();
+			var d = description.getValue();
+			desktop.admin.groups.add({
+				name: n,
+				description: d,
+				callback: function(id) {
+					name.setValue("");
+					description.setValue("");
+					this._groupStore.newItem({
+						id: id,
+						name: n,
+						description: d
+					})
+				}
+			})
+		})
+	});
+	line.appendChild(button.domNode);
+	dialog.containerNode.appendChild(line);
+	
+	return dialog;
 }
