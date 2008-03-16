@@ -42,7 +42,7 @@
 			foreach($p as $d => $v)
 			{
 				$item = array();
-				foreach(array("id", "name", "category", "version", "filetypes") as $key) {
+				foreach(array("id", "name", "author", "email", "maturity", "category", "version", "filetypes") as $key) {
 					$item[$key] = $v->$key;
 				}
 				array_push($list, $item);

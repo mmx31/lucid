@@ -140,7 +140,7 @@ api.ide = new function()
 	 * 		> 	category: "Accessories", //can be "Accessories", "Development", "Games", "Graphics", "Internet", "Multimedia", "Office", "Other", or "System
 	 * 		> }
 	 */
-	this.getAppList = function(callback) {
+	this.getAppList = function(/*Function*/callback) {
 	api.xhr({
 		backend: "core.app.fetch.list",
 		load: function(data, ioArgs)
@@ -149,5 +149,25 @@ api.ide = new function()
 		},
 		handleAs: "json"
 	});
+	}
+	/*
+	 * Method: remove
+	 * 
+	 * Removes an app from the system
+	 * 
+	 * Arguments:
+	 * 		id - the id of the app to remove
+	 * 		callback - a callback function once the operation is complete. First argument is true if successful.
+	 */
+	this.remove = function(/*Integer*/id, /*Function*/callback) {
+		api.xhr({
+			backend: "api.ide.io.remove",
+			content: {
+				id: id
+			},
+			load: function(d) {
+				callback(d=="0");
+			}
+		})
 	}
 }

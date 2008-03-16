@@ -260,6 +260,31 @@ desktop.app = new function()
 			}
 		}
 	}
+	/*
+	 * Method: list
+	 * 
+	 * Lists the apps available on the server
+	 * 
+	 * Arguments:
+	 * 		callback - a callback function. First argument passed is an array with each app:
+	 * 		> {
+	 * 		> 	id: integer, //the app's id
+	 * 		> 	name: string, //the app's name
+	 * 		> 	author: string, //the app's author
+	 * 		> 	email: string, //the app's author's email
+	 * 		> 	maturity: string, //the app's maturity
+	 * 		> 	category: string, //the app's category. See desktop.config.set for a list of catagories you can get
+	 * 		> 	version: string, //the version of the app
+	 * 		> 	filetypes: array //an array of mimetypes the app can open
+	 * 		> }
+	 */
+	this.list = function(/*Function*/callback) {
+		api.xhr({
+			backend: "core.app.fetch.list",
+			load: callback,
+			handleAs: "json"
+		});
+	}
 	//PROCESS MANAGEMENT FUNCTIONS
 	/*
 	 * Method: getInstances

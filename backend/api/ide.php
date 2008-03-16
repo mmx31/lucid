@@ -34,5 +34,10 @@ if($_GET['section'] == "io")
 		$out = new jsonOutput();
 		$out->append("id", $app->id);
 	}
+	if($_GET['action'] == "remove") {
+		$app = $App->get($_POST['id']);
+		$app->delete();
+		$out = new intOutput("ok");
+	}
 }
 ?>
