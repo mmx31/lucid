@@ -1,12 +1,14 @@
 this.kill = function() {
 	if(!this.win.closed) this.win.close();
+	if(this.timer) clearInterval(this.timer);
 }
 this.imgNode = false;
 this.init = function(args) {
 	dojo.require("dijit.Toolbar");
 	dojo.require("dojox.layout.DragPane");
 	this.win = new api.window({
-		title: "Image Viewer"
+		title: "Image Viewer",
+		onClose: dojo.hitch(this, "kill")
 	});
 	var toolbar = new dijit.Toolbar({layoutAlign: "top"});
 	dojo.forEach([
@@ -30,7 +32,7 @@ this.init = function(args) {
 	this.win.startup();
 	if(typeof args.file != "undefined") this.open(args.file);
 }
-
+this.timer = false;
 this.open = function(path) {
 	if(!this.imgNode) {
 		this.imgNode = document.createElement("div");
@@ -42,10 +44,15 @@ this.open = function(path) {
 		dojo.style(overlay, "position", "absolute");
 		dojo.style(overlay, "top", "0px");
 		dojo.style(overlay, "left", "0px");
+		dojo.style(overlay, "zIndex", "100");
 		this.imgNode.appendChild(overlay);
+
+		this.timer = setInterval(dojo.hitch(this, function() {
+			dojo.style(overlay, "width", this.dragPane.domNode.scrollWidth+"px");
+			dojo.style(overlay, "height", this.dragPane.domNode.scrollHeight+"px");
+		}), 1000);
 		
 		this.dragPane.domNode.appendChild(this.imgNode);
-		this.dragPane.resize();
 	}
 	dojo.query("img", this.imgNode)[0].src = api.fs.embed(path);
 }
