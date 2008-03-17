@@ -293,6 +293,9 @@ dojo.declare("api.sound.html", api.sound._backend, {
 	volume: function(l) {
 		if(l) this.htmlSound.volume = l;
 		return this.htmlSound.volume;
+	},
+	uninitialize: function() {
+		this.stop();
 	}
 });
 	
@@ -346,6 +349,9 @@ dojo.declare("api.sound.flash", api.sound._backend, {
 		dojox.flash.comm.makeObj(this.id, "Sound");
 		dojox.flash.comm.callFunction(this.id, "loadSound", [this.src, true])
 		//dojox.flash.comm.attachEvent(this.id, "onLoad");
+	},
+	uninitialize: function() {
+		this.stop();
 	}
 });
 	
@@ -387,5 +393,6 @@ dojo.declare("api.sound.embed", api.sound._backend, {
 	},
 	uninitialize: function() {
 		clearInterval(this.timer);
+		this.stop();
 	}
 });
