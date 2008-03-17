@@ -109,6 +109,36 @@
 				$p->delete();
 				$out = new intOutput("ok");
 			}
+			if($_GET['action'] == "getMembers") {
+				import("models.user");
+				import("models.group");
+				$g = $Group->get($_POST['id']);
+				$users = $User->all();
+				$array = array();
+				foreach($users as $user) {
+					foreach($user->groups as $group) {
+						if($group == $g->name) {
+							array_push($array, $user);
+							break;
+						}
+					}
+				}
+				$final = array();
+				foreach($array as $user) {
+					$item = array();
+					foreach(array("id", "name", "username", "email", "logged", "permissions", "groups", "lastAuth") as $key) {
+						$item[$key] = $user->$key;
+					}
+					array_push($final, $item);
+				}
+				$out = new jsonOutput($final);
+			}
+			if($_GET['action'] == "addMember") {
+				
+			}
+			if($_GET['action'] == "removeMember") {
+				
+			}
 		}
 		if($_GET['section'] == "users")
 		{

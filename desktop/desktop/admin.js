@@ -128,6 +128,15 @@ desktop.admin = new function()
 				handleAs: "json"
 			})
 		},
+		/*
+		 * Method: remove
+		 * 
+		 * Remove a group from the system
+		 * 
+		 * Arguments:
+		 * 		id - the id of the group to remove
+		 * 		callback - a callback function once the operation is complete
+		 */
 		remove: function(/*Integer*/id, /*Function?*/callback) {
 			api.xhr({
 				backend: "core.administration.groups.delete",
@@ -139,6 +148,20 @@ desktop.admin = new function()
 				}
 			});
 		},
+		/*
+		 * Method: set
+		 * 
+		 * Set group information
+		 * 
+		 * Arguments:
+		 * 		args - an object containing additional arguments:
+		 * 		> {
+		 * 		> 	id: integer, //the id of the group to modify
+		 * 		> 	name: string, //the new name of the group (optional)
+		 * 		> 	description: string, //the new description of the group (optional)
+		 * 		> 	permissions: object //the permissions of the group
+		 * 		> }
+		 */
 		set: function(/*Object*/args) {
 			var callback = args.callback;
 			delete args.callback;
@@ -149,6 +172,51 @@ desktop.admin = new function()
 					callback(data == "0");
 				}
 			})
+		},
+		/*
+		 * Method: getMembers
+		 * 
+		 * Get the members of a group
+		 * 
+		 * Arguments:
+		 * 		id - the id of the group to get the members of
+		 * 		callback - callback function. First argument is an array of the users. See api.user.get for the attributes of each object in the array.
+		 */
+		getMembers: function(/*Integer*/id, /*Function*/callback) {
+			api.xhr({
+				backend: "core.administration.groups.getMembers",
+				content: {
+					id: id
+				},
+				load: callback,
+				handleAs: "json"
+			})
+		},
+		/*
+		 * Method: addMember
+		 * 
+		 * adds a user to a group
+		 * 
+		 * Arguments:
+		 * 		id - the group ID
+		 * 		userid - the user's id
+		 * 		callback - a callback for once the operation has been completed
+		 */
+		addMember: function(/*Integer*/id, /*Ineger*/userid, /*Function?*/callback) {
+			//TODO:
+		},
+		/*
+		 * Method: removeMember
+		 * 
+		 * removes a user from a group
+		 * 
+		 * Arguments:
+		 * 		id - the group ID
+		 * 		userid - the user's id
+		 * 		callback - a callback for once the operation has been completed
+		 */
+		removeMember: function(/*Integer*/id, /*Ineger*/userid, /*Function?*/callback) {
+			//TODO:
 		}
 	}
 	/*

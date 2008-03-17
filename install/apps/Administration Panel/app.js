@@ -16,6 +16,7 @@ this.init = function(args)
 	dojo.require("dijit.form.Button");
 	dojo.require("dijit.form.CheckBox");
 	dojo.require("dijit.form.TextBox");
+	dojo.require("dijit.form.FilteringSelect");
 	dojo.require("dojox.grid.Grid");
 	dojo.require("dojo.data.ItemFileWriteStore");
 	dojo.require("dijit.Menu");
@@ -30,7 +31,7 @@ this.init = function(args)
 		var menu = new dijit.Menu({});
 		menu.domNode.style.width="100%";
 			var item = new dijit.MenuItem({label: "Home",
-						       iconClass: "icon-22-actions-go-home",
+						       iconClass: "icon-16-actions-go-home",
 						       onClick: dojo.hitch(this, this.pages.home)});
 			menu.addChild(item);
 			var item = new dijit.MenuItem({label: "Apps",
@@ -312,8 +313,11 @@ this.pages = {
 							})
 						})
 					)
+				},
+				{
+					label: "Manage group members",
+					onClick: dojo.hitch(this, "groupMemberDialog")
 				}
-				//TODO: add an item for managing group members
 			], function(item) {
 				var menuItem = new dijit.MenuItem(item);
 				menu.addChild(menuItem);
@@ -330,7 +334,6 @@ this.pages = {
 	permissions: function() {
 		this.toolbar.destroyDescendants();
 		this.main.setContent("loading...");
-		this.toolbar.destroyDescendants();
 		
 		desktop.admin.permissions.list(dojo.hitch(this, function(data) {
 			var layout = [{
@@ -369,6 +372,22 @@ this.pages = {
 			this.win.startup();
 		}));
 	}
+}
+
+this.makeUserStore = function(callback) {
+	desktop.admin.users.list(dojo.hitch(this, function(data) {
+		for(i=0;i<data.length;i++) {
+			data[i].permissions = dojo.toJson(data[i].permissions);
+			data[i].groups = dojo.toJson(data[i].groups);
+		};
+		this._userStore = new dojo.data.ItemFileWriteStore({
+			data: {
+				identifier: "id",
+				items: data
+			}
+		});
+		callback();
+	}));
 }
 
 this.installPackage = function() {
@@ -543,4 +562,69 @@ this.createGroupDialog = function() {
 	dialog.containerNode.appendChild(line);
 	
 	return dialog;
+}
+
+this.groupMemberDialog = function(group) {
+	var row = this._groupGrid.model.getRow(this.__rowIndex).__dojo_data_item;
+	var window = new api.window({
+		title: "Manage "+this._groupStore.getValue(row, "name")+" members"
+	})
+	this.windows.push(window);
+	var makeUI = function(list) {
+		var client = new dijit.layout.ContentPane({
+			layoutAlign: "client",
+			style: "overflow-y: auto"
+		})
+		var div = document.createElement("div");
+		
+		dojo.forEach(list, function(item){
+			var row = document.createElement("div");
+			row.textContent = item.username;
+			var right = document.createElement("span");
+			dojo.addClass(right, "floatRight");
+			dojo.addClass(right, "icon-16-actions-list-remove");
+			row.appendChild(right);
+			dojo.connect(row, "onclick", this, function() {
+				desktop.admin.groups.removeMember(item.id);
+			})
+			div.appendChild(row);
+		})
+		
+		client.setContent(div);
+		window.addChild(client);
+		
+		var top = new dijit.layout.ContentPane({
+			layoutAlign: "top"
+		});
+		var div = document.createElement("div");
+		var s = new dijit.form.FilteringSelect({
+			store: this._userStore,
+			autoComplete: true,
+			labelAttr: "username"
+		});
+		var b = new dijit.form.Button({
+			label: "Add",
+			onClick: dojo.hitch(this, function() {
+				this._userStore.fetch({
+					query: {username: s.getValue()},
+					onItem: function(i) {
+						desktop.admin.groups.addMember(
+							this._groupStore.getValue(row, "id"),
+							this._userStore.getValue(i, "id")
+						);
+					}
+				})
+				s.setValue("");
+			})
+		})
+		div.appendChild(s.domNode);
+		top.setContent(div);
+		window.addChild(top);
+	}
+	desktop.admin.groups.getMembers(this._groupStore.getValue(row, "id"), function(list){
+		if(typeof this._userStore == "undefined") {
+			this.makeUserStore(dojo.hitch(this, makeUI, list));
+		}
+		else makeUI(list);
+	});
 }
