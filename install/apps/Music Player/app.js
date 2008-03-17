@@ -132,7 +132,7 @@ this.pause = function() {
 this.skip = function(value) {
 	if (!this.ignoreOnChange && this.sound) {
 		var d = this.sound.duration();
-		this.sound._startPos = ((value / 100) * (d/1000));
+		this.sound.position((value / 100) * d);
 		if(this.is_playing) {
 			this.sound.play();
 			this.startTicker();
