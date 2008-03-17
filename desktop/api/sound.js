@@ -306,19 +306,26 @@ dojo.declare("api.sound.html", api.sound._backend, {
  */
 dojo.declare("api.sound.flash", api.sound._backend, {
 	_startPos: 0,
+	playing: false,
 	play: function() {
 		dojox.flash.comm.callFunction(this.id, "start", [this._startPos, this.loop]);
+		this.playing = true;
 	},
 	pause: function() {
 		dojox.flash.comm.callFunction(this.id, "stop");
-		this._startPos = this.position() / 1000;
+		this._startPos = this.position();
+		this.playing = false;
 	},
 	stop: function() {
 		this._startPos = 0;
 		dojox.flash.comm.callFunction(this.id, "stop");
+		this.playing = false;
 	},
 	position: function(v) {
-		if(v) return dojox.flash.comm.setValue(this.id, "position", v);
+		if(v) {
+			this._startPos = v;
+			if(this.playing) this.play();
+		}
 		else {
 			return dojox.flash.comm.getValue(this.id, "position");
 		}
@@ -330,7 +337,7 @@ dojo.declare("api.sound.flash", api.sound._backend, {
 		return dojox.flash.comm.getValue(this.id, "id3");
 	},
 	volume: function(val) {
-		return dojox.flash.comm.callFunction(this.id, "setVolume", [val*100]);
+		return dojox.flash.comm.callFunction(this.id, "setVolume", [val]);
 	},
 	checkCompat: function() {
 		return dojox.flash.info.capable;

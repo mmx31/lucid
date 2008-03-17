@@ -130,7 +130,7 @@ this.pause = function() {
 	}
 }
 this.skip = function(value) {
-	if (!this.ignoreOnChange && this.sound) {
+	if (!this.ignoreOnChange) {
 		var d = this.sound.duration();
 		this.sound.position((value / 100) * d);
 		if(this.is_playing) {
