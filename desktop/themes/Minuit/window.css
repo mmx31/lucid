@@ -1,0 +1,102 @@
+.win-buttons {
+	/*padding-top: 2px;
+	padding-left: 2px;
+	padding-right: 2px;
+	margin-top: 3px; */
+	width: 62px;
+	height: 18px;
+	right: 10px;
+	/*background-image: url(./images/.png);
+	background-repeat: no-repeat;
+	background-position: top right; */
+}
+.win-close,
+.win-min,
+.win-max {
+	height: 18px;
+}
+.win-close {
+  width: 21px;
+	background-image: url(./images/close.png);
+	margin-right: 0px;
+}
+.win-min {
+  width: 21px;
+	background-image: url(./images/min.png);
+}
+.win-max {
+  width: 21px;
+	background-image: url(./images/max.png);
+}
+.win-tc {
+    height: 29px;
+	background-image: url(./images/center.png);
+}
+.win-title {
+	color: white;
+	font-weight: bold;
+	left: 20px;
+	padding-top: 2px;
+}
+.win-tr,
+.win-tl {
+	height: 29px;
+}
+.win-tr {
+	background-image: url(./images/right.png);
+	padding-right: 17px;
+	width: 10px;
+}
+.win-tl {
+	background-image: url(./images/left.png);
+	padding-left: 19px;
+	width: 10px;
+}
+.win-resize {
+	width: 12px;
+	height: 16px;
+	position: absolute;
+	bottom: 8px;
+	right: 4px;
+	cursor: se-resize;
+}
+
+.win-mc {
+	background-color: white;
+}
+/*.win-ml {
+	background-image: url(./images/);
+	padding-left: 10px;
+}*/
+.win > .win-bmw {
+	top: 27px;
+}
+
+.win-bmw > .win-ml {
+	bottom: 26px;
+}
+
+.win-mr > .win-mc {
+	left: 10px;
+	right: 10px;
+}
+
+/*.win-mr {
+	background-image: url(./images/);
+	padding-right: 10px;
+}*/
+.win-bl {
+	padding-left: 19px;
+	height: 16px;
+	background-image: url(./images/b_left.png);
+}
+.win-br {
+	padding-right: 17px;
+	height: 16px;
+	background-image: url(./images/b_right.png);
+}
+.win-bc {
+	height: 26px;
+	background-image: url(./images/b_center.png);
+}
+
