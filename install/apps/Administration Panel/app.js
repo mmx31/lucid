@@ -524,6 +524,9 @@ this.createGroupDialog = function() {
 	var dialog = new dijit.TooltipDialog({
 		title: "Create a new group"
 	});
+	var errBox = document.createElement("div");
+	dojo.style(errBox, "color", "red");
+	dialog.containerNode.appendChild(errBox);
 	
 	var line = document.createElement("div");
     var p = document.createElement("span");
@@ -548,16 +551,26 @@ this.createGroupDialog = function() {
 		onClick: dojo.hitch(this, function() {
 			var n = name.getValue();
 			var d = description.getValue();
-			desktop.admin.groups.add({
-				name: n,
-				description: d,
-				callback: dojo.hitch(this, function(id) {
-					name.setValue("");
-					description.setValue("");
-					this._groupStore.newItem({
-						id: id,
+			this._groupStore.fetch({
+				query: {name: n},
+				onComplete: dojo.hitch(this, function(list) {
+					if(list.length != 0){
+						errBox.textContent = "Group with that name allready exists";
+						return;
+					}
+					errBox.textContent = "";
+					desktop.admin.groups.add({
 						name: n,
-						description: d
+						description: d,
+						callback: dojo.hitch(this, function(id) {
+							name.setValue("");
+							description.setValue("");
+							this._groupStore.newItem({
+								id: id,
+								name: n,
+								description: d
+							})
+						})
 					})
 				})
 			})
@@ -572,7 +585,9 @@ this.createGroupDialog = function() {
 this.groupMemberDialog = function(group) {
 	var row = this._groupGrid.model.getRow(this.__rowIndex).__dojo_data_item;
 	var window = new api.window({
-		title: "Manage "+this._groupStore.getValue(row, "name")+" members"
+		title: "Manage "+this._groupStore.getValue(row, "name")+" members",
+		width: "400px",
+		height: "200px"
 	})
 	this.windows.push(window);
 	var makeUI = function(list) {
@@ -593,7 +608,7 @@ this.groupMemberDialog = function(group) {
 				desktop.admin.groups.removeMember(item.id);
 			})
 			div.appendChild(row);
-		})
+		}, this)
 		
 		client.setContent(div);
 		window.addChild(client);
@@ -605,7 +620,8 @@ this.groupMemberDialog = function(group) {
 		var s = new dijit.form.FilteringSelect({
 			store: this._userStore,
 			autoComplete: true,
-			labelAttr: "username"
+			labelAttr: "username",
+			searchAttr: "username"
 		});
 		var b = new dijit.form.Button({
 			label: "Add",
@@ -623,13 +639,16 @@ this.groupMemberDialog = function(group) {
 			})
 		})
 		div.appendChild(s.domNode);
+		div.appendChild(b.domNode);
 		top.setContent(div);
 		window.addChild(top);
+		window.show();
+		window.startup();
 	}
-	desktop.admin.groups.getMembers(this._groupStore.getValue(row, "id"), function(list){
+	desktop.admin.groups.getMembers(this._groupStore.getValue(row, "id"), dojo.hitch(this, function(list){
 		if(typeof this._userStore == "undefined") {
 			this.makeUserStore(dojo.hitch(this, makeUI, list));
 		}
 		else makeUI(list);
-	});
+	}));
 }
