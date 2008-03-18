@@ -44,12 +44,12 @@
 }
 .win-tr {
 	background-image: url(./images/right.png);
-	padding-right: 17px;
+	/*padding-right: 17px;*/
 	width: 10px;
 }
 .win-tl {
 	background-image: url(./images/left.png);
-	padding-left: 19px;
+	/*padding-left: 19px;*/
 	width: 10px;
 }
 .win-resize {
@@ -73,7 +73,7 @@
 }
 
 .win-bmw > .win-ml {
-	bottom: 26px;
+	bottom: 16px;
 }
 
 .win-mr > .win-mc {
@@ -86,17 +86,17 @@
 	padding-right: 10px;
 }*/
 .win-bl {
-	padding-left: 19px;
+	/*padding-left: 19px;*/
 	height: 16px;
 	background-image: url(./images/b_left.png);
 }
 .win-br {
-	padding-right: 17px;
+	/*padding-right: 17px;*/
 	height: 16px;
 	background-image: url(./images/b_right.png);
 }
 .win-bc {
-	height: 26px;
+	height: 16px;
 	background-image: url(./images/b_center.png);
 }
 

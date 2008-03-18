@@ -6,7 +6,7 @@ html, body {
 
 /******************** Taskbar ********************/
 .desktopPanel {
-  background: url('./images/startbarmid.png');
+  background: url('./images/panelback.png');
 }
 /******************** Window List ********************/
 #appbar {
@@ -21,14 +21,14 @@ html, body {
 
 .taskBarItem {
 	display: inline;
-	background-image: url(./images/task.png);
+	background-image: url(./images/task_sel.png);
 	background-repeat: no-repeat;
 	margin-right: 5px;
 	margin: 0px;
-	padding: 4px;
+	padding: 3px;
 	cursor: pointer;
 	height: 24px;
-	width: 140px;
+	width: 135px;
 	font-size: 10pt;
 	white-space: nowrap;
 	text-align: center;
@@ -53,8 +53,8 @@ html, body {
 .seperator {
 	background-image: url(./images/separator.png);
 	height:29px;
-	width: 5px;
-	margin-top: -5px;
+	width: 3px;
+	/*margin-top: -5px;*/
 }
 /******************** Console ********************/
 .console {
@@ -76,8 +76,9 @@ html, body {
 /******************** Menu ********************/
 .menubutton-icon
 {
-	background-image: url(./images/launch.png);
-	width: 71px;
-	height: 29px;
+	background-image: url(./images/begin.png);
+	width: 74px;
+	height: 22px;
 	background-repeat: no-repeat;
+	padding-top: 3px;
 }
