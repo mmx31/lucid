@@ -99,9 +99,12 @@
 				import("models.group");
 				$p = $Group->get($_POST['id']);
 				foreach(array("name", "description", "permissions") as $key) {
-					if($key == "permissions") $_POST[$key] = Zend_Json::decode($_POST[$key]);
-					$p->$key = $_POST[$key];
+					if(!isset($_POST[$key])) continue;
+					if($key == "permissions") $p->$key = Zend_Json::decode($_POST[$key]);
+					else $p->$key = $_POST[$key];
 				}
+				$p->save();
+				$out = new intOutput("ok");
 			}
 			if($_GET['action'] == "delete") {
 				import("models.group");

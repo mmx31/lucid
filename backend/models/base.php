@@ -31,26 +31,6 @@
 			}
 			return $r;
 		}
-		function __get($var) {
-			$parent = new $this->_parentModel(array(), true);
-			$type = $parent->$var['type'];
-			if($type == "foreignkey") {
-				$p = $this->_make_parent();
-				$return = $p->get($this->$var) or null;
-			}
-			elseif($type == "array") {
-				import("lib.Json.Json");
-				if(!is_array($this->$var)) $val = Zend_Json::decode($this->$var);
-				if(is_array($val)) $return = $val;
-			}
-			else {
-				$return = $this->$var;
-			}
-			if(is_null($return)) {
-				$return = $parent->$var['default'] or ($type == "array" ? array() : null);
-			}
-			return $return;
-		}
 		function _make_parent()
 		{
 			if(!$this->_parentInstance)
@@ -152,19 +132,19 @@
 				$parent = new $me(array(), true);
 				$type = $parent->$var['type'];
 				if($type == "foreignkey") {
-					$p = new $this->$var['model'];
-					$return = $p->get($this->$var['id']) or null;
+					$p = $this->_make_parent();
+					$return = $p->get($this->$var);
 				}
 				elseif($type == "array") {
 					import("lib.Json.Json");
 					if(!is_array($this->$var)) $val = Zend_Json::decode($this->$var);
-					if(is_array($val)) $return = $val or null;
+					if(is_array($val)) $return = $val;
 				}
 				else {
-					$return = $this->$var or null;
+					$return = $this->$var;
 				}
 				if(is_null($return)) {
-					$return = $default or ($type == "array" ? array() : null);
+					$return = $parent->$var['default'] or ($type == "array" ? array() : null);
 				}
 				return $return;
 			}

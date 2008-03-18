@@ -165,6 +165,7 @@ desktop.admin = new function()
 		set: function(/*Object*/args) {
 			var callback = args.callback;
 			delete args.callback;
+			if(typeof args.permissions != "undefined") args.permissions = dojo.toJson(args.permissions);
 			api.xhr({
 				backend: "core.administration.groups.set",
 				content: args,

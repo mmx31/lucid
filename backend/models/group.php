@@ -20,7 +20,7 @@
 	{
 		var $name = array('type' => "text");
 		var $description = array('type' => "text");
-		var $permissions = array('type' => 'array');
+		var $permissions = array('type' => "array");
 		
 		function clear_permission($perm) {
 			unset($this->permissions[$perm]);

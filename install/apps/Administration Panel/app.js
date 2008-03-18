@@ -116,6 +116,7 @@ this.pages = {
 				desktop.admin.users.remove(a.id[0]); //that feels really hackish
 			})
 			dojo.connect(this._userStore, "onSet", this, function(item, attribute, oldVal, newVal) {
+				if(attribute == "permissions") return;
 				var id = this._userStore.getValue(item, "id");
 				if(id == false) return;
 				var args = {id: id};
@@ -143,6 +144,7 @@ this.pages = {
 				{
 					label: "Alter permissions",
 					onClick: dojo.hitch(this, "permDialog",
+						grid,
 						dojo.hitch(this, function(row){
 							this._userStore.getValue(row, "username");
 						}),
@@ -272,6 +274,7 @@ this.pages = {
 				desktop.admin.groups.remove(a.id[0]); //that feels really hackish
 			})
 			dojo.connect(this._groupStore, "onSet", this, function(item, attribute, oldVal, newVal) {
+				if(attribute == "permissions") return;
 				var id = this._groupStore.getValue(item, "id");
 				if(id == false) return;
 				var args = {id: id};
@@ -299,6 +302,7 @@ this.pages = {
 				{
 					label: "Alter permissions",
 					onClick: dojo.hitch(this, "permDialog",
+						grid,
 						dojo.hitch(this, function(row) {
 							return this._groupStore.getValue(row, "name");
 						}),
@@ -306,6 +310,7 @@ this.pages = {
 							return dojo.fromJson(this._groupStore.getValue(row, "permissions"));
 						}),
 						dojo.hitch(this, function(row, newPerms){
+							console.log(newPerms);
 							this._groupStore.setValue(row, "permissions", dojo.toJson(newPerms));
 							desktop.admin.groups.set({
 								id: this._groupStore.getValue(row, "id"),
@@ -430,8 +435,8 @@ this.installPackage = function() {
 	uploader.startup();
 }
 
-this.permDialog = function(lbl, permissions, callback) {
-	var row = this._userGrid.model.getRow(this.__rowIndex).__dojo_data_item;
+this.permDialog = function(grid, lbl, permissions, callback) {
+	var row = grid.model.getRow(this.__rowIndex).__dojo_data_item;
 	var perms = permissions(row);
 	this.__rowIndex = null;
 	var win = new api.window({
