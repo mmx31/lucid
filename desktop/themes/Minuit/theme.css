@@ -6,7 +6,7 @@ html, body {
 
 /******************** Taskbar ********************/
 .desktopPanel {
-  background: url('./images/panelback.png');
+  background: url(./images/panelback.png);
 }
 /******************** Window List ********************/
 #appbar {
@@ -78,7 +78,7 @@ html, body {
 {
 	background-image: url(./images/begin.png);
 	width: 74px;
-	height: 22px;
+	height: 24px;
 	background-repeat: no-repeat;
 	padding-top: 3px;
 }

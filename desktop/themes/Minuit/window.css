@@ -1,3 +1,8 @@
+.win {
+	border: 0px;
+	padding: 0px;
+	margin: 0px;
+}
 .win-buttons {
 	/*padding-top: 2px;
 	padding-left: 2px;
@@ -25,7 +30,7 @@
 	background-image: url(./images/min.png);
 }
 .win-max {
-  width: 21px;
+  width: 20px;
 	background-image: url(./images/max.png);
 }
 .win-tc {
@@ -69,7 +74,7 @@
 	padding-left: 10px;
 }*/
 .win > .win-bmw {
-	top: 27px;
+	top: 29px;
 }
 
 .win-bmw > .win-ml {
