@@ -54,7 +54,7 @@ html, body {
 	background-image: url(./images/separator.png);
 	height:29px;
 	width: 3px;
-	/*margin-top: -5px;*/
+	margin-top: -5px;
 }
 /******************** Console ********************/
 .console {
