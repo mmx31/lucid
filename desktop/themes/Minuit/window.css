@@ -9,7 +9,6 @@
 	padding-right: 2px;
 	margin-top: 3px; */
 	width: 62px;
-	height: 18px;
 	right: 10px;
 	/*background-image: url(./images/.png);
 	background-repeat: no-repeat;
@@ -23,7 +22,6 @@
 .win-close {
   width: 21px;
 	background-image: url(./images/close.png);
-	margin-right: 0px;
 }
 .win-min {
   width: 21px;
@@ -34,8 +32,9 @@
 	background-image: url(./images/max.png);
 }
 .win-tc {
-    height: 29px;
+  height: 29px;
 	background-image: url(./images/center.png);
+	z-index: 1;
 }
 .win-title {
 	color: white;
@@ -66,9 +65,9 @@
 	cursor: se-resize;
 }
 
-.win-mc {
+/*.win-mc {
 	background-color: white;
-}
+}*/
 /*.win-ml {
 	background-image: url(./images/);
 	padding-left: 10px;
@@ -77,7 +76,7 @@
 	top: 29px;
 }
 
-.win-bmw > .win-ml {
+/*.win-bmw > .win-ml {
 	bottom: 16px;
 }
 
@@ -86,7 +85,7 @@
 	right: 10px;
 }
 
-/*.win-mr {
+.win-mr {
 	background-image: url(./images/);
 	padding-right: 10px;
 }*/
