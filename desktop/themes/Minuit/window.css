@@ -4,10 +4,10 @@
 	margin: 0px;
 }
 .win-buttons {
-	/*padding-top: 2px;
+	padding-top: 1px;
 	padding-left: 2px;
-	padding-right: 2px;
-	margin-top: 3px; */
+	padding-right: 4px;
+	/*margin-top: 3px; */
 	width: 62px;
 	/*background-image: url(./images/.png);
 	background-repeat: no-repeat;
@@ -64,19 +64,18 @@
 
 .win-mc {
 	background-color: white;
+	border-left: 1px solid gray;
+	border-right: 1px solid gray;
+	border-bottom: 1px solid gray;
+	margin-bottom: 16px;
 }
 /*.win-ml {
 	background-image: url(./images/);
 	padding-left: 10px;
 }*/
-.win > .win-bmw {
+/*.win > .win-bmw {
 	top: 29px;
-}
-
-/*.win-bmw{
-	bottom: 16px;
 }*/
-
 /*.win-mr > .win-mc {
 	left: 10px;
 	right: 10px;
