@@ -8,6 +8,9 @@ html, body {
 .desktopPanel {
   background: url('./images/panelback.png');
 }
+.desktopPanelTop {
+  background:url(./images/panelbacktop.png) #f5f5f5 repeat-x;
+}
 /******************** Window List ********************/
 #appbar {
 	width: 100%;
