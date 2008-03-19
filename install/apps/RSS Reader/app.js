@@ -23,52 +23,60 @@ this.init = function(args)
 	this.feedStore = new api.registry({
 		appid: this.id,
 		name: "rssFeeds",
-		identifier: "title",
+		identifier: "id",
 		data: {
 			label: "label",
 			items: [
 				{
+					id: 0,
 					label: "Feeds",
 					title: "Feeds",
 					category: true,
 					children: [
 						{
+							id: 1,
 							label: "Psych Desktop",
 							title: "Psych Desktop",
 							url: "http://www.psychdesktop.net/rss.xml",
 							category: false
 						},
 						{
+							id: 2,
 							label: "Slashdot",
 							title: "Slashdot",
 							url: "http://rss.slashdot.org/Slashdot/slashdot",
 							category: false
 						},
 						{
+							id: 3,
 							label: "Ajaxian",
 							title: "Ajaxian",
 							url: "http://feeds.feedburner.com/ajaxian",
 							category: false
 						},
 						{
+							id: 4,
 							label: "Dojo Toolkit",
 							title: "Dojo Toolkit",
 							url: "http://dojotoolkit.org/rss.xml",
 							category: false
 						},
 						{
+							id: 5,
 							label: "xkcd",
 							title: "xkcd",
 							url: "http://www.xkcd.com/rss.xml",
 							category: false
 						},
 						{
+							id: 6,
 							label: "Psychcf's blog",
 							title: "Psychcf's blog",
 							url: "http://psychdesigns.net/psych/rss.xml",
 							category: false
 						},
 						{
+							id: 7,
 							label: "Jay's blog",
 							title: "Jay's blog",
 							url: "http://www.jaymacdesigns.net/feed/",
@@ -239,7 +247,7 @@ this.addFeedDialog = function()
     dojo.connect(button, "onClick", this, function(e) {
 	if(this._form.title.getValue() == "") return;
 	if(!this._form.url.isValid() && this._form.isCategory.checked) return;
-	if(!this._form.isCategory.checked && this._form.category.isValid()) return;
+	if(!this._form.isCategory.checked && !this._form.category.isValid()) return;
 	if(!this._form.icon.isValid()) return;
 	this.feedStore.fetch({query: {title: this._form.title.getValue()}, onComplete: dojo.hitch(this, function(f) {
 		if(typeof f[0] != "undefined") {
@@ -247,24 +255,27 @@ this.addFeedDialog = function()
 			return;
 		}
 		var makeItem = dojo.hitch(this, function(items) {
+			console.log(items);
+			var maxID = this.feedStore._arrayOfAllItems.length; //feels hackish
 			var item = this.feedStore.newItem({
+				id: maxID,
 				title: this._form.title.getValue(),
 				label: this._form.title.getValue(),
 				url: this._form.url.getValue(),
 				iconClass: this._form.icon.getValue() || null,
 				category: this._form.isCategory.checked
-			}, (items ? { //TODO: allways appending to root because items is null... why?
+			}, (items[0] ? {
 				attribute: "children",
-				item: items[0]
+				parent: items[0]
 			} : null));
 			this.updateCount(item);
 			this.feedStore.save();
 		});
-		if(this._form.isCategory.checked) {
+		if(!this._form.isCategory.checked) {
 			this.feedStore.fetch({
 				query: {
 					category: true,
-					title: this._form.category.getValue()
+					id: this._form.category.getValue()
 				},
 				onComplete: makeItem
 			})
