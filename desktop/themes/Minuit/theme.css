@@ -9,7 +9,7 @@ html, body {
   background: url('./images/panelback.png');
 }
 .desktopPanelTop {
-  background:url(./images/panelbacktop.png) #f5f5f5 repeat-x;
+  background:url(./images/panelbacktop.png) repeat-x;
 }
 /******************** Window List ********************/
 #appbar {
