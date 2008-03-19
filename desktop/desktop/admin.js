@@ -204,7 +204,16 @@ desktop.admin = new function()
 		 * 		callback - a callback for once the operation has been completed
 		 */
 		addMember: function(/*Integer*/id, /*Ineger*/userid, /*Function?*/callback) {
-			//TODO:
+			api.xhr({
+				backend: "core.administration.groups.addMember",
+				content: {
+					groupid: id,
+					userid: userid
+				},
+				load: function(data) {
+					if(callback) callback(data == "0");
+				}
+			})
 		},
 		/*
 		 * Method: removeMember
@@ -216,8 +225,17 @@ desktop.admin = new function()
 		 * 		userid - the user's id
 		 * 		callback - a callback for once the operation has been completed
 		 */
-		removeMember: function(/*Integer*/id, /*Ineger*/userid, /*Function?*/callback) {
-			//TODO:
+		removeMember: function(/*Integer*/id, /*Integer*/userid, /*Function?*/callback) {
+			api.xhr({
+				backend: "core.administration.groups.removeMember",
+				content: {
+					groupid: id,
+					userid: userid
+				},
+				load: function(data) {
+					if(callback) callback(data == "0");
+				}
+			})
 		}
 	}
 	/*

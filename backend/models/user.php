@@ -149,6 +149,7 @@
 			$this->permissionsExpiry[$perm] = 0;
 		}
 		function has_permission($perm) {
+			global $Group;
 			if(!isset($this->permissions[$perm]) && !is_null($this->permissions[$perm])) {
 				if(!isset($this->permissionsExpiry[$perm])) { return $this->permissions[$perm]; }
 				if(time() < $this->permissionsExpiry[$perm]) { return $this->permissions[$perm]; }

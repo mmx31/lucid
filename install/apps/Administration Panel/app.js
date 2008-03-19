@@ -593,22 +593,35 @@ this.groupMemberDialog = function(group) {
 	var makeUI = function(list) {
 		var client = new dijit.layout.ContentPane({
 			layoutAlign: "client",
-			style: "overflow-y: auto"
+			style: "overflow-x: auto"
 		})
 		var div = document.createElement("div");
-		
-		dojo.forEach(list, function(item){
-			var row = document.createElement("div");
-			row.textContent = item.username;
+		var idList = [];
+		var makeItem = dojo.hitch(this, function(item){
+			idList.push(item.id);
+			var drow = document.createElement("div");
+			dojo.style(drow, "position", "relative");
+			drow.innerHTML = "<span>"+item.username+"</span>";
 			var right = document.createElement("span");
-			dojo.addClass(right, "floatRight");
+			dojo.style(right, "position", "absolute");
+			dojo.style(right, "right", "0px");
+			dojo.style(right, "top", "0px");
 			dojo.addClass(right, "icon-16-actions-list-remove");
-			row.appendChild(right);
-			dojo.connect(row, "onclick", this, function() {
-				desktop.admin.groups.removeMember(item.id);
+			drow.appendChild(right);
+			dojo.connect(right, "onclick", this, function() {
+				desktop.admin.groups.removeMember(
+					this._groupStore.getValue(row, "id"),
+					item.id
+				);
+				div.removeChild(drow);
+				dojo.forEach(idList, function(id, i) {
+					if(id == item.id) idList.splice(i, 1);
+				})
 			})
-			div.appendChild(row);
-		}, this)
+			div.appendChild(drow);
+		})
+		
+		dojo.forEach(list, makeItem, this)
 		
 		client.setContent(div);
 		window.addChild(client);
@@ -616,7 +629,7 @@ this.groupMemberDialog = function(group) {
 		var top = new dijit.layout.ContentPane({
 			layoutAlign: "top"
 		});
-		var div = document.createElement("div");
+		var tdiv = document.createElement("div");
 		var s = new dijit.form.FilteringSelect({
 			store: this._userStore,
 			autoComplete: true,
@@ -626,21 +639,25 @@ this.groupMemberDialog = function(group) {
 		var b = new dijit.form.Button({
 			label: "Add",
 			onClick: dojo.hitch(this, function() {
-				this._userStore.fetch({
-					query: {username: s.getValue()},
-					onItem: function(i) {
-						desktop.admin.groups.addMember(
-							this._groupStore.getValue(row, "id"),
-							this._userStore.getValue(i, "id")
-						);
-					}
+				desktop.admin.groups.addMember(
+					this._groupStore.getValue(row, "id"),
+					s.getValue()
+				);
+				var hasItem = false;
+				dojo.forEach(idList, function(id) {
+					if(id == s.getValue()) hasItem = true;
+				});
+				if(!hasItem) this._userStore.fetch({
+					query: {id: s.getValue()},
+					onItem: makeItem
 				})
-				s.setValue("");
+				s.setDisplayedValue("");
+				s.reset();
 			})
 		})
-		div.appendChild(s.domNode);
-		div.appendChild(b.domNode);
-		top.setContent(div);
+		tdiv.appendChild(s.domNode);
+		tdiv.appendChild(b.domNode);
+		top.setContent(tdiv);
 		window.addChild(top);
 		window.show();
 		window.startup();
@@ -649,6 +666,6 @@ this.groupMemberDialog = function(group) {
 		if(typeof this._userStore == "undefined") {
 			this.makeUserStore(dojo.hitch(this, makeUI, list));
 		}
-		else makeUI(list);
+		else dojo.hitch(this, makeUI, list)();
 	}));
 }

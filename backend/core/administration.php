@@ -137,10 +137,32 @@
 				$out = new jsonOutput($final);
 			}
 			if($_GET['action'] == "addMember") {
-				
+				import("models.user");
+				import("models.group");
+				$user = $User->get($_POST['userid']);
+				$group = $Group->get($_POST['groupid']);
+				foreach($user->groups as $g) {
+					if($g == $group->name) {
+						$out = new intOutput("ok");
+						die();
+					}
+				}
+				array_push($user->groups, $group->name);
+				$user->save();
+				$out = new intOutput("ok");
 			}
 			if($_GET['action'] == "removeMember") {
-				
+				import("models.user");
+				import("models.group");
+				$user = $User->get($_POST['userid']);
+				$group = $Group->get($_POST['groupid']);
+				foreach($user->groups as $k => $g) {
+					if($g == $group->name) {
+						array_splice($user->groups, $k, 1);
+					}
+				}
+				$user->save();
+				$out = new intOutput("ok");
 			}
 		}
 		if($_GET['section'] == "users")
