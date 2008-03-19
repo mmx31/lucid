@@ -11,7 +11,7 @@ html, body {
 /******************** Window List ********************/
 #appbar {
 	width: 100%;
-	height: 29px;
+	height: 30px;
 	background-color: transparent;
 	border:0px;
 	padding: 0px;
@@ -25,7 +25,7 @@ html, body {
 	background-repeat: no-repeat;
 	margin-right: 5px;
 	margin: 0px;
-	padding: 3px;
+	/*padding: 3px;*/
 	cursor: pointer;
 	height: 24px;
 	width: 135px;
@@ -80,5 +80,5 @@ html, body {
 	width: 74px;
 	height: 24px;
 	background-repeat: no-repeat;
-	padding-top: 3px;
+	/*padding-top: 3px;*/
 }
