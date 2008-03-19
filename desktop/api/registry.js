@@ -22,7 +22,7 @@ dojo.declare("api.registry", dojo.data.ItemFileWriteStore, {
 		this.__desktop_name = args.name;
 		this.__desktop_appid = args.appid;
 		
-		if(args.data) return;
+		this._jsonData = null;
 		
 		this.url = this._jsonFileUrl = api.xhr("api.registry.stream.load")
 		+ "&appid=" + encodeURIComponent(args.appid)
