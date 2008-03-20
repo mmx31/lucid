@@ -73,7 +73,12 @@
 					$user->set_password($val);
 					continue;
 				}
+				if($key == "username") {
+					//rename their userdir
+					rename("../../files/" . $user->$key, "../../files/" . $val);
+				}
 				$user->$key = $val;
+				
 			}
 			$user->save();
 			$out = new intOutput("ok");
