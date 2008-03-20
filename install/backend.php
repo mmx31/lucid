@@ -48,16 +48,19 @@
 				'description' => 'Can login'
 			),
 			array(
+				'name' => 'core.administration',
+				'description' => 'Can administrate the system',
+				'initial' => false
+			),
+			array(
 				'name' => 'core.user.set.password',
 				'description' => 'Can change password',
-				'initial' => false,
-				'staticPer' => false,
-				'timeout' => 5
+				'initial' => false
 			)
 		) as $args) {
 			$out->append("Adding " . $args['name'] . " permission...", "...done");
-			$p = new $Permission($args);
-			$p->save();
+			$perm = new $Permission($args);
+			$perm->save();
 		}
 	}
 	if($act == "installadmin")
@@ -71,7 +74,7 @@
 		$user->email = $_POST['email'];
 		$user->password = $_POST['password'];
 		$user->crypt_password();
-		$user->level = "admin";
+		$user->add_permission("core.administration");
 		$user->save();
 		$out->append("Writing admin username, password, and e-mail to database...", "...done");
 	}

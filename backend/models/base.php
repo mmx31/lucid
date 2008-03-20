@@ -60,8 +60,7 @@
 			'type' => "integer",
 			'autoincrement' => 1,
 			'notnull' => 1,
-			'unsigned' => 1,
-			'default' => 0
+			'unsigned' => 1
 		);
 		var $_parentItem = null;
 		var $_result = false;
@@ -72,10 +71,10 @@
 			if(!$preserveSchema) {
 				foreach($this as $key => $value) {
 					if($key{0} != "_"){
-						$this->$key = ($this->$key['type'] == "array" ? array() : null);
-						if(is_null($this->$key)) {
-							unset($this->$key);
-						}
+						$p = $this->$key;
+						$this->$key = (isset($p['default']) ? $p['default'] : 
+							($p['type'] == "array" ? array() : null)
+						);
 					}
 				}
 				foreach($values as $key => $value) {
@@ -83,7 +82,6 @@
 				}
 			} else $this->_schema = true;
 		}
-		
 		function _connect() {
 			if(!$this->_link) {
 				$this->_link = MDB2::factory($GLOBALS['db']['database']);

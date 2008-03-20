@@ -122,8 +122,8 @@ this.init = function(args)
     var client = new dijit.layout.SplitContainer({
         orientation: "horizontal",
         layoutAlign: "client"
-    },
-    document.createElement("div"));
+    });
+	
 	var model = new dijit.tree.TreeStoreModel({
 		store: this.feedStore,
 		query: {category: true}
@@ -258,7 +258,6 @@ this.addFeedDialog = function()
 				return;
 			}
 			var makeItem = dojo.hitch(this, function(items) {
-				console.log(items);
 				var maxID = this.feedStore._arrayOfAllItems.length; //feels hackish
 				var item = this.feedStore.newItem({
 					id: maxID,

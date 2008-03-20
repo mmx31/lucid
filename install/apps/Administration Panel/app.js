@@ -95,10 +95,6 @@ this.pages = {
 					field: field
 				};
 				if(field == "name" || field == "username" || field == "email") args.editor = dojox.grid.editors.Input;
-				if(field == "level") {
-					args.editor = dojox.grid.editors.Select;
-					args.options = ["admin", "developer", "user"];
-				}
 				layout[0].cells[0].push(args);
 			}
 			

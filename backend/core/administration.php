@@ -18,7 +18,8 @@
 	*/
 	require("../lib/includes.php");
 	import("models.user");
-	if($_SESSION['userlevel'] == "admin")
+	$curuser = $User->get_current();
+	if($curuser->has_permission("core.administration"))
 	{
 		if($_GET['section'] == "general")
 		{
@@ -188,7 +189,6 @@
 						"name",
 						"logged",
 						"email",
-						"level",
 						"permissions",
 						"groups",
 						"lastauth"
@@ -215,4 +215,5 @@
 			}
 		}
 	}
+	else internal_error("permission_denied");
 ?>

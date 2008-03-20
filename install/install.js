@@ -152,10 +152,10 @@ install = new function() {
 					install.tasks.apps(function(noerr){
 						if (noerr) {
 							install.updateBar(50);
-							install.tasks.admin(form, function(umm) {
+							install.tasks.permissions(function(umm) {
 								if (umm) {
 										install.updateBar(75);
-										install.tasks.permissions(function(asdfumm){
+										install.tasks.admin(form, function(asdfumm){
 											if (asdfumm) {
 												install.updateBar(100);
 												dijit.byId("next").setDisabled(false);

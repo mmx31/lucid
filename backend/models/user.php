@@ -23,9 +23,7 @@
 		var $password = array('type' => 'text');
 		var $logged = array('type' => 'integer', 'length' => 1, 'default' => 0);
 		var $email = array('type' => 'text');
-		var $level = array('type' => 'text');
 		var $permissions = array('type' => 'array');
-		var $permissionsExpiry = array('type' => 'array');
 		var $groups = array('type' => 'array');
 		var $lastauth = array('type' => 'timestamp');
 		
@@ -64,7 +62,6 @@
 		{
 			$_SESSION['userid'] = $this->id;
 			$_SESSION['username'] = $this->username;
-			$_SESSION['userlevel'] = $this->level;
 			$_SESSION['userloggedin'] = TRUE;
 			$this->logged = 1;
 			$this->lastauth = date('Y-m-d H:i:s');
@@ -75,7 +72,6 @@
 		{
 			$_SESSION['userid'] = null;
 			$_SESSION['username'] = null;
-			$_SESSION['userlevel'] = null;
 			$_SESSION['userloggedin'] = FALSE;
 			$this->logged = 0;
 			$this->save();
@@ -142,20 +138,15 @@
 		}
 		function clear_permission($perm) {
 			unset($this->permissions[$perm]);
-			unset($this->permissionsExpiry[$perm]);
 		}
 		function remove_permission($perm) {
 			$this->permissions[$perm] = false;
-			$this->permissionsExpiry[$perm] = 0;
 		}
 		function has_permission($perm) {
 			global $Group;
-			if(!isset($this->permissions[$perm]) && !is_null($this->permissions[$perm])) {
-				if(!isset($this->permissionsExpiry[$perm])) { return $this->permissions[$perm]; }
-				if(time() < $this->permissionsExpiry[$perm]) { return $this->permissions[$perm]; }
-				$this->clear_permission($perm);
-				$this->save();
-				return false;
+			$myPerms = $this->permissions;
+			if(isset($myPerms[$perm]) && !is_null($myPerms[$perm])) {
+				return $myPerms[$perm];
 			}
 			$groupPerms = array();
 			if(!empty($this->groups)) {
@@ -178,17 +169,7 @@
 			return $p[0]->initial;
 		}
 		function add_permission($perm) {
-			import("models.permission");
-			global $Permission;
-			$p = $Permission->filter("name", $perm);
-			if($p == false) return false;
-			if($p[0]->staticPer == true) { $this->permissions[$perm] = true; $this->permissionsExpiry[$perm] = 0; return true; }
-			$time = $p[0]->timeout;
-			$expiry = time() - ($time * 60);
-			$this->permissionsExpiry[$perm] = $expiry;
 			$this->permissions[$perm] = true;
-			$this->save();
-			return true;
 		}
 	}
 	global $User;

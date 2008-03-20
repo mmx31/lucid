@@ -28,14 +28,13 @@
 			$out->append("name", $user->name);
 			$out->append("username", $user->username);
 			$out->append("email", $user->email);
-			$out->append("level", $user->level);
 			$out->append("lastauth", $user->lastauth);
 		}
 		if($_GET['action'] == "set") {
 			$id = $_POST['id'];
 			$info = array();
 			$cur = $User->get_current();
-			if(is_numeric($id) && $cur->level == "admin") {
+			if(is_numeric($id) && $cur->has_permission("core.administration")) {
 				$user = $User->get($id);
 				if($user === false) internal_error("generic_err");
 			}
@@ -43,13 +42,12 @@
 			else $user = $cur;
 			foreach($_POST as $key => $val){
 				if($key == "id"
-				|| ($key == "level" && $cur->level != "admin")
-				|| ($key == "permissions" && $cur->level != "admin")
-				|| ($key == "groups" && $cur->level != "admin")
-				|| ($key == "username" && $cur->level != "admin")
+				|| ($key == "permissions" && !$cur->has_permission("core.administration"))
+				|| ($key == "groups" && !$cur->has_permission("core.administration"))
+				|| ($key == "username" && !$cur->has_permission("core.administration"))
 				|| $key == "logged"
 				|| $key == "lastAuth") continue;
-				if($key == "password" && $cur->level != "admin") {
+				if($key == "password" && !$cur->has_permission("core.administration")) {
 					//this is handled a bit differently...
 					//the user had to auth themselves in the past 5 minuites
 					if(!$user->lastAuth) continue; //this user has never logged in. wait, how's that possible?
@@ -153,7 +151,6 @@
 					$p->username = $_POST['username'];
 					$p->email = $_POST['email'];
 					$p->set_password($_POST['password']);
-					$p->level = "user";
 					$p->logged = 0;
 					$p->save();
 					echo "0";
