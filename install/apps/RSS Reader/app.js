@@ -20,7 +20,7 @@ this.init = function(args)
         title: "RSS Reader",
         onClose: dojo.hitch(this, this.kill)
     });
-	this.feedStore = new api.registry({
+	var store = this.feedStore = new api.registry({
 		appid: this.id,
 		name: "rssFeeds",
 		identifier: "id",
@@ -124,14 +124,16 @@ this.init = function(args)
         layoutAlign: "client"
     },
     document.createElement("div"));
-
+	var model = new dijit.tree.TreeStoreModel({
+		store: this.feedStore,
+		query: {category: true}
+	})
     this.left = new dijit.Tree({
-        store: this.feedStore,
-		labelAttr: "title",
-		query: {category: true},
-		getIconClass: function(/*dojo.data.Item*/ item){
-			if(item != null && this.store.hasAttribute(item, "iconClass"))
-				return this.store.getValue(item, "iconClass");
+        model: model,
+		getIconClass: function(item){
+			console.log(arguments);
+			if(item != null && this.model.store.hasAttribute(item, "iconClass"))
+				return this.model.store.getValue(item, "iconClass");
 		}
     });
 	dojo.connect(this.left, "onClick", this, "changeFeeds");
@@ -246,7 +248,7 @@ this.addFeedDialog = function()
 	dojo.style(div, "color", "red");
     dojo.connect(button, "onClick", this, function(e) {
 	if(this._form.title.getValue() == "") return;
-	if(!this._form.url.isValid() && this._form.isCategory.checked) return;
+	if(!this._form.url.isValid() && !this._form.isCategory.checked) return;
 	if(!this._form.isCategory.checked && !this._form.category.isValid()) return;
 	if(!this._form.icon.isValid()) return;
 	this.feedStore.fetch({query: {title: this._form.title.getValue()}, onComplete: dojo.hitch(this, function(f) {
