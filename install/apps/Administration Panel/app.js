@@ -94,7 +94,7 @@ this.pages = {
 					name: field.charAt(0).toUpperCase() + field.substr(1).toLowerCase(),
 					field: field
 				};
-				if(field == "name" || field == "username") args.editor = dojox.grid.editors.Input;
+				if(field == "name" || field == "username" || field == "email") args.editor = dojox.grid.editors.Input;
 				if(field == "level") {
 					args.editor = dojox.grid.editors.Select;
 					args.options = ["admin", "developer", "user"];
@@ -139,6 +139,71 @@ this.pages = {
 								this._userStore.deleteItem(row.__dojo_data_item);
 							})
 						})
+					})
+				},
+				{
+					label: "Change Password",
+					onClick: dojo.hitch(this, function(e) {
+						var row = this._userGrid.model.getRow(this.__rowIndex);
+						var win = new api.window({
+							title: "Change "+row.username+"'s password",
+							width: "250px",
+							height: "200px"
+						});
+						this.windows.push(win);
+						
+						var client = new dijit.layout.ContentPane({
+							layoutAlign: "client"
+						});
+						var div = document.createElement("div");
+						var errBox = document.createElement("div");
+						div.appendChild(errBox);
+						var input1, input2;
+						dojo.forEach([
+							{
+								label: "New password",
+								widget: input1 = new dijit.form.TextBox({
+									type: "password"
+								})
+							},
+							{
+								label: "Confirm password",
+								widget: input2 = new dijit.form.TextBox({
+									type: "password"
+								})
+							}
+						], function(item) {
+							var row = document.createElement("div");
+							var label = document.createElement("span");
+							label.textContent = item.label+": ";
+							row.appendChild(label);
+							row.appendChild(item.widget.domNode);
+							div.appendChild(row);
+						})
+						
+						client.setContent(div);
+						win.addChild(client);
+						
+						var bottom = new dijit.layout.ContentPane({
+							layoutAlign: "bottom"
+						});
+						var div = document.createElement("div");
+						dojo.addClass(div, "floatRight");
+						var button = new dijit.form.Button({
+							label: "Ok",
+							onClick: dojo.hitch(this, function() {
+								if(input1.getValue() != input2.getValue()) return errBox.innerHTML = "Two passwords don't match";
+								this._userStore.setValue(row.__dojo_data_item, "password", input1.getValue());
+								win.close();
+							})
+						})
+						div.appendChild(button.domNode);
+						var cancel = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(win, "close")});
+						div.appendChild(cancel.domNode);
+						bottom.setContent(div);
+						win.addChild(bottom);
+						win.show();
+						win.startup();
 					})
 				},
 				{
