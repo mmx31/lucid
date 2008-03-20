@@ -119,16 +119,19 @@ class dUnzip2{
 			foreach($this->compressedList as $fileName=>$item){
 				if(!$kkk && $kkk=1){
 					////echo "<tr style='background: #ADA'>";
-					foreach($item as $fieldName=>$value)
+					foreach($item as $fieldName=>$value) {
 						////echo "<td>$fieldName</td>";
+					}
 					////echo '</tr>';
 				}
 				////echo "<tr style='background: #CFC'>";
 				foreach($item as $fieldName=>$value){
-					if($fieldName == 'lastmod_datetime')
+					if($fieldName == 'lastmod_datetime'){
 						////echo "<td title='$fieldName' nowrap='nowrap'>".date("d/m/Y H:i:s", $value)."</td>";
-					else
+					}
+					else{
 						////echo "<td title='$fieldName' nowrap='nowrap'>$value</td>";
+					}
 				}
 				////echo "</tr>";
 			}
@@ -141,16 +144,19 @@ class dUnzip2{
 				foreach($this->centralDirList as $fileName=>$item){
 					if(!$kkk && $kkk=1){
 						////echo "<tr style='background: #AAD'>";
-						foreach($item as $fieldName=>$value)
+						foreach($item as $fieldName=>$value) {
 							////echo "<td>$fieldName</td>";
+						}
 						////echo '</tr>';
 					}
 					////echo "<tr style='background: #CCF'>";
 					foreach($item as $fieldName=>$value){
-						if($fieldName == 'lastmod_datetime')
+						if($fieldName == 'lastmod_datetime') {
 							////echo "<td title='$fieldName' nowrap='nowrap'>".date("d/m/Y H:i:s", $value)."</td>";
-						else
+						}
+						else {
 							////echo "<td title='$fieldName' nowrap='nowrap'>$value</td>";
+						}
 					}
 					////echo "</tr>";
 				}
@@ -311,10 +317,12 @@ class dUnzip2{
 	}
 	Function debugMsg($level, $string){
 		if($this->debug)
-			if($level == 1)
+			if($level == 1) {
 				////echo "<b style='color: #777'>dUnzip2:</b> $string<br>";
-			if($level == 2)
+			}
+			if($level == 2) {
 				////echo "<b style='color: #F00'>dUnzip2:</b> $string<br>";
+			}
 	}
 
 	Function _loadFileListByEOF(&$fh, $stopOnFile=false){

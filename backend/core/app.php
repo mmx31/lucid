@@ -21,7 +21,8 @@
 	import("models.user");
     if($_GET['section'] == "install")
 	{
-		if($_GET['action'] == "package")
+		$cur = $User->get_current();
+		if($_GET['action'] == "package" && $cur->has_permission("api.ide"))
 		{
 			$out = new textareaOutput();	
 			if(isset($_FILES['uploadedfile']['name'])) {
@@ -29,12 +30,12 @@
 			$target_path = $target_path . basename( $_FILES['uploadedfile']['name']); 
 			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
 				$out->append("Accessing uploaded file...", "success");
-				require("../backend/lib.unzip.php");
+				import("lib.unzip");
 				$zip = new dUnzip2($target_path);
 				$zip->getList();
 				$zip->unzipAll('../../apps/tmp/unzipped');
 				$out->append("Decompressing...", "success");
-				require("../backend/lib.xml.php");
+				import("lib.xml");
 				$xml = new Xml;
 				if(!file_exists("../../apps/tmp/unzipped/appmeta.xml")) { $out->set("generic_err", true); }
 				$in = $xml->parse('../../apps/tmp/unzipped/appmeta.xml', 'FILE');
@@ -58,11 +59,11 @@
 				fclose ($file2); 
 				$app->code = $templine;
 				$app->save();
-				$out->append("AppPackage Installation", "success");
+				$out->append("success", "AppPackage installation successful");
 			} else{
-			   $out->append("Accessing uploaded file...", "error");
+			   $out->append("error", "Problem accessing uploaded file");
 			}
-		} else { $out->append("No File Uploaded...", "error"); }
+		} else { $out->append("error", "No File Uploaded"); }
 	}
 	}
     if($_GET['section'] == "fetch")

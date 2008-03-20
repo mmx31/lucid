@@ -134,7 +134,7 @@
 		import("lib.Json.Json");
 		$App->truncate();
 		$out->append("Establishing connection to database...", "...done");
-		require("../backend/lib.xml.php");
+		import("lib.xml");
 		$xml = new Xml; 
 		$out->append("Initalizing application installer...", "...done");
 		$dir = opendir("./apps/");

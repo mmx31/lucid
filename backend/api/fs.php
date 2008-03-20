@@ -124,7 +124,7 @@ if($_GET['section'] == "io")
 	if($_GET['action'] == "downloadFolder") {
 		$user = $User->get_current();
 		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
-		require("../lib.zip.php");
+		import("lib.zip");
 		if($_GET["as"] == "zip") { $newzip = new zip_file("folder.zip"); }
 		if($_GET["as"] == "gzip") { $newzip = new gzip_file("folder.tgz"); }
 		if($_GET["as"] == "bzip") { $newzip = new bzip_file("folder.tbz2"); }
@@ -136,7 +136,7 @@ if($_GET['section'] == "io")
 	if($_GET['action'] == "compressDownload") {
 		$user = $User->get_current();
 		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
-		require("../lib.zip.php");
+		import("lib.zip");
 		if($_GET["as"] == "zip") { $newzip = new zip_file("compressed.zip"); }
 		if($_GET["as"] == "gzip") { $newzip = new gzip_file("compressed.tgz"); }
 		if($_GET["as"] == "bzip") { $newzip = new bzip_file("compressed.tbz2"); }

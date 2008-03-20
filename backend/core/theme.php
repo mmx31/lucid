@@ -18,7 +18,7 @@
 	*/
 error_reporting(0); //<<<<<<<<<<<<<<<<<<<LEAVE THIS ALONE!!!
 require("../lib/includes.php");
-require("../lib.xml.php");
+import("lib.xml");
 if($_GET['section'] == "get")
 {
 	if($_GET['action'] == "list")
