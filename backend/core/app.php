@@ -18,6 +18,53 @@
 	*/
 	require("../lib/includes.php");
 	import("models.app");
+	import("models.user");
+    if($_GET['section'] == "install")
+	{
+		if($_GET['action'] == "package")
+		{
+			$out = new textareaOutput();	
+			if(isset($_FILES['uploadedfile']['name'])) {
+			$target_path = '../../apps/tmp/appzip.zip';
+			$target_path = $target_path . basename( $_FILES['uploadedfile']['name']); 
+			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
+				$out->append("Accessing uploaded file...", "success");
+				require("../backend/lib.unzip.php");
+				$zip = new dUnzip2($target_path);
+				$zip->getList();
+				$zip->unzipAll('../../apps/tmp/unzipped');
+				$out->append("Decompressing...", "success");
+				require("../backend/lib.xml.php");
+				$xml = new Xml;
+				if(!file_exists("../../apps/tmp/unzipped/appmeta.xml")) { $out->set("generic_err", true); }
+				$in = $xml->parse('../../apps/tmp/unzipped/appmeta.xml', 'FILE');
+				$out->append("Parsing...", "success");
+				$app = new $App();
+				$app->name = $in[name];
+				$app->author = $in[author];
+				$app->email = $in[email];
+				$app->version = $in[version];
+				$app->maturity = $in[maturity];
+				$app->category = $in[category];
+				$app->filetypes = Zend_Json::decode($in['filetypes'] ? $in['filetypes'] : "[]");
+				$installfile = $in[installFile];
+				$message = $in[installMessage];
+				$message2 = $in[installedMessage];
+				$templine = '';
+				$file2 = fopen("../apps/tmp/unzipped/$installfile", "r");
+				while(!feof($file2)) {
+					$templine = $templine . fgets($file2, 4096);
+				}
+				fclose ($file2); 
+				$app->code = $templine;
+				$app->save();
+				$out->append("AppPackage Installation", "success");
+			} else{
+			   $out->append("Accessing uploaded file...", "error");
+			}
+		} else { $out->append("No File Uploaded...", "error"); }
+	}
+	}
     if($_GET['section'] == "fetch")
 	{
 		if($_GET['action'] == "id")

@@ -472,6 +472,7 @@ this.installPackage = function() {
 	dojo.addClass(div, "tundra");
 	div.innerHTML = "Select an app package to install from your local hard disk:";
 	var uploader = new dojox.widget.FileInputAuto({
+		name: "uploadedfile",
 		url: api.xhr("core.app.install.package"),
 		onComplete: function(data,ioArgs,widgetRef) {
 			if(data.status && data.status == "success"){

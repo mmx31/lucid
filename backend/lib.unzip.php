@@ -58,7 +58,7 @@ if(!function_exists('file_put_contents')){
 			fclose($tmp);
 			return true;
 		}
-		echo "<b>file_put_contents:</b> Cannot create file $file<br>";
+		////echo "<b>file_put_contents:</b> Cannot create file $file<br>";
 		return false;
 	}
 }
@@ -115,60 +115,60 @@ class dUnzip2{
 		if($this->debug){
 			#------- Debug compressedList
 			$kkk = 0;
-			echo "<table border='0' style='font: 11px Verdana; border: 1px solid #000'>";
+			////echo "<table border='0' style='font: 11px Verdana; border: 1px solid #000'>";
 			foreach($this->compressedList as $fileName=>$item){
 				if(!$kkk && $kkk=1){
-					echo "<tr style='background: #ADA'>";
+					////echo "<tr style='background: #ADA'>";
 					foreach($item as $fieldName=>$value)
-						echo "<td>$fieldName</td>";
-					echo '</tr>';
+						////echo "<td>$fieldName</td>";
+					////echo '</tr>';
 				}
-				echo "<tr style='background: #CFC'>";
+				////echo "<tr style='background: #CFC'>";
 				foreach($item as $fieldName=>$value){
 					if($fieldName == 'lastmod_datetime')
-						echo "<td title='$fieldName' nowrap='nowrap'>".date("d/m/Y H:i:s", $value)."</td>";
+						////echo "<td title='$fieldName' nowrap='nowrap'>".date("d/m/Y H:i:s", $value)."</td>";
 					else
-						echo "<td title='$fieldName' nowrap='nowrap'>$value</td>";
+						////echo "<td title='$fieldName' nowrap='nowrap'>$value</td>";
 				}
-				echo "</tr>";
+				////echo "</tr>";
 			}
-			echo "</table>";
+			////echo "</table>";
 			
 			#------- Debug centralDirList
 			$kkk = 0;
 			if(sizeof($this->centralDirList)){
-				echo "<table border='0' style='font: 11px Verdana; border: 1px solid #000'>";
+				////echo "<table border='0' style='font: 11px Verdana; border: 1px solid #000'>";
 				foreach($this->centralDirList as $fileName=>$item){
 					if(!$kkk && $kkk=1){
-						echo "<tr style='background: #AAD'>";
+						////echo "<tr style='background: #AAD'>";
 						foreach($item as $fieldName=>$value)
-							echo "<td>$fieldName</td>";
-						echo '</tr>';
+							////echo "<td>$fieldName</td>";
+						////echo '</tr>';
 					}
-					echo "<tr style='background: #CCF'>";
+					////echo "<tr style='background: #CCF'>";
 					foreach($item as $fieldName=>$value){
 						if($fieldName == 'lastmod_datetime')
-							echo "<td title='$fieldName' nowrap='nowrap'>".date("d/m/Y H:i:s", $value)."</td>";
+							////echo "<td title='$fieldName' nowrap='nowrap'>".date("d/m/Y H:i:s", $value)."</td>";
 						else
-							echo "<td title='$fieldName' nowrap='nowrap'>$value</td>";
+							////echo "<td title='$fieldName' nowrap='nowrap'>$value</td>";
 					}
-					echo "</tr>";
+					////echo "</tr>";
 				}
-				echo "</table>";
+				////echo "</table>";
 			}
 		
 			#------- Debug endOfCentral
 			$kkk = 0;
 			if(sizeof($this->endOfCentral)){
-				echo "<table border='0' style='font: 11px Verdana' style='border: 1px solid #000'>";
-				echo "<tr style='background: #DAA'><td colspan='2'>dUnzip - End of file</td></tr>";
+				////echo "<table border='0' style='font: 11px Verdana' style='border: 1px solid #000'>";
+				////echo "<tr style='background: #DAA'><td colspan='2'>dUnzip - End of file</td></tr>";
 				foreach($this->endOfCentral as $field=>$value){
-					echo "<tr>";
-					echo "<td style='background: #FCC'>$field</td>";
-					echo "<td style='background: #FDD'>$value</td>";
-					echo "</tr>";
+					////echo "<tr>";
+					////echo "<td style='background: #FCC'>$field</td>";
+					////echo "<td style='background: #FDD'>$value</td>";
+					////echo "</tr>";
 				}
-				echo "</table>";
+				////echo "</table>";
 			}
 		}
 		
@@ -312,9 +312,9 @@ class dUnzip2{
 	Function debugMsg($level, $string){
 		if($this->debug)
 			if($level == 1)
-				echo "<b style='color: #777'>dUnzip2:</b> $string<br>";
+				////echo "<b style='color: #777'>dUnzip2:</b> $string<br>";
 			if($level == 2)
-				echo "<b style='color: #F00'>dUnzip2:</b> $string<br>";
+				////echo "<b style='color: #F00'>dUnzip2:</b> $string<br>";
 	}
 
 	Function _loadFileListByEOF(&$fh, $stopOnFile=false){
