@@ -94,7 +94,7 @@ this.pages = {
 					name: field.charAt(0).toUpperCase() + field.substr(1).toLowerCase(),
 					field: field
 				};
-				if(field == "name" || field == "username") args.editor = dojox.grid.editors.TextBox;
+				if(field == "name" || field == "username") args.editor = dojox.grid.editors.Input;
 				if(field == "level") {
 					args.editor = dojox.grid.editors.Select;
 					args.options = ["admin", "developer", "user"];
@@ -256,8 +256,8 @@ this.pages = {
 			//make headers (need to do it manually unfortunatly)
 			var layout = [{
 				cells: [[
-					{name: "Name", field: "name", editor: dojox.grid.editors.TextBox},
-					{name: "Description", field: "description", editor: dojox.grid.editors.TextBox}
+					{name: "Name", field: "name", editor: dojox.grid.editors.Input},
+					{name: "Description", field: "description", editor: dojox.grid.editors.Input}
 				]]
 			}];
 			this._groupStore = new dojo.data.ItemFileWriteStore({
