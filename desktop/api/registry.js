@@ -55,7 +55,7 @@ dojo.declare("api.registry", dojo.data.ItemFileWriteStore, {
 	 * 		callback - a callback function. The first argument passed to it is true if it does exist, false if it does not.
 	 * 		sync - should the call be syncronous? defaults to false
 	 */
-	exists: function(/*Function*/callback, /*Bolean*/sync)
+	exists: function(/*Function*/callback, /*Boolean*/sync)
 	{
 		api.xhr({
 			backend: "api.registry.info.exists",
@@ -65,8 +65,9 @@ dojo.declare("api.registry", dojo.data.ItemFileWriteStore, {
 				appid: this.__desktop_appid
 			},
 			load: function(data, ioArgs) {
-				callback(data == "0");
-			}
+				callback(data.exists);
+			},
+			handleAs: "json"
 		});
 	},
 	/*

@@ -131,7 +131,6 @@ this.init = function(args)
     this.left = new dijit.Tree({
         model: model,
 		getIconClass: function(item){
-			console.log(arguments);
 			if(item != null && this.model.store.hasAttribute(item, "iconClass"))
 				return this.model.store.getValue(item, "iconClass");
 		}
@@ -247,48 +246,50 @@ this.addFeedDialog = function()
 	var div = document.createElement("div");
 	dojo.style(div, "color", "red");
     dojo.connect(button, "onClick", this, function(e) {
-	if(this._form.title.getValue() == "") return;
-	if(!this._form.url.isValid() && !this._form.isCategory.checked) return;
-	if(!this._form.isCategory.checked && !this._form.category.isValid()) return;
-	if(!this._form.icon.isValid()) return;
-	this.feedStore.fetch({query: {title: this._form.title.getValue()}, onComplete: dojo.hitch(this, function(f) {
-		if(typeof f[0] != "undefined") {
-			div.innerHTML = "An item with that name already exists";
-			return;
-		}
-		var makeItem = dojo.hitch(this, function(items) {
-			console.log(items);
-			var maxID = this.feedStore._arrayOfAllItems.length; //feels hackish
-			var item = this.feedStore.newItem({
-				id: maxID,
-				title: this._form.title.getValue(),
-				label: this._form.title.getValue(),
-				url: this._form.url.getValue(),
-				iconClass: this._form.icon.getValue() || null,
-				category: this._form.isCategory.checked
-			}, (items[0] ? {
-				attribute: "children",
-				parent: items[0]
-			} : null));
-			this.updateCount(item);
-			this.feedStore.save();
-		});
+		if(this._form.title.getValue() == "") return;
 		if(!this._form.isCategory.checked) {
-			this.feedStore.fetch({
-				query: {
-					category: true,
-					id: this._form.category.getValue()
-				},
-				onComplete: makeItem
-			})
+			if(!this._form.url.isValid()) return;
+			if(!this._form.category.isValid()) return;
 		}
-		else makeItem();
-        this._form.title.setValue("");
-        this._form.url.setValue("");
-        this._form.icon.setValue("");
-        this._form.isCategory.setChecked(false);
-        div.innerHTML = "";
-	})});
+		if(!this._form.icon.isValid()) return;
+		this.feedStore.fetch({query: {title: this._form.title.getValue()}, onComplete: dojo.hitch(this, function(f) {
+			if(typeof f[0] != "undefined") {
+				div.innerHTML = "An item with that name already exists";
+				return;
+			}
+			var makeItem = dojo.hitch(this, function(items) {
+				console.log(items);
+				var maxID = this.feedStore._arrayOfAllItems.length; //feels hackish
+				var item = this.feedStore.newItem({
+					id: maxID,
+					title: this._form.title.getValue(),
+					label: this._form.title.getValue(),
+					url: this._form.url.getValue(),
+					iconClass: this._form.icon.getValue() || null,
+					category: this._form.isCategory.checked
+				}, (typeof items[0] != "undefined" ? {
+					attribute: "children",
+					parent: items[0]
+				} : null));
+				this.updateCount(item);
+				this.feedStore.save();
+			});
+			if(!this._form.isCategory.checked) {
+				this.feedStore.fetch({
+					query: {
+						category: true,
+						id: this._form.category.getValue()
+					},
+					onComplete: makeItem
+				})
+			}
+			else makeItem([]);
+	        this._form.title.setValue("");
+	        this._form.url.setValue("");
+	        this._form.icon.setValue("");
+	        this._form.isCategory.setChecked(false);
+	        div.innerHTML = "";
+		})});
 
     })
     dialog.startup();
