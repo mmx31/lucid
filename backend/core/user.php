@@ -46,7 +46,7 @@
 				|| ($key == "level" && $cur->level != "admin")
 				|| ($key == "permissions" && $cur->level != "admin")
 				|| ($key == "groups" && $cur->level != "admin")
-				|| $key == "username"
+				|| ($key == "username" && $cur->level != "admin")
 				|| $key == "logged"
 				|| $key == "lastAuth") continue;
 				if($key == "password" && $cur->level != "admin") {
