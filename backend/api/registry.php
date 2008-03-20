@@ -40,10 +40,6 @@
 				$result = $result[0];
 				echo $result->value;
 			}
-			else
-			{
-				echo $_GET['data'];
-			}
 		}
 		if($_GET['action'] == "delete")
 		{
@@ -59,7 +55,7 @@
 		{
 			$p = $User->get_current();
 			$result = $Registry->filter(array("userid" => $p->id, "appid" => $_POST['appid'], "name" => $_POST['name']));
-			if(isset($result[0])) { $out = new intOutput("ok"); }
+			if($result != false) { $out = new intOutput("ok"); }
 			else { $out = new intOutput("generic_err"); }
 		}
 	}

@@ -23,11 +23,12 @@ dojo.declare("api.registry", dojo.data.ItemFileWriteStore, {
 		this.__desktop_appid = args.appid;
 		
 		this._jsonData = null;
-		
-		this.url = this._jsonFileUrl = api.xhr("api.registry.stream.load")
-		+ "&appid=" + encodeURIComponent(args.appid)
-		+ "&name=" + encodeURIComponent(args.name)
-		+ "&data=" + encodeURIComponent(dojo.toJson(args.data));
+		this.exists(dojo.hitch(this, function(e) {
+			if(e == true) this.url = this._jsonFileUrl = api.xhr("api.registry.stream.load")
+			+ "&appid=" + encodeURIComponent(args.appid)
+			+ "&name=" + encodeURIComponent(args.name);
+			else this._jsonData = args.data;
+		}), true);
 	},
 	_saveEverything: function(saveCompleteCallback, saveFailedCallback, newFileContentString) {
 		api.xhr({
@@ -52,11 +53,13 @@ dojo.declare("api.registry", dojo.data.ItemFileWriteStore, {
 	 * 
 	 * Arguments:
 	 * 		callback - a callback function. The first argument passed to it is true if it does exist, false if it does not.
+	 * 		sync - should the call be syncronous? defaults to false
 	 */
-	exists: function(callback)
+	exists: function(/*Function*/callback, /*Bolean*/sync)
 	{
 		api.xhr({
 			backend: "api.registry.info.exists",
+			sync: sync,
 			content: {
 				name: this.__desktop_name,
 				appid: this.__desktop_appid
@@ -74,7 +77,7 @@ dojo.declare("api.registry", dojo.data.ItemFileWriteStore, {
 	 * Arguments:
 	 * 		callback - a callback function. The first argument passed to it is true if deletion was successful, false if it failed.
 	 */
-	drop: function(callback)
+	drop: function(/*Function*/callback)
 	{
 		api.xhr({
 			backend: "api.registry.stream.delete",
