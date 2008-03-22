@@ -93,6 +93,15 @@
 					Admin E-mail:&nbsp;
 					<input dojoType="dijit.form.TextBox" name="admin_email" type="text" />
 					<br />
+					Allow public registration:
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="conf_public" id="conf_public_true" value="true" /> 
+						<label for="conf_public_true"> yes</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="conf_public" id="conf_public_false" value="false" /> 
+						<label for="conf_public_false"> no</label>
+					</div>
 				</div>
 				<div dojoType="dijit.layout.ContentPane" id="install-page" title="Installing">
 					<div class="title">Installing...</div>

@@ -81,8 +81,9 @@
 	if($act == "installdatabase")
 	{
 		$out = new jsonOutput();
-		$db_url = $_POST['db_url'];
-		$db_prefix = $_POST['db_prefix'];
+		$db_url = addslashes($_POST['db_url']);
+		$db_prefix = addslashes($_POST['db_prefix']);
+		$conf_public = $_POST['conf_public'];
 		$out->append("Parsing form values...", "...done");
 		$characters = 10;
 		$possible = '23456789bcdfghjkmnpqrstvwxyz'; 
@@ -101,7 +102,7 @@
 		$writebuffer .= "\t);\n";
 		$writebuffer .= "\t$" . "GLOBALS['conf'] = Array(\n";
 		$writebuffer .= "\t\t\"salt\" => \"" . $conf_secretword . "\",\n";
-		$writebuffer .= "\t\t\"public\" => \"yes\"\n";
+		$writebuffer .= "\t\t\"public\" => " . ($conf_public == "true" ? "true" : "false") . "\n";
 		$writebuffer .= "\t);\n";
 		$writebuffer .= "?" . ">";
 		if (is_writable("../backend/configuration.php")) {

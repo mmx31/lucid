@@ -141,7 +141,7 @@
 		}
 		if($_GET['action'] == "register")
 		{
-			if($GLOBALS['conf']['public'] == "yes")
+			if($GLOBALS['conf']['public'] == true)
 			{
 				$u = $User->filter("username", $_POST['username']);
 				if(isset($u[0])) { $out = new intOutput("generic_err"); }

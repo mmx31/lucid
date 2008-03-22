@@ -298,7 +298,8 @@ install = new function() {
 				url: "./backend.php?action=installdatabase",
 				content: {
 					db_url: form.db_url,
-					db_prefix: form.db_prefix
+					db_prefix: form.db_prefix,
+					conf_public: form.conf_public
 				},
 				load: function(data, args){
 					if (dojo.isObject(data)) {
