@@ -26,14 +26,19 @@
 		{
 			$out = new textareaOutput();	
 			if(isset($_FILES['uploadedfile']['name'])) {
-				import("lib.Archive");
+			$target_path = '../../apps/tmp/appzip.zip';
+			$target_path = $target_path . basename( $_FILES['uploadedfile']['name']); 
+			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
+				import("lib.unzip");
+				$zip = new dUnzip2($target_path);
+				$zip->getList();
+				//$zip->unzipAll('../../apps/tmp/unzipped');
+				//this is causing the client to lock up, we need a better extraction library.
+				//I'd suggest looking on PEAR for something and drop it in /lib/
 				import("lib.xml");
 				$xml = new Xml;
-				File_Archive::extract(
-					File_Archive::readUploadedFile("uploadedfile"),
-					File_Archive::toFiles("../apps/tmp/".$_FILES['uploadedfile']['name'])
-				);
-				$in = $xml->parse("../apps/tmp/".$_FILES['uploadedfile']['name']."/appmeta.xml", 'FILE');
+				if(!file_exists("../../apps/tmp/unzipped/appmeta.xml")) { $out->append("error", "missing app metadata"); die(); }
+				$in = $xml->parse('../../apps/tmp/unzipped/appmeta.xml', 'FILE');
 				$app = new $App();
 				$app->name = $in[name];
 				$app->author = $in[author];
@@ -43,8 +48,10 @@
 				$app->category = $in[category];
 				$app->filetypes = Zend_Json::decode($in['filetypes'] ? $in['filetypes'] : "[]");
 				$installfile = $in[installFile];
+				$message = $in[installMessage];
+				$message2 = $in[installedMessage];
 				$templine = '';
-				$file2 = fopen("../apps/tmp/".$_FILES['uploadedfile']['name'].$installfile, "r");
+				$file2 = fopen("../apps/tmp/unzipped/$installfile", "r");
 				while(!feof($file2)) {
 					$templine = $templine . fgets($file2, 4096);
 				}
@@ -52,9 +59,11 @@
 				$app->code = $templine;
 				$app->save();
 				$out->append("status", "success");
-				rmdir("../apps/tmp/".$_FILES['uploadedfile']['name']);
-			} else { $out->append("error", "No File Uploaded"); }
-		}
+			} else{
+			   $out->append("error", "Problem accessing uploaded file");
+			}
+		} else { $out->append("error", "No File Uploaded"); }
+	}
 	}
     if($_GET['section'] == "fetch")
 	{
