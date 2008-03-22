@@ -179,6 +179,8 @@
 	{
 		$dirs = array(
 			"../files/",
+			"../apps/",
+			"../apps/tmp/",
 			"../backend/configuration.php"
 		);
 		$ok = array("error", "error");
