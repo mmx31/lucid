@@ -1,10 +1,10 @@
 <?php
 	$GLOBALS['db'] = Array(
-		"database" => "mysql://mysql:mysql@localhost/desktop",
+		"database" => "mysqli://mysql:mysql@localhost/desktop",
 		"prefix" => ""
 	);
 	$GLOBALS['conf'] = Array(
-		"salt" => "3e89f96cd4e23c42fdd1d3c088d111d4",
+		"salt" => "aa8360f63b556e623da55edc8de2731b",
 		"public" => true
 	);
 ?>

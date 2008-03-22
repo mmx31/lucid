@@ -78,6 +78,11 @@ this.pages = {
 	},
 	users: function() {
 		this.toolbar.destroyDescendants();
+		var button = new dijit.form.DropDownButton({
+			label: "Create new user",
+			dropDown: this.newUserDialog()
+		});
+		this.toolbar.addChild(button);
 		this.main.setContent("loading...");
 		desktop.admin.users.list(dojo.hitch(this, function(data) {
 			for(i=0;i<data.length;i++) {
@@ -456,6 +461,89 @@ this.makeUserStore = function(callback) {
 	}));
 }
 
+this.newUserDialog = function() {
+	var dialog = new dijit.TooltipDialog({
+		title: "New User"
+	});
+	var error = document.createElement("div");
+	dialog.containerNode.appendChild(error);
+	
+	var line = document.createElement("div");
+    var p = document.createElement("span");
+    p.innerHTML = "Name: ";
+    line.appendChild(p);
+	var name = new dijit.form.TextBox();
+    line.appendChild(name.domNode);
+	dialog.containerNode.appendChild(line);
+	
+	var line = document.createElement("div");
+    var p = document.createElement("span");
+    p.innerHTML = "Username: ";
+    line.appendChild(p);
+	var username = new dijit.form.TextBox();
+    line.appendChild(username.domNode);
+	dialog.containerNode.appendChild(line);
+	
+	var line = document.createElement("div");
+    var p = document.createElement("span");
+    p.innerHTML = "Email: ";
+    line.appendChild(p);
+	var email = new dijit.form.TextBox();
+    line.appendChild(email.domNode);
+	dialog.containerNode.appendChild(line);
+	
+	var line = document.createElement("div");
+    var p = document.createElement("span");
+    p.innerHTML = "Password: ";
+    line.appendChild(p);
+	var password = new dijit.form.TextBox({type: "password"});
+    line.appendChild(password.domNode);
+	dialog.containerNode.appendChild(line);
+	
+	var line = document.createElement("div");
+    var p = document.createElement("span");
+    p.innerHTML = "Confirm Password: ";
+    line.appendChild(p);
+	var confpassword = new dijit.form.TextBox({type: "password"});
+    line.appendChild(confpassword.domNode);
+	dialog.containerNode.appendChild(line);
+	
+	var line = document.createElement("div");
+    var button = new dijit.form.Button({
+		label: "Create",
+		onClick: dojo.hitch(this, function() {
+			dojo.require("dojox.validate.web");
+			if(username.getValue() == "") return error.textContent = "Enter a username";
+			if(dojox.validate.isEmailAddress(email.getValue())) return error.textContent = "Enter a valid email";
+			if(password.getValue() == "") return error.textContent = "Enter a password";
+			if(password.getValue() != confpassword.getValue()) return error.textContent = "Two passwords don't match";
+			error.textContent = "";
+			desktop.admin.users.create({
+				name: name.getValue(),
+				username: username.getValue(),
+				email: email.getValue(),
+				password: password.getValue(),
+				callback: dojo.hitch(this, function(id) {
+					if(id == false) return error.textContent = "Username allready taken";
+					error.textContent = "User created";
+					this._userStore.newItem({
+						name: name.getValue(),
+						username: username.getValue(),
+						groups: "[]",
+						permissions: "[]",
+						email: email.getValue(),
+						id: id
+					});
+				})
+			});
+		})
+	});
+    line.appendChild(button.domNode);
+	dialog.containerNode.appendChild(line);
+	dialog.startup();
+	return dialog;
+}
+
 this.installPackage = function() {
 	var win = new api.window({
 		title: "Install app package",
@@ -470,14 +558,15 @@ this.installPackage = function() {
 	var uploader = new dojox.widget.FileInputAuto({
 		name: "uploadedfile",
 		url: api.xhr("core.app.install.package"),
-		onComplete: function(data,ioArgs,widgetRef) {
+		onComplete: dojo.hitch(this, function(data,ioArgs,widgetRef) {
 			if(data.status && data.status == "success"){
-				widgetRef.overlay.innerHTML = "success!";
+				widgetRef.overlay.innerHTML = "App package installation successful!";
+				this.pages.apps();
 			}else{
 				widgetRef.overlay.innerHTML = "Error: "+data.error;
 				console.log('error',data,ioArgs);
 			}
-		}
+		})
 	});
 	div.appendChild(uploader.domNode);
 	main.setContent(div);
@@ -630,7 +719,8 @@ this.createGroupDialog = function() {
 							this._groupStore.newItem({
 								id: id,
 								name: n,
-								description: d
+								description: d,
+								permissions: "[]"
 							})
 						})
 					})

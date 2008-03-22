@@ -263,7 +263,6 @@ desktop.admin = new function()
 		 * 		> 	username: (string), //user's username
 		 * 		> 	logged: (bool), //is the user logged in?
 		 * 		> 	email: (string), //the user's email
-		 * 		> 	level: (string), //the user's level (can be "admin", "developer", or "user")
 		 * 		> 	permissions: (array), //array of user's permissions
 		 * 		> 	groups: (array), //array of the user's groups
 		 * 		>	lastauth: (string) //the time that the user last logged in
@@ -275,6 +274,37 @@ desktop.admin = new function()
 				load: function(data, ioArgs) {
 					callback(dojo.fromJson(data));
 				}
+			});
+		},
+		/*
+		 * Method: create
+		 * 
+		 * Creates a user on the system
+		 * 
+		 * Arguments:
+		 * 		info - an object with additional parameters
+		 * 		> {
+		 * 		> 	name: (string), //user's real name
+		 * 		> 	username: (string), //user's username
+		 * 		> 	email: (string), //the user's email
+		 * 		> 	permissions: (array), //array of user's permissions
+		 * 		> 	groups: (array), //array of the user's groups
+		 * 		> 	password: (string), //the user's password
+		 * 		> 	callback: (function) //a callback function once the new user has been created. first argument will be the ID of the new user, except when the username allready exists. In that case the first argument will be false.
+		 * 		> }
+		 */
+		create: function(/*Object*/info) {
+			var callback = info.callback;
+			delete info.callback;
+			info.permissions = dojo.toJson(info.permissions);
+			info.groups = dojo.toJson(info.groups);
+			api.xhr({
+				backend: "core.administration.users.create",
+				content: info,
+				load: function(data) {
+					callback(data.id);
+				},
+				handleAs: "json"
 			});
 		},
 		/*

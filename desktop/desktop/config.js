@@ -69,7 +69,7 @@ desktop.config = {
 	 * 
 	 * Intensity of desktop effects (3 = insane, 0 = none)
 	 */
-	fx: 1,
+	fx: 2,
 	/*
 	 * Property: debug
 	 * 
@@ -114,8 +114,8 @@ desktop.config = {
 	 * storedList - an array of wallpapers that the user can pick from in the wallpaper dialog
 	 */
 	wallpaper: {
-		image: "./themes/green/wallpaper.jpg",
-		color: "#eeeeee",
+		image: "./themes/default/wallpaper.png",
+		color: "#32cd32",
 		style: "centered",
 		storedList: [
 			"./themes/green/wallpaper.jpg",

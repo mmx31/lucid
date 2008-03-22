@@ -168,6 +168,33 @@
 		}
 		if($_GET['section'] == "users")
 		{
+			if($_GET['action'] == "create") {
+				$exUser = $User->filter("username", $_POST['username']);
+				if($exUser != false) {
+					$out = new jsonOutput(array(
+						id => false
+					));
+					die();
+				}
+				$args = array();
+				foreach(array(
+					"name",
+					"username",
+					"email",
+					"permissions",
+					"groups",
+					"password"
+				) as $key) {
+					if(!isset($_POST[$key])) continue;
+					$args[$key] = $_POST[$key];
+				}
+				$user = new $User($args);
+				$user->crypt_password();
+				$user->save();
+				$out = new jsonOutput(array(
+					id => $user->id
+				));
+			}
 			if($_GET['action'] == "delete") {
 				$p = $User->get($_POST['id']);
 				$cur = $User->get_current();
