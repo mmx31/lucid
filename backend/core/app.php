@@ -27,14 +27,12 @@
 			$out = new textareaOutput();	
 			if(isset($_FILES['uploadedfile']['name'])) {
 			$target_path = '../../apps/tmp/appzip.zip';
-			$target_path = $target_path . basename( $_FILES['uploadedfile']['name']); 
 			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
 				import("lib.unzip");
 				$zip = new dUnzip2($target_path);
 				$zip->getList();
-				//$zip->unzipAll('../../apps/tmp/unzipped');
-				//this is causing the client to lock up, we need a better extraction library.
-				//I'd suggest looking on PEAR for something and drop it in /lib/
+				if (!file_exists("../../apps/tmp/unzipped")) { mkdir("../../apps/tmp/unzipped"); }
+				$zip->unzipAll('../../apps/tmp/unzipped');
 				import("lib.xml");
 				$xml = new Xml;
 				if(!file_exists("../../apps/tmp/unzipped/appmeta.xml")) { $out->append("error", "missing app metadata"); die(); }
@@ -51,7 +49,7 @@
 				$message = $in[installMessage];
 				$message2 = $in[installedMessage];
 				$templine = '';
-				$file2 = fopen("../apps/tmp/unzipped/$installfile", "r");
+				$file2 = fopen("../../apps/tmp/unzipped/$installfile", "r");
 				while(!feof($file2)) {
 					$templine = $templine . fgets($file2, 4096);
 				}
