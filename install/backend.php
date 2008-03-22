@@ -198,7 +198,7 @@
 			}
 			$a++;
 		}
-		$x = count($dir);
+		$x = count($dirs)-1;
 		$out = new jsonOutput();
 		for($i=0;$i<=$x;$i++)
 		{
