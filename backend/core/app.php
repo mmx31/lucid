@@ -57,6 +57,7 @@
 				$app->code = $templine;
 				$app->save();
 				$out->append("status", "success");
+				rmdir("../../apps/tmp/unzipped");
 			} else{
 			   $out->append("error", "Problem accessing uploaded file");
 			}
