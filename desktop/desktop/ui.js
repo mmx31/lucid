@@ -679,10 +679,10 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 	resize: function(e) {
 		var max = this.getBox();
 		var viewport = dijit.getViewport();
-		dojo.style(this.filearea.domNode, "top", max.T);
-		dojo.style(this.filearea.domNode, "left", max.L);
-		dojo.style(this.filearea.domNode, "width", viewport.w - max.R);
-		dojo.style(this.filearea.domNode, "height", viewport.h - max.B);
+		dojo.style(this.filearea.domNode, "top", max.T+"px");
+		dojo.style(this.filearea.domNode, "left", max.L+"px");
+		dojo.style(this.filearea.domNode, "width", (viewport.w - max.R)+"px");
+		dojo.style(this.filearea.domNode, "height", (viewport.h - max.B)+"px");
 		dojo.query("div.win", desktop.ui.containerNode).forEach(function(win) {
 			var c = dojo.coords(win);
 			if(c.t < max.T && max.T > 0) dojo.style(win, "top", max.T+c.t+"px");
@@ -729,13 +729,6 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 			}
 			this.wallpaperImageNode.src = image;
 		}
-		/*
-		var css = dojo.byId("corestyle").sheet;
-		if (typeof css.cssRules != "undefined")
-			var rules = css.cssRules
-		else if (typeof css.rules != "undefined")
-			var rules = css.rules
-		if(typeof rules != "undefined") rules[0].style.backgroundColor = desktop.config.wallpaper.color;*/
 		var rule;
 		try {
 			rule = document.styleSheets[0].cssRules[0].style;
@@ -1139,7 +1132,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		if(desktop.config.fx) {
 			var props = {};
 			for(key in s) {
-				props[key] = {end: s[key]};
+				props[key] = {end: s[key], unit: "px"};
 			}
 			dojo.animateProperty({
 				node: this.domNode,
@@ -1149,7 +1142,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		}
 		else {
 			for(key in s) {
-				this.domNode.style[key] = s[key]+"px";
+				dojo.style(this.domNode, key, s[key]+"px");
 			}
 		}
 		dojo.forEach(this.getChildren(), function(item) {
@@ -1164,8 +1157,8 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	 */
 	resize: function() {
 		var viewport = dijit.getViewport();
-		dojo.style(this.domNode, (this.getOrientation() == "horizontal" ? "width" : "height"), this.span*viewport[(this.getOrientation() == "horizontal" ? "w" : "h")]);
-		dojo.style(this.domNode, (this.getOrientation() == "vertical" ? "width" : "height"), this.thickness);
+		dojo.style(this.domNode, (this.getOrientation() == "horizontal" ? "width" : "height"), (this.span*viewport[(this.getOrientation() == "horizontal" ? "w" : "h")])+"px");
+		dojo.style(this.domNode, (this.getOrientation() == "vertical" ? "width" : "height"), this.thickness+"px");
 		dojo.forEach(this.getChildren(), function(item) {
 			item.resize();
 		});
@@ -1257,16 +1250,16 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			//TODO: add to viewport when there are other panels around!
 			var viewport = dijit.getViewport();
 			if(this.placement.charAt(0) == "B") {
-				dojo.style(this.domNode, "top", viewport.h + this.thickness);
+				dojo.style(this.domNode, "top", (viewport.h + this.thickness)+"px");
 			}
 			else if(this.placement.charAt(0) == "T") {
-				dojo.style(this.domNode, "top", -(this.thickness))
+				dojo.style(this.domNode, "top", (-(this.thickness))+"px")
 			}
 			else if(this.placement.charAt(0) == "R") {
-				dojo.style(this.domNode, "left", viewport.w + this.thickness);
+				dojo.style(this.domNode, "left", (viewport.w + this.thickness)+"px");
 			}
 			else {
-				dojo.style(this.domNode, "left", -(this.thickness));
+				dojo.style(this.domNode, "left", (-(this.thickness))+"px");
 			}
 			
 			if(this.placement.charAt(1) == "T") {
@@ -1290,7 +1283,7 @@ dojo.declare("desktop.ui.panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		if(dojo.isIE){
 			dojo.connect(this.domNode,'onresize', this,"_place");
 		}
-		dojo.connect(window,'onresize',this,"_place");
+		dojo.connect(window,'onresize',this, "_place");
 		this._place();
 		//if(this.getOrientation() == "horizontal") this._makeHorizontal();
 		//else this._makeVertical();
@@ -1417,8 +1410,8 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 	 */
 	resize: function() {
 		var size = dojo.style(this.getParent().domNode, this.getParent().getOrientation() == "horizontal" ? "width" : "height");
-		dojo.style(this.domNode, (this.getParent().getOrientation() == "horizontal" ? "left" : "top"), this.pos*size);
-		dojo.style(this.domNode, (this.getParent().getOrientation() != "horizontal" ? "left" : "top"), 0);
+		dojo.style(this.domNode, (this.getParent().getOrientation() == "horizontal" ? "left" : "top"), (this.pos*size)+"px");
+		dojo.style(this.domNode, (this.getParent().getOrientation() != "horizontal" ? "left" : "top"), "0px");
 		this._calcSpan(size);
 	},
 	/*
@@ -1442,7 +1435,7 @@ dojo.declare("desktop.ui.applet", [dijit._Widget, dijit._Templated, dijit._Conta
 					break;
 				}
 			}
-			dojo.style(this.domNode, this.getParent().getOrientation() == "horizontal" ? "width" : "height", (nextApplet - (this.pos*size)) - 1);
+			dojo.style(this.domNode, this.getParent().getOrientation() == "horizontal" ? "width" : "height", ((nextApplet - (this.pos*size)) - 1)+"px");
 			dojo.style(this.domNode, this.getParent().getOrientation() == "horizontal" ? "height" : "width", "100%");
 		}
 	},

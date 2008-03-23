@@ -75,6 +75,7 @@ this.start = function() {
 	this.editor = document.createElement("textarea");
 	dojo.style(this.editor, "width", "100%");
 	dojo.style(this.editor, "height", "100%");
+	dojo.style(this.editor, "border", "0px");
     box.setContent(this.editor);
     this.other.setContent("No file open");
     this.window.addChild(box);
