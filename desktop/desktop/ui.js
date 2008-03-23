@@ -729,8 +729,7 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 			}
 			this.wallpaperImageNode.src = image;
 		}
-		var css = document.getElementsByTagName('style')[0]; //dojo.byId("corestyle").sheet;
-		if(typeof css.sheet != "undefined") css = css.sheet;
+		var css = document.styleSheets[0]; //dojo.byId("corestyle").sheet;
 		var rules;
 		try {
 			rules = css.cssRules;
