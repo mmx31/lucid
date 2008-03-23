@@ -374,7 +374,7 @@ dojo.declare(
 	 * An array of setTimeout handles for when the icon is clicked on (to handle double-clicking)
 	 */
 	_timeouts: [],
-	templateString: "<div class='desktopFileItem' style='width: 80px; height: 50px; padding: 10px;' dojoAttachPoint='focusNode'><div class='desktopFileItemIcon ${iconClass}'></div><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px; text-align: center;'><div dojoAttachPoint='textFront' class='desktopFileItemTextFront'>${label}</div><div dojoAttachPoint='textBack' class='desktopFileItemTextBack'>${label}</div></div></div>",
+	templateString: "<div class='desktopFileItem' style='width: 80px; height: 50px; padding: 10px;' dojoAttachPoint='focusNode'><div class='desktopFileItemIcon ${iconClass}' dojoAttachPoint='iconNode'></div><div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px; text-align: center;'><div dojoAttachPoint='textFront' class='desktopFileItemTextFront'>${label}</div><div dojoAttachPoint='textBack' class='desktopFileItemTextBack'>${label}</div></div></div>",
 	postCreate: function() {
 		/*if(!this.textShadow)
 		{
@@ -386,6 +386,7 @@ dojo.declare(
 		if(this.floatLeft) {
 			dojo.addClass(this.domNode, "desktopFileItemInline");
 		}*/
+		dojo.connect(this.iconNode, "ondblclick", this, "_onOpen");
 	},
 	/*
 	 * Method: _delete_file
@@ -426,22 +427,8 @@ dojo.declare(
 	 * called when the icon is clicked on
 	 */
 	_onIconClick: function(e) {
-		if(this.highlighted == false)
-		{
 			this.getParent().unhighlightChildren();
-			this.highlight();
 			this.getParent().onHighlight(this.path);
-			this._timeouts.push(setTimeout(dojo.hitch(this, function() {
-				this.unhighlight();
-			}), 1000));
-		}
-		else
-		{
-			dojo.forEach(this._timeouts, function(e) {
-				clearTimeout(e);
-			});
-			this._onOpen();
-		}
 	},
 	/*
 	 * Method: _onOpen
