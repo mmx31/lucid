@@ -68,7 +68,7 @@
 		import("models.user");
 		$out = new jsonOutput();
 		$User->truncate();
-		$out->append("Connecting to database...", "...done");
+		$out->append("Establishing connection to database...", "...done");
 		$user = new $User();
 		$user->username = $_POST['username'];
 		$user->email = $_POST['email'];
@@ -115,6 +115,8 @@
 			$out->append("Saving new configuration...", "...fail");
 			die();
 		}
+		require("../backend/configuration.php");
+		$out->append("Reloading configuration...", "...done");
 		$dir = opendir("../backend/models");
 		while(($file = readdir($dir)) !== false){
 			if($file{0} == '.' || $file == "base.php"){

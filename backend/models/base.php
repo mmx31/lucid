@@ -273,14 +273,7 @@
 		}		
 		function _get_tablename()
 		{
-			if(isset($this->_tablename))
-			{
-				$tablename=$this->_tablename;
-			}
-			else
-			{
-				$tablename=strtolower(get_class($this));
-			}
+			$tablename=strtolower(get_class($this));
 			$db_prefix = $GLOBALS['db']['prefix'];
 			return $db_prefix . $tablename;
 		}
@@ -361,7 +354,8 @@
 			}
 			$p = $this->_link->mgCreateTable($this->_link->quoteIdentifier($this->_get_tablename()), $list);
 			if (PEAR::isError($p)) {
-    			internal_error("db_query_err", 'Creation of table failed: "'.$p->getMessage().'"');
+				if($p->getMessage() == "MDB2 Error: connect failed")internal_error("db_connect_err", 'Creation of table failed: "'.$p->getMessage().'"');
+    			else internal_error("db_query_err", 'Creation of table failed: "'.$p->getMessage().'"');
 			}
 			$this->_link->mgCreateIndex($this->_link->quoteIdentifier($this->_get_tablename()), "id_key", array(
 				'fields' => array(

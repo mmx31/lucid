@@ -6,6 +6,7 @@ dojo.require("dijit.form.TextBox");
 dojo.require("dijit.form.Form");
 dojo.require("dijit.ProgressBar");
 install = new function() {
+	this.typeWasChecked = false;
 	this.selected = function(page){
 		dijit.byId("previous").setDisabled(page.isFirstChild);
 		if(page.isLastChild)
@@ -18,8 +19,9 @@ install = new function() {
 		}
 		install.currentPage = page;
 		if(page.title == "Start" || 
-		   page.title == "installation type" ||
+		   page.title == "Installation Type" ||
 		   page.title == "Database" ||
+		   page.title == "Admin Setup" ||
 		   page.title == "Installing")
 		{
 			dijit.byId("next").setDisabled(true);
@@ -28,6 +30,32 @@ install = new function() {
 		{
 			dijit.byId("previous").setDisabled(true);
 			install.doInstall();
+		}
+		if(page.title == "Installation Type") {
+			if(install.typeWasChecked == true)  dijit.byId("next").setDisabled(false);
+		}
+		if(page.title == "Admin Setup") {
+			install.checkAdmin();
+		}
+	}
+	this.checkAdmin = function() {
+		var form = dijit.byId("form").getValues();
+			if(form.admin_user != ""
+			&& form.admin_pass != ""
+			&& form.admin_email != "")
+				dijit.byId("next").setDisabled(false);
+			else
+				dijit.byId("next").setDisabled(true);
+	}
+	this.onPasswordChange = function() {
+		var form = dijit.byId("form").getValues();
+		if(form.admin_pass != form.admin_confpass) {
+			dojo.byId("admin_passbox").textContent = "Two passwords don't match";
+			dijit.byId("next").setDisabled(true);
+		}
+		else {
+			dojo.byId("admin_passbox").textContent = "";
+			dijit.byId("next").setDisabled(false);
 		}
 	}
 	this.onLoad = function() {
@@ -42,6 +70,10 @@ install = new function() {
 			dijit.byId(e)._clicked = install.onTypeRadioClick;
 		});
 		dijit.byId("installtype-reset")._clicked = install.onResetRadioClick;
+		
+		
+		
+		setTimeout(function() {dijit.byId("wizard").resize();}, 100);
 	}
 	this.checkDbInput = function() {
 		if (install.currentPage.title == "Database") {
@@ -107,6 +139,7 @@ install = new function() {
 				dijit.byId('wizard').forward();
 			};
 		}
+		install.typeWasChecked = true;
 	}
 	this.onResetRadioClick = function(e) {
 		if(!this.checked) {
@@ -192,12 +225,27 @@ install = new function() {
 			maximum: 100,
 			progress: percent
 		});
+		if(percent == 100) {
+			dojo.byId("taskList").innerHTML += "<div class='installComplete'>*** Installation Complete ***</div>";
+		}
+		dojo.byId("taskList").scrollTop = dojo.byId("taskList").scrollHeight;
+	}
+	this.writeError = function(data) {
+		var num = data.charAt(data.length-1);
+		var text = "Unknown error";
+		if(num == "6") text = "Database query error";
+		if(num == "4") text = "Database connection error";
+		dojo.byId("taskList").innerHTML = "<div class='installError'>***Installation Error***</div>"
+		+ "<div class='installError'>"+text+"</div>";
 	}
 	this.tasks = {
 		permissions: function(callback) {
 			dojo.xhrPost({
 				url: "./backend.php?action=installpermissions",
 				load: function(data, args){
+					try{
+						data = dojo.fromJson(data);
+					}catch(e){}
 					if (dojo.isObject(data)) {
 						var html = "<ul>";
 						var ready = true;
@@ -216,13 +264,12 @@ install = new function() {
 						callback(ready);
 					}
 					else {
-						dojo.byId("taskList").innerHTML += "<span style='color: red'>A problem occurred:</span><br />"+data;
+						install.writeError(data);
 						callback(false);
 						//TODO: once the output framework is used tell the user what went wrong.
 					}
 				},
-				callback: callback,
-				handleAs: "json"
+				callback: callback
 			});
 		},
 		apps: function(callback)
@@ -230,6 +277,9 @@ install = new function() {
 			dojo.xhrPost({
 				url: "./backend.php?action=installprograms",
 				load: function(data, args){
+					try{
+						data = dojo.fromJson(data);
+					}catch(e){}
 					if (dojo.isObject(data)) {
 						var html = "<ul>";
 						var ready = true;
@@ -248,13 +298,12 @@ install = new function() {
 						callback(ready);
 					}
 					else {
-						dojo.byId("taskList").innerHTML += "<span style='color: red'>A problem occurred:</span><br />"+data;
+						install.writeError(data);
 						callback(false);
 						//TODO: once the output framework is used tell the user what went wrong.
 					}
 				},
-				callback: callback,
-				handleAs: "json"
+				callback: callback
 			});
 		},
 		admin: function(form, callback) {
@@ -266,6 +315,9 @@ install = new function() {
 					email: form.admin_email
 				},
 				load: function(data, args){
+					try{
+						data = dojo.fromJson(data);
+					}catch(e){}
 					if (dojo.isObject(data)) {
 						var html = "<ul>";
 						var ready = true;
@@ -284,13 +336,12 @@ install = new function() {
 						callback(ready);
 					}
 					else {
-						dojo.byId("taskList").innerHTML += "<span style='color: red'>A problem occurred:</span><br />"+data;
+						install.writeError(data);
 						callback(false);
 						//TODO: once the output framework is used tell the user what went wrong.
 					}
 				},
-				callback: callback,
-				handleAs: "json"
+				callback: callback
 			});
 		},
 		database: function(form, callback) {
@@ -302,6 +353,9 @@ install = new function() {
 					conf_public: form.conf_public
 				},
 				load: function(data, args){
+					try{
+						data = dojo.fromJson(data);
+					}catch(e){}
 					if (dojo.isObject(data)) {
 						var html = "<ul>";
 						var ready = true;
@@ -320,13 +374,12 @@ install = new function() {
 						callback(ready);
 					}
 					else {
-						dojo.byId("taskList").innerHTML += "<span style='color: red'>A problem occurred:</span><br />"+data;
+						install.writeError(data);
 						callback(false);
 						//TODO: once the output framework is used tell the user what went wrong.
 					}
 				},
-				callback: callback,
-				handleAs: "json"
+				callback: callback
 			});
 		}
 	}

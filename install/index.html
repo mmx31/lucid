@@ -18,7 +18,7 @@
 					Before you start the installation, you need to change some file permissions:<br /> 
 					<div id="perms">please wait...</div>
 				</div>
-				<div dojoType="dijit.layout.ContentPane" title="installation type">
+				<div dojoType="dijit.layout.ContentPane" title="Installation Type">
 					<div class="title">What type of installation do you want?</div>
 					<input dojoType="dijit.form.RadioButton" id="installtype-new" type="radio" name="type" value="clean" />
 					<label for="installtype-new"><b>I want to do a clean installation</b></label>
@@ -84,25 +84,32 @@
 					DSN: <input dojoType="dijit.form.TextBox" name="db_url" id="urlstr" style="width: 400px;" type="text" /><br />
 					 <i style="color: red;">Do not change this unless you know what you're doing</i>
 				</div>
-				<div dojoType="dijit.layout.ContentPane" title="Admin Setup">
+				<div dojoType="dijit.layout.ContentPane" title="Admin Setup" onkeyup="install.checkAdmin();">
 					<div class="title">Adminstrative User Settings</div>
-					Admin User:&nbsp;
-					<input dojoType="dijit.form.TextBox" name="admin_user" type="text" />
-					<br />
-					Admin Pass:&nbsp;
-					<input dojoType="dijit.form.TextBox" name="admin_pass" type="password" />
-					<br />
-					Admin E-mail:&nbsp;
-					<input dojoType="dijit.form.TextBox" name="admin_email" type="text" />
-					<br />
-					Allow public registration:
-					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="conf_public" id="conf_public_true" value="true" /> 
-						<label for="conf_public_true"> yes</label>
+						Admin Username:&nbsp;
+						<input dojoType="dijit.form.TextBox" name="admin_user" type="text" />
+					<div onkeyup="install.onPasswordChange();">
+						Admin Password:&nbsp;
+						<input dojoType="dijit.form.TextBox" name="admin_pass" type="password" /><span id="admin_passbox"></span>
+					</div>
+					<div onkeyup="install.onPasswordChange();">
+						Confirm Password:&nbsp;
+						<input dojoType="dijit.form.TextBox" name="admin_confpass" type="password" />
 					</div>
 					<div>
-						<input dojoType="dijit.form.RadioButton" type="radio" name="conf_public" id="conf_public_false" value="false" /> 
-						<label for="conf_public_false"> no</label>
+						Admin E-mail:&nbsp;
+						<input dojoType="dijit.form.TextBox" name="admin_email" type="text" />
+					</div>
+					<div style="margin-top: 10px;">
+						Allow public registration:
+						<div>
+							<input checked dojoType="dijit.form.RadioButton" type="radio" name="conf_public" id="conf_public_true" value="true" /> 
+							<label for="conf_public_true"> yes</label>
+						</div>
+						<div>
+							<input dojoType="dijit.form.RadioButton" type="radio" name="conf_public" id="conf_public_false" value="false" /> 
+							<label for="conf_public_false"> no</label>
+						</div>
 					</div>
 				</div>
 				<div dojoType="dijit.layout.ContentPane" id="install-page" title="Installing">

@@ -6,6 +6,22 @@ body {
 	font-size:76%;
 }
 
+#admin_passbox {
+	color: red;
+	font-size: 10px;
+	margin-left: 10px;
+}
+
+.installComplete {
+	text-align: center;
+	color: green;
+	margin: 5px 0px 15px 0px;
+}
+.installError {
+	text-align: center;
+	color: red;
+}
+
 #wizard {
 	border: 1px solid #9b9b9b;
 	background-color: white;
@@ -29,7 +45,7 @@ body {
 }
 
 .title {
-	font-size: 14pt;
+	font-size: 14px;
 	font-weight: bold;
 	margin-bottom: 20px;
 }
@@ -49,4 +65,9 @@ body {
 #taskList {
 	border: 1px solid gray;
 	padding: 5px;
+	height: 250px;
+	overflow-y: scroll;
+	text-align: left;
+	font-family: monospace;
+	font-size: 10px;
 }
