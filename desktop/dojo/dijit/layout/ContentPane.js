@@ -7,7 +7,7 @@ dojo.require("dijit.layout._LayoutWidget");
 
 dojo.require("dojo.parser");
 dojo.require("dojo.string");
-dojo.requireLocalization("dijit", "loading", null, "ko,zh,sv,ja,gr,zh-tw,ru,it,ROOT,hu,fr,pt,pl,es,de,cs");
+dojo.requireLocalization("dijit", "loading", null, "zh,pt,ru,sv,ROOT,de,ja,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
 
 dojo.declare(
 	"dijit.layout.ContentPane",

@@ -25,10 +25,10 @@ dijit._editor.getNodeHtml=function(/* DomNode */node){
 			if(dojo.isIE && node.outerHTML){
 				var s = node.outerHTML;
 				s = s.substr(0,s.indexOf('>'));
-				s = s.replace(/(?:['"])[^"']*\1/g, '');//to make the following regexp safe
+				s = s.replace(/(['"])[^"']*\1/g, '');//to make the following regexp safe
 				var reg = /([^\s=]+)=/g;
 				var m, key;
-				while((m = reg.exec(s)) != undefined){
+				while((m = reg.exec(s))){
 					key=m[1];
 					if(key.substr(0,3) != '_dj'){
 						if(key == 'src' || key == 'href'){
@@ -49,15 +49,16 @@ dijit._editor.getNodeHtml=function(/* DomNode */node){
 				while((attr=attrs[i++])){
 					//ignore all attributes starting with _dj which are
 					//internal temporary attributes used by the editor
-					if(attr.name.substr(0,3) != '_dj' /*&&
+					var n=attr.name;
+					if(n.substr(0,3) != '_dj' /*&&
 						(attr.specified == undefined || attr.specified)*/){
 						var v = attr.value;
-						if(attr.name == 'src' || attr.name == 'href'){
+						if(n == 'src' || n == 'href'){
 							if(node.getAttribute('_djrealurl')){
 								v = node.getAttribute('_djrealurl');
 							}
 						}
-						attrarray.push([attr.name,v]);
+						attrarray.push([n,v]);
 					}
 				}
 			}
@@ -66,7 +67,7 @@ dijit._editor.getNodeHtml=function(/* DomNode */node){
 			});
 			i=0;
 			while((attr=attrarray[i++])){
-				output += ' '+attr[0]+'="'+attr[1]+'"';
+				output += ' '+attr[0]+'="'+dijit._editor.escapeXml(attr[1],true)+'"';
 			}
 			if(node.childNodes.length){
 				output += '>' + dijit._editor.getChildrenHtml(node)+'</'+node.nodeName.toLowerCase()+'>';

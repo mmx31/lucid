@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2004-2007, The Dojo Foundation
+	Copyright (c) 2004-2008, The Dojo Foundation
 	All Rights Reserved.
 
 	Licensed under the Academic Free License version 2.1 or above OR the
@@ -258,7 +258,8 @@ dojo.declare("dojox.storage.Provider", null, {
 		//		if left off, the value will be placed into dojox.storage.DEFAULT_NAMESPACE
 		
 		console.warn("dojox.storage.putMultiple not implemented");
-		//	JAC: We could implement a 'default' puMultiple here by just doing each put individually
+		//	JAC: We could implement a 'default' puMultiple here by just doing 
+		//  each put individually
 	},
 
 	getMultiple: function(/*array*/ keys, /*string?*/ namespace){ /*Object*/
@@ -274,13 +275,15 @@ dojo.declare("dojox.storage.Provider", null, {
 		// return: Returns any JavaScript object type; null if the key is not present
 
 		console.warn("dojox.storage.getMultiple not implemented");
-		//	JAC: We could implement a 'default' getMultiple here by just doing each get individually
+		//	JAC: We could implement a 'default' getMultiple here by just 
+		//  doing each get individually
 	},
 
 	removeMultiple: function(/*array*/ keys, /*string?*/ namespace) {
 		// summary: Removes the given keys from this storage system.
 
-		//	JAC: We could implement a 'default' removeMultiple here by just doing each remove individually
+		//	JAC: We could implement a 'default' removeMultiple here by just 
+		//  doing each remove individually
 		console.warn("dojox.storage.remove not implemented");
 	},
 	
@@ -289,7 +292,8 @@ dojo.declare("dojox.storage.Provider", null, {
 			return false;
 		}
 
-		//	JAC: This could be optimized by running the key validity test directly over a joined string
+		//	JAC: This could be optimized by running the key validity test 
+		//  directly over a joined string
 		return !dojo.some(keys, function(key){
 			return !this.isValidKey(key);
 		}); // Boolean
@@ -335,6 +339,9 @@ dojo.declare("dojox.storage.Provider", null, {
 		//	to cache these resources to ensure the machinery
 		//	used by this storage provider is available offline.
 		//	What is returned is an array of URLs.
+		//  Note that Dojo Offline uses Gears as its native 
+		//  storage provider, and does not support using other
+		//  kinds of storage providers while offline anymore.
 		
 		return [];
 	}
@@ -362,10 +369,14 @@ dojox.storage.manager = new function(){
 	// available: Boolean
 	//	Whether storage of some kind is available.
 	this.available = false;
+
+  // providers: Array
+  //  Array of all the static provider instances, useful if you want to
+  //  loop through and see what providers have been registered.
+  this.providers = [];
 	
 	this._initialized = false;
-	
-	this._providers = [];
+
 	this._onLoadListeners = [];
 	
 	this.initialize = function(){
@@ -388,8 +399,13 @@ dojox.storage.manager = new function(){
 		// instance:
 		//		An instance of this provider, which we will use to call
 		//		isAvailable() on. 
-		this._providers[this._providers.length] = instance; //FIXME: push?
-		this._providers[name] = instance; // FIXME: this._providers is an array, not a hash
+		
+		// keep list of providers as a list so that we can know what order
+		// storage providers are preferred; also, store the providers hashed
+		// by name in case someone wants to get a provider that uses
+		// a particular storage backend
+		this.providers.push(instance);
+		this.providers[name] = instance;
 	};
 	
 	this.setProvider = function(storageClass){
@@ -411,28 +427,27 @@ dojox.storage.manager = new function(){
 		//console.debug("dojox.storage.manager.autodetect");
 		
 		if(this._initialized){ // already finished
-			//console.debug("dojox.storage.manager already initialized; returning");
 			return;
 		}
 
 		// a flag to force the storage manager to use a particular 
 		// storage provider type, such as 
 		// djConfig = {forceStorageProvider: "dojox.storage.WhatWGStorageProvider"};
-		var forceProvider = dojo.config["forceStorageProvider"]||false;
+		var forceProvider = dojo.config["forceStorageProvider"] || false;
 
 		// go through each provider, seeing if it can be used
 		var providerToUse;
 		//FIXME: use dojo.some
-		for(var i = 0; i < this._providers.length; i++){
-			providerToUse = this._providers[i];
-			if(forceProvider == providerToUse.declaredClass){
+		for(var i = 0; i < this.providers.length; i++){
+			providerToUse = this.providers[i];
+			if(forceProvider && forceProvider == providerToUse.declaredClass){
 				// still call isAvailable for this provider, since this helps some
 				// providers internally figure out if they are available
 				// FIXME: This should be refactored since it is non-intuitive
 				// that isAvailable() would initialize some state
 				providerToUse.isAvailable();
 				break;
-			}else if(providerToUse.isAvailable()){
+			}else if(!forceProvider && providerToUse.isAvailable()){
 				break;
 			}
 		}
@@ -498,7 +513,9 @@ dojox.storage.manager = new function(){
 		//		be used. 
 
 		// FIXME: This should REALLY not be in here, but it fixes a tricky
-		// Flash timing bug
+		// Flash timing bug.
+		// Confirm that this is still needed with the newly refactored Dojo
+		// Flash. Used to be for Internet Explorer. -- Brad Neuberg
 		if(this.currentProvider != null
 			&& this.currentProvider.declaredClass == "dojox.storage.FlashStorageProvider" 
 			&& dojox.flash.ready == false){
@@ -584,7 +601,7 @@ dojox.storage.manager = new function(){
 		//		were to sync against Dojo Offline on Firefox 2, then we would
 		//		not grab the FlashStorageProvider resources needed for Safari.
 		var results = [];
-		dojo.forEach(dojox.storage.manager._providers, function(currentProvider){
+		dojo.forEach(dojox.storage.manager.providers, function(currentProvider){
 			results = results.concat(currentProvider.getResourceList());
 		});
 		
@@ -1092,7 +1109,10 @@ dojo.mixin(dojox.sql, {
 		if(!this.dbName){
 			this.dbName = "dot_store_" 
 				+ window.location.href.replace(/[^0-9A-Za-z_]/g, "_");
-			//console.debug("Using Google Gears database " + this.dbName);
+			// database names in Gears are limited to 64 characters long
+			if(this.dbName.length > 63){
+			  this.dbName = this.dbName.substring(0, 63);
+			}
 		}
 		
 		if(!dbName){
@@ -1600,8 +1620,6 @@ if(dojo.isGears){
 			//		to store data (it is saved into the local SQL database
 			//		provided by Gears, using dojox.sql)
 			// description: 
-			//		
-			//
 			//		You can disable this storage provider with the following djConfig
 			//		variable:
 			//		var djConfig = { disableGearsStorage: true };
@@ -1899,10 +1917,1618 @@ if(dojo.isGears){
 		// register the existence of our storage providers
 		dojox.storage.manager.register("dojox.storage.GearsStorageProvider",
 										new dojox.storage.GearsStorageProvider());
-	
-		dojox.storage.manager.initialize();
 	})();
 }
+
+}
+
+if(!dojo._hasResource["dojox.storage.WhatWGStorageProvider"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource["dojox.storage.WhatWGStorageProvider"] = true;
+dojo.provide("dojox.storage.WhatWGStorageProvider");
+
+
+
+dojo.declare("dojox.storage.WhatWGStorageProvider", [ dojox.storage.Provider ], {
+	// summary:
+	//		Storage provider that uses WHAT Working Group features in Firefox 2 
+	//		to achieve permanent storage.
+	// description: 
+	//		The WHAT WG storage API is documented at 
+	//		http://www.whatwg.org/specs/web-apps/current-work/#scs-client-side
+	//
+	//		You can disable this storage provider with the following djConfig
+	//		variable:
+	//		var djConfig = { disableWhatWGStorage: true };
+	//		
+	//		Authors of this storage provider-	
+	//			JB Boisseau, jb.boisseau@eutech-ssii.com
+	//			Brad Neuberg, bkn3@columbia.edu 
+
+	initialized: false,
+	
+	_domain: null,
+	_available: null,
+	_statusHandler: null,
+	_allNamespaces: null,
+	_storageEventListener: null,
+	
+	initialize: function(){
+		if(dojo.config["disableWhatWGStorage"] == true){
+			return;
+		}
+		
+		// get current domain
+		// see: https://bugzilla.mozilla.org/show_bug.cgi?id=357323
+		this._domain = (location.hostname == "localhost") ? "localhost.localdomain" : location.hostname;
+		// console.debug(this._domain);
+		
+		// indicate that this storage provider is now loaded
+		this.initialized = true;
+		dojox.storage.manager.loaded();	
+	},
+	
+	isAvailable: function(){
+		try{
+			// see: https://bugzilla.mozilla.org/show_bug.cgi?id=357323
+			var myStorage = globalStorage[((location.hostname == "localhost") ? "localhost.localdomain" : location.hostname)];
+		}catch(e){
+			this._available = false;
+			return this._available;
+		}
+		
+		this._available = true;	
+		return this._available;
+	},
+
+	put: function(key, value, resultsHandler, namespace){
+		if(this.isValidKey(key) == false){
+			throw new Error("Invalid key given: " + key);
+		}
+		namespace = namespace||this.DEFAULT_NAMESPACE;
+		
+		// get our full key name, which is namespace + key
+		key = this.getFullKey(key, namespace);	
+		
+		this._statusHandler = resultsHandler;
+		
+		// serialize the value;
+		// handle strings differently so they have better performance
+		if(dojo.isString(value)){
+			value = "string:" + value;
+		}else{
+			value = dojo.toJson(value);
+		}
+		
+		// register for successful storage events.
+		var storageListener = dojo.hitch(this, function(evt){
+			// remove any old storage event listener we might have added
+			// to the window on old put() requests; Firefox has a bug
+			// where it can occassionaly go into infinite loops calling
+			// our storage event listener over and over -- this is a 
+			// workaround
+			// FIXME: Simplify this into a test case and submit it
+			// to Firefox
+			window.removeEventListener("storage", storageListener, false);
+			
+			// indicate we succeeded
+			if(resultsHandler){
+				resultsHandler.call(null, this.SUCCESS, key);
+			}
+		});
+		
+		window.addEventListener("storage", storageListener, false);
+		
+		// try to store the value	
+		try{
+			var myStorage = globalStorage[this._domain];
+			myStorage.setItem(key, value);
+		}catch(e){
+			// indicate we failed
+			this._statusHandler.call(null, this.FAILED, key, e.toString());
+		}
+	},
+
+	get: function(key, namespace){
+		if(this.isValidKey(key) == false){
+			throw new Error("Invalid key given: " + key);
+		}
+		namespace = namespace||this.DEFAULT_NAMESPACE;
+		
+		// get our full key name, which is namespace + key
+		key = this.getFullKey(key, namespace);
+		
+		// sometimes, even if a key doesn't exist, Firefox
+		// will return a blank string instead of a null --
+		// this _might_ be due to having underscores in the
+		// keyname, but I am not sure.
+		
+		// FIXME: Simplify this bug into a testcase and
+		// submit it to Firefox
+		var myStorage = globalStorage[this._domain];
+		var results = myStorage.getItem(key);
+		
+		if(results == null || results == ""){
+			return null;
+		}
+		
+		results = results.value;
+		
+		// destringify the content back into a 
+		// real JavaScript object;
+		// handle strings differently so they have better performance
+		if(dojo.isString(results) && (/^string:/.test(results))){
+			results = results.substring("string:".length);
+		}else{
+			results = dojo.fromJson(results);
+		}
+		
+		return results;
+	},
+	
+	getNamespaces: function(){
+		var results = [ this.DEFAULT_NAMESPACE ];
+		
+		// simply enumerate through our array and save any string
+		// that starts with __
+		var found = {};
+		var myStorage = globalStorage[this._domain];
+		var tester = /^__([^_]*)_/;
+		for(var i = 0; i < myStorage.length; i++){
+			var currentKey = myStorage.key(i);
+			if(tester.test(currentKey) == true){
+				var currentNS = currentKey.match(tester)[1];
+				// have we seen this namespace before?
+				if(typeof found[currentNS] == "undefined"){
+					found[currentNS] = true;
+					results.push(currentNS);
+				}
+			}
+		}
+		
+		return results;
+	},
+
+	getKeys: function(namespace){
+		namespace = namespace||this.DEFAULT_NAMESPACE;
+		
+		if(this.isValidKey(namespace) == false){
+			throw new Error("Invalid namespace given: " + namespace);
+		}
+		
+		// create a regular expression to test the beginning
+		// of our key names to see if they match our namespace;
+		// if it is the default namespace then test for the presence
+		// of no namespace for compatibility with older versions
+		// of dojox.storage
+		var namespaceTester;
+		if(namespace == this.DEFAULT_NAMESPACE){
+			namespaceTester = new RegExp("^([^_]{2}.*)$");	
+		}else{
+			namespaceTester = new RegExp("^__" + namespace + "_(.*)$");
+		}
+		
+		var myStorage = globalStorage[this._domain];
+		var keysArray = [];
+		for(var i = 0; i < myStorage.length; i++){
+			var currentKey = myStorage.key(i);
+			if(namespaceTester.test(currentKey) == true){
+				// strip off the namespace portion
+				currentKey = currentKey.match(namespaceTester)[1];
+				keysArray.push(currentKey);
+			}
+		}
+		
+		return keysArray;
+	},
+
+	clear: function(namespace){
+		namespace = namespace||this.DEFAULT_NAMESPACE;
+		
+		if(this.isValidKey(namespace) == false){
+			throw new Error("Invalid namespace given: " + namespace);
+		}
+		
+		// create a regular expression to test the beginning
+		// of our key names to see if they match our namespace;
+		// if it is the default namespace then test for the presence
+		// of no namespace for compatibility with older versions
+		// of dojox.storage
+		var namespaceTester;
+		if(namespace == this.DEFAULT_NAMESPACE){
+			namespaceTester = new RegExp("^[^_]{2}");	
+		}else{
+			namespaceTester = new RegExp("^__" + namespace + "_");
+		}
+		
+		var myStorage = globalStorage[this._domain];
+		var keys = [];
+		for(var i = 0; i < myStorage.length; i++){
+			if(namespaceTester.test(myStorage.key(i)) == true){
+				keys[keys.length] = myStorage.key(i);
+			}
+		}
+		
+		dojo.forEach(keys, dojo.hitch(myStorage, "removeItem"));
+	},
+	
+	remove: function(key, namespace){
+		// get our full key name, which is namespace + key
+		key = this.getFullKey(key, namespace);
+		
+		var myStorage = globalStorage[this._domain];
+		myStorage.removeItem(key);
+	},
+	
+	isPermanent: function(){
+		return true;
+	},
+
+	getMaximumSize: function(){
+		return this.SIZE_NO_LIMIT;
+	},
+
+	hasSettingsUI: function(){
+		return false;
+	},
+	
+	showSettingsUI: function(){
+		throw new Error(this.declaredClass + " does not support a storage settings user-interface");
+	},
+	
+	hideSettingsUI: function(){
+		throw new Error(this.declaredClass + " does not support a storage settings user-interface");
+	},
+	
+	getFullKey: function(key, namespace){
+		namespace = namespace||this.DEFAULT_NAMESPACE;
+		
+		if(this.isValidKey(namespace) == false){
+			throw new Error("Invalid namespace given: " + namespace);
+		}
+		
+		// don't append a namespace string for the default namespace,
+		// for compatibility with older versions of dojox.storage
+		if(namespace == this.DEFAULT_NAMESPACE){
+			return key;
+		}else{
+			return "__" + namespace + "_" + key;
+		}
+	}
+});
+
+dojox.storage.manager.register("dojox.storage.WhatWGStorageProvider", 
+								new dojox.storage.WhatWGStorageProvider());
+
+}
+
+if(!dojo._hasResource["dijit._base.place"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource["dijit._base.place"] = true;
+dojo.provide("dijit._base.place");
+
+// ported from dojo.html.util
+
+dijit.getViewport = function(){
+	//	summary
+	//	Returns the dimensions and scroll position of the viewable area of a browser window
+
+	var _window = dojo.global;
+	var _document = dojo.doc;
+
+	// get viewport size
+	var w = 0, h = 0;
+	var de = _document.documentElement;
+	var dew = de.clientWidth, deh = de.clientHeight;
+	if(dojo.isMozilla){
+		// mozilla
+		// _window.innerHeight includes the height taken by the scroll bar
+		// clientHeight is ideal but has DTD issues:
+		// #4539: FF reverses the roles of body.clientHeight/Width and documentElement.clientHeight/Width based on the DTD!
+		// check DTD to see whether body or documentElement returns the viewport dimensions using this algorithm:
+		var minw, minh, maxw, maxh;
+		var dbw = _document.body.clientWidth;
+		if(dbw > dew){
+			minw = dew;
+			maxw = dbw;
+		}else{
+			maxw = dew;
+			minw = dbw;
+		}
+		var dbh = _document.body.clientHeight;
+		if(dbh > deh){
+			minh = deh;
+			maxh = dbh;
+		}else{
+			maxh = deh;
+			minh = dbh;
+		}
+		w = (maxw > _window.innerWidth) ? minw : maxw;
+		h = (maxh > _window.innerHeight) ? minh : maxh;
+	}else if(!dojo.isOpera && _window.innerWidth){
+		//in opera9, dojo.body().clientWidth should be used, instead
+		//of window.innerWidth/document.documentElement.clientWidth
+		//so we have to check whether it is opera
+		w = _window.innerWidth;
+		h = _window.innerHeight;
+	}else if(dojo.isIE && de && deh){
+		w = dew;
+		h = deh;
+	}else if(dojo.body().clientWidth){
+		// IE5, Opera
+		w = dojo.body().clientWidth;
+		h = dojo.body().clientHeight;
+	}
+
+	// get scroll position
+	var scroll = dojo._docScroll();
+
+	return { w: w, h: h, l: scroll.x, t: scroll.y };	//	object
+};
+
+dijit.placeOnScreen = function(
+	/* DomNode */	node,
+	/* Object */		pos,
+	/* Object */		corners,
+	/* boolean? */		tryOnly){
+	//	summary:
+	//		Keeps 'node' in the visible area of the screen while trying to
+	//		place closest to pos.x, pos.y. The input coordinates are
+	//		expected to be the desired document position.
+	//
+	//		Set which corner(s) you want to bind to, such as
+	//		
+	//			placeOnScreen(node, {x: 10, y: 20}, ["TR", "BL"])
+	//		
+	//		The desired x/y will be treated as the topleft(TL)/topright(TR) or
+	//		BottomLeft(BL)/BottomRight(BR) corner of the node. Each corner is tested
+	//		and if a perfect match is found, it will be used. Otherwise, it goes through
+	//		all of the specified corners, and choose the most appropriate one.
+	//		
+	//		NOTE: node is assumed to be absolutely or relatively positioned.
+
+	var choices = dojo.map(corners, function(corner){ return { corner: corner, pos: pos }; });
+
+	return dijit._place(node, choices);
+}
+
+dijit._place = function(/*DomNode*/ node, /* Array */ choices, /* Function */ layoutNode){
+	// summary:
+	//		Given a list of spots to put node, put it at the first spot where it fits,
+	//		of if it doesn't fit anywhere then the place with the least overflow
+	// choices: Array
+	//		Array of elements like: {corner: 'TL', pos: {x: 10, y: 20} }
+	//		Above example says to put the top-left corner of the node at (10,20)
+	//	layoutNode: Function(node, aroundNodeCorner, nodeCorner)
+	//		for things like tooltip, they are displayed differently (and have different dimensions)
+	//		based on their orientation relative to the parent.   This adjusts the popup based on orientation.
+
+	// get {x: 10, y: 10, w: 100, h:100} type obj representing position of
+	// viewport over document
+	var view = dijit.getViewport();
+
+	// This won't work if the node is inside a <div style="position: relative">,
+	// so reattach it to dojo.doc.body.   (Otherwise, the positioning will be wrong
+	// and also it might get cutoff)
+	if(!node.parentNode || String(node.parentNode.tagName).toLowerCase() != "body"){
+		dojo.body().appendChild(node);
+	}
+
+	var best = null;
+	dojo.some(choices, function(choice){
+		var corner = choice.corner;
+		var pos = choice.pos;
+
+		// configure node to be displayed in given position relative to button
+		// (need to do this in order to get an accurate size for the node, because
+		// a tooltips size changes based on position, due to triangle)
+		if(layoutNode){
+			layoutNode(node, choice.aroundCorner, corner);
+		}
+
+		// get node's size
+		var style = node.style;
+		var oldDisplay = style.display;
+		var oldVis = style.visibility;
+		style.visibility = "hidden";
+		style.display = "";
+		var mb = dojo.marginBox(node);
+		style.display = oldDisplay;
+		style.visibility = oldVis;
+
+		// coordinates and size of node with specified corner placed at pos,
+		// and clipped by viewport
+		var startX = (corner.charAt(1) == 'L' ? pos.x : Math.max(view.l, pos.x - mb.w)),
+			startY = (corner.charAt(0) == 'T' ? pos.y : Math.max(view.t, pos.y -  mb.h)),
+			endX = (corner.charAt(1) == 'L' ? Math.min(view.l + view.w, startX + mb.w) : pos.x),
+			endY = (corner.charAt(0) == 'T' ? Math.min(view.t + view.h, startY + mb.h) : pos.y),
+			width = endX - startX,
+			height = endY - startY,
+			overflow = (mb.w - width) + (mb.h - height);
+
+		if(best == null || overflow < best.overflow){
+			best = {
+				corner: corner,
+				aroundCorner: choice.aroundCorner,
+				x: startX,
+				y: startY,
+				w: width,
+				h: height,
+				overflow: overflow
+			};
+		}
+		return !overflow;
+	});
+
+	node.style.left = best.x + "px";
+	node.style.top = best.y + "px";
+	if(best.overflow && layoutNode){
+		layoutNode(node, best.aroundCorner, best.corner);
+	}
+	return best;
+}
+
+dijit.placeOnScreenAroundElement = function(
+	/* DomNode */		node,
+	/* DomNode */		aroundNode,
+	/* Object */		aroundCorners,
+	/* Function */		layoutNode){
+
+	//	summary
+	//	Like placeOnScreen, except it accepts aroundNode instead of x,y
+	//	and attempts to place node around it.  Uses margin box dimensions.
+	//
+	//	aroundCorners
+	//		specify Which corner of aroundNode should be
+	//		used to place the node => which corner(s) of node to use (see the
+	//		corners parameter in dijit.placeOnScreen)
+	//		e.g. {'TL': 'BL', 'BL': 'TL'}
+	//
+	//	layoutNode: Function(node, aroundNodeCorner, nodeCorner)
+	//		for things like tooltip, they are displayed differently (and have different dimensions)
+	//		based on their orientation relative to the parent.   This adjusts the popup based on orientation.
+
+
+	// get coordinates of aroundNode
+	aroundNode = dojo.byId(aroundNode);
+	var oldDisplay = aroundNode.style.display;
+	aroundNode.style.display="";
+	// #3172: use the slightly tighter border box instead of marginBox
+	var aroundNodeW = aroundNode.offsetWidth; //mb.w;
+	var aroundNodeH = aroundNode.offsetHeight; //mb.h;
+	var aroundNodePos = dojo.coords(aroundNode, true);
+	aroundNode.style.display=oldDisplay;
+
+	// Generate list of possible positions for node
+	var choices = [];
+	for(var nodeCorner in aroundCorners){
+		choices.push( {
+			aroundCorner: nodeCorner,
+			corner: aroundCorners[nodeCorner],
+			pos: {
+				x: aroundNodePos.x + (nodeCorner.charAt(1) == 'L' ? 0 : aroundNodeW),
+				y: aroundNodePos.y + (nodeCorner.charAt(0) == 'T' ? 0 : aroundNodeH)
+			}
+		});
+	}
+
+	return dijit._place(node, choices, layoutNode);
+}
+
+}
+
+if(!dojo._hasResource["dojox.flash._base"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource["dojox.flash._base"] = true;
+dojo.provide("dojox.flash._base");
+
+// for dijit.getViewport(), needed by dojox.flash.Embed.center()
+
+
+dojox.flash = function(){
+	// summary:
+	//	The goal of dojox.flash is to make it easy to extend Flash's capabilities
+	//	into an Ajax/DHTML environment.
+	//  
+	//	dojox.flash provides an easy object for interacting with the Flash plugin. 
+	//	This object provides methods to determine the current version of the Flash
+	//	plugin (dojox.flash.info); write out the necessary markup to 
+	//	dynamically insert a Flash object into the page (dojox.flash.Embed; and 
+	//	do dynamic installation and upgrading of the current Flash plugin in 
+	//	use (dojox.flash.Install). If you want to call methods on the Flash object
+	//	embedded into the page it is your responsibility to use Flash's ExternalInterface
+	//	API and get a reference to the Flash object yourself.
+	//		
+	//	To use dojox.flash, you must first wait until Flash is finished loading 
+	//	and initializing before you attempt communication or interaction. 
+	//	To know when Flash is finished use dojo.connect:
+	//		
+	//	dojo.connect(dojox.flash, "loaded", myInstance, "myCallback");
+	//		
+	//	Then, while the page is still loading provide the file name:
+	//		
+	//	dojox.flash.setSwf(dojo.moduleUrl("dojox", "_storage/storage.swf"));
+	//			
+	//	If no SWF files are specified, then Flash is not initialized.
+	//		
+	//	Your Flash must use Flash's ExternalInterface to expose Flash methods and
+	//	to call JavaScript.
+	//		
+	//	setSwf can take an optional 'visible' attribute to control whether
+	//	the Flash object is visible or not on the page; the default is visible:
+	//		
+	//	dojox.flash.setSwf(dojo.moduleUrl("dojox", "_storage/storage.swf"),
+	//						false);
+	//		
+	//	Once finished, you can query Flash version information:
+	//		
+	//	dojox.flash.info.version
+	//		
+	//	Or can communicate with Flash methods that were exposed:	
+	//
+	//	var f = dojox.flash.get();
+	//	var results = f.sayHello("Some Message");	
+	// 
+	//	Your Flash files should use DojoExternalInterface.as to register methods;
+	//	this file wraps Flash's normal ExternalInterface but correct various
+	//	serialization bugs that ExternalInterface has.
+	//
+	//	Note that dojox.flash is not meant to be a generic Flash embedding
+	//	mechanism; it is as generic as necessary to make Dojo Storage's
+	//	Flash Storage Provider as clean and modular as possible. If you want 
+	//	a generic Flash embed mechanism see SWFObject 
+	//	(http://blog.deconcept.com/swfobject/).
+	//
+	// 	Notes:
+	//	Note that dojox.flash can currently only work with one Flash object
+	//	on the page; it does not yet support multiple Flash objects on
+	//	the same page. 
+	//		
+	//	Your code can detect whether the Flash player is installing or having
+	//	its version revved in two ways. First, if dojox.flash detects that
+	//	Flash installation needs to occur, it sets dojox.flash.info.installing
+	//	to true. Second, you can detect if installation is necessary with the
+	//	following callback:
+	//		
+	//	dojo.connect(dojox.flash, "installing", myInstance, "myCallback");
+	//		
+	//	You can use this callback to delay further actions that might need Flash;
+	//	when installation is finished the full page will be refreshed and the
+	//	user will be placed back on your page with Flash installed.
+	//		
+	//	-------------------
+	//	Todo/Known Issues
+	//	-------------------
+	//	* On Internet Explorer, after doing a basic install, the page is
+	//	not refreshed or does not detect that Flash is now available. The way
+	//	to fix this is to create a custom small Flash file that is pointed to
+	//	during installation; when it is finished loading, it does a callback
+	//	that says that Flash installation is complete on IE, and we can proceed
+	//	to initialize the dojox.flash subsystem.
+	//	* Things aren't super tested for sending complex objects to Flash
+	//	methods, since Dojo Storage only needs strings
+	//		
+	//	Author- Brad Neuberg, http://codinginparadise.org
+}
+
+dojox.flash = {
+	ready: false,
+	url: null,
+	
+	_visible: true,
+	_loadedListeners: new Array(),
+	_installingListeners: new Array(),
+	
+	setSwf: function(/* String */ url, /* boolean? */ visible){
+		// summary: Sets the SWF files and versions we are using.
+		// url: String
+		//	The URL to this Flash file.
+		// visible: boolean?
+		//	Whether the Flash file is visible or not. If it is not visible we hide it off the
+		//	screen. This defaults to true (i.e. the Flash file is visible).
+		this.url = url;
+		
+		if(typeof visible != "undefined"){
+			this._visible = visible;
+		}
+		
+		// initialize ourselves		
+		this._initialize();
+	},
+	
+	addLoadedListener: function(/* Function */ listener){
+		// summary:
+		//	Adds a listener to know when Flash is finished loading. 
+		//	Useful if you don't want a dependency on dojo.event.
+		// listener: Function
+		//	A function that will be called when Flash is done loading.
+		
+		this._loadedListeners.push(listener);
+	},
+
+	addInstallingListener: function(/* Function */ listener){
+		// summary:
+		//	Adds a listener to know if Flash is being installed. 
+		//	Useful if you don't want a dependency on dojo.event.
+		// listener: Function
+		//	A function that will be called if Flash is being
+		//	installed
+		
+		this._installingListeners.push(listener);
+	},	
+	
+	loaded: function(){
+		// summary: Called back when the Flash subsystem is finished loading.
+		// description:
+		//	A callback when the Flash subsystem is finished loading and can be
+		//	worked with. To be notified when Flash is finished loading, add a
+		//  loaded listener: 
+		//
+		//  dojox.flash.addLoadedListener(loadedListener);
+	
+		dojox.flash.ready = true;
+		if(dojox.flash._loadedListeners.length > 0){
+			for(var i = 0;i < dojox.flash._loadedListeners.length; i++){
+				dojox.flash._loadedListeners[i].call(null);
+			}
+		}
+	},
+	
+	installing: function(){
+		// summary: Called if Flash is being installed.
+		// description:
+		//	A callback to know if Flash is currently being installed or
+		//	having its version revved. To be notified if Flash is installing, connect
+		//	your callback to this method using the following:
+		//	
+		//	dojo.event.connect(dojox.flash, "installing", myInstance, "myCallback");
+		
+		if(dojox.flash._installingListeners.length > 0){
+			for(var i = 0; i < dojox.flash._installingListeners.length; i++){
+				dojox.flash._installingListeners[i].call(null);
+			}
+		}
+	},
+	
+	// Initializes dojox.flash.
+	_initialize: function(){
+		//console.debug("dojox.flash._initialize");
+		// see if we need to rev or install Flash on this platform
+		var installer = new dojox.flash.Install();
+		dojox.flash.installer = installer;
+
+		if(installer.needed() == true){		
+			installer.install();
+		}else{
+			// write the flash object into the page
+			dojox.flash.obj = new dojox.flash.Embed(this._visible);
+			dojox.flash.obj.write();
+			
+			// setup the communicator
+			dojox.flash.comm = new dojox.flash.Communicator();
+		}
+	}
+};
+
+
+dojox.flash.Info = function(){
+	// summary: A class that helps us determine whether Flash is available.
+	// description:
+	//	A class that helps us determine whether Flash is available,
+	//	it's major and minor versions, and what Flash version features should
+	//	be used for Flash/JavaScript communication. Parts of this code
+	//	are adapted from the automatic Flash plugin detection code autogenerated 
+	//	by the Macromedia Flash 8 authoring environment. 
+	//	
+	//	An instance of this class can be accessed on dojox.flash.info after
+	//	the page is finished loading.
+	//	
+	//	This constructor must be called before the page is finished loading.	
+	
+	// Visual basic helper required to detect Flash Player ActiveX control 
+	// version information on Internet Explorer
+	if(dojo.isIE){
+		document.write([
+			'<script language="VBScript" type="text/vbscript"\>',
+			'Function VBGetSwfVer(i)',
+			'  on error resume next',
+			'  Dim swControl, swVersion',
+			'  swVersion = 0',
+			'  set swControl = CreateObject("ShockwaveFlash.ShockwaveFlash." + CStr(i))',
+			'  if (IsObject(swControl)) then',
+			'    swVersion = swControl.GetVariable("$version")',
+			'  end if',
+			'  VBGetSwfVer = swVersion',
+			'End Function',
+			'</script\>'].join("\r\n"));
+	}
+	
+	this._detectVersion();
+}
+
+dojox.flash.Info.prototype = {
+	// version: String
+	//		The full version string, such as "8r22".
+	version: -1,
+	
+	// versionMajor, versionMinor, versionRevision: String
+	//		The major, minor, and revisions of the plugin. For example, if the
+	//		plugin is 8r22, then the major version is 8, the minor version is 0,
+	//		and the revision is 22. 
+	versionMajor: -1,
+	versionMinor: -1,
+	versionRevision: -1,
+	
+	// capable: Boolean
+	//		Whether this platform has Flash already installed.
+	capable: false,
+	
+	// installing: Boolean
+	//	Set if we are in the middle of a Flash installation session.
+	installing: false,
+	
+	isVersionOrAbove: function(
+							/* int */ reqMajorVer, 
+							/* int */ reqMinorVer, 
+							/* int */ reqVer){ /* Boolean */
+		// summary: 
+		//	Asserts that this environment has the given major, minor, and revision
+		//	numbers for the Flash player.
+		// description:
+		//	Asserts that this environment has the given major, minor, and revision
+		//	numbers for the Flash player. 
+		//	
+		//	Example- To test for Flash Player 7r14:
+		//	
+		//	dojox.flash.info.isVersionOrAbove(7, 0, 14)
+		// returns:
+		//	Returns true if the player is equal
+		//	or above the given version, false otherwise.
+		
+		// make the revision a decimal (i.e. transform revision 14 into
+		// 0.14
+		reqVer = parseFloat("." + reqVer);
+		
+		if(this.versionMajor >= reqMajorVer && this.versionMinor >= reqMinorVer
+			 && this.versionRevision >= reqVer){
+			return true;
+		}else{
+			return false;
+		}
+	},
+	
+	_detectVersion: function(){
+		var versionStr;
+		
+		// loop backwards through the versions until we find the newest version	
+		for(var testVersion = 25; testVersion > 0; testVersion--){
+			if(dojo.isIE){
+				versionStr = VBGetSwfVer(testVersion);
+			}else{
+				versionStr = this._JSFlashInfo(testVersion);		
+			}
+				
+			if(versionStr == -1 ){
+				this.capable = false; 
+				return;
+			}else if(versionStr != 0){
+				var versionArray;
+				if(dojo.isIE){
+					var tempArray = versionStr.split(" ");
+					var tempString = tempArray[1];
+					versionArray = tempString.split(",");
+				}else{
+					versionArray = versionStr.split(".");
+				}
+					
+				this.versionMajor = versionArray[0];
+				this.versionMinor = versionArray[1];
+				this.versionRevision = versionArray[2];
+				
+				// 7.0r24 == 7.24
+				var versionString = this.versionMajor + "." + this.versionRevision;
+				this.version = parseFloat(versionString);
+				
+				this.capable = true;
+				
+				break;
+			}
+		}
+	},
+	 
+	// JavaScript helper required to detect Flash Player PlugIn version 
+	// information. Internet Explorer uses a corresponding Visual Basic
+	// version to interact with the Flash ActiveX control. 
+	_JSFlashInfo: function(testVersion){
+		// NS/Opera version >= 3 check for Flash plugin in plugin array
+		if(navigator.plugins != null && navigator.plugins.length > 0){
+			if(navigator.plugins["Shockwave Flash 2.0"] || 
+				 navigator.plugins["Shockwave Flash"]){
+				var swVer2 = navigator.plugins["Shockwave Flash 2.0"] ? " 2.0" : "";
+				var flashDescription = navigator.plugins["Shockwave Flash" + swVer2].description;
+				var descArray = flashDescription.split(" ");
+				var tempArrayMajor = descArray[2].split(".");
+				var versionMajor = tempArrayMajor[0];
+				var versionMinor = tempArrayMajor[1];
+				if(descArray[3] != ""){
+					var tempArrayMinor = descArray[3].split("r");
+				}else{
+					var tempArrayMinor = descArray[4].split("r");
+				}
+				var versionRevision = tempArrayMinor[1] > 0 ? tempArrayMinor[1] : 0;
+				var version = versionMajor + "." + versionMinor + "." 
+											+ versionRevision;
+											
+				return version;
+			}
+		}
+		
+		return -1;
+	}
+};
+
+dojox.flash.Embed = function(visible){
+	// summary: A class that is used to write out the Flash object into the page.
+	// description:
+	//	Writes out the necessary tags to embed a Flash file into the page. Note that
+	//	these tags are written out as the page is loaded using document.write, so
+	//	you must call this class before the page has finished loading.
+	
+	this._visible = visible;
+}
+
+dojox.flash.Embed.prototype = {
+	// width: int
+	//	The width of this Flash applet. The default is the minimal width
+	//	necessary to show the Flash settings dialog. Current value is 
+	//  215 pixels.
+	width: 215,
+	
+	// height: int 
+	//	The height of this Flash applet. The default is the minimal height
+	//	necessary to show the Flash settings dialog. Current value is
+	// 138 pixels.
+	height: 138,
+	
+	// id: String
+	// 	The id of the Flash object. Current value is 'flashObject'.
+	id: "flashObject",
+	
+	// Controls whether this is a visible Flash applet or not.
+	_visible: true,
+
+	protocol: function(){
+		switch(window.location.protocol){
+			case "https:":
+				return "https";
+				break;
+			default:
+				return "http";
+				break;
+		}
+	},
+	
+	write: function(/* Boolean? */ doExpressInstall){
+		// summary: Writes the Flash into the page.
+		// description:
+		//	This must be called before the page
+		//	is finished loading. 
+		// doExpressInstall: Boolean
+		//	Whether to write out Express Install
+		//	information. Optional value; defaults to false.
+		
+		// determine our container div's styling
+		var containerStyle = "";
+		containerStyle += ("width: " + this.width + "px; ");
+		containerStyle += ("height: " + this.height + "px; ");
+		if(!this._visible){
+			containerStyle += "position: absolute; z-index: 10000; top: -1000px; left: -1000px; ";
+		}
+		
+		// figure out the SWF file to get and how to write out the correct HTML
+		// for this Flash version
+		var objectHTML;
+		var swfloc = dojox.flash.url;
+		var swflocObject = swfloc;
+		var swflocEmbed = swfloc;
+		var dojoUrl = dojo.baseUrl;
+		if(doExpressInstall){
+			// the location to redirect to after installing
+			var redirectURL = escape(window.location);
+			document.title = document.title.slice(0, 47) + " - Flash Player Installation";
+			var docTitle = escape(document.title);
+			swflocObject += "?MMredirectURL=" + redirectURL
+			                + "&MMplayerType=ActiveX"
+			                + "&MMdoctitle=" + docTitle
+							+ "&baseUrl=" + escape(dojoUrl);
+			swflocEmbed += "?MMredirectURL=" + redirectURL 
+							+ "&MMplayerType=PlugIn"
+							+ "&baseUrl=" + escape(dojoUrl);
+		}else{
+		  // IE/Flash has an evil bug that shows up some time: if we load the
+		  // Flash and it isn't in the cache, ExternalInterface works fine --
+		  // however, the second time when its loaded from the cache a timing
+		  // bug can keep ExternalInterface from working. The trick below 
+		  // simply invalidates the Flash object in the cache all the time to
+		  // keep it loading fresh. -- Brad Neuberg
+		  swflocObject += "?cachebust=" + new Date().getTime();
+		}
+
+		if(swflocEmbed.indexOf("?") == -1){
+			swflocEmbed +=  '?baseUrl='+escape(dojoUrl);
+		}else{
+		  swflocEmbed +=  '&baseUrl='+escape(dojoUrl);
+		}
+
+		objectHTML =
+			'<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" '
+			  + 'codebase="'
+				+ this.protocol()
+				+ '://fpdownload.macromedia.com/pub/shockwave/cabs/flash/'
+				+ 'swflash.cab#version=8,0,0,0"\n '
+			  + 'width="' + this.width + '"\n '
+			  + 'height="' + this.height + '"\n '
+			  + 'id="' + this.id + '"\n '
+			  + 'name="' + this.id + '"\n '
+			  + 'align="middle">\n '
+			  + '<param name="allowScriptAccess" value="sameDomain"></param>\n '
+			  + '<param name="movie" value="' + swflocObject + '"></param>\n '
+			  + '<param name="quality" value="high"></param>\n '
+			  + '<param name="bgcolor" value="#ffffff"></param>\n '
+			  + '<embed src="' + swflocEmbed + '" '
+			  	  + 'quality="high" '
+				  + 'bgcolor="#ffffff" '
+				  + 'width="' + this.width + '" '
+				  + 'height="' + this.height + '" '
+				  + 'id="' + this.id + 'Embed' + '" '
+				  + 'name="' + this.id + '" '
+				  + 'swLiveConnect="true" '
+				  + 'align="middle" '
+				  + 'allowScriptAccess="sameDomain" '
+				  + 'type="application/x-shockwave-flash" '
+				  + 'pluginspage="'
+				  + this.protocol()
+				  +'://www.macromedia.com/go/getflashplayer" '
+				  + '></embed>\n'
+			+ '</object>\n';
+					
+		// using same mechanism on all browsers now to write out
+		// Flash object into page
+
+		// document.write no longer works correctly
+		// due to Eolas patent workaround in IE;
+		// nothing happens (i.e. object doesn't
+		// go into page if we use it)
+		dojo.connect(dojo, "loaded", dojo.hitch(this, function(){
+			var div = document.createElement("div");
+			div.setAttribute("id", this.id + "Container");
+			div.setAttribute("style", containerStyle);
+			div.innerHTML = objectHTML;
+	
+			var body = document.getElementsByTagName("body");
+			if(!body || !body.length){
+				throw new Error("No body tag for this page");
+			}
+			body = body[0];
+			body.appendChild(div);
+		}));
+	},  
+	
+	get: function(){ /* Object */
+		// summary: Gets the Flash object DOM node.
+		if(dojo.isIE || dojo.isSafari){
+			return document.getElementById(this.id);
+		}else{
+			// different IDs on OBJECT and EMBED tags or
+			// else Firefox will return wrong one and
+			// communication won't work; 
+			// also, document.getElementById() returns a
+			// plugin but ExternalInterface calls don't
+			// work on it so we have to use
+			// document[id] instead
+			return document[this.id + "Embed"];
+		}
+	},
+	
+	setVisible: function(/* Boolean */ visible){
+	  //console.debug("setVisible, visible="+visible);
+		
+		// summary: Sets the visibility of this Flash object.		
+		var container = dojo.byId(this.id + "Container");
+		if(visible == true){
+		  container.style.position = "absolute"; // IE -- Brad Neuberg
+			container.style.visibility = "visible";
+		}else{
+			container.style.position = "absolute";
+			container.style.x = "-1000px";
+			container.style.y = "-1000px";
+			container.style.visibility = "hidden";
+		}
+	},
+	
+	center: function(){
+		// summary: Centers the flash applet on the page.
+		
+		var elementWidth = this.width;
+		var elementHeight = this.height;
+
+		var viewport = dijit.getViewport();
+
+		// compute the centered position    
+		var x = viewport.l + (viewport.w - elementWidth) / 2;
+		var y = viewport.t + (viewport.h - elementHeight) / 2; 
+		
+		// set the centered position
+		var container = dojo.byId(this.id + "Container");
+		container.style.top = y + "px";
+		container.style.left = x + "px";
+	}
+};
+
+
+dojox.flash.Communicator = function(){
+	// summary:
+	//	A class that is used to communicate between Flash and JavaScript.
+	// description:
+	//	This class helps mediate Flash and JavaScript communication. Internally
+	//	it uses Flash 8's ExternalInterface API, but adds functionality to fix 
+	//	various encoding bugs that ExternalInterface has.
+}
+
+dojox.flash.Communicator.prototype = {
+	// Registers the existence of a Flash method that we can call with
+	// JavaScript, using Flash 8's ExternalInterface. 
+	_addExternalInterfaceCallback: function(methodName){
+		var wrapperCall = dojo.hitch(this, function(){
+			// some browsers don't like us changing values in the 'arguments' array, so
+			// make a fresh copy of it
+			var methodArgs = new Array(arguments.length);
+			for(var i = 0; i < arguments.length; i++){
+				methodArgs[i] = this._encodeData(arguments[i]);
+			}
+			
+			var results = this._execFlash(methodName, methodArgs);
+			results = this._decodeData(results);
+			
+			return results;
+		});
+		
+		this[methodName] = wrapperCall;
+	},
+	
+	// Encodes our data to get around ExternalInterface bugs that are still
+	// present even in Flash 9.
+	_encodeData: function(data){
+		if(!data || typeof data != "string"){
+			return data;
+		}
+		
+		// double encode all entity values, or they will be mis-decoded
+		// by Flash when returned
+		var entityRE = /\&([^;]*)\;/g;
+		data = data.replace(entityRE, "&amp;$1;");
+
+		// entity encode XML-ish characters, or Flash's broken XML serializer
+		// breaks
+		data = data.replace(/</g, "&lt;");
+		data = data.replace(/>/g, "&gt;");
+
+		// transforming \ into \\ doesn't work; just use a custom encoding
+		data = data.replace("\\", "&custom_backslash;");
+
+		data = data.replace(/\0/g, "\\0"); // null character
+		data = data.replace(/\"/g, "&quot;");
+
+		return data;
+	},
+	
+	// Decodes our data to get around ExternalInterface bugs that are still
+	// present even in Flash 9.
+	_decodeData: function(data){
+		// wierdly enough, Flash sometimes returns the result as an
+		// 'object' that is actually an array, rather than as a String;
+		// detect this by looking for a length property; for IE
+		// we also make sure that we aren't dealing with a typeof string
+		// since string objects have length property there
+		if(data && data.length && typeof data != "string"){
+			data = data[0];
+		}
+		
+		if(!data || typeof data != "string"){
+			return data;
+		}
+	
+		// certain XMLish characters break Flash's wire serialization for
+		// ExternalInterface; these are encoded on the 
+		// DojoExternalInterface side into a custom encoding, rather than
+		// the standard entity encoding, because otherwise we won't be able to
+		// differentiate between our own encoding and any entity characters
+		// that are being used in the string itself
+		data = data.replace(/\&custom_lt\;/g, "<");
+		data = data.replace(/\&custom_gt\;/g, ">");
+		data = data.replace(/\&custom_backslash\;/g, '\\');
+		
+		// needed for IE; \0 is the NULL character
+		data = data.replace(/\\0/g, "\0");
+		
+		return data;
+	},
+	
+	// Executes a Flash method; called from the JavaScript wrapper proxy we
+	// create on dojox.flash.comm.
+	_execFlash: function(methodName, methodArgs){
+		var plugin = dojox.flash.obj.get();
+		methodArgs = (methodArgs) ? methodArgs : [];
+		
+		// encode arguments that are strings
+		for(var i = 0; i < methodArgs; i++){
+			if(typeof methodArgs[i] == "string"){
+				methodArgs[i] = this._encodeData(methodArgs[i]);
+			}
+		}
+
+		// we use this gnarly hack below instead of 
+		// plugin[methodName] for two reasons:
+		// 1) plugin[methodName] has no call() method, which
+		// means we can't pass in multiple arguments dynamically
+		// to a Flash method -- we can only have one
+		// 2) On IE plugin[methodName] returns undefined -- 
+		// plugin[methodName] used to work on IE when we
+		// used document.write but doesn't now that
+		// we use dynamic DOM insertion of the Flash object
+		// -- Brad Neuberg
+		var flashExec = function(){ 
+			return eval(plugin.CallFunction(
+						 "<invoke name=\"" + methodName
+						+ "\" returntype=\"javascript\">" 
+						+ __flash__argumentsToXML(methodArgs, 0) 
+						+ "</invoke>")); 
+		};
+		var results = flashExec.call(methodArgs);
+		
+		if(typeof results == "string"){
+			results = this._decodeData(results);
+		}
+			
+		return results;
+	}
+}
+
+// FIXME: dojo.declare()-ify this
+
+// TODO: I did not test the Install code when I refactored Dojo Flash from 0.4 to 
+// 1.0, so am not sure if it works. If Flash is not present I now prefer 
+// that Gears is installed instead of Flash because GearsStorageProvider is
+// much easier to work with than Flash's hacky ExternalInteface. 
+// -- Brad Neuberg
+dojox.flash.Install = function(){
+	// summary: Helps install Flash plugin if needed.
+	// description:
+	//		Figures out the best way to automatically install the Flash plugin
+	//		for this browser and platform. Also determines if installation or
+	//		revving of the current plugin is needed on this platform.
+}
+
+dojox.flash.Install.prototype = {
+	needed: function(){ /* Boolean */
+		// summary:
+		//		Determines if installation or revving of the current plugin is
+		//		needed. 
+	
+		// do we even have flash?
+		if(dojox.flash.info.capable == false){
+			return true;
+		}
+
+		// Must have ExternalInterface which came in Flash 8
+		if(!dojox.flash.info.isVersionOrAbove(8, 0, 0)){
+			return true;
+		}
+
+		// otherwise we don't need installation
+		return false;
+	},
+
+	install: function(){
+		// summary: Performs installation or revving of the Flash plugin.
+	
+		// indicate that we are installing
+		dojox.flash.info.installing = true;
+		dojox.flash.installing();
+		
+		if(dojox.flash.info.capable == false){ // we have no Flash at all
+			// write out a simple Flash object to force the browser to prompt
+			// the user to install things
+			var installObj = new dojox.flash.Embed(false);
+			installObj.write(); // write out HTML for Flash
+		}else if(dojox.flash.info.isVersionOrAbove(6, 0, 65)){ // Express Install
+			var installObj = new dojox.flash.Embed(false);
+			installObj.write(true); // write out HTML for Flash 8 version+
+			installObj.setVisible(true);
+			installObj.center();
+		}else{ // older Flash install than version 6r65
+			alert("This content requires a more recent version of the Macromedia "
+						+" Flash Player.");
+			window.location.href = + dojox.flash.Embed.protocol() +
+						"://www.macromedia.com/go/getflashplayer";
+		}
+	},
+	
+	// Called when the Express Install is either finished, failed, or was
+	// rejected by the user.
+	_onInstallStatus: function(msg){
+		if (msg == "Download.Complete"){
+			// Installation is complete.
+			dojox.flash._initialize();
+		}else if(msg == "Download.Cancelled"){
+			alert("This content requires a more recent version of the Macromedia "
+						+" Flash Player.");
+			window.location.href = dojox.flash.Embed.protocol() +
+						"://www.macromedia.com/go/getflashplayer";
+		}else if (msg == "Download.Failed"){
+			// The end user failed to download the installer due to a network failure
+			alert("There was an error downloading the Flash Player update. "
+						+ "Please try again later, or visit macromedia.com to download "
+						+ "the latest version of the Flash plugin.");
+		}	
+	}
+}
+
+// find out if Flash is installed
+dojox.flash.info = new dojox.flash.Info();
+
+// vim:ts=4:noet:tw=0:
+
+}
+
+if(!dojo._hasResource["dojox.flash"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource["dojox.flash"] = true;
+dojo.provide("dojox.flash");
+
+
+}
+
+if(!dojo._hasResource["dojox.storage.FlashStorageProvider"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource["dojox.storage.FlashStorageProvider"] = true;
+dojo.provide("dojox.storage.FlashStorageProvider");
+
+
+
+
+
+// summary: 
+//		Storage provider that uses features in Flash to achieve permanent
+//		storage
+// description:
+//		Authors of this storage provider-
+//			Brad Neuberg, bkn3@columbia.edu	
+dojo.declare("dojox.storage.FlashStorageProvider", dojox.storage.Provider, {
+		initialized: false,
+		
+		_available: null,
+		_statusHandler: null,
+		_flashReady: false,
+		_pageReady: false,
+		
+		initialize: function(){
+		  //console.debug("FlashStorageProvider.initialize");
+			if(dojo.config["disableFlashStorage"] == true){
+				return;
+			}
+			
+			// initialize our Flash
+			dojox.flash.addLoadedListener(dojo.hitch(this, function(){
+			  //console.debug("flashReady");
+			  // indicate our Flash subsystem is now loaded
+			  this._flashReady = true;
+			  if(this._flashReady && this._pageReady){
+				  this._loaded();
+				}
+			}));
+			var swfLoc = dojo.moduleUrl("dojox", "storage/Storage.swf").toString();
+			dojox.flash.setSwf(swfLoc, false);
+			
+			// wait till page is finished loading
+			dojo.connect(dojo, "loaded", this, function(){
+			  //console.debug("pageReady");
+			  this._pageReady = true;
+			  if(this._flashReady && this._pageReady){
+			    this._loaded();
+			  }
+			});
+		},
+		
+		//	Set a new value for the flush delay timer.
+		//	Possible values:
+		//	  0 : Perform the flush synchronously after each "put" request
+		//	> 0 : Wait until 'newDelay' ms have passed without any "put" request to flush
+		//	 -1 : Do not  automatically flush
+		setFlushDelay: function(newDelay){
+			if(newDelay === null || typeof newDelay === "undefined" || isNaN(newDelay)){
+				throw new Error("Invalid argunment: " + newDelay);
+			}
+			
+			dojox.flash.comm.setFlushDelay(String(newDelay));
+		},
+		
+		getFlushDelay: function(){
+			return Number(dojox.flash.comm.getFlushDelay());
+		},
+		
+		flush: function(namespace){
+			//FIXME: is this test necessary?  Just use !namespace
+			if(namespace == null || typeof namespace == "undefined"){
+				namespace = dojox.storage.DEFAULT_NAMESPACE;		
+			}
+			dojox.flash.comm.flush(namespace);
+		},
+
+		isAvailable: function(){
+			return (this._available = !dojo.config["disableFlashStorage"]);
+		},
+
+		put: function(key, value, resultsHandler, namespace){
+			if(!this.isValidKey(key)){
+				throw new Error("Invalid key given: " + key);
+			}
+			
+			if(!namespace){
+				namespace = dojox.storage.DEFAULT_NAMESPACE;		
+			}
+			
+			if(!this.isValidKey(namespace)){
+				throw new Error("Invalid namespace given: " + namespace);
+			}
+				
+			this._statusHandler = resultsHandler;
+			
+			// serialize the value;
+			// handle strings differently so they have better performance
+			if(dojo.isString(value)){
+				value = "string:" + value;
+			}else{
+				value = dojo.toJson(value);
+			}
+			
+			dojox.flash.comm.put(key, value, namespace);
+		},
+
+		putMultiple: function(keys, values, resultsHandler, namespace){
+			if(!this.isValidKeyArray(keys) || ! values instanceof Array 
+			    || keys.length != values.length){
+				throw new Error("Invalid arguments: keys = [" + keys + "], values = [" + values + "]");
+			}
+			
+			if(!namespace){
+				namespace = dojox.storage.DEFAULT_NAMESPACE;		
+			}
+
+			if(!this.isValidKey(namespace)){
+				throw new Error("Invalid namespace given: " + namespace);
+			}
+
+			this._statusHandler = resultsHandler;
+			
+			//	Convert the arguments on strings we can pass along to Flash
+			var metaKey = keys.join(",");
+			var lengths = [];
+			for(var i=0;i<values.length;i++){
+				if(dojo.isString(values[i])){
+					values[i] = "string:" + values[i];
+				}else{
+					values[i] = dojo.toJson(values[i]);
+				}
+				lengths[i] = values[i].length; 
+			}
+			var metaValue = values.join("");
+			var metaLengths = lengths.join(",");
+			
+			dojox.flash.comm.putMultiple(metaKey, metaValue, metaLengths, this.namespace);
+		},
+
+		get: function(key, namespace){
+			if(!this.isValidKey(key)){
+				throw new Error("Invalid key given: " + key);
+			}
+			
+			if(!namespace){
+				namespace = dojox.storage.DEFAULT_NAMESPACE;		
+			}
+			
+			if(!this.isValidKey(namespace)){
+				throw new Error("Invalid namespace given: " + namespace);
+			}
+			
+			var results = dojox.flash.comm.get(key, namespace);
+
+			if(results == ""){
+				return null;
+			}
+		
+			return this._destringify(results);
+		},
+
+		getMultiple: function(/*array*/ keys, /*string?*/ namespace){ /*Object*/
+			if(!this.isValidKeyArray(keys)){
+				throw new ("Invalid key array given: " + keys);
+			}
+			
+			if(!namespace){
+				namespace = dojox.storage.DEFAULT_NAMESPACE;		
+			}
+			
+			if(!this.isValidKey(namespace)){
+				throw new Error("Invalid namespace given: " + namespace);
+			}
+			
+			var metaKey = keys.join(",");
+			var metaResults = dojox.flash.comm.getMultiple(metaKey, this.namespace);
+			var results = eval("(" + metaResults + ")");
+			
+			//	destringify each entry back into a real JS object
+			//FIXME: use dojo.map
+			for(var i = 0; i < results.length; i++){
+				results[i] = (results[i] == "") ? null : this._destringify(results[i]);
+			}
+			
+			return results;		
+		},
+
+		_destringify: function(results){
+			// destringify the content back into a 
+			// real JavaScript object;
+			// handle strings differently so they have better performance
+			if(dojo.isString(results) && (/^string:/.test(results))){
+				results = results.substring("string:".length);
+			}else{
+				results = dojo.fromJson(results);
+			}
+		
+			return results;
+		},
+		
+		getKeys: function(namespace){
+			if(!namespace){
+				namespace = dojox.storage.DEFAULT_NAMESPACE;		
+			}
+			
+			if(!this.isValidKey(namespace)){
+				throw new Error("Invalid namespace given: " + namespace);
+			}
+			
+			var results = dojox.flash.comm.getKeys(namespace);
+			
+			// Flash incorrectly returns an empty string as "null"
+			if(results == null || results == "null"){
+			  results = "";
+			}
+			
+			results = results.split(",");
+			results.sort();
+			
+			return results;
+		},
+		
+		getNamespaces: function(){
+			var results = dojox.flash.comm.getNamespaces();
+			
+			// Flash incorrectly returns an empty string as "null"
+			if(results == null || results == "null"){
+			  results = dojox.storage.DEFAULT_NAMESPACE;
+			}
+			
+			results = results.split(",");
+			results.sort();
+			
+			return results;
+		},
+
+		clear: function(namespace){
+			if(!namespace){
+				namespace = dojox.storage.DEFAULT_NAMESPACE;
+			}
+			
+			if(!this.isValidKey(namespace)){
+				throw new Error("Invalid namespace given: " + namespace);
+			}
+			
+			dojox.flash.comm.clear(namespace);
+		},
+		
+		remove: function(key, namespace){
+			if(!namespace){
+				namespace = dojox.storage.DEFAULT_NAMESPACE;		
+			}
+			
+			if(!this.isValidKey(namespace)){
+				throw new Error("Invalid namespace given: " + namespace);
+			}
+			
+			dojox.flash.comm.remove(key, namespace);
+		},
+		
+		removeMultiple: function(/*array*/ keys, /*string?*/ namespace){ /*Object*/
+			if(!this.isValidKeyArray(keys)){
+				dojo.raise("Invalid key array given: " + keys);
+			}
+			if(!namespace){
+				namespace = dojox.storage.DEFAULT_NAMESPACE;		
+			}
+			
+			if(!this.isValidKey(namespace)){
+				throw new Error("Invalid namespace given: " + namespace);
+			}
+			
+			var metaKey = keys.join(",");
+			dojox.flash.comm.removeMultiple(metaKey, this.namespace);
+		},
+
+		isPermanent: function(){
+			return true;
+		},
+
+		getMaximumSize: function(){
+			return dojox.storage.SIZE_NO_LIMIT;
+		},
+
+		hasSettingsUI: function(){
+			return true;
+		},
+
+		showSettingsUI: function(){
+			dojox.flash.comm.showSettings();
+			dojox.flash.obj.setVisible(true);
+			dojox.flash.obj.center();
+		},
+
+		hideSettingsUI: function(){
+			// hide the dialog
+			dojox.flash.obj.setVisible(false);
+			
+			// call anyone who wants to know the dialog is
+			// now hidden
+			if(dojo.isFunction(dojox.storage.onHideSettingsUI)){
+				dojox.storage.onHideSettingsUI.call(null);	
+			}
+		},
+		
+		getResourceList: function(){ /* Array[] */
+			// Dojo Offline no longer uses the FlashStorageProvider for offline
+			// storage; Gears is now required
+			return [];
+		},
+		
+		/** Called when Flash and the page are finished loading. */
+		_loaded: function(){
+			// get available namespaces
+			this._allNamespaces = this.getNamespaces();
+			
+			this.initialized = true;
+
+			// indicate that this storage provider is now loaded
+			dojox.storage.manager.loaded();
+		},
+		
+		//	Called if the storage system needs to tell us about the status
+		//	of a put() request. 
+		_onStatus: function(statusResult, key, namespace){
+		  //console.debug("onStatus, statusResult="+statusResult+", key="+key);
+			var ds = dojox.storage;
+			var dfo = dojox.flash.obj;
+			
+			if(statusResult == ds.PENDING){
+				dfo.center();
+				dfo.setVisible(true);
+			}else{
+				dfo.setVisible(false);
+			}
+			
+			if(ds._statusHandler){
+				ds._statusHandler.call(null, statusResult, key, namespace);		
+			}
+		}
+	}
+);
+
+dojox.storage.manager.register("dojox.storage.FlashStorageProvider",
+								new dojox.storage.FlashStorageProvider());
 
 }
 
@@ -1912,12 +3538,14 @@ dojo.provide("dojox.storage._common");
 
 
 
+/*
+  Note: if you are doing Dojo Offline builds you _must_
+  have offlineProfile=true when you run the build script:
+  ./build.sh action=release profile=offline offlineProfile=true
+*/
 
 
-// FIXME: Find way to set isGears from offline.profile.js file; it didn't
-// work for me
-//dojo.requireIf(!dojo.isGears, "dojox.storage.FlashStorageProvider");
-//dojo.requireIf(!dojo.isGears, "dojox.storage.WhatWGStorageProvider");
+
 
 // now that we are loaded and registered tell the storage manager to
 // initialize itself
@@ -2306,6 +3934,11 @@ dojox.off.files = {
 		
 		var storeName = "dot_store_" 
 							+ window.location.href.replace(/[^0-9A-Za-z_]/g, "_");
+							
+		// clip at 64 characters, the max length of a resource store name
+		if(storeName.length >= 64){
+		  storeName = storeName.substring(0, 63);
+		}
 			
 		// refresh everything by simply removing
 		// any older stores

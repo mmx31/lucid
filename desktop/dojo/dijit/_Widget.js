@@ -2,7 +2,7 @@ if(!dojo._hasResource["dijit._Widget"]){ //_hasResource checks added by build. D
 dojo._hasResource["dijit._Widget"] = true;
 dojo.provide("dijit._Widget");
 
-dojo.require("dijit._base");
+dojo.require( "dijit._base" );
 
 dojo.declare("dijit._Widget", null, {
 	//	summary:
@@ -15,25 +15,30 @@ dojo.declare("dijit._Widget", null, {
 	//		used instead.
 	id: "",
 
-	// lang: String
-	//	Language to display this widget in (like en-us).
-	//	Defaults to brower's specified preferred language (typically the language of the OS)
+	//	lang: String
+	//		Rarely used.  Overrides the default Dojo locale used to render this widget,
+	//		as defined by the [HTML LANG](http://www.w3.org/TR/html401/struct/dirlang.html#adef-lang) attribute.
+	//		Value must be among the list of locales specified during by the Dojo bootstrap,
+	//		formatted according to [RFC 3066](http://www.ietf.org/rfc/rfc3066.txt) (like en-us).
 	lang: "",
 
-	// dir: String
-	//  Bi-directional support, as defined by the HTML DIR attribute. Either left-to-right "ltr" or right-to-left "rtl".
+	//	dir: String
+	//		Unsupported by Dijit, but here for completeness.  Dijit only supports setting text direction on the
+	//		entire document.
+	//		Bi-directional support, as defined by the [HTML DIR](http://www.w3.org/TR/html401/struct/dirlang.html#adef-dir)
+	//		attribute. Either left-to-right "ltr" or right-to-left "rtl".
 	dir: "",
 
 	// class: String
-	// HTML class attribute
+	//		HTML class attribute
 	"class": "",
 
 	// style: String
-	// HTML style attribute
+	//		HTML style attribute
 	style: "",
 
 	// title: String
-	// HTML title attribute
+	//		HTML title attribute
 	title: "",
 
 	// srcNodeRef: DomNode
@@ -54,13 +59,16 @@ dojo.declare("dijit._Widget", null, {
 	attributeMap: {id:"", dir:"", lang:"", "class":"", style:"", title:""},  // TODO: add on* handlers?
 
 	//////////// INITIALIZATION METHODS ///////////////////////////////////////
-
-	postscript: function(params, srcNodeRef){
+//TODOC: params and srcNodeRef need docs.  Is srcNodeRef optional?
+//TODOC: summary needed for postscript
+	postscript: function(/*Object?*/params, /*DomNode|String*/srcNodeRef){
 		this.create(params, srcNodeRef);
 	},
 
-	create: function(params, srcNodeRef){
-		// summary:
+	create: function(/*Object?*/params, /*DomNode|String*/srcNodeRef){
+		//	summary:
+		//		Kick off the life-cycle of a widget
+		//	description:
 		//		To understand the process by which widgets are instantiated, it
 		//		is critical to understand what other methods create calls and
 		//		which of them you'll want to override. Of course, adventurous
@@ -70,19 +78,19 @@ dojo.declare("dijit._Widget", null, {
 		//		Below is a list of the methods that are called, in the order
 		//		they are fired, along with notes about what they do and if/when
 		//		you should over-ride them in your widget:
-		//			
-		//		|	* postMixInProperties
-		//		|		a stub function that you can over-ride to modify
-		//		|		variables that may have been naively assigned by
-		//		|		mixInProperties
-		//		|	# widget is added to manager object here
-		//		|	* buildRendering
-		//		|		Subclasses use this method to handle all UI initialization
-		//		|		Sets this.domNode.  Templated widgets do this automatically
-		//		|		and otherwise it just uses the source dom node.
-		//		|	* postCreate
-		//		|		a stub function that you can over-ride to modify take
-		//		|		actions once the widget has been placed in the UI
+		//
+		// * postMixInProperties:
+		//	|	* a stub function that you can over-ride to modify
+		//		variables that may have been naively assigned by
+		//		mixInProperties
+		// * widget is added to manager object here
+		// * buildRendering:
+		//	|	* Subclasses use this method to handle all UI initialization
+		//		Sets this.domNode.  Templated widgets do this automatically
+		//		and otherwise it just uses the source dom node.
+		// * postCreate:
+		//	|	* a stub function that you can over-ride to modify take
+		//		actions once the widget has been placed in the UI
 
 		// store pointer to original dom tree
 		this.srcNodeRef = dojo.byId(srcNodeRef);
@@ -316,14 +324,14 @@ dojo.declare("dijit._Widget", null, {
 		}
 	},
 
-	nodesWithKeyClick : ["input", "button"],
+//TODOC
+	nodesWithKeyClick: ["input", "button"],
 
 	connect: function(
 			/*Object|null*/ obj,
 			/*String*/ event,
 			/*String|Function*/ method){
-
-		// summary:
+		//	summary:
 		//		Connects specified obj/event to specified method of this object
 		//		and registers for disconnect() on widget destroy.
 		//		Special event: "ondijitclick" triggers on a click or enter-down or space-up

@@ -15,13 +15,23 @@
 	height:14px;
 }
 .soria .dojoxExpandoIcon {
-	background:url('../../../dijit/themes/soria/images/spriteRoundedIconsSmall.png') no-repeat center center;
+	background: url('../../../dijit/themes/soria/images/spriteRoundedIconsSmall.png') no-repeat center center;
 }
-.nihilo .dojoxExpandoIcon {
-	background:url('../../../dijit/themes/nihilo/images/spriteRoundedIconsSmall.gif') no-repeat center center;
+.tundra .dojoxExpandoLeft .dojoxExpandoIcon,
+.nihilo .dojoxExpandoLeft .dojoxExpandoIcon {
+	
+	background: url('../../../dijit/themes/tundra/images/minusButton.gif') no-repeat;
+}
+.tundra .dojoxExpandoRight .dojoxExpandoIcon,
+.nihilo .dojoxExpandoRight .dojoxExpandoIcon {
+	
+	background: url('../../../dijit/themes/tundra/images/minusButton.gif') no-repeat;
+}
+.tundra .dojoxExpandoClosed .dojoxExpandoIcon {
+	background: url('../../../dijit/themes/tundra/images/plusButton.gif') no-repeat;
 }
 .dojoxExpandoClosed .dojoxExpandoIcon {
-	background-position:0px 0px;
+	background-position: 0px 0px;
 }
 .dojoxExpandoClosed .dojoxExpandoTitleNode {
 	visibility:hidden;
@@ -30,7 +40,7 @@
 	padding-right:6px; padding-left:6px;
 }
 .dojoxExpandoClosed .dijitContentPane {
-	overflow:hidden;
+	overflow: hidden;
 }
 .dojoxExpandoIcon .a11yNode {
 	display:none;
@@ -70,4 +80,20 @@
 	padding-top:7px;
 	padding-bottom:7px;
 	background:#f0f4fc url("../../../dijit/themes/soria/images/tabStripe.gif") repeat-x left bottom; 
+}
+.tundra .dojoxExpandoTitle {
+	font-size: 0.9em;
+	font-weight: bold;
+	padding: 3px;
+	padding-top: 7px;
+	padding-bottom: 7px;
+	background: #fafafa url("../../../dijit/themes/tundra/images/accordionItemActive.gif") repeat-x scroll left bottom;
+}
+.tundra .dojoxExpandoClosed {
+	
+	background-color: #fafafa;
+}
+.tundra .dojoxExpandoClosed .dojoxExpandoTitle {
+	background-image: none;
+	background-color: transparent;
 }

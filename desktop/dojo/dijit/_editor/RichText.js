@@ -259,6 +259,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			var tmpFunc = dojo.hitch(this, function(){
 				//some browsers refuse to submit display=none textarea, so
 				//move the textarea out of screen instead
+				dojo.attr(this.textarea, 'tabIndex', '-1');
 				with(this.textarea.style){
 					display = "block";
 					position = "absolute";
@@ -296,8 +297,6 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		this._oldHeight = content.h;
 		this._oldWidth = content.w;
 
-		this.savedContent = html;
-
 		// If we're a list item we have to put in a blank line to force the
 		// bullet to nicely align at the top of text
 		if(	(this.domNode["nodeName"]) &&
@@ -332,39 +331,57 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		// so for now IE is our only hero
 		//if(typeof dojo.doc.body.contentEditable != "undefined"){
 		if(dojo.isIE || dojo.isSafari || dojo.isOpera){ // contentEditable, easy
-			var ifr = this.iframe = dojo.doc.createElement('iframe');
-			ifr.id=this.id;
-			ifr.src = 'javascript:void(0)';
-			this.editorObject = ifr;
+			var burl = dojo.moduleUrl("dojo", "resources/blank.html")+"";
+			var ifr = this.editorObject = this.iframe = dojo.doc.createElement('iframe');
+			ifr.id = this.id+"_iframe";
+			ifr.src = burl;
 			ifr.style.border = "none";
 			ifr.style.width = "100%";
 			ifr.frameBorder = 0;
-//			ifr.style.scrolling = this.height ? "auto" : "vertical";
+			// ifr.style.scrolling = this.height ? "auto" : "vertical";
 			this.editingArea.appendChild(ifr);
-			this.window = ifr.contentWindow;
-			this.document = this.window.document;
-			this.document.open();
-			this.document.write(this._getIframeDocTxt(html));
-			this.document.close();
+			var h = null; // set later in non-ie6 branch
+			var loadFunc = dojo.hitch( this, function(){
+				if(h){ dojo.disconnect(h); h = null; }
+				this.window = ifr.contentWindow;
+				var d = this.document = this.window.document;
+				d.open();
+				d.write(this._getIframeDocTxt(html));
+				d.close();
 
-			if(dojo.isIE >= 7){
-				if(this.height){
-					ifr.style.height = this.height;
+				if(dojo.isIE >= 7){
+					if(this.height){
+						ifr.style.height = this.height;
+					}
+					if(this.minHeight){
+						ifr.style.minHeight = this.minHeight;
+					}
+				}else{
+					ifr.style.height = this.height ? this.height : this.minHeight;
 				}
-				if(this.minHeight){
-					ifr.style.minHeight = this.minHeight;
+
+				if(dojo.isIE){
+					this._localizeEditorCommands();
 				}
-			}else{
-				ifr.style.height = this.height ? this.height : this.minHeight;
-			}
 
-			if(dojo.isIE){
-				this._localizeEditorCommands();
+				this.onLoad();
+				this.savedContent = this.getValue(true);
+			});
+			if(dojo.isIE && dojo.isIE < 7){ // IE 6 is a steaming pile...
+				var t = setInterval(function(){
+					if(ifr.contentWindow.isLoaded){
+						clearInterval(t);
+						loadFunc();
+					}
+				}, 100);
+			}else{ // blissful sanity!
+				h = dojo.connect(
+					((dojo.isIE) ? ifr.contentWindow : ifr), "onload", loadFunc
+				);
 			}
-
-			this.onLoad();
 		}else{ // designMode in iframe
 			this._drawIframe(html);
+			this.savedContent = this.getValue(true);
 		}
 
 		// TODO: this is a guess at the default line-height, kinda works
@@ -401,22 +418,23 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			"<style>",
 			"body,html {",
 			"	background:transparent;",
-			"	padding: 0;",
-			"	margin: 0;",
+			"	font:", font, ";",
+			"	padding: 1em 0 0 0;",
+			"	margin: -1em 0 0 0;", // remove extraneous vertical scrollbar on safari and firefox
+			"	height: 100%;",
 			"}",
 			// TODO: left positioning will cause contents to disappear out of view
 			//	   if it gets too wide for the visible area
 			"body{",
 			"	top:0px; left:0px; right:0px;",
 				((this.height||dojo.isOpera) ? "" : "position: fixed;"),
-			"	font:", font, ";",
 			// FIXME: IE 6 won't understand min-height?
 			"	min-height:", this.minHeight, ";",
 			"	line-height:", lineHeight,
 			"}",
 			"p{ margin: 1em 0 !important; }",
-			(this.height ?
-				"" : "body,html{overflow-y:hidden;/*for IE*/} body > div {overflow-x:auto;/*for FF to show vertical scrollbar*/}"
+			(this.height ? // height:auto undoes the height:100%
+				"" : "body,html{height:auto;overflow-y:hidden;/*for IE*/} body > div {overflow-x:auto;/*for FF to show vertical scrollbar*/}"
 			),
 			"li > ul:-moz-first-node, li > ol:-moz-first-node{ padding-top: 1.2em; } ",
 			"li{ min-height:1.2em; }",
@@ -613,7 +631,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 	setDisabled: function(/*Boolean*/ disabled){
 		if(dojo.isIE || dojo.isSafari || dojo.isOpera){
 			if(dojo.isIE){ this.editNode.unselectable = "on"; } // prevent IE from setting focus
-                        this.editNode.contentEditable=!disabled;
+			this.editNode.contentEditable = !disabled;
 			if(dojo.isIE){
 				var _this = this;
 				setTimeout(function(){ _this.editNode.unselectable = "off"; }, 0);
@@ -655,13 +673,9 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			this.editNode=this.document.body.firstChild;
 			var _this = this;
 			if(dojo.isIE){ // #4996 IE wants to focus the BODY tag
-				this.editNode.parentNode.onfocus =
-					function(){
-						if(!_this.editNode.blurring){
-							_this.editNode.focus();
-						}
-						_this.editNode.blurring = false;
-					}
+				var tabStop = this.tabStop = dojo.doc.createElement('<div tabIndex=-1>');
+				this.editingArea.appendChild(tabStop);
+				this.iframe.onfocus = function(){ _this.editNode.setActive(); }
 			}
 		}
 
@@ -715,8 +729,10 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		if(dojo.isIE){
 			if(e.keyCode == dojo.keys.TAB && e.shiftKey && !e.ctrlKey && !e.altKey){
 				// focus the BODY so the browser will tab away from it instead
-				this.editNode.blurring = true;
-				this.editNode.parentNode.focus();
+				this.iframe.focus();
+			}else if(e.keyCode == dojo.keys.TAB && !e.shiftKey && !e.ctrlKey && !e.altKey){
+				// focus the BODY so the browser will tab away from it instead
+				this.tabStop.focus();
 			}else if(e.keyCode === dojo.keys.BACKSPACE && this.document.selection.type === "Control"){
 				// IE has a bug where if a non-text object is selected in the editor,
 		  // hitting backspace would act as if the browser's back button was
@@ -760,9 +776,9 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		// summary: Fired on keypress
 
 		// handle the various key events
-		var modifiers = e.ctrlKey ? this.KEY_CTRL : 0 | e.shiftKey?this.KEY_SHIFT : 0;
+		var modifiers = (e.ctrlKey && !e.altKey) ? this.KEY_CTRL : 0 | e.shiftKey ? this.KEY_SHIFT : 0;
 
-		var key = e.keyChar||e.keyCode;
+		var key = e.keyChar || e.keyCode;
 		if(this._keyHandlers[key]){
 			// console.debug("char:", e.key);
 			var handlers = this._keyHandlers[key], i = 0, h;
@@ -831,22 +847,26 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		}
 	},
 
+	// TODO: why is this needed - should we deprecate this ?
 	blur: function(){
 		// summary: remove focus from this instance
-		if(this.iframe){
-			this.window.blur();
-		}else if(this.editNode){
-			this.editNode.blur();
+		if(!dojo.isIE && this.window.document.documentElement && this.window.document.documentElement.focus){
+			this.window.document.documentElement.focus();
+		}else if(dojo.doc.body.focus){
+			dojo.doc.body.focus();
 		}
 	},
 
 	focus: function(){
 		// summary: move focus to this instance
-		if(this.iframe && !dojo.isIE){
+		if(!dojo.isIE){
 			dijit.focus(this.iframe);
 		}else if(this.editNode && this.editNode.focus){
 			// editNode may be hidden in display:none div, lets just punt in this case
-			dijit.focus(this.editNode);
+			//this.editNode.focus(); -> causes IE to scroll always (strict and quirks mode) to the top the Iframe 
+			// if we fire the event manually and let the browser handle the focusing, the latest  
+			// cursor position is focused like in FF                         
+			this.iframe.fireEvent('onfocus', document.createEventObject()); // createEventObject only in IE 
 //		}else{
 // TODO: should we throw here?
 //			console.debug("Have no idea how to focus into the editor!");
@@ -895,9 +915,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		//		browser
 
 		var command = cmd.toLowerCase();
-		if(command == "formatblock"){
-			if(dojo.isSafari){ command = "heading"; }
-		}else if(command == "hilitecolor" && !dojo.isMoz){
+		if(command == "hilitecolor" && !dojo.isMoz){
 			command = "backcolor";
 		}
 

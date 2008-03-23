@@ -384,19 +384,27 @@ if(dojo.isIE || dojo.isOpera){
 	var _pixelRegExp = /margin|padding|width|height|max|min|offset/;  // |border
 	var _toStyleValue = function(node, type, value){
 		type = type.toLowerCase();
+		if(dojo.isIE && value == "auto"){
+			if(type == "height"){ return node.offsetHeight; }
+			if(type == "width"){ return node.offsetWidth; }
+		}
 		if(!(type in _pixelNamesCache)){
-//			if(dojo.isOpera && type == "cssText"){
-// FIXME: add workaround for #2855 here
-//			}
+			//	if(dojo.isOpera && type == "cssText"){
+			// 		FIXME: add workaround for #2855 here
+			//	}
 			_pixelNamesCache[type] = _pixelRegExp.test(type);
 		}
 		return _pixelNamesCache[type] ? dojo._toPixelValue(node, value) : value;
-
 	}
 
+	var _floatStyle = dojo.isIE ? "styleFloat" : "cssFloat";
+	var _floatAliases = { "cssFloat": _floatStyle, "styleFloat": _floatStyle, "float": _floatStyle };
+	
 	// public API
 	
-	dojo.style = function(/*DomNode|String*/ node, /*String?||Object?*/style, /*String?*/value){
+	dojo.style = function(	/*DomNode|String*/		node, 
+							/*String?||Object?*/	style, 
+							/*String?*/				value){
 		//	summary:
 		//		gets or sets a style property on node. If 2 arguments are
 		//		passed, acts as a getter. If value is passed, acts as a setter
@@ -429,15 +437,32 @@ if(dojo.isIE || dojo.isOpera){
 		//	|		"border": "3px solid black",
 		//	|		"height": 300
 		//	|	});
-		var n=dojo.byId(node), args=arguments.length, op=(style=="opacity");
+		// 	example:
+		//		style properties in JavaScript are mixed-cased when the CSS equilivant is hypenated.
+		//		font-size becomes fontSize, and so on.
+		//	|	dojo.style("thinger",{
+		//	|		fontSize:"14pt",
+		//	|		letterSpacing:"1.2em"
+		//	|	});
+		//	example:
+		//		dojo.NodeList implements .style() using the same syntax, omitting the "node" parameter, calling
+		//		dojo.style() on every element of the list. See: dojo.query and dojo.NodeList
+		//	|	dojo.query(".someClassName").style("visibility","hidden");
+		//	|	// or
+		//	|	dojo.query("#baz > div").style({
+		//	|		opacity:0.75,
+		//	|		fontSize:"13pt"
+		//	|	});
+		var n = dojo.byId(node), args = arguments.length, op = (style=="opacity");
+		style = _floatAliases[style] || style;
 		if(args==3){
 			return op ? dojo._setOpacity(n, value) : n.style[style] = value; /*Number*/
 		}
-		if(args==2 && op){
+		if(args == 2 && op){
 			return dojo._getOpacity(n);
 		}
 		var s = dojo.getComputedStyle(n);
-		if(args==2 && !dojo.isString(style)){
+		if(args == 2 && !dojo.isString(style)){
 			for(var x in style){
 				dojo.style(node, x, style[x]);
 			}
@@ -876,9 +901,9 @@ if(dojo.isIE || dojo.isOpera){
 
 		// targetBoxType == "border-box"
 		var db = dojo.body();
-		if(dojo.isIE){
+		if(dojo.isIE || (dojo.isFF >= 3)){
 			var client = node.getBoundingClientRect();
-			var offset = dojo._getIeDocumentElementOffset();
+			var offset = (dojo.isIE) ? dojo._getIeDocumentElementOffset() : { x: 0, y: 0};
 			ret.x = client.left - offset.x;
 			ret.y = client.top - offset.y;
 		}else if(ownerDocument["getBoxObjectFor"]){
@@ -969,7 +994,8 @@ if(dojo.isIE || dojo.isOpera){
 			case "tabindex":
 				// Internet Explorer will only set or remove tabindex
 				// if it is spelled "tabIndex"
-				return dojo.isIE ? "tabIndex" : "tabindex";
+				// console.debug((dojo.isIE && dojo.isIE < 8)? "tabIndex" : "tabindex");
+				return (dojo.isIE && dojo.isIE < 8) ? "tabIndex" : "tabindex";
 			default:
 				return name;
 		}
@@ -1008,32 +1034,71 @@ if(dojo.isIE || dojo.isOpera){
 		return attr ? attr.specified : false;
 	}
 
-	dojo.attr = function(/*DomNode|String*/node, /*String*/name, /*String?*/value){
+	dojo.attr = function(/*DomNode|String*/node, /*String|Object*/name, /*String?*/value){
 		//	summary:
 		//		Gets or sets an attribute on an HTML element.
 		//	description:
-		//		If 2 arguments are passed, acts as a getter.
-		//		If a third argument is passed, acts as a setter.
+		//		Handles normalized getting and setting of attributes on DOM
+		//		Nodes. If 2 arguments are passed, and a the second argumnt is a
+		//		string, acts as a getter.
+		//	
+		//		If a third argument is passed, or if the second argumnt is a
+		//		map of attributes, acts as a setter.
 		//	node:
 		//		id or reference to the element to get or set the attribute on
 		//	name:
-		//		the name of the attribute to get or set
+		//		the name of the attribute to get or set.
 		//	value:
-		//		the value for the attribute (optional)
+		//		Optional. The value to set for the attribute
 		//	returns:
 		//		when used as a getter, the value of the requested attribute
 		//		or null if that attribute does not have a specified or
 		//		default value;
+		//
 		//		when user as a setter, undefined
+		//	example:
+		//	|	// get the current value of the "foo" attribute on a node
+		//	|	dojo.attr(dojo.byId("nodeId"), "foo");
+		//	|	
+		//	|	// we can just pass the id:
+		//	|	dojo.attr("nodeId", "foo");
+		//	|
+		//	|	// use attr() to set the tab index
+		//	|	dojo.attr("nodeId", "tabindex", 3);
+		//	|
+		//	|	// set multiple values at once, including event handlers:
+		//	|	dojo.attr("formId", {
+		//	|		"foo": "bar",
+		//	|		"tabindex": -1,
+		//	|		"method": "POST",
+		//	|		"onsubmit": function(e){
+		//	|			dojo.stopEvent(e);
+		//	|			// submit the form with Ajax
+		//	|			dojo.xhrPost({ form: "formId" });
+		//	|		}
+		//	|	});
+
+		var args = arguments.length;
+		if(args == 2 && !dojo.isString(name)){
+			for(var x in name){ dojo.attr(node, x, name[x]); }
+			return;
+		}
 		node = dojo.byId(node);
 		name = _fixAttrName(name);
-		if(arguments.length == 3){
-			if(typeof value == "function" || typeof value == "boolean"){ // e.g. onsubmit, disabled
+		if(args == 3){
+			if(dojo.isFunction(value)){
+				try{
+					delete node[name]; // preserve clobbering behavior
+				}catch(e){}
+				// ensure that event objects are normalized, etc.
+				dojo.connect(node, name, value);
+			}else if(typeof value == "boolean"){ // e.g. onsubmit, disabled
+				// if a function, we should normalize the event object here!!!
 				node[name] = value;
 			}else{
 				node.setAttribute(name, value);
 			}
-			return undefined;
+			return;
 		}else{
 			// should we access this attribute via a property or
 			// via getAttribute()?

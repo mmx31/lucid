@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2004-2007, The Dojo Foundation
+	Copyright (c) 2004-2008, The Dojo Foundation
 	All Rights Reserved.
 
 	Licensed under the Academic Free License version 2.1 or above OR the
@@ -69,6 +69,7 @@ djConfig = {
 	// summary:
 	//		Application code can set the global 'djConfig' prior to loading
 	//		the library to override certain global settings for how dojo works.
+	//
 	// isDebug: Boolean
 	//		Defaults to `false`. If set to `true`, ensures that Dojo provides
 	//		extende debugging feedback via Firebug. If Firebug is not available
@@ -92,20 +93,20 @@ djConfig = {
 	//		Due to the somewhat unpredictable side-effects of using
 	//		`debugAtAllCosts`, it is strongly recommended that you enable this
 	//		flag as a last resort. `debugAtAllCosts` has no effect when loading
-	//		resources across domains. For usage information, see the [Dojo
-	//		Book](http://dojotoolkit.org/book/book-dojo/part-4-meta-dojo-making-your-dojo-code-run-faster-and-better/debugging-facilities/deb)
+	//		resources across domains. For usage information, see the
+	//		[Dojo Book](http://dojotoolkit.org/book/book-dojo/part-4-meta-dojo-making-your-dojo-code-run-faster-and-better/debugging-facilities/deb)
 	debugAtAllCosts: false,
 	// locale: String
-	//		The locale to assume for loading localized resources in this page.
-	//		The form of the locale is in the common convention format of
-	//		`en-us` and `zh-cn`. See the documentation for `dojo.i18n` and
-	//		`dojo.requireLocalization` for details on loading localized
-	//		resources. If no locale is specified, Dojo attempts to determine
-	//		the locale of the page from the browser's `navigator.userLanguage`
+	//		The locale to assume for loading localized resources in this page,
+	//		specified according to [RFC 3066](http://www.ietf.org/rfc/rfc3066.txt).
+	//		Must be specified entirely in lowercase, e.g. `en-us` and `zh-cn`.
+	//		See the documentation for `dojo.i18n` and `dojo.requireLocalization`
+	//		for details on loading localized resources. If no locale is specified,
+	//		Dojo assumes the locale of the user agent, according to `navigator.userLanguage`
 	//		or `navigator.language` properties.
 	locale: undefined,
-	// extraLocale: String
-	//		No default value. Specifies a secondary locale whose
+	// extraLocale: Array
+	//		No default value. Specifies additional locales whose
 	//		resources should also be loaded alongside the default locale when
 	//		calls to `dojo.requireLocalization()` are processed.
 	extraLocale: undefined,
@@ -132,19 +133,31 @@ djConfig = {
 
 (function(){
 	// firebug stubs
-	if((!this["console"])||(!console["firebug"])){
-		this.console = {};
+
+	// if((!this["console"])||(!console["firebug"])){
+
+	if(!this["console"]){
+		this.console = {
+			log: function(){} // no-op
+		};
 	}
 
 	var cn = [
 		"assert", "count", "debug", "dir", "dirxml", "error", "group",
-		"groupEnd", "info", "log", "profile", "profileEnd", "time",
-		"timeEnd", "trace", "warn"
+		"groupEnd", "info", "profile", "profileEnd", "time", "timeEnd",
+		"trace", "warn", "log" 
 	];
 	var i=0, tn;
 	while((tn=cn[i++])){
 		if(!console[tn]){
-			console[tn] = function(){};
+			(function(){
+				var tcn = tn+"";
+				console[tcn] = function(){ 
+					var a = Array.apply({}, arguments);
+					a.unshift(tcn+":");
+					console.log(a.join(" "));
+				}
+			})();
 		}
 	}
 
@@ -212,7 +225,7 @@ dojo.global = {
 =====*/
 	dojo.locale = d.config.locale;
 	
-	var rev = "$Rev: 12886 $".match(/\d+/);
+	var rev = "$Rev: 13165 $".match(/\d+/);
 
 	dojo.version = {
 		// summary: 
@@ -227,8 +240,8 @@ dojo.global = {
 		//		Descriptor flag. If total version is "1.2.0beta1", will be "beta1"
 		//	revision: Number
 		//		The SVN rev from which dojo was pulled
-		major: 1, minor: 1, patch: 0, flag: "b3",
-		revision: rev ? Number(rev[0]) : 999999,
+		major: 1, minor: 1, patch: 0, flag: "rc1",
+		revision: rev ? +rev[0] : 999999, //FIXME: use NaN?
 		toString: function(){
 			with(d.version){
 				return major + "." + minor + "." + patch + flag + " (" + revision + ")";	// String
@@ -327,8 +340,8 @@ dojo.global = {
 	}
 
 	dojo._getProp = function(/*Array*/parts, /*Boolean*/create, /*Object*/context){
-		var obj=context||d.global;
-		for(var i=0, p; obj&&(p=parts[i]); i++){
+		var obj=context || d.global;
+		for(var i=0, p; obj && (p=parts[i]); i++){
 			if(i == 0 && this._scopeMap[p]){
 				p = this._scopeMap[p];
 			}
@@ -364,7 +377,7 @@ dojo.global = {
 		//		wheras with `dojo.setObject`, we can shorten that to:
 		//	|	dojo.setObject("parent.child.prop", "some value", obj);
 		var parts=name.split("."), p=parts.pop(), obj=d._getProp(parts, true, context);
-		return (obj && p ? (obj[p]=value) : undefined); // Object
+		return obj && p ? (obj[p]=value) : undefined; // Object
 	}
 
 	dojo.getObject = function(/*String*/name, /*Boolean*/create, /*Object*/context){
@@ -588,7 +601,8 @@ dojo.global = {
 			//it is most likely the i18n bundle stuff.
 			contents = this._scopePrefix + contents + this._scopeSuffix;
 		}
-		var value = d["eval"](contents+"\r\n//@ sourceURL="+uri);
+		if(d.isMoz){ contents += "\r\n//@ sourceURL=" + uri; } // debugging assist for Firebug
+		var value = d["eval"](contents);
 		if(cb){ cb(value); }
 		return true; // Boolean
 	}
@@ -625,6 +639,7 @@ dojo.global = {
 			try{
 				mll[x]();
 			}catch(e){
+				throw e;
 				console.error("dojo.addOnLoad callback failed: " + e, e); /* let other load events fire, like the parser, but report the error */
 			}
 		}
@@ -650,6 +665,15 @@ dojo.global = {
 		}
 	}
 
+	var onto = function(arr, obj, fn){
+		if(!fn){
+			arr.push(obj);
+		}else if(fn){
+			var func = (typeof fn == "string") ? obj[fn] : fn;
+			arr.push(function(){ func.call(obj); });
+		}
+	}
+
 	dojo.addOnLoad = function(/*Object?*/obj, /*String|Function*/functionName){
 		// summary:
 		//		Registers a function to be triggered after the DOM has finished
@@ -661,13 +685,9 @@ dojo.global = {
 		// example:
 		//	|	dojo.addOnLoad(functionPointer);
 		//	|	dojo.addOnLoad(object, "functionName");
-		if(arguments.length == 1){
-			d._loaders.push(obj);
-		}else if(arguments.length > 1){
-			d._loaders.push(function(){
-				obj[functionName]();
-			});
-		}
+		//	|	dojo.addOnLoad(object, function(){ /* ... */});
+
+		onto(d._loaders, obj, functionName);
 
 		//Added for xdomain loading. dojo.addOnLoad is used to
 		//indicate callbacks after doing some dojo.require() statements.
@@ -679,17 +699,14 @@ dojo.global = {
 	}
 
 	dojo.addOnUnload = function(/*Object?*/obj, /*String|Function?*/functionName){
-		// summary: registers a function to be triggered when the page unloads
+		// summary:
+		//		registers a function to be triggered when the page unloads
 		// example:
 		//	|	dojo.addOnUnload(functionPointer)
 		//	|	dojo.addOnUnload(object, "functionName")
-		if(arguments.length == 1){
-			d._unloaders.push(obj);
-		}else if(arguments.length > 1){
-			d._unloaders.push(function(){
-				obj[functionName]();
-			});
-		}
+		//	|	dojo.addOnUnload(object, function(){ /* ... */});
+
+		onto(d._unloaders, obj, functionName);
 	}
 
 	dojo._modulesLoaded = function(){
@@ -702,12 +719,14 @@ dojo.global = {
 	}
 
 	dojo._callLoaded = function(){
-		//The "object" check is for IE, and the other opera check fixes an issue
-		//in Opera where it could not find the body element in some widget test cases.
-		//For 0.9, maybe route all browsers through the setTimeout (need protection
-		//still for non-browser environments though). This might also help the issue with
-		//FF 2.0 and freezing issues where we try to do sync xhr while background css images
-		//are being loaded (trac #2572)? Consider for 0.9.
+
+		// The "object" check is for IE, and the other opera check fixes an
+		// issue in Opera where it could not find the body element in some
+		// widget test cases.  For 0.9, maybe route all browsers through the
+		// setTimeout (need protection still for non-browser environments
+		// though). This might also help the issue with FF 2.0 and freezing
+		// issues where we try to do sync xhr while background css images are
+		// being loaded (trac #2572)? Consider for 0.9.
 		if(typeof setTimeout == "object" || (dojo.config.useXDomain && d.isOpera)){
 			if(dojo.isAIR){
 				setTimeout(function(){dojo.loaded();}, 0);
@@ -1554,12 +1573,14 @@ dojo.provide("dojo._base.lang");
 // Crockford (ish) functions
 
 dojo.isString = function(/*anything*/ it){
-	// summary:	Return true if it is a String
+	//	summary:
+	//		Return true if it is a String
 	return !!arguments.length && it != null && (typeof it == "string" || it instanceof String); // Boolean
 }
 
 dojo.isArray = function(/*anything*/ it){
-	// summary: Return true if it is an Array
+	//	summary:
+	//		Return true if it is an Array
 	return it && (it instanceof Array || typeof it == "array"); // Boolean
 }
 
@@ -1567,6 +1588,7 @@ dojo.isArray = function(/*anything*/ it){
 dojo.isFunction = function(it){
 	// summary: Return true if it is a Function
 	// it: anything
+	//	return: Boolean
 }
 =====*/
 
@@ -1585,7 +1607,8 @@ dojo.isFunction = (function(){
 
 dojo.isObject = function(/*anything*/ it){
 	// summary: 
-	//		Returns true if it is a JavaScript object (or an Array, a Function or null)
+	//		Returns true if it is a JavaScript object (or an Array, a Function
+	//		or null)
 	return it !== undefined &&
 		(it === null || typeof it == "object" || dojo.isArray(it) || dojo.isFunction(it)); // Boolean
 }
@@ -1600,7 +1623,7 @@ dojo.isArrayLike = function(/*anything*/ it){
 	//		dojo.isArrayLike(), but will return false when passed to
 	//		dojo.isArray().
 	//	return:
-	//		If it walks like a duck and quicks like a duck, return true
+	//		If it walks like a duck and quicks like a duck, return `true`
 	var d = dojo;
 	return it && it !== undefined &&
 		// keep out built-in constructors (Number, String, ...) which have length
@@ -1642,7 +1665,7 @@ dojo._hitchArgs = function(scope, method /*,...*/){
 }
 
 dojo.hitch = function(/*Object*/scope, /*Function|String*/method /*,...*/){
-	// summary: 
+	//	summary: 
 	//		Returns a function that will only ever execute in the a given scope. 
 	//		This allows for easy use of object member functions
 	//		in callbacks and other places in which the "this" keyword may
@@ -1651,16 +1674,16 @@ dojo.hitch = function(/*Object*/scope, /*Function|String*/method /*,...*/){
 	//		beyond "method".
 	//		Each of these values will be used to "placehold" (similar to curry)
 	//		for the hitched function. 
-	// scope: 
+	//	scope: 
 	//		The scope to use when method executes. If method is a string, 
 	//		scope is also the object containing method.
-	// method:
+	//	method:
 	//		A function to be hitched to scope, or the name of the method in
 	//		scope to be hitched.
-	// example:
+	//	example:
 	//	|	dojo.hitch(foo, "bar")(); 
 	//		runs foo.bar() in the scope of foo
-	// example:
+	//	example:
 	//	|	dojo.hitch(foo, myFunction);
 	//		returns a function that runs myFunction in the scope of foo
 	if(arguments.length > 2){
@@ -1702,8 +1725,8 @@ dojo.delegate = function(obj, props){
 	//	|	var foo = { bar: "baz" };
 	//	|	var thinger = dojo.delegate(foo, { thud: "xyzzy"});
 	//	|	thinger.bar == "baz"; // delegated to foo
-	//	|	foo.xyzzy == undefined; // by definition
-	//	|	thinger.xyzzy == "xyzzy"; // mixed in from props
+	//	|	foo.thud == undefined; // by definition
+	//	|	thinger.thud == "xyzzy"; // mixed in from props
 	//	|	foo.bar = "thonk";
 	//	|	thinger.bar == "thonk"; // still delegated to foo's bar
 }
@@ -1723,7 +1746,7 @@ dojo.delegate = dojo._delegate = function(obj, props){
 }
 
 dojo.partial = function(/*Function|String*/method /*, ...*/){
-	// summary:
+	//	summary:
 	//		similar to hitch() except that the scope object is left to be
 	//		whatever the execution context eventually becomes.
 	//	description:
@@ -1734,16 +1757,17 @@ dojo.partial = function(/*Function|String*/method /*, ...*/){
 }
 
 dojo._toArray = function(/*Object*/obj, /*Number?*/offset, /*Array?*/ startWith){
-	// summary:
-	//		Converts an array-like object (i.e. arguments, DOMCollection)
-	//		to an array. Returns a new Array object.
-	// obj:
+	//	summary:
+	//		Converts an array-like object (i.e. arguments, DOMCollection) to an
+	//		array. Returns a new Array with the elements of obj.
+	//	obj:
 	//		the object to "arrayify". We expect the object to have, at a
 	//		minimum, a length property which corresponds to integer-indexed
 	//		properties.
-	// offset:
-	//		the location in obj to start iterating from. Defaults to 0. Optional.
-	// startWith:
+	//	offset:
+	//		the location in obj to start iterating from. Defaults to 0.
+	//		Optional.
+	//	startWith:
 	//		An array to pack with the properties of obj. If provided,
 	//		properties in obj are appended at the end of startWith and
 	//		startWith is the returned array.
@@ -2841,12 +2865,16 @@ dojo.provide("dojo._base.array");
 			//		For details on this method, see:
 			// 			<http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:indexOf>
 
-			var step = 1, end = array.length, i = (fromIndex||0);
+			var step = 1, end = array.length || 0, i = 0;
 			if(findLast){
-				step = -1, i = (fromIndex||array.length - 1), end = -1;
+				i = end - 1;
+				step = end = -1;
 			}
-			for(; i!=end; i+=step){
-				if(array[i] == value){ return i; }
+			if(fromIndex != undefined){ i = fromIndex; }
+			if((findLast && i > end) || i < end){
+				for(; i != end; i += step){
+					if(array[i] == value){ return i; }
+				}
 			}
 			return -1;	// Number
 		},
@@ -2857,7 +2885,7 @@ dojo.provide("dojo._base.array");
 			//		If the value is not found, -1 is returned.
 			// description:
 			//		For details on this method, see:
-			// 			http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:lastIndexOf
+			// 			<http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:lastIndexOf>
 			return dojo.indexOf(array, value, fromIndex, true); // Number
 		},
 
@@ -2871,7 +2899,7 @@ dojo.provide("dojo._base.array");
 			//		This function corresponds to the JavaScript 1.6 Array.forEach() method.
 			//		In environments that support JavaScript 1.6, this function is a passthrough to the built-in method.
 			//		For more details, see:
-			//			http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:forEach
+			//			<http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:forEach>
 
 			// match the behavior of the built-in forEach WRT empty arrs
 			if(!arr || !arr.length){ return; }
@@ -2907,7 +2935,7 @@ dojo.provide("dojo._base.array");
 			//		This function corresponds to the JavaScript 1.6 Array.every() method.
 			//		In environments that support JavaScript 1.6, this function is a passthrough to the built-in method.
 			//		For more details, see:
-			//			http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:every
+			//			<http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:every>
 			// example:
 			//	|	dojo.every([1, 2, 3, 4], function(item){ return item>1; });
 			//		returns false
@@ -2929,7 +2957,7 @@ dojo.provide("dojo._base.array");
 			//		This function corresponds to the JavaScript 1.6 Array.some() method.
 			//		In environments that support JavaScript 1.6, this function is a passthrough to the built-in method.
 			//		For more details, see:
-			//			http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:some
+			//			<http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:some>
 			// example:
 			//	|	dojo.some([1, 2, 3, 4], function(item){ return item>1; });
 			//		returns true
@@ -2950,7 +2978,7 @@ dojo.provide("dojo._base.array");
 			//		This function corresponds to the JavaScript 1.6 Array.map() method.
 			//		In environments that support JavaScript 1.6, this function is a passthrough to the built-in method.
 			//		For more details, see:
-			//			http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:map
+			//			<http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:map>
 			// example:
 			//	|	dojo.map([1, 2, 3, 4], function(item){ return item+1 });
 			//		returns [2, 3, 4, 5]
@@ -2974,7 +3002,7 @@ dojo.provide("dojo._base.array");
 			//		This function corresponds to the JavaScript 1.6 Array.filter() method.
 			//		In environments that support JavaScript 1.6, this function is a passthrough to the built-in method.
 			//		For more details, see:
-			//			http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:filter
+			//			<http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:filter>
 			// example:
 			//	|	dojo.filter([1, 2, 3, 4], function(item){ return item>1; });
 			//		returns [2, 3, 4]
@@ -4226,19 +4254,27 @@ if(dojo.isIE || dojo.isOpera){
 	var _pixelRegExp = /margin|padding|width|height|max|min|offset/;  // |border
 	var _toStyleValue = function(node, type, value){
 		type = type.toLowerCase();
+		if(dojo.isIE && value == "auto"){
+			if(type == "height"){ return node.offsetHeight; }
+			if(type == "width"){ return node.offsetWidth; }
+		}
 		if(!(type in _pixelNamesCache)){
-//			if(dojo.isOpera && type == "cssText"){
-// FIXME: add workaround for #2855 here
-//			}
+			//	if(dojo.isOpera && type == "cssText"){
+			// 		FIXME: add workaround for #2855 here
+			//	}
 			_pixelNamesCache[type] = _pixelRegExp.test(type);
 		}
 		return _pixelNamesCache[type] ? dojo._toPixelValue(node, value) : value;
-
 	}
 
+	var _floatStyle = dojo.isIE ? "styleFloat" : "cssFloat";
+	var _floatAliases = { "cssFloat": _floatStyle, "styleFloat": _floatStyle, "float": _floatStyle };
+	
 	// public API
 	
-	dojo.style = function(/*DomNode|String*/ node, /*String?||Object?*/style, /*String?*/value){
+	dojo.style = function(	/*DomNode|String*/		node, 
+							/*String?||Object?*/	style, 
+							/*String?*/				value){
 		//	summary:
 		//		gets or sets a style property on node. If 2 arguments are
 		//		passed, acts as a getter. If value is passed, acts as a setter
@@ -4271,15 +4307,32 @@ if(dojo.isIE || dojo.isOpera){
 		//	|		"border": "3px solid black",
 		//	|		"height": 300
 		//	|	});
-		var n=dojo.byId(node), args=arguments.length, op=(style=="opacity");
+		// 	example:
+		//		style properties in JavaScript are mixed-cased when the CSS equilivant is hypenated.
+		//		font-size becomes fontSize, and so on.
+		//	|	dojo.style("thinger",{
+		//	|		fontSize:"14pt",
+		//	|		letterSpacing:"1.2em"
+		//	|	});
+		//	example:
+		//		dojo.NodeList implements .style() using the same syntax, omitting the "node" parameter, calling
+		//		dojo.style() on every element of the list. See: dojo.query and dojo.NodeList
+		//	|	dojo.query(".someClassName").style("visibility","hidden");
+		//	|	// or
+		//	|	dojo.query("#baz > div").style({
+		//	|		opacity:0.75,
+		//	|		fontSize:"13pt"
+		//	|	});
+		var n = dojo.byId(node), args = arguments.length, op = (style=="opacity");
+		style = _floatAliases[style] || style;
 		if(args==3){
 			return op ? dojo._setOpacity(n, value) : n.style[style] = value; /*Number*/
 		}
-		if(args==2 && op){
+		if(args == 2 && op){
 			return dojo._getOpacity(n);
 		}
 		var s = dojo.getComputedStyle(n);
-		if(args==2 && !dojo.isString(style)){
+		if(args == 2 && !dojo.isString(style)){
 			for(var x in style){
 				dojo.style(node, x, style[x]);
 			}
@@ -4718,9 +4771,9 @@ if(dojo.isIE || dojo.isOpera){
 
 		// targetBoxType == "border-box"
 		var db = dojo.body();
-		if(dojo.isIE){
+		if(dojo.isIE || (dojo.isFF >= 3)){
 			var client = node.getBoundingClientRect();
-			var offset = dojo._getIeDocumentElementOffset();
+			var offset = (dojo.isIE) ? dojo._getIeDocumentElementOffset() : { x: 0, y: 0};
 			ret.x = client.left - offset.x;
 			ret.y = client.top - offset.y;
 		}else if(ownerDocument["getBoxObjectFor"]){
@@ -4811,7 +4864,8 @@ if(dojo.isIE || dojo.isOpera){
 			case "tabindex":
 				// Internet Explorer will only set or remove tabindex
 				// if it is spelled "tabIndex"
-				return dojo.isIE ? "tabIndex" : "tabindex";
+				// console.debug((dojo.isIE && dojo.isIE < 8)? "tabIndex" : "tabindex");
+				return (dojo.isIE && dojo.isIE < 8) ? "tabIndex" : "tabindex";
 			default:
 				return name;
 		}
@@ -4850,32 +4904,71 @@ if(dojo.isIE || dojo.isOpera){
 		return attr ? attr.specified : false;
 	}
 
-	dojo.attr = function(/*DomNode|String*/node, /*String*/name, /*String?*/value){
+	dojo.attr = function(/*DomNode|String*/node, /*String|Object*/name, /*String?*/value){
 		//	summary:
 		//		Gets or sets an attribute on an HTML element.
 		//	description:
-		//		If 2 arguments are passed, acts as a getter.
-		//		If a third argument is passed, acts as a setter.
+		//		Handles normalized getting and setting of attributes on DOM
+		//		Nodes. If 2 arguments are passed, and a the second argumnt is a
+		//		string, acts as a getter.
+		//	
+		//		If a third argument is passed, or if the second argumnt is a
+		//		map of attributes, acts as a setter.
 		//	node:
 		//		id or reference to the element to get or set the attribute on
 		//	name:
-		//		the name of the attribute to get or set
+		//		the name of the attribute to get or set.
 		//	value:
-		//		the value for the attribute (optional)
+		//		Optional. The value to set for the attribute
 		//	returns:
 		//		when used as a getter, the value of the requested attribute
 		//		or null if that attribute does not have a specified or
 		//		default value;
+		//
 		//		when user as a setter, undefined
+		//	example:
+		//	|	// get the current value of the "foo" attribute on a node
+		//	|	dojo.attr(dojo.byId("nodeId"), "foo");
+		//	|	
+		//	|	// we can just pass the id:
+		//	|	dojo.attr("nodeId", "foo");
+		//	|
+		//	|	// use attr() to set the tab index
+		//	|	dojo.attr("nodeId", "tabindex", 3);
+		//	|
+		//	|	// set multiple values at once, including event handlers:
+		//	|	dojo.attr("formId", {
+		//	|		"foo": "bar",
+		//	|		"tabindex": -1,
+		//	|		"method": "POST",
+		//	|		"onsubmit": function(e){
+		//	|			dojo.stopEvent(e);
+		//	|			// submit the form with Ajax
+		//	|			dojo.xhrPost({ form: "formId" });
+		//	|		}
+		//	|	});
+
+		var args = arguments.length;
+		if(args == 2 && !dojo.isString(name)){
+			for(var x in name){ dojo.attr(node, x, name[x]); }
+			return;
+		}
 		node = dojo.byId(node);
 		name = _fixAttrName(name);
-		if(arguments.length == 3){
-			if(typeof value == "function" || typeof value == "boolean"){ // e.g. onsubmit, disabled
+		if(args == 3){
+			if(dojo.isFunction(value)){
+				try{
+					delete node[name]; // preserve clobbering behavior
+				}catch(e){}
+				// ensure that event objects are normalized, etc.
+				dojo.connect(node, name, value);
+			}else if(typeof value == "boolean"){ // e.g. onsubmit, disabled
+				// if a function, we should normalize the event object here!!!
 				node[name] = value;
 			}else{
 				node.setAttribute(name, value);
 			}
-			return undefined;
+			return;
 		}else{
 			// should we access this attribute via a property or
 			// via getAttribute()?
@@ -6426,7 +6519,13 @@ dojo.provide("dojo._base.query");
 	// future
 	var getQueryFunc = function(query){
 		// return a cached version if one is available
-		if(d.doc["querySelectorAll"]){
+		var qcz = query.charAt(0);
+		if(d.doc["querySelectorAll"] && 
+			( (!d.isSafari) || (d.isSafari > 3.1) ) && // see #5832
+			// as per CSS 3, we can't currently start w/ combinator:
+			//		http://www.w3.org/TR/css3-selectors/#w3cselgrammar
+			(">+~".indexOf(qcz) == -1)
+		){
 			return function(root){
 				var r = root.querySelectorAll(query);
 				r.nozip = true; // skip expensive duplication checks and just wrap in a NodeList
@@ -7885,7 +7984,7 @@ dojo.provide("dojo._base.fx");
 					var v = ({height: node.offsetHeight, width: node.offsetWidth})[p];
 					if(v !== undefined){ return v; }
 					v = d.style(node, p);
-					return (p=="opacity") ? Number(v) : parseFloat(v);
+					return (p=="opacity") ? Number(v) : (isColor ? v : parseFloat(v));
 				}
 				if(!("end" in prop)){
 					prop.end = getStyle(this.node, p);

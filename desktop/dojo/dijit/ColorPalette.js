@@ -6,7 +6,7 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dojo.colors");
 dojo.require("dojo.i18n");
-dojo.requireLocalization("dojo", "colors", null, "ko,zh,ja,gr,zh-tw,ru,it,hu,ROOT,fr,pt,pl,es,de,cs");
+dojo.requireLocalization("dojo", "colors", null, "zh,pt,cs,ru,es,fr,de,gr,ko,zh-tw,ja,pl,ROOT,hu,it");
 
 dojo.declare("dijit.ColorPalette",
 	[dijit._Widget, dijit._Templated],

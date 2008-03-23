@@ -118,7 +118,7 @@ dijit.typematic = {
 				dojo.stopEvent(evt);
 				if(dojo.isIE){
 					dijit.typematic.trigger(evt, _this, node, callback, node, subsequentDelay, initialDelay);
-					setTimeout(dijit.typematic.stop, 50);
+					setTimeout(dojo.hitch(this, dijit.typematic.stop), 50);
 				}
 			})
 		];

@@ -6,7 +6,7 @@ dojo.require("dijit._Templated");
 dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dijit.form.Button");
 dojo.require("dijit.Menu");
-dojo.requireLocalization("dijit", "common", null, "ko,zh,sv,ja,gr,zh-tw,ru,it,hu,fr,pt,ROOT,pl,es,de,cs");
+dojo.requireLocalization("dijit", "common", null, "zh,pt,ru,sv,de,ja,ROOT,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
 
 dojo.declare(
 	"dijit.layout.StackContainer",
@@ -252,7 +252,10 @@ dojo.declare(
 		postCreate: function(){
 			dijit.setWaiRole(this.domNode, "tablist");
 
+			// TODO: change key from object to id, to get more separation from StackContainer
 			this.pane2button = {};		// mapping from panes to buttons
+			this.pane2menu = {};		// mapping from panes to close menu
+
 			this._subscriptions=[
 				dojo.subscribe(this.containerId+"-startup", this, "onStartup"),
 				dojo.subscribe(this.containerId+"-addChild", this, "onAddChild"),
@@ -269,6 +272,9 @@ dojo.declare(
 		},
 
 		destroy: function(){
+			for(var pane in this.pane2button){
+				this.onRemoveChild(pane);
+			}
 			dojo.forEach(this._subscriptions, dojo.unsubscribe);
 			this.inherited(arguments);
 		},
@@ -297,13 +303,14 @@ dojo.declare(
 				var mItem = new dijit.MenuItem({label:_nlsResources.itemClose});
             	dojo.connect(mItem, "onClick", dojo.hitch(this, "onCloseButtonClick", page));
            		closeMenu.addChild(mItem);
+           		this.pane2menu[page] = closeMenu;
 			}
 			if(!this._currentChild){ // put the first child into the tab order
 				button.focusNode.setAttribute("tabIndex", "0");
 				this._currentChild = page;
 			}
 			//make sure all tabs have the same length
-			if(!dojo._isBodyLtr() && dojo.isIE && this._rectifyRtlTabList){
+			if(!this.isLeftToRight() && dojo.isIE && this._rectifyRtlTabList){
 				this._rectifyRtlTabList();
 			}
 		},
@@ -314,6 +321,10 @@ dojo.declare(
 			//   Remove the button corresponding to the page.
 			if(this._currentChild === page){ this._currentChild = null; }
 			var button = this.pane2button[page];
+			var menu = this.pane2menu[page];
+			if (menu){
+				menu.destroy();
+			}
 			if(button){
 				// TODO? if current child { reassign }
 				button.destroy();

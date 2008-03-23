@@ -9,12 +9,15 @@ dojo.declare(
 	[dijit.form.MappedTextBox, dijit.form.ComboBoxMixin],
 	{
 		// summary
-		// An enhanced version of the HTML SELECT tag, but is populated dynamically. It works
+		// An enhanced version of the HTML SELECT tag, populated dynamically
+		//
+		// description
+		// An enhanced version of the HTML SELECT tag, populated dynamically. It works
 		// very nicely with very large data sets because it can load and page data as needed.
 		// It also resembles ComboBox, but does not allow values outside of the provided ones.
 		//  
 		// Similar features:
-		// - There is a drop down list of possible values.
+		//  - There is a drop down list of possible values.
 		//	- You can only enter a value from the drop down list.  (You can't
 		//	  enter an arbitrary value.)
 		//	- The value submitted with the form is the hidden value (ex: CA),
@@ -101,7 +104,7 @@ dojo.declare(
 			this._lastDisplayedValue = displayedValue;
 		},
 
-		setValue: function(/*String*/ value, /*Boolean, optional*/ priorityChange){
+		setValue: function(/*String*/ value, /*Boolean?*/ priorityChange){
 			// summary
 			//	Sets the value of the select.
 			//	Also sets the label to the corresponding value by reverse lookup.
@@ -134,7 +137,7 @@ dojo.declare(
 			});
 		},
 
-		_setValueFromItem: function(/*item*/ item, /*Boolean, optional*/ priorityChange){
+		_setValueFromItem: function(/*item*/ item, /*Boolean?*/ priorityChange){
 			//	summary:
 			//		Set the displayed valued in the input box, based on a
 			//		selected item.
@@ -163,13 +166,13 @@ dojo.declare(
 			this._setValueFromItem(tgt.item, true);
 		},
 
-		setDisplayedValue:function(/*String*/ label, /*Boolean, optional*/ priorityChange){
+		setDisplayedValue:function(/*String*/ label, /*Boolean?*/ priorityChange){
 			// summary:
 			//		Set textbox to display label. Also performs reverse lookup
 			//		to set the hidden value. Used in InlineEditBox
 
 			if(this.store){
-				var query = {};
+				var query = dojo.clone(this.query); // #6196: populate query with user-specifics
 				this._lastQuery = query[this.searchAttr] = label;
 				// if the label is not valid, the callback will never set it,
 				// so the last valid value will get the warning textbox set the

@@ -368,27 +368,27 @@
 	height:5px;
 }
  
-.nihilo .dijitSplitterHorizontal {
+.nihilo .dijitSplitterH {
 	background:url(images/splitContainerSizerH.png) repeat-x #fff;
 	border:0;
 	border-left:0px solid #d3d3d3;
 	border-right:0px solid #d3d3d3;
 	height:5px;
 }
-.nihilo .dijitSplitterHorizontal .dijitSplitterThumb {
+.nihilo .dijitSplitterH .dijitSplitterThumb {
 	background:url(images/splitContainerSizerH-thumb.png) no-repeat;
 	top:1px;
 	width:19px;
 	height:2px;
 }
-.nihilo .dijitSplitterVertical {
+.nihilo .dijitSplitterV {
 	background:url(images/splitContainerSizerV.png) repeat-y #fff;
 	border:0;
 	border-top:0px solid #d3d3d3;
 	border-bottom:0px solid #d3d3d3;
 	width:5px;
 }
-.nihilo .dijitSplitterVertical .dijitSplitterThumb {
+.nihilo .dijitSplitterV .dijitSplitterThumb {
 	background:url(images/splitContainerSizerV-thumb.png) no-repeat;
 	left:1px;
 	height:19px;
@@ -477,6 +477,10 @@
 }
 .nihilo .dijitComboButton .dijitDownArrowButton {
 	padding-right:4px;
+}
+.dj_ff2 .nihilo .dijitComboButton .dijitButtonContentsFocused,
+.dj_ff2 .nihilo .dijitComboButton .dijitDownArrowButtonFocused {
+	border: 1px black dotted !important;
 }
 .nihilo .dijitButtonDisabled .dijitButtonNode,
 .nihilo .dijitToggleButtonDisabled .dijitButtonNode,
@@ -639,27 +643,27 @@
 	border:1px solid #c4c4c4;
 	line-height: normal;
 }
-.nihilo .dijitHorizontalSliderProgressBar {
+.nihilo .dijitSliderProgressBarH {
 	border-color: #aab0bb;
 	background: #c0c2c5 url(images/sliderFull.png) repeat-x top left;
 }
-.nihilo .dijitVerticalSliderProgressBar {
+.nihilo .dijitSliderProgressBarV {
 	border-color: #aab0bb;
 	background: #c0c2c5 url(images/sliderFullVertical.png) repeat-y bottom left;
 }
-.nihilo .dijitSliderFocused .dijitHorizontalSliderProgressBar,
-.nihilo .dijitSliderFocused .dijitHorizontalSliderLeftBumper {
+.nihilo .dijitSliderFocused .dijitSliderProgressBarH,
+.nihilo .dijitSliderFocused .dijitSliderLeftBumper {
 	background-image:url(images/sliderFullFocus.png);
 }
-.nihilo .dijitSliderFocused .dijitVerticalSliderProgressBar,
-.nihilo .dijitSliderFocused .dijitVerticalSliderBottomBumper {
+.nihilo .dijitSliderFocused .dijitSliderProgressBarV,
+.nihilo .dijitSliderFocused .dijitSliderBottomBumper {
 	background-image:url(images/sliderFullVerticalFocus.png);
 }
-.nihilo .dijitVerticalSliderRemainingBar {
+.nihilo .dijitSliderRemainingBarV {
 	border-color: #b4b4b4;
 	background: #dcdcdc url(images/sliderEmptyVertical.png) repeat-y bottom left;
 }
-.nihilo .dijitHorizontalSliderRemainingBar {
+.nihilo .dijitSliderRemainingBarH {
 	border-color: #b4b4b4;
 	background: #dcdcdc url(images/sliderEmpty.png) repeat-x top left;
 }
@@ -674,70 +678,70 @@
 .dijit_a11y .dijitSliderProgressBar {
 	background-color:#333 !important;
 }
-.nihilo .dijitHorizontalSliderImageHandle {
+.nihilo .dijitSliderImageHandleH {
 	border:0px;
 	width:15px;
 	height:18px;
 	background:url(images/preciseSliderThumb.png) no-repeat center top;
 	cursor:pointer;
 }
-.nihilo .dijitSliderFocused .dijitHorizontalSliderImageHandle {
+.nihilo .dijitSliderFocused .dijitSliderImageHandleH {
 	background-image:url(images/preciseSliderThumbFocus.png);
 	#background-image:url(images/preciseSliderThumbFocus.gif);
 }
-.dj_ie6 .nihilo .dijitHorizontalSliderImageHandle {
+.dj_ie6 .nihilo .dijitSliderImageHandleH {
 	background-image:url(images/preciseSliderThumb.gif);
 }
-.nihilo .dijitHorizontalSliderLeftBumper {
+.nihilo .dijitSliderLeftBumper {
 	border-left-width: 1px;
 	border-color: #aab0bb;
 	background: #c0c2c5 url(images/sliderFull.png) repeat-x top left;
 }
-.nihilo .dijitHorizontalSliderRightBumper {
+.nihilo .dijitSliderRightBumper {
 	background: #dcdcdc url(images/sliderEmpty.png) repeat-x top left;
 	border-color: #b4b4b4;
 	border-right-width: 1px;
 }
-.nihilo .dijitVerticalSliderImageHandle {
+.nihilo .dijitSliderImageHandleV {
 	border:0px;
 	width:20px;
 	height:15px;
 	background:url(images/sliderThumb.png) no-repeat center center;
 	cursor:pointer;
 }
-.nihilo .dijitSliderFocused .dijitVerticalSliderImageHandle {
+.nihilo .dijitSliderFocused .dijitSliderImageHandleV {
 	background-image:url(images/sliderThumbFocus.png);
 }
-.dj_ie6 .nihilo .dijitSliderFocused .dijitVerticalSliderImageHandle {
+.dj_ie6 .nihilo .dijitSliderFocused .dijitSliderImageHandleV {
 	background-image:url(images/sliderThumbFocus.gif);
 }
-.nihilo .dijitVerticalSliderBottomBumper {
+.nihilo .dijitSliderBottomBumper {
 	border-bottom-width: 1px;
 	border-color: #aab0bb;
 	background: #c0c2c5 url(images/sliderFullVertical.png) repeat-y bottom left;
 }
-.nihilo .dijitVerticalSliderTopBumper {
+.nihilo .dijitSliderTopBumper {
 	background: #dcdcdc url(images/sliderEmptyVertical.png) repeat-y top left;
 	border-color: #b4b4b4;
 	border-top-width: 1px;
 }
-.nihilo .dijitHorizontalSliderIncrementIcon,
-.nihilo .dijitVerticalSliderIncrementIcon {
+.nihilo .dijitSliderIncrementIconH,
+.nihilo .dijitSliderIncrementIconV {
 	background:url(images/spriteRoundedIconsSmall.png) no-repeat -45px top;
 	width:15px; height:15px;
 	cursor:pointer;
 }
-.nihilo .dijitHorizontalSliderIncrementIcon {
+.nihilo .dijitSliderIncrementIconH {
 	background:url(images/spriteRoundedIconsSmall.png) no-repeat -30px top;
 }
-.nihilo .dijitHorizontalSliderDecrementIcon,
-.nihilo .dijitVerticalSliderDecrementIcon {
+.nihilo .dijitSliderDecrementIconH,
+.nihilo .dijitSliderDecrementIconV {
 	width:15px;
 	height:15px;
 	cursor:pointer;
 	background:url(images/spriteRoundedIconsSmall.png) no-repeat -15px top;
 }
-.nihilo .dijitHorizontalSliderDecrementIcon { background:url(images/spriteRoundedIconsSmall.png) no-repeat 0px top; }
+.nihilo .dijitSliderDecrementIconH { background:url(images/spriteRoundedIconsSmall.png) no-repeat 0px top; }
 .nihilo .dijitSliderButtonInner {
 	visibility:hidden;
 }
@@ -745,7 +749,7 @@
 	opacity:0.6 !important;
 }
 .dj_ie6 .nihilo .dijitSliderDisabled,
-.dj_ie6 .nihilo .dijitSliderDisabled .RuleContainer,
+.dj_ie6 .nihilo .dijitSliderDisabled .dijitRuleContainer,
 .dj_ie6 .nihilo .dijitSliderDisabled .dijitSliderRemainingBar,
 .dj_ie6 .nihilo .dijitSliderDisabled .dijitSliderProgressBar {
 	filter: gray() alpha(opacity=40);
@@ -1042,51 +1046,85 @@
 .nihilo .dijitToolbar {
 	padding: 3px 0 1px 3px;	
 	border-bottom: 1px solid #ccc;
-	background:#fdfdfd url(images/titleBar.png) repeat-x top left;
-}
-.nihilo .dijitToolbar * {
-	padding: 0;
-	margin: 0;
-	
-	
-}
-.dj_ie .nihilo .dijitToolbar {
-	padding-bottom: 1px;
+	background:#eaeaea url(images/titleBar.png) repeat-x top left;
 }
 .nihilo .dijitToolbar .dijitButtonNode {
-	padding: 0;
-	margin: 1px;
-	border: 1px solid transparent;
 	background: none;
-	_margin: 1px;
-	_padding: 0 1px 0 1px;
-	_border: 0;
+	margin: 0px !important;
+	padding: 0px !important;	
+	border: none;
+	font-size: 12px;
 }
-.nihilo .dijitToolbar .dijitToggleButtonChecked .dijitButtonNode {
+.nihilo .dijitToolbar .dijitButton,
+.nihilo .dijitToolbar .dijitToggleButton,
+.nihilo .dijitToolbar .dijitDropDownButton {
+	background: none;
+	margin: 1px;
+	padding: 0px;	
+	border: 1px solid transparent;
+}
+.nihilo .dijitToolbar .dijitButtonChecked,
+.nihilo .dijitToolbar .dijitToggleButtonChecked {
+	background-color:#ffeeb9;
+	border:1px solid #f7c95c;
+	margin: 1px !important;
+	padding: 0px !important;
+}
+.nihilo .dijitToolbar .dijitButtonCheckedHover,
+.nihilo .dijitToolbar .dijitToggleButtonCheckedHover
+ {
 	background-color:#ffe284;
 	border:1px solid #f7c95c;
+	margin: 1px !important;
+	padding: 0px !important;
 }
-.nihilo .dijitToolbar .dijitToggleButtonCheckedHover .dijitButtonContents {
-	border-color: #f7c95c;
-	background-color: #9abbea !important;
-}
-.dj_ie6 .nihilo .dijitToolbar .dijitButtonNode {
+.nihilo .dijitToolbar .dijitButtonHover,
+.nihilo .dijitToolbar .dijitToggleButtonHover,
+.nihilo .dijitToolbar .dijitDropDownButtonHover {
 	
-	border-color: #ccc;
-}
-.nihilo .dijitToolbar .dijitButtonHover .dijitButtonNode,
-.nihilo .dijitToolbar .dijitToggleButtonHover .dijitButtonNode,
-.nihilo .dijitToolbar .dijitDropDownButtonHover .dijitButtonNode {
-	
-	border-color: #f7c95c;
-	background-color: #ffe284 !important;
-	
-	_border: 1px solid #F7C95C;
-	_margin: 0 0 0 0;
-	_padding: 0;
+	border: 1px solid #f7c95c;
+	background-color:#ffe284;
 }
 .nihilo .dijitToolbar label {	
 	padding: 3px 3px 0 6px;
+}
+.dj_ie .nihilo .dijitToolbar .dijitComboButton .dijitButtonContentsFocused,
+.dj_ie .nihilo .dijitToolbar .dijitComboButton .dijitDownArrowButtonFocused,
+.dj_ff2 .nihilo.dijitToolbar .dijitComboButton .dijitButtonContentsFocused,
+.dj_ff2 .nihilo .dijitToolbar .dijitComboButton .dijitDownArrowButtonFocused {
+	border: 1px black dotted !important;	
+}
+.dj_ie6 .nihilo .dijitToolbar .dijitButton,
+.dj_ie6 .nihilo .dijitToolbar .dijitToggleButton,
+.dj_ie6 .nihilo .dijitToolbar .dijitDropDownButton {
+	
+	margin: 2px;
+	padding: 0px 2px;
+	border: 0px;
+}
+.dj_ie6 .nihilo .dijitToolbar .dijitButtonChecked,
+.dj_ie6 .nihilo .dijitToolbar .dijitToggleButtonChecked,
+.dj_ie6 .nihilo .dijitToolbar .dijitDropDownButtonChecked {
+	background-color:#ffeeb9;
+	border:1px solid #f7c95c;
+	margin: 1px !important;
+	padding: 0px 2px !important;
+}
+.dj_ie6 .nihilo .dijitToolbar .dijitButtonCheckedHover,
+.dj_ie6 .nihilo .dijitToolbar .dijitToggleButtonCheckedHover,
+.dj_ie6 .nihilo .dijitToolbar .dijitDropDownButtonCheckedHover {
+	background-color:#ffe284;
+	border:1px solid #f7c95c;
+	margin: 1px !important;
+	padding: 0px 2px !important;
+}
+.dj_ie6 .nihilo .dijitToolbar .dijitButtonHover,
+.dj_ie6 .nihilo .dijitToolbar .dijitToggleButtonHover,
+.dj_ie6 .nihilo .dijitToolbar .dijitDropDownButtonHover  {
+	background-color:#ffe284;
+	border:1px solid #f7c95c;
+	margin: 1px !important;
+	padding: 0px 2px !important;
 }
 .nihilo .dijitDialog {
 	background: #eee;
@@ -1226,7 +1264,7 @@
 	background-image: url(images/tooltipConnectorLeft.gif);
 }
 .nihilo .dijitMenu {
-	border: 1px solid #dedede;
+	border: 1px solid #d3d3d3;
 	margin: 0px;
 	padding: 0px;
 	background-color: #fff;
@@ -1278,7 +1316,7 @@
 .nihilo .dijitMenuSeparatorBottom {
 	border-top: 1px solid #d3d3d3;
 }
-.IEFixedToolbar {
+.dijitIEFixedToolbar {
 	position:absolute;
 	
 	top: expression(eval((document.documentElement||document.body).scrollTop));
@@ -1333,3 +1371,8 @@
 .nihilo .dijitEditorIconUndo { background-position: -666px; }
 .nihilo .dijitEditorIconWikiword { background-position: -684px; }
 .nihilo .dijitEditorIconToggleDir { background-position: -540px; }
+.dijitColorPalette {
+	border:1px solid #d3d3d3;
+	background:#fff;
+	-moz-border-radius: 0px !important;
+}

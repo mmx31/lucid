@@ -9,8 +9,7 @@ dojo.declare(
 	dijit.form._FormValueWidget,
 	{
 		// summary:
-		//		A generic textbox field.
-		//		Serves as a base class to derive more specialized functionality in subclasses.
+		//		A base class for textbox form inputs
 
 		//	trim: Boolean
 		//		Removes leading and trailing whitespace if true.  Default is false.
@@ -39,6 +38,9 @@ dojo.declare(
 			{maxLength:"focusNode"}),
 
 		getDisplayedValue: function(){
+			//	summary:
+			//		Returns the formatted value that the user sees in the textbox, which may be different
+			//		from the serialized value that's actually sent to the server (see dijit.form.ValidationTextBox.serialize)
 			return this.filter(this.textbox.value);
 		},
 
@@ -46,7 +48,7 @@ dojo.declare(
 			return this.parse(this.getDisplayedValue(), this.constraints);
 		},
 
-		setValue: function(value, /*Boolean, optional*/ priorityChange, /*String, optional*/ formattedValue){
+		setValue: function(value, /*Boolean?*/ priorityChange, /*String?*/ formattedValue){
 			var filteredValue = this.filter(value);
 			if((((typeof filteredValue == typeof value) && (value !== undefined/*#5317*/)) || (value === null/*#5329*/)) && (formattedValue == null || formattedValue == undefined)){
 				formattedValue = this.format(filteredValue, this.constraints);
@@ -57,7 +59,9 @@ dojo.declare(
 			dijit.form.TextBox.superclass.setValue.call(this, filteredValue, priorityChange);
 		},
 
-		setDisplayedValue: function(/*String*/value, /*Boolean, optional*/ priorityChange){
+//TODOC: what is a priorityChange?
+//TODOC: summary
+		setDisplayedValue: function(/*String*/value, /*Boolean?*/ priorityChange){
 			this.textbox.value = value;
 			this.setValue(this.getValue(), priorityChange);
 		},
@@ -86,7 +90,7 @@ dojo.declare(
 		},
 
 		filter: function(val){
-			// summary: Apply various filters to textbox value
+			// summary: Apply specified filters to textbox value
 			if(val === null || val === undefined){ return ""; }
 			else if(typeof val != "string"){ return val; }
 			if(this.trim){
@@ -114,7 +118,38 @@ dojo.declare(
 			this._setBlurValue();
 			this.inherited(arguments);
 		}
+
 	}
 );
+
+dijit.selectInputText = function(/*DomNode*/element, /*Number, optional*/ start, /*Number, optional*/ stop){
+	// summary:
+	//	Select text in the input element argument, from start (default 0), to stop (default end).
+
+	// TODO: use functions in _editor/selection.js?
+	var _window = dojo.global;
+	var _document = dojo.doc;
+	element = dojo.byId(element);
+	if(isNaN(start)){ start = 0; }
+	if(isNaN(stop)){ stop = element.value.length; }
+	element.focus();
+	if(_document["selection"] && dojo.body()["createTextRange"]){ // IE
+		if(element.createTextRange){
+			var range = element.createTextRange();
+			with(range){
+				collapse(true);
+				moveStart("character", start);
+				moveEnd("character", stop);
+				select();
+			}
+		}
+	}else if(_window["getSelection"]){
+		var selection = _window.getSelection();
+		// FIXME: does this work on Safari?
+		if(element.setSelectionRange){
+			element.setSelectionRange(start, stop);
+		}
+	}
+}
 
 }

@@ -12,7 +12,7 @@ dojo.require("dojo.i18n");
 
 // Load the bundles containing localization information for
 // names and formats
-dojo.requireLocalization("dojo.cldr", "gregorian", null, "ko,zh-cn,zh,ja,en,it-it,en-ca,en-au,zh-tw,it,en-gb,es-es,fr,pt,ROOT,ko-kr,es,de,pt-br");
+dojo.requireLocalization("dojo.cldr", "gregorian", null, "zh-cn,zh,en-ca,ko-kr,pt,pt-br,it-it,ROOT,en-gb,de,ja,en,en-au,fr,es,ko,zh-tw,it,es-es");
 
 //NOTE: Everything in this module assumes Gregorian calendars.
 // Other calendars will be implemented in separate modules.
@@ -141,7 +141,7 @@ dojo.requireLocalization("dojo.cldr", "gregorian", null, "ko,zh-cn,zh,ja,en,it-i
 					s = dateObject.getSeconds(); pad = true;
 					break;
 				case 'S':
-					s = Math.round(dateObject.getMilliseconds() * Math.pow(10, l-3));
+					s = Math.round(dateObject.getMilliseconds() * Math.pow(10, l-3)); pad = true;
 					break;
 				case 'v': // FIXME: don't know what this is. seems to be same as z?
 				case 'z':

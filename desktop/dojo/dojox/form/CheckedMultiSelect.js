@@ -5,24 +5,6 @@ dojo.provide("dojox.form.CheckedMultiSelect");
 dojo.require("dijit.form.MultiSelect");
 dojo.require("dijit.form.CheckBox");
 
-dojo.setObject("dojox.form.util.getScrollbarWidth", function(){
-	// summary:
-	//		A function to return the calculated width of scroll bars
-	if(dojox.form.util._scrollBarWidth){
-		return dojox.form.util._scrollBarWidth;
-	}
-	dojo.setObject("dojox.form.util._scrollBarWidth", 18);
-	try{
-		var e = document.createElement("div");
-		e.style.cssText = "top:0;left:0;width:100px;height:100px;overflow:scroll;position:absolute;visibility:hidden;";
-		document.body.appendChild(e);
-		dojox.form.util._scrollBarWidth = e.offsetWidth - e.clientWidth;
-		document.body.removeChild(e);
-		delete e;
-	}catch (ex){}
-	return dojox.form.util._scrollBarWidth;
-});
-
 dojo.declare("dojox.form._CheckedMultiSelectItem", 
 	[dijit._Widget, dijit._Templated],
 	{
@@ -30,12 +12,18 @@ dojo.declare("dojox.form._CheckedMultiSelectItem",
 	//		The individual items for a CheckedMultiSelect
 
 	widgetsInTemplate: true,
-	templateString:"<tr class=\"dijitReset dijitMenuItem\"\n\t><td class=\"dijitReset\"\n\t\t><div class=\"dijitMenuItemIcon\"\n\t\t\t><input dojoType=\"dijit.form.CheckBox\" dojoAttachPoint=\"checkBox\" dojoAttachEvent=\"_onClick:_changeBox\" type=\"checkbox\" \n\t\t/></div\n\t\t></td\n\t><td class=\"dijitReset dijitMenuItemLabel\" dojoAttachPoint=\"labelNode\" dojoAttachEvent=\"onclick:_labelClick\">${option.innerHTML}</td\n></tr>\n",
+	templateString:"<div class=\"dijitReset ${baseClass}\"\n\t><input class=\"${baseClass}Box\" dojoType=\"dijit.form.CheckBox\" dojoAttachPoint=\"checkBox\" dojoAttachEvent=\"_onClick:_changeBox\" type=\"checkbox\" \n\t><div class=\"dijitInline ${baseClass}Label\" dojoAttachPoint=\"labelNode\" dojoAttachEvent=\"onmousedown:_onMouse,onmouseover:_onMouse,onmouseout:_onMouse,onclick:_onClick\">${option.innerHTML}</div\n></div>\n",
+
+	baseClass: "dojoxMultiSelectItem",
 
 	// option: Element
 	//		The option that is associated with this item
 	option: null,
 	parent: null,
+	
+	// disabled: boolean
+	//		Whether or not this widget is disabled
+	disabled: false,
 
 	_changeBox: function(){
 		// summary:
@@ -45,20 +33,53 @@ dojo.declare("dojox.form._CheckedMultiSelectItem",
 
 		// fire the parent's change
 		this.parent._onChange();
+		
+		// refocus the parent
+		this.parent.focus();
 	},
 
 	_labelClick: function(){
 		// summary:
 		//		Called when the label portion is clicked
+		dojo.stopEvent(e);
+		if(this.disabled){
+			return;
+		}
 		var cb = this.checkBox;
 		cb.setValue(!cb.getValue());
 		this._changeBox();
 	},
 
+	_onMouse: function(e){
+		// summary:
+		//		Sets the hover state depending on mouse state (passes through
+		//		to the check box)
+		this.checkBox._onMouse(e);
+	},
+	
+	_onClick: function(e){
+		// summary:
+		//		Sets the click state (passes through to the check box)
+		this.checkBox._onClick(e);
+	},
+	
 	_updateBox: function(){
 		// summary:
 		//		Called to force the box to match the state of the select
 		this.checkBox.setValue(this.option.selected);
+	},
+	
+	setAttribute: function(attr, value){
+		// summary:
+		//		Disables (or enables) all the children as well
+		this.inherited(arguments);
+		switch(attr){
+			case "disabled":
+				this.checkBox.setAttribute(attr, value);
+				break;
+			default:
+				break;
+		}
 	}
 });
 
@@ -67,25 +88,53 @@ dojo.declare("dojox.form.CheckedMultiSelect", dijit.form.MultiSelect, {
 	//		Extends the core dijit MultiSelect to provide a "checkbox" selector
 
 	templateString: "",
-	templateString:"<div class=\"dijit dijitReset dijitInline dojoxMultiSelect\"\n\t><select style=\"display: none\" multiple=\"true\" dojoAttachPoint=\"containerNode,focusNode\" dojoAttachEvent=\"onchange: _onChange\"></select\n\t><div dojoAttachPoint=\"wrapperDiv\" class=\"dijitMenu\"\n\t\t><table dojoAttachPoint=\"tableDiv\" class=\"dijit dijitReset dijitMenuTable\"\n\t\t\t><tbody class=\"dijitReset\" dojoAttachPoint=\"selectBody\"></tbody\n\t\t></table\n\t></div\n></div>\n",
+	templateString:"<div class=\"dijit dijitReset dijitInline\" dojoAttachEvent=\"onmousedown:_mouseDown,onclick:focus\"\n\t><select class=\"${baseClass}Select\" multiple=\"true\" dojoAttachPoint=\"containerNode,focusNode\" dojoAttachEvent=\"onchange: _onChange\"></select\n\t><div dojoAttachPoint=\"wrapperDiv\"></div\n></div>\n",
+
+	baseClass: "dojoxMultiSelect",
 
 	// children: dojox.form._CheckedMultiSelectItem[]
 	//		Array of all our children (for updating them)
 	children: [],
+	
+	/*=====
+	dojox.form.__SelectOption = function(){
+		//	value: String
+		//		The value of the option.  Setting to empty (or missing) will
+		//		place a separator at that location
+		//	label: String
+		//		The label for our option.  It can contain html tags.
+		this.value = value;
+		this.label = label;
+	}
+	=====*/
+
+	// options: dojox.form.__SelectOption[]
+	//		our set of options
+	options: null,
+
+	_mouseDown: function(e){
+		// summary:
+		//		Cancels the mousedown event to prevent others from stealing
+		//		focus
+		dojo.stopEvent(e);
+	},
 
 	_updateChildren: function(){
 		// summary:
 		//		Called to update the checked states of my children to match me
-		dojo.forEach(this.children,function(i){
-			i._updateBox();
+		dojo.forEach(this.children,function(child){
+			child._updateBox();
 		});
 	},
 	
 	_addChild: function(/*Element*/ option){
 		// summary:
 		//		Adds and returns a child for the given option.
-		var item = new dojox.form._CheckedMultiSelectItem({option: option, parent: this});
-		this.selectBody.appendChild(item.domNode);
+		var item = new dojox.form._CheckedMultiSelectItem({
+			option: option,
+			parent: this
+		});
+		this.wrapperDiv.appendChild(item.domNode);
 		return item;
 	},
 
@@ -94,35 +143,41 @@ dojo.declare("dojox.form.CheckedMultiSelect", dijit.form.MultiSelect, {
 		//		Reloads the children to match our box.
 
 		// Destroy any existing children before loading them again
-		dojo.forEach(this.children, function(i){
-			i.destroyRecursive();
+		dojo.forEach(this.children, function(child){
+			child.destroyRecursive();
 		});
-		this.children = dojo.query("option", this.domNode).map(function(i){
-			return this._addChild(i);
+		this.children = dojo.query("option", this.domNode).map(function(child){
+			return this._addChild(child);
 		}, this);
-		
-		// Update our width and scroll bar display
-		var len = this.children.length,
-			scr = (len > this.size),
-			d = this.wrapperDiv,
-			sw = dojox.form.util.getScrollbarWidth();
-
-		d.style.overflowY = (scr ? "scroll" : "");
-
-		dojo.contentBox(d,{
-			w: (dojo.marginBox(this.tableDiv).w + (scr ? sw : 0) + (len === 0 ? 20 : 0))
+		this.options = dojo.map(this.children, function(child){
+			var opt = child.option;
+			return { value:opt.value, label: opt.text };
 		});
-		
 		// Update the statuses of the children
 		this._updateChildren();
 	},
 
-	addOption: function(/*Element*/ option){
+	addOption: function(/* dojox.form.__SelectOption or string, optional */ value, /* string? */ label){
 		// summary: Adds the given option to the select
-		this.containerNode.appendChild(option);
-		this._loadChildren();
+		
+		var o = new Option("","");
+		o.value = value.value || value;
+		o.innerHTML = value.label || label;
+		this.containerNode.appendChild(o);
+	},
+
+	removeOption: function(/*String*/ optionId){
+		dojo.query("option[value=" + optionId + "]", this.domNode).forEach(function(node){
+			node.parentNode.removeChild(node);
+		}, this);
 	},
 	
+	setOptionLabel: function(/*string*/ optionId, /*string*/ label){
+		dojo.query("option[value=" + optionId + "]", this.domNode).forEach(function(node){
+			node.innerHTML = label;
+		});
+	},
+
 	addSelected: function(select){
 		this.inherited(arguments);
 		
@@ -132,23 +187,22 @@ dojo.declare("dojox.form.CheckedMultiSelect", dijit.form.MultiSelect, {
 		}
 		this._loadChildren();
 	},
-
-	postCreate: function(){
+	
+	setAttribute: function(attr, value){
+		// summary:
+		//		Disable (or enable) all the children as well
 		this.inherited(arguments);
-
-		// Create children to find our max height
-		this.children = [];
-		for(var i = 0; i < this.size; i++){
-			this.children.push(this._addChild({ innerHTML: "" + i}));
+		switch(attr){
+			case "disabled":
+				dojo.forEach(this.children, function(node){
+					if(node && node.setAttribute){
+						node.setAttribute(attr, value);
+					}
+				});
+				break;
+			default:
+				break;
 		}
-		
-		// Hack safari since for some reason it's calculating 10 pixels too 
-		// high.
-		// TODO: Figure out why this is happening
-		dojo.contentBox(this.wrapperDiv, {
-			h: dojo.marginBox(this.tableDiv).h - (dojo.isSafari ? 10 : 0)
-		});
-
 	},
 
 	startup: function(){
@@ -157,8 +211,11 @@ dojo.declare("dojox.form.CheckedMultiSelect", dijit.form.MultiSelect, {
 
 		// Load children and make connections
 		this._loadChildren();
-		dojo.connect(this, "setValue", this, "_updateChildren");
-		dojo.connect(this, "invertSelection", this, "_updateChildren");
+		this.connect(this, "setValue", "_updateChildren");
+		this.connect(this, "invertSelection", "_updateChildren");
+		this.connect(this, "addOption", "_loadChildren");
+		this.connect(this, "removeOption", "_loadChildren");
+		this.connect(this, "setOptionLabel", "_loadChildren");
 		this._started = true;
 	}
 });

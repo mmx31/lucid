@@ -165,7 +165,7 @@ dojo.require("dojox.string.tokenize");
 			if(varr){
 				return [types.varr, varr];
 			}else if(load){
-				var parts = dd.text.pySplit(dojo.trim(tag));
+				var parts = dd.text.pySplit(tag);
 				for(var i = 0, part; part = parts[i]; i++){
 					dojo["require"](part);
 				}
@@ -190,7 +190,7 @@ dojo.require("dojox.string.tokenize");
 			//		A node reference or set of nodes
 			// context: dojo._Url|String|Object
 			//		The context object or location
-			ddt._resolveContextArg(context).addCallback(this, function(contextObject){
+			return ddt._resolveContextArg(context).addCallback(this, function(contextObject){
 				var content = this.render(new dd._Context(contextObject));
 				if(node.forEach){
 					node.forEach(function(item){
@@ -199,9 +199,8 @@ dojo.require("dojox.string.tokenize");
 				}else{
 					dojo.byId(node).innerHTML = content;
 				}
+				return this;
 			});
-
-			return this;
 		},
 		render: function(context, /*concatenatable?*/ buffer){
 			buffer = buffer || this.getBuffer();

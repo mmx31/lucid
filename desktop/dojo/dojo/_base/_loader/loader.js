@@ -50,8 +50,7 @@ dojo._hasResource["dojo.foo"] = true;
 	});
 
 
-	//>>excludeStart("xdomainExclude", fileName.indexOf("dojo.xd.js") != -1 && kwArgs.loader == "xdomain");
-	dojo._loadPath = function(/*String*/relpath, /*String?*/module, /*Function?*/cb){
+		dojo._loadPath = function(/*String*/relpath, /*String?*/module, /*Function?*/cb){
 		// 	summary:
 		//		Load a Javascript module given a relative path
 		//
@@ -108,12 +107,12 @@ dojo._hasResource["dojo.foo"] = true;
 			//it is most likely the i18n bundle stuff.
 			contents = this._scopePrefix + contents + this._scopeSuffix;
 		}
-		var value = d["eval"](contents+"\r\n//@ sourceURL="+uri);
+		if(d.isMoz){ contents += "\r\n//@ sourceURL=" + uri; } // debugging assist for Firebug
+		var value = d["eval"](contents);
 		if(cb){ cb(value); }
 		return true; // Boolean
 	}
-	//>>excludeEnd("xdomainExclude");
-
+	
 	// FIXME: probably need to add logging to this method
 	dojo._loadUriAndCheck = function(/*String*/uri, /*String*/moduleName, /*Function?*/cb){
 		// summary: calls loadUri then findModule and returns true if both succeed
@@ -146,6 +145,7 @@ dojo._hasResource["dojo.foo"] = true;
 			try{
 				mll[x]();
 			}catch(e){
+				throw e;
 				console.error("dojo.addOnLoad callback failed: " + e, e); /* let other load events fire, like the parser, but report the error */
 			}
 		}
@@ -171,6 +171,15 @@ dojo._hasResource["dojo.foo"] = true;
 		}
 	}
 
+	var onto = function(arr, obj, fn){
+		if(!fn){
+			arr.push(obj);
+		}else if(fn){
+			var func = (typeof fn == "string") ? obj[fn] : fn;
+			arr.push(function(){ func.call(obj); });
+		}
+	}
+
 	dojo.addOnLoad = function(/*Object?*/obj, /*String|Function*/functionName){
 		// summary:
 		//		Registers a function to be triggered after the DOM has finished
@@ -182,13 +191,9 @@ dojo._hasResource["dojo.foo"] = true;
 		// example:
 		//	|	dojo.addOnLoad(functionPointer);
 		//	|	dojo.addOnLoad(object, "functionName");
-		if(arguments.length == 1){
-			d._loaders.push(obj);
-		}else if(arguments.length > 1){
-			d._loaders.push(function(){
-				obj[functionName]();
-			});
-		}
+		//	|	dojo.addOnLoad(object, function(){ /* ... */});
+
+		onto(d._loaders, obj, functionName);
 
 		//Added for xdomain loading. dojo.addOnLoad is used to
 		//indicate callbacks after doing some dojo.require() statements.
@@ -200,17 +205,14 @@ dojo._hasResource["dojo.foo"] = true;
 	}
 
 	dojo.addOnUnload = function(/*Object?*/obj, /*String|Function?*/functionName){
-		// summary: registers a function to be triggered when the page unloads
+		// summary:
+		//		registers a function to be triggered when the page unloads
 		// example:
 		//	|	dojo.addOnUnload(functionPointer)
 		//	|	dojo.addOnUnload(object, "functionName")
-		if(arguments.length == 1){
-			d._unloaders.push(obj);
-		}else if(arguments.length > 1){
-			d._unloaders.push(function(){
-				obj[functionName]();
-			});
-		}
+		//	|	dojo.addOnUnload(object, function(){ /* ... */});
+
+		onto(d._unloaders, obj, functionName);
 	}
 
 	dojo._modulesLoaded = function(){
@@ -223,12 +225,14 @@ dojo._hasResource["dojo.foo"] = true;
 	}
 
 	dojo._callLoaded = function(){
-		//The "object" check is for IE, and the other opera check fixes an issue
-		//in Opera where it could not find the body element in some widget test cases.
-		//For 0.9, maybe route all browsers through the setTimeout (need protection
-		//still for non-browser environments though). This might also help the issue with
-		//FF 2.0 and freezing issues where we try to do sync xhr while background css images
-		//are being loaded (trac #2572)? Consider for 0.9.
+
+		// The "object" check is for IE, and the other opera check fixes an
+		// issue in Opera where it could not find the body element in some
+		// widget test cases.  For 0.9, maybe route all browsers through the
+		// setTimeout (need protection still for non-browser environments
+		// though). This might also help the issue with FF 2.0 and freezing
+		// issues where we try to do sync xhr while background css images are
+		// being loaded (trac #2572)? Consider for 0.9.
 		if(typeof setTimeout == "object" || (dojo.config.useXDomain && d.isOpera)){
 			if(dojo.isAIR){
 				setTimeout(function(){dojo.loaded();}, 0);

@@ -12,14 +12,14 @@ dojox.analytics = function(){
 	this._id=1;
 
 	//some default values
-	this.sendInterval=djConfig["sendInterval"] || 5000;
-	this.inTransitRetry=djConfig["inTransitRetry"] || 200;
-	this.dataUrl=djConfig["analyticsUrl"] || dojo.moduleUrl("dojox.analytics.logger", "dojoxAnalytics.php");
-	this.sendMethod = djConfig["sendMethod"] || "xhrPost";
+	this.sendInterval=dojo.config["sendInterval"] || 5000;
+	this.inTransitRetry=dojo.config["inTransitRetry"] || 200;
+	this.dataUrl=dojo.config["analyticsUrl"] || dojo.moduleUrl("dojox.analytics.logger", "dojoxAnalytics.php");
+	this.sendMethod = dojo.config["sendMethod"] || "xhrPost";
 	if (dojo.isIE){
 		this.maxRequestSize = 2000;
 	}else{
-		this.maxRequestSize = djConfig["maxRequestSize"] || 4000;	
+		this.maxRequestSize = dojo.config["maxRequestSize"] || 4000;	
 	}
 
 	//while we can go ahead and being logging as soon as this constructor is completed
@@ -50,7 +50,6 @@ dojo.extend(dojox.analytics, {
 		}
 
 		this._data.push({plugin: dataType, data: data});
-		console.log("Add Data: ", dataType);
 	},
 
 	checkData: function(){
@@ -101,7 +100,6 @@ dojo.extend(dojox.analytics, {
 				this._split=1;
 			}else{
 				//console.log("script send: ", this._inTransit, " Remaining in queue: ", this._data.length);
-				console.log("remaining in queue: " + this._data.length);
 				return query;
 			}	
 		}
@@ -120,7 +118,6 @@ dojo.extend(dojox.analytics, {
 		} else {
 			this.schedulePusher();
 		}
-		console.log("Request Completed");
 	}
 });
 

@@ -41,16 +41,13 @@ dojo.declare("dojox.rpc.Service", null, {
 				}else{
 					url = smd;
 				}
-				var def = dojo.xhrGet({
-					url: url,
-					handleAs: "json",
-					sync: true
-				});
-				
-				def.addCallback(processSmd);
-				def.addErrback(function(){
-					throw new Error("Unable to load SMD from " + smd);
-				});
+			
+				var text = dojo._getText(url);
+				if(!text){
+					throw new Error("Unable to load SMD from " + smd)
+				}else{
+					processSmd(dojo.fromJson(text));
+				}
 			}else{
 				processSmd(smd);
 			}
@@ -99,10 +96,14 @@ dojo.declare("dojox.rpc.Service", null, {
 				}
 			}
 		}
+		if (dojo.isObject(this._options)){
+			args = dojo.mixin(args, this._options);
+		}
+
 		var envelope = method.envelope || smd.envelope || "NONE";
 		var envDef = dojox.rpc.envelopeRegistry.match(envelope);
 		var schema = method._schema || method.returns; // serialize with the right schema for the context;
-		var request = envDef.serialize.apply(this, [smd, method, args, this._options]);
+		var request = envDef.serialize.apply(this, [smd, method, args]);
 		var contentType = (method.contentType || smd.contentType || request.contentType);
 		var isJson = (contentType + '').match(/application\/json/);
 
@@ -187,7 +188,7 @@ dojox.rpc.envelopeRegistry = new dojo.AdapterRegistry(true);
 
 dojox.rpc.envelopeRegistry.register(
 	"URL",function(str){return str == "URL"},{
-		serialize:function(smd, method, data, options){ 
+		serialize:function(smd, method, data ){ 
 			var d = dojo.objectToQuery(dojox.rpc.toNamed(method, data, method.strictParameters||smd.strictParameters));
 	
 			return {
@@ -203,7 +204,7 @@ dojox.rpc.envelopeRegistry.register(
 
 dojox.rpc.envelopeRegistry.register(
 	"JSON",function(str){return str == "JSON"},{
-		serialize: function(smd, method, data, options){ 
+		serialize: function(smd, method, data){ 
 			var d = dojox.rpc.toJson(dojox.rpc.toNamed(method, data, method.strictParameters||smd.strictParameters));
 	
 			return {
@@ -217,7 +218,7 @@ dojox.rpc.envelopeRegistry.register(
 );
 dojox.rpc.envelopeRegistry.register(
 	"PATH",function(str){return str == "PATH"},{
-		serialize:function(smd, method, data, options){
+		serialize:function(smd, method, data){
 			var i;
 			var target = dojox.rpc.getTarget(smd, method);
 			if (dojo.isArray(data)){

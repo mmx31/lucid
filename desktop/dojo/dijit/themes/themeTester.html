@@ -13,8 +13,8 @@
 /*		#header, #mainSplit { margin: 10px; } */
 		#leftAccordion { width: 25%; }
 		#bottomTabs { height: 40%; }
-		#main .dijitSplitterHorizontal { height: 7px }
-		#main .dijitSplitterVertical { width: 7px }
+		#main .dijitSplitterH { height: 7px }
+		#main .dijitSplitterV { width: 7px }
 
 		/* pre-loader specific stuff to prevent unsightly flash of unstyled content */
 		#loader { 
@@ -46,7 +46,7 @@
 			vertical-align: middle;
 			padding: 0.2em 0.2em;
 			background: url("themeTesterImages/blackButtonEnabled.gif") repeat-x bottom left #474747;
-			color:#fff;
+			color: blue;
 		}
 		
 		.myCustomTheme .dijitButtonHover .dijitButtonNode,
@@ -68,7 +68,7 @@
 	<script type="text/javascript" src="http://prototypejs.org/assets/2007/10/16/prototype.js"></script>
 	-->
 	<script type="text/javascript" src="../dijit.js"></script>
-	<script type="text/javascript" src="../dijit-all.js"></script>
+	<script type="text/javascript" src="../dijit-all.js" charset="utf-8"></script>
 
 	<script type="text/javascript" src="../tests/_testCommon.js"></script>
 	<script type="text/javascript"> // dojo.requires()
@@ -592,7 +592,7 @@
 							<div class="dc">bit longer</div>
 						</button>
 
-						<button dojoType="dijit.form.Button" class="myCustomThem"
+						<button dojoType="dijit.form.Button" class="myCustomTheme"
 							onclick='console.debug("longer yet");'>
 							<div class="dc">ridiculously long</div>
 						</button>
@@ -623,21 +623,21 @@
 					<hr class="spacer">
 
 
-					<h2 class="testTitle">dijit.InlineEditBox + dijit.form.TextBox</h2>
+					<h2 class="testTitle">dijit.InlineEditBox + dijit.form.TextBox on &lt;h3&gt;</h2>
 
-					This is an editable header,
+					(HTML before)
 					<h3 id="editable" style="font-size:larger;" dojoType="dijit.InlineEditBox" onChange="myHandler(this.id,arguments[0])">
 						Edit me - I trigger the onChange callback
 					</h3>
-					And keep the text around me static.
+					(HTML after)
 
 					<hr class="spacer">
 
 					<h2>dijit.InlineEditBox + dijit.form.Textarea</h2>
 
 					(HTML before)
-					<p id="areaEditable" dojoType="dijit.InlineEditBox" editor="dijit.form.Textarea">
-						I'm one big paragraph.  Go ahead and <i>edit</i> me.  <b>I dare you.</b>
+					<p id="areaEditable" dojoType="dijit.InlineEditBox" editor="dijit.form.Textarea" autoSave="false">
+						I'm one big paragraph.  Go ahead and edit me.  I dare you.
 						The quick brown fox jumped over the lazy dog.  Blah blah blah blah blah blah blah ...
 					</p>
 					(HTML after)

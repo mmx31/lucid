@@ -25,10 +25,10 @@
 </head>
 <body>
 	<div dojoType="dijit.Editor" id="automated" height="1.5em" plugins="[]" focusOnLoad="true" style="border:0px;"
-	>Automated Test<script type='dojo/method' event='onFocus'>
+	>Automated Test - all check boxes should be checked<script type='dojo/method' event='onFocus'>
 			if(!document.getElementById('onFocusFired').checked){
 				document.getElementById('onFocusFired').checked=true;
-				document.getElementById('initialValueOK').checked = (dijit.byId('automated').getValue() == 'Automated Test');
+				document.getElementById('initialValueOK').checked = (dijit.byId('automated').getValue() == 'Automated Test - all check boxes should be checked');
 				dijit.byId('automated').document.execCommand('selectall', false, false);
 				document.getElementById('onChangeOKnow').checked=true;
 				dijit.byId('automated').document.execCommand('underline', false, false);
@@ -39,10 +39,10 @@
 			if(!document.getElementById('onBlurFired').checked){
 				document.getElementById('onBlurFired').checked=true;
 				dijit.byId('automated').setDisabled(true);
-				try {
+				setTimeout(function(){ try {
 					dijit.byId('automated').document.execCommand('bold', false, false);
 					document.getElementById('disabledOK').checked = (dijit.byId('automated').document.queryCommandState('bold') == false);
-				} catch(e) { document.getElementById('disabledOK').checked = true; }
+				} catch(e) { document.getElementById('disabledOK').checked = true; }}, 0);
 			}
 		</script
 		><script type='dojo/method' event='onChange'>
@@ -64,7 +64,7 @@
 	<h2>Created from div</h2>
 	<div style="border: 1px solid black;">
 		<div dojoType="dijit.Editor" id="editor1"
-			onChange="console.log('user onChange handler: ' + arguments[0])"
+			onChange="console.log('editor1 onChange handler: ' + arguments[0])"
 		><p>This instance is created from a div directly with default toolbar and plugins</p></div>
 	</div>
 	<button onClick="dijit.byId('editor1').destroy()">destroy</button>
@@ -75,6 +75,7 @@
 	<div style="border: 1px dotted black;">
 		<h3><label for="thud">thud - from textarea</label></h3>
 		<textarea dojoType="dijit.Editor" height=""
+			onChange="console.log('thud onChange handler: ' + arguments[0])"
 			extraPlugins="['dijit._editor.plugins.AlwaysShowToolbar']"
 			styleSheets="../../dojo/resources/dojo.css" id="thud">
 			<p>
@@ -97,13 +98,25 @@
 	<div style="border: 1px dotted black;">
 		<h3><label for="blah">blah entry</label></h3>
 		<textarea dojoType="dijit.Editor"
-			plugins="['bold','italic','|','createLink','foreColor','hiliteColor','fontName','fontSize','insertImage']"
+			plugins="['bold','italic','|','createLink','foreColor','hiliteColor',{name:'dijit._editor.plugins.FontChoice', command:'fontName', generic:true},'fontSize','formatBlock','insertImage']"
 			styleSheets="../../dojo/resources/dojo.css" id="blah">
 			This instance includes optional toolbar buttons which pull in additional ui (dijit) code.
 			Note the dojo.require() statements required to pull in the associated editor plugins to make
-			this work. 
+			this work.
+			<br>
+			<span style="font-family: serif">This is serif.</span>
+			<br>
+			<span style="font-family: sans-serif">This is sans-serif.</span>
+			<br>
+			<span style="font-family: monospace">This is monospace.</span>
+			<br>
+			<span style="font-family: cursive">This is cursive.</span>
+			<br>
+			<span style="font-family: fantasy">This is fantasy.</span>
+			<br>
 		</textarea>
 		<h3>..after</h3>
+		<button onclick="alert(dijit.byId('blah').getValue());">getValue</button>
 	</div>
 	<hr/>
 
@@ -111,7 +124,7 @@
 	<div style="border: 1px dotted black;">
 		<h3><label for="blah2">Another blah entry</label></h3>
 		<textarea dojoType="dijit.Editor"
-			plugins="['bold','italic','|',{name:'dijit._editor.plugins.LinkDialog'}]"
+			plugins="['bold','italic','|',{name:'dijit._editor.plugins.EnterKeyHandling'},{name:'dijit._editor.plugins.FontChoice', command:'fontName', custom:['Verdana','Myriad','Garamond','Apple Chancery','Hiragino Mincho Pro']}, {name:'dijit._editor.plugins.FontChoice', command:'fontSize', custom:[3,4,5]}]"
 			styleSheets="../../dojo/resources/dojo.css" id="blah2">
 			This instance demos how to:
 			<ol>

@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2004-2007, The Dojo Foundation
+	Copyright (c) 2004-2008, The Dojo Foundation
 	All Rights Reserved.
 
 	Licensed under the Academic Free License version 2.1 or above OR the
@@ -203,7 +203,7 @@ dojo.mixin(dijit,
 			targetWindow = window;
 		}
 
-		dojo.connect(targetWindow.document, "onmousedown", null, function(evt){
+		dojo.connect(targetWindow.document, "onmousedown", function(evt){
 			dijit._justMouseDowned = true;
 			setTimeout(function(){ dijit._justMouseDowned = false; }, 0);
 			dijit._onTouchNode(evt.target||evt.srcElement);
@@ -277,8 +277,8 @@ dojo.mixin(dijit,
 						break;
 					}
 					// otherwise, find the iframe this node refers to (can't access it via parentNode,
-					// need to do this trick instead) and continue tracing up the document
-					node=dojo.query("iframe").filter(function(iframe){ return iframe.contentDocument.body===node; })[0];
+					// need to do this trick instead). window.frameElement is supported in IE/FF/Webkit
+					node=dijit.getDocumentWindow(node.ownerDocument).frameElement;
 				}else{
 					var id = node.getAttribute && node.getAttribute("widgetId");
 					if(id){
@@ -1099,15 +1099,13 @@ dijit.scrollIntoView = function(/* DomNode */node){
 	// it doesnt work in Konqueror or Opera even though the function is there and probably
 	// not safari either
 	// dont like browser sniffs implementations but sometimes you have to use it
-	if(dojo.isIE){
-		//only call scrollIntoView if there is a scrollbar for this menu,
-		//otherwise, scrollIntoView will scroll the window scrollbar
-		if(dojo.marginBox(node.parentNode).h <= node.parentNode.scrollHeight){ //PORT was getBorderBox
-			node.scrollIntoView(false);
-		}
-	}else if(dojo.isMozilla){
+	if(dojo.isMozilla){
 		node.scrollIntoView(false);
 	}else{
+		// #6146: IE scrollIntoView is broken
+		// It's not enough just to scroll the menu node into view if
+		// node.scrollIntoView hides part of the parent's scrollbar,
+		// so just manage the parent scrollbar ourselves
 		var parent = node.parentNode;
 		var parentBottom = parent.scrollTop + dojo.marginBox(parent).h; //PORT was getBorderBox
 		var nodeBottom = node.offsetTop + dojo.marginBox(node).h;
@@ -1136,6 +1134,7 @@ dojo.provide("dijit._base.sniff");
 	var ie = d.isIE;
 	var opera = d.isOpera;
 	var maj = Math.floor;
+	var ff = d.isFF;
 	var classes = {
 		dj_ie: ie,
 //		dj_ie55: ie == 5.5,
@@ -1148,7 +1147,8 @@ dojo.provide("dijit._base.sniff");
 		dj_opera9: maj(opera) == 9,
 		dj_khtml: d.isKhtml,
 		dj_safari: d.isSafari,
-		dj_gecko: d.isMozilla
+		dj_gecko: d.isMozilla,
+		dj_ff2: maj(ff) == 2
 	}; // no dojo unsupported browsers
 
 	for(var p in classes){
@@ -1299,7 +1299,7 @@ dijit.typematic = {
 				dojo.stopEvent(evt);
 				if(dojo.isIE){
 					dijit.typematic.trigger(evt, _this, node, callback, node, subsequentDelay, initialDelay);
-					setTimeout(dijit.typematic.stop, 50);
+					setTimeout(dojo.hitch(this, dijit.typematic.stop), 50);
 				}
 			})
 		];
@@ -1477,6 +1477,17 @@ dojo.provide("dijit._base");
 
 
 
+
+//	FIXME: Find a better way of solving this bug!
+if(dojo.isSafari){
+	//	Ugly-ass hack to solve bug #5626 for 1.1; basically force Safari to re-layout.
+	//	Note that we can't reliably use dojo.addOnLoad here because this bug is basically
+	//		a timing / race condition; so instead we use window.onload.
+	dojo.connect(window, "load", function(){
+		window.resizeBy(1,0);
+		setTimeout(function(){ window.resizeBy(-1,0); }, 10);
+	});
+}
 
 }
 
@@ -1904,7 +1915,7 @@ if(!dojo._hasResource["dijit._Widget"]){ //_hasResource checks added by build. D
 dojo._hasResource["dijit._Widget"] = true;
 dojo.provide("dijit._Widget");
 
-
+dojo.require( "dijit._base" );
 
 dojo.declare("dijit._Widget", null, {
 	//	summary:
@@ -1917,25 +1928,30 @@ dojo.declare("dijit._Widget", null, {
 	//		used instead.
 	id: "",
 
-	// lang: String
-	//	Language to display this widget in (like en-us).
-	//	Defaults to brower's specified preferred language (typically the language of the OS)
+	//	lang: String
+	//		Rarely used.  Overrides the default Dojo locale used to render this widget,
+	//		as defined by the [HTML LANG](http://www.w3.org/TR/html401/struct/dirlang.html#adef-lang) attribute.
+	//		Value must be among the list of locales specified during by the Dojo bootstrap,
+	//		formatted according to [RFC 3066](http://www.ietf.org/rfc/rfc3066.txt) (like en-us).
 	lang: "",
 
-	// dir: String
-	//  Bi-directional support, as defined by the HTML DIR attribute. Either left-to-right "ltr" or right-to-left "rtl".
+	//	dir: String
+	//		Unsupported by Dijit, but here for completeness.  Dijit only supports setting text direction on the
+	//		entire document.
+	//		Bi-directional support, as defined by the [HTML DIR](http://www.w3.org/TR/html401/struct/dirlang.html#adef-dir)
+	//		attribute. Either left-to-right "ltr" or right-to-left "rtl".
 	dir: "",
 
 	// class: String
-	// HTML class attribute
+	//		HTML class attribute
 	"class": "",
 
 	// style: String
-	// HTML style attribute
+	//		HTML style attribute
 	style: "",
 
 	// title: String
-	// HTML title attribute
+	//		HTML title attribute
 	title: "",
 
 	// srcNodeRef: DomNode
@@ -1956,13 +1972,16 @@ dojo.declare("dijit._Widget", null, {
 	attributeMap: {id:"", dir:"", lang:"", "class":"", style:"", title:""},  // TODO: add on* handlers?
 
 	//////////// INITIALIZATION METHODS ///////////////////////////////////////
-
-	postscript: function(params, srcNodeRef){
+//TODOC: params and srcNodeRef need docs.  Is srcNodeRef optional?
+//TODOC: summary needed for postscript
+	postscript: function(/*Object?*/params, /*DomNode|String*/srcNodeRef){
 		this.create(params, srcNodeRef);
 	},
 
-	create: function(params, srcNodeRef){
-		// summary:
+	create: function(/*Object?*/params, /*DomNode|String*/srcNodeRef){
+		//	summary:
+		//		Kick off the life-cycle of a widget
+		//	description:
 		//		To understand the process by which widgets are instantiated, it
 		//		is critical to understand what other methods create calls and
 		//		which of them you'll want to override. Of course, adventurous
@@ -1972,19 +1991,19 @@ dojo.declare("dijit._Widget", null, {
 		//		Below is a list of the methods that are called, in the order
 		//		they are fired, along with notes about what they do and if/when
 		//		you should over-ride them in your widget:
-		//			
-		//		|	* postMixInProperties
-		//		|		a stub function that you can over-ride to modify
-		//		|		variables that may have been naively assigned by
-		//		|		mixInProperties
-		//		|	# widget is added to manager object here
-		//		|	* buildRendering
-		//		|		Subclasses use this method to handle all UI initialization
-		//		|		Sets this.domNode.  Templated widgets do this automatically
-		//		|		and otherwise it just uses the source dom node.
-		//		|	* postCreate
-		//		|		a stub function that you can over-ride to modify take
-		//		|		actions once the widget has been placed in the UI
+		//
+		// * postMixInProperties:
+		//	|	* a stub function that you can over-ride to modify
+		//		variables that may have been naively assigned by
+		//		mixInProperties
+		// * widget is added to manager object here
+		// * buildRendering:
+		//	|	* Subclasses use this method to handle all UI initialization
+		//		Sets this.domNode.  Templated widgets do this automatically
+		//		and otherwise it just uses the source dom node.
+		// * postCreate:
+		//	|	* a stub function that you can over-ride to modify take
+		//		actions once the widget has been placed in the UI
 
 		// store pointer to original dom tree
 		this.srcNodeRef = dojo.byId(srcNodeRef);
@@ -2218,14 +2237,14 @@ dojo.declare("dijit._Widget", null, {
 		}
 	},
 
-	nodesWithKeyClick : ["input", "button"],
+//TODOC
+	nodesWithKeyClick: ["input", "button"],
 
 	connect: function(
 			/*Object|null*/ obj,
 			/*String*/ event,
 			/*String|Function*/ method){
-
-		// summary:
+		//	summary:
 		//		Connects specified obj/event to specified method of this object
 		//		and registers for disconnect() on widget destroy.
 		//		Special event: "ondijitclick" triggers on a click or enter-down or space-up
@@ -3575,7 +3594,7 @@ dojo.declare("dijit.form._FormValueWidget", dijit.form._FormWidget,
 		// Equality comparison of objects such as dates are done by reference so
 		// two distinct objects are != even if they have the same data. So use
 		// toStrings in case the values are objects.
-		return ((v !== null && (v !== undefined) && v.toString)?v.toString():null) !== ((lv !== null && (lv !== undefined) && lv.toString)?lv.toString():null);
+		return ((v !== null && (v !== undefined) && v.toString)?v.toString():'') !== ((lv !== null && (lv !== undefined) && lv.toString)?lv.toString():'');
 	},
 
 	_onKeyPress: function(e){

@@ -142,7 +142,7 @@ tests.register("tests.number",
 				var partLocaleList = ["en-us", "fr-fr", "de-de"];
 
 				for(var i = 0 ; i < partLocaleList.length; i ++){
-					dojo.requireLocalization("dojo.cldr","number",partLocaleList[i], "ko,zh-cn,zh,ja,en,en-au,zh-tw,en-us,it,ja-jp,en-gb,ROOT,de-de,es-es,fr,pt,ko-kr,es,de");
+					dojo.requireLocalization("dojo.cldr","number",partLocaleList[i], "zh-cn,zh,ko-kr,pt,en-us,en-gb,de,ja,ja-jp,en,ROOT,en-au,fr,es,ko,zh-tw,it,es-es,de-de");
 				}
 			},
 			runTest: function(t){

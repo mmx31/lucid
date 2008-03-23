@@ -7,15 +7,25 @@ dojo.require("dojo.i18n");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.Tooltip");
 
-dojo.requireLocalization("dijit.form", "validate", null, "ko,zh-cn,zh,ja,gr,zh-tw,ru,it,hu,ROOT,fr,pt,pl,es,de,cs");
+dojo.requireLocalization("dijit.form", "validate", null, "zh-cn,zh,pt,ru,de,ja,ROOT,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
+
+/*=====
+	dijit.form.ValidationTextBox.__Constraints = function(){
+		// locale: String
+		//		locale used for validation, picks up value from this widget's lang attribute
+		// _flags_: anything
+		//		various flags passed to regExpGen function
+		this.locale = "";
+		this._flags_ = "";
+	}
+=====*/
 
 dojo.declare(
 	"dijit.form.ValidationTextBox",
 	dijit.form.TextBox,
 	{
 		// summary:
-		//		A subclass of TextBox.
-		//		Over-ride isValid in subclasses to perform specific kinds of validation.
+		//		A TextBox subclass with the ability to validate content of various types and provide user feedback.
 
 		templateString:"<div class=\"dijit dijitReset dijitInlineTable dijitLeft\"\n\tid=\"widget_${id}\"\n\tdojoAttachEvent=\"onmouseenter:_onMouse,onmouseleave:_onMouse,onmousedown:_onMouse\" waiRole=\"presentation\"\n\t><div style=\"overflow:hidden;\"\n\t\t><div class=\"dijitReset dijitValidationIcon\"><br></div\n\t\t><div class=\"dijitReset dijitValidationIconText\">&Chi;</div\n\t\t><div class=\"dijitReset dijitInputField\"\n\t\t\t><input class=\"dijitReset\" dojoAttachPoint='textbox,focusNode' dojoAttachEvent='onfocus:_update,onkeyup:_update,onblur:_onMouse,onkeypress:_onKeyPress' autocomplete=\"off\"\n\t\t\ttype='${type}' name='${name}'\n\t\t/></div\n\t></div\n></div>\n",
 		baseClass: "dijitTextBox",
@@ -33,7 +43,7 @@ dojo.declare(
 		// 		The message to display if value is invalid.
 		invalidMessage: "$_unset_$", // read from the message file if not overridden
 
-		// constraints: Object
+		// constraints: dijit.form.ValidationTextBox.__Constraints
 		//		user-defined object needed to pass parameters to the validator functions
 		constraints: {},
 
@@ -45,7 +55,7 @@ dojo.declare(
 		// regExpGen: Function
 		//		user replaceable function used to generate regExp when dependent on constraints
 		//		Do not specify both regExp and regExpGen
-		regExpGen: function(constraints){ return this.regExp; },
+		regExpGen: function(/*dijit.form.ValidationTextBox.__Constraints*/constraints){ return this.regExp; },
 
 		// state: String
 		//		Shows current state (ie, validation result) of input (Normal, Warning, or Error)
@@ -60,14 +70,14 @@ dojo.declare(
 			this.validate(this._focused);
 		},
 
-		validator: function(value,constraints){
+		validator: function(/*anything*/value, /*dijit.form.ValidationTextBox.__Constraints*/constraints){
 			// summary: user replaceable function used to validate the text input against the regular expression.
 			return (new RegExp("^(" + this.regExpGen(constraints) + ")"+(this.required?"":"?")+"$")).test(value) &&
 				(!this.required || !this._isEmpty(value)) &&
-				(this._isEmpty(value) || this.parse(value, constraints) !== undefined);
+				(this._isEmpty(value) || this.parse(value, constraints) !== undefined); // Boolean
 		},
 
-		isValid: function(/* Boolean*/ isFocused){
+		isValid: function(/*Boolean*/ isFocused){
 			// summary: Need to over-ride with your own validation code in subclasses
 			return this.validator(this.textbox.value, this.constraints);
 		},
@@ -77,17 +87,17 @@ dojo.declare(
 			return /^\s*$/.test(value); // Boolean
 		},
 
-		getErrorMessage: function(/* Boolean*/ isFocused){
+		getErrorMessage: function(/*Boolean*/ isFocused){
 			// summary: return an error message to show if appropriate
-			return this.invalidMessage;
+			return this.invalidMessage; // String
 		},
 
-		getPromptMessage: function(/* Boolean*/ isFocused){
+		getPromptMessage: function(/*Boolean*/ isFocused){
 			// summary: return a hint to show if appropriate
-			return this.promptMessage;
+			return this.promptMessage; // String
 		},
 
-		validate: function(/* Boolean*/ isFocused){
+		validate: function(/*Boolean*/ isFocused){
 			// summary:
 			//		Called by oninit, onblur, and onkeypress.
 			// description:
@@ -156,18 +166,22 @@ dojo.declare(
 	dijit.form.ValidationTextBox,
 	{
 		// summary:
-		//		A subclass of ValidationTextBox.
-		//		Provides a hidden input field and a serialize method to override
+		//		A dijit.form.ValidationTextBox subclass which provides a visible formatted display and a serializable
+		//		value in a hidden input field which is actually sent to the server.  The visible display may
+		//		be locale-dependent and interactive.  The value sent to the server is stored in a hidden
+		//		input field which uses the `name` attribute declared by the original widget.  That value sent
+		//		to the serveris defined by the dijit.form.MappedTextBox.serialize method and is typically
+		//		locale-neutral.
 
-		serialize: function(val, /*Object?*/options){
+		serialize: function(/*anything*/val, /*Object?*/options){
 			// summary: user replaceable function used to convert the getValue() result to a String
-			return val.toString ? val.toString() : "";
+			return val.toString ? val.toString() : ""; // String
 		},
 
 		toString: function(){
 			// summary: display the widget as a printable string using the widget's value
 			var val = this.filter(this.getValue());
-			return val != null ? (typeof val == "string" ? val : this.serialize(val, this.constraints)) : "";
+			return val != null ? (typeof val == "string" ? val : this.serialize(val, this.constraints)) : ""; // String
 		},
 
 		validate: function(){
@@ -202,54 +216,62 @@ dojo.declare(
 	}
 );
 
+/*=====
+	dijit.form.RangeBoundTextBox.__Constraints = function(){
+		// min: Number
+		//		Minimum signed value.  Default is -Infinity
+		// max: Number
+		//		Maximum signed value.  Default is +Infinity
+		this.min = min;
+		this.max = max;
+	}
+=====*/
+
 dojo.declare(
 	"dijit.form.RangeBoundTextBox",
 	dijit.form.MappedTextBox,
 	{
 		// summary:
-		//		A subclass of MappedTextBox.
-		//		Tests for a value out-of-range
-		/*===== contraints object:
-		// min: Number
-		//		Minimum signed value.  Default is -Infinity
-		min: undefined,
-		// max: Number
-		//		Maximum signed value.  Default is +Infinity
-		max: undefined,
-		=====*/
-
+		//		A dijit.form.MappedTextBox subclass which defines a range of valid values
+		//
+		// constraints: dijit.form.RangeBoundTextBox.__Constraints
+		//
 		// rangeMessage: String
 		//		The message to display if value is out-of-range
+
+		/*=====
+		constraints: {},
+		======*/
 		rangeMessage: "",
 
-		compare: function(val1, val2){
+		compare: function(/*anything*/val1, /*anything*/val2){
 			// summary: compare 2 values
-			return val1 - val2;
+			return val1 - val2; // anything
 		},
 
-		rangeCheck: function(/* Number */ primitive, /* Object */ constraints){
+		rangeCheck: function(/*Number*/ primitive, /*dijit.form.RangeBoundTextBox.__Constraints*/ constraints){
 			// summary: user replaceable function used to validate the range of the numeric input value
-			var isMin = (constraints.min !== undefined);
-			var isMax = (constraints.max !== undefined);
+			var isMin = "min" in constraints;
+			var isMax = "max" in constraints;
 			if(isMin || isMax){
 				return (!isMin || this.compare(primitive,constraints.min) >= 0) &&
 					(!isMax || this.compare(primitive,constraints.max) <= 0);
 			}
-			return true;
+			return true; // Boolean
 		},
 
-		isInRange: function(/* Boolean*/ isFocused){
+		isInRange: function(/*Boolean*/ isFocused){
 			// summary: Need to over-ride with your own validation code in subclasses
 			return this.rangeCheck(this.getValue(), this.constraints);
 		},
 
-		isValid: function(/* Boolean*/ isFocused){
+		isValid: function(/*Boolean*/ isFocused){
 			return this.inherited(arguments) &&
-				((this._isEmpty(this.textbox.value) && !this.required) || this.isInRange(isFocused));
+				((this._isEmpty(this.textbox.value) && !this.required) || this.isInRange(isFocused)); // Boolean
 		},
 
-		getErrorMessage: function(/* Boolean*/ isFocused){
-			if(dijit.form.RangeBoundTextBox.superclass.isValid.call(this, false) && !this.isInRange(isFocused)){ return this.rangeMessage; }
+		getErrorMessage: function(/*Boolean*/ isFocused){
+			if(dijit.form.RangeBoundTextBox.superclass.isValid.call(this, false) && !this.isInRange(isFocused)){ return this.rangeMessage; } // String
 			return this.inherited(arguments);
 		},
 
@@ -271,7 +293,7 @@ dojo.declare(
 			}
 		},
 		
-		setValue: function(/*Number*/ value, /*Boolean, optional*/ priorityChange){
+		setValue: function(/*Number*/ value, /*Boolean?*/ priorityChange){
 			dijit.setWaiState(this.focusNode, "valuenow", value);
 			this.inherited('setValue', arguments);
 		}

@@ -49,7 +49,7 @@ dojo.declare(
 			if(this.disabled || this.readOnly){ return; }
 			this._arrowState(nodePressed, true);
 			this.setValue(this.adjust(this.getValue(), direction*this.smallDelta), false);
-			dijit.focus(this.textbox);
+			dijit.selectInputText(this.textbox, this.textbox.value.length);
 		},
 
 		_arrowReleased: function(/*Node*/ node){
@@ -96,6 +96,21 @@ dojo.declare(
 			this.connect(this.textbox, dojo.isIE ? "onmousewheel" : 'DOMMouseScroll', "_mouseWheeled");
 			this._connects.push(dijit.typematic.addListener(this.upArrowNode, this.textbox, {keyCode:dojo.keys.UP_ARROW,ctrlKey:false,altKey:false,shiftKey:false}, this, "_typematicCallback", this.timeoutChangeRate, this.defaultTimeout));
 			this._connects.push(dijit.typematic.addListener(this.downArrowNode, this.textbox, {keyCode:dojo.keys.DOWN_ARROW,ctrlKey:false,altKey:false,shiftKey:false}, this, "_typematicCallback", this.timeoutChangeRate, this.defaultTimeout));
+			if(dojo.isIE){
+				// When spinner is moved from hidden to visible, call _setStateClass to remind IE to render it. (#6123)
+				var _this = this;
+				this.connect(this.domNode, "onresize", 
+					function(){ setTimeout(dojo.hitch(_this,
+						function(){
+							// cause the IE expressions to rerun
+							this.upArrowNode.style.behavior = '';
+							this.downArrowNode.style.behavior = '';
+							// cause IE to rerender
+							this._setStateClass();
+						}), 0);
+					}
+				);
+			}
 		}
 });
 

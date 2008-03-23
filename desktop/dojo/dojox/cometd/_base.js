@@ -20,10 +20,12 @@ dojo.require("dojo.io.script");
 dojox.cometd = new function(){
 	
 	// cometd states:
- 	this.DISCONNECTED="DISCONNECTED";	// _initialized==false 	&& _connected==false
- 	this.CONNECTING="CONNECTING";		// _initialized==true	&& _connected==false (handshake sent)
- 	this.CONNECTED="CONNECTED";		// _initialized==true	&& _connected==true (first successful connect)
- 	this.DISCONNECTING="DISCONNECING";	// _initialized==false 	&& _connected==true (disconnect sent)
+
+	// alex; OMG, these "constants" need to die. Java truly is a degenerative disease.
+ 	this.DISCONNECTED = "DISCONNECTED";		// _initialized==false 	&& _connected==false
+ 	this.CONNECTING = "CONNECTING";			// _initialized==true	&& _connected==false (handshake sent)
+ 	this.CONNECTED = "CONNECTED";			// _initialized==true	&& _connected==true (first successful connect)
+ 	this.DISCONNECTING = "DISCONNECING";	// _initialized==false 	&& _connected==true (disconnect sent)
  	
 	this._initialized = false;
 	this._connected = false;
@@ -31,31 +33,33 @@ dojox.cometd = new function(){
 
 	this.connectionTypes = new dojo.AdapterRegistry(true);
 
-	this.version="1.0";
-	this.minimumVersion="0.9";
-	this.clientId=null;
-	this.messageId=0;
-	this.batch=0;
+	this.version =	"1.0";
+	this.minimumVersion = "0.9";
+	this.clientId = null;
+	this.messageId = 0;
+	this.batch = 0;
 
 	this._isXD = false;
-	this.handshakeReturn=null;
-	this.currentTransport=null;
+	this.handshakeReturn = null;
+	this.currentTransport = null;
 	this.url = null;
-	this.lastMessage=null;
-	this._messageQ=[];
-	this.handleAs="json-comment-optional";
-	this._advice={};
-	this._backoffInterval=0;
-	this._backoffIncrement=1000;
-	this._backoffMax=60000;
-	this._deferredSubscribes={};
-	this._deferredUnsubscribes={};
-	this._subscriptions=[];
-	this._extendInList=[];	// List of functions invoked before delivering messages
-	this._extendOutList=[];	// List of functions invoked before sending messages
+	this.lastMessage = null;
+	this._messageQ = [];
+	this.handleAs = "json-comment-optional";
+	this._advice = {};
+	this._backoffInterval = 0;
+	this._backoffIncrement = 1000;
+	this._backoffMax = 60000;
+	this._deferredSubscribes = {};
+	this._deferredUnsubscribes = {};
+	this._subscriptions = [];
+	this._extendInList = [];	// List of functions invoked before delivering messages
+	this._extendOutList = [];	// List of functions invoked before sending messages
 
 	this.state = function() {
-		return this._initialized?(this._connected?this.CONNECTED:this.CONNECTING):(this._connected?this.DISCONNECTING:this.DISCONNECTED);
+		return this._initialized ? 
+			(this._connected ? "CONNECTED" : "CONNECTING") : 
+			( this._connected ? "DISCONNECTING" : "DISCONNECTED");
 	}
 
 	this.init = function(	/*String*/	root,
@@ -169,7 +173,14 @@ dojox.cometd = new function(){
 		}else{
 			r = dojo.xhrPost(bindArgs);
 		}
-		dojo.publish("/cometd/meta", [{cometd:this,action:"handshake",successful:true,state:this.state()}]);
+		dojo.publish("/cometd/meta", [
+			{
+				cometd: this,
+				action: "handshake",
+				successful: true,
+				state: this.state()
+			}
+		]);
 		return r;
 	}
 	
@@ -200,17 +211,54 @@ dojox.cometd = new function(){
 					/*Object */	objOrFunc,
 					/*String */	funcName,
 					/*Object?*/ props){ // return: dojo.Deferred
-		// summary:
+		//	summary:
 		//		inform the server of this client's interest in channel
-		// channel:
+		//	description:
+		//		`dojox.cometd.subscribe()` handles all the hard work of telling
+		//		the server that we want to be notified when events are
+		//		published on a particular topic. `subscribe` accepts a function
+		//		to handle messages and returns a `dojo.Deferred` object which
+		//		has an extra property added to it which makes it suitable for
+		//		passing to `dojox.cometd.unsubscribe()` as a "subscription
+		//		handle" (much like the handle object that `dojo.connect()`
+		//		produces and which `dojo.disconnect()` expects).
+		//		
+		//		Note that of a subscription is registered before a connection
+		//		with the server is established, events sent before the
+		//		connection is established will not be delivered to this client.
+		//		The deferred object which `subscribe` returns will callback
+		//		when the server successfuly acknolwedges receipt of our
+		//		"subscribe" request.
+		//	channel:
 		//		name of the cometd channel to subscribe to
-		// objOrFunc:
+		//	objOrFunc:
 		//		an object scope for funcName or the name or reference to a
 		//		function to be called when messages are delivered to the
 		//		channel
-		// funcName:
+		//	funcName:
 		//		the second half of the objOrFunc/funcName pair for identifying
 		//		a callback function to notifiy upon channel message delivery
+		//	example:
+		//		Simple subscribe use-case
+		//	|	dojox.cometd.init("http://myserver.com:8080/cometd");
+		//	|	// log out all incoming messages on /foo/bar
+		//	|	dojox.cometd.subscribe("/foo/bar", console, "debug");
+		//	example:
+		//		Subscribe before connection is initialized
+		//	|	dojox.cometd.subscribe("/foo/bar", console, "debug");
+		//	|	dojox.cometd.init("http://myserver.com:8080/cometd");
+		//	example:
+		//		Subscribe an unsubscribe
+		//	|	dojox.cometd.init("http://myserver.com:8080/cometd");
+		//	|	var h = dojox.cometd.subscribe("/foo/bar", console, "debug");
+		//	|	dojox.cometd.unsubscribe(h);
+		//	example:
+		//		Listen for successful subscription:
+		//	|	dojox.cometd.init("http://myserver.com:8080/cometd");
+		//	|	var h = dojox.cometd.subscribe("/foo/bar", console, "debug");
+		//	|	h.addCallback(function(){
+		//	|		console.debug("subscription to /foo/bar established");
+		//	|	});
 
 		props = props||{};
 		if(objOrFunc){
@@ -223,11 +271,11 @@ dojox.cometd = new function(){
 				this._sendMessage(props);
 				
 				var _ds = this._deferredSubscribes;
-				_ds[channel] = new dojo.Deferred();
 				if(_ds[channel]){
 					_ds[channel].cancel();
 					delete _ds[channel];
 				}
+				_ds[channel] = new dojo.Deferred();
 			}
 			
 			for(var i in subs){
@@ -242,9 +290,11 @@ dojox.cometd = new function(){
 				objOrFunc: objOrFunc, 
 				funcName: funcName
 			});
-			this._subscriptions[tname] =subs;
+			this._subscriptions[tname] = subs;
 		}
-		return this._deferredSubscribes[channel];
+		var ret = this._deferredSubscribes[channel]||{};
+		ret.args = dojo._toArray(arguments);
+		return ret; // dojo.Deferred
 	}
 
 
@@ -264,6 +314,15 @@ dojox.cometd = new function(){
 		// funcName:
 		//		the second half of the objOrFunc/funcName pair for identifying
 		//		a callback function to notifiy upon channel message delivery
+
+		if(
+			(arguments.length == 1) &&
+			(!dojo.isString(channel)) &&
+			(channel.args)
+		){
+			// it's a subscription handle, unroll
+			return this.unsubscribe.apply(this, channel.args);
+		}
 		
 		var tname = "/cometd"+channel;
 		var subs = this._subscriptions[tname];
@@ -299,7 +358,7 @@ dojox.cometd = new function(){
 				delete this._deferredSubscribes[channel];
 			}
 		}
-		return this._deferredUnsubscribes[channel];
+		return this._deferredUnsubscribes[channel]; // dojo.Deferred
 	}
 	
 	
@@ -517,8 +576,23 @@ dojox.cometd = new function(){
 		if(message.data){
 			// dispatch the message to any locally subscribed listeners
 			try {
-				var tname = "/cometd"+message.channel;
-				dojo.publish(tname, [ message ]);
+                                var messages=[message];
+
+				// Determine target topic
+				var tname="/cometd"+message.channel;
+
+				// Deliver to globs that apply to target topic
+				var tnameParts=message.channel.split("/");
+				var tnameGlob="/cometd";
+				for (var i=1;i<tnameParts.length-1;i++) {
+					dojo.publish(tnameGlob+"/**",messages);
+					tnameGlob+="/"+tnameParts[i];
+				}
+				dojo.publish(tnameGlob+"/**",messages);
+				dojo.publish(tnameGlob+"/*",messages);
+	
+				// deliver to target topic
+				dojo.publish(tname,messages);
 			}catch(e){
 				console.debug(e);
 			}

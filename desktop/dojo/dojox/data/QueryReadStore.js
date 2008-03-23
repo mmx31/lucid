@@ -1,11 +1,8 @@
 if(!dojo._hasResource["dojox.data.QueryReadStore"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.data.QueryReadStore"] = true;
 dojo.provide("dojox.data.QueryReadStore");
-dojo.provide("dojox.data.QueryReadStore.InvalidItemError");
-dojo.provide("dojox.data.QueryReadStore.InvalidAttributeError");
 
 dojo.require("dojo.string");
-dojo.require("dojo.data.util.simpleFetch");
 
 dojo.declare("dojox.data.QueryReadStore", null, {
 	/*
@@ -87,6 +84,8 @@ dojo.declare("dojox.data.QueryReadStore", null, {
 	_identifier:null,
 
 	_features: {'dojo.data.api.Read':true, 'dojo.data.api.Identity':true},
+
+	_labelAttr: "label",
 	
 	constructor: function(/* Object */ params){
 		dojo.mixin(this,params);
@@ -111,6 +110,7 @@ dojo.declare("dojox.data.QueryReadStore", null, {
 	},
 	
 	getValues: function(/* item */ item, /* attribute-name-string */ attribute){
+		this._assertIsItem(item);
 		var ret = [];
 		if(this.hasAttribute(item, attribute)){
 			ret.push(item.i[attribute]);
@@ -259,13 +259,22 @@ dojo.declare("dojox.data.QueryReadStore", null, {
 	},
 
 	getLabel: function(/* item */ item){
-		// Override it to return whatever the label shall be, see Read-API.
-		return undefined;
+		//	summary:
+		//		See dojo.data.api.Read.getLabel()
+		if(this._labelAttr && this.isItem(item)){
+			return this.getValue(item, this._labelAttr); //String
+		}
+		return undefined; //undefined
 	},
 
 	getLabelAttributes: function(/* item */ item){
-		return null;
-	},
+		//	summary:
+		//		See dojo.data.api.Read.getLabelAttributes()
+		if(this._labelAttr){
+			return [this._labelAttr]; //array
+		}
+		return null; //null
+        },
 	
 	_fetchItems: function(request, fetchHandler, errorHandler){
 		//	summary:
@@ -315,7 +324,10 @@ dojo.declare("dojox.data.QueryReadStore", null, {
 			var xhrFunc = this.requestMethod.toLowerCase()=="post" ? dojo.xhrPost : dojo.xhrGet;
 			var xhrHandler = xhrFunc({url:this.url, handleAs:"json-comment-optional", content:serverQuery});
 			xhrHandler.addCallback(dojo.hitch(this, function(data){
-				data=this._filterResponse(data);
+				data = this._filterResponse(data);
+				if (data.label){
+					this._labelAttr = data.label;
+				}
 				var numRows = data.numRows || -1;
 
 				this._items = [];
@@ -336,7 +348,7 @@ dojo.declare("dojox.data.QueryReadStore", null, {
 						if(!this._itemsByIdentity[identity]){
 							this._itemsByIdentity[identity] = item;
 						}else{
-							throw new Error("dojo.data.QueryReadStore:  The json data as specified by: [" + this.url + "] is malformed.  Items within the list have identifier: [" + identifier + "].  Value collided: [" + identity + "]");
+							throw new Error(this._className+":  The json data as specified by: [" + this.url + "] is malformed.  Items within the list have identifier: [" + identifier + "].  Value collided: [" + identity + "]");
 						}
 					}
 				}else{
@@ -379,7 +391,7 @@ dojo.declare("dojox.data.QueryReadStore", null, {
 		//	item: 
 		//		The item to test for being contained by the store.
 		if(!this.isItem(item)){
-			throw new dojox.data.QueryReadStore.InvalidItemError(this._className+": a function was passed an item argument that was not an item");
+			throw new Error(this._className+": Invalid item argument.");
 		}
 	},
 
@@ -389,7 +401,7 @@ dojo.declare("dojox.data.QueryReadStore", null, {
 		//	attribute: 
 		//		The attribute to test for being contained by the store.
 		if(typeof attribute !== "string"){ 
-			throw new dojox.data.QueryReadStore.InvalidAttributeError(this._className+": '"+attribute+"' is not a valid attribute identifier.");
+			throw new Error(this._className+": Invalid attribute argument ('"+attribute+"').");
 		}
 	},
 
@@ -467,11 +479,5 @@ dojo.declare("dojox.data.QueryReadStore", null, {
 		return [this._identifier];
 	}
 });
-
-dojo.declare("dojox.data.QueryReadStore.InvalidItemError", Error, {});
-dojo.declare("dojox.data.QueryReadStore.InvalidAttributeError", Error, {});
-
-
-
 
 }

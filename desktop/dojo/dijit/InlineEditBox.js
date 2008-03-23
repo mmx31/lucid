@@ -9,7 +9,7 @@ dojo.require("dijit._Container");
 dojo.require("dijit.form.Button");
 dojo.require("dijit.form.TextBox");
 
-dojo.requireLocalization("dijit", "common", null, "ko,zh,sv,ja,gr,zh-tw,ru,it,hu,fr,pt,ROOT,pl,es,de,cs");
+dojo.requireLocalization("dijit", "common", null, "zh,pt,ru,sv,de,ja,ROOT,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
 
 dojo.declare("dijit.InlineEditBox",
 	dijit._Widget,
@@ -176,22 +176,27 @@ dojo.declare("dijit.InlineEditBox",
 
 		// display the read-only text and then quickly hide the editor (to avoid screen jitter)
 		this.displayNode.style.display="";
-		var ews = this.editWidget.domNode.style;
+		var ew = this.editWidget;
+		var ews = ew.domNode.style;
 		ews.position="absolute";
 		ews.visibility="hidden";
 
 		this.domNode = this.displayNode;
 
+		if(focus){
+			dijit.focus(this.displayNode);
+		}
+		ews.display = "none";
 		// give the browser some time to render the display node and then shift focus to it
-		// and hide the edit widget
-		var _this = this;
+		// and hide the edit widget before garbage collecting the edit widget
 		setTimeout(function(){
-			if(focus){
-				dijit.focus(_this.displayNode);
+			ew.destroy();
+			delete ew;
+			if(dojo.isIE){
+				// messing with the DOM tab order can cause IE to focus the body - so restore
+				dijit.focus(dijit.getFocus());
 			}
-			_this.editWidget.destroy();
-			delete _this.editWidget;
-		}, 100);
+		}, 1000); // no hurry - wait for things to quiesce
 	},
 
 	save: function(/*Boolean*/ focus){
@@ -332,7 +337,19 @@ dojo.declare(
 				this.save(true);
 			}else if(e.keyCode == dojo.keys.TAB){
 				this._exitInProgress = true;
-				this.save(false);
+				// allow the TAB to change focus before we mess with the DOM: #6227
+				// Expounding by request:
+				// 	The current focus is on the edit widget input field.
+				//	save() will hide and destroy this widget.
+				//	We want the focus to jump from the currently hidden
+				//	displayNode, but since it's hidden, it's impossible to
+				//	unhide it, focus it, and then have the browser focus
+				//	away from it to the next focusable element since each
+				//	of these events is asynchronous and the focus-to-next-element
+				//	is already queued.
+				//	So we allow the browser time to unqueue the move-focus event 
+				//	before we do all the hide/show stuff.
+				setTimeout(dojo.hitch(this, "save", false), 0);
 			}
 		}else{
 			var _this = this;
@@ -401,30 +418,5 @@ dojo.declare(
 		dijit.selectInputText(this.editWidget.focusNode);
 	}
 });
-
-dijit.selectInputText = function(/*DomNode*/element){
-	// summary: select all the text in an input element 
-
-	// TODO: use functions in _editor/selection.js?
-	var _window = dojo.global;
-	var _document = dojo.doc;
-	element = dojo.byId(element);
-	if(_document["selection"] && dojo.body()["createTextRange"]){ // IE
-		if(element.createTextRange){
-			var range = element.createTextRange();
-			range.moveStart("character", 0);
-			range.moveEnd("character", element.value.length);
-			range.select();
-		}
-	}else if(_window["getSelection"]){
-		var selection = _window.getSelection();
-		// FIXME: does this work on Safari?
-		if(element.setSelectionRange){
-			element.setSelectionRange(0, element.value.length);
-		}
-	}
-	element.focus();
-};
-
 
 }

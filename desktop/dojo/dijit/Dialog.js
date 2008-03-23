@@ -2,14 +2,14 @@ if(!dojo._hasResource["dijit.Dialog"]){ //_hasResource checks added by build. Do
 dojo._hasResource["dijit.Dialog"] = true;
 dojo.provide("dijit.Dialog");
 
-dojo.require("dojo.dnd.move");
+dojo.require("dojo.dnd.TimedMoveable");
 dojo.require("dojo.fx");
 
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit.layout.ContentPane");
 dojo.require("dijit.form.Form");
-dojo.requireLocalization("dijit", "common", null, "ko,zh,sv,ja,gr,zh-tw,ru,it,hu,fr,pt,ROOT,pl,es,de,cs");
+dojo.requireLocalization("dijit", "common", null, "zh,pt,ru,sv,de,ja,ROOT,cs,fr,es,gr,ko,zh-tw,pl,it,hu");
 
 dojo.declare(
 	"dijit.DialogUnderlay",
@@ -209,7 +209,7 @@ dojo.declare(
 			//		performance reasons)
 
 			if(this.titleBar){
-				this._moveable = new dojo.dnd.Moveable(this.domNode, { handle: this.titleBar });
+				this._moveable = new dojo.dnd.TimedMoveable(this.domNode, { handle: this.titleBar, timeout: 0 });
 			}
 
 			this._underlay = new dijit.DialogUnderlay({
