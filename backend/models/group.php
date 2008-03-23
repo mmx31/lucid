@@ -34,6 +34,14 @@
 		function add_permission($perm) {
 			$this->permissions[$perm] = true;
 		}
+		function cleanup() {
+			$p = $User->all();
+			foreach($p as $user) {
+				foreach($user->groups as $key => $val) {
+					if($val == $this->name) array_splice($user->groups, $key, 1);
+				}
+			}
+		}
 	}
 	global $Group;
 	$Group = new Group();

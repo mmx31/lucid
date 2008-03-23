@@ -90,6 +90,9 @@
 				fclose($ourFileHandle);
 			}
 		}
+		function cleanup() {
+			$this->delete_userdir();
+		}
 		function delete_userdir()
 		{
 			$user = $this->username;
