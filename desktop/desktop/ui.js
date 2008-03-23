@@ -734,7 +734,7 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 			rule = document.styleSheets[0].cssRules[0].style;
 		}
 		catch(e) {
-			rule = document.styleSheets[0].rules[0];
+			rule = document.styleSheets[0].rules[0].style;
 		}
 		rule.backgroundColor = desktop.config.wallpaper.color;
 
