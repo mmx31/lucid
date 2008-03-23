@@ -117,6 +117,7 @@ var bootstrap = {
         element.media = "screen";
         element.href = file;
         element.id = id;
+        element.title = id;
         document.getElementsByTagName("head")[0].appendChild(element);
     },
 	checkLoggedIn: function()
