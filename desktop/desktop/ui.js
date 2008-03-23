@@ -729,15 +729,14 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 			}
 			this.wallpaperImageNode.src = image;
 		}
-		var css = document.styleSheets[0]; //dojo.byId("corestyle").sheet;
-		var rules;
+		var rule;
 		try {
-			rules = css.cssRules;
+			rule = document.styleSheets[0].cssRules[0];
 		}
 		catch(e) {
-			rules = css.rules;
+			rule = document.styleSheets[0].rules[0];
 		}
-		rules[0].style.backgroundColor = desktop.config.wallpaper.color;
+		rule.style.backgroundColor = desktop.config.wallpaper.color;
 	}
 });
 dojo.require("dijit.layout.LayoutContainer");
