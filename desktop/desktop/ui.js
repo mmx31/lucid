@@ -729,6 +729,13 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 			}
 			this.wallpaperImageNode.src = image;
 		}
+		/*
+		var css = dojo.byId("corestyle").sheet;
+		if (typeof css.cssRules != "undefined")
+			var rules = css.cssRules
+		else if (typeof css.rules != "undefined")
+			var rules = css.rules
+		if(typeof rules != "undefined") rules[0].style.backgroundColor = desktop.config.wallpaper.color;*/
 		var rule;
 		try {
 			rule = document.styleSheets[0].cssRules[0].style;
@@ -737,6 +744,7 @@ dojo.declare("desktop.ui.area", [dijit._Widget, dijit._Templated, dijit._Contain
 			rule = document.styleSheets[0].rules[0];
 		}
 		rule.backgroundColor = desktop.config.wallpaper.color;
+
 	}
 });
 dojo.require("dijit.layout.LayoutContainer");

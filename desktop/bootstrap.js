@@ -53,6 +53,9 @@ var bootstrap = {
 	],
 	loaded: false,
     load: function() {
+        bootstrap.link("desktop.css", "corestyle");
+        bootstrap.link("./dojo/dijit/themes/dijit.css", "dijit");
+        bootstrap.link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
 		dojo.forEach(bootstrap.modules, function(libraryName) {
 	        var path = libraryName.split(".").join("/");
 			var base = libraryName.split(".")[0];
@@ -106,6 +109,16 @@ var bootstrap = {
 			}
 		});
 	},
+    link: function(file, id)
+    {
+        var element = document.createElement("link");
+        element.rel = "stylesheet";
+        element.type = "text/css";
+        element.media = "screen";
+        element.href = file;
+        element.id = id;
+        document.getElementsByTagName("head")[0].appendChild(element);
+    },
 	checkLoggedIn: function()
 	{
 		dojo.xhrGet({
