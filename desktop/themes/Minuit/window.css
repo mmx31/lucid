@@ -4,7 +4,8 @@
 	margin: 0px;
 }
 .win-buttons {
-	width: 62px;
+	width: 64px;
+	padding-right: 2px;
 	/*background-image: url(./images/.png);
 	background-repeat: no-repeat;
 	background-position: top right; */
