@@ -319,6 +319,7 @@ dojo.declare(
 			}
 			this.inherited(arguments);
 			dojo.attr(this.domNode, 'onreset', dojo.hitch(this, this._onReset));
+			dojo.attr(this.domNode, 'onsubmit', dojo.hitch(this, this._onSubmit));
 		},
 
 		onReset: function(){ 
@@ -338,12 +339,16 @@ dojo.declare(
 		},
 
 		// TODO: remove ths function beginning with 2.0
-		_onSubmit: function(){
+		_onSubmit: function(e){
 			var fp = dijit.form.Form.prototype;
+			dojo.stopEvent(e);
 			if(this.execute != fp.execute || this.onExecute != fp.onExecute){
 				dojo.deprecated("dijit.form.Form:execute()/onExecute() are deprecated. Use onSubmit() instead.", "", "2.0");
 				this.onExecute();
 				this.execute(this.getValues());
+			}
+			else {
+				this.submit();
 			}
 		},
 		
