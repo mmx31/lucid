@@ -123,6 +123,13 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	 * Internal variable used by the window maximizer
 	 */
 	pos: {},
+	/*
+	 * Property: _minimizeAnim
+	 * 
+	 * Set to true when the window is in the middle of a minimize animation.
+	 * This is to prevent a bug where the size is captured mid-animation and restores weird.
+	 */
+	_minimizeAnim: false,
 	postCreate: function() {
 		this.domNode.title="";
 		this.makeDragger();
@@ -252,9 +259,11 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	 */
 	minimize: function()
 	{
+		if(this._minimizeAnim && desktop.config.fx >= 2) return;
 		this.onMinimize();
 		if(desktop.config.fx >= 2)
 		{
+			this._minimizeAnim = true;
 			if(desktop.config.fx < 3) dojo.style(this.containerNode, "display", "none");
 			var pos = dojo.coords(this.domNode, true);
 			this.left = pos.x;
@@ -279,6 +288,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			dojo.connect(anim, "onEnd", this, function() {
 				dojo.style(this.domNode, "display", "none");
 				if(desktop.config.fx < 3) dojo.style(this.containerNode, "display", "block");
+				this._minimizeAnim = false;
 			});
 			anim.play();
 		}
@@ -296,9 +306,11 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	 */
 	restore: function()
 	{
+		if(this._minimizeAnim && desktop.config.fx >= 2) return;
 		this.domNode.style.display = "inline";
 		if(desktop.config.fx >= 2)
 		{
+			this._minimizeAnim = true;
 			if(desktop.config.fx < 3) dojo.style(this.containerNode, "display", "none");
 			var anim = dojo.animateProperty({
 				node: this.domNode,
@@ -315,6 +327,7 @@ dojo.declare("api.window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			dojo.connect(anim, "onEnd", this, function() {
 				if(desktop.config.fx < 3) dojo.style(this.containerNode, "display", "block");
 				this.resize();
+				this._minimizeAnim = false;
 			});
 			anim.play();
 		}
