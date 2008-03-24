@@ -104,6 +104,13 @@ desktop.config = {
 		}
 	],
 	/*
+	 * Property: toasterPos
+	 * 
+	 * Position the toaster popup will appear
+	 * Can be one of: ["br-up", "br-left", "bl-up", "bl-right", "tr-down", "tr-left", "tl-down", "tl-right"]
+	 */
+	toasterPos: "tr-down",
+	/*
 	 * Property: wallpaper
 	 * 
 	 * wallpaper information

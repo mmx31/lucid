@@ -1,4 +1,5 @@
 dojo.require("dijit.layout.ContentPane");
+dojo.require("dojox.widget.Toaster");
 
 /* 
  * Class: api.ui
@@ -298,13 +299,29 @@ api.ui = new function() {
 	/*
 	 * Method: notify
 	 * 
-	 * Show a toaster popup
+	 * Show a toaster popup (similar to libnotify)
 	 * 
 	 * Arguments:
-	 * 		message - the message to show
+	 * 		message - the message to show. If an object, takes the following parameters:
+	 * 		> {
+	 * 		> 	message: string, // the message to show
+	 * 		> 	type: string, //type of message. Can be "message", "warning", "error", or "fatal"
+	 * 		> 	duration: integer //how long should the message be displayed in milliseconds
+	 * 		> }
 	 */
-	this.notify = function(/*String*/message)
+	this.notify = function(/*String|Object*/message)
 	{
-		dojo.publish("notification", [message]);
+		dojo.publish("desktop_notification", [message]);
+	}
+	this.init = function() {
+		api.addDojoCss("dojox/widget/Toaster/Toaster.css"); //TODO: theme it!
+		var toaster = new dojox.widget.Toaster({
+			messageTopic: "desktop_notification",
+			positionDirection: desktop.config.toasterPos
+		});
+		desktop.ui._area.domNode.appendChild(toaster.domNode);
+		dojo.subscribe("configApply", function() {
+			toaster.positionDirection = desktop.config.toasterPos;
+		})
 	}
 }
