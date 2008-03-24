@@ -7,7 +7,7 @@ dojo.require("dijit.form.Form");
 dojo.require("dijit.ProgressBar");
 install = new function() {
 	this.typeWasChecked = false;
-	this.selected = function(page){
+	this.selected = function(page) {
 		dijit.byId("previous").setDisabled(page.isFirstChild);
 		if(page.isLastChild)
 		{
@@ -70,9 +70,10 @@ install = new function() {
 			dijit.byId(e)._clicked = install.onTypeRadioClick;
 		});
 		dijit.byId("installtype-reset")._clicked = install.onResetRadioClick;
-		
-		
-		
+		dijit.byId("wizardPages").onButtonClick = function() {};
+		dojo.forEach(dijit.byId("wizardPages").getChildren(), function(button) {
+			button._clicked=function() {}
+		})
 		setTimeout(function() {dijit.byId("wizard").resize();}, 100);
 	}
 	this.checkDbInput = function() {

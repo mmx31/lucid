@@ -22,6 +22,19 @@ body {
 	color: red;
 }
 
+#pageBar {
+	height: 48px;
+}
+
+.dijitStackController .dijitToggleButtonChecked button {
+	background-color: white;
+	background-image: none;
+}
+.dijit_a11y .dijitStackController .dijitToggleButtonChecked button {
+	border-style: dashed !important;
+}
+
+
 #wizard {
 	border: 1px solid #9b9b9b;
 	background-color: white;
@@ -35,12 +48,12 @@ body {
 	position: relative;
 	width: 642px;
 	margin: 20px auto;
-	height: 450px;
+	height: 500px;
 }
 
 .buttons {
 	position: absolute;
-	bottom: 10px;
+	bottom: 13px;
 	right: 3px;
 }
 
