@@ -62,7 +62,7 @@ var bootstrap = {
 			if(typeof window[base] == "undefined")
 				window[base] = {}; //make the root object
 	        dojo.io.script.get({
-	            url: "./dojo/" + path + ".js",
+	            url: "./" + path + ".js",
 	            preventCache: false,
 	            module: libraryName,
 	            checkString: libraryName,
