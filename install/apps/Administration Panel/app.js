@@ -25,7 +25,7 @@ this.init = function(args)
 	api.addDojoCss("dojox/grid/_grid/Grid.css");
 	api.addDojoCss("dojox/widget/FileInput/FileInput.css");
 	//make window
-	this.win = new api.window({title: "Administration Panel", width: "500px", height: "400px", onClose: dojo.hitch(this, "kill")});
+	this.win = new api.Window({title: "Administration Panel", width: "500px", height: "400px", onClose: dojo.hitch(this, "kill")});
 	var split = new dijit.layout.SplitContainer({sizerWidth: 7, orientation: "horizontal", layoutAlign: "client"});
 	var pane = new dijit.layout.ContentPane({sizeMin: 10, sizeShare: 20}, document.createElement("div"));
 		var menu = new dijit.Menu({});
@@ -146,7 +146,7 @@ this.pages = {
 					label: "Change Password",
 					onClick: dojo.hitch(this, function(e) {
 						var row = this._userGrid.model.getRow(this.__rowIndex);
-						var win = new api.window({
+						var win = new api.Window({
 							title: "Change "+row.username+"'s password",
 							width: "250px",
 							height: "200px"
@@ -545,7 +545,7 @@ this.newUserDialog = function() {
 }
 
 this.installPackage = function() {
-	var win = new api.window({
+	var win = new api.Window({
 		title: "Install app package",
 		width: "300px",
 		height: "200px"
@@ -590,7 +590,7 @@ this.permDialog = function(grid, lbl, permissions, callback) {
 	var row = grid.model.getRow(this.__rowIndex).__dojo_data_item;
 	var perms = permissions(row);
 	this.__rowIndex = null;
-	var win = new api.window({
+	var win = new api.Window({
 		title: "Permissions for "+lbl(row)
 	});
 	this.windows.push(win);
@@ -736,7 +736,7 @@ this.createGroupDialog = function() {
 
 this.groupMemberDialog = function(group) {
 	var row = this._groupGrid.model.getRow(this.__rowIndex).__dojo_data_item;
-	var window = new api.window({
+	var window = new api.Window({
 		title: "Manage "+this._groupStore.getValue(row, "name")+" members",
 		width: "400px",
 		height: "200px"

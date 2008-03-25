@@ -7,7 +7,7 @@ this.init = function(args)
 	dojo.require("dijit.form.Button");
     dojo.require("dijit.form.TextBox");
 	dojo.require("dijit.Toolbar");
-	this.win = new api.window({
+	this.win = new api.Window({
 		title: "Katana IDE",
 		onClose: dojo.hitch(this, this.kill)
 	});
@@ -92,7 +92,7 @@ this.editMetadata = function()
 	this.tempCache  = this.editor.value;
         this.editor.value = "To continue working, close the metadata window.";
         this.editor.disabled = true;
-        this.winn = new api.window({
+        this.winn = new api.Window({
 			title: "Edit Metadata",
 			onClose: dojo.hitch(this, this._editMetadata)
 		});
@@ -145,7 +145,7 @@ this.load = function()
 {
 	//create a window with a list of apps to edit.
 	api.ide.getAppList(dojo.hitch(this, function(data){
-		this.loadwin = new api.window({title: "Select App"});
+		this.loadwin = new api.Window({title: "Select App"});
 		var pane = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
 		content=document.createElement("ul");
 		dojo.forEach(data, dojo.hitch(this, function(a){

@@ -16,11 +16,11 @@ this.init = function(args)
     dojo.require("dojox.validate.web");
 
 
-    this.win = new api.window({
+    this.win = new api.Window({
         title: "RSS Reader",
         onClose: dojo.hitch(this, this.kill)
     });
-	var store = this.feedStore = new api.registry({
+	var store = this.feedStore = new api.Registry({
 		appid: this.id,
 		name: "rssFeeds",
 		identifier: "id",

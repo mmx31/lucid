@@ -4,7 +4,7 @@ this.init = function(args) {
 	dojo.require("dijit.form.Slider");
 	dojo.require("dijit.layout.LayoutContainer");
 	dojo.require("dijit.layout.ContentPane");
-	this.win = new api.window({
+	this.win = new api.Window({
 		title: "Music Player",
 		width: "350px",
 		height: "150px",
@@ -159,7 +159,7 @@ this.openDialog = function() {
 }
 this.open = function(file) {
 	if (file) {
-		this.sound = new api.sound({
+		this.sound = new api.Sound({
 			src: api.fs.embed(file)
 		});
 		this.play();

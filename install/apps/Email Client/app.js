@@ -9,7 +9,7 @@ this.init = function(args) {
 	dojo.require("dojo.data.ItemFileWriteStore");
 	api.addDojoCss("dojox/grid/_grid/Grid.css");
 	//I made this fake account to test it with...
-	this.prefs = new api.registry({appid: this.id, name: "accounts", data: {
+	this.prefs = new api.Registry({appid: this.id, name: "accounts", data: {
 		identifier: 'id',
 	        label: 'label',
 	        items: [{
@@ -30,7 +30,7 @@ this.init = function(args) {
 		label: "disp",
 		items: []
 	}});
-	this.win = new api.window({
+	this.win = new api.Window({
 		title: "Email Clent",
 		onClose: dojo.hitch(this, this.kill)
 	});

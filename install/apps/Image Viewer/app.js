@@ -6,7 +6,7 @@ this.imgNode = false;
 this.init = function(args) {
 	dojo.require("dijit.Toolbar");
 	dojo.require("dojox.layout.DragPane");
-	this.win = new api.window({
+	this.win = new api.Window({
 		title: "Image Viewer",
 		onClose: dojo.hitch(this, "kill")
 	});

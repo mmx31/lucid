@@ -34,16 +34,16 @@ dojo.require("dijit.ProgressBar");
 var bootstrap = {
     modules: [
 		"api._base",
-    	'api.console',
+    	'api.Console',
 		"api.crosstalk",
-		"api.registry",
-		"api.filearea",
+		"api.Registry",
+		"api.Filearea",
 		"api.fs",
 		"api.ide",
 		"api.mail",
-		"api.sound",
+		"api.Sound",
 		"api.ui",
-		"api.window",
+		"api.Window",
 	    'desktop.admin',
 	    'desktop.app',
 	    'desktop.config',
@@ -62,7 +62,7 @@ var bootstrap = {
 			if(typeof window[base] == "undefined")
 				window[base] = {}; //make the root object
 	        dojo.io.script.get({
-	            url: "./" + path + ".js",
+	            url: "./dojo/" + path + ".js",
 	            preventCache: false,
 	            module: libraryName,
 	            checkString: libraryName,
@@ -84,6 +84,7 @@ var bootstrap = {
 			}
 			if (ready) {
 				bootstrap.loaded = true;
+				console.info("Modules loaded. Starting the desktop...");
 				bootstrap.startup();
 			}
 		}

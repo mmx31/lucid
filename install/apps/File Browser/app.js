@@ -41,11 +41,11 @@ this.init = function(args)
 		}
 	});
 	
-	this.win = new api.window({
+	this.win = new api.Window({
 		title: "File Browser",
 		onClose: dojo.hitch(this, this.kill)
 	});
-	this.fileArea = new api.filearea({layoutAlign: "client", path: (args.path || "/")})
+	this.fileArea = new api.Filearea({layoutAlign: "client", path: (args.path || "/")})
 	this.win.addChild(this.fileArea);
 	this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
 		var button = new dijit.form.Button({

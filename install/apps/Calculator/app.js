@@ -31,7 +31,7 @@ winHTML += '<button style="width: 25%; height: 16%;" onClick="document.getElemen
 winHTML += '<button style="width: 25%; height: 16%;" onClick="desktop.app.instances['+this.instance+'].evaluate()">=</button>';
 winHTML += '<button style="width: 25%; height: 16%;" onClick="document.getElementById(\'results'+this.instance+'\').value += \'+\'">+</button>';
 //-------------------
-this.window = new api.window({
+this.window = new api.Window({
 	title: "Calculator",
 	width: "200px",
 	height: "235px"

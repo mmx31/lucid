@@ -12,7 +12,7 @@ this.init = function(args) {
     dojo.require("dijit.form.Button");
     dojo.require("dijit.Menu");
     //make window
-    this.win = new api.window({
+    this.win = new api.Window({
         title: "Task Manager",
         width: "500px",
         height: "400px"

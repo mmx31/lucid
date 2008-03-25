@@ -25,7 +25,7 @@ this.kill = function() {
 }
 
 this.start = function() {
-    this.window = new api.window({
+    this.window = new api.Window({
         onClose: dojo.hitch(this, this.kill)
     });
     var toolbar = new dijit.Toolbar({

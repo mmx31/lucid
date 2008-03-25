@@ -2,7 +2,7 @@ this.init = function(args)
 {
 	dojo.require("dojox.gfx");
 	dojo.require("dojox.gfx.move");
-	this.win = new api.window({
+	this.win = new api.Window({
 		title: "Checkers",
 		width: "400px",
 		height: "420px",

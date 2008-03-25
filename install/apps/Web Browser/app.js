@@ -7,7 +7,7 @@ this.init = function(args)
 	dojo.require("dijit.form.Form");
 	dojo.require("dijit.form.Button");
 	dojo.require("dijit.layout.ContentPane");
-	this.win = new api.window({
+	this.win = new api.Window({
 		title: "Web Browser",
 		onClose: dojo.hitch(this, this.kill)
 	});
