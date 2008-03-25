@@ -8,6 +8,7 @@ dojo.require("dijit.form.Form");
 dojo.require("dijit.form.ValidationTextBox");
 dojo.require("dijit.form.CheckBox");
 dojo.require("dojo.fx");
+dojo.require("dijit.ColorPalette");
 dojo.require("dojox.validate.web");
 dojo.require("dijit.layout.LayoutContainer");
 dojo.require("dijit.form.Slider");
