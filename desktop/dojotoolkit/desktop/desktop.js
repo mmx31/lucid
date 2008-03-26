@@ -36,8 +36,21 @@ dojo.require("desktop.user");
 			object.prototype[method]();
 		}
 	}
-	
+	var link = function(file, id)
+        {
+            var element = document.createElement("link");
+            element.rel = "stylesheet";
+            element.type = "text/css";
+            element.media = "screen";
+            element.href = file;
+            element.id = id;
+            document.getElementsByTagName("head")[0].appendChild(element);
+        }
 	dojo.addOnLoad(function() {
+                link("desktop.css", "corestyle");
+                link("./dojo/dijit/themes/dijit.css", "dijit");
+                link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
+		
 		dojo.forEach(modules, function(module) {
 			callIfExists(module, "draw");
 		});
