@@ -17,7 +17,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 (function() {
 dojo.require("dojo.io.script");
-dojo.require("dijit.ProgressBar");
 /* 
 * Package: bootstrap
 * 
