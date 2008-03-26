@@ -320,7 +320,7 @@ api.ui = new function() {
 			messageTopic: "desktop_notification",
 			positionDirection: desktop.config.toasterPos
 		});
-		desktop.ui._area.domNode.appendChild(toaster.domNode);
+		document.body.appendChild(toaster.domNode);
 		dojo.subscribe("configApply", function() {
 			toaster.positionDirection = desktop.config.toasterPos;
 		})
