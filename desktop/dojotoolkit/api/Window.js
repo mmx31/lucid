@@ -489,9 +489,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		else
 		{
 			win.style.top = this.pos.top+"px";
-			win.style.bottom = this.pos.bottom+"px";
 			win.style.left = this.pos.left+"px";
-			win.style.right = this.pos.right+"px";
 			win.style.height= this.pos.height+"px";
 			win.style.width= this.pos.width+"px";
 			this._showBorders();
