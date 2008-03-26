@@ -379,8 +379,8 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			//api.log("maximizing...");
 			win.style.top = max.T;
 			win.style.left = max.L;
-			win.style.width = dojo.style(this.domNode.parentNode, "width") - max.R;
-			win.style.height = dojo.style(this.domNode.parentNode, "height") - max.B;
+			win.style.width = (dojo.style(this.domNode.parentNode, "width") - max.R)+"px";
+			win.style.height = (dojo.style(this.domNode.parentNode, "height") - max.B)+"px";
 			this._hideBorders();
 			this.resize();
 		}
