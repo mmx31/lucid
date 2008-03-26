@@ -46,11 +46,10 @@ dojo.require("desktop.user");
             element.id = id;
             document.getElementsByTagName("head")[0].appendChild(element);
         }
+        link("desktop.css", "corestyle");
+        link("./dojotoolkit/dijit/themes/dijit.css", "dijit");
+        link("./dojotoolkit/dijit/themes/dijit_rtl.css", "dijit_rtl");
 	dojo.addOnLoad(function() {
-                link("desktop.css", "corestyle");
-                link("./dojo/dijit/themes/dijit.css", "dijit");
-                link("./dojo/dijit/themes/dijit_rtl.css", "dijit_rtl");
-		
 		dojo.forEach(modules, function(module) {
 			callIfExists(module, "draw");
 		});
