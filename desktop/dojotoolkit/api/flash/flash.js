@@ -1,3 +1,4 @@
+dojo.provide("api.flash.flash");
 dojo.require("dojox.flash");
 if (dojox.flash.info.capable == true) {
 	dojox.flash.addLoadedListener(function() {
