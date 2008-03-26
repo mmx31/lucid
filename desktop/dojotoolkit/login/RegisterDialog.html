@@ -1,0 +1,30 @@
+<div class="dijitDialog" tabindex="-1" waiRole="dialog" waiState="labelledby-${id}_title">
+	<div dojoAttachPoint="titleBar" class="dijitDialogTitleBar">
+	<span dojoAttachPoint="titleNode" class="dijitDialogTitle" id="${id}_title">${title}</span>
+	<span dojoAttachPoint="closeButtonNode" class="dijitDialogCloseIcon" dojoAttachEvent="onclick: onCancel">
+		<span dojoAttachPoint="closeText" class="closeText">x</span>
+	</span>
+	</div>
+		<div dojoAttachPoint="containerNode" class="dijitDialogPaneContent">
+			<form dojoAttachEvent="onsubmit:onSubmit">
+				<div dojoAttachPoint="errorNode" class='desktopRegisterDialogError'></div>
+				<div>
+					<span class='desktopInputLabel'>Username:</span>
+					<input type='text' dojoAttachPoint="usernameInputNode" name='username' />
+				</div>
+				<div>
+					<span class='desktopInputLabel'>Email:</span>
+					<input type='text' dojoAttachPoint="emailInputNode" name='email' />
+				</div>
+				<div>
+					<span class='desktopInputLabel'>Password:</span>
+					<input type='text' dojoAttachPoint="passwordInputNode" name='password' />
+				</div>
+				<div>
+					<span class='desktopInputLabel'>Confirm Password:</span>
+					<input type='text' dojoAttachPoint="confPasswordInputNode" name='confPassword' />
+				</div>
+				<input type='submit' name='submit' dojoAttachPoint="submitNode" value='Submit' />
+			</form>
+		</div>
+</div>

@@ -6,31 +6,34 @@ Customizing:
 	If you use a CMS or want to intergrate it into a template, website, etc,
 	you can use the javascript login form made. First, insert this
 	div element onto your page. This is where the form will be displayed.
-	You may apply any CSS properties to it, as long as the ID of the element
+	You may apply any CSS properties or classes to it, as long as the dojoType property of the element
 	stays intact.
 	
-		<div id="psychdesktop_login"></div>
+		<div dojoType="login.Form"></div>
 
 	Then, include this code just before the </body> tag of the document/template,
-	replacing '/path/to/' with your psych desktop installation path:
+	replacing *BOTH* "desktop_installDir"s with your psych desktop installation path:
 	
-		<script type="text/javascript" src="/path/to/login.js"></script>
+		<link href="desktop_installDir/desktop/dojotoolkit/dijit/themes/dijit.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="desktop_installDir/desktop/dojotoolkit/dojo/dojo.js"></script>
+		<script type="text/javascript">dojo.require("login.Form");</script>
+		
+	You can theme the login form as you wish using CSS. If you do not want to do this,
+	you can add one of the following to your page (again, make sure you replace "desktop_installDir" with your installation dir):
+	
+	Choice 1:
+		<link href="desktop_installDir/desktop/dojotoolkit/dijit/themes/tundra/tundra.css" rel="stylesheet" type="text/css" />
+		...
+		<body class="tundra">
+	Choice 2:
+		<link href="desktop_installDir/desktop/dojotoolkit/dijit/themes/soria/soria.css" rel="stylesheet" type="text/css" />
+		...
+		<body class="soria">
+	Choice 3:
+		<link href="desktop_installDir/desktop/dojotoolkit/dijit/themes/nihilo/nihilo.css" rel="stylesheet" type="text/css" />
+		...
+		<body class="nihilo">
 		
 	If you don't need the default page provided, you may delete it along with the /images/ directory.
 	
 	That's it, enjoy your installation of psych desktop!
-
-
-Manual Installation:
-
-	*Make a database, and grant all permissions to a mySQL user.
-	*Open database.sql. Replace '#__' with your desired table prefix.
-	*run database.sql on the database
-	*Edit /backend/config.php to fit your server's environment.
-	 Specify a random string for $conf_secretword.
-	 This can be any combination of letters and numbers.
-	*In order to insert the administrator, you must use the
-	 installer so it will encrypt your password correctly.
-	 The installer will import anything you set in your config file.
-	 Set the "Fresh Install" option to 'no' in this case.
-	*Installation is done.
