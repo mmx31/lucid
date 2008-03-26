@@ -59,27 +59,6 @@ var desktop = {
 		if(desktop.path===""){
 			desktop.path="./";
 		}
-		if(typeof dojo == "undefined"){
-			var element = document.createElement("script");
-			element.type = "text/javascript";
-			element.src = desktop.path+"/desktop/dojo/dojo/dojo.js";
-			element.id = "";
-			document.getElementsByTagName("head")[0].appendChild(element);
-			
-			element = document.createElement("link");
-			element.rel = "stylesheet";
-			element.type = "text/css";
-			element.media = "screen";
-			element.href = desktop.path+"/desktop/dojo/dijit/themes/tundra/tundra_rtl.css";
-			document.getElementsByTagName("head")[0].appendChild(element);
-			
-			element = document.createElement("link");
-			element.rel = "stylesheet";
-			element.type = "text/css";
-			element.media = "screen";
-			element.href = desktop.path+"/desktop/dojo/dijit/themes/tundra/tundra.css";
-			document.getElementsByTagName("head")[0].appendChild(element);
-		}
 		desktop.setOnLoad();
 	},
 	setOnLoad: function() {
