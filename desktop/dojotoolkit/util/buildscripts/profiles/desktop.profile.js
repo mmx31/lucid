@@ -8,6 +8,8 @@ dependencies ={
     prefixes: [
         [ "desktop", "../desktop" ],
         [ "api", "../api" ],
-        [ "login", "../login" ]
+        [ "login", "../login" ],
+        [ "dijit", "../dijit" ],
+        [ "dojox", "../dojox" ]
     ]
 };
