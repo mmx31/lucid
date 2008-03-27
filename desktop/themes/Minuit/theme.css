@@ -8,6 +8,7 @@ html, body {
 .desktopPanel {
   background: url('./images/panelback.png');
   height: 35px;
+  color: white;
 }
 .desktopPanelTop {
   background:url(./images/panelbacktop.png) repeat-x;
