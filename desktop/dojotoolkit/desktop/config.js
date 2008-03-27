@@ -127,7 +127,7 @@ desktop.config = {
 	 * storedList - an array of wallpapers that the user can pick from in the wallpaper dialog
 	 */
 	wallpaper: {
-		image: "./themes/default/wallpaper.png",
+		image: "./themes/Minuit/wallpaper.png",
 		color: "#32cd32",
 		style: "centered",
 		storedList: [
@@ -141,7 +141,7 @@ desktop.config = {
 	 * 
 	 * The user's preferred theme
 	 */
-	theme: "green",
+	theme: "Minuit",
 	/*
 	 * Property: theme
 	 * 
