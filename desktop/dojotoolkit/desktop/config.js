@@ -96,15 +96,25 @@ desktop.config = {
 			span: 1,
 			locked: true,
 			orientation: "horizontal",
-			placement: "BC",
+			placement: "TC",
 			opacity: 0.95,
 			applets: [
 				{"settings": {}, "pos": 0.00, "declaredClass": "desktop.ui.applets.Menubar"},
-				{"settings": {}, "pos": 0.25, "declaredClass": "desktop.ui.applets.Taskbar"},
 				{"settings": {}, "pos": 0.85, "declaredClass": "desktop.ui.applets.Netmonitor"},
 				{"settings": {}, "pos": 0.88, "declaredClass": "desktop.ui.applets.Clock"}
 			]
-		}
+		},
+                {
+                        thickness: 24,
+                        span: 1,
+                        locked: true,
+                        orientation: "horizontal",
+                        placement: "BC",
+                        opacity: 0.95,
+                        applets: [
+                                {"settings": {}, "pos": 0.00, "declaredClass": "desktop.ui.applets.Taskbar"}
+                        ]
+                }
 	],
 	/*
 	 * Property: toasterPos
