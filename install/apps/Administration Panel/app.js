@@ -514,7 +514,7 @@ this.newUserDialog = function() {
 		onClick: dojo.hitch(this, function() {
 			dojo.require("dojox.validate.web");
 			if(username.getValue() == "") return error.textContent = "Enter a username";
-			if(dojox.validate.isEmailAddress(email.getValue())) return error.textContent = "Enter a valid email";
+			if(!dojox.validate.isEmailAddress(email.getValue())) return error.textContent = "Enter a valid email";
 			if(password.getValue() == "") return error.textContent = "Enter a password";
 			if(password.getValue() != confpassword.getValue()) return error.textContent = "Two passwords don't match";
 			error.textContent = "";
