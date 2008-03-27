@@ -51,7 +51,7 @@ dojo.declare("api.Sound", dijit._Widget, {
 		this.domNode.style.left="-999px";
 		this.domNode.style.top="-999px";
 		document.body.appendChild(this.domNode);
-		var backends = ["html", "flash",/**/ "embed"];
+		var backends = ["html", "flash", "embed"];
 		for(k in backends) {
 			var i = backends[k];
 			var backend = new api.Sound[i]({
@@ -344,7 +344,7 @@ dojo.declare("api.Sound.flash", api.Sound._backend, {
 		return dojox.flash.comm.callFunction(this.id, "setVolume", [val]);
 	},
 	checkCompat: function() {
-		return dojox.flash.info.capable;
+		return dojox.flash.info.capable && typeof dojox.flash.comm.makeObj == "function";
 	},
 	startup: function() {
 		dojox.flash.comm.makeObj(this.id, "Sound");
