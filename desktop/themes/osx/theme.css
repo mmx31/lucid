@@ -27,12 +27,16 @@ html, body {
 .desktopPanelTop .desktopPanel-start {
 	background-image: url(./images/toppanel-left.png);
 	background-position: top left;
+	height: 100%;
+	background-repeat: no-repeat;
 }
 
 .desktopPanelTop .desktopPanel-end {
 	background-image: url(./images/toppanel-right.png);
 	background-position: top right;
 	margin-left: 7px;
+	height: 100%;
+	background-repeat: no-repeat;
 }
 
 .desktopPanelBottom .desktopPanel-start, .desktopPanelBottom .desktopPanel-end {
