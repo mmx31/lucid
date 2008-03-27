@@ -25,11 +25,7 @@
 		foreach(array(
 			array(
 				'name' => 'api.xsite',
-				'description' => 'Can make cross-domain requests'
-			),
-			array(
-				'name' => 'api.ide',
-				'description' => 'Can develop applications'
+				'description' => 'Can make cross-domain requests by using the server as a proxy'
 			),
 			array(
 				'name' => 'api.fs.download',
@@ -53,8 +49,8 @@
 				'initial' => false
 			),
 			array(
-				'name' => 'core.user.set.password',
-				'description' => 'Can change password',
+				'name' => 'api.ide',
+				'description' => 'Can develop applications',
 				'initial' => false
 			)
 		) as $args) {
