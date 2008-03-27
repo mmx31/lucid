@@ -8,7 +8,6 @@ dojo.require("desktop.ui");
 dojo.require("desktop.user");
 (function() {
 	var modules = [
-		'api._base',
 		'api.Console',
 		"api.crosstalk",
 		"api.Registry",
