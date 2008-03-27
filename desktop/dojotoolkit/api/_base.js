@@ -84,7 +84,7 @@ api.addDojoCss = function(/*String*/path)
 	element.rel = "stylesheet";
 	element.type = "text/css";
 	element.media = "screen";
-	element.href = "./dojo/"+path;
+	element.href = "./dojotoolkit/"+path;
 	document.getElementsByTagName("head")[0].appendChild(element);
 }
 

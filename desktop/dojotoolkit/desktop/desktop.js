@@ -50,11 +50,25 @@ dojo.require("desktop.user");
         link("./dojotoolkit/dijit/themes/dijit.css", "dijit");
         link("./dojotoolkit/dijit/themes/dijit_rtl.css", "dijit_rtl");
 	dojo.addOnLoad(function() {
-		dojo.forEach(modules, function(module) {
-			callIfExists(module, "draw");
-		});
-		dojo.forEach(modules, function(module) {
-			callIfExists(module, "init");
+		api.xhr({
+			backend: "core.bootstrap.check.loggedin",
+			load: function(data, ioArgs) {
+				if(data == "0")
+				{
+					dojo.forEach(modules, function(module) {
+						callIfExists(module, "draw");
+					});
+					dojo.forEach(modules, function(module) {
+						callIfExists(module, "init");
+					});
+				}
+				else
+				{
+					history.back();
+					window.close();
+					document.body.innerHTML = "Not Logged In";
+				}
+			}
 		});
 	});
 })();

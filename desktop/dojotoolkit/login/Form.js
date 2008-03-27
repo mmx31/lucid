@@ -13,6 +13,7 @@ dojo.require("dojox.validate.web");
 dojo.declare("login.Form", dijit.form.Form, {
 	templateString: null,
 	templatePath: dojo.moduleUrl("login", "Form.html"),
+	_popup: null,
 	postCreate: function() {
 		this.inherited(arguments);
 		new dijit.form.TextBox({
@@ -32,6 +33,24 @@ dojo.declare("login.Form", dijit.form.Form, {
 			value: "current"
 		}, this.currentWindowNode);
 	},
+	_winCheck: function() {
+		if(this._popup.closed === false) {setTimeout(dojo.hitch(this, "_winCheck"), 500);}
+		else {
+			this.submitNode.disabled=false;
+			this.errorNode.innerHTML = "";
+		}
+	},
+	_popUp: function()
+	{
+		var URL=dojo.baseUrl+"../../index.html";
+		var day=new Date();
+		var id=day.getTime();
+		this._popup=window.open(URL,id,"toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=1,width=1024,height=786,left = 0,top = 0");
+		if(!this._popup)
+			return false;
+		else
+			return true;
+	},
 	onSubmit: function(e) {
 		dojo.stopEvent(e);
 		var contents = this.getValues();
@@ -49,12 +68,11 @@ dojo.declare("login.Form", dijit.form.Form, {
 					{
 						if(contents.windowAct == "current") {
 							this.errorNode.innerHTML = "Logged in. Redirecting to desktop...";
-							window.location = dojo.baseUrl+"../../desktop/index.html";
+							window.location = dojo.baseUrl+"../../index.html";
 						}
 						else {
-							if (desktop.popUp()) {
-								desktop.loggedin();
-								dojo.disconnect(desktop.elements.onExecuteForm);
+							if (this._popUp()) {
+								this._winCheck();
 								this.domNode.username.value = "";
 								this.domNode.password.value = "";
 								this.errorNode.innerHTML = "Logged in. Window open.";
@@ -211,7 +229,7 @@ dojo.declare("login._ResetPassDialog", dijit.Dialog, {
 						}
 						else if(data == "0")
 						{
-							desktop.elements.forgotDialog.hide();
+							this.hide();
 							this.parentForm.errorNode.innerHTML = "A new password has been sent"
 						}
 					})
