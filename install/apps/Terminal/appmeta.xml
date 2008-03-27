@@ -5,7 +5,7 @@
 <email>will@psychdesigns.net</email>
 <version>1.0</version>
 <maturity>Stable</maturity>
-<category>System</category>
+<category>Accessories</category>
 <installFile>app.js</installFile>
 <filesRequired>false</filesRequired>
 <installMessage>Terminal is being installed...</installMessage>
