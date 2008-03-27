@@ -1,0 +1,19 @@
+When designing an API, please use this format:
+
+	General rules of thumb:
+		
+		keep method and property names short but descriptive.
+	
+	For storage-centric APIs:
+	
+		use three methods, get(), save(), and remove().
+		
+		If it is something like a database:
+			For filtering, name methods filter(), byId(), and exclude().
+			Make sure get(), filter(), byId(), and exclude()
+			return a member of the object, named 'objects'
+			containing the filtering methods.
+		
+	For widgets/windows:
+		
+		To show/hide, use methods named show() and close().

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<appMeta>
+<name>RSS Reader</name>
+<author>Psychcf</author>
+<email>will@psychdesigns.net</email>
+<version>1.0.1</version>
+<maturity>Alpha</maturity>
+<category>Internet</category>
+<installFile>app.js</installFile>
+<filesRequired>false</filesRequired>
+<installMessage>RSS Reader is being installed...</installMessage>
+<installedMessage>...done</installedMessage>
+</appMeta>

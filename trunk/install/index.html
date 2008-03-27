@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+		"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<title>Psych Desktop Installer</title>
+		<script type="text/javascript" src="../desktop/dojotoolkit/dojo/dojo.js" djConfig="parseOnLoad: true"></script>
+		<script type="text/javascript" src="install.js"></script>
+		<link href="style.css" rel="stylesheet" media="screen" />
+		<link href="../desktop/dojotoolkit/dijit/themes/dijit.css" rel="stylesheet" media="screen" />
+		<link href="../desktop/dojotoolkit/dijit/themes/tundra/tundra.css" rel="stylesheet" media="screen" />
+		<link href="../desktop/dojotoolkit/dijit/themes/tundra/tundra_rtl.css" rel="stylesheet" media="screen" />
+	</head>
+	<body class="tundra">
+		<form dojoType="dijit.form.Form" id="form">
+			<div id="pageBar"><span id="wizardPages" dojoType="dijit.layout.StackController" containerId="wizard"></span></div>
+			<div dojoType="dijit.layout.StackContainer" id="wizard" widgetid="wizard">
+				<div dojoType="dijit.layout.ContentPane" title="Start" id="start">
+					<div class="title">Welcome to the Psych Desktop installer!</div>
+					Before you start the installation, you need to change some file permissions:<br /> 
+					<div id="perms">please wait...</div>
+				</div>
+				<div dojoType="dijit.layout.ContentPane" title="Installation Type">
+					<div class="title">What type of installation do you want?</div>
+					<input dojoType="dijit.form.RadioButton" id="installtype-new" type="radio" name="type" value="clean" />
+					<label for="installtype-new"><b>I want to do a clean installation</b></label>
+					<p>Do a new installation, and create a new admin user</p>
+					
+					<input dojoType="dijit.form.RadioButton" id="installtype-cms" type="radio" name="type" value="CMS" disabled="true" />
+					<label for="installtype-cms"><b>I want to do a clean installation, but intergrate it with a CMS</b></label>
+					<p>Do a new installation, then configure it to intergrate with a user table from a CMS</p>
+					<!-- We should support drupal, joomla/mambo, phpnuke, and some others -->
+					
+					<input dojoType="dijit.form.RadioButton" id="installtype-reset" type="radio" name="type" value="reset" />
+					<label for="installtype-reset"><b>I want to reset my existing installation</b></label>
+					<p>Keeps your settings and users, but re-installs apps and other things</p>
+				</div>
+				<div dojoType="dijit.layout.ContentPane" title="Database" onclick="install.fixurlStr(arguments[0]);" onkeyup="install.fixurlStr(arguments[0]);">
+					<div class="title">Database Settings</div>
+					<br />
+					Database Backend:
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" id="db_type_mysql" value="mysql" /> 
+						<label for="db_type_mysql"> mySQL</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" id="db_type_mysqli" value="mysqli" /> 
+						<label for="db_type_mysqli"> mySQLi</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="sqlite" id="db_type_sqlite" />
+						<label for="db_type_sqlite"> SQLite</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="mssql" id="db_type_mssql" />
+						<label for="db_type_mssql"> Microsoft SQL Server</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="pgsql" id="db_type_pgsql" />
+						<label for="db_type_pgsql"> PostgreSQL</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="ibase" id="db_type_ibase" />
+						<label for="db_type_ibase"> iBase</label>
+					</div>
+					<div>
+						<input dojoType="dijit.form.RadioButton" type="radio" name="db_type" value="oci8" id="db_type_oci8" />
+						<label for="db_type_oci8"> Oracle DB (versions 7-10)</label>
+					</div>
+					<br />
+					Database Host:&nbsp;
+					<input dojoType="dijit.form.TextBox" name="db_host" type="text" /> <i style="font-size: 10pt;">(Path to database for SQLite)</i>
+					<br />
+					Database Name:&nbsp;
+					<input dojoType="dijit.form.TextBox" name="db_name" type="text" /> <i style="font-size: 10pt;">(Not used in SQLite)</i>
+					<br />
+					Table Prefix:&nbsp;
+					<input dojoType="dijit.form.TextBox" name="db_prefix" type="text" /> 
+					<br />
+					Username:&nbsp;
+					<input dojoType="dijit.form.TextBox" name="db_username" type="text" /> <i style="font-size: 10pt;">(Not used in SQLite)</i>
+					<br />
+					Password:&nbsp;
+					<input dojoType="dijit.form.TextBox" name="db_password" type="text" /> <i style="font-size: 10pt;">(Not used in SQLite)</i>
+					<br /><br />
+					DSN: <input dojoType="dijit.form.TextBox" name="db_url" id="urlstr" style="width: 400px;" type="text" /><br />
+					 <i style="color: red;">Do not change this unless you know what you're doing</i>
+				</div>
+				<div dojoType="dijit.layout.ContentPane" title="Admin Setup" onkeyup="install.checkAdmin();">
+					<div class="title">Adminstrative User Settings</div>
+						Admin Username:&nbsp;
+						<input dojoType="dijit.form.TextBox" name="admin_user" type="text" />
+					<div onkeyup="install.onPasswordChange();">
+						Admin Password:&nbsp;
+						<input dojoType="dijit.form.TextBox" name="admin_pass" type="password" /><span id="admin_passbox"></span>
+					</div>
+					<div onkeyup="install.onPasswordChange();">
+						Confirm Password:&nbsp;
+						<input dojoType="dijit.form.TextBox" name="admin_confpass" type="password" />
+					</div>
+					<div>
+						Admin E-mail:&nbsp;
+						<input dojoType="dijit.form.TextBox" name="admin_email" type="text" />
+					</div>
+					<div style="margin-top: 10px;">
+						Allow public registration:
+						<div>
+							<input checked dojoType="dijit.form.RadioButton" type="radio" name="conf_public" id="conf_public_true" value="true" /> 
+							<label for="conf_public_true"> yes</label>
+						</div>
+						<div>
+							<input dojoType="dijit.form.RadioButton" type="radio" name="conf_public" id="conf_public_false" value="false" /> 
+							<label for="conf_public_false"> no</label>
+						</div>
+					</div>
+				</div>
+				<div dojoType="dijit.layout.ContentPane" id="install-page" title="Installing">
+					<div class="title">Installing...</div>
+					<div id="progressContainer">
+						<div id="progressBarContainer">
+							<div dojoType="dijit.ProgressBar" id="progressBar" indeterminate="true"></div>
+						</div>
+						<div id="taskList">
+							Starting installation...
+						</div>
+					</div>
+				</div>
+				<div dojoType="dijit.layout.ContentPane" title="Finish">
+					<div class="title">Installation Completed</div>
+					Please delete the /install/ directory for security purposes. You may also want to chmod /backend/configuration.php back to 444. Enjoy!
+				</div>
+			</div>
+			<div class="buttons">			
+				<button dojoType="dijit.form.Button" id="previous" onClick="dijit.byId('wizard').back()">&lt;</button>
+				<button dojoType="dijit.form.Button" id="next" onClick="dijit.byId('wizard').forward()">&gt;</button>
+			</div>
+		</form>
+	</body>
+</html>

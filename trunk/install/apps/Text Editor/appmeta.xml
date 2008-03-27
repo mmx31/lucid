@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<appMeta>
+<name>Text Editor</name>
+<author>Psychcf/Jaymacdonald</author>
+<email>will@psychdesigns.net/Jaymac407@gmail.com</email>
+<version>1.0.3.1</version>
+<maturity>Beta</maturity>
+<category>Accessories</category>
+<filetypes>["text/*"]</filetypes>
+<installFile>app.js</installFile>
+<filesRequired>false</filesRequired>
+<installMessage>Text Editor is being installed...</installMessage>
+<installedMessage>...done</installedMessage>
+</appMeta>

@@ -1,0 +1,4 @@
+#Uncomment these lines to force a secure connection. Make sure your webserver supports this/has ssl enabled!
+#RewriteEngine On
+#RewriteCond %{HTTPS} off
+#RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}

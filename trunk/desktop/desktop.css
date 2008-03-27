@@ -1,0 +1,288 @@
+.dojoDndItemSelected .desktopFileItemText, .selectedItem {
+	background-color: #eeeeee;
+}
+/*
+	YOU MUST LEAVE THIS AS THE FIRST RULE DEFINITION
+	(otherwise we cannot change it dynamically)
+*/
+
+/**********Page stuff*************/
+html body {
+overflow: hidden;
+margin: 0px;
+}
+
+.desktopApplet .dijit button {
+	border: 0px none;
+}
+.dijit .desktopPanel .desktopApplet .dijitA11yDownArrow {
+	display: none;
+}
+.dijit .desktopPanel .desktopApplet .dijitButtonNode,
+.dijit .desktopPanel .desktopApplet .dijitToolbar {
+	background: transparent none repeat scroll 0%;
+}
+.dijit .desktopPanel .desktopApplet .dijitToolbar {
+	border: 0px none;
+}
+
+.desktopPanel {
+	font-size: 10pt;
+}
+.wallpaper {
+	z-index: 0;
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	background-position: 50% 50%;
+}
+.console 
+{
+	overflow: auto;
+	cursor: default;
+	font-family: monospace;
+	font-size: 10pt;
+}
+.console form b {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+.consoleinput {
+	padding-left: 26px;
+	width: 100%;
+	font-family: monospace;
+	font-size: 10pt;
+}
+.console form
+{
+	margin: 0px;
+	position: relative;
+}
+/* Hide that damn dojo.io.iframe */
+#dojoIoIframe {
+	display: none;
+	opacity: 0;
+	width: 0px;
+	height: 0px;
+	border: 0px;
+}
+/* windows */
+.win-handle {
+	cursor: hand;
+}
+
+.win {
+	position: absolute;
+	top: 50px;
+	left: 50px;
+}
+
+.win-tl {
+	position: relative;
+	z-index: 1;
+	background-repeat: no-repeat;
+}
+
+.win-tr {
+	background-repeat: no-repeat;
+	background-position: top right;
+}
+
+.win-tc {
+	overflow: hidden;
+	background-repeat: repeat-x;
+	vertical-align: middle;
+}
+
+.win-title {
+	white-space: nowrap;
+	width: auto;
+	position: absolute;
+	left: 0px;
+	width: 100%;
+	z-index: 1;
+}
+.win-buttons {
+	background-repeat: no-repeat;
+	position: absolute;
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+	right: 0px;
+	z-index: 10;
+}
+
+.win-max,
+.win-min,
+.win-close {
+	float: right;
+	background-repeat: no-repeat;
+}
+
+.win-bmw {
+	position: relative;
+	height: 100%;
+}
+
+.win-ml {
+	position: relative;
+	overflow: hidden;
+	z-index: 1;
+	background-repeat: repeat-y;
+	height: 100%;
+}
+
+.win-mr {
+	background-repeat: repeat-y;
+	background-position: top right;
+	height: 100%;
+}
+
+.win-mc {
+	overflow: hidden;
+	height: 100%; /* temporary untill I find a better solution */
+}
+
+.win-bl {
+	position: relative;
+	overflow: hidden;
+	z-index: 1;
+	background-repeat: no-repeat;
+}
+
+.win-br {
+	background-repeat: no-repeat;
+	background-position: top right;
+}
+
+.win-bc {
+	background-repeat: repeat-x;
+}
+
+.win-resize {
+	z-index: 100;
+	position: absolute;
+}
+
+/*if not IE we can use the method that works :D */
+
+.win > .win-bmw,
+.win-bmw > .win-ml,
+.win-ml > .win-mr,
+.win-mr > .win-mc {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	height: auto;
+	width: auto;
+}
+
+.win-bmw > .win-bl {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+}
+
+/* filearea */
+.desktopFileItemText { 
+	position: relative;
+	left: 0px;
+	top: 0px;
+	color: black;
+	text-align: center;
+}
+.desktopFileItemTextFront {
+	color: black;
+}
+.mainFileArea .desktopFileItemTextFront {
+	color: white;
+}
+.desktopFileItemTextBack {
+	display: none;
+}
+.mainFileArea .desktopFileItemTextBack {
+	display: block;
+	z-index: -1;
+	color: black;
+	position: absolute;
+	left: 1px;
+	top: 1px;
+	color: #000;
+	width: 100%;
+}
+
+.desktopFileItemIcon {
+	margin-left: auto;
+	margin-right: auto;
+}
+.dojoDndItemSelected .desktopFileItemIcon, .desktopFileArea .dojoDndItemOver {
+	opacity: 0.8;
+	filter: alpha(opacity=80);
+}
+.floatLeft {
+	float: left; /* I know this is stupid, but you can't really set the float property in js */
+}
+.floatRight {
+	float: right;
+}
+.desktopFileItem {
+	float: left;
+}
+.mainFileArea .desktopFileItem {
+	float: none;
+}
+/* Applets */
+.desktopApplet {
+	position: absolute;
+}
+.desktopPanelHorizontal .desktopApplet {
+	height: 100%;
+}
+.desktopPanelVertical .desktopApplet {
+	width: 100%;
+}
+.desktopAppletHandle {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background-color: #666;
+	display: none;
+}
+.desktopPanelHorizontal .desktopAppletHandle {
+	height: 100%;
+	width: 10px;
+}
+.desktopPanelVertical .desktopAppletHandle {
+	width: 100%;
+	height: 10px;
+}
+.desktopAppletHandleShow {
+	display: block;
+	cursor: move;
+}
+.desktopPanel {
+	position: absolute;
+	background-color: white;
+	/*overflow: hidden;*/
+}
+.desktopAppletFullspan .desktopAppletContent {
+	width: 100%;
+	height: 100%;
+}
+.uiArea {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 500;
+}
+/****** Widget Layer *******/
+.widgetLayer {	
+	opacity: 0.8;
+	filter: alpha(opacity=80);
+}

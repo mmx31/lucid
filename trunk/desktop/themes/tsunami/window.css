@@ -1,0 +1,99 @@
+.win-buttons {
+	padding-top: 2px;
+	padding-left: 2px;
+	padding-right: 2px;
+	margin-top: 3px;
+	width: 70px;
+	height: 19px;
+	right: 15px;
+	background-image: url(./images/winbutnback.png);
+	background-repeat: no-repeat;
+	background-position: top right;
+}
+.win-close,
+.win-min,
+.win-max {
+	width: 16px;
+	height: 15px;
+	margin-right: 3px;
+}
+.win-close {
+	background-image: url(./images/tsunamiclose.png);
+	margin-right: 0px;
+}
+.win-min {
+	background-image: url(./images/tsunamiminimize.png);
+}
+.win-max {
+	background-image: url(./images/tsunamimaximize.png);
+}
+.win-tc {
+    height: 27px;
+	background-image: url(./images/tsunamiwindow_topcenter.png);
+}
+.win-title {
+	color: white;
+	font-weight: bold;
+	left: 20px;
+	padding-top: 2px;
+}
+.win-tr,
+.win-tl {
+	height: 27px;
+}
+.win-tr {
+	background-image: url(./images/tsunamiwindow_topright.png);
+	padding-right: 17px;
+}
+.win-tl {
+	background-image: url(./images/tsunamiwindow_topleft.png);
+	padding-left: 19px;
+}
+.win-resize {
+	width: 12px;
+	height: 12px;
+	position: absolute;
+	bottom: 8px;
+	right: 4px;
+	cursor: se-resize;
+}
+
+.win-mc {
+	background-color: white;
+}
+.win-ml {
+	background-image: url(./images/tsunamiwindow_borderleft.png);
+	padding-left: 10px;
+}
+.win > .win-bmw {
+	top: 27px;
+}
+
+.win-bmw > .win-ml {
+	bottom: 26px;
+}
+
+.win-mr > .win-mc {
+	left: 10px;
+	right: 10px;
+}
+
+.win-mr {
+	background-image: url(./images/tsunamiwindow_borderright.png);
+	padding-right: 10px;
+}
+.win-bl {
+	padding-left: 19px;
+	height: 26px;
+	background-image: url(./images/tsunamiwindow_bottomleft.png);
+}
+.win-br {
+	padding-right: 17px;
+	height: 26px;
+	background-image: url(./images/tsunamiwindow_bottomright.png);
+}
+.win-bc {
+	height: 26px;
+	background-image: url(./images/tsunamiwindow_bottomcenter.png);
+}
+
