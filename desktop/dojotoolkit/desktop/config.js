@@ -128,7 +128,7 @@ desktop.config = {
 	 */
 	wallpaper: {
 		image: "./themes/Minuit/wallpaper.png",
-		color: "#32cd32",
+		color: "#696969",
 		style: "centered",
 		storedList: [
 			"./themes/green/wallpaper.jpg",
