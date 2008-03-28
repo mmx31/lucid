@@ -28,7 +28,7 @@ a {
 	opacity: 0.8;
 	filter: alpha(opacity=80);
 }
-#desktop_message {
+.desktop_message {
 	font-size: 14pt;
 	font-weight: bold;
 	margin-bottom: 10px;
