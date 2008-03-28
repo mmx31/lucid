@@ -101,7 +101,7 @@ class jsonOutput extends objOutput {
 			header("Content-Type: text/json; charset=utf-8");
 			if(isset($php_errormsg))
 			{
-				$this->append("sqlerror", $php_errormsg);
+				$this->append("core_error", $php_errormsg);
 			}
 			$json = Zend_Json::encode($this->output);
 			//comment filtering is tricky in certain cases...
@@ -117,7 +117,7 @@ class textareaOutput extends jsonOutput {
 			header("Content-Type: text/html; charset=utf-8");
 			if(isset($php_errormsg))
 			{
-				$this->append("sqlerror", $php_errormsg);
+				$this->append("core_error", $php_errormsg);
 			}
 			echo "<textarea>" . Zend_Json::encode($this->output) . "</textarea>";
 		}
