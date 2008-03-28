@@ -1,3 +1,4 @@
+djConfig.usePlainJson = true; //THIS IS ANNOYING!!!!>_<
 dojo.provide("desktop._base");
 dojo.require("api._base");
 dojo.require("desktop.admin");
