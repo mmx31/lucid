@@ -55,7 +55,7 @@ this.newApp = function()
 		maturity: "alpha",
 		author: "NewApp Creator"
 	};
-	this.editor.value="";
+	this.editor.value="this.init = function(args)\n{\n\n/*Insert application start code here*/\n\n}\n\nthis.kill = function()\n{\n\n/*Insert application end code here*/\n\n}";
 }
 this.about = function() {
 	api.ui.alertDialog({title: "Katana IDE", message:"Psych Desktop Katana IDE - Application Creation IDE<br>Version "+this.version});
@@ -68,7 +68,6 @@ this.save = function()
 	this.app.callback = dojo.hitch(this, this.saved);
 	this.app.error = dojo.hitch(this, function(one, two) {
 	if(one == 7) api.ui.alertDialog({title: "Katana IDE", message:"Permissions error. Contact your administrator."});
-	});
 	else api.ui.alertDialog({title: "Katana IDE", message:"Error: "+one+"<br>Please try again or report this bug."});
 	});
 	api.ide.save(this.app);
