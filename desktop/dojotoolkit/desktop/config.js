@@ -181,7 +181,7 @@ desktop.config = {
 	 * icons - a json object containing icons for each file extention
 	 */
 	filesystem: {
-		hideExt: true,
+		hideExt: false,
 		//TODO: use mimetypes, not extentions!
 		icons: {
 			txt: "icon-32-mimetypes-text-x-generic",
