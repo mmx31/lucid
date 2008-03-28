@@ -14,7 +14,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 	templateString: null,
 	templatePath: dojo.moduleUrl("login", "Form.html"),
 	_popup: null,
-	preloadDesktop: true,
+	preload: true,
 	postCreate: function() {
 		this.inherited(arguments);
 		new dijit.form.TextBox({

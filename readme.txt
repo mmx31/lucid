@@ -10,6 +10,13 @@ Customizing:
 	stays intact.
 	
 		<div dojoType="login.Form"></div>
+		
+	There are extra parameters that you can add to the div. The login form fetches parts of the desktop
+	when the user begins to type in their login information. This gets cached by the browser, so the desktop
+	loads faster when the user actually logs into the desktop. To prevent this behaviour, just add preload="false"
+	to the form:
+		
+		<div dojoType="login.Form" preload="false"></div>
 
 	Then, include this code just before the </body> tag of the document/template,
 	replacing *BOTH* "desktop_installDir"s with your psych desktop installation path:
