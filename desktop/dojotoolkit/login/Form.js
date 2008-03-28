@@ -14,6 +14,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 	templateString: null,
 	templatePath: dojo.moduleUrl("login", "Form.html"),
 	_popup: null,
+	preloadDesktop: true,
 	postCreate: function() {
 		this.inherited(arguments);
 		new dijit.form.TextBox({
@@ -32,6 +33,14 @@ dojo.declare("login.Form", dijit.form.Form, {
 			name: "windowAct",
 			value: "current"
 		}, this.currentWindowNode);
+		if(this.preloadDesktop) {
+			var ontype = dojo.connect(this.domNode, "onkeydown", this, function() {
+				dojo.disconnect(ontype);
+				dojo.xhrGet({
+					url: dojo.baseUrl+"../desktop/desktop.js"
+				});
+			})
+		}
 	},
 	_winCheck: function() {
 		if(this._popup.closed === false) {setTimeout(dojo.hitch(this, "_winCheck"), 500);}
