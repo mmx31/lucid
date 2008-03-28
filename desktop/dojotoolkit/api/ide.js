@@ -73,6 +73,10 @@ api.ide = new function()
 	                    category: app.category,
 	                    code: app.code
 	               },
+		       error: function(data, ioArgs) {
+						if(app.error) app.error(data, ioArgs);
+						api.log("IDE API: Save error");
+			},
 	               load: function(data, ioArgs){
 						app.callback(data.id);
 						api.log("IDE API: Save Sucessful");

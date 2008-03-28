@@ -66,6 +66,9 @@ this.save = function()
 	this.editor.disabled = true;
 	this.app.code=this.editor.value;
 	this.app.callback = dojo.hitch(this, this.saved);
+	this.app.error = dojo.hitch(this, function(one, two) {
+	api.ui.alertDialog({title: "Katana IDE", message:"Error Code: "+one+"<br>Please try again or report this bug."});
+	});
 	api.ide.save(this.app);
 }
 
