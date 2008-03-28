@@ -8,7 +8,7 @@ desktop.user = new function() {
 	this.init = function() {
 		this.beforeUnloadEvent = dojo.addOnUnload(function(e)
 		{
-			desktop.user.logout(true);
+			desktop.user.logout();
 		});
 	}
 	/*
@@ -112,19 +112,15 @@ desktop.user = new function() {
 	 * Method: logout
 	 *
 	 * logs a user out
-	 *
-	 * Arguments:
-	 * 	sync - should the logout call be synchronous? defaults to false.
 	 */
-	this.logout = function(/*Boolean?*/sync)
+	this.logout = function()
 	{
 		if(desktop.reload) { return false; }
-		if(typeof sync == "undefined") sync=false;
-		desktop.config.save(sync);
-		dojo.publish("desktoplogout", ["yes"]);
+		desktop.config.save(true);
+		dojo.publish("desktoplogout", []);
 		api.xhr({
 			backend: "core.user.auth.logout",
-			sync: sync,
+			sync: true,
 			load: function(data, ioArgs){
 				if(data == "0")
 				{

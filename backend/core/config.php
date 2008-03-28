@@ -24,8 +24,9 @@ if($_GET['section'] == "stream")
 	if($_GET['action'] == "save")
 	{
 		$p = $User->get_current();
+		if($p==false) die();
 		$result = $Config->filter("userid", $p->id);
-		if(!isset($result[0])) { $u = new $Config(); $u->userid = $p->id; }
+		if($result == false) { $u = new $Config(array(userid => $p->id)); }
 		else { $u = $result[0]; }
 		$u->value = $_POST['value'];
 		$u->save();

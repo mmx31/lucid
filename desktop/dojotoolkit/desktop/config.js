@@ -18,7 +18,8 @@ desktop.version = "SVN";
 desktop.config = {
 	init: function(cback) {
 		desktop.config.load(cback);
-		setInterval(desktop.config.save, 1000*60);
+		setInterval(dojo.hitch(desktop.config, "save"), 1000*60);
+		dojo.subscribe("desktoplogout", dojo.hitch(desktop.config, "save"));
 	},
 	/*
 	 * Method: load
