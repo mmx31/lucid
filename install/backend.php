@@ -71,6 +71,7 @@
 		$user->password = $_POST['password'];
 		$user->crypt_password();
 		$user->add_permission("core.administration");
+		$user->add_permission("api.ide");
 		$user->save();
 		$out->append("Writing admin username, password, and e-mail to database...", "...done");
 	}
