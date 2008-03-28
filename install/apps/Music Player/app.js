@@ -6,8 +6,8 @@ this.init = function(args) {
 	dojo.require("dijit.layout.ContentPane");
 	this.win = new api.Window({
 		title: "Music Player",
-		width: "350px",
-		height: "150px",
+		width: "500px",
+		height: "300px",
 		onClose: dojo.hitch(this, this.kill)
 	});
 	var toolbar = new dijit.Toolbar({layoutAlign: "top"});
