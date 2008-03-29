@@ -26,7 +26,7 @@ if($_GET['section'] == "io")
 	$username = $user->username;
 	if($_POST['fileStreamType'] == "local") { $dirUse = "../../files"; }
 	if($_POST['fileStream'] == "0") { $username = $username; }
-	if($_POST['fileStream'] == "-1") { $username = ".public"; }
+	if($_POST['fileStream'] == "-1") { $username = "../public"; }
 	if ($_GET['action'] == "createDirectory") {
 					$odir = $_POST['path'];
 				    $dir = "$dirUse/".$username."/$odir";

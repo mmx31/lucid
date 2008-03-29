@@ -146,14 +146,14 @@ this.switchFs = function() {
 		this.fileArea.path = "/";
 		this.fileArea.refresh();
 		api.ui.alertDialog({title: "Psych Desktop", message:"File stream set to public<br>Any user can upload or download from here."});
-		this.toggleButton.label = "Switch to your FS";
+		this.toggleButton.setAttribute("label","Switch to your FS");
 	}
 	else {
 		this.fileArea.fileStream = "0";
 		this.fileArea.path = "/";
 		this.fileArea.refresh();
 		api.ui.alertDialog({title: "Psych Desktop", message:"File stream set to private<br>Only you can upload or download from here."});
-		this.toggleButton.label = "Switch to public FS";
+		this.toggleButton.setAttribute("label","Switch to public FS");
 	}
 }	
 

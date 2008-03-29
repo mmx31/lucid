@@ -74,7 +74,6 @@
 		$user->add_permission("api.ide");
 		$user->save();
 		$out->append("Writing admin username, password, and e-mail to database...", "...done");
-		mkdir("../files/.public");
 	}
 	if($act == "installdatabase")
 	{
@@ -182,7 +181,8 @@
 			"../files/",
 			"../apps/",
 			"../apps/tmp/",
-			"../backend/configuration.php"
+			"../backend/configuration.php",
+			"../public"
 		);
 		$ok = array("error", "error");
 		$a = 0;
