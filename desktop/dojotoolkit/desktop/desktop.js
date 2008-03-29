@@ -1,4 +1,3 @@
-djConfig.usePlainJson = true; //THIS IS ANNOYING!!!!>_<
 dojo.provide("desktop._base");
 dojo.require("api._base");
 dojo.require("desktop.admin");
@@ -7,6 +6,13 @@ dojo.require("desktop.config");
 dojo.require("desktop.theme");
 dojo.require("desktop.ui");
 dojo.require("desktop.user");
+
+//THIS IS ANNOYING!!!!>_<
+if(typeof djConfig == "undefined") djConfig = {};
+djConfig.usePlainJson = true;
+if(typeof dojo.config == "undefined") dojo.config = {};
+dojo.config.usePlainJson = true;
+
 (function() {
 	var modules = [
 		'api.Console',
