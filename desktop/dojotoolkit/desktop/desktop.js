@@ -21,7 +21,7 @@ dojo.config.usePlainJson = true;
 		"api.Filearea",
 		"api.fs",
 		"api.ide",
-		"api.mail",
+		"api.Mail",
 		"api.Sound",
 		"api.ui",
 		"api.Window",

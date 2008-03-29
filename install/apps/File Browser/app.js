@@ -46,27 +46,30 @@ this.init = function(args)
 		title: "File Browser",
 		onClose: dojo.hitch(this, this.kill)
 	});
-		var layout = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
-		this.client = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 70, layoutAlign: "client"});
-		this.pane = new dijit.layout.ContentPane({sizeMin: 150}, document.createElement("div"));
-		var menu = new dijit.Menu({});
-		menu.domNode.style.width="100%";
+		this.client = new dijit.layout.SplitContainer({layoutAlign: "client"});
+		this.fileArea = new api.Filearea({path: (args.path || "/"), sizeShare: 70})
+		this.pane = new dijit.layout.ContentPane({sizeMin: 0, sizeShare: 30});
+		var menu = new dijit.Menu({
+			style: "width: 100%;"
+		});
 		var item = new dijit.MenuItem({label: "Home",
 			iconClass: "icon-16-places-user-home",
-			onClick: dojo.hitch(this.fileArea, function() { this.setPath("/"); })});
+			onClick: dojo.hitch(this.fileArea, "setPath", "/")
+		});
 		menu.addChild(item);
 		var item = new dijit.MenuItem({label: "Documents",
 			iconClass: "icon-16-places-folder",
-			onClick: dojo.hitch(this.fileArea, function() { this.setPath("/Documents/"); })});
+			onClick: dojo.hitch(this.fileArea, "setPath", "/Documents/")
+		});
 		menu.addChild(item);
 		var item = new dijit.MenuItem({label: "Desktop",
 			iconClass: "icon-16-places-user-desktop",
-			onClick: dojo.hitch(this.fileArea, function() { this.setPath("/Desktop/"); })});
+			onClick: dojo.hitch(this.fileArea, "setPath", "/Desktop/")
+		});
 		menu.addChild(item);
 		this.pane.setContent(menu.domNode);
 		this.client.addChild(this.pane);
-	this.fileArea = new api.Filearea({path: (args.path || "/")})
-	layout.addChild(this.fileArea);
+		this.client.addChild(this.fileArea);
 	this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
 		var button = new dijit.form.Button({
 			onClick: dojo.hitch(this.fileArea, function() {
@@ -125,7 +128,6 @@ this.init = function(args)
 			_onBlur: function(e) {}
 		});
 		this.toolbar.addChild(this.upbutton);
-	this.client.addChild(layout);
 	this.win.addChild(this.toolbar);
 	this.win.addChild(this.client);
 	this.win.show();

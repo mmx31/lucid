@@ -1,6 +1,6 @@
-dojo.provide("api.mail");
+dojo.provide("api.Mail");
 
-dojo.declare("api.mail", null, {
+dojo.declare("api.Mail", null, {
 	constructor: function(params) {
 		if(!params) params = {};
 		if(!params.rootdir) params.rootdir = "/";

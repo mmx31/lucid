@@ -67,13 +67,13 @@ this.makeMailClasses = function() {
 			dojo.forEach(items, function(item) {
 				this.mail.push({
 					prefItem: item,
-					down: new api.mail({
+					down: new api.Mail({
 						host: this.prefs.getValue(item, "downHost"),
 						username: this.prefs.getValue(item, "downUsername"),
 						password: this.prefs.getValue(item, "downPassword"),
 						protocol: this.prefs.getValue(item, "downProtocol")
 					}),
-					up: new api.mail({
+					up: new api.Mail({
 						host: this.prefs.getValue(item, "upHost"),
 						username: this.prefs.getValue(item, "upUsername"),
 						password: this.prefs.getValue(item, "upPassword"),
