@@ -24,41 +24,44 @@ if($_GET['section'] == "io")
 	import("models.user");
 	$user = $User->get_current();
 	$username = $user->username;
+	if($_POST['fileStreamType'] == "local") { $dirUse = "../../files"; }
+	if($_POST['fileStream'] == "0") { $username = $username; }
+	if($_POST['fileStream'] == "-1") { $username = ".public"; }
 	if ($_GET['action'] == "createDirectory") {
 					$odir = $_POST['path'];
-				    $dir = "../../files/".$username."/$odir";
+				    $dir = "$dirUse/".$username."/$odir";
 					mkdir($dir);
 					$out = new intOutput("ok");
 	}
 		if ($_GET['action'] == "copyFile") {
-					$odir = "../../files/".$username."/".$_POST['path'];
-					$odira = "../../files/".$username."/".$_POST['newpath'];
+					$odir = "$dirUse/".$username."/".$_POST['path'];
+					$odira = "$dirUse/".$username."/".$_POST['newpath'];
 					copy($odir, $odira);
 					$out = new intOutput("ok");
 	}
 		if ($_GET['action'] == "removeFile") {
 					$odir = $_POST['path'];
-				    $dir = "../../files/".$username."/$odir";
+				    $dir = "$dirUse/".$username."/$odir";
 					unlink($dir);
 					$out = new intOutput("ok");
 	}
 		if ($_GET['action'] == "removeDir") {
 					$odir = $_POST['path'];
-				    $dir = "../../files/".$username."/$odir";
+				    $dir = "$dirUse/".$username."/$odir";
 					deltree($dir);
 					$out = new intOutput("ok");
 	}
 		if ($_GET['action'] == "renameFile") {
 					$file = $_POST['path'];
 					$newfile = $_POST['newpath'];
-				    $dir = "../../files/".$username."/$file";
-					$dir2 = "../../files/".$username."/$newfile";
+				    $dir = "$dirUse/".$username."/$file";
+					$dir2 = "$dirUse/".$username."/$newfile";
 					rename($dir, $dir2);
 					$out = new intOutput("ok");
 	}
 		if ($_GET['action'] == "getFolder") {
 			$odir = $_POST['path'];
-		    $dir = opendir("../../files/".$username."/$odir");
+		    $dir = opendir("$dirUse/".$username."/$odir");
 			if(!$dir){
 				$out = new intOutput();
 				$out->set("generic_err", true);
@@ -69,7 +72,7 @@ if($_GET['section'] == "io")
 						continue;
 					} else {
 						$t = strtolower($file);
-						if(is_dir("../../files/".$username."/$odir" . $file)){
+						if(is_dir("$dirUse/".$username."/$odir" . $file)){
 							$type = 'folder';
 						} else {
 							$type = 'file';
@@ -85,14 +88,14 @@ if($_GET['section'] == "io")
 	}
 		if ($_GET['action'] == "getFile") {
 					$odir = $_POST['path'];
-				    	$dir = "../../files/".$username."/$odir";
+				    	$dir = "$dirUse/".$username."/$odir";
 					$file = file_get_contents($dir);
 					$out = new jsonOutput(array(contents => $file));
 	}
 		if ($_GET['action'] == "writeFile") {
 					$content = $_POST['content'];
 					$odir = $_POST['path'];
-				    	$dir = "../../files/".$username."/$odir";
+				    	$dir = "$dirUse/".$username."/$odir";
 					$file = file_put_contents($dir, $content);
 					$out = new intOutput("ok");
 	}
