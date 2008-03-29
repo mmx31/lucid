@@ -2,6 +2,7 @@ this.init = function(args)
 {
 	dojo.require("dijit.Toolbar");
 	dojo.require("dijit.layout.LayoutContainer");
+	dojo.require("dijit.layout.SplitContainer");
 	dojo.require("dijit.form.Button");
 	dojo.require("dijit.Dialog");
 	api.addDojoCss("dojox/widget/FileInput/FileInput.css");
@@ -45,24 +46,27 @@ this.init = function(args)
 		title: "File Browser",
 		onClose: dojo.hitch(this, this.kill)
 	});
-		this.pane = new dijit.layout.ContentPane({sizeMin: 30}, document.createElement("div"));
+		var layout = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
+		this.client = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 70, layoutAlign: "client"});
+		this.pane = new dijit.layout.ContentPane({sizeMin: 150}, document.createElement("div"));
 		var menu = new dijit.Menu({});
 		menu.domNode.style.width="100%";
 		var item = new dijit.MenuItem({label: "Home",
 			iconClass: "icon-16-places-user-home",
-			onClick: dojo.hitch(this.file, function() { this.setPath("/"); })});
+			onClick: dojo.hitch(this.fileArea, function() { this.setPath("/"); })});
 		menu.addChild(item);
 		var item = new dijit.MenuItem({label: "Documents",
 			iconClass: "icon-16-places-folder",
-			onClick: dojo.hitch(this.file, function() { this.setPath("/Documents/"); })});
+			onClick: dojo.hitch(this.fileArea, function() { this.setPath("/Documents/"); })});
 		menu.addChild(item);
 		var item = new dijit.MenuItem({label: "Desktop",
 			iconClass: "icon-16-places-user-desktop",
-			onClick: dojo.hitch(this.file, function() { this.setPath("/Desktop/"); })});
+			onClick: dojo.hitch(this.fileArea, function() { this.setPath("/Desktop/"); })});
 		menu.addChild(item);
 		this.pane.setContent(menu.domNode);
-	this.fileArea = new api.Filearea({layoutAlign: "client", path: (args.path || "/")})
-	this.win.addChild(this.fileArea);
+		this.client.addChild(this.pane);
+	this.fileArea = new api.Filearea({path: (args.path || "/")})
+	layout.addChild(this.fileArea);
 	this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
 		var button = new dijit.form.Button({
 			onClick: dojo.hitch(this.fileArea, function() {
@@ -121,7 +125,9 @@ this.init = function(args)
 			_onBlur: function(e) {}
 		});
 		this.toolbar.addChild(this.upbutton);
+	this.client.addChild(layout);
 	this.win.addChild(this.toolbar);
+	this.win.addChild(this.client);
 	this.win.show();
 	this.win.startup();
 	this.win.onDestroy = dojo.hitch(this, this.kill);
@@ -132,3 +138,4 @@ this.init = function(args)
 this.kill = function() {
 	if(!this.win.closed) { this.win.close(); }
 }
+
