@@ -246,7 +246,7 @@ api.ui = new function() {
 		this.toolbar.addChild(button);
 		dialog.addChild(this.toolbar);
 		this.client = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 70, layoutAlign: "client"});
-		this.pane = new dijit.layout.ContentPane({sizeMin: 30}, document.createElement("div"));
+		this.pane = new dijit.layout.ContentPane({sizeMin: 125}, document.createElement("div"));
 		this.details = new dijit.layout.ContentPane({layoutAlign: "bottom"}, document.createElement("div"));
 		var menu = new dijit.Menu({});
 		menu.domNode.style.width="100%";
