@@ -248,20 +248,16 @@ api.ui = new function() {
 		this.client = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 70, layoutAlign: "client"});
 		this.pane = new dijit.layout.ContentPane({sizeMin: 125}, document.createElement("div"));
 		this.details = new dijit.layout.ContentPane({layoutAlign: "bottom"}, document.createElement("div"));
-		var menu = new dijit.Menu({});
-		menu.domNode.style.width="100%";
-		var item = new dijit.MenuItem({label: "Home",
-			iconClass: "icon-16-places-user-home",
-			onClick: dojo.hitch(this.file, function() { this.setPath("file://"); })});
-		menu.addChild(item);
-		var item = new dijit.MenuItem({label: "Documents",
-			iconClass: "icon-16-places-folder",
-			onClick: dojo.hitch(this.file, function() { this.setPath("file://Documents/"); })});
-		menu.addChild(item);
-		var item = new dijit.MenuItem({label: "Desktop",
-			iconClass: "icon-16-places-user-desktop",
-			onClick: dojo.hitch(this.file, function() { this.setPath("file://Desktop/"); })});
-		menu.addChild(item);
+		var menu = new dijit.Menu({
+			style: "width: 100%;"
+		});
+		dojo.forEach(desktop.config.filesystem.places, function(place) {
+			var item = new dijit.MenuItem({label: place.label,
+				iconClass: place.icon || "icon-16-places-folder",
+				onClick: dojo.hitch(this.file, "setPath", place.path)
+			});
+			menu.addChild(item);
+		}, this);
 		this.pane.setContent(menu.domNode);
         this.address = new dijit.form.TextBox({value: "/"});
 		if(object.types) {

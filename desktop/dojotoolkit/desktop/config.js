@@ -181,6 +181,11 @@ desktop.config = {
 	 * icons - a json object containing icons for each file extention
 	 */
 	filesystem: {
+		places: [
+			{name: "Home", path: "/", icon: "icon-16-places-user-home"},
+			{name: "Desktop", path: "/Desktop/", icon: "icon-16-places-user-desktop"},
+			{name: "Documents", path: "/Documents/"}
+		],
 		hideExt: false,
 		//TODO: use mimetypes, not extentions!
 		icons: {

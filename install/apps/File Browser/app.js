@@ -52,21 +52,13 @@ this.init = function(args)
 		var menu = new dijit.Menu({
 			style: "width: 100%;"
 		});
-		var item = new dijit.MenuItem({label: "Home",
-			iconClass: "icon-16-places-user-home",
-			onClick: dojo.hitch(this.fileArea, "setPath", "/")
-		});
-		menu.addChild(item);
-		var item = new dijit.MenuItem({label: "Documents",
-			iconClass: "icon-16-places-folder",
-			onClick: dojo.hitch(this.fileArea, "setPath", "/Documents/")
-		});
-		menu.addChild(item);
-		var item = new dijit.MenuItem({label: "Desktop",
-			iconClass: "icon-16-places-user-desktop",
-			onClick: dojo.hitch(this.fileArea, "setPath", "/Desktop/")
-		});
-		menu.addChild(item);
+		dojo.forEach(desktop.config.filesystem.places, function(item) {
+			var item = new dijit.MenuItem({label: item.label,
+				iconClass: item.icon || "icon-16-places-folder",
+				onClick: dojo.hitch(this.fileArea, "setPath", item.path)
+			});
+			menu.addChild(item);
+		}, this);
 		this.pane.setContent(menu.domNode);
 		this.client.addChild(this.pane);
 		this.client.addChild(this.fileArea);
