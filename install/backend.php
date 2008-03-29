@@ -74,6 +74,7 @@
 		$user->add_permission("api.ide");
 		$user->save();
 		$out->append("Writing admin username, password, and e-mail to database...", "...done");
+		mkdir("../files/.public");
 	}
 	if($act == "installdatabase")
 	{
