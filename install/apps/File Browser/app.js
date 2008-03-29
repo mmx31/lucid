@@ -45,6 +45,22 @@ this.init = function(args)
 		title: "File Browser",
 		onClose: dojo.hitch(this, this.kill)
 	});
+		this.pane = new dijit.layout.ContentPane({sizeMin: 30}, document.createElement("div"));
+		var menu = new dijit.Menu({});
+		menu.domNode.style.width="100%";
+		var item = new dijit.MenuItem({label: "Home",
+			iconClass: "icon-16-places-user-home",
+			onClick: dojo.hitch(this.file, function() { this.setPath("/"); })});
+		menu.addChild(item);
+		var item = new dijit.MenuItem({label: "Documents",
+			iconClass: "icon-16-places-folder",
+			onClick: dojo.hitch(this.file, function() { this.setPath("/Documents/"); })});
+		menu.addChild(item);
+		var item = new dijit.MenuItem({label: "Desktop",
+			iconClass: "icon-16-places-user-desktop",
+			onClick: dojo.hitch(this.file, function() { this.setPath("/Desktop/"); })});
+		menu.addChild(item);
+		this.pane.setContent(menu.domNode);
 	this.fileArea = new api.Filearea({layoutAlign: "client", path: (args.path || "/")})
 	this.win.addChild(this.fileArea);
 	this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
