@@ -30,10 +30,13 @@ api.fs = new function()
     */
    this.ls = function(/*Object*/object)
     {
+	if(!object.fileStream) { object.fileStream = "0"; object.fileStreamType = "local"; }
         api.xhr({
         backend: "api.fs.io.getFolder",
 		content: {
-			path: object.path
+			path: object.path,
+			fileStream: object.fileStream,
+			fileStreamType: object.fileStreamType
 		},
 		handleAs: "json",
         load: function(data, ioArgs) {
@@ -68,10 +71,13 @@ api.fs = new function()
     */
    this.read = function(/*Object*/object)
     {
+	if(!object.fileStream) { object.fileStream = "0"; object.fileStreamType = "local"; }
         api.xhr({
         backend: "api.fs.io.getFile",
 		content: {
-			path: object.path
+			path: object.path,
+			fileStream: object.fileStream,
+			fileStreamType: object.fileStreamType
 		},
 		handleAs: "json",
         load: function(data, ioArgs) {
@@ -103,11 +109,14 @@ api.fs = new function()
     */
    this.write = function(/*Object*/object)
    {
+	if(!object.fileStream) { object.fileStream = "0"; object.fileStreamType = "local"; }
 		api.xhr({
         backend: "api.fs.io.writeFile",
 		content: {
 			path: object.path,
-			content: object.content
+			content: object.content,
+			fileStream: object.fileStream,
+			fileStreamType: object.fileStreamType
 		},
 		load: function(data, ioArgs)
 		{
@@ -136,6 +145,7 @@ api.fs = new function()
      */
     this.move = function(/*Object*/object)
     {
+	if(!object.fileStream) { object.fileStream = "0"; object.fileStreamType = "local"; }
 	if(object.newname) {
 		var newpath_ = object.path.lastIndexOf("/");
 		var newpath = object.path.substring(0, newpath_);
@@ -147,7 +157,9 @@ api.fs = new function()
         backend: "api.fs.io.renameFile",
 		content: {
 			path: object.path,
-			newpath: newpath
+			newpath: newpath,
+			fileStream: object.fileStream,
+			fileStreamType: object.fileStreamType
 		},
 		load: function(data, ioArgs)
 		{
@@ -184,10 +196,13 @@ api.fs = new function()
      */
     this.mkdir = function(/*Object*/object)
     {
+	if(!object.fileStream) { object.fileStream = "0"; object.fileStreamType = "local"; }
         api.xhr({
         backend: "api.fs.io.createDirectory",
 		content: {
-			path: object.path
+			path: object.path,
+			fileStream: object.fileStream,
+			fileStreamType: object.fileStreamType
 		},
 		load: function(data, ioArgs)
 		{
@@ -211,10 +226,13 @@ api.fs = new function()
     */
    this.rm = function(/*Object*/object)
     {
+	if(!object.fileStream) { object.fileStream = "0"; object.fileStreamType = "local"; }
         api.xhr({
         backend: "api.fs.io.removeFile",
 		content: {
-			path: object.path
+			path: object.path,
+			fileStream: object.fileStream,
+			fileStreamType: object.fileStreamType
 		},
 		load: function(data, ioArgs) {
 			object.callback(data);
@@ -237,11 +255,14 @@ api.fs = new function()
 	 */
    this.copy = function(/*Object*/object)
     {
+	if(!object.fileStream) { object.fileStream = "0"; object.fileStreamType = "local"; }
         api.xhr({
         backend: "api.fs.io.copyFile",
 		content: {
 			path: object.from,
-			newpath: object.to
+			newpath: object.to,
+			fileStream: object.fileStream,
+			fileStreamType: object.fileStreamType
 		},
 		load: function(data, ioArgs) {
 			object.callback(data);
@@ -264,10 +285,13 @@ api.fs = new function()
     */
    this.rmdir = function(/*Object*/object)
     {
+	if(!object.fileStream) { object.fileStream = "0"; object.fileStreamType = "local"; }
         api.xhr({
 	        backend: "api.fs.io.removeDir",
 			content: {
-				path: object.path
+				path: object.path,
+				fileStream: object.fileStream,
+				fileStreamType: object.fileStreamType
 			},
 			dsktp_callback: object.callback,
 			load: function(data, ioArgs) {

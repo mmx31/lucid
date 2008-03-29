@@ -88,6 +88,11 @@ this.init = function(args)
 			label: "Refresh"
 		});
 		this.toolbar.addChild(button);
+		this.toggleButton = new dijit.form.Button({
+			onClick: dojo.hitch(this, this.switchFs),
+			label: "Change to Public FS"
+		});
+		this.toolbar.addChild(this.toggleButton);
 		this.uDiag = new dijit.TooltipDialog({
 			title: "Upload",
 			onOpen: dojo.hitch(this, function(pos) {
@@ -134,6 +139,24 @@ this.init = function(args)
 	this.fileArea.refresh();
 	this.uploader.startup();
 }
+
+this.switchFs = function() {
+	if(this.fileArea.fileStream == 0) {
+		this.fileArea.fileStream = "-1";
+		this.fileArea.path = "/";
+		this.fileArea.refresh();
+		api.ui.alertDialog({title: "Psych Desktop", message:"File stream set to public<br>Any user can upload or download from here."});
+		this.toggleButton.setAttribute("label","Switch to your FS");
+	}
+	else {
+		this.fileArea.fileStream = "0";
+		this.fileArea.path = "/";
+		this.fileArea.refresh();
+		api.ui.alertDialog({title: "Psych Desktop", message:"File stream set to private<br>Only you can upload or download from here."});
+		this.toggleButton.setAttribute("label","Switch to public FS");
+	}
+}	
+
 
 this.kill = function() {
 	if(!this.win.closed) { this.win.close(); }

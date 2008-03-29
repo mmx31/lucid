@@ -181,7 +181,8 @@
 			"../files/",
 			"../apps/",
 			"../apps/tmp/",
-			"../backend/configuration.php"
+			"../backend/configuration.php",
+			"../public"
 		);
 		$ok = array("error", "error");
 		$a = 0;
