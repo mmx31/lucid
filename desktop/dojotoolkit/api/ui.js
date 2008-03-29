@@ -226,7 +226,7 @@ api.ui = new function() {
 		var layout = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
 		var button = new dijit.form.Button({
 			onClick: dojo.hitch(this.file, function() {
-				this.setPath("/");
+				this.setPath("file://");
 			}),
 			iconClass: "icon-16-places-user-home",
 			label: "Home"
@@ -252,15 +252,15 @@ api.ui = new function() {
 		menu.domNode.style.width="100%";
 		var item = new dijit.MenuItem({label: "Home",
 			iconClass: "icon-16-places-user-home",
-			onClick: dojo.hitch(this.file, function() { this.setPath("/"); })});
+			onClick: dojo.hitch(this.file, function() { this.setPath("file://"); })});
 		menu.addChild(item);
 		var item = new dijit.MenuItem({label: "Documents",
 			iconClass: "icon-16-places-folder",
-			onClick: dojo.hitch(this.file, function() { this.setPath("/Documents/"); })});
+			onClick: dojo.hitch(this.file, function() { this.setPath("file://Documents/"); })});
 		menu.addChild(item);
 		var item = new dijit.MenuItem({label: "Desktop",
 			iconClass: "icon-16-places-user-desktop",
-			onClick: dojo.hitch(this.file, function() { this.setPath("/Desktop/"); })});
+			onClick: dojo.hitch(this.file, function() { this.setPath("file://Desktop/"); })});
 		menu.addChild(item);
 		this.pane.setContent(menu.domNode);
         this.address = new dijit.form.TextBox({value: "/"});
