@@ -29,18 +29,6 @@ dojo.declare(
 	 */
 	path: "/",
 	/*
-	 * Property: fileStream
-	 * 
-	 * The current fileStream. 
-	 */
-	fileStream: "0",
-	/*
-	 * Property: fileStreamType
-	 * 
-	 * The current fileStream type. 
-	 */
-	fileStreamType: "local",
-	/*
 	 * Property: operation
 	 * 
 	 * I forgot what this does. Oh noes.
@@ -119,8 +107,6 @@ dojo.declare(
 		}));
 		api.fs.ls({
 			path: this.path,
-			fileStream: this.fileStream,
-			fileStreamType: this.fileStreamType,
 			callback: dojo.hitch(this, function(array)
 			{
 				var widList = [];
@@ -165,8 +151,6 @@ dojo.declare(
 				if(dirname == "") return;
 				api.fs.mkdir({
 					path: this.path+"/"+escape(dirname),
-					fileStream: this.fileStream,
-					fileStreamType: this.fileStreamType,
 					callback: dojo.hitch(this, this.refresh)
 				});
 			})
@@ -188,8 +172,6 @@ dojo.declare(
 				if(filename == "") return;
 				api.fs.write({
 					path: this.path+"/"+escape(filename),
-					fileStream: this.fileStream,
-					fileStreamType: this.fileStreamType,
 					callback: dojo.hitch(this, this.refresh)
 				});
 			})
@@ -425,7 +407,7 @@ dojo.declare(
 	_rename_file: function(e)
 	{
 		this.parent = this.getParent();
-		api.ui.inputDialog({title: "Rename File/Folder", message: "Rename file/folder (currently \""+this.fileName+"\") to:", callback: dojo.hitch(this, function(newv) { api.fs.rename({path: this.path,fileStream: this.fileStream,fileStreamType: this.fileStreamType, newname: newv, callback: dojo.hitch(this, function() {this.parent.refresh();})}); })});
+		api.ui.inputDialog({title: "Rename File/Folder", message: "Rename file/folder (currently \""+this.fileName+"\") to:", callback: dojo.hitch(this, function(newv) { api.fs.rename({path: this.path, newname: newv, callback: dojo.hitch(this, function() {this.parent.refresh();})}); })});
 	},
 	/*
 	 * Method: onClick
