@@ -58,7 +58,6 @@
 	{
 		var $id = array(
 			'type' => "integer",
-			'autoincrement' => 1,
 			'notnull' => 1,
 			'unsigned' => 1
 		);
@@ -90,7 +89,13 @@
 				}
 			}
 		}
-		
+		function _getNewId() {
+			$id = $this->_link->nextID($this->_get_tablename());
+			if (PEAR::isError($id)) {
+			    internal_error("db_query_err", $id->getMessage());
+			}
+			return $id;
+		}
 		function _query($sql, $values=array()) {
 			$this->_connect();
 		    $this->_result = array();
@@ -155,9 +160,12 @@
 		{
 			$this->_connect();
 			$table = $this->_link->quoteIdentifier($this->_get_tablename());
-			if(is_numeric($this->id)) { $sql = "UPDATE ${table} SET "; }
-			else { $sql = "INSERT INTO ${table} SET "; }
 			$arr = array();
+			if(is_numeric($this->id)) { $sql = "UPDATE ${table} SET "; }
+			else {
+				$sql = "INSERT INTO ${table} SET ";
+				array_push($arr, "id=" . $this->_getNewId());
+			}
 			$me = get_class($this);
 			$parent = new $me(array(), true);
 			foreach($this as $key => $value)
