@@ -141,6 +141,8 @@ dojo.mixin(desktop.ui, {
 			dojo.style(cbody, "overflow", "auto");
 			
 			var makeThumb = function(item) {
+				if(item == "") return;
+				if(item === true) item = "";
 				var p = document.createElement("div");
 				dojo.addClass(p, "floatLeft");
 				dojo.style(p, "width", "150px");
@@ -166,7 +168,7 @@ dojo.mixin(desktop.ui, {
 				})
 				cbody.appendChild(p);
 			}
-			makeThumb("");
+			makeThumb(true);
 			dojo.forEach(desktop.config.wallpaper.storedList, makeThumb);
 			c.setContent(cbody);
 			wallpaper.addChild(c);
