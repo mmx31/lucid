@@ -49,22 +49,13 @@ dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 	 */
 	_makePlacesMenu: function() {
 		var m = new dijit.Menu();
-		dojo.forEach([
-			new dijit.MenuItem({
-				label: "Home",
-				iconClass: "icon-16-places-user-home",
-				onClick: function() {
-					desktop.app.launchHandler("/", {}, "text/directory");
-				}
-			}),
-			new dijit.MenuItem({
-				label: "Desktop",
-				iconClass: "icon-16-places-user-desktop",
-				onClick: function() {
-					desktop.app.launchHandler("/Desktop/", {}, "text/directory");
-				}
-			})
-		], m.addChild, m);
+		dojo.forEach(desktop.config.filesystem.places, function(place) {
+			var item = new dijit.MenuItem({label: place.name,
+				iconClass: place.icon || "icon-16-places-folder",
+				onClick: function() { desktop.app.launchHandler(place.path, {}, "text/directory"); }
+			});
+			m.addChild(item);
+		}, this);
 		return m;
 	},
 	/*
