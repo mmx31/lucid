@@ -221,7 +221,7 @@ api.ui = new function() {
 		dialog.title = object.title;
 		dialog.width = "500px";
 		dialog.height = "300px";
-		this.file = new api.Filearea({onItem: dojo.hitch(this, function(path) { object.callback(path); dialog.close(); })}); //Make the fileArea
+		this.file = new api.Filearea({path: "file://", onItem: dojo.hitch(this, function(path) { object.callback(path); dialog.close(); })}); //Make the fileArea
 		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
 		var layout = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
 		var button = new dijit.form.Button({
@@ -259,7 +259,7 @@ api.ui = new function() {
 			menu.addChild(item);
 		}, this);
 		this.pane.setContent(menu.domNode);
-        this.address = new dijit.form.TextBox({value: "/"});
+       		this.address = new dijit.form.TextBox({value: "file://"});
 		if(object.types) {
 		this.internalStore = new dojo.data.ItemFileWriteStore({});
 		for(a=0;a<object.types.length;a++) {

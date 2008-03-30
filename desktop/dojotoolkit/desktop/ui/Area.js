@@ -14,7 +14,7 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 	templateString: "<div class=\"uiArea\"><div dojoAttachPoint=\"containerNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10;\"></div><div dojoAttachPoint=\"wallpaperNode\" class=\"wallpaper\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 1;\"></div></div>",
 	drawn: false,
 	postCreate: function() {
-		var filearea = this.filearea = new api.Filearea({path: "/Desktop/", forDesktop: true, subdirs: false, style: "position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;", overflow: "hidden"});
+		var filearea = this.filearea = new api.Filearea({path: "file://Desktop/", forDesktop: true, subdirs: false, style: "position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;", overflow: "hidden"});
 		dojo.addClass(filearea.domNode, "mainFileArea");
 		filearea.menu.addChild(new dijit.MenuSeparator({}));
 		filearea.menu.addChild(new dijit.MenuItem({label: "Wallpaper", iconClass: "icon-16-apps-preferences-desktop-wallpaper", onClick: dojo.hitch(desktop.ui.config, "appearance")}));
