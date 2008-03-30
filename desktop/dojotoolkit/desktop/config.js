@@ -185,7 +185,7 @@ desktop.config = {
 			{name: "Home", path: "file://", icon: "icon-16-places-user-home"},
 			{name: "Desktop", path: "file://Desktop/", icon: "icon-16-places-user-desktop"},
 			{name: "Documents", path: "file://Documents/"},
-			{name: "Public Home", path: "public://"},
+			{name: "Public", path: "public://"},
 		],
 		hideExt: false,
 		//TODO: use mimetypes, not extentions!
