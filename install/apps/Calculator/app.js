@@ -43,7 +43,7 @@ this.init = function() {
 					style: "width: 100%; height: 100%; margin: 0px;",
 					label: cell,
 					onClick: dojo.hitch(this, function(){
-						if(parseInt(cell)+"" != "NaN" && this.answerShown) this.clear(textbox); 
+						if((parseInt(cell)+"" != "NaN" || cell == ".") && this.answerShown) this.clear(textbox); 
 						if(cell == "=") return this.onSubmit(textbox);
 						if(cell == "C") return this.clear(textbox);
 						this.answerShown = false;
@@ -123,6 +123,8 @@ this.offsetDecimal = function(a, b) {
 	|| ((a.length - a.indexOf(".") == b.length - b.indexOf(".")) && (a.indexOf(".") != -1 && b.indexOf(".") != -1))) return [a, b];
 	if(a.indexOf(".") == -1) a += ".";
 	if(b.indexOf(".") == -1) b += ".";
+	if(a.charAt(0) == ".") a = "0"+a;
+	if(b.charAt(0) == ".") b = "0"+b;
 	var g = a.length - a.indexOf(".") > b.length - b.indexOf(".") ? a : b;
 	var l = a.length - a.indexOf(".") <= b.length - b.indexOf(".") ? a : b;
 	while(g.length - g.indexOf(".") > l.length - l.indexOf(".")) {
@@ -147,7 +149,11 @@ this.sum = function(a, b) {
 		return i;
 	}
 	for(i=l; i>=0; i--) {
-		if(a.charAt(i) == ".") retVal = "." + retVal;
+		console.log({retVal: retVal, carryFlag: carryFlag, i: i});
+		if(a.charAt(i) == ".") {
+			retVal = "." + retVal;
+			continue;
+		}
 		if(a.charAt(i) == "") {
 			retVal = checkFlag(parseInt(b.charAt(i)) + carryFlag) + retVal;
 		}
@@ -156,5 +162,7 @@ this.sum = function(a, b) {
 		}
 		else retVal = checkFlag((parseInt(a.charAt(i)) + parseInt(b.charAt(i))) + carryFlag);
 	}
+	console.log({retVal: retVal, carryFlag: carryFlag, i: i});
+	if(carryFlag > 0) retVal = carryFlag + retVal;
 	return retVal;
 }
