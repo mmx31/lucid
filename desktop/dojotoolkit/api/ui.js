@@ -252,7 +252,7 @@ api.ui = new function() {
 			style: "width: 100%;"
 		});
 		dojo.forEach(desktop.config.filesystem.places, function(place) {
-			var item = new dijit.MenuItem({label: place.label,
+			var item = new dijit.MenuItem({label: place.name,
 				iconClass: place.icon || "icon-16-places-folder",
 				onClick: dojo.hitch(this.file, "setPath", place.path)
 			});

@@ -53,7 +53,7 @@ this.init = function(args)
 			style: "width: 100%;"
 		});
 		dojo.forEach(desktop.config.filesystem.places, function(item) {
-			var item = new dijit.MenuItem({label: item.label,
+			var item = new dijit.MenuItem({label: item.name,
 				iconClass: item.icon || "icon-16-places-folder",
 				onClick: dojo.hitch(this.fileArea, "setPath", item.path)
 			});
