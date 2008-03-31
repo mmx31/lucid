@@ -7,8 +7,8 @@ class FileFs extends BaseFs {
 		$cur = $User->get_current();
 		$this->_username = $cur->username;
 	}
-	function _basePath() {
-		return "../../files/".$this->_username . "/";
+	function _basePath($path=false) {
+		return "../../files/".$this->_username . "/" . ($path ? $path : "");
 	}
 	function _getFileInfo($file, $realPath=false) {
 		$r = array();
