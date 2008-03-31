@@ -30,7 +30,7 @@ this.init = function(args)
 	this.win.addChild(client);
 	
 	this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
-		this.toolbar.addChild(new dijit.form.Button({label: "New", iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, this.newApp)}));
+		this.toolbar.addChild(new dijit.form.Button({label: "New", iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, function btnNewApp() { this.newApp(1); })}));
 		this.toolbar.addChild(new dijit.form.Button({label: "Open", iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this.load)}));
 		this.toolbar.addChild(new dijit.form.Button({label: "Save", iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, this.save)}));
 		this.toolbar.addChild(new dijit.form.Button({label: "Metadata", iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, this.editMetadata)}));
@@ -50,8 +50,9 @@ this.kill = function()
 	if(!this.win.closed)this.win.close();
 }
 
-this.newApp = function()
+this.newApp = function(showmeta)
 {
+	if ( showmeta == null ) showmeta = 0;
 	this.app = {
 		id: -1,
 		code: "",
@@ -67,6 +68,8 @@ this.newApp = function()
 	// Update app string for window title
 	this.currentAppStr = this.app.name + " " + this.app.version;
 	this.updateTitle();
+
+	if ( showmeta == 1 ) this.editMetadata();
 }
 this.about = function() {
 	api.ui.alertDialog({title: "Katana IDE", message:"Psych Desktop Katana IDE - Application Creation IDE<br>Version "+this.version});
@@ -182,6 +185,7 @@ this._editMetadata = function()
 
 this.execute = function()
 {
+	api.ui.alertDialog({title:"Katana IDE", message:this.editor.value});
 	api.ide.execute(this.editor.value);
 }
 
@@ -261,6 +265,7 @@ this.onKey = function(e)
 		case dojo.keys.END: break;
 		case dojo.keys.INSERT: break;
 		default:
+			if ( e.ctrlKey || e.altKey ) break;
 			// Update title app str to reflect new unsaved changes
 			this.changed = 1;
 			this.updateTitle();
