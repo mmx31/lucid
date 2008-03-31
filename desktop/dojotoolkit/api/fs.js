@@ -37,16 +37,10 @@ api.fs = new function()
 		},
 		handleAs: "json",
         load: function(data, ioArgs) {
-			var lsArray = [];
-			dojo.forEach(data, function(f) {
-				lsArray.push({
-					isDir: f.type == "folder",
-					file: f.name
-				});
-			})
-	        if(object.callback) { object.callback(lsArray); }
+	        if(object.callback) { object.callback(data); }
 		},
-        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
+        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); },
+		handleAs: "json"
         });
     }
    /*

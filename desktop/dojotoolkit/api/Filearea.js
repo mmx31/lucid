@@ -120,12 +120,11 @@ dojo.declare(
 					}
 					else { item.fullFile = item.file; }
 					var icon = desktop.config.filesystem.icons[item.ext.toLowerCase()];
-					console.log(item);
 					var wid = {
-						label: item.file,
-						fileName: item.fullFile,
-						iconClass: (item.isDir ? "icon-32-places-folder" : (icon || "icon-32-mimetypes-text-x-generic")),
-						isDir: item.isDir,
+						label: item.name,
+						fileName: item.name,
+						iconClass: (item.type=="text/directory" ? "icon-32-places-folder" : (icon || "icon-32-mimetypes-text-x-generic")),
+						isDir: item.type=="text/directory",
 						path: this.path+item.fullFile,
 						textShadow: this.forDesktop,
 						floatLeft: !this.forDesktop
