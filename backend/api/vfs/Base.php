@@ -64,11 +64,11 @@ class BaseFs {
 			accessed => "never"
 		);
 	}
-	function removePath($path) {
+	function remove($path) {
 		$path = $this->_getPath($path);
-		return $this->_removePath($path);
+		return $this->_remove($path);
 	}
-	function _removePath($path) {
+	function _remove($path) {
 		return true;
 	}
 	function createDirectory($path) {

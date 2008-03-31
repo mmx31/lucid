@@ -48,7 +48,7 @@ class FileFs extends BaseFs {
 			return $arr;
 		}
 	}
-	function _removePath($path) {
+	function _remove($path) {
 		$path = $this->_basePath($path);
 		return $this->_deltree($path);
 	}
