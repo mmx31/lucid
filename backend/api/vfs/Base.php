@@ -42,6 +42,13 @@ class BaseFs {
 		}
 		return $file;
 	}
+	function getRealPath($path) {
+		$path = $this->_getPath($path);
+		return $this->_getRealPath($path);
+	}
+	function _getRealPath($path) {
+		return $path;
+	}
 	function listPath($path=false) {
 		if($path == false) $path = $this->$path;
 		return $this->_listPath($path);

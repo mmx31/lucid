@@ -10,6 +10,9 @@ class FileFs extends BaseFs {
 	function _basePath($path=false) {
 		return "../../files/".$this->_username . "/" . ($path ? $path : "");
 	}
+	function _getRealPath($path) {
+		return $this->_basePath($path);
+	}
 	function _getFileInfo($file, $realPath=false) {
 		$r = array();
 		$r['path'] = $file;

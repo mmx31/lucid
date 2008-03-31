@@ -16,6 +16,9 @@ class PublicFs extends BaseFs {
 	function _basePath($path=false) {
 		return "../../public/" . ($path ? $path : "");
 	}
+        function _getRealPath($path) {
+                return $this->_basePath($path);
+        }
 	function _getFileInfo($file, $realPath=false) {
 		$r = array();
 		$r['path'] = $file;
