@@ -1,4 +1,11 @@
 this.blah = 0;
+
+// this.changed - Bool - Whether current file or app has been modified
+this.changed = 0;
+
+// this.currentAppStr - String - Name and version of currently opened file or app
+this.currentAppStr = "";
+
 this.init = function(args)
 {
 	dojo.require("dijit.layout.LayoutContainer");
@@ -56,6 +63,10 @@ this.newApp = function()
 		author: "NewApp Creator"
 	};
 	this.editor.value="this.init = function(args)\n{\n\n/*Insert application start code here*/\n\n}\n\nthis.kill = function()\n{\n\n/*Insert application end code here*/\n\n}";
+
+	// Update app string for window title
+	this.currentAppStr = this.app.name + " " + this.app.version;
+	this.updateTitle();
 }
 this.about = function() {
 	api.ui.alertDialog({title: "Katana IDE", message:"Psych Desktop Katana IDE - Application Creation IDE<br>Version "+this.version});
@@ -89,6 +100,10 @@ this.saved = function(id)
 		//api.ui.alertDialog({title:"Katana IDE", message:"Save Sucessful"});
 		delete this.app.callback;
 	}));
+
+	// Update title app string to reflect saved changes
+	this.changed = 0;
+	this.updateTitle();
 }
 this.spawnID = 0;
 this.editMetadata = function()
@@ -129,6 +144,23 @@ this.editMetadata = function()
 
 this._editMetadata = function()
 {
+	var anyChanged = 0;	// Has ANY meta data changed?
+	var nameChanged = 0;	// Has app name been changed?
+	var versionChanged = 0;	// Has app version been changed?
+
+	if ( this.app.name != dijit.byId("appname"+this.instance+this.blah).getValue() ) {
+		nameChanged = 1;
+		anyChanged = 1;
+	}
+	if ( this.app.version != dijit.byId("appversion"+this.instance+this.blah).getValue() ) {
+		versionChanged = 1;
+		anyChanged = 1;
+	}
+	if ( this.app.author != dijit.byId("appauthor"+this.instance+this.blah).getValue() ) anyChanged = 1;
+	if ( this.app.email != dijit.byId("appemail"+this.instance+this.blah).getValue() ) anyChanged = 1;
+	if ( this.app.category != dijit.byId("appcategory"+this.instance+this.blah).getValue() ) anyChanged = 1;
+	if ( this.app.maturity != dijit.byId("appmaturity"+this.instance+this.blah).getValue() ) anyChanged = 1;
+	
 	this.app.name = dijit.byId("appname"+this.instance+this.blah).getValue();
 	this.app.author = dijit.byId("appauthor"+this.instance+this.blah).getValue();
 	this.app.email = dijit.byId("appemail"+this.instance+this.blah).getValue();
@@ -138,6 +170,14 @@ this._editMetadata = function()
 	this.editor.value = this.tempCache;
         this.editor.disabled = false;
 	this.blah++;
+
+	if ( nameChanged == 1 || versionChanged == 1 ) {
+		this.currentAppStr = this.app.name + " " + this.app.version;
+	}
+	if ( anyChanged == 1 ) {
+		this.changed = 1;
+		this.updateTitle();
+	}
 }
 
 this.execute = function()
@@ -161,6 +201,12 @@ this.load = function()
 			dojo.connect(l, "onclick", this, function(e) {
 				console.debug(this);
 				this.loadwin.close();
+
+				// Update title app str to reflect new file
+				this.currentAppStr = a.name + " " + a.version;
+				this.changed = 0;
+				this.updateTitle();
+
 				api.ide.load(parseInt(e.target.title), dojo.hitch(this, function(data) {
 					this.editor.value=data.code;
 					this.app = data;
@@ -203,4 +249,30 @@ this.onKey = function(e)
 			this.editor.value += "	";
 		}
 	}
+	switch (e.keyCode) {
+		case dojo.keys.UP_ARROW: break;
+		case dojo.keys.DOWN_ARROW: break;
+		case dojo.keys.LEFT_ARROW: break;
+		case dojo.keys.RIGHT_ARROW: break;
+		case dojo.keys.PAGE_UP: break;
+		case dojo.keys.PAGE_DOWN: break;
+		case dojo.keys.ESCAPE: break;
+		case dojo.keys.HOME: break;
+		case dojo.keys.END: break;
+		case dojo.keys.INSERT: break;
+		default:
+			// Update title app str to reflect new unsaved changes
+			this.changed = 1;
+			this.updateTitle();
+			break;
+	}
+}
+
+this.updateTitle = function() {
+	var titleStr = "Katana IDE - ";
+	titleStr += this.currentAppStr;
+	if ( this.changed == 1 ) {
+		titleStr += " (+)";
+	}
+	this.win.setTitle( titleStr );
 }
