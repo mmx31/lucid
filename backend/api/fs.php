@@ -20,45 +20,66 @@ require("../lib/includes.php");
 import("api.vfs.Base");
 if($_GET['section'] == "io")
 {
+	if(isset($_GET['path'])) $sentpath = $_GET['path'];
+	else $sentpath = $_POST['path'];
 	$_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop hacking.
 	//parse url for the protocol
-	$protocolPart = explode("://", $_POST["path"]);
+	$protocolPart = explode("://", $sentpath);
 	if($protocolPart[0] == $_POST['path']) { $protocol = "file"; }
-	else { $_POST["path"] = "/".$protocolPart[1]; $protocol = $protocolPart[0]; }
+	else { $sentpath = "/".$protocolPart[1]; $protocol = $protocolPart[0]; }
 	//construct the class
 	$class = ucwords($protocol);
 	import("api.vfs." . $class);
 	$class .= "Fs";
 	$module = new $class($_POST['path']);
+	//if there's a new path, figure out what protocol it's using as well
+	if(isset($_POST['newpath'])) {
+		$protocolPart = explode("://", $sentpath);
+		if($protocolPart[0] == $_POST['newpath']) { $newprotocol = "file"; }
+		else { $sentnewpath = "/".$protocolPart[1]; $newprotocol = $protocolPart[0]; }
+		if($protocol != $newprotocol) {
+			$class = ucwords($newprotocol);
+			import("api.vfs." . $class);
+			$class .= "Fs";
+			$newmodule = new $class($_POST['newpath']);
+		}
+	}
 	//figure out what do do
 	if ($_GET['action'] == "createDirectory") {
-	    $module->createDirectory($_POST['path']);
+	    $module->createDirectory($sentpath);
 		$out = new intOutput("ok");
 	}
 	if ($_GET['action'] == "copyFile") {
-		//TODO: if protocols differ, copy the file between protocols!
-		$module->copy($_POST['path'], $_POST['newpath']);
+		if(isset($newmodule)) {
+			$content = $module->read($sentpath);
+			$newmodule->write($sentnewpath, $content);
+		}
+		else $module->copy($sentpath, $sentnewpath);
 		$out = new intOutput("ok");
 	}
 	if ($_GET['action'] == "removeFile" || $_GET['action'] == "removeDir") {
-		$module->remove($_POST['path']);
+		$module->remove($sentpath);
 		$out = new intOutput("ok");
 	}
 	if ($_GET['action'] == "renameFile") {
-		//TODO: if protocols differ, move the file between protocols!
-		$module->rename($_POST['path'], $_POST['newpath']);
+		if(isset($newmodule)) {
+			$content = $module->read($sentpath);
+			$newmodule->write($sentnewpath, $content);
+			$module->remove($sentpath);
+		}
+		else $module->rename($sentpath, $sentnewpath);
 		$out = new intOutput("ok");
 	}
 	if ($_GET['action'] == "getFolder") {
-			$arr = $module->listPath($_POST['path']);
+			$arr = $module->listPath($sentpath);
 			$out = new jsonOutput($arr);
 	}
 	if ($_GET['action'] == "getFile") {
-		$content = $module->read($_POST['path']);
+		$content = $module->read($sentpath);
 		$out = new jsonOutput(array(contents => $content));
 	}
 	if ($_GET['action'] == "writeFile") {
-		$module->write($_POST['path'], $_POST['content']);
+		$module->write($sentpath, $_POST['content']);
 		$out = new intOutput("ok");
 	}
 	if($_GET['action'] == "upload") {
@@ -69,7 +90,7 @@ if($_GET['section'] == "io")
 		}
 		if(isset($_FILES['uploadedfile']['name'])) {
 			//TODO: get this to use the VFS
-			$target_path = '../../files/'.$username.'/'.$_GET['path'];
+			$target_path = '../../files/'.$username.'/'.$sentpath;
 			$target_path = $target_path . basename( $_FILES['uploadedfile']['name']); 
 			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
 			    echo "<textarea>{status: 'success', details: '" . $_FILES['uploadedfile']['name'] . "'}</textarea>";
@@ -88,7 +109,7 @@ if($_GET['section'] == "io")
 		}
 	}
 	if($_GET['action'] == "downloadFolder") {
-		//TODO: get this to use the VFS
+		import("models.user");
 		$user = $User->get_current();
 		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
 		import("lib.zip");
@@ -96,7 +117,7 @@ if($_GET['section'] == "io")
 		if($_GET["as"] == "gzip") { $newzip = new gzip_file("folder.tgz"); }
 		if($_GET["as"] == "bzip") { $newzip = new bzip_file("folder.tbz2"); }
 		$newzip->set_options(array('inmemory' => 1, 'recurse' => 1, 'storepaths' => 1));
-		$newzip->add_files(array("../../files/".$username."/".$_GET['path']."/*"));
+		$newzip->add_files(array("../../files/".$username."/".$sentpath."/*"));
 		$newzip->create_archive();
 		$newzip->download_file();
 	}
@@ -109,32 +130,27 @@ if($_GET['section'] == "io")
 		if($_GET["as"] == "gzip") { $newzip = new gzip_file("compressed.tgz"); }
 		if($_GET["as"] == "bzip") { $newzip = new bzip_file("compressed.tbz2"); }
 		$newzip->set_options(array('inmemory' => 1, 'recurse' => 1, 'storepaths' => 1));
-		$newzip->add_files("../../files/".$username."/".$_GET['path']);
+		$newzip->add_files("../../files/".$username."/".$sentpath);
 		$newzip->create_archive();
 		$newzip->download_file();
 	}
 	if($_GET['action'] == "download") {
-		//TODO: get this to use the VFS
 		$user = $User->get_current();
 		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
-		$f = "../../files/" . $username . "/" . $_GET['path'];
-		if(file_exists($f))
-		{
-			$name = basename($f);
-			$type = mime_content_type($f);
-			$size = filesize($f);
-			header("Content-type: $type");
-			header("Content-Disposition: attachment;filename=\"$name\"");
-			header('Pragma: no-cache');
-			header('Expires: 0');
-			header("Content-length: $size");
-			readfile($f);
-		}
+		$name = basename($sentpath);
+		$type = mime_content_type($f);
+		$size = filesize($f);
+		header("Content-type: $type");
+		header("Content-Disposition: attachment;filename=\"$name\"");
+		header('Pragma: no-cache');
+		header('Expires: 0');
+		header("Content-length: $size");
+		echo $module->read($sentpath);
 	}
 	if($_GET['action'] == "display")
 	{
 		//TODO: get this to use the VFS
-		$f = "../../files/" . $username . "/" . $_GET['path'];
+		$f = "../../files/" . $username . "/" . $sentpath;
 		if(file_exists($f))
 		{
 			$name = basename($f);
@@ -149,7 +165,7 @@ if($_GET['section'] == "io")
 	}
 	if ($_GET['action'] == "info") {
 			$out = new jsonOutput();
-			$out->set($module->getFileInfo($_POST['path']));
+			$out->set($module->getFileInfo($sentpath));
 	}
 }
 ?>
