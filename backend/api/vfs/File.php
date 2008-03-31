@@ -33,7 +33,7 @@ class FileFs extends BaseFs {
 		return $r;
 	}
 	function _listPath($path) {
-	    $dir = opendir($this->_basePath() . $path);
+	    $dir = opendir($this->_basePath($path));
 		if(!$dir){
 			return false;
 		} else {
@@ -42,7 +42,7 @@ class FileFs extends BaseFs {
 				if($file == '..' || $file == '.'){
 					continue;
 				} else {
-					array_push($arr, $this->_getFileInfo($file, true));
+					array_push($arr, $this->_getFileInfo($this->_basePath($path . "/" . $file), true));
 				}
 			}
 			return $arr;
