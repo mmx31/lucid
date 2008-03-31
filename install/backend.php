@@ -179,6 +179,7 @@
 	{
 		$dirs = array(
 			"../files/",
+			"../public/",
 			"../apps/",
 			"../apps/tmp/",
 			"../backend/configuration.php"

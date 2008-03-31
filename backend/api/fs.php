@@ -34,7 +34,7 @@ if($_GET['section'] == "io")
 	$module = new $class($_POST['path']);
 	//if there's a new path, figure out what protocol it's using as well
 	if(isset($_POST['newpath'])) {
-		$protocolPart = explode("://", $sentpath);
+		$protocolPart = explode("://", $_POST['newpath']);
 		if($protocolPart[0] == $_POST['newpath']) { $newprotocol = "file"; }
 		else { $sentnewpath = "/".$protocolPart[1]; $newprotocol = $protocolPart[0]; }
 		if($protocol != $newprotocol) {
