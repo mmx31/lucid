@@ -198,6 +198,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	 */
 	setTitle: function(title) {
 		this.titleNode.innerHTML = title;
+		this._task._domNode.innerHTML = this._task._domNode.innerHTML.replace(this._task.label, title);
 	},
 	/*
 	 * Method: _getPoints

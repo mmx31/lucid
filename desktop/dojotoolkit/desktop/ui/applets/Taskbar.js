@@ -53,7 +53,9 @@ dojo.declare("desktop.ui.Task", null, {
 			});
 		}
 		domNode.innerHTML += v;
-		return domNode;
+		this._domNode = domNode;
+		this._orientation = orientation;
+		return this._domNode;
 	},
 	/*
 	 * Method: onClick
