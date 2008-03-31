@@ -198,6 +198,10 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	 */
 	setTitle: function(title) {
 		this.titleNode.innerHTML = title;
+		if(title.length >= 18) {
+		title = title.slice(0, 18);
+		title += "...";
+		}
 		this._task._domNode.innerHTML = this._task._domNode.innerHTML.replace(this._task.label, title);
 	},
 	/*

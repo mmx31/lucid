@@ -46,6 +46,10 @@ dojo.declare("desktop.ui.Task", null, {
 		else dojo.addClass(domNode, "taskBarItemVertical");
 		if(this.icon) domNode.innerHTML = "<img src='"+this.icon+"' />";
 		var v = this.label;
+		if(v.length >= 18) {
+		v = v.slice(0, 18);
+		v += "...";
+		}
 		if(orientation == "vertical") {
 			v = "<br />";
 			dojo.forEach(this.label, function(s) {
