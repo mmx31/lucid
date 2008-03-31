@@ -96,7 +96,7 @@ class BaseFs {
 	}
 	function read($path) {
 		$path = $this->_getPath($path);
-		return $this->_getContent($path);
+		return $this->_read($path);
 	}
 	function _read($path) {
 		return "";
