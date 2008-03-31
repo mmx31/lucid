@@ -113,7 +113,7 @@ dojo.declare(
 				dojo.forEach(array, function(item) {
 					var p = item.file.lastIndexOf(".");
 					item.ext = item.file.substring(p+1, item.file.length);
-					if(desktop.config.filesystem.hideExt && !item.isDir && p != -1)
+					if(desktop.config.filesystem.hideExt && item.type!="text/directory" && p != -1)
 					{
 						item.fullFile = item.file;
 						item.file = item.file.substring(0, p);
@@ -123,8 +123,8 @@ dojo.declare(
 					var wid = {
 						label: item.file,
 						fileName: item.fullFile,
-						iconClass: (item.isDir ? "icon-32-places-folder" : (icon || "icon-32-mimetypes-text-x-generic")),
-						isDir: item.isDir,
+						iconClass: (item.type=="text/directory" ? "icon-32-places-folder" : (icon || "icon-32-mimetypes-text-x-generic")),
+						isDir: item.type=="text/directory",
 						path: this.path+item.fullFile,
 						textShadow: this.forDesktop,
 						floatLeft: !this.forDesktop
