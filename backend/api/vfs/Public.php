@@ -11,7 +11,7 @@ class PublicFs extends FileFs {
 }
 */
 import("models.user");
-class FileFs extends BaseFs {
+class PublicFs extends BaseFs {
 	var $_username;
 	function _basePath($path=false) {
 		return "../../public/" . ($path ? $path : "");
