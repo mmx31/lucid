@@ -145,7 +145,7 @@ desktop.app = new function()
 		else {
 			if(!format) {
 				api.fs.info(file, dojo.hitch(this, function(f){
-					var type = f.mimetype;
+					var type = f.type;
 					this._launchHandler(file, type, args);
 				}));
 			}
