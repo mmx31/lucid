@@ -202,7 +202,8 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		title = title.slice(0, 18);
 		title += "...";
 		}
-		this._task._domNode.innerHTML = this._task._domNode.innerHTML.replace(this._task.label, title);
+		this._task._domNode.innerHTML = this._task._domNode.innerHTML.replace(this.title, title);
+		this.title = title;
 	},
 	/*
 	 * Method: _getPoints
