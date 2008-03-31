@@ -122,7 +122,6 @@ if($_GET['section'] == "io")
 		$newzip->download_file();
 	}
 	if($_GET['action'] == "compressDownload") {
-		//TODO: get this to use the VFS
 		$user = $User->get_current();
 		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
 		import("lib.zip");
@@ -130,16 +129,17 @@ if($_GET['section'] == "io")
 		if($_GET["as"] == "gzip") { $newzip = new gzip_file("compressed.tgz"); }
 		if($_GET["as"] == "bzip") { $newzip = new bzip_file("compressed.tbz2"); }
 		$newzip->set_options(array('inmemory' => 1, 'recurse' => 1, 'storepaths' => 1));
-		$newzip->add_files("../../files/".$username."/".$sentpath);
+		$newzip->add_files($module->getRealPath($sentpath));
 		$newzip->create_archive();
 		$newzip->download_file();
 	}
 	if($_GET['action'] == "download") {
 		$user = $User->get_current();
 		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
-		$name = basename($sentpath);
-		$type = mime_content_type($f);
-		$size = filesize($f);
+		$info = $module->getFileInfo($sentpath);
+		$type = $info['type'];
+		$size = $info['size'];
+		$name = $info['name'];
 		header("Content-type: $type");
 		header("Content-Disposition: attachment;filename=\"$name\"");
 		header('Pragma: no-cache');
@@ -149,23 +149,19 @@ if($_GET['section'] == "io")
 	}
 	if($_GET['action'] == "display")
 	{
-		//TODO: get this to use the VFS
-		$f = "../../files/" . $username . "/" . $sentpath;
-		if(file_exists($f))
-		{
-			$name = basename($f);
-			$type = mime_content_type($f);
-			$size = filesize($f);
-			header("Content-type: $type");
-			header('Pragma: no-cache');
-			header('Expires: 0');
-			header("Content-length: $size");
-			readfile($f);
-		}
+		$info = $module->getFileInfo($sentpath);
+		$type = $info['type'];
+		$size = $info['size'];
+		$name = $info['name'];
+		header("Content-type: $type");
+		header('Pragma: no-cache');
+		header('Expires: 0');
+		header("Content-length: $size");
+		echo $module->read($sentpath);
 	}
 	if ($_GET['action'] == "info") {
-			$out = new jsonOutput();
-			$out->set($module->getFileInfo($sentpath));
+		$out = new jsonOutput();
+		$out->set($module->getFileInfo($sentpath));
 	}
 }
 ?>
