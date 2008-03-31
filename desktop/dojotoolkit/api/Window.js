@@ -189,6 +189,17 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			} else this.resize();
 	},
 	/*
+	 * Method: setTitle
+	 * 
+	 * Sets window title after window creation
+	 * 
+	 * Arguments:
+	 * 		title - The new title
+	 */
+	setTitle: function(title) {
+		this.titleNode.innerHTML = title;
+	},
+	/*
 	 * Method: _getPoints
 	 * 
 	 * Get the points of a box (as if it were on an xy plane)
