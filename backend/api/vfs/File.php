@@ -33,8 +33,7 @@ class FileFs extends BaseFs {
 		return $r;
 	}
 	function _listPath($path) {
-		$odir = $_POST['path'];
-	    $dir = opendir($this->_basePath().$odir);
+	    $dir = opendir($this->_basePath() . $path);
 		if(!$dir){
 			return false;
 		} else {

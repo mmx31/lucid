@@ -36,6 +36,10 @@ class BaseFs {
 	function _getPath($file) {
 		$t = explode("/", $file);
 		if(!isset($t[1])) $file = $this->path . "/" . $file;
+		else {
+			$t = explode("./", $file, 1);
+			if(isset($t[1])) $file = $this->path . "/" . $t[1];
+		}
 		return $file;
 	}
 	function listPath($path=false) {
