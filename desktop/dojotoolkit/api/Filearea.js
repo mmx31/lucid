@@ -111,21 +111,21 @@ dojo.declare(
 			{
 				var widList = [];
 				dojo.forEach(array, function(item) {
-					var p = item.file.lastIndexOf(".");
-					item.ext = item.file.substring(p+1, item.file.length);
+					var p = item.name.lastIndexOf(".");
+					item.ext = item.name.substring(p+1, item.name.length);
 					if(desktop.config.filesystem.hideExt && item.type!="text/directory" && p != -1)
 					{
-						item.fullFile = item.file;
-						item.file = item.file.substring(0, p);
+						item.fullName = item.name;
+						item.name = item.name.substring(0, p);
 					}
-					else { item.fullFile = item.file; }
+					else { item.fullName = item.name; }
 					var icon = desktop.config.filesystem.icons[item.ext.toLowerCase()];
 					var wid = {
 						label: item.name,
-						fileName: item.name,
+						fileName: item.fullName,
 						iconClass: (item.type=="text/directory" ? "icon-32-places-folder" : (icon || "icon-32-mimetypes-text-x-generic")),
 						isDir: item.type=="text/directory",
-						path: this.path+item.fullFile,
+						path: this.path+item.name,
 						textShadow: this.forDesktop,
 						floatLeft: !this.forDesktop
 					};
