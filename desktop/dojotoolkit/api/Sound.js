@@ -317,7 +317,7 @@ dojo.declare("api.Sound.flash", api.Sound._backend, {
 	},
 	pause: function() {
 		dojox.flash.comm.callFunction(this.id, "stop");
-		this._startPos = this.position();
+		this._startPos = this.position()/1000;
 		this.playing = false;
 	},
 	stop: function() {
@@ -327,7 +327,7 @@ dojo.declare("api.Sound.flash", api.Sound._backend, {
 	},
 	position: function(v) {
 		if(v) {
-			this._startPos = v;
+			this._startPos = v/1000;
 			if(this.playing) this.play();
 		}
 		else {
