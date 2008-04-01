@@ -47,7 +47,7 @@ this.init = function(args)
 		onClose: dojo.hitch(this, this.kill)
 	});
 		this.client = new dijit.layout.SplitContainer({layoutAlign: "client"});
-		this.fileArea = new api.Filearea({path: (args.path || "/"), sizeShare: 70})
+		this.fileArea = new api.Filearea({path: (args.path || "file://"), sizeShare: 70})
 		this.pane = new dijit.layout.ContentPane({sizeMin: 0, sizeShare: 30});
 		var menu = new dijit.Menu({
 			style: "width: 100%;"
@@ -120,6 +120,12 @@ this.init = function(args)
 			_onBlur: function(e) {}
 		});
 		this.toolbar.addChild(this.upbutton);
+	this.details = new dijit.layout.ContentPane({layoutAlign: "bottom"}, document.createElement("div"));
+	this.line = document.createElement("div");
+	this.line.innerHTML = this.fileArea.path;
+	this.details.setContent(this.line);
+	this.fileArea.onPathChange = dojo.hitch(this, function(path) { this.line.innerHTML = path; });
+	this.win.addChild(this.details);
 	this.win.addChild(this.toolbar);
 	this.win.addChild(this.client);
 	this.win.show();
