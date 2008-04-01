@@ -15,7 +15,7 @@ class BaseFs {
 			//parse the URL for server connection details
 			$url = explode("://", $url);
 			$url = $url[1];
-			$path = explode("/", $url);
+			$path = explode("/", $url, 2);
 			$this->path = $path[1];
 			$args = explode("@", $path[0], 1);
 			if(isset($args[1])){

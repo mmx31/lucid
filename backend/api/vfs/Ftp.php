@@ -2,6 +2,7 @@
 class FtpFs extends BaseFs {
 	var $_type="server";
 	var $_link;
+	var $path = ".";
 	function _startup() {
 		$this->_link = ftp_connect($this->hostname, $this->port);
 		if($this->username != "") $login = ftp_login($this->_link, $this->username, $this->password);
