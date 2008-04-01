@@ -70,7 +70,7 @@ class FileFs extends BaseFs {
 	}
 	function _createDirectory($path) {
 		$path = $this->_basePath($path);
-		return mkdir($path, 0777, true);
+		return mkdir($path, 0666, true);
 	}
 	function _copy($source, $destination) {
 		$source = $this->_basePath($source);
