@@ -11,6 +11,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		this._getApps();
 		//this._interval = setInterval(dojo.hitch(this, this._getApps), 1000*60);
 		dojo.addClass(this.containerNode, "menuApplet");
+		dojo.subscribe("updateMenu", dojo.hitch(this, "_getApps"));
 		this.inherited("postCreate", arguments);
 	},
 	uninitialize: function() {
@@ -89,8 +90,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 				if (this._menu) {
 					this._menu.destroy();
 				}
-				var menu = new dijit.Menu({});
-				this._menu = menu;
+				var menu = this._menu = new dijit.Menu({});
 				var cats = {};
 				for(item in data)
 				{

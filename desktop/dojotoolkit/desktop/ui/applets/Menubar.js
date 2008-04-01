@@ -8,6 +8,7 @@ dojo.require("dijit.Menu");
  */
 dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 	dispName: "Menu Bar",
+	_drawn: false,
 	/*
 	 * Method: _makeSystemMenu
 	 * 
@@ -64,6 +65,13 @@ dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 	 * Draws the button for the applet
 	 */
 	_drawButton: function() {
+		if(this._drawn) {
+			this._appMenuButton.dropDown = this._menu;
+			this._appMenuButton._started = false; //hackish....
+			this._appMenuButton.startup();
+			return;
+		}
+		else this._drawn = true;
 		dojo.require("dijit.Toolbar");
 		dojo.require("dijit.form.Button");
 		var tbar = new dijit.Toolbar();
@@ -87,6 +95,7 @@ dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 			tbar.addChild(b);
 			b.domNode.style.height="100%";
 			b.startup();
-		});
+			if(i.label == "Applications") this._appMenuButton = b;
+		}, this);
 	}
 });

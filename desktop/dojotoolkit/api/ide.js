@@ -81,6 +81,7 @@ api.ide = new function()
 						app.callback(data.id);
 						api.log("IDE API: Save Sucessful");
 						delete desktop.app.apps[parseInt(data.id)];
+						dojo.publish("updateMenu", []);
 				   },
 				   handleAs: "json"
 	          });
