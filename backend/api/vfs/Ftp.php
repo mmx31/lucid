@@ -32,7 +32,7 @@ class FtpFs extends BaseFs {
 			name => basename($path),
 			modified => ftp_mdtm($this->_link, $path),
 			size => ftp_size($this->_link, $path),
-			mimetype => ($isDir ? "text/directory" : "text/plain") //TODO: figure out mimetype?
+			type => ($isDir ? "text/directory" : "text/plain") //TODO: figure out mimetype?
 		);
 	}
 	function _listPath($path) {

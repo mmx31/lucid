@@ -125,7 +125,7 @@ dojo.declare(
 						fileName: item.fullName,
 						iconClass: (item.type=="text/directory" ? "icon-32-places-folder" : (icon || "icon-32-mimetypes-text-x-generic")),
 						isDir: item.type=="text/directory",
-						path: this.path+item.name,
+						path: this.path+(this.path.charAt(this.path.length-1) == "/" ? "" : "/")+item.name,
 						textShadow: this.forDesktop,
 						floatLeft: !this.forDesktop
 					};
