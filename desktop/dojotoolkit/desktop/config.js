@@ -118,6 +118,13 @@ desktop.config = {
                 }
 	],
 	/*
+	 * Property: locale
+	 * 
+	 * The locale of the user
+	 * more details here: http://dojotoolkit.org/book/dojo-book-0-9/part-3-programmatic-dijit-and-dojo/i18n/specifying-locale
+	 */
+	locale: "en-us",
+	/*
 	 * Property: toasterPos
 	 * 
 	 * Position the toaster popup will appear
