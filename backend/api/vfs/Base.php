@@ -13,7 +13,9 @@ class BaseFs {
 		}
 		else if($this->_type == "server") {
 			//parse the URL for server connection details
-			$path = explode("/", $url, 1);
+			$url = explode("://", $url);
+			$url = $url[1];
+			$path = explode("/", $url);
 			$this->path = $path[1];
 			$args = explode("@", $path[0], 1);
 			if(isset($args[1])){

@@ -2,11 +2,11 @@
 class FtpFs extends BaseFs {
 	var $_type="server";
 	var $_link;
-	var $port = 25;
 	function _startup() {
 		$this->_link = ftp_connect($this->hostname, $this->port);
-		if($this->username) $login = ftp_login($this->_link, $this->username, $this->password);
-		if((!$this->_link) || (!$login)) internal_error("generic_err");
+		if($this->username != "") $login = ftp_login($this->_link, $this->username, $this->password);
+		else $login = ftp_login($this->_link, "anonymous", "anonymous");
+		if((!$this->_link) || (!$login)) internal_error("generic_err", $this->_link ? "Authentication Error" : "Connection Error");
 	}
 	function __destroy() {
 		ftp_close($this->_link);
