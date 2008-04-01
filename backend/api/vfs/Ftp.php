@@ -12,6 +12,18 @@ class FtpFs extends BaseFs {
 	function __destroy() {
 		ftp_close($this->_link);
 	}
+	function _chdir($path) {
+		$dirs = explode("/", $path);
+		if($dirs[0] != $path) {
+			foreach($dirs as $dir) {
+				if($dir != "") {
+					$cd = ftp_chdir($this->_link, $dir);
+					if(!$cd) return false;	
+				}
+			}
+		}
+		return true;
+	}
 	function _getFileInfo($path) {
 		$curdir = ftp_pwd($this->_link);
 		$isDir = ftp_chdir($this->_link, $path);
@@ -24,15 +36,7 @@ class FtpFs extends BaseFs {
 		);
 	}
 	function _listPath($path) {
-		$dirs = explode("/", $path);
-		if($dirs[0] != $path) {
-			foreach($dirs as $dir) {
-				if($dir != "") {
-					$cd = ftp_chdir($this->_link, $dir);
-					if(!$cd) return false;	
-				}
-			}
-		}
+		$this->_chdir($path);
 		$list = ftp_nlist($this->_link, ".");
 		$arr = array();
 		foreach($list as $dir) {
