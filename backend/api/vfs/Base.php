@@ -13,20 +13,20 @@ class BaseFs {
 		}
 		else if($this->_type == "server") {
 			//parse the URL for server connection details
-			$url = explode("://", $url);
+			$url = explode("://", $url, 2);
 			$url = $url[1];
 			$path = explode("/", $url, 2);
 			$this->path = $path[1];
-			$args = explode("@", $path[0], 1);
+			$args = explode("@", $path[0], 2);
 			if(isset($args[1])){
 				$serverInfo = $args[1];
 				$userInfo = $args[0];
-				$userInfo = explode(":", $userInfo);
+				$userInfo = explode(":", $userInfo, 2);
 				$this->username = $userInfo[0];
 				if(isset($userInfo[1])) $this->password = $userInfo[1];
 			}
 			else $serverInfo = $args[0];
-			$serverInfo = explode(":", $serverInfo, 1);
+			$serverInfo = explode(":", $serverInfo, 2);
 			$this->hostname = $serverInfo[0];
 			if(isset($serverInfo[1])) $this->port = $serverInfo[1];
 		}
@@ -52,7 +52,7 @@ class BaseFs {
 		return $path;
 	}
 	function listPath($path=false) {
-		if($path == false) $path = $this->$path;
+		if($path == false) $path = $this->path;
 		return $this->_listPath($path);
 	}
 	function _listPath($path) {

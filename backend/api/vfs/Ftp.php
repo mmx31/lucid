@@ -17,13 +17,23 @@ class FtpFs extends BaseFs {
 		$isDir = ftp_chdir($this->_link, $path);
 		ftp_chdir($this->_link, $path);
 		return array(
+			name => basename($path),
 			modified => ftp_mdtm($this->_link, $path),
 			size => ftp_size($this->_link, $path),
 			mimetype => ($isDir ? "text/directory" : "text/plain") //TODO: figure out mimetype?
 		);
 	}
 	function _listPath($path) {
-		$list = ftp_nlist($this->_link, $path);
+		$dirs = explode("/", $path);
+		if($dirs[0] != $path) {
+			foreach($dirs as $dir) {
+				if($dir != "") {
+					$cd = ftp_chdir($this->_link, $dir);
+					if(!$cd) return false;	
+				}
+			}
+		}
+		$list = ftp_nlist($this->_link, ".");
 		$arr = array();
 		foreach($list as $dir) {
 			array_push($arr, $this->_getFileInfo($path . "/" . $dir));

@@ -24,9 +24,9 @@ if($_GET['section'] == "io")
 	else $sentpath = $_POST['path'];
 	$_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop hacking.
 	//parse url for the protocol
-	$protocolPart = explode("://", $sentpath);
+	$protocolPart = explode("://", $sentpath, 2);
 	if($protocolPart[0] == $_POST['path']) { $protocol = "file"; }
-	else { $sentpath = "/".$protocolPart[1]; $protocol = $protocolPart[0]; }
+	else { $sentpath = $protocolPart[1]; $protocol = $protocolPart[0]; }
 	//construct the class
 	$class = ucwords($protocol);
 	import("api.vfs." . $class);
@@ -34,15 +34,25 @@ if($_GET['section'] == "io")
 	$module = new $class($_POST['path']);
 	//if there's a new path, figure out what protocol it's using as well
 	if(isset($_POST['newpath'])) {
-		$protocolPart = explode("://", $_POST['newpath']);
+		$protocolPart = explode("://", $_POST['newpath'], 2);
 		if($protocolPart[0] == $_POST['newpath']) { $newprotocol = "file"; }
-		else { $sentnewpath = "/".$protocolPart[1]; $newprotocol = $protocolPart[0]; }
+		else { $sentnewpath = $protocolPart[1]; $newprotocol = $protocolPart[0]; }
 		if($protocol != $newprotocol) {
 			$class = ucwords($newprotocol);
 			import("api.vfs." . $class);
 			$class .= "Fs";
 			$newmodule = new $class($_POST['newpath']);
 		}
+	}
+	if($module->_type == "server") {
+		//strip it out of $sentpath
+		$sentpath = explode("/", $sentpath, 2);
+		if(!is_string($sentpath)) $sentpath = $sentpath[1];
+	}
+	if(isset($newmodule) && $newmodule->_type == "server") {
+		//strip it out of $newsentpath
+		$newsentpath = explode("/", $newsentpath, 2);
+		if(!is_string($newsentpath)) $newsentpath = $newsentpath[1];
 	}
 	//figure out what do do
 	if ($_GET['action'] == "createDirectory") {
