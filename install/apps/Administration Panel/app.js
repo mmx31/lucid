@@ -566,6 +566,7 @@ this.installPackage = function() {
 				widgetRef.overlay.innerHTML = "Error: "+data.error;
 				console.log('error',data,ioArgs);
 			}
+			dojo.publish("updateMenu", []);
 		})
 	});
 	div.appendChild(uploader.domNode);
