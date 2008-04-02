@@ -106,7 +106,8 @@ this.init = function(args) {
 	this.win.addChild(client);
 	this.win.show();
 	this.win.startup();
-	if(args.file) this.open(args.file);
+	if(args.file) this.openFile(args.file);
+	else if(args.url) this.openURL(args.url);
 }
 this.sound = false;
 this.play = function() {
