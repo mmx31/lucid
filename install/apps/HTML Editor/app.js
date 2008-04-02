@@ -1,34 +1,19 @@
-dojo.require("dijit.Toolbar");
-dojo.require("dijit.layout.ContentPane");
-dojo.require("dojo.parser");
-dojo.require("dijit.Editor");
 this.newAs = false;
 this.editing = false;
 this.fileEditing = "";
-this.init = function(args) {
-    if (args.file) {
-        this.start();
-        this._processOpen(args.file);
-
-    }
-    else {
-        this.start();
-
-    }
-
-}
-
 this.kill = function() {
     if (!this.window.closed) {
         this.window.close();
-
     }
 }
 
-this.start = function() {
+this.init = function(args) {
+	dojo.require("dijit.Toolbar");
+	dojo.require("dijit.layout.ContentPane");
+	dojo.require("dojo.parser");
+	dojo.require("dijit.Editor");
     this.window = new api.Window({
         onClose: dojo.hitch(this, this.kill)
-
     });
     var toolbar = new dijit.Toolbar({
         layoutAlign: "top"
@@ -83,8 +68,12 @@ this.start = function() {
 		editor = dijit.byId(editor.id);
 		delete editor.toolbar;
 		editor.postCreate();
-		editor.replaceValue("<b>Open</b> or <b>Create</b> a file.");
-	    editor.setDisabled(true);
+		if(args.file) 
+			this._processOpen(args.file);
+		else {
+			editor.replaceValue("<b>Open</b> or <b>Create</b> a file.");
+			editor.setDisabled(true);
+		}
 	}, 500);
 
 }
