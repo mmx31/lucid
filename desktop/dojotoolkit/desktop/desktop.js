@@ -1,4 +1,17 @@
 dojo.provide("desktop._base");
+(function() {
+	var p = dojo.requireLocalization;
+	var deferred = [];
+	dojo.requireLocalization = function() {
+		deferred.push(arguments);
+	}
+	dojo.subscribe("desktopReadyToLoad", function() {
+		dojo.requireLocalization = p;
+		dojo.forEach(deferred, function(a) {
+			dojo.requireLocalization.apply(dojo, a);
+		})
+	});
+})();
 dojo.require("api._base");
 dojo.require("desktop.admin");
 dojo.require("desktop.app");
@@ -62,6 +75,7 @@ dojo.config.usePlainJson = true;
 				if(data.loggedin == true)
 				{
 					dojo.locale = data.locale || dojo.locale;
+					dojo.publish("desktopReadyToLoad", []);
 					dojo.forEach(modules, function(module) {
 						callIfExists(module, "draw");
 					});
