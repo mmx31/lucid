@@ -24,7 +24,7 @@ if($_GET['section'] == "stream")
 	if($_GET['action'] == "save")
 	{
 		$p = $User->get_current();
-		if($p==false) die();
+		if($p==false) internal_error("generic_err", "user not logged in");
 		$result = $Config->filter("userid", $p->id);
 		if($result == false) { $u = new $Config(array(userid => $p->id)); }
 		else { $u = $result[0]; }
