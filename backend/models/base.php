@@ -161,10 +161,8 @@
 			$this->_connect();
 			$table = $this->_link->quoteIdentifier($this->_get_tablename());
 			$arr = array();
-			if(is_numeric($this->id)) { $sql = "UPDATE ${table} SET "; }
-			else {
-				$sql = "INSERT INTO ${table} SET ";
-				array_push($arr, "id=" . $this->_getNewId());
+			if(!is_numeric($this->id)) {
+				$arr['id'] = $this->_getNewId();
 			}
 			$me = get_class($this);
 			$parent = new $me(array(), true);
@@ -193,24 +191,12 @@
 						}
 					}
 					
-					if(is_int($value) || is_null($value))
-					{
-						@array_push($arr, $this->_escape($key) . "=" . (is_null($value) ? "null" : $value));
-					}
-					else
-					{
-						//when all else fails, make it a string
-						@array_push($arr, $this->_escape($key) . "=\"" . $this->_escape($value) ."\"");
-					}
+					$arr[$key] = $value;
 				}
 			}
-			$sql .= implode(', ',$arr);
-			$id = $this->id;
-			if(is_numeric($this->id)) { $sql .= " WHERE `ID`=${id} LIMIT 1"; }
-			$this->_query($sql);
-			if(!is_numeric($this->id)) {
-				$this->id = $this->_link->lastInsertID($this->_get_tablename());
-			}
+			$this->_link->loadModule('Extended');
+			$this->_link->autoExecute($this->_get_tablename(), $arr, (is_numeric($this->id) ? MDB2_AUTOQUERY_UPDATE : MDB2_AUTOQUERY_INSERT), "id=".$id);
+			if(!is_numeric($this->id)) $this->id = $arr['id'];
 		}
 		
 		function get($id)
@@ -305,8 +291,8 @@
 		function truncate() {
 			$this->_connect();
 			$table = $this->_link->quoteIdentifier($this->_get_tablename());
-			$this->_query("TRUNCATE TABLE ${table}");
-			$this->_query("ALTER TABLE ${table} AUTO_INCREMENT = 1");
+			$this->_link->loadModule('Extended');
+			$this->_link->autoExecute($table, false, MDB2_AUTOQUERY_DELETE, "id=*");
 		}
 		function make_json($columns=false)
 		{
@@ -370,6 +356,7 @@
 					'id' => array()
 				)
 			));
+			$this->_link->createSequence($this->_get_tablename());
 		}
 	}
 ?>
