@@ -99,7 +99,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 					}
 					else if(data == "4" || data == "5" || data == "6")
 					{
-						this.errorNode.innerHTML = "A database error occured. Contact the Administrator.";
+						this.errorNode.innerHTML = "A database error occured. Check Psych Desktop is installed or contact the Administrator.";
 						this.submitNode.disabled=false;
 					}
 					else if(data == "7")
