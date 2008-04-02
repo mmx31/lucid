@@ -7,15 +7,20 @@ this.init = function(args) {
 	this.win = new api.Window({
 		title: "Music Player",
 		width: "500px",
-		height: "300px",
+		height: "150px",
 		onClose: dojo.hitch(this, this.kill)
 	});
 	var toolbar = new dijit.Toolbar({layoutAlign: "top"});
 	dojo.forEach([
 		{
-			label: "Open",
+			label: "Open File",
 			iconClass: "icon-16-actions-document-open",
-			onClick: dojo.hitch(this, this.openDialog)
+			onClick: dojo.hitch(this, this.openFileDialog)
+		},
+		{
+			label: "Open URL",
+			iconClass: "icon-16-actions-document-open",
+			onClick: dojo.hitch(this, this.openURLDialog)
 		}
 	], function(item) {
 		toolbar.addChild(new dijit.form.Button(item));
@@ -151,13 +156,29 @@ this.stop = function() {
 		this.ui.slider.setValue(0);
 	}
 }
-this.openDialog = function() {
-	api.ui.fileDialog({
-		title: "Select audio file to open",
-		callback: dojo.hitch(this, this.open)
+this.openURLDialog = function() {
+	api.ui.inputDialog({
+		title: "Open URL",
+		callback: dojo.hitch(this, this.openURL)
 	});
 }
-this.open = function(file) {
+this.openURL = function(fileurl) {
+	if ( fileurl) {
+		this.sound = new api.Sound({
+			src: fileurl
+		});
+		this.play();
+		fileurl = fileurl.split("/");
+		this.filename = fileurl.pop();
+	}
+}
+this.openFileDialog = function() {
+	api.ui.fileDialog({
+		title: "Select audio file to open",
+		callback: dojo.hitch(this, this.openFile)
+	});
+}
+this.openFile = function(file) {
 	if (file) {
 		this.sound = new api.Sound({
 			src: api.fs.embed(file)
@@ -204,3 +225,4 @@ this.kill = function() {
 	if(this.sound) this.sound.destroy();
 	this.stopTicker();
 }
+
