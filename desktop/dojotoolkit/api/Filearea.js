@@ -207,13 +207,22 @@ dojo.declare(
 	 */
 	up: function()
 	{
-		if (this.path != "/") {
-			dirs = this.path.split("/");
-			if(this.path.charAt(this.path.length-1) == "/") dirs.pop();
-			if(this.path.charAt(0) == "/") dirs.shift();
+		var path = this.path.split("://");
+		if(typeof path[1] == "undefined") {
+			path = path[0];
+			var protocol = "file";
+		}
+		else {
+			path = path[1];
+			var protocol = this.path.split("://")[0];
+		} 
+		if (path != "/") {
+			dirs = path.split("/");
+			if(path.charAt(path.length-1) == "/") dirs.pop();
+			if(path.charAt(0) == "/") dirs.shift();
 			dirs.pop();
 			if(dirs.length == 0) this.setPath("/");
-			else this.setPath("/"+dirs.join("/")+"/");
+			else this.setPath(protocol+"://"+dirs.join("/")+"/");
 		}
 	},
 	/*
