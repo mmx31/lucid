@@ -57,10 +57,11 @@ dojo.config.usePlainJson = true;
         link("./dojotoolkit/dijit/themes/dijit_rtl.css", "dijit_rtl");
 	dojo.addOnLoad(function() {
 		api.xhr({
-			backend: "core.bootstrap.check.loggedin",
+			backend: "core.bootstrap.check.load",
 			load: function(data, ioArgs) {
-				if(data == "0")
+				if(data.loggedin == true)
 				{
+					dojo.locale = data.locale || dojo.locale;
 					dojo.forEach(modules, function(module) {
 						callIfExists(module, "draw");
 					});
@@ -74,7 +75,8 @@ dojo.config.usePlainJson = true;
 					window.close();
 					document.body.innerHTML = "Not Logged In";
 				}
-			}
+			},
+			handleAs: "json"
 		});
 	});
 })();

@@ -34,37 +34,28 @@ console.log("when ui loads, area: ", typeof desktop.ui.Area);
  */
 dojo.mixin(desktop.ui, {
 	/*
-	 * Property: _drawn
-	 * 
-	 * true after the UI has been drawn
-	 */
-	_drawn: false,
-	/*
-	 * Method: _draw
+	 * Method: draw
 	 *  
-	 * creates a desktop.ui.Area widget and places it on the screen
-	 * waits for the config to load so we can get the locale set right
+	 * Summary:
+	 * 		creates a desktop.ui.Area widget and places it on the screen
 	 */
-	_draw: function() {
-		if(this._drawn === true) return;
-		this._drawn = true;
-		dojo.locale = desktop.config.locale;
-		this._area = new desktop.ui.Area({});
-		this.containerNode = desktop.ui._area.containerNode;
+	draw: function() {
+		console.log("when ui is drawn, area: ", typeof desktop.ui.Area);
+		desktop.ui._area = new desktop.ui.Area({});
+		desktop.ui.containerNode = desktop.ui._area.containerNode;
 		document.body.appendChild(desktop.ui._area.domNode);
-		this._area.updateWallpaper();
-		this.makePanels();
-		dojo.subscribe("configApply", this, function() {
-			this._area.updateWallpaper();
-		});
 	},
 	/*
 	 * Method: init
 	 *  
-	 * subscribes to events, overwrites the autoscroll method in dojo.dnd
+	 * Summary:
+	 * 		subscribes to events, overwrites the autoscroll method in dojo.dnd
 	 */
 	init: function() {
-		dojo.subscribe("configApply", this, "_draw");
+		dojo.subscribe("configApply", this, "makePanels");
+		dojo.subscribe("configApply", this, function() {
+			desktop.ui._area.updateWallpaper();
+		});
 		dojo.require("dojo.dnd.autoscroll");
 		dojo.dnd.autoScroll = function(e) {} //in order to prevent autoscrolling of the window
 	},
