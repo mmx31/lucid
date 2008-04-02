@@ -58,12 +58,15 @@ this.about = function() {
 
 this.executeKill = function(id) {
     if (desktop.app.getInstance(id).status != "killed") {
-        desktop.app.kill(id);
+        if(desktop.app.kill(id)) {
         api.ui.alertDialog({
-            title: "Task Manager",
-            message: "Instance " + id + " was killed sucessfully."
+           	title: "Task Manager",
+            	message: "Instance " + id + " was killed sucessfully."
         });
-
+	}
+	else {
+		api.ui.alertDialog({title: "Task Manager", message: "Instance " + id + " was NOT killed sucessfully."});
+	}
     }
     else {
         api.ui.alertDialog({
@@ -83,7 +86,7 @@ this.home = function() {
         if (typeof(data[x]) == "object") {
             // Error handler, for some reason, it sometimes fucksup.
             if (data[x].status != "killed") {
-                html += "<tr><td>" + data[x].name + "</td><td>" + data[x].instance + "</td><td>" + data[x].appid + "</td><td>" + data[x].status + "</td><td><a href='javascript:void(0);' onClick='desktop.app.instances[" + this.instance + "].executeKill(" + data[x].instance + ")'>Kill</a></td></tr>";
+                html += "<tr><td>" + data[x].name + "</td><td>" + data[x].instance + "</td><td>" + data[x].appid + "</td><td>" + data[x].status + "</td><td><a href='javascript:void(0);' onClick='desktop.app.instances[" + this.instance + "].executeKill("+ data[x].instance + ")'>Kill</a></td></tr>";
 
             }
 

@@ -235,9 +235,10 @@ desktop.app = new function()
                     this.instances[this.instanceCount],
                     function() {
                         this.status = "killed";
+			instance = this.instance;
 						//allow the garbage collector to free up memory
 						setTimeout(function(){
-							desktop.app.instances[desktop.app.instanceCount]=null;
+							desktop.app.instances[instance]=null;
 						}, desktop.config.window.animSpeed + 50);
                     }
                 );
@@ -298,10 +299,10 @@ desktop.app = new function()
 	 */
 	this.getInstances = function() {
 		this.returnObject = new Array();
-		for(var x = 1; x<desktop.app.instances.length; x++){
+		for(var x = 0; x<desktop.app.instances.length; x++){
 				if (desktop.app.instances[x] != null) {
 					var i = desktop.app.instances[x];
-					this.returnObject[x-1] = {
+					this.returnObject[x] = {
 						instance: x,
 						status: i.status,
 						appid: i.id,
@@ -333,10 +334,12 @@ desktop.app = new function()
 	 */
 	this.kill = function(/*Integer*/instance) {
 		try {
-			desktop.app.instances[instance].kill();
+			api.log("procSystem: killing instance "+instance);
+			desktop.app.instances[instance].kill();	//Pre-Kill the instance
 			return true;
 		}
 		catch(err) {
+			api.log("procSystem: killing instance "+instance+" failed. setting status to zombie.");
 			console.error(err);
 			desktop.app.instances[instance].status = "zombie";
 			return false;
