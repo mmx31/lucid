@@ -27,6 +27,7 @@ if($_GET['section'] == "io")
 	$protocolPart = explode("://", $sentpath, 2);
 	if($protocolPart[0] == $_POST['path']) { $protocol = "file"; }
 	else { $sentpath = $protocolPart[1]; $protocol = $protocolPart[0]; }
+	if($sentpath == "") $sentpath = "/";
 	//construct the class
 	$class = ucwords($protocol);
 	import("api.vfs." . $class);
@@ -37,6 +38,7 @@ if($_GET['section'] == "io")
 		$protocolPart = explode("://", $_POST['newpath'], 2);
 		if($protocolPart[0] == $_POST['newpath']) { $newprotocol = "file"; }
 		else { $sentnewpath = $protocolPart[1]; $newprotocol = $protocolPart[0]; }
+		if($sentnewpath == "") $sentnewpath = "/";
 		if($protocol != $newprotocol) {
 			$class = ucwords($newprotocol);
 			import("api.vfs." . $class);
