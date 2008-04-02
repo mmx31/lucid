@@ -207,7 +207,7 @@
             {
                 $id = "'" . $this->_escape($id) . "'"; 
             }
-			$this->_query("SELECT * FROM ${tablename} WHERE `ID`=${id} LIMIT 1");
+			$this->_query("SELECT * FROM ${tablename} WHERE id=${id}");
 			if($this->_result[0])
 			{
 				$p = $this->_makeModel($this->_result[0]);
@@ -322,7 +322,7 @@
 			{
 				$this->_connect();
 				$this->cleanup();
-				$this->_query("DELETE FROM " . $this->_link->quoteIdentifier($this->_get_tablename()) . " WHERE ID=" . $this->id . " LIMIT 1");
+				$this->_query("DELETE FROM " . $this->_link->quoteIdentifier($this->_get_tablename()) . " WHERE ID=" . $this->id);
 			}
 		}
 		function cleanup() {
