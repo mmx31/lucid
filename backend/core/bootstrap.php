@@ -17,25 +17,11 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 require("../lib/includes.php");
-import("models.user");
-import("models.config");
 if($_GET['section'] == "check")
 {
 	if($_GET['action'] == "loggedin")
 	{
-		$cur = $User->get_current();
-		$locale = "NONE";
-		if($cur != false)
-		{
-			$conf = $Config->filter("userid", $cur->id);
-			if($conf != false) {
-				import("lib.Json.Json");
-				$locale = Zend_Json::decode($conf[0]->value);
-				$locale = $locale['locale'];
-			}
-		}
-		setcookie("desktopLocale", $locale, 0, "/");
-		$out = new intOutput($cur != false ? "ok" : "generic_err");
+		$out = new intOutput($_SESSION['userloggedin'] === true ? "ok" : "generic_err");
 	}
 }
 ?>

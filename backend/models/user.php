@@ -66,7 +66,20 @@
 			$this->logged = 1;
 			$this->lastauth = date('Y-m-d H:i:s');
 			$this->make_userdir();
+			$this->writeLocaleCookie();
 			$this->save();
+		}
+		function writeLocaleCookie() {
+			import("models.config");
+			global $Config;
+			$locale = "NONE";
+			$conf = $Config->filter("userid", $this->id);
+			if($conf != false) {
+				import("lib.Json.Json");
+				$locale = Zend_Json::decode($conf[0]->value);
+				$locale = $locale['locale'];
+			}
+			setcookie("desktopLocale", $locale, 0, "/");
 		}
 		function logout()
 		{
