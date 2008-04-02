@@ -37,8 +37,13 @@ if($_GET['section'] == "stream")
 	{
 		$p = $User->get_current();
 		$result = $Config->filter("userid", $p->id);
-		$result = $result[0];
-		echo $result->value;
+		if($result == false) {
+			echo "{}";
+		}
+		else {
+			$result = $result[0];
+			echo $result->value;	
+		}
 	}
 }
 ?>
