@@ -8,7 +8,7 @@
 			var matches = document.cookie.match(new RegExp("(?:^|; )desktopLocale=([^;]*)"));
 			var cookie = matches ? decodeURIComponent(matches[1]) : false;
 			if(cookie !== false && cookie != "NONE")
-				dojo.locale = cookie;
+				window.djConfig = {locale:cookie, usePlainJson: true};
 		})();
 	</script>
 	<script type="text/javascript" src="./dojotoolkit/dojo/dojo.js"></script>
