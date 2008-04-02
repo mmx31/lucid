@@ -80,8 +80,11 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 			this.stdout.innerHTML += "&nbsp;&nbsp;&nbsp;PID&nbsp;&nbsp;TTY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CMD<br />";
 			object = desktop.app.getInstances();
 			dojo.forEach(object, dojo.hitch(this, function(proc) {
+				if (typeof(proc) != "object") { }
+				else {
 				if(proc.status != "killed") {
 					this.stdout.innerHTML += "&nbsp;&nbsp;&nbsp;"+proc.instance+"&nbsp;&nbsp;&nbsp;&nbsp;pts/0&nbsp;&nbsp;&nbsp;"+proc.name+" (AppID: "+proc.appid+")<br />";
+				}
 				}
 			}));
 		},
