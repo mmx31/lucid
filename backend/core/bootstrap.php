@@ -21,10 +21,10 @@ import("models.user");
 import("models.config");
 if($_GET['section'] == "check")
 {
-	if($_GET['action'] == "load")
+	if($_GET['action'] == "loggedin")
 	{
 		$cur = $User->get_current();
-		$locale = false;
+		$locale = "NONE";
 		if($cur != false)
 		{
 			$conf = $Config->filter("userid", $cur->id);
@@ -34,10 +34,8 @@ if($_GET['section'] == "check")
 				$locale = $locale['locale'];
 			}
 		}
-		$p = new jsonOutput(array(
-			loggedin => $cur != false,
-			locale => $locale
-		));
+		setcookie("desktopLocale", $locale, 0, "/");
+		$out = new intOutput($cur != false ? "ok" : "generic_err");
 	}
 }
 ?>

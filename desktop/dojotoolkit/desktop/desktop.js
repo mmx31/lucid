@@ -1,17 +1,4 @@
 dojo.provide("desktop._base");
-(function() {
-	var p = dojo.requireLocalization;
-	var deferred = [];
-	dojo.requireLocalization = function() {
-		deferred.push(arguments);
-	}
-	dojo.subscribe("desktopReadyToLoad", function() {
-		dojo.requireLocalization = p;
-		dojo.forEach(deferred, function(a) {
-			dojo.requireLocalization.apply(dojo, a);
-		})
-	});
-})();
 dojo.require("api._base");
 dojo.require("desktop.admin");
 dojo.require("desktop.app");
@@ -20,7 +7,6 @@ dojo.require("desktop.theme");
 dojo.require("desktop.ui");
 dojo.require("desktop.user");
 
-//THIS IS ANNOYING!!!!>_<
 if(typeof djConfig == "undefined") djConfig = {};
 djConfig.usePlainJson = true;
 if(typeof dojo.config == "undefined") dojo.config = {};
@@ -70,12 +56,10 @@ dojo.config.usePlainJson = true;
         link("./dojotoolkit/dijit/themes/dijit_rtl.css", "dijit_rtl");
 	dojo.addOnLoad(function() {
 		api.xhr({
-			backend: "core.bootstrap.check.load",
+			backend: "core.bootstrap.check.loggedin",
 			load: function(data, ioArgs) {
-				if(data.loggedin == true)
+				if(data == "0")
 				{
-					dojo.locale = data.locale || dojo.locale;
-					dojo.publish("desktopReadyToLoad", []);
 					dojo.forEach(modules, function(module) {
 						callIfExists(module, "draw");
 					});
@@ -89,8 +73,7 @@ dojo.config.usePlainJson = true;
 					window.close();
 					document.body.innerHTML = "Not Logged In";
 				}
-			},
-			handleAs: "json"
+			}
 		});
 	});
 })();
