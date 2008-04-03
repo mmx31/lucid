@@ -9,7 +9,8 @@ class BaseFs {
 	var $_type = "filesystem"; //possible are 'filesystem' and 'server'. Server will parse the URL for server info.
 	function __construct($url) {
 		if($this->_type == "filesystem") {
-			$this->path = $url;
+			$p = explode("://", $url, 2);
+			$this->path = isset($p[1]) ? $p[1] : $url;
 		}
 		else if($this->_type == "server") {
 			//parse the URL for server connection details

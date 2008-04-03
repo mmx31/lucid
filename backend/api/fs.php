@@ -27,37 +27,44 @@ if($_GET['section'] == "io")
 	$protocolPart = explode("://", $sentpath, 2);
 	if($protocolPart[0] == $_POST['path']) { $protocol = "file"; }
 	else { $sentpath = $protocolPart[1]; $protocol = $protocolPart[0]; }
-	$sentpath = "/" . $sentpath;
+	
 	//construct the class
 	$class = ucwords($protocol);
 	import("api.vfs." . $class);
 	$class .= "Fs";
-	$module = new $class($sentpath);
+	$module = new $class($_POST['path'] ? $_POST['path'] : $_GET['path']);
+	
+	if($module->_type == "server") {
+		//strip the server URL out of $sentpath
+		$sentpath = explode("/", $sentpath, 2);
+		$sentpath = isset($sentpath[1]) ? $sentpath[1] : "/";
+	}
+	$sentpath = "/" . $sentpath;
 	
 	//if there's a new path, figure out what protocol it's using as well
 	if(isset($_POST['newpath'])) {
 		$protocolPart = explode("://", $_POST['newpath'], 2);
 		if($protocolPart[0] == $_POST['newpath']) { $newprotocol = "file"; }
 		else { $sentnewpath = $protocolPart[1]; $newprotocol = $protocolPart[0]; }
-		$sentnewpath = "/" . $sentnewpath;
 		if($protocol != $newprotocol) {
 			$class = ucwords($newprotocol);
 			import("api.vfs." . $class);
 			$class .= "Fs";
-			$newmodule = new $class($sentnewpath);
+			$newmodule = new $class($_POST['newpath']);
+			if($newmodule->_type == "server") {
+				//strip the server URL out of $sentnewpath
+				$sentnewpath = explode("/", $sentnewpath, 2);
+				$sentnewpath = isset($sentnewpath[1]) ? $sentnewpath[1] : "/";
+				if(isset($newmodule) && $newmodule->_type == "server") {
+					//strip the server URL out of $sentnewpath
+					$sentnewpath = explode("/", $sentnewpath, 2);
+					$sentnewpath = isset($sentnewpath[1]) ? $sentnewpath[1] : "/";
+				}
+			}
 		}
+		$sentnewpath = "/" . $sentnewpath;
 	}
 	
-	if($module->_type == "server") {
-		//strip it out of $sentpath
-		$sentpath = explode("/", $sentpath, 2);
-		if(!is_string($sentpath)) $sentpath = $sentpath[1];
-	}
-	if(isset($newmodule) && $newmodule->_type == "server") {
-		//strip it out of $newsentpath
-		$newsentpath = explode("/", $newsentpath, 2);
-		if(!is_string($newsentpath)) $newsentpath = $newsentpath[1];
-	}
 	//figure out what do do
 	if ($_GET['action'] == "createDirectory") {
 	    $module->createDirectory($sentpath);
