@@ -98,34 +98,45 @@ if($_GET['section'] == "io")
 	}
 	if($_GET['action'] == "upload") {
 		$user = $User->get_current();
-		if(!$user->has_permission("api.fs.upload")) { die("<textarea>{status: 'failed', details: 'Contact administrator; Your account lacks uploading permissions. '}</textarea>"); }
+		if(!$user->has_permission("api.fs.upload")) { 
+			$out = new textareaOutput(array(
+				status => "failed",
+				details => "Contact administrator; Your account lacks uploading permissions."
+			));
+		}
 		if(!isset($_SESSION['userid'])) {
-			die("<textarea>{status: 'failed', details: 'Session is dead.'}</textarea>");
+			$out = new textareaOutput(array(
+				status => "failed",
+				details => "Session is dead, please log in again"
+			));
 		}
 		if(isset($_FILES['uploadedfile']['name'])) {
-			//TODO: get this to use the VFS
-			$target_path = '../../files/'.$username.'/'.$sentpath;
-			$target_path = $target_path . basename( $_FILES['uploadedfile']['name']); 
-			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
-			    echo "<textarea>{status: 'success', details: '" . $_FILES['uploadedfile']['name'] . "'}</textarea>";
+			if($content = file_get_contents($_FILES['uploadedfile']['tmp_name'])
+			&& $module->write($sentpath . "/" . basename( $_FILES['uploadedfile']['name']), $content)) {
+				$out = new textareaOutput(array(
+					status => "success",
+					details => $_FILES['uploadedfile']['name']
+				));
 			} else{
-			    echo "<textarea>{status: 'failed', details: 'Contact administrator; could not write to disk'}</textarea>";
+				$out = new textareaOutput(array(
+					status => "failed",
+					details => "Contact administrator; could not write to disk"
+				));
 			}
 		}
 		else {
-			#echo "/*";
-			#foreach($_FILES as $file)
-			#{
-			#	echo $file['name'] . "\n";
-			#}
-			#echo "*/";
-			die("<textarea>{status: 'failed', details: 'File not uploaded'}</textarea>");
+			$out = new textareaOutput(array(
+				status => "failed",
+				details => "No file uploaded"
+			));
 		}
 	}
 	if($_GET['action'] == "downloadFolder") {
 		import("models.user");
 		$user = $User->get_current();
-		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
+		if(!$user->has_permission("api.fs.download")) {
+			die("<script type='text/javascript'>alert('Contact administrator; Your account lacks download permissions.');</script>");
+		}
 		import("lib.zip");
 		if($_GET["as"] == "zip") { $newzip = new zip_file("folder.zip"); }
 		if($_GET["as"] == "gzip") { $newzip = new gzip_file("folder.tgz"); }
@@ -137,7 +148,9 @@ if($_GET['section'] == "io")
 	}
 	if($_GET['action'] == "compressDownload") {
 		$user = $User->get_current();
-		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
+		if(!$user->has_permission("api.fs.download")) { 
+			die("<script type='text/javascript'>alert('Contact administrator; Your account lacks download permissions.');</script>");
+		}
 		import("lib.zip");
 		if($_GET["as"] == "zip") { $newzip = new zip_file("compressed.zip"); }
 		if($_GET["as"] == "gzip") { $newzip = new gzip_file("compressed.tgz"); }
@@ -149,7 +162,9 @@ if($_GET['section'] == "io")
 	}
 	if($_GET['action'] == "download") {
 		$user = $User->get_current();
-		if(!$user->has_permission("api.fs.download")) { die("Contact administrator; Your account lacks local download permissions."); }
+		if(!$user->has_permission("api.fs.download")) {
+			die("<script type='text/javascript'>alert('Contact administrator; Your account lacks download permissions.');</script>");
+		}
 		$info = $module->getFileInfo($sentpath);
 		$type = $info['type'];
 		$size = $info['size'];
