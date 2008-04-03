@@ -290,7 +290,7 @@
 		}
 		function truncate() {
 			$this->_connect();
-			$table = $this->_get_tablename());
+			$table = $this->_get_tablename();
 			$this->_link->loadModule('Extended');
 			$this->_link->autoExecute($table, false, MDB2_AUTOQUERY_DELETE, false);
 		}
