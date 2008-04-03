@@ -14,16 +14,20 @@ dojo.declare("desktop.ui.applets.Clock", desktop.ui.Applet, {
 			label: "loading...",
 			dropDown: calendar
 		}, this.containerNode);
+		var old = "";
 		this.clockInterval = setInterval(dojo.hitch(this, function(){
 			var p = dojo.date.locale.format(new Date());
-			if(this.getParent().getOrientation() == "vertical") {
+			/*if(this.getParent().getOrientation() == "vertical") {
 				var v = "";
-				dojo.forEach(p, function(e) {
-					v += e + "<br />";
-				})
+				for(i=0; i<p.length; i++) {
+					v += "<div style='text-align: center;'>" + p.charAt(i) + "</div>";
+				}
 				p = v;
+			}*/
+			if(p != old) {
+				old=p;
+				this.button.setLabel(p);
 			}
-			this.button.setLabel(p);
 		}), 1000);
 		this.inherited("postCreate", arguments);
 	},
