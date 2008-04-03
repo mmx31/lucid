@@ -27,25 +27,27 @@ if($_GET['section'] == "io")
 	$protocolPart = explode("://", $sentpath, 2);
 	if($protocolPart[0] == $_POST['path']) { $protocol = "file"; }
 	else { $sentpath = $protocolPart[1]; $protocol = $protocolPart[0]; }
-	if($sentpath == "") $sentpath = "/";
+	$sentpath = "/" . $sentpath;
 	//construct the class
 	$class = ucwords($protocol);
 	import("api.vfs." . $class);
 	$class .= "Fs";
-	$module = new $class($_POST['path']);
+	$module = new $class($sentpath);
+	
 	//if there's a new path, figure out what protocol it's using as well
 	if(isset($_POST['newpath'])) {
 		$protocolPart = explode("://", $_POST['newpath'], 2);
 		if($protocolPart[0] == $_POST['newpath']) { $newprotocol = "file"; }
 		else { $sentnewpath = $protocolPart[1]; $newprotocol = $protocolPart[0]; }
-		if($sentnewpath == "") $sentnewpath = "/";
+		$sentnewpath = "/" . $sentnewpath;
 		if($protocol != $newprotocol) {
 			$class = ucwords($newprotocol);
 			import("api.vfs." . $class);
 			$class .= "Fs";
-			$newmodule = new $class($_POST['newpath']);
+			$newmodule = new $class($sentnewpath);
 		}
 	}
+	
 	if($module->_type == "server") {
 		//strip it out of $sentpath
 		$sentpath = explode("/", $sentpath, 2);
@@ -76,7 +78,7 @@ if($_GET['section'] == "io")
 	if ($_GET['action'] == "renameFile") {
 		if(isset($newmodule)) {
 			$content = $module->read($sentpath);
-			$newmodule->write($sentnewpath, $content);
+			$p = $newmodule->write($sentnewpath, $content);
 			$module->remove($sentpath);
 		}
 		else $module->rename($sentpath, $sentnewpath);
