@@ -99,13 +99,13 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	 * 
 	 * The window's height in px, or %.
 	 */
-	height: "400px",
+	height: "480px",
 	/*
 	 * Property: width
 	 * 
 	 * The window's width in px, or %.
 	 */
-	width: "500px",
+	width: "600px",
 	/*
 	 * Property: title
 	 * 
