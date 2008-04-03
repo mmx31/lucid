@@ -171,15 +171,7 @@
 				if($key{0} != "_" && $key != "id")
 				{
 					$info = $parent->$key;
-					if(!isset($info['type'])) {
-						if(stristr($info['dbtype'], "text") !== false) {
-							$info['type'] = "string";
-						}
-						if(stristr($info['dbtype'], "int") !== false) {
-							$info['type'] = "integer";
-						}
-					}
-					else {
+					if(isset($info['type'])) {
 						if($info['type'] == "array") {
 							if(is_null($value)) $value = array();
 							import("lib.Json.Json");
@@ -195,7 +187,9 @@
 				}
 			}
 			$this->_link->loadModule('Extended');
-			$this->_link->autoExecute($this->_get_tablename(), $arr, (is_numeric($this->id) ? MDB2_AUTOQUERY_UPDATE : MDB2_AUTOQUERY_INSERT), "id=".$id);
+			$this->_link->autoExecute($this->_get_tablename(), $arr,
+				(is_numeric($this->id) ? MDB2_AUTOQUERY_UPDATE : MDB2_AUTOQUERY_INSERT),
+				(is_numeric($this->id) ? "id = ".$this->id : null));
 			if(!is_numeric($this->id)) $this->id = $arr['id'];
 		}
 		
