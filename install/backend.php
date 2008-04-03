@@ -184,27 +184,17 @@
 			"../apps/tmp/",
 			"../backend/configuration.php"
 		);
-		$ok = array("error", "error");
-		$a = 0;
+		$out = new jsonOutput();
 		foreach($dirs as $dir)
 		{
 			if(!is_writable($dir))
 			{
-				$ok[$a] = "not writable (chmod to 777 or chown to webserver's user)";
+				$out->append($dir, "not writable (chmod to 777 or chown to webserver's user)");
 			}
 			else
 			{
-				$ok[$a] = "ok";
+				$out->append($dir, "ok");
 			}
-			$a++;
-		}
-		$x = count($dirs)-1;
-		$out = new jsonOutput();
-		for($i=0;$i<=$x;$i++)
-		{
-			$p = $dirs[$i];
-			$d = $ok[$i];
-			$out->append($p, $d);
 		}
 	}
 	if($act == "listApps")
