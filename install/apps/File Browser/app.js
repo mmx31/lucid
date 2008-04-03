@@ -4,6 +4,7 @@ this.init = function(args)
 	dojo.require("dijit.layout.LayoutContainer");
 	dojo.require("dijit.layout.SplitContainer");
 	dojo.require("dijit.form.Button");
+	dojo.require("dijit.form.TextBox");
 	dojo.require("dijit.Dialog");
 	api.addDojoCss("dojox/widget/FileInput/FileInput.css");
 	dojo.require("dojox.widget.FileInputAuto");
@@ -62,10 +63,30 @@ this.init = function(args)
 		this.pane.setContent(menu.domNode);
 		this.client.addChild(this.pane);
 		this.client.addChild(this.fileArea);
+		
+		this.pathbar = new dijit.Toolbar({layoutAlign: "top"});
+		this.pathbox = new dijit.form.TextBox({
+			style: "width: 90%;",
+			value: args.path || "file://"
+		});
+		dojo.connect(this.fileArea, "onPathChange", this, function() {
+			this.pathbox.setValue(this.fileArea.path);
+		});
+		this.pathbar.addChild(this.pathbox);
+		this.goButton = new dijit.form.Button({
+			style: "position: absolute; top: 0px; right: 0px;",
+			label: "Go",
+			onClick: dojo.hitch(this, function() {
+				this.fileArea.setPath(this.pathbox.getValue());
+			})
+		});
+		this.pathbar.addChild(this.goButton);
+		
+		
 	this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
 		var button = new dijit.form.Button({
 			onClick: dojo.hitch(this.fileArea, function() {
-				this.setPath("/");
+				this.setPath("file://");
 			}),
 			iconClass: "icon-16-places-user-home",
 			label: "Home"
@@ -120,13 +141,8 @@ this.init = function(args)
 			_onBlur: function(e) {}
 		});
 		this.toolbar.addChild(this.upbutton);
-	this.details = new dijit.layout.ContentPane({layoutAlign: "bottom"}, document.createElement("div"));
-	this.line = document.createElement("div");
-	this.line.innerHTML = this.fileArea.path;
-	this.details.setContent(this.line);
-	this.fileArea.onPathChange = dojo.hitch(this, function(path) { this.line.innerHTML = path; });
-	this.win.addChild(this.details);
 	this.win.addChild(this.toolbar);
+	this.win.addChild(this.pathbar);
 	this.win.addChild(this.client);
 	this.win.show();
 	this.win.startup();
