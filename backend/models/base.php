@@ -290,9 +290,9 @@
 		}
 		function truncate() {
 			$this->_connect();
-			$table = $this->_link->quoteIdentifier($this->_get_tablename());
+			$table = $this->_get_tablename());
 			$this->_link->loadModule('Extended');
-			$this->_link->autoExecute($table, false, MDB2_AUTOQUERY_DELETE, "id=*");
+			$this->_link->autoExecute($table, false, MDB2_AUTOQUERY_DELETE, false);
 		}
 		function make_json($columns=false)
 		{
