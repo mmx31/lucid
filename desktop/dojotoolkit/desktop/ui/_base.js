@@ -2,6 +2,7 @@ dojo.provide("desktop.ui._base");
 dojo.require("dijit.form.Button");
 dojo.require("dijit.form.FilteringSelect");
 dojo.require("dojo.data.ItemFileReadStore");
+dojo.require("dojo.data.ItemFileWriteStore");
 dojo.require("dijit.layout.ContentPane");
 dojo.require("dijit.layout.TabContainer");
 dojo.require("dijit.form.Form");
@@ -28,7 +29,7 @@ dojo.require("desktop.ui.applets.Taskbar");
 
 dojo.requireLocalization("desktop.ui", "appearance");
 dojo.requireLocalization("desktop.ui", "accountInfo");
-dojo.requireLocalization("desktop.ui", "common");
+dojo.requireLocalization("desktop", "common");
 
 /*
  * Class: desktop.ui
@@ -37,6 +38,14 @@ dojo.requireLocalization("desktop.ui", "common");
  * 		Draws core UI for the desktop such as panels and wallpaper
  */
 dojo.mixin(desktop.ui, {
+	/*
+	 * Property: _windowList
+	 * 
+	 * A dojo.data.ItemFileWriteStore containing a list of windows
+	 */
+	_windowList: new dojo.data.ItemFileWriteStore({
+		data: {identifer: "id", items: []}
+	}),
 	/*
 	 * Property: _drawn
 	 * 

@@ -27,6 +27,12 @@ dojo.require("dijit._Templated");
 dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	templatePath: dojo.moduleUrl("api", "templates/Window.html"),
 	/*
+	 * Property: _winListItem
+	 * 
+	 * The store item that represents this window on desktop.ui._windowList
+	 */
+	_winListItem: null,
+	/*
 	 * Property: closed
 	 * 
 	 * Is the window closed?
@@ -167,10 +173,10 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			dojo.style(this.domNode, "width", this.width);
 			dojo.style(this.domNode, "height", this.height);
 			this.titleNode.innerHTML = this.title;
-			this._task = new desktop.ui.Task({
+			this._winListItem = desktop.ui._windowList.newItem({
 				label: this.title,
 				icon: this.icon,
-				onClick: dojo.hitch(this, this._onTaskClick)
+				id: this.id
 			});
 			if(this.maximized == true) this.maximize();
 			dojo.style(this.domNode, "display", "block");
@@ -222,11 +228,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	 */
 	setTitle: function(title) {
 		this.titleNode.innerHTML = title;
-		if(title.length >= 18) {
-		title = title.slice(0, 18);
-		title += "...";
-		}
-		this._task._domNode.innerHTML = this._task._domNode.innerHTML.replace(this.title, title);
+		desktop.ui._windowList.setValue(this._winListItem, "label", title);
 		this.title = title;
 	},
 	/*
@@ -573,7 +575,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	},
 	uninitialize: function() {
 		if(!this.closed) this.onClose();
-		if(this._task) this._task.destroy();
+		if(this._winListItem) desktop.ui._windowList.deleteItem(this._winListItem);
 		if(this._drag) this._drag.destroy();
 		if(this.sizeHandle) this.sizeHandle.destroy();
 	},
@@ -586,6 +588,8 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	{
 		if (!this.closed) {
 			this.closed = true;
+			if(this._winListItem) desktop.ui._windowList.deleteItem(this._winListItem);
+			this._winListItem = false;
 			var onEnd = dojo.hitch(this, function() {
 				this.onClose();
 				this.domNode.parentNode.removeChild(this.domNode);

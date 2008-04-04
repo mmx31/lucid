@@ -5,6 +5,7 @@ dojo.require("dijit._Container");
 dojo.require("dijit.Menu");
 dojo.require("dijit.form.Button");
 dojo.requireLocalization("desktop.ui", "panel");
+dojo.requireLocalization("desktop.ui", "applets");
 dojo.requireLocalization("desktop", "common");
 /*
  * Class: desktop.ui.Panel
