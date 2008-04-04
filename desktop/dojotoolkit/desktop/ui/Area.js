@@ -82,6 +82,9 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 			if(c.l < max.L && max.L > 0) dojo.style(win, "left", max.L+c.l+"px");
 			if(c.l > viewport.w - max.R && ((max.R > 0 || e.type=="resize") || (max.R > 0 && e.type=="resize"))) dojo.style(win, "left", (viewport.w - 20  - max.R)+"px");
 			if(c.t > viewport.h - max.B && ((max.B > 0 || e.type=="resize") || (max.B > 0 && e.type=="resize"))) dojo.style(win, "top", (viewport.h - 20 - max.B)+"px");
+			var wid = dijit.byNode(win);
+			if(wid.maximized) wid.resize();
+			
 		}, this);
 	},
 	/*
