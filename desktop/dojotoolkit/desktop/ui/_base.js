@@ -25,7 +25,11 @@ dojo.require("desktop.ui.applets.Menubar");
 dojo.require("desktop.ui.applets.Netmonitor");
 dojo.require("desktop.ui.applets.Seperator");
 dojo.require("desktop.ui.applets.Taskbar");
-console.log("when ui loads, area: ", typeof desktop.ui.Area);
+
+dojo.requireLocalization("desktop.ui", "appearance");
+dojo.requireLocalization("desktop.ui", "accountInfo");
+dojo.requireLocalization("desktop.ui", "common");
+
 /*
  * Class: desktop.ui
  * 
@@ -105,7 +109,6 @@ dojo.mixin(desktop.ui, {
 			p.restore(panel.applets);
 			desktop.ui._area.domNode.appendChild(p.domNode);
 			p.startup();
-			
 		});
 		desktop.ui._area.resize();
 	},
@@ -142,7 +145,8 @@ dojo.mixin(desktop.ui, {
 		 * Creates a layoutContainer with wallpaper configuration UI and returns it
 		 */
 		_wallpaper: function() {
-			var wallpaper = new dijit.layout.LayoutContainer({title: "Wallpaper"});
+			var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
+			var wallpaper = new dijit.layout.LayoutContainer({title: l.wallpaper});
 			var c = new dijit.layout.ContentPane({layoutAlign: "client"});
 			var cbody = document.createElement("div");
 			dojo.style(cbody, "width", "100%");
@@ -182,6 +186,7 @@ dojo.mixin(desktop.ui, {
 			c.setContent(cbody);
 			wallpaper.addChild(c);
 			
+			var nc = dojo.i18n.getLocalization("desktop", "common");
 			//botom part -------------
 			var color = new dijit.ColorPalette({value: desktop.config.wallpaper.color, onChange: dojo.hitch(this, function(value) {
 				desktop.config.wallpaper.color = value;
@@ -189,7 +194,7 @@ dojo.mixin(desktop.ui, {
 			})});
 			var colorButton = new dijit.form.DropDownButton({
 				dropDown: color,
-				label: "Background Color"
+				label: l.bgColor
 			});
 			var styleLabel = document.createElement("span");
 			styleLabel.innerHTML = " Style:";
@@ -201,9 +206,9 @@ dojo.mixin(desktop.ui, {
 					data: {
 						identifier: "value",
 						items: [
-							{label: "Centered", value: "centered"},
-							{label: "Fill Screen", value: "fillscreen"},
-							{label: "Tiled", value: "tiled"}
+							{label: l.centered, value: "centered"},
+							{label: l.fillScreen, value: "fillscreen"},
+							{label: l.tiled, value: "tiled"}
 						]
 					}
 				}),
@@ -215,7 +220,7 @@ dojo.mixin(desktop.ui, {
 			});
 			styleButton.setValue(desktop.config.wallpaper.style);
 			var addButton = new dijit.form.Button({
-				label: "Add",
+				label: nc.add,
 				iconClass: "icon-22-actions-list-add",
 				onClick: function() {
 					api.ui.fileDialog({
@@ -234,7 +239,7 @@ dojo.mixin(desktop.ui, {
 				}
 			});
 			var removeButton = new dijit.form.Button({
-				label: "Remove",
+				label: nc.remove,
 				iconClass: "icon-22-actions-list-remove",
 				onClick: function() {
 					var q = dojo.query("div.selectedItem img", c.domNode)
@@ -270,7 +275,8 @@ dojo.mixin(desktop.ui, {
 		 * generates a theme configuration pane and returns it
 		 */
 		_themes: function() {
-			var p = new dijit.layout.LayoutContainer({title: "Theme"});
+			var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
+			var p = new dijit.layout.LayoutContainer({title: l.theme});
 			var m = new dijit.layout.ContentPane({layoutAlign: "client"});
 			var area = document.createElement("div");
 			var makeThumb = function(item) {
@@ -323,9 +329,10 @@ dojo.mixin(desktop.ui, {
 		 * generates an effects configuration pane and returns it
 		 */
 		_effects: function() {
-			var p = new dijit.layout.ContentPane({title: "Visual Effects"});
+			var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
+			var p = new dijit.layout.ContentPane({title: l.effects});
 			var rows = {
-				None: {
+				none: {
 					desc: "Provides a desktop environment without any effects. Good for older computers or browsers.",
 					params: {
 						checked: desktop.config.fx == 0,
@@ -334,7 +341,7 @@ dojo.mixin(desktop.ui, {
 						}
 					}
 				},
-				Basic: {
+				basic: {
 					desc: "Provides basic transitional effects that don't require a fast computer.",
 					params: {
 						checked: desktop.config.fx == 1,
@@ -343,7 +350,7 @@ dojo.mixin(desktop.ui, {
 						}
 					}
 				},
-				Extra: {
+				extra: {
 					desc: "Provides a desktop environment with extra transitional effects that require a faster computer.",
 					params: {
 						checked: desktop.config.fx == 2,
@@ -352,7 +359,7 @@ dojo.mixin(desktop.ui, {
 						}
 					}
 				},
-				Insane: {
+				insane: {
 					desc: "Provides a desktop environment with full transitional effects. Requires a fast-rendering browser and a fast computer.",
 					params: {
 						checked: desktop.config.fx == 3,
@@ -370,7 +377,7 @@ dojo.mixin(desktop.ui, {
 				rows[key].params.name = "visualeffects_picker";
 				row.appendChild(new dijit.form.RadioButton(rows[key].params).domNode);
 				var desc = document.createElement("span");
-				desc.innerHTML = "<b>&nbsp;&nbsp;" +key + ":&nbsp;</b>" + rows[key].desc;
+				desc.innerHTML = "<b>&nbsp;&nbsp;" + (l[key] || key) + ":&nbsp;</b>" + (l[key+"Desc"] || rows[key].desc);
 				dojo.style(desc, "padding-left", "10px");
 				row.appendChild(desc);
 				div.appendChild(row);
@@ -384,9 +391,10 @@ dojo.mixin(desktop.ui, {
 		 * Shows the appearance configuration dialog
 		 */
 		appearance: function() {
+			var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
 			if(this.wallWin) return this.wallWin.bringToFront();
 			var win = this.wallWin = new api.Window({
-				title: "Appearance Preferences",
+				title: l.appearancePrefs,
 				width: "600px",
 				height: "500px",
 				onClose: dojo.hitch(this, function() {
