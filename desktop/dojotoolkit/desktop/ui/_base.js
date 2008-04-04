@@ -438,7 +438,7 @@ dojo.mixin(desktop.ui, {
 			var usernameSpan = document.createElement("span");
 			topRow.appendChild(usernameSpan);
 			var button = new dijit.form.Button({
-				label: l.changePassword,
+				label: l.changePasswordAction,
 				onClick: desktop.ui.config.password
 			});
 			chpasswd.appendChild(topRow);
@@ -486,7 +486,7 @@ dojo.mixin(desktop.ui, {
 			var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
 			var close = new dijit.form.Button({
 				label: cm.close,
-				onClick: dojo.hitch(win, win.destroy)
+				onClick: dojo.hitch(win, "close")
 			});
 			var p=document.createElement("div");
 			dojo.addClass(p, "floatRight");
@@ -529,8 +529,10 @@ dojo.mixin(desktop.ui, {
 		 */
 		password: function() {
 			if(this.passwordWin) return this.passwordWin.bringToFront();
+			var l = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
+			var cm = dojo.i18n.getLocalization("desktop", "common");
 			var win = this.passwordWin = new api.Window({
-				title: "Change password",
+				title: l.changePassword,
 				width: "450px",
 				height: "350px",
 				onClose: dojo.hitch(this, function() {
@@ -539,32 +541,31 @@ dojo.mixin(desktop.ui, {
 				})
 			});
 			var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding: 20px;"});
-			top.setContent("To change your password, enter your current password in the field below and click <b>Authenticate</b>.<br />"
-						  +"After you have authenticated, enter your new password, retype it for verification and click <b>Change Password</b>")
+			top.setContent(l.passwordDirections);
 			
 			var client = new dijit.layout.ContentPane({layoutAlign: "client"});
 			var row4 = document.createElement("div");
 			dojo.style(row4, "textAlign", "center");
 			var onChange = dojo.hitch(this, function() {
 				if(this.newpasswd.getValue() == this.confpasswd.getValue()) {
-					row4.textContent = "The two passwords match";
+					row4.textContent = l.passwordsMatch;
 					this.chPasswdButton.setDisabled(false)
 				}
 				else {
-					row4.textContent = "The two passwords do not match";
+					row4.textContent = l.passwordsDontMatch;
 					this.chPasswdButton.setDisabled(true);
 				}
 			});
 			var row2 = document.createElement("div");
-			row2.innerHTML = "New password:&nbsp;";
+			row2.innerHTML = l.newPassword+":&nbsp;";
 			var newpasswd = this.newpasswd = new dijit.form.TextBox({type: "password", onChange: onChange, disabled: true});
 			row2.appendChild(newpasswd.domNode)
 			var row3 = document.createElement("div");
-			row3.innerHTML = "Retype new password:&nbsp;";
+			row3.innerHTML = l.confirmNewPassword+":&nbsp;";
 			var confpasswd = this.confpasswd = new dijit.form.TextBox({type: "password", onChange: onChange, disabled: true});
 			row3.appendChild(confpasswd.domNode);
 			var row1 = document.createElement("div");
-			row1.innerHTML = "Current password:&nbsp;";
+			row1.innerHTML = l.currentPassword+":&nbsp;";
 			var current = new dijit.form.TextBox({type: "password", style: "width: 125px;"});
 			row1.appendChild(current.domNode);
 			var resetForm = dojo.hitch(this, function() {
@@ -578,7 +579,7 @@ dojo.mixin(desktop.ui, {
 					this.chPasswdButton.setDisabled(true);
 			});
 			var authButton = this.authButton = new dijit.form.Button({
-				label: "Authenticate",
+				label: l.authenticate,
 				onClick: dojo.hitch(this, function() {
 					current.setDisabled(true);
 					this.authButton.setDisabled(true);
@@ -592,7 +593,7 @@ dojo.mixin(desktop.ui, {
 							authButton.setDisabled(data == "0");
 							newpasswd.setDisabled(data != "0");
 							confpasswd.setDisabled(data != "0");
-							row4.textContent = (data == "0" ? "Authentication was successful" : "Authentication failed");
+							row4.textContent = (data == "0" ? l.authSuccess : l.authFail);
 							this._authTimeout = setTimeout(resetForm, 5*60*1000);
 						})
 					})
@@ -610,14 +611,14 @@ dojo.mixin(desktop.ui, {
 			var div = document.createElement("div");
 			dojo.addClass(div, "floatRight");
 			div.appendChild((new dijit.form.Button({
-				label: "Close",
+				label: cm.close,
 				onClick: dojo.hitch(win, win.close)
 			})).domNode);
 			div.appendChild((this.chPasswdButton = new dijit.form.Button({
-				label: "Change password",
+				label: l.changePassword,
 				disabled: true,
 				onClick: dojo.hitch(this, function() {
-					row4.textContent = "Changing password...";
+					row4.textContent = l.changingPassword;
 					current.setDisabled(true);
 					this.authButton.setDisabled(true);
 					newpasswd.setDisabled(true);
@@ -628,7 +629,7 @@ dojo.mixin(desktop.ui, {
 						password: newpasswd.getValue(),
 						callback: function() {
 							resetForm();
-							row4.textContent = "Password change successful";
+							row4.textContent = l.passwordChangeSuccessful;
 							clearTimeout(this._authTimeout);
 						}
 					})

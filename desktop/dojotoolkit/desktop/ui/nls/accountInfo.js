@@ -3,6 +3,18 @@
 	"username": "Username",
 	"email": "Email",
 	"name": "Name",
-	"changePassword": "Change Password...",
-	"general": "General"
+	"changePasswordAction": "Change Password...",
+	"general": "General",
+	"changePassword": "Change password",
+	"passwordsMatch": "The two passwords match",
+	"passwordsDontMatch": "The two passwords do not match",
+	"newPassword": "New password",
+	"confirmNewPassword": "Retype new password",
+	"currentPassword": "Current password",
+	"authenticate": "Authenticate",
+	"authSuccess": "Authentication was successful",
+	"authFail": "Authentication failed",
+	"changingPassword": "Changing password...",
+	"passwordChangeSuccessful": "Password change successful",
+	"passwordDirections": "To change your password, enter your current password in the field below and click <b>Authenticate</b>.<br />After you have authenticated, enter your new password, retype it for verification and click <b>Change Password</b>"
 })
