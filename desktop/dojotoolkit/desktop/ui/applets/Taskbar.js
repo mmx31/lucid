@@ -31,6 +31,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		this.inherited("uninitialize", arguments);
 	},
 	onSet: function(item, attribute, oldValue, v) {
+		var store = desktop.ui._windowList;
 		if(attribute != "label") return;
 		if(v.length >= 18) {
 			v = v.slice(0, 18) + "...";
