@@ -6,9 +6,7 @@
 .win-buttons {
 	width: 64px;
 	padding-right: 2px;
-	/*background-image: url(./images/.png);
-	background-repeat: no-repeat;
-	background-position: top right; */
+	top: 0px;
 }
 .win-close,
 .win-min,
@@ -35,8 +33,12 @@
 .win-title {
 	color: white;
 	font-weight: bold;
-	left: 20px;
 	padding-top: 2px;
+	margin-right: 55px;
+	width: auto;
+	overflow: hidden;
+	padding-left: 10px;
+	position: relative;
 }
 .win-tr,
 .win-tl {
