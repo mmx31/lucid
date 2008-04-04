@@ -71,8 +71,7 @@ this.init = function(args) {
 		if(args.file) 
 			this._processOpen(args.file);
 		else {
-			editor.replaceValue("<b>Open</b> or <b>Create</b> a file.");
-			editor.setDisabled(true);
+			this.processNew();
 		}
 	}, 500);
 
