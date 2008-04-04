@@ -17,7 +17,7 @@ dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 	 * Makes the system menu
 	 */
 	_makeSystemMenu: function() {
-		var l = dojo.i18n.getLocalization("desktop", "menus");
+		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
 		var m = new dijit.Menu();
 		dojo.forEach([
 			new dijit.PopupMenuItem({
@@ -69,7 +69,7 @@ dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 	 * Draws the button for the applet
 	 */
 	_drawButton: function() {
-		var l = dojo.i18n.getLocalization("desktop", "menus");
+		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
 		if(this._drawn) {
 			this._appMenuButton.dropDown = this._menu;
 			this._appMenuButton._started = false; //hackish....

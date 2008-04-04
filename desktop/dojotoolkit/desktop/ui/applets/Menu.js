@@ -29,7 +29,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 	 * Creates a preferences menu and returns it
 	 */
 	_makePrefsMenu: function() {
-		var l = dojo.i18n.getLocalization("desktop", "menus");
+		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
 		var pMenu = new dijit.Menu();
 		dojo.forEach([
 			{
@@ -53,7 +53,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 	 * Creates a drop down button for the applet.
 	 */
 	_drawButton: function() {
-		var l = dojo.i18n.getLocalization("desktop", "menus");
+		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
 		dojo.require("dijit.form.Button");
 		if (this._menubutton) {
 			this._menubutton.destroy();
@@ -88,7 +88,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 	 * Gets the app list from the server and makes a menu for them
 	 */
 	_getApps: function() {
-		var l = dojo.i18n.getLocalization("desktop", "menus");
+		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
 		api.xhr({
 			backend: "core.app.fetch.list",
 			load: dojo.hitch(this, function(data, ioArgs){
