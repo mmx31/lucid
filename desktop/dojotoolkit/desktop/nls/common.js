@@ -8,5 +8,11 @@
 	"saveAs": "Save As",
 	"new": "New",
 	"loading": "loading...",
-	"": ""
+	"go": "Go",
+	"export": "Export",
+	"import": "Import",
+	"upload": "Upload",
+	"download": "Download",
+	"up": "Up",
+	"refresh": "Refresh"
 })
