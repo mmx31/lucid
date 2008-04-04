@@ -384,6 +384,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	{
 		this.onMaximize();
 		this.maximized = true;
+		var viewport = dijit.getViewport();
 		dojo.addClass(this.domNode, "win-maximized");
 		if(this._drag) this._drag.onMouseUp(); this._drag.destroy();
 		this.killResizer();
@@ -404,8 +405,8 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 				properties: {
 					top: {end: max.T},
 					left: {end: max.L},
-					width: {end: dojo.style(this.domNode.parentNode, "width") - max.R},
-					height: {end: dojo.style(this.domNode.parentNode, "height") - max.B}
+					width: {end: viewport.w - max.R - max.L},
+					height: {end: viewport.h - max.B - max.T}
 				},
 				duration: desktop.config.window.animSpeed
 			});
@@ -421,8 +422,8 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			//api.log("maximizing...");
 			win.style.top = max.T;
 			win.style.left = max.L;
-			win.style.width = (dojo.style(this.domNode.parentNode, "width") - max.R)+"px";
-			win.style.height = (dojo.style(this.domNode.parentNode, "height") - max.B)+"px";
+			win.style.width = (viewport.h - max.R - max.L)+"px";
+			win.style.height = (viewport.h - max.B - max.T)+"px";
 			this._hideBorders();
 			this.resize();
 		}
@@ -612,7 +613,17 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	 */
 	resize: function(/*Object?*/args){
 		var node = this.domNode;
-
+		
+		//first take care of our size if we're maximized
+		if(this.maximized) {
+			var max = desktop.ui._area.getBox();
+			var viewport = dijit.getViewport();
+			dojo.style(node, "top", max.T+"px");
+			dojo.style(node, "left", max.L+"px");
+			dojo.style(node, "width", (viewport.w - max.R - max.L)+"px");
+			dojo.style(node, "height", (viewport.h - max.B  - max.T)+"px");
+		}
+		
 		// set margin box size, unless it wasn't specified, in which case use current size
 		if(args){
 			dojo.marginBox(node, args);

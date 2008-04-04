@@ -74,8 +74,8 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 		var viewport = dijit.getViewport();
 		dojo.style(this.filearea.domNode, "top", max.T+"px");
 		dojo.style(this.filearea.domNode, "left", max.L+"px");
-		dojo.style(this.filearea.domNode, "width", (viewport.w - max.R)+"px");
-		dojo.style(this.filearea.domNode, "height", (viewport.h - max.B)+"px");
+		dojo.style(this.filearea.domNode, "width", (viewport.w - max.R - max.L)+"px");
+		dojo.style(this.filearea.domNode, "height", (viewport.h - max.B - max.T)+"px");
 		dojo.query("div.win", desktop.ui.containerNode).forEach(function(win) {
 			var c = dojo.coords(win);
 			if(c.t < max.T && max.T > 0) dojo.style(win, "top", max.T+c.t+"px");
