@@ -5,7 +5,7 @@ this.init = function(args)
 	this.win = new api.Window({
 		title: "Checkers",
 		width: "400px",
-		height: "420px",
+		height: "400px",
 		resizable: false,
 		onClose: dojo.hitch(this, this.kill)
 	});
