@@ -174,6 +174,12 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			});
 			if(this.maximized == true) this.maximize();
 			dojo.style(this.domNode, "display", "block");
+			var calcWidth = this.domNode.offsetWidth;
+			var calcHeight = this.domNode.offsetHeight;
+			var bodyWidth = this.containerNode.offsetWidth;
+			var bodyHeight = this.containerNode.offsetHeight;
+			dojo.style(this.domNode, "width", ((calcWidth - bodyWidth)+calcWidth)+"px");
+			dojo.style(this.domNode, "height", ((calcHeight - bodyHeight)+calcHeight)+"px");
 			if (desktop.config.fx >= 2) {
 				if (desktop.config.fx < 3) dojo.style(this.containerNode, "display", "none");
 				dojo.style(this.domNode, "opacity", 0);
