@@ -1,5 +1,8 @@
 dojo.provide("desktop.ui.applets.Menu");
 dojo.require("dijit.Menu");
+dojo.requireLocalization("desktop.ui", "menus");
+dojo.requireLocalization("desktop", "places");
+dojo.requireLocalization("desktop", "apps");
 /*
  * Class: desktop.ui.applets.Menu
  * 
@@ -26,15 +29,16 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 	 * Creates a preferences menu and returns it
 	 */
 	_makePrefsMenu: function() {
+		var l = dojo.i18n.getLocalization("desktop", "menus");
 		var pMenu = new dijit.Menu();
 		dojo.forEach([
 			{
-				label: "Appearance",
+				label: l.apperance,
 				iconClass: "icon-16-apps-preferences-desktop-theme",
 				onClick: function() { desktop.ui.config.appearance(); }
 			},
 			{
-				label: "Account Information",
+				label: l.accountInfo,
 				iconClass: "icon-16-apps-system-users",
 				onClick: function() { desktop.ui.config.account(); }
 			}
@@ -49,17 +53,18 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 	 * Creates a drop down button for the applet.
 	 */
 	_drawButton: function() {
+		var l = dojo.i18n.getLocalization("desktop", "menus");
 		dojo.require("dijit.form.Button");
 		if (this._menubutton) {
 			this._menubutton.destroy();
 		}
 		this._menu.addChild(new dijit.PopupMenuItem({
-			label: "Preferences",
+			label: l.preferences,
 			iconClass: "icon-16-categories-preferences-desktop",
 			popup: this._makePrefsMenu()
 		}))
 		this._menu.addChild(new dijit.MenuItem({
-			label: "Log Out", 
+			label: l.logOut, 
 			iconClass: "icon-16-actions-system-log-out",
 			onClick: desktop.user.logout
 		}));
@@ -67,7 +72,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		this.containerNode.appendChild(div);
 		var b = new dijit.form.DropDownButton({
 			iconClass: "icon-16-places-start-here",
-			label: "Applications",
+			label: l.applications,
 			showLabel: false,
 			dropDown: this._menu
 		}, div);
@@ -83,6 +88,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 	 * Gets the app list from the server and makes a menu for them
 	 */
 	_getApps: function() {
+		var l = dojo.i18n.getLocalization("desktop", "menus");
 		api.xhr({
 			backend: "core.app.fetch.list",
 			load: dojo.hitch(this, function(data, ioArgs){
@@ -106,17 +112,21 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 				{
 					var cat = list[cat];
 					//cat.meow();
-					var category = new dijit.PopupMenuItem({iconClass: "icon-16-categories-applications-"+cat.toLowerCase(), label: cat});
+					var category = new dijit.PopupMenuItem({
+						iconClass: "icon-16-categories-applications-"+cat.toLowerCase(),
+						label: l[cat.toLowerCase()] || cat
+					});
 					var catMenu = new dijit.Menu({parentMenu: category});
 					for(app in data)
 					{
 						if(data[app].category == cat)
 						{
 							var item = new dijit.MenuItem({
-								label: data[app].name
+								label: l[data[app].name] || data[app].name
 							});
-							dojo.connect(item, "onClick", desktop.app, 
-							new Function("desktop.app.launch("+data[app].id+")") );
+							dojo.connect(item, "onClick", desktop.app, function(){
+								desktop.app.launch(data[app].id);
+							});
 							catMenu.addChild(item);
 						}
 					}
