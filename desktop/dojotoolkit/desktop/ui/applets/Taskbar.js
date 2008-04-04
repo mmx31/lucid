@@ -9,6 +9,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 	dispName: "Window List",
 	fullspan: true,
 	_buttons: {},
+	_labels: {},
 	_connects: [],
 	postCreate: function() {
 		dojo.addClass(this.containerNode, "desktopTaskbarApplet");
@@ -34,7 +35,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		if(v.length >= 18) {
 			v = v.slice(0, 18) + "...";
 		}
-		this.labelNode.textContent = v;
+		this._labels[store.getValue(item, "id")].textContent = v;
 	},
 	onNew: function(item) {
 		var store = desktop.ui._windowList;
@@ -47,13 +48,14 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		if(v.length >= 18) {
 			v = v.slice(0, 18) + "...";
 		}
-		var labelNode = this.labelNode = document.createElement("span");
+		var labelNode = document.createElement("span");
 		labelNode.textContent = v;
 		domNode.appendChild(labelNode);
 		
 		this._connects[store.getValue(item, "id")] = dojo.connect(domNode, "onclick", dijit.byId(store.getValue(item, "id")), "_onTaskClick");
 		
 		this._buttons[store.getValue(item, "id")] = domNode;
+		this._labels[store.getValue(item, "id")] = labelNode;
 		this.containerNode.appendChild(domNode);
 	},
 	onDelete: function(item) {
