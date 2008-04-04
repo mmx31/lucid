@@ -5,10 +5,10 @@
 <email>Jaymac407@gmail.com</email>
 <version>1.0</version>
 <maturity>Alpha</maturity>
-<category>Accessories</category>
+<category>Office</category>
 <filetypes>["text/html"]</filetypes>
 <installFile>app.js</installFile>
 <filesRequired>false</filesRequired>
-<installMessage>Rich/HTML Editor is being installed...</installMessage>
+<installMessage>Word Processor is being installed...</installMessage>
 <installedMessage>...done</installedMessage>
 </appMeta>
