@@ -22,7 +22,14 @@ this.drawBoard = function()
 	for(var i = 0; i < 400; i += 50){
 		for(var j = 0; j < 400; j += 50){
 			if(!(i % 100 == j % 100)) {
-				this.surface.createRect({ x: i, y: j, width: 50, height: 50 }).setFill("gray");
+				this.surface.createRect({ x: i, y: j, width: 50, height: 50 }).setFill({
+					type: "linear",
+					x1: i, y1: j, x2: (i+50), y2: (j+50),
+					colors:[
+						{offset: 0, color:"#888888"},
+						{offset: 1, color:"#222222"}
+					]
+				});
 			}
 		}
 	}
@@ -38,14 +45,37 @@ this.drawBoard = function()
 this.pieces = [];
 this.makePiece = function(c)
 {
+	
 	var shape = this.surface.createCircle({
 		cx: c.x,
 		cy: c.y,
 		r: 18
-	}).setFill(c.color).setStroke({
+	}).setStroke({
 		color: (c.color=="red" ? [150, 0, 0, 0.8] : "gray"),
 		width: 1
 	});
+	
+	if ( c.color == "red" ) {
+		shape.setFill({
+			type: "radial",
+			//x1: (c.x), y1: (c.y), x2: (c.x + 15), y2: (c.y + 15),
+			cx: c.x, cy: c.y, r: 18,
+			colors:[
+				{offset:0, color: "#880000"},
+				{offset:1, color: "#DD0000"}
+			]
+		});
+	} else {
+		shape.setFill({
+			type: "radial",
+			cx: c.x, cy: c.y, r: 18,
+			colors: [
+				{offset: 0, color: "#000000"},
+				{offset: 1, color: "#444444"}
+			]
+		});
+	}
+
 	var move = new dojox.gfx.Moveable(shape);
 	shape.checkMove = dojo.hitch(this, this.checkMove);
 	shape.checkKing = dojo.hitch(this, this.checkKing);
@@ -176,3 +206,4 @@ this.checkMove = function(old_pos, x, y, shape)
 	}
 	return false;
 }
+
