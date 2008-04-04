@@ -384,6 +384,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	{
 		this.onMaximize();
 		this.maximized = true;
+		dojo.addClass(this.domNode, "win-maximized");
 		if(this._drag) this._drag.onMouseUp(); this._drag.destroy();
 		this.killResizer();
 		this.pos.top = dojo.style(this.domNode, "top");
@@ -500,6 +501,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	 */
 	unmaximize: function()
 	{
+		dojo.removeClass(this.domNode, "win-maximized");
 		this.makeDragger();
 		if(this.resizable == true)
 		{		
