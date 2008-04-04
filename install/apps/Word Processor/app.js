@@ -64,7 +64,7 @@ this.init = function(args) {
     this.window.startup();
     this.window.onClose = dojo.hitch(this, this.kill);
 
-	setTimeout(function() {
+	setTimeout(dojo.hitch(this, function() {
 		editor = dijit.byId(editor.id);
 		delete editor.toolbar;
 		editor.postCreate();
@@ -73,7 +73,7 @@ this.init = function(args) {
 		else {
 			this.processNew();
 		}
-	}, 500);
+	}), 500);
 
 }
 this.processNew = function() {
