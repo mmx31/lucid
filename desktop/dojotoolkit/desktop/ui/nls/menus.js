@@ -8,6 +8,7 @@
 	"graphics": "Graphics",
 	"internet": "Internet",
 	"multimedia": "Multimedia",
+	"office": "Office",
 	"system": "System",
 	"preferences": "Preferences",
 	"about": "About Psych Desktop",
