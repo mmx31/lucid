@@ -218,7 +218,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		});
 		for(key in desktop.ui.appletList) {
 			var header = document.createElement("h4");
-			header.innerText = key;
+			header.innerText = a[key] || key;
 			div.appendChild(header);
 			for(applet in desktop.ui.appletList[key]) {
 				var name = desktop.ui.appletList[key][applet];

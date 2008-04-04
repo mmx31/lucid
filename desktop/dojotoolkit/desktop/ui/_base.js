@@ -644,6 +644,6 @@ dojo.mixin(desktop.ui, {
 desktop.ui.appletList = {
 		"Accessories": ["Clock"],
 		"Desktop & Windows": ["Taskbar"],
-		"System & Hardware": ["Netmonitor"],
+		"System": ["Netmonitor"],
 		"Utilities": ["Menu", "Menubar", "Seperator"]
 }
