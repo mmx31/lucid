@@ -261,12 +261,11 @@ api.ui = new function() {
 		this.pane.setContent(menu.domNode);
        		this.address = new dijit.form.TextBox({value: "file://"});
 		if(object.types) {
-		this.internalStore = new dojo.data.ItemFileWriteStore({});
-		for(a=0;a<object.types.length;a++) {
-		this.internalStore.newItem({type: object.types[a].type});
-		}
-		this.internalStore.newItem({type: ""});
-		this.select = new dijit.form.FilteringSelect({store: this.internalStore, searchAttr: "type"});
+			var store = this.internalStore = new dojo.data.ItemFileWriteStore({
+				identifier: "type",
+				data: object.types
+			});
+			store.newItem({type: ""});
 		}
 		this.button = new dijit.form.Button({label: "Load/Save", onClick: dojo.hitch(this, function() { p = this.address.getValue(); f = ""; if(object.types) { f = this.select.getValue(); } object.callback(p+f); dialog.close(); })});
 		this.ablah = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(this, function() { object.callback(false); dialog.close(); })});
