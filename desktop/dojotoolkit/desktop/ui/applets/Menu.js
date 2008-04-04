@@ -124,9 +124,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 							var item = new dijit.MenuItem({
 								label: l[data[app].name] || data[app].name
 							});
-							dojo.connect(item, "onClick", desktop.app, function(){
-								desktop.app.launch(data[app].id);
-							});
+							dojo.connect(item, "onClick", dojo.hitch(desktop.app, "launch", data[app].id));
 							catMenu.addChild(item);
 						}
 					}

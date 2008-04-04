@@ -6,5 +6,7 @@
 	"open": "Open",
 	"save": "Save",
 	"saveAs": "Save As",
-	"new": "New"
+	"new": "New",
+	"loading": "loading...",
+	"": ""
 })
