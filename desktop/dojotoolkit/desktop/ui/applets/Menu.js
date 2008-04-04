@@ -33,7 +33,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		var pMenu = new dijit.Menu();
 		dojo.forEach([
 			{
-				label: l.apperance,
+				label: l.appearance,
 				iconClass: "icon-16-apps-preferences-desktop-theme",
 				onClick: function() { desktop.ui.config.appearance(); }
 			},
