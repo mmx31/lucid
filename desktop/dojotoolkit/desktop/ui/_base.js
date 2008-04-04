@@ -416,9 +416,11 @@ dojo.mixin(desktop.ui, {
 		 * Shows the account configuration dialog
 		 */
 		account: function() {
+			var l = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
+			var cm = dojo.i18n.getLocalization("desktop", "common");
 			if(this.accountWin) return this.accountWin.bringToFront();
 			var win = this.accountWin = new api.Window({
-				title: "Account Information",
+				title: l.accountInfo,
 				width: "600px",
 				height: "500px",
 				onClose: dojo.hitch(this, function() {
@@ -432,11 +434,11 @@ dojo.mixin(desktop.ui, {
 			dojo.style(chpasswd, "top", "0px");
 			dojo.style(chpasswd, "right", "0px");
 			var topRow = document.createElement("div");
-			topRow.innerHTML = "User name: ";
+			topRow.innerHTML = l.username+": ";
 			var usernameSpan = document.createElement("span");
 			topRow.appendChild(usernameSpan);
 			var button = new dijit.form.Button({
-				label: "Change Password...",
+				label: l.changePassword,
 				onClick: desktop.ui.config.password
 			});
 			chpasswd.appendChild(topRow);
@@ -452,14 +454,14 @@ dojo.mixin(desktop.ui, {
 				layoutAlign: "client"
 			});
 			
-			var general = new dijit.layout.ContentPane({title: "General"});
+			var general = new dijit.layout.ContentPane({title: l.general});
 			
 			var rows = {
-				Name: {
+				name: {
 					widget: "TextBox",
 					params: {}
 				},
-				Email: {
+				email: {
 					widget: "ValidationTextBox",
 					params: {
 						isValid: function(blah) {
@@ -473,7 +475,7 @@ dojo.mixin(desktop.ui, {
 			for(key in rows) {
 				var row = document.createElement("div");
 				dojo.style(row, "marginBottom", "5px");
-				row.innerHTML = key+":&nbsp;";
+				row.innerHTML = l[key]+":&nbsp;";
 				row.appendChild((elems[key] = new dijit.form[rows[key].widget](rows[key].params)).domNode);
 				div.appendChild(row);
 			};
@@ -483,7 +485,7 @@ dojo.mixin(desktop.ui, {
 			
 			var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
 			var close = new dijit.form.Button({
-				label: "Close",
+				label: cm.close,
 				onClick: dojo.hitch(win, win.destroy)
 			});
 			var p=document.createElement("div");
@@ -496,8 +498,8 @@ dojo.mixin(desktop.ui, {
 				wid.startup();
 			}, this);
 			desktop.user.get({callback: function(info) {
-				elems["Name"].setValue(info.name);
-				elems["Email"].setValue(info.email);
+				elems["name"].setValue(info.name);
+				elems["email"].setValue(info.email);
 				usernameSpan.textContent = info.username
 			}});
 			dojo.connect(win, "onClose", this, function() {
@@ -508,9 +510,9 @@ dojo.mixin(desktop.ui, {
 						if(!elem.isValid()) continue;
 					}
 					switch(key) {
-						case "Name":
+						case "name":
 							args.name = elem.getValue();
-						case "Email":
+						case "email":
 							args.email = elem.getValue();
 					}
 				}
