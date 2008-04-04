@@ -192,12 +192,15 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 	 * Shows the "Add to panel" dialog so the user can add applets
 	 */
 	addDialog: function() {
+		var l = dojo.i18n.getLocalization("desktop.ui", "panel");
+		var a = dojo.i18n.getLocalization("desktop.ui", "applets");
+		var c = dojo.i18n.getLocalization("desktop", "common");
 		if(this.window) {
 			this.window.bringToFront();
 			return;
 		}
 		var win = this.window = new api.Window({
-			title: "Add to panel",
+			title: l.addToPanel,
 			onClose: dojo.hitch(this, function() {
 				this.window = false;
 			})
@@ -221,6 +224,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				var name = desktop.ui.appletList[key][applet];
 				var iconClass = desktop.ui.applets[name].prototype.appletIcon;
 				var dispName = desktop.ui.applets[name].prototype.dispName;
+				dispName = a[dispName] || dispName;
 				c = document.createElement("div");
 				c.name = name;
 				dojo.addClass(c, "dijitInline");
@@ -242,7 +246,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			});
 		}, this);
 		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom", style: "height: 40px;"});
-		var button = new dijit.form.Button({label: "Add to panel", style: "float: right;"});
+		var button = new dijit.form.Button({label: l.addToPanel, style: "float: right;"});
 		bottom.setContent(button.domNode);
 		win.addChild(bottom);
 		dojo.connect(button, "onClick", this, function() {
