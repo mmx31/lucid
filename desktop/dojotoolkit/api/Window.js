@@ -414,7 +414,6 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			});
 			dojo.connect(anim, "onEnd", this, function() {
 				if(desktop.config.fx < 3) this._toggleBody(true);
-				this._hideBorders();
 				this.resize();
 			});
 			anim.play();
@@ -426,47 +425,8 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			win.style.left = max.L;
 			win.style.width = (viewport.h - max.R - max.L)+"px";
 			win.style.height = (viewport.h - max.B - max.T)+"px";
-			this._hideBorders();
 			this.resize();
 		}
-	},
-	/*
-	 * Method: _showBorders
-	 * 
-	 * Show the borders of the window
-	 * Used when unmaximizing the window
-	 */
-	_showBorders: function() {
-		dojo.forEach([
-			"win-tr",
-			"win-tl",
-			"win-ml",
-			"win-mr",
-			"win-br",
-			"win-bl",
-			"win-bc"
-		], function(item) {
-			dojo.query("."+item+"-hidden", this.domNode).addClass(item).removeClass(item+"-hidden");
-		});
-	},
-	/*
-	 * Method: _hideBorders
-	 * 
-	 * Hide the borders of the window
-	 * Used when maximizing the window
-	 */
-	_hideBorders: function() {
-		dojo.forEach([
-			"win-tr",
-			"win-tl",
-			"win-ml",
-			"win-mr",
-			"win-br",
-			"win-bl",
-			"win-bc"
-		], function(item) {
-			dojo.query("."+item, this.domNode).addClass(item+"-hidden").removeClass(item);
-		});
 	},
 	/*
 	 * Method: makeDragger
@@ -513,7 +473,6 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		var win = this.domNode;
 		if(desktop.config.fx >= 2)
 		{
-			this._showBorders();
 			if(desktop.config.fx < 3) this._toggleBody(false);
 			var anim = dojo.animateProperty({
 				node: this.domNode,
@@ -538,7 +497,6 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			win.style.left = this.pos.left+"px";
 			win.style.height= this.pos.height+"px";
 			win.style.width= this.pos.width+"px";
-			this._showBorders();
 			this.resize();
 		}
 		this.maximized = false;
