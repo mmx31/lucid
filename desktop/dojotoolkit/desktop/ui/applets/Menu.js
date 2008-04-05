@@ -89,6 +89,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 	 */
 	_getApps: function() {
 		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
+		var ap = dojo.i18n.getLocalization("desktop", "apps");
 		api.xhr({
 			backend: "core.app.fetch.list",
 			load: dojo.hitch(this, function(data, ioArgs){
@@ -122,7 +123,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 						if(data[app].category == cat)
 						{
 							var item = new dijit.MenuItem({
-								label: l[data[app].name] || data[app].name
+								label: ap[data[app].name] || data[app].name
 							});
 							dojo.connect(item, "onClick", dojo.hitch(desktop.app, "launch", data[app].id));
 							catMenu.addChild(item);

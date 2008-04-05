@@ -35,7 +35,7 @@ this.init = function(args)
 			var _newForm = document.createElement('form');
 			_newForm.setAttribute("enctype","multipart/form-data");
 			var node = dojo.clone(this.fileInput);
-			_newForm.appendChild(this.fileInput);;
+			_newForm.appendChild(this.fileInput);
 			dojo.body().appendChild(_newForm);
 			dojo.io.iframe.send({
 				url: this.url+"&path="+encodeURIComponent(this.path),
@@ -59,7 +59,7 @@ this.init = function(args)
 			style: "width: 100%;"
 		});
 		dojo.forEach(desktop.config.filesystem.places, function(item) {
-			var item = new dijit.MenuItem({label: item.name,
+			var item = new dijit.MenuItem({label: places[item.name] || item.name,
 				iconClass: item.icon || "icon-16-places-folder",
 				onClick: dojo.hitch(this.fileArea, "setPath", item.path)
 			});
