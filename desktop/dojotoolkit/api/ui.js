@@ -1,6 +1,7 @@
 dojo.provide("api.ui");
 dojo.require("dijit.layout.ContentPane");
 dojo.require("dojox.widget.Toaster");
+dojo.requireLocalization("desktop", "common");
 
 /* 
  * Class: api.ui
@@ -47,67 +48,70 @@ api.ui = new function() {
 	 */
 	this.authenticationDialog = function(/*Object*/object)
 	{
-			if(this.authenticationWin) this.authenticationWin.bringToFront();
-			else {
-			if(!object.program) { object.program = "(unknown)"; }
-			var win = this.authenticationWin = new api.Window({
-				title: "Authentication required",
-				width: "450px",
-				height: "350px",
-				onClose: dojo.hitch(this, function() {
-					this.authenticationWin = false;
-					if(this.success != 0) { object.callback(1); }
-				}),
-				showClose: false,
-				showMinimize: false,
-				showMaximize: false
-			});
-			this.times = 3;
-			this.success = 1;
-			var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding: 20px;"});
-			top.setContent("An application is attempting to perform an action which requires privileges. Authentication is required to perform this action.");
-			var client = new dijit.layout.ContentPane({layoutAlign: "client", style: "padding: 40px;"});
-			var row1 = document.createElement("div");
-			row1.innerHTML = "Password:&nbsp;";
-			var current = new dijit.form.TextBox({type: "password", style: "width: 125px;"});
-			row1.appendChild(current.domNode);
-			var row2 = document.createElement("div");
-			var authButton = this.authButton = new dijit.form.Button({
-				label: "Authenticate",
-				onClick: dojo.hitch(this, function() {	
-					desktop.user.authentication({
-						permission: object.permission,
-						action: "set",
-						password: current.getValue(),
-						callback: dojo.hitch(this, function(data) {
-							if(data == 1 && (this.times - 1) != 0) { this.times--; this.row3.innerHTML = this.times; }
-							else { object.callback(data); this.success = data; win.close(); }
-						})
+		var cm = dojo.i18n.getLocalization("desktop", "common");
+		var ac = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
+		if(this.authenticationWin) this.authenticationWin.bringToFront();
+		else {
+		if(!object.program) { object.program = ac.unknown; }
+		var times = 3;
+		var success = 1;
+		var win = this.authenticationWin = new api.Window({
+			title: ac.authRequired,
+			width: "450px",
+			height: "350px",
+			onClose: dojo.hitch(this, function() {
+				this.authenticationWin = false;
+				if(success != 0) { object.callback(1); }
+			}),
+			showClose: false,
+			showMinimize: false,
+			showMaximize: false
+		});
+		var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding: 20px;"});
+		top.setContent(ac.sudoExplanation);
+		var client = new dijit.layout.ContentPane({layoutAlign: "client", style: "padding: 40px;"});
+		var row1 = document.createElement("div");
+		row1.innerHTML = ac.password+":&nbsp;";
+		var current = new dijit.form.TextBox({type: "password", style: "width: 125px;"});
+		row1.appendChild(current.domNode);
+		var row2 = document.createElement("div");
+		var authButton = this.authButton = new dijit.form.Button({
+			label: ac.authenticate,
+			onClick: dojo.hitch(this, function() {	
+				desktop.user.authentication({
+					permission: object.permission,
+					action: "set",
+					password: current.getValue(),
+					callback: dojo.hitch(this, function(data) {
+						if(data == 1 && (times - 1) != 0) { times--; this.row3.innerHTML = times; } //TODO: client side security? wtf are you on?!
+						else { object.callback(data); success = data; win.close(); }
 					})
 				})
 			})
-			var closeButton = this.authButton = new dijit.form.Button({
-				label: "Close",
-				onClick: dojo.hitch(win, win.close)
-			});
-			row2.appendChild(authButton.domNode);
-			row2.appendChild(closeButton.domNode);
-			this.row3 = document.createElement("div");
-			this.row3.innerHTML = this.times;
-			var row4 = document.createElement("div");
-			row4.innerHTML = "attempt(s) remaining";
-			var main = document.createElement("div"); main.appendChild(row1); main.appendChild(row2); main.appendChild(this.row3); main.appendChild(row4);
-			client.setContent(main);
-			var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom", style: "padding: 20px;"});
-			bottom.setContent("Program: "+object.program+"<br />Action: "+object.permission+"<br />Vendor:  (unknown)");
-			dojo.forEach([top, bottom, client], function(e) {
-				win.addChild(e);
-			});
-			win.show();
-			win.startup();
-			}
+		})
+		var closeButton = this.authButton = new dijit.form.Button({
+			label: cm.close,
+			onClick: dojo.hitch(win, win.close)
+		});
+		row2.appendChild(authButton.domNode);
+		row2.appendChild(closeButton.domNode);
+		var row4 = document.createElement("div");
+		row4.textContent = ac.attemptsRemaining+": ";
+		this.row3 = document.createElement("span");
+		this.row3.innerHTML = times;
+		row4.appendChild(row3);
+		var main = document.createElement("div"); main.appendChild(row1); main.appendChild(row2); main.appendChild(row4);
+		client.setContent(main);
+		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom", style: "padding: 20px;"});
+		bottom.setContent(ac.program+": "+object.program+"<br />"+ac.action+": "+object.permission+"<br />"+ac.vendor+": "+ac.unknown);
+		dojo.forEach([top, bottom, client], function(e) {
+			win.addChild(e);
+		});
+		win.show();
+		win.startup();
+		}
 				
-}
+	}
 	/*
 	 * Method: inputDialog
 	 * 
@@ -126,6 +130,7 @@ api.ui = new function() {
 	 */
 	this.inputDialog = function(/*Object*/object)
 	{
+		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var dialog = new api.Window();
 		dialog.title = object.title;	
 		dialog.width = "400px";
@@ -134,8 +139,8 @@ api.ui = new function() {
 		this.details = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
 		this.text = new dijit.form.TextBox({value: ""});
 		all = document.createElement("div");
-		this.blah = new dijit.form.Button({label: "OK", onClick: dojo.hitch(this, function() {  dojo.disconnect(onClose); object.callback(this.text.getValue()); dialog.close(); })});
-		this.ablah = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(this, function() {  dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
+		this.blah = new dijit.form.Button({label: cm.ok, onClick: dojo.hitch(this, function() {  dojo.disconnect(onClose); object.callback(this.text.getValue()); dialog.close(); })});
+		this.ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function() {  dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
 		var line = document.createElement("div");
         var p = document.createElement("span");
 		var q = document.createElement("span");
@@ -173,6 +178,7 @@ api.ui = new function() {
 	 */
 	this.yesnoDialog = function(/*Object*/object)
 	{
+		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var dialog = new api.Window();
 		dialog.title = object.title;	
 		dialog.width = "400px";
@@ -180,8 +186,8 @@ api.ui = new function() {
 		var onClose = dojo.connect(dialog, "onClose", null, function() {object.callback(false)});
 		this.details = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
 		all = document.createElement("div");
-		this.blah = new dijit.form.Button({label: "Yes", onClick: dojo.hitch(this, function() { dojo.disconnect(onClose); object.callback(true); dialog.close(); })});
-		this.ablah = new dijit.form.Button({label: "No", onClick: dojo.hitch(this, function() { dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
+		this.blah = new dijit.form.Button({label: cm.yes, onClick: dojo.hitch(this, function() { dojo.disconnect(onClose); object.callback(true); dialog.close(); })});
+		this.ablah = new dijit.form.Button({label: cm.no, onClick: dojo.hitch(this, function() { dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
 		var line = document.createElement("div");
         var p = document.createElement("span");
 		var q = document.createElement("span");
@@ -212,6 +218,8 @@ api.ui = new function() {
 	 */
 	this.fileDialog = function(/*Object*/object)
 	{
+		var cm = dojo.i18n.getLocalization("desktop", "common");
+		var pl = dojo.i18n.getLocalization("desktop", "places");
 		dojo.require("dijit.layout.SplitContainer");
 		dojo.require("dijit.layout.LayoutContainer");
 		dojo.require("dijit.form.FilteringSelect");
@@ -229,19 +237,19 @@ api.ui = new function() {
 				this.setPath("file://");
 			}),
 			iconClass: "icon-16-places-user-home",
-			label: "Home"
+			label: pl.home
 		});
 		this.toolbar.addChild(button);
 		var button = new dijit.form.Button({
 			onClick: dojo.hitch(this.file, this.file.up),
 			iconClass: "icon-16-actions-go-up",
-			label: "Up"
+			label: cm.up
 		});
 		this.toolbar.addChild(button);
 		var button = new dijit.form.Button({
 			onClick: dojo.hitch(this.file, this.file.refresh),
 			iconClass: "icon-16-actions-view-refresh",
-			label: "Refresh"
+			label: cm.refresh
 		});
 		this.toolbar.addChild(button);
 		dialog.addChild(this.toolbar);
@@ -267,12 +275,12 @@ api.ui = new function() {
 			});
 			store.newItem({type: ""});
 		}
-		this.button = new dijit.form.Button({label: "Load/Save", onClick: dojo.hitch(this, function() { p = this.address.getValue(); f = ""; if(object.types) { f = this.select.getValue(); } object.callback(p+f); dialog.close(); })});
-		this.ablah = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(this, function() { object.callback(false); dialog.close(); })});
+		this.button = new dijit.form.Button({label: cm.loadOrSave, onClick: dojo.hitch(this, function() { p = this.address.getValue(); f = ""; if(object.types) { f = this.select.getValue(); } object.callback(p+f); dialog.close(); })});
+		this.ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function() { object.callback(false); dialog.close(); })});
 		var all = document.createElement("div");
 		var line = document.createElement("div");
         var p = document.createElement("span");
-		p.innerHTML = "Address:";
+		p.innerHTML = cm.path+":";
 		line.appendChild(p);
 		line.appendChild(this.address.domNode);
 		if(object.types) line.appendChild(this.select.domNode);

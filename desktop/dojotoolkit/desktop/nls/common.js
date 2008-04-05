@@ -14,5 +14,11 @@
 	"upload": "Upload",
 	"download": "Download",
 	"up": "Up",
-	"refresh": "Refresh"
+	"refresh": "Refresh",
+	"yes": "Yes",
+	"no": "No",
+	"ok": "OK",
+	"cancel": "Cancel",
+	"loadOrSave": "Load/Save",
+	"path": "Path"
 })

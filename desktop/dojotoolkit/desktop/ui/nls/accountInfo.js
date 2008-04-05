@@ -16,5 +16,12 @@
 	"authFail": "Authentication failed",
 	"changingPassword": "Changing password...",
 	"passwordChangeSuccessful": "Password change successful",
-	"passwordDirections": "To change your password, enter your current password in the field below and click <b>Authenticate</b>.<br />After you have authenticated, enter your new password, retype it for verification and click <b>Change Password</b>"
+	"authRequired": "Authentication required",
+	"attemptsRemaining": "Attempt(s) remaining",
+	"program": "Program",
+	"action": "Action",
+	"vendor": "Vendor",
+	"unknown": "(Unknown)",
+	"passwordDirections": "To change your password, enter your current password in the field below and click <b>Authenticate</b>.<br />After you have authenticated, enter your new password, retype it for verification and click <b>Change Password</b>",
+	"sudoExplination": "An application is attempting to perform an action which requires privileges. Authentication is required to perform this action."
 })
