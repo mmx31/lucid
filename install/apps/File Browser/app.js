@@ -8,6 +8,9 @@ this.init = function(args)
 	dojo.require("dijit.Dialog");
 	api.addDojoCss("dojox/widget/FileInput/FileInput.css");
 	dojo.require("dojox.widget.FileInputAuto");
+	dojo.requireLocalization("desktop", "common");
+	dojo.requireLocalization("desktop", "apps");
+	dojo.requireLocalization("desktop", "places");
 	
 	dojo.declare("dojox.widget.FileInput_fileb_remix",
 	dojox.widget.FileInputAuto,
@@ -42,9 +45,11 @@ this.init = function(args)
 			});
 		}
 	});
-	
+	var cm = dojo.i18n.getLocalization("desktop", "common");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
+	var places = dojo.i18n.getLocalization("desktop", "places");
 	this.win = new api.Window({
-		title: "File Browser",
+		title: app["File Browser"],
 		onClose: dojo.hitch(this, this.kill)
 	});
 		this.client = new dijit.layout.SplitContainer({layoutAlign: "client"});
@@ -75,7 +80,7 @@ this.init = function(args)
 		this.pathbar.addChild(this.pathbox);
 		this.goButton = new dijit.form.Button({
 			style: "position: absolute; top: 0px; right: 0px;",
-			label: "Go",
+			label: cm.go,
 			onClick: dojo.hitch(this, function() {
 				this.fileArea.setPath(this.pathbox.getValue());
 			})
@@ -89,23 +94,23 @@ this.init = function(args)
 				this.setPath("file://");
 			}),
 			iconClass: "icon-16-places-user-home",
-			label: "Home"
+			label: places.Home
 		});
 		this.toolbar.addChild(button);
 		var button = new dijit.form.Button({
 			onClick: dojo.hitch(this.fileArea, this.fileArea.up),
 			iconClass: "icon-16-actions-go-up",
-			label: "Up"
+			label: cm.up
 		});
 		this.toolbar.addChild(button);
 		var button = new dijit.form.Button({
 			onClick: dojo.hitch(this.fileArea, this.fileArea.refresh),
 			iconClass: "icon-16-actions-view-refresh",
-			label: "Refresh"
+			label: cm.refresh
 		});
 		this.toolbar.addChild(button);
 		this.uDiag = new dijit.TooltipDialog({
-			title: "Upload",
+			title: cm.upload,
 			onOpen: dojo.hitch(this, function(pos) {
 				this.uploader.path = this.fileArea.path;
 				dojo.connect(closebut, "onClick", this.upbutton, this.upbutton._closeDropDown);
@@ -113,7 +118,7 @@ this.init = function(args)
 			style: "width: 415px; height: 30px;"
 		});
 		this.uploaderArgs = {
-			path: this.fileArea.path,
+			path: this.fileArea.path, //TODO: update as path on fileArea changes?
 			onComplete: dojo.hitch(this, function(data, ioArgs, widgetRef){
 				widgetRef.setMessage(data.status+": "+data.details);
 				setTimeout(dojo.hitch(this, function(){
@@ -126,7 +131,7 @@ this.init = function(args)
 		}
 		this.uploader = new dojox.widget.FileInput_fileb_remix(this.uploaderArgs);
 		var closebut = new dijit.form.Button({
-			label: "Close",
+			label: cm.close,
 			style: "position: absolute; top: 20px; right: 5px;"
 		});
 		this.uploadDiv = document.createElement("div");
@@ -136,7 +141,7 @@ this.init = function(args)
 		this.upbutton = new dijit.form.DropDownButton({
 			onClick: dojo.hitch(this.fileArea, this.fileArea.refresh),
 			iconClass: "icon-16-actions-mail-send-receive",
-			label: "Upload",
+			label: cm.upload,
 			dropDown: this.uDiag,
 			_onBlur: function(e) {}
 		});
