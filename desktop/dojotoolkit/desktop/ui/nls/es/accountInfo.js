@@ -3,6 +3,7 @@
 	"username": "Nombre de usuario",
 	"email": "Dirección de correo electrónico",
 	"name": "Nombre",
+	"language": "Idioma",
 	"changePasswordAction": "Cambie contraseña...",
 	"general": "General",
 	"changePassword": "Cambie contraseña",

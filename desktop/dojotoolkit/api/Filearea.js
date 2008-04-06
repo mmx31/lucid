@@ -63,7 +63,7 @@ dojo.declare(
 	forDesktop: false,
 	templatePath: dojo.moduleUrl("api", "templates/Filearea.html"),
 	postCreate: function() {
-		var nc = dojo.i18n.getLocalization("desktop", "common");
+		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var nf = dojo.i18n.getLocalization("api", "filearea");
 		this.menu = new dijit.Menu({});
 		this.menu.addChild(new dijit.MenuItem({label: nf.createFolder, iconClass: "icon-16-actions-folder-new", onClick: dojo.hitch(this, this._makeFolder)}));

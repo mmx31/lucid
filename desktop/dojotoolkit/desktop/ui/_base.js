@@ -477,6 +477,24 @@ dojo.mixin(desktop.ui, {
 							return dojox.validate.isEmailAddress(this.textbox.value);
 						}
 					}
+				},
+				language: {
+					widget: "FilteringSelect",
+					params: {
+						value: desktop.config.locale,
+						searchAttr: "label",
+						autoComplete: true,
+						store: new dojo.data.ItemFileReadStore({
+							data: {
+								identifier: "value",
+								label: "label",
+								items: [
+									{label: "English", value: "en"},
+									{label: "Spanish", value: "es"}
+								]
+							}
+						})
+					}
 				}
 			}
 			var div = document.createElement("div");
@@ -521,8 +539,13 @@ dojo.mixin(desktop.ui, {
 					switch(key) {
 						case "name":
 							args.name = elem.getValue();
+							break;
 						case "email":
 							args.email = elem.getValue();
+							break;
+						case "language":
+							desktop.config.locale = elem.getValue();
+							break;
 					}
 				}
 				desktop.user.set(args);
