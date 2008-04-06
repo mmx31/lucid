@@ -46,7 +46,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 		}
 		this.checkForLogin();
 	},
-	checkForLogin: function() {
+	checkForLogin: function(winClosed) {
 		dojo.xhrGet({
 			url: dojo.baseUrl + "../../../backend/core/bootstrap.php?section=check&action=loggedin",
 			load: dojo.hitch(this, function(data) {
@@ -56,6 +56,13 @@ dojo.declare("login.Form", dijit.form.Form, {
 							this.errorNode.innerHTML = "You are allready logged in. Redirecting to desktop...";
 							this.submitNode.disabled = true;
 							window.location = dojo.baseUrl+"../../index.html";
+						}
+						else if(winClosed) {
+							this.errorNode.innerHTML = "You are allready logged in. <a href='" + dojo.baseUrl + "../../index.html'>Click here</a> to open the desktop.";
+							dojo.query("a", this.errorNode).forEach(function(elem) {
+								elem.href="javascript:void(0);";
+								dojo.connect(elem, "onclick", this, "onLinkClick");
+							}, this);
 						}
 						else {
 							if (this._popUp()) {
@@ -68,7 +75,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 								dojo.query("a", this.errorNode).forEach(function(elem) {
 									elem.href="javascript:void(0);";
 									dojo.connect(elem, "onclick", this, "onLinkClick");
-								});
+								}, this);
 							}
 						}
 					}
@@ -77,7 +84,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 						dojo.query("a", this.errorNode).forEach(function(elem) {
 							elem.href="javascript:void(0);";
 							dojo.connect(elem, "onclick", this, "onLinkClick");
-						});
+						}, this);
 				}
 			})
 		})
@@ -94,7 +101,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 				dojo.query("a", this.errorNode).forEach(function(elem) {
 					elem.href="javascript:void(0);";
 					dojo.connect(elem, "onclick", this, "onLinkClick");
-				});
+				}, this);
 			}
 		}
 	},
@@ -103,7 +110,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 		else {
 			this.submitNode.disabled=false;
 			this.errorNode.innerHTML = "";
-			this.checkForLogin();
+			this.checkForLogin(true);
 		}
 	},
 	_popUp: function()
