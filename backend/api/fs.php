@@ -18,6 +18,7 @@
 */
 require("../lib/includes.php");
 import("api.vfs.Base");
+import("models.user");
 if($_GET['section'] == "io")
 {
 	if(isset($_GET['path'])) $sentpath = $_GET['path'];
@@ -38,6 +39,10 @@ if($_GET['section'] == "io")
 		//strip the server URL out of $sentpath
 		$sentpath = explode("/", $sentpath, 2);
 		$sentpath = isset($sentpath[1]) ? $sentpath[1] : "/";
+		
+		//check for permissions
+		$c = $User->get_current();
+		if(!$c->has_permission("api.fs.remote")) internal_error("permission_denied");
 	}
 	$sentpath = "/" . $sentpath;
 	
@@ -60,6 +65,10 @@ if($_GET['section'] == "io")
 					$sentnewpath = explode("/", $sentnewpath, 2);
 					$sentnewpath = isset($sentnewpath[1]) ? $sentnewpath[1] : "/";
 				}
+				
+				//check for permissions
+				$c = $User->get_current();
+				if(!$c->has_permission("api.fs.remote")) internal_error("permission_denied");
 			}
 		}
 		$sentnewpath = "/" . $sentnewpath;

@@ -36,6 +36,10 @@
 				'description' => 'Can upload files'
 			),
 			array(
+				'name' => 'api.fs.remote',
+				'description' => 'Can connect to remote file servers'
+			),
+			array(
 				'name' => 'api.mail',
 				'description' => 'Can send/receive mail'
 			),
