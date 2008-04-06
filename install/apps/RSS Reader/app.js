@@ -14,10 +14,13 @@ this.init = function(args)
     dojo.require("dojo.data.ItemFileReadStore");
     dojo.require("dijit.Dialog");
     dojo.require("dojox.validate.web");
-
+	dojo.requireLocalization("desktop", "common");
+	dojo.requireLocalization("desktop", "apps");
+	var cm = dojo.i18n.getLocalization("desktop", "common");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
 
     this.win = new api.Window({
-        title: "RSS Reader",
+        title: app["RSS Reader"],
         onClose: dojo.hitch(this, this.kill)
     });
 	var store = this.feedStore = new api.Registry({
@@ -91,20 +94,20 @@ this.init = function(args)
         layoutAlign: "top"
     });
     var button = new dijit.form.Button({
-        label: "Refresh",
+        label: cm.refresh,
         iconClass: "icon-22-actions-view-refresh",
         onClick: dojo.hitch(this, this.refresh)
 
     });
     this.toolbar.addChild(button);
     var button = new dijit.form.DropDownButton({
-        label: "Add",
+        label: cm.add,
         iconClass: "icon-22-actions-list-add",
         dropDown: this.addFeedDialog()
     });
     this.toolbar.addChild(button);
     var button = new dijit.form.Button({
-        label: "Remove",
+        label: cm.remove,
         iconClass: "icon-22-actions-list-remove",
         onClick: dojo.hitch(this, this.removeFeed)
 

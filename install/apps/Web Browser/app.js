@@ -7,8 +7,12 @@ this.init = function(args)
 	dojo.require("dijit.form.Form");
 	dojo.require("dijit.form.Button");
 	dojo.require("dijit.layout.ContentPane");
+	dojo.requireLocalization("desktop", "apps");
+	dojo.requireLocalization("desktop", "common");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
+	var cm = dojo.i18n.getLocalization("desktop", "common");
 	this.win = new api.Window({
-		title: "Web Browser",
+		title: app["Web Browser"],
 		onClose: dojo.hitch(this, this.kill)
 	});
 	this.Iframe = document.createElement("iframe");
@@ -18,7 +22,7 @@ this.init = function(args)
 	this.urlbox = new dijit.form.TextBox({onExecute: dojo.hitch(this, this.go), style: "width: 80%;"});
 	var form = new dijit.Toolbar({layoutAlign: "top"});
 	form.addChild(this.urlbox);
-	form.addChild(new dijit.form.Button({label: "Go", onClick: dojo.hitch(this, this.go), style: "width: 10%;"}));
+	form.addChild(new dijit.form.Button({label: cm.go, onClick: dojo.hitch(this, this.go), style: "width: 10%;"}));
 	form.startup();
 	this.win.addChild(form);
 	var client = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));

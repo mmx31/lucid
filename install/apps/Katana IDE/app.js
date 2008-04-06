@@ -14,8 +14,12 @@ this.init = function(args)
 	dojo.require("dijit.form.Button");
     dojo.require("dijit.form.TextBox");
 	dojo.require("dijit.Toolbar");
+	dojo.requireLocalization("desktop", "common");
+	dojo.requireLocalization("desktop", "apps");
+	var cm = dojo.i18n.getLocalization("desktop", "common");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
 	this.win = new api.Window({
-		title: "Katana IDE",
+		title: app["Katana IDE"],
 		onClose: dojo.hitch(this, this.kill)
 	});
 	
@@ -30,11 +34,10 @@ this.init = function(args)
 	this.win.addChild(client);
 	
 	this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
-		this.toolbar.addChild(new dijit.form.Button({label: "New", iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, function btnNewApp() { this.newApp(1); })}));
-		this.toolbar.addChild(new dijit.form.Button({label: "Open", iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this.load)}));
-		this.toolbar.addChild(new dijit.form.Button({label: "Save", iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, this.save)}));
+		this.toolbar.addChild(new dijit.form.Button({label: cm["new"], iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, function btnNewApp() { this.newApp(1); })}));
+		this.toolbar.addChild(new dijit.form.Button({label: cm.open, iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this.load)}));
+		this.toolbar.addChild(new dijit.form.Button({label: cm.save, iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, this.save)}));
 		this.toolbar.addChild(new dijit.form.Button({label: "Metadata", iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, this.editMetadata)}));
-	    this.toolbar.addChild(new dijit.form.Button({label: "About", onClick: dojo.hitch(this, this.about), iconClass: "icon-16-apps-help-browser"}));
 
 	this.win.addChild(this.toolbar);
 	this.win.show();
@@ -70,9 +73,6 @@ this.newApp = function(showmeta)
 	this.updateTitle();
 
 	if ( showmeta == 1 ) this.editMetadata();
-}
-this.about = function() {
-	api.ui.alertDialog({title: "Katana IDE", message:"Psych Desktop Katana IDE - Application Creation IDE<br>Version "+this.version});
 }
 this.app = {};
 this.save = function()

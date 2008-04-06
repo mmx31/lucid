@@ -11,26 +11,14 @@ this.init = function(args) {
     dojo.require("dijit.Toolbar");
     dojo.require("dijit.form.Button");
     dojo.require("dijit.Menu");
+	dojo.requireLocalization("desktop", "apps");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
     //make window
     this.win = new api.Window({
-        title: "Task Manager",
+        title: app["Task Manager"],
         width: "500px",
         height: "400px"
     });
-    var toolbar = new dijit.Toolbar({
-        layoutAlign: "top"
-    });
-    toolbar.addChild(new dijit.form.Button({
-        label: "About",
-        onClick: dojo.hitch(this, this.about),
-        iconClass: "icon-16-apps-help-browser"
-    }));
-    toolbar.addChild(new dijit.form.Button({
-        label: "Exit",
-        onClick: dojo.hitch(this, this.kill),
-        iconClass: "icon-16-actions-system-log-out"
-    }));
-    this.win.addChild(toolbar);
     //var layout = new dijit.layout.LayoutContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
     this.main = new dijit.layout.ContentPane({
         layoutAlign: "client"
@@ -48,29 +36,21 @@ this.init = function(args) {
 
 }
 
-this.about = function() {
-    api.ui.alertDialog({
-        title: "Task Manager",
-        message: "Psych Desktop Task Manager<br>Version " + this.version
-    });
-
-}
-
 this.executeKill = function(id) {
     if (desktop.app.getInstance(id).status != "killed") {
         if(desktop.app.kill(id)) {
-        api.ui.alertDialog({
-           	title: "Task Manager",
-            	message: "Instance " + id + " was killed sucessfully."
-        });
+        api.ui.notify("Instance " + id + " was killed sucessfully.");
 	}
 	else {
-		api.ui.alertDialog({title: "Task Manager", message: "Instance " + id + " was NOT killed sucessfully."});
+		api.ui.notify({
+			message: "Instance " + id + " was NOT killed sucessfully.",
+			type: "error"
+		});
 	}
     }
     else {
-        api.ui.alertDialog({
-            title: "Task Manager",
+        api.ui.notify({
+            type: "warning",
             message: "This process has already been killed or has exited."
         });
 

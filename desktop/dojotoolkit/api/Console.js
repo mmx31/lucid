@@ -2,7 +2,7 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
 dojo.provide("api.Console");
-dojo.requireLocalization("api", "filearea");
+dojo.requireLocalization("api", "console");
 /*
  * Class: api.Console
  * 
@@ -65,7 +65,7 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 			var n = dojo.i18n.getLocalization("api", "console");
 			this.stdout.innerHTML += n.helpHeader;
 			dojo.forEach(["reload", "ls", "cat", "mkdir", "rm", "rmdir", "ps", "kill", "clear", "logout"], function(a) {
-				var s = "&nbsp;&nbsp;"+a;
+				var s = a;
 				if(a == "ls"
 				|| a == "mkdir"
 				|| a == "rmdir") s += " ["+n.dir+"]";
@@ -74,6 +74,7 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 				if(a == "kill") s += " ["+n.instance+"]";
 				s += ("- "+n[a+"Help"] || "Oh noes, I forgot what this does");
 				var p = document.createElement("div");
+				dojo.style(p, "paddingLeft", "30px");
 				p.textContent = s;
 				this.stdout.appendChild(p);
 			}, this);

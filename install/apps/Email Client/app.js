@@ -7,6 +7,10 @@ this.init = function(args) {
 	dojo.require("dijit.form.Button");
 	dojo.require("dojox.grid.Grid");
 	dojo.require("dojo.data.ItemFileWriteStore");
+	dojo.requireLocalization("desktop", "common");
+	dojo.requireLocalization("desktop", "apps");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
+	var cm = dojo.i18n.getLocalization("desktop", "common");
 	api.addDojoCss("dojox/grid/_grid/Grid.css");
 	//I made this fake account to test it with...
 	this.prefs = new api.Registry({appid: this.id, name: "accounts", data: {
@@ -31,12 +35,12 @@ this.init = function(args) {
 		items: []
 	}});
 	this.win = new api.Window({
-		title: "Email Clent",
+		title: app["Email Client"],
 		onClose: dojo.hitch(this, this.kill)
 	});
 	this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
 	dojo.forEach([
-		{label: "Refresh", onClick: dojo.hitch(this, this.refresh)}
+		{label: cm.refresh, onClick: dojo.hitch(this, this.refresh)}
 	], function(args) {
 		this.toolbar.addChild(new dijit.form.Button(args));
 	}, this);
@@ -162,7 +166,7 @@ this._refreshHost = function(rootitem, mail) {
 	}));
 }
 this.kill = function() {
-	if(!this.win.closed) this.win.close();
+	if(this.win && !this.win.closed) this.win.close();
 	this.treeStore.close();
 	this.prefs.close();
 	dojo.forEach(this.mail, function(mail) { mail.down.destroy(); mail.up.destroy(); });

@@ -6,8 +6,10 @@ this.init = function() {
 	dojo.require("dijit.form.Button");
 	dojo.require("dijit.form.TextBox");
 	dojo.require("dijit.layout.ContentPane");
+	dojo.requireLocalization("desktop", "apps");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
 	var win = this.win = new api.Window({
-		title: "Calculator",
+		title: app["Calculator"],
 		width: "200px",
 		height: "270px",
 		onClose: dojo.hitch(this, "kill")

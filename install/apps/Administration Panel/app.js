@@ -24,8 +24,10 @@ this.init = function(args)
 	dojo.require("dojox.widget.FileInputAuto");
 	api.addDojoCss("dojox/grid/_grid/Grid.css");
 	api.addDojoCss("dojox/widget/FileInput/FileInput.css");
+	dojo.requireLocalization("desktop", "apps");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
 	//make window
-	this.win = new api.Window({title: "Administration Panel", width: "500px", height: "400px", onClose: dojo.hitch(this, "kill")});
+	this.win = new api.Window({title: app["Administration Panel"], width: "500px", height: "400px", onClose: dojo.hitch(this, "kill")});
 	var split = new dijit.layout.SplitContainer({sizerWidth: 7, orientation: "horizontal", layoutAlign: "client"});
 	var pane = new dijit.layout.ContentPane({sizeMin: 10, sizeShare: 20}, document.createElement("div"));
 		var menu = new dijit.Menu({});

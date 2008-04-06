@@ -2,8 +2,10 @@ this.init = function(args)
 {
 	dojo.require("dojox.gfx");
 	dojo.require("dojox.gfx.move");
+	dojo.requireLocalization("desktop", "apps");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
 	this.win = new api.Window({
-		title: "Checkers",
+		title: app["Checkers"],
 		width: "400px",
 		height: "400px",
 		resizable: false,

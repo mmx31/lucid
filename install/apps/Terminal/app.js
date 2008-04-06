@@ -1,8 +1,10 @@
 this.init = function(args)
 {
 	dojo.require("dijit.layout.LayoutContainer");
+	dojo.requireLocalization("desktop", "apps");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
 	this.win = new api.Window({
-		title: "Terminal",
+		title: app["Terminal"],
 		onClose: dojo.hitch(this, this.kill)
 	});
 	this.term = new api.Console({layoutAlign: "client", path: (args.path || "/")})

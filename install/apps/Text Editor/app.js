@@ -5,6 +5,8 @@ this.fileEditing = "";
 this.init = function(args) {
     dojo.require("dijit.Toolbar");
     dojo.require("dijit.layout.ContentPane");
+	dojo.requireLocalization("desktop", "common");
+	dojo.requireLocalization("desktop", "apps");
     if (args.file) {
         this.start();
         this._processOpen(args.file);
@@ -25,41 +27,39 @@ this.kill = function() {
 }
 
 this.start = function() {
+	var cm = dojo.i18n.getLocalization("desktop", "common");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
     this.window = new api.Window({
+		title: app["Text Editor"],
         onClose: dojo.hitch(this, this.kill)
     });
     var toolbar = new dijit.Toolbar({
         layoutAlign: "top"
     });
     toolbar.addChild(new dijit.form.Button({
-        label: "New",
+        label: cm["new"],
         onClick: dojo.hitch(this, this.processNew),
         iconClass: "icon-16-actions-document-open"
     }));
     toolbar.addChild(new dijit.form.Button({
-        label: "Open",
+        label: cm.open,
         onClick: dojo.hitch(this, this.processOpen),
         iconClass: "icon-16-actions-document-open"
     }));
     toolbar.addChild(new dijit.form.Button({
-        label: "Save",
+        label: cm.save,
         onClick: dojo.hitch(this, this.processSave),
         iconClass: "icon-16-actions-document-save"
     }));
     toolbar.addChild(new dijit.form.Button({
-        label: "Save As",
+        label: cm.saveAs,
         onClick: dojo.hitch(this, this.processSaveAs),
         iconClass: "icon-16-actions-document-save-as"
     }));
     toolbar.addChild(new dijit.form.Button({
-        label: "Close",
+        label: cm.close,
         onClick: dojo.hitch(this, this.processClose),
         iconClass: "icon-16-actions-process-stop"
-    }));
-    toolbar.addChild(new dijit.form.Button({
-        label: "Exit",
-        onClick: dojo.hitch(this, this.kill),
-        iconClass: "icon-16-actions-system-log-out"
     }));
     this.window.addChild(toolbar);
     var box = new dijit.layout.ContentPane({
@@ -80,7 +80,6 @@ this.start = function() {
     this.other.setContent("No file open");
     this.window.addChild(box);
     this.window.addChild(this.other);
-    this.window.title = "Text Editor";
     this.window.width = "320px";
     this.window.height = "305px";
     this.window.show();

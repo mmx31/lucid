@@ -4,8 +4,10 @@ this.init = function(args) {
 	dojo.require("dijit.form.Slider");
 	dojo.require("dijit.layout.LayoutContainer");
 	dojo.require("dijit.layout.ContentPane");
+	dojo.requireLocalization("desktop", "apps");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
 	this.win = new api.Window({
-		title: "Music Player",
+		title: app["Music Player"],
 		width: "500px",
 		height: "150px",
 		onClose: dojo.hitch(this, this.kill)

@@ -12,34 +12,41 @@ this.init = function(args) {
 	dojo.require("dijit.layout.ContentPane");
 	dojo.require("dojo.parser");
 	dojo.require("dijit.Editor");
+	dojo.requireLocalization("desktop", "common");
+	dojo.requireLocalization("desktop", "apps");
+	
+	var cm = dojo.i18n.getLocalization("desktop", "common");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
+	
     this.window = new api.Window({
+		title: app["Word Processor"],
         onClose: dojo.hitch(this, this.kill)
     });
     var toolbar = new dijit.Toolbar({
         layoutAlign: "top"
     });
     toolbar.addChild(new dijit.form.Button({
-        label: "New",
+        label: cm["new"],
         onClick: dojo.hitch(this, this.processNew),
         iconClass: "icon-16-actions-document-open"
     }));
     toolbar.addChild(new dijit.form.Button({
-        label: "Open",
+        label: cm.open,
         onClick: dojo.hitch(this, this.processOpen),
         iconClass: "icon-16-actions-document-open"
     }));
     toolbar.addChild(new dijit.form.Button({
-        label: "Save",
+        label: cm.save,
         onClick: dojo.hitch(this, this.processSave),
         iconClass: "icon-16-actions-document-save"
     }));
     toolbar.addChild(new dijit.form.Button({
-        label: "Save As",
+        label: cm.saveAs,
         onClick: dojo.hitch(this, this.processSaveAs),
         iconClass: "icon-16-actions-document-save-as"
     }));
     toolbar.addChild(new dijit.form.Button({
-        label: "Close",
+        label: cm.close,
         onClick: dojo.hitch(this, this.processClose),
         iconClass: "icon-16-actions-process-stop"
     }));
@@ -55,7 +62,6 @@ this.init = function(args) {
     document.createElement("div"));
     this.other.setContent("No file open");
     this.window.addChild(this.other);
-    this.window.title = "HTML Editor";
     var editor = this.editor = new dijit.Editor({layoutAlign: "client"}, document.body.appendChild(document.createElement("div")));
 	editor.startup();
 	this.window.addChild(editor);
@@ -87,7 +93,7 @@ this.processNew = function() {
 }
 this.processClose = function() {
     this.editor.setDisabled(true);
-    this.editor.replaceValue("<b>Open</b> or <b>Create</b> a file.");
+    this.editor.replaceValue("");
     this.newAs = false;
     this.editing = false;
     this.fileEditing = "";

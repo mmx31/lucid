@@ -6,14 +6,18 @@ this.imgNode = false;
 this.init = function(args) {
 	dojo.require("dijit.Toolbar");
 	dojo.require("dojox.layout.DragPane");
+	dojo.requireLocalization("desktop", "common");
+	dojo.requireLocalization("desktop", "apps");
+	var cm = dojo.i18n.getLocalization("desktop", "common");
+	var app = dojo.i18n.getLocalization("desktop", "apps");
 	this.win = new api.Window({
-		title: "Image Viewer",
+		title: app["Image Viewer"],
 		onClose: dojo.hitch(this, "kill")
 	});
 	var toolbar = new dijit.Toolbar({layoutAlign: "top"});
 	dojo.forEach([
 		{
-			label: "Open",
+			label: cm.open,
 	        iconClass: "icon-16-actions-document-open",
 			onClick: dojo.hitch(this, function() {
 				api.ui.fileDialog({
