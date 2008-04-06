@@ -164,7 +164,7 @@
 				$templine = '';
 				$file2 = fopen("./apps/$file/$installfile", "r");
 				while(!feof($file2)) {
-					$templine = $templine . fgets($file2, 4096);
+					$templine = $templine . fread($file2, 4096);
 				}
 				fclose ($file2); 
 				$app->code = $templine;

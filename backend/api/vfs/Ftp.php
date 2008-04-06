@@ -5,9 +5,10 @@ class FtpFs extends BaseFs {
 	var $path = ".";
 	function _startup() {
 		$this->_link = ftp_connect($this->hostname, $this->port);
-		if($this->username != "") $login = ftp_login($this->_link, $this->username, $this->password);
+		if(!is_null($this->username)) $login = ftp_login($this->_link, $this->username, $this->password);
 		else $login = ftp_login($this->_link, "anonymous", "anonymous");
 		if((!$this->_link) || (!$login)) internal_error("generic_err", $this->_link ? "Authentication Error" : "Connection Error");
+		@ftp_pasv($this->_link,true);
 	}
 	function __destroy() {
 		ftp_close($this->_link);
@@ -40,21 +41,27 @@ class FtpFs extends BaseFs {
 		$list = ftp_nlist($this->_link, ".");
 		$arr = array();
 		foreach($list as $dir) {
-			array_push($arr, $this->_getFileInfo($path . ($path[count($path)-1] == "/" ? "" : "/") . $dir));
+			array_push($arr, $this->_getFileInfo($path . "/" . $dir));
 		}
 		return $arr;
 	}
 	function _read($path) {
+		$this->_chdir(dirname($path));
 		$tmpFile =  tmpfile();
-		ftp_fget($this->_link, $tmpFile, $path);
-		$content = stream_get_contents($tmpFile);
+		ftp_fget($this->_link, $tmpFile, basename($path), FTP_BINARY);
+		$content = "";
+		fseek($tmpFile, 0);
+		while(!feof($tmpFile)) {
+			$content = $content . fread($tmpFile, 4096);
+		}
 		fclose($tmpFile);
 		return $content;
 	}
 	function _write($path, $content) {
 		$tmpFile = tmpfile();
 		fwrite($tmpFile, $content);
-		$ret = ftp_fput($this->_link, $path, $tmpFile);
+		fseek($tmpFile, 0);
+		$ret = ftp_fput($this->_link, $path, $tmpFile, FTP_BINARY);
 		fclose($tmpFile);
 		return $ret;
 	}
