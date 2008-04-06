@@ -17,11 +17,14 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 require("../lib/includes.php");
+import("models.user");
 if($_GET['section'] == "check")
 {
 	if($_GET['action'] == "loggedin")
 	{
-		$out = new intOutput($_SESSION['userloggedin'] === true ? "ok" : "generic_err");
+		$c = $User->get_current();
+		$out = new intOutput($c !== false ? "ok" : "generic_err");
+		if($c !== false) $c->writeLocaleCookie();
 	}
 }
 ?>

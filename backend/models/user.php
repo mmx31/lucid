@@ -79,7 +79,7 @@
 				$locale = Zend_Json::decode($conf[0]->value);
 				$locale = $locale['locale'];
 			}
-			setcookie("desktopLocale", $locale, 0, "/");
+			setcookie("desktopLocale", $locale, 0, dirname($GLOBALS['path']));
 		}
 		function logout()
 		{

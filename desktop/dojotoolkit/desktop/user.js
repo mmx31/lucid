@@ -8,7 +8,8 @@ desktop.user = new function() {
 	this.init = function() {
 		this.beforeUnloadEvent = dojo.addOnUnload(function(e)
 		{
-			desktop.user.logout();
+			desktop.config.save(true);
+			//desktop.user.logout();
 		});
 	}
 	/*

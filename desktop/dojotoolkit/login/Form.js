@@ -9,12 +9,14 @@ dojo.require("dijit.Dialog");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.form.CheckBox");
 dojo.require("dojox.validate.web");
+dojo.require("dojo.cookie");
 
 dojo.declare("login.Form", dijit.form.Form, {
 	templateString: null,
 	templatePath: dojo.moduleUrl("login", "Form.html"),
 	_popup: null,
 	preload: true,
+	autoRedirect: false,
 	postCreate: function() {
 		this.inherited(arguments);
 		new dijit.form.TextBox({
@@ -26,12 +28,13 @@ dojo.declare("login.Form", dijit.form.Form, {
 		}, this.passwordInputNode);
 		new dijit.form.RadioButton({
 			name: "windowAct",
-			checked: true,
+			checked: (dojo.cookie("desktopWindowPref") != "current"),
 			value: "new"
 		}, this.newWindowNode);
 		new dijit.form.RadioButton({
 			name: "windowAct",
-			value: "current"
+			value: "current",
+			checked: (dojo.cookie("desktopWindowPref") == "current")
 		}, this.currentWindowNode);
 		if(this.preloadDesktop) {
 			var ontype = dojo.connect(this.domNode, "onkeydown", this, function() {
@@ -40,6 +43,56 @@ dojo.declare("login.Form", dijit.form.Form, {
 					url: dojo.baseUrl+"../desktop/desktop.js"
 				});
 			})
+		}
+		dojo.xhrGet({
+			url: dojo.baseUrl + "../../../backend/core/bootstrap.php?section=check&action=loggedin",
+			load: dojo.hitch(this, function(data) {
+				if(data == 0) {
+					if(this.autoRedirect) {
+						if(dojo.cookie("desktopWindowPref") == "current") {
+							this.errorNode.innerHTML = "You are allready logged in. Redirecting to desktop...";
+							this.submitNode.disabled = true;
+							window.location = dojo.baseUrl+"../../index.html";
+						}
+						else {
+							if (this._popUp()) {
+								this.errorNode.innerHTML = "You are allready logged in. Window opened.";
+								this.submitNode.disabled = true;
+								this._winCheck();
+							}
+							else {
+								this.errorNode.innerHTML = "Your popup blocker is blocking the window. <a href='" + dojo.baseUrl + "../../index.html'>Click here</a> to try again.";
+								dojo.query("a", this.errorNode).forEach(function(elem) {
+									elem.href="javascript:void(0);";
+									dojo.connect(elem, "onclick", this, "onLinkClick");
+								});
+							}
+						}
+					}
+					else 
+						this.errorNode.innerHTML = "You are allready logged in. <a href='" + dojo.baseUrl + "../../index.html'>Click here</a> to continue to the desktop.";
+						dojo.query("a", this.errorNode).forEach(function(elem) {
+							elem.href="javascript:void(0);";
+							dojo.connect(elem, "onclick", this, "onLinkClick");
+						});
+				}
+			})
+		})
+	},
+	onLinkClick: function() {
+		if(dojo.cookie("desktopWindowPref") == "current") {
+			window.location = dojo.baseUrl+"../../index.html";
+		}
+		else {
+			if (this._popUp()) {
+			}
+			else {
+				this.errorNode.innerHTML = "Your popup blocker is blocking the window. <a href='" + dojo.baseUrl + "../../index.html'>Click here</a> to try again.";
+				dojo.query("a", this.errorNode).forEach(function(elem) {
+					elem.href="javascript:void(0);";
+					dojo.connect(elem, "onclick", this, "onLinkClick");
+				});
+			}
 		}
 	},
 	_winCheck: function() {
@@ -62,7 +115,9 @@ dojo.declare("login.Form", dijit.form.Form, {
 	},
 	onSubmit: function(e) {
 		dojo.stopEvent(e);
+		if(this.submitNode.disabled == true) return;
 		var contents = this.getValues();
+		dojo.cookie("desktopWindowPref", contents.windowAct);
 		this.errorNode.innerHTML = "";
 		this.submitNode.disabled=true;
 		if(contents.username && contents.password)
