@@ -5,7 +5,7 @@
 	"Utilities": "Utilities",
 	"Menu": "Menu",
 	"Menubar": "Menubar",
-	"Seperator": "Seperator",
+	"Separator": "Separator",
 	"Clock": "Clock",
 	"Netmonitor": "Netmonitor",
 	"Taskbar": "Taskbar"

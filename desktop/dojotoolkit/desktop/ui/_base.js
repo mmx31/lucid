@@ -24,7 +24,7 @@ dojo.require("desktop.ui.applets.Clock");
 dojo.require("desktop.ui.applets.Menu");
 dojo.require("desktop.ui.applets.Menubar");
 dojo.require("desktop.ui.applets.Netmonitor");
-dojo.require("desktop.ui.applets.Seperator");
+dojo.require("desktop.ui.applets.Separator");
 dojo.require("desktop.ui.applets.Taskbar");
 
 dojo.requireLocalization("desktop.ui", "appearance");
@@ -665,5 +665,5 @@ desktop.ui.appletList = {
 		"Accessories": ["Clock"],
 		"Desktop & Windows": ["Taskbar"],
 		"System": ["Netmonitor"],
-		"Utilities": ["Menu", "Menubar", "Seperator"]
+		"Utilities": ["Menu", "Menubar", "Separator"]
 }

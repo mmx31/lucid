@@ -13,7 +13,7 @@
 	"import": "Importación",
 	"upload": "Sube archivos",
 	"download": "Descarge",
-	"up": "Subir",
+	"up": "Sube",
 	"refresh": "Actualizar",
 	"yes": "Sí",
 	"no": "No",
