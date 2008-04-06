@@ -44,6 +44,9 @@ dojo.declare("login.Form", dijit.form.Form, {
 				});
 			})
 		}
+		this.checkForLogin();
+	},
+	checkForLogin: function() {
 		dojo.xhrGet({
 			url: dojo.baseUrl + "../../../backend/core/bootstrap.php?section=check&action=loggedin",
 			load: dojo.hitch(this, function(data) {
@@ -100,6 +103,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 		else {
 			this.submitNode.disabled=false;
 			this.errorNode.innerHTML = "";
+			this.checkForLogin();
 		}
 	},
 	_popUp: function()
