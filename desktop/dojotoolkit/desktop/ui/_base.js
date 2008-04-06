@@ -29,6 +29,7 @@ dojo.require("desktop.ui.applets.Taskbar");
 
 dojo.requireLocalization("desktop.ui", "appearance");
 dojo.requireLocalization("desktop.ui", "accountInfo");
+dojo.requireLocalization("desktop", "languages");
 dojo.requireLocalization("desktop", "common");
 
 /*
@@ -465,6 +466,12 @@ dojo.mixin(desktop.ui, {
 			
 			var general = new dijit.layout.ContentPane({title: l.general});
 			
+			var langs = [];
+			var intLangs = dojo.i18n.getLocalization("desktop", "languages");
+			for(key in intLangs) {
+				langs.push({value: key, label: intLangs[key]});
+			}
+			
 			var rows = {
 				name: {
 					widget: "TextBox",
@@ -488,10 +495,7 @@ dojo.mixin(desktop.ui, {
 							data: {
 								identifier: "value",
 								label: "label",
-								items: [
-									{label: "English", value: "en"},
-									{label: "Spanish", value: "es"}
-								]
+								items: langs
 							}
 						})
 					}
@@ -544,7 +548,11 @@ dojo.mixin(desktop.ui, {
 							args.email = elem.getValue();
 							break;
 						case "language":
+							var oldLocale = desktop.config.locale;
 							desktop.config.locale = elem.getValue();
+							if(oldLocale != desktop.config.locale) {
+								api.ui.notify(l.restartDesktopForLangChange);
+							}
 							break;
 					}
 				}

@@ -23,6 +23,7 @@
 	"action": "Action",
 	"vendor": "Vendor",
 	"unknown": "(Unknown)",
+	"restartDesktopForLangChange": "You must restart the desktop for the language change to occur",
 	"passwordDirections": "To change your password, enter your current password in the field below and click <b>Authenticate</b>.<br />After you have authenticated, enter your new password, retype it for verification and click <b>Change Password</b>",
 	"sudoExplination": "An application is attempting to perform an action which requires privileges. Authentication is required to perform this action."
 })
