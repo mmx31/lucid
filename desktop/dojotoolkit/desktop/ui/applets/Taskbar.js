@@ -13,6 +13,10 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 	_storeconnects: [],
 	postCreate: function() {
 		dojo.addClass(this.containerNode, "desktopTaskbarApplet");
+		var tbl = document.createElement("table");
+		var tr = this.trNode = document.createElement("tr");
+		tbl.appendChild(tr);
+		this.containerNode.appendChild(tbl);
 		this.inherited("postCreate", arguments);
 	},
 	startup: function() {
@@ -42,7 +46,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 	},
 	onNew: function(item) {
 		var store = desktop.ui._windowList;
-		var domNode=document.createElement("div");
+		var domNode=document.createElement("td");
 		dojo.addClass(domNode, "taskBarItem");
 		if(this.getParent().getOrientation() == "horizontal") dojo.addClass(domNode, "taskBarItemHorizontal");
 		else dojo.addClass(domNode, "taskBarItemVertical");
@@ -59,7 +63,11 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		
 		this._buttons[store.getValue(item, "id")] = domNode;
 		this._labels[store.getValue(item, "id")] = labelNode;
-		this.containerNode.appendChild(domNode);
+		this.trNode.appendChild(domNode);
+		if(desktop.config.fx > 0) {
+			dojo.style(domNode, "opacity", 0);
+			dojo.fadeIn({node: domNode, duration: desktop.config.window.animSpeed}).play();
+		}
 	},
 	onDelete: function(item) {
 		var node = this._buttons[item.id[0]];
@@ -71,7 +79,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		if (desktop.config.fx >= 1) {
 			var fade = dojo.fadeOut({
 				node: node,
-				duration: 200
+				duration: desktop.config.window.animSpeed
 			});
 			var slide = dojo.animateProperty({
 				node: node,

@@ -286,3 +286,21 @@ margin: 0px;
 	opacity: 0.8;
 	filter: alpha(opacity=80);
 }
+
+/* taskbar */
+
+.taskBarItem {
+	cursor: pointer;
+	font-size: 10pt;
+	white-space: nowrap;
+	text-align: center;
+	overflow: hidden;
+}
+
+.taskBarItem img {
+	vertical-align: middle;
+	margin-right: 5px;
+	margin-left: 5px;	
+	height: 16px;
+	width: 16px;
+}

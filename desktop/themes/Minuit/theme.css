@@ -25,20 +25,14 @@ html, body {
 }
 
 .taskBarItem {
-	display: inline;
 	background-image: url(./images/task_sel.png);
 	background-repeat: no-repeat;
 	margin-right: 5px;
 	margin: 0px;
 	padding: 2px;
-	cursor: pointer;
 	height: 24px;
 	width: 165px;
 	font-size: 10pt;
-	white-space: nowrap;
-	text-align: center;
-	float: left;
-	overflow: hidden;
 	color: white;
 }
 
