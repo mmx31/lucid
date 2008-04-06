@@ -19,7 +19,7 @@ class FtpFs extends BaseFs {
 			foreach($dirs as $dir) {
 				if($dir != "") {
 					$cd = ftp_chdir($this->_link, $dir);
-					if(!$cd) return false;
+					if(!$cd) internal_error("generic_err", "path does not exist");
 				}
 			}
 		}
@@ -68,6 +68,31 @@ class FtpFs extends BaseFs {
 	function _createDirectory($path) {
 		$this->_chdir(dirname($path));
 		return ftp_mkdir($this->_link, basename($path));
+	}
+	function _copy($oldpath, $newpath) {
+		$content = $this->_read($oldpath);
+		return $this->_write($newpath, $content);
+	}
+	function _rename($oldpath, $newpath) {
+		$content = $this->_read($oldpath);
+		$w = $this->_write($newpath, $content);
+		$d = $this->_remove($oldpath);
+		return ($w && $d);
+	}
+	function _remove($path) {
+		$this->_chdir(dirname($path));
+		$this->_deltree(basename($path));
+	}
+	function _deltree($path)
+	{
+		if (!(@ftp_rmdir($this->_link, $path) || @ftp_delete($this->_link, $path)))
+		{
+			$list = ftp_nlist($this->_link, $path);
+			if (!empty($list))
+			foreach($list as $value)
+			$this->_deltree($value);
+		}
+		@ftp_rmdir($this->_link, $path);
 	}
 }
 ?>
