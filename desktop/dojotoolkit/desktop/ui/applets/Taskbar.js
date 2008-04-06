@@ -10,14 +10,14 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 	fullspan: true,
 	_buttons: {},
 	_labels: {},
-	_connects: [],
+	_storeconnects: [],
 	postCreate: function() {
 		dojo.addClass(this.containerNode, "desktopTaskbarApplet");
 		this.inherited("postCreate", arguments);
 	},
 	startup: function() {
 		var store = desktop.ui._windowList;
-		this._connects = [
+		this._storeconnects = [
 			dojo.connect(store, "onNew", this, "onNew"),
 			dojo.connect(store, "onDelete", this, "onDelete"),
 			dojo.connect(store, "onSet", this, "onSet")
@@ -27,7 +27,9 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		});
 	},
 	uninitialize: function() {
-		dojo.forEach(this._connects, dojo.disconnect, dojo);
+		dojo.forEach(this._storeconnects, function(e) {
+			dojo.disconnect(e);
+		});
 		this.inherited("uninitialize", arguments);
 	},
 	onSet: function(item, attribute, oldValue, v) {
