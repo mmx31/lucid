@@ -7,6 +7,6 @@
 	"Menubar": "Barra de menú",
 	"Separator": "Separador",
 	"Clock": "Reloj",
-	"Netmonitor": "Red de seguimiento",
-	"Taskbar": "Barra de tareas"
+	"Network Monitor": "Red de seguimiento",
+	"Window List": "Ventana de lista"
 })

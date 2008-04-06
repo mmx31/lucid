@@ -7,6 +7,6 @@
 	"Menubar": "Menubar",
 	"Separator": "Separator",
 	"Clock": "Clock",
-	"Netmonitor": "Netmonitor",
-	"Taskbar": "Taskbar"
+	"Network Monitor": "Network Monitor",
+	"Window List": "Window List"
 })
