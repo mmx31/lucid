@@ -8,6 +8,8 @@ dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
 dojo.require("dojo.dnd.Source");
 dojo.require("dijit.Menu");
+dojo.requireLocalization("desktop", "common");
+dojo.requireLocalization("api", "filearea");
 
 /*
  * Class: api.Filearea
@@ -61,11 +63,13 @@ dojo.declare(
 	forDesktop: false,
 	templatePath: dojo.moduleUrl("api", "templates/Filearea.html"),
 	postCreate: function() {
+		var nc = dojo.i18n.getLocalization("desktop", "common");
+		var nf = dojo.i18n.getLocalization("api", "filearea");
 		this.menu = new dijit.Menu({});
-		this.menu.addChild(new dijit.MenuItem({label: "Create Folder", iconClass: "icon-16-actions-folder-new", onClick: dojo.hitch(this, this._makeFolder)}));
-		this.menu.addChild(new dijit.MenuItem({label: "Create File", iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, this._makeFile)}));
+		this.menu.addChild(new dijit.MenuItem({label: nf.createFolder, iconClass: "icon-16-actions-folder-new", onClick: dojo.hitch(this, this._makeFolder)}));
+		this.menu.addChild(new dijit.MenuItem({label: nf.createFile, iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, this._makeFile)}));
 		this.menu.addChild(new dijit.MenuSeparator({}));
-		this.menu.addChild(new dijit.MenuItem({label: "Refresh", iconClass: "icon-16-actions-view-refresh", onClick: dojo.hitch(this, this.refresh)}));
+		this.menu.addChild(new dijit.MenuItem({label: cm.refresh, iconClass: "icon-16-actions-view-refresh", onClick: dojo.hitch(this, this.refresh)}));
 		this.source = new dojo.dnd.Source(this.domNode, {
 			horizontal: !this.forDesktop,
 			accept: ["dir", "item"],
@@ -144,9 +148,10 @@ dojo.declare(
 	 * 		Alert the user if that dir allready exists
 	 */
 	_makeFolder: function() {
+		var nf = dojo.i18n.getLocalization("api", "filearea");
 		api.ui.inputDialog({
-			title: "New Folder",
-			message: "Enter the new folder's name.<br />Be careful, providing an existing name will overwrite that folder.",
+			title: nf.createFolder,
+			message: nf.createFolderText,
 			callback: dojo.hitch(this, function(dirname) {
 				if(dirname == "") return;
 				api.fs.mkdir({
@@ -165,9 +170,10 @@ dojo.declare(
 	 * 		Alert the user if that file allready exists
 	 */
 	_makeFile: function() {
+		var nf = dojo.i18n.getLocalization("api", "filearea");
 		api.ui.inputDialog({
-			title: "New File",
-			message: "Enter the new file's name.<br />Be careful, providing an existing name will overwrite that file.",
+			title: nf.createFile,
+			message: nf.createFileText,
 			callback: dojo.hitch(this, function(filename) {
 				if(filename == "") return;
 				api.fs.write({
@@ -492,31 +498,33 @@ dojo.declare(
 		this.highlighted = false;
 	},
 	startup: function() {
+		var nc = dojo.i18n.getLocalization("desktop", "common");
+		var nf = dojo.i18n.getLocalization("api", "filearea");
 		this.menu = new dijit.Menu({});
-	       	this.menu.addChild(new dijit.MenuItem({label: "Open", iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
-			menuDl = new dijit.PopupMenuItem({iconClass: "icon-16-actions-document-open", label: "Download"});
+	       	this.menu.addChild(new dijit.MenuItem({label: nc.open, iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
+			menuDl = new dijit.PopupMenuItem({iconClass: "icon-16-actions-document-open", label: nc.download});
 			this.menu2 = new dijit.Menu({parentMenu: menuDl});
-			if(!this.isDir) { this.menu2.addChild(new dijit.MenuItem({label: "as file", onClick: dojo.hitch(this, function(e) {
+			if(!this.isDir) { this.menu2.addChild(new dijit.MenuItem({label: nf.asFile, onClick: dojo.hitch(this, function(e) {
 				api.fs.download(this.path);
 			})}));
-			this.menu2.addChild(new dijit.MenuItem({label: "as ZIP (ZIP)",onClick: dojo.hitch(this, function(e) {
+			this.menu2.addChild(new dijit.MenuItem({label: nf.asZip ,onClick: dojo.hitch(this, function(e) {
 				api.fs.compressDownload(this.path, "zip");
 			})}));
-			this.menu2.addChild(new dijit.MenuItem({label: "as TGZ (GZIP)", onClick: dojo.hitch(this, function(e) {
+			this.menu2.addChild(new dijit.MenuItem({label: nf.asTgz, onClick: dojo.hitch(this, function(e) {
 				api.fs.compressDownload(this.path, "gzip");
 			})}));
-			this.menu2.addChild(new dijit.MenuItem({label: "as TBZ2 (BZIP)", onClick: dojo.hitch(this, function(e) {
+			this.menu2.addChild(new dijit.MenuItem({label: nf.asTbz2, onClick: dojo.hitch(this, function(e) {
 				api.fs.compressDownload(this.path, "bzip");
 			})}));
 			}
 			if(this.isDir) {
-				this.menu2.addChild(new dijit.MenuItem({label: "as ZIP (ZIP)", onClick: dojo.hitch(this, function(e) {
+				this.menu2.addChild(new dijit.MenuItem({label: nf.asZip, onClick: dojo.hitch(this, function(e) {
 					api.fs.downloadFolder(this.path, "zip");
 				})}));
-				this.menu2.addChild(new dijit.MenuItem({label: "as TGZ (GZIP)", onClick: dojo.hitch(this, function(e) {
+				this.menu2.addChild(new dijit.MenuItem({label: nf.asTgz, onClick: dojo.hitch(this, function(e) {
 					api.fs.downloadFolder(this.path, "gzip");
 				})}));
-				this.menu2.addChild(new dijit.MenuItem({label: "as TBZ2 (BZIP)", onClick: dojo.hitch(this, function(e) {
+				this.menu2.addChild(new dijit.MenuItem({label: nf.asTbz2, onClick: dojo.hitch(this, function(e) {
 					api.fs.downloadFolder(this.path, "bzip");
 				})}));
 			}

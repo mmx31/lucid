@@ -1,0 +1,23 @@
+({
+	"helpHeader": "--Consola de Psych Desktop--<br />Puedes escribir cualquier javascript quiera evaluar esta consola.<br />O, puede usar estos comandos:<br />",
+	"reloadHelp": "Volver a cargar el escritorio sin necesidad de acceder a",
+	"lsHelp": "En la lista de archivos [dir]",
+	"catHelp": "Leer el archivo [archivo] y de impresión a cabo en la consola",
+	"mkdirHelp": "Crea el directorio [dir]",
+	"rmHelp": "Elimina el archivo [archivo]",
+	"rmdirHelp": "Elimina el directorio [dir]",
+	"psHelp": "Mostrar los procesos activos",
+	"killHelp": "Mata a una instancia/pid",
+	"clearHelp": "Claro la consola",
+	"logoutHelp": "Registros que de los de escritorio",
+	"instance": "instancia",
+	"file": "archivo",
+	"dir": "dir",
+	"usage": "usado",
+	"sysCannotBeKilled": "Sistema no puede estar muerto",
+	"procKilled": "Proceso muertos",
+	"procKillFail": "Proceso no matar",
+	"needDirName": "Necesitamos un nombre de directorio!",
+	"needFileName": "Necesitamos un nombre de archivo!",
+	"unknownError": "Un error desconocido ha ocurridoUn error desconocido ha ocurrido"
+})

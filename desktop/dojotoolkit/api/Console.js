@@ -2,6 +2,7 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
 dojo.provide("api.Console");
+dojo.requireLocalization("api", "filearea");
 /*
  * Class: api.Console
  * 
@@ -61,40 +62,45 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		help: function(params)
 		{
-			this.stdout.innerHTML += "--Psych Desktop Console--<br />";
-			this.stdout.innerHTML += "You can type any javascript you want to evaluate this console.<br />";
-			this.stdout.innerHTML += "Or, you can use these commands:<br />";
-			this.stdout.innerHTML += "&nbsp;&nbsp;reload- reload the desktop without logging out<br />";
-			this.stdout.innerHTML += "&nbsp;&nbsp;ls [dir]- list files in [dir]<br />";
-			this.stdout.innerHTML += "&nbsp;&nbsp;cat [file]- read the file [file]<br />";
-			this.stdout.innerHTML += "&nbsp;&nbsp;mkdir [dir]- creates the directory [dir]<br />";
-			this.stdout.innerHTML += "&nbsp;&nbsp;rm [file]- removes the file [file]<br />";
-			this.stdout.innerHTML += "&nbsp;&nbsp;rmdir [dir]- removes the dir [dir]<br />";
-			this.stdout.innerHTML += "&nbsp;&nbsp;ps- show running processes<br />";
-			this.stdout.innerHTML += "&nbsp;&nbsp;kill [instance]- kills an instance/pid<br />";
-			this.stdout.innerHTML += "&nbsp;&nbsp;clear- clear the screen<br />";
-			this.stdout.innerHTML += "&nbsp;&nbsp;logout- logs you out of the desktop<br />";
+			var n = dojo.i18n.getLocalization("api", "console");
+			this.stdout.innerHTML += n.helpHeader;
+			dojo.forEach(["reload", "ls", "cat", "mkdir", "rm", "rmdir", "ps", "kill", "clear", "logout"], function(a) {
+				var s = "&nbsp;&nbsp;"+a;
+				if(a == "ls"
+				|| a == "mkdir"
+				|| a == "rmdir") s += " ["+n.dir+"]";
+				if(a == "cat"
+				|| a == "rm") s += " ["+n.file+"]";
+				if(a == "kill") s += " ["+n.instance+"]";
+				s += ("- "+n[a+"Help"] || "Oh noes, I forgot what this does");
+				var p = document.createElement("div");
+				p.textContent = s;
+				this.stdout.appendChild(p);
+			}, this);
+			
 		},
 		ps: function(params)
 		{
+			//TODO: use an actual table
 			this.stdout.innerHTML += "&nbsp;&nbsp;&nbsp;PID&nbsp;&nbsp;TTY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CMD<br />";
 			object = desktop.app.getInstances();
 			dojo.forEach(object, dojo.hitch(this, function(proc) {
 				if (typeof(proc) != "object") { }
 				else {
-				if(proc.status != "killed") {
-					this.stdout.innerHTML += "&nbsp;&nbsp;&nbsp;"+proc.instance+"&nbsp;&nbsp;&nbsp;&nbsp;pts/0&nbsp;&nbsp;&nbsp;"+proc.name+" (AppID: "+proc.appid+")<br />";
-				}
+					if(proc.status != "killed") {
+						this.stdout.innerHTML += "&nbsp;&nbsp;&nbsp;"+proc.instance+"&nbsp;&nbsp;&nbsp;&nbsp;pts/0&nbsp;&nbsp;&nbsp;"+proc.name+" (AppID: "+proc.appid+")<br />";
+					}
 				}
 			}));
 		},
 		kill: function(params)
 		{
-			if(params == "") { this.stdout.innerHTML += "kill: usage: kill [instance]<br />"; }
-			else if(params == "0") { this.stdout.innerHTML += "kill: system cannot be killed<br />"; }
+			var n = dojo.i18n.getLocalization("api", "console");
+			if(params == "") { this.stdout.innerHTML += "kill: "+n.usage+": kill ["+n.instance+"]<br />"; }
+			else if(params == "0") { this.stdout.innerHTML += "kill: "+n.sysCannotBeKilled+"<br />"; }
 			else {
-			if(desktop.app.kill(params) == 1) { this.stdout.innerHTML += "kill: process killed<br />"; }
-			else { this.stdout.innerHTML += "kill: process kill failed<br />"; }
+			if(desktop.app.kill(params) == 1) { this.stdout.innerHTML += "kill: "+n.procKilled+"<br />"; }
+			else { this.stdout.innerHTML += "kill: "+n.procKillFail+"<br />"; }
 			}
 		},
 		cd: function(params)
@@ -116,13 +122,14 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		ls: function(params)
 		{
+			var n = dojo.i18n.getLocalization("api", "console");
 			if(params == "") params = this.path;
 			api.fs.ls({path: params, callback: dojo.hitch(this, function(array)
 			{
 				var i = 0;
 				while(i < array.length) {
 					if(array[i].isDir == true) {
-						this.stdout.innerHTML +="[DIR] "+array[i].file + "<br />";
+						this.stdout.innerHTML +="["+n.dir+"] "+array[i].file + "<br />";
 					}
 					else {
 						this.stdout.innerHTML += array[i].file + "<br />";
@@ -134,8 +141,9 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		mkdir: function(params)
 		{
+			var n = dojo.i18n.getLocalization("api", "console");
 			if(params == "") {
-				this.stdout.innerHTML += "mkdir: need a dir name!<br />";
+				this.stdout.innerHTML += "mkdir: "+n.needDirName+"<br />";
 			}
 			else {
 				api.fs.mkdir({path: params});
@@ -143,8 +151,9 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		rm: function(params)
 		{
+			var n = dojo.i18n.getLocalization("api", "console");
 			if(params == "") {
-				this.stdout.innerHTML += "rm: need a file!<br />";
+				this.stdout.innerHTML += "rm: "+n.needFileName+"<br />";
 			}
 			else {
 				api.fs.rm({path: params});
@@ -152,8 +161,9 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		rmdir: function(params)
 		{
+			var n = dojo.i18n.getLocalization("api", "console");
 			if(params == "") {
-				this.stdout.innerHTML += "rmdir: need a directory!";
+				this.stdout.innerHTML += "rmdir: "+n.needDirName+"<br />";
 			}
 			else {
 				api.fs.rmdir({path: params});
@@ -161,8 +171,9 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		cat: function(params)
 		{
+			var n = dojo.i18n.getLocalization("api", "console");
 			if(params == "") {
-				this.stdout.innerHTML +="cat: need a file!<br />";
+				this.stdout.innerHTML +="cat: "+n.needFileName+"<br />";
 			}
 			else {
 				api.fs.read({path: this.path + params, callback: dojo.hitch(this, function(array)
@@ -262,7 +273,8 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 			this.domNode.scrollTop = this.domNode.scrollHeight;
 		}
 		catch(e){
-			if(!e) e='An unknown error has occurred';
+			var n = dojo.i18n.getLocalization("api", "console");
+			if(!e) e=n.unknownError;
 			this.stdout.innerHTML += e+'<br />\n';
 			this._input.value = '';
 			this.hist = this.history.length;

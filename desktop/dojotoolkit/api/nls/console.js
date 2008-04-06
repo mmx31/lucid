@@ -1,0 +1,23 @@
+({
+	"helpHeader": "--Psych Desktop Console--<br />You can type any javascript you want to evaluate this console.<br />Or, you can use these commands:<br />",
+	"reloadHelp": "reload the desktop without logging out",
+	"lsHelp": "list files in [dir]",
+	"catHelp": "read the file [file] and print it out onto the console",
+	"mkdirHelp": "creates the directory [dir]",
+	"rmHelp": "removes the file [file]",
+	"rmdirHelp": "removes the dir [dir]",
+	"psHelp": "show running processes",
+	"killHelp": "kills an instance/pid",
+	"clearHelp": "clear the screen",
+	"logoutHelp": "logs you out of the desktop",
+	"instance": "instance",
+	"file": "file",
+	"dir": "dir",
+	"usage": "usage",
+	"sysCannotBeKilled": "system cannot be killed",
+	"procKilled": "process killed",
+	"procKillFail": "process kill failed",
+	"needDirName": "need a dir name!",
+	"needFileName": "need a file name!",
+	"unknownError": "An unknown error has occurred"
+})
