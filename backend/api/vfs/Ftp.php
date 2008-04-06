@@ -65,5 +65,9 @@ class FtpFs extends BaseFs {
 		fclose($tmpFile);
 		return $ret;
 	}
+	function _createDirectory($path) {
+		$this->_chdir(dirname($path));
+		return ftp_mkdir($this->_link, basename($path));
+	}
 }
 ?>
