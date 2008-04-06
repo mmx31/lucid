@@ -15,6 +15,7 @@ dojo.require("dijit.layout.LayoutContainer");
 dojo.require("dijit.form.Slider");
 dojo.require("dijit.form.NumberSpinner");
 dojo.require("dijit.Menu");
+dojo.require("dojo.cookie");
 
 dojo.require("desktop.ui._appletMoveable");
 dojo.require("desktop.ui.Area");
@@ -405,8 +406,6 @@ dojo.mixin(desktop.ui, {
 			if(this.wallWin) return this.wallWin.bringToFront();
 			var win = this.wallWin = new api.Window({
 				title: l.appearancePrefs,
-				width: "600px",
-				height: "500px",
 				onClose: dojo.hitch(this, function() {
 					this.wallWin = false;
 				})
@@ -431,8 +430,6 @@ dojo.mixin(desktop.ui, {
 			if(this.accountWin) return this.accountWin.bringToFront();
 			var win = this.accountWin = new api.Window({
 				title: l.accountInfo,
-				width: "600px",
-				height: "500px",
 				onClose: dojo.hitch(this, function() {
 					this.accountWin = false;
 				})
@@ -551,6 +548,7 @@ dojo.mixin(desktop.ui, {
 							var oldLocale = desktop.config.locale;
 							desktop.config.locale = elem.getValue();
 							if(oldLocale != desktop.config.locale) {
+								dojo.cookie("desktopLocale", desktop.config.locale);
 								api.ui.notify(l.restartDesktopForLangChange);
 							}
 							break;
