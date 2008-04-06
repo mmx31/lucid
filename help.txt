@@ -1,3 +1,0 @@
-For all your help, installation and development needs, please see the trac.
-
-http://trac.psychdesktop.net
