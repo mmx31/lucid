@@ -26,11 +26,5 @@
 	"stop": "Stop",
 	"volume": "Volume",
 	"openFile": "Open File",
-	"openUrl": "Open URL",
-	"start": "Start",
-	"easy": "Easy",
-	"medium": "Medium",
-	"hard": "Hard",
-	"youLose": "You Loose!",
-	"youWin": "You Win!"
+	"openUrl": "Open URL"
 })

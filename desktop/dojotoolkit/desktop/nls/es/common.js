@@ -26,11 +26,5 @@
 	"stop": "Pare",
 	"volume": "Tomo",
 	"openFile": "Abra archivo",
-	"openUrl": "Abra URL",
-	"start": "Inicie",
-	"easy": "Fácil",
-	"medium": "Mediano",
-	"hard": "Difícil",
-	"youLose": "¡Usted Pierde!",
-	"youWin": "¡Usted gana!"
+	"openUrl": "Abra URL"
 })

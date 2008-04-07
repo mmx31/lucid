@@ -21,9 +21,9 @@
 		dojo.require("dijit.form.FilteringSelect");
 		dojo.require("dojo.data.ItemFileReadStore");
 		dojo.require("dojox.gfx");
-		dojo.requireLocalization("desktop", "common");
+		dojo.requireLocalization("desktop", "games");
 		dojo.requireLocalization("desktop", "apps");
-		var nls = dojo.i18n.getLocalization("desktop", "common");
+		var nls = dojo.i18n.getLocalization("desktop", "games");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		this.win = new api.Window({
 			title: app["MineSweep"],
@@ -242,7 +242,7 @@
 			width: (this.xSize*20), height: (this.ySize*20)
 		}).setFill([ 225,225,225,0.75 ]);
 		
-		var nls = dojo.i18n.getLocalization("desktop", "common");
+		var nls = dojo.i18n.getLocalization("desktop", "games");
 		this.resultMessage = this.surface.createText({
 			x: ((this.xSize * 20)/2), y: ((this.ySize * 20)/2),
 			text: nls.youLose,
@@ -261,7 +261,7 @@
 			width: (this.xSize*20), height: (this.ySize*20)
 		}).setFill([ 225,225,225,0.75 ]);
 
-		var nls = dojo.i18n.getLocalization("desktop", "common");
+		var nls = dojo.i18n.getLocalization("desktop", "games");
 		this.resultMessage = this.surface.createText({
 			x: ((this.xSize * 20)/2), y: ((this.ySize * 20)/2),
 			text: nls.youWin,
