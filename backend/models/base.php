@@ -227,15 +227,14 @@
 				$list = array();
 				foreach($field as $key => $value)
 				{
-					array_push($list, $this->_escape($key) . "=\"" . $this->_escape($value) . "\"");
+					array_push($list, $this->_escape($key) . "=" . $this->_link->quote($value) . "");
 				}
 				$query .= implode(" AND ", $list);
 			}
 			else {
-				$field = $this->_escape($field);
-				//TODO: format value's datatype accordingly
-				$value = $this->_escape($value);
-				$query = "SELECT * FROM ${tablename} WHERE ${field}=\"${value}\"";
+				$field = $this->_link->quoteIdentifier($field);
+				$value = $this->_link->quote($value);
+				$query = "SELECT * FROM ${tablename} WHERE ${field}=${value}";
 			}
 			$this->_query($query); 
 			$list = Array();
