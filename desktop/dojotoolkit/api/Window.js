@@ -316,7 +316,9 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			console.log("test");
 			this._width = dojo.style(win, "width");
 			this._height = dojo.style(win, "height");
-			var pos = dojo.coords(this._task.nodes[0], true);
+			var taskbar = dijit.byNode(dojo.query(".desktopTaskbarApplet")[0].parentNode);
+			if(taskbar) var pos = dojo.coords(taskbar._buttons[this.id], true);
+			else var pos = {x: 0, y: 0, w: 0, h: 0};
 			var anim = dojo.animateProperty({
 				node: this.domNode,
 				duration: desktop.config.window.animSpeed,
@@ -324,8 +326,8 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 					opacity: {end: 0},
 					top: {end: pos.y},
 					left: {end: pos.x},
-					height: {end: 26}, //TODO: is there a way of detecting this?
-					width: {end: 191} //and this?
+					height: {end: pos.h},
+					width: {end: pos.w}
 				},
 				easing: dojox.fx.easing.easeIn
 			});
@@ -585,7 +587,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			dojo.style(node, "width", (viewport.w - max.R - max.L)+"px");
 			dojo.style(node, "height", (viewport.h - max.B  - max.T)+"px");
 		}
-		else if(this.maximize && typeof args != "undefined") {
+		else if(this.maximized && typeof args != "undefined") {
 			var fx = desktop.config.fx;
 			desktop.config.fx = 0;
 			this.unmaximize();
@@ -594,12 +596,25 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		
 		// set margin box size, unless it wasn't specified, in which case use current size
 		if(args){
+			// Offset based on window border size
+			if(args.w) {
+				var calc = node.offsetWidth;
+				var c = this.containerNode.offsetWidth;
+				args.w = ((calc-c)+args.w);
+			}
+			if(args.h) {
+				var calc = node.offsetHeight;
+				var c = this.containerNode.offsetHeight;
+				args.h = ((calc-c)+args.h);
+			}
 			dojo.marginBox(node, args);
 
 			// set offset of the node
 			if(args.t){ node.style.top = args.t + "px"; }
 			if(args.l){ node.style.left = args.l + "px"; }
+			
 		}
+		
 		// If either height or width wasn't specified by the user, then query node for it.
 		// But note that setting the margin box and then immediately querying dimensions may return
 		// inaccurate results, so try not to depend on it.
@@ -607,14 +622,6 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 
 		// Save the size of my content box.
 		this._contentBox = dijit.layout.marginBox2contentBox(this.containerNode, mb);
-		
-		// Offset based on window border size
-		var calcWidth = this.domNode.offsetWidth;
-		var calcHeight = this.domNode.offsetHeight;
-		var bodyWidth = this.containerNode.offsetWidth;
-		var bodyHeight = this.containerNode.offsetHeight;
-		dojo.style(this.domNode, "width", ((calcWidth - bodyWidth)+calcWidth)+"px");
-		dojo.style(this.domNode, "height", ((calcHeight - bodyHeight)+calcHeight)+"px");
 		
 		// Callback for widget to adjust size of it's children
 		this.layout();

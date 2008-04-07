@@ -1,5 +1,4 @@
 dojo.provide("desktop.ui.applets.Taskbar");
-dojo.provide("desktop.ui.applets.Task");
 /*
  * Class: desktop.ui.applets.Taskbar
  * 
