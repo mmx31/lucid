@@ -90,7 +90,23 @@ desktop.app = new function()
 	 * internal method that gets the callback from the xhr made in fetchapp
 	 */
 	this._fetchApp = function(app, callback) {
-		this.apps[app.id] = new Function("\tthis.id = "+app.id+";\n\tthis.name = \""+app.name+"\";\n\tthis.version = \""+app.version+"\";\n\tthis.instance = -1;\n"+app.code);
+		dojo.declare("desktop.app.apps.app"+app.id, null, {
+			id: app.id,
+			name: app.name,
+			version: app.version,
+			instance: -1,
+			status: "",
+			constructor: function(info) {
+				this.status = "init";
+				this.instance = info.instance;
+				this.init(info.args);
+				this.status = "active";
+			},
+			kill: function() {
+				//cleanup ui, disconnect events, etc.
+			}
+		});
+		dojo.extend(desktop.app.apps["app"+app.id], eval("("+app.code+")"));
 		if(callback)
 		{
 			if(typeof args == "undefined") args = {};
@@ -218,49 +234,33 @@ desktop.app = new function()
 	this.launch = function(/*Integer*/id, /*Object?*/args)
 	{
 		api.log("launching app "+id);
-		if(typeof this.apps[id] == "undefined")
+		if(typeof this.apps["app"+id] == "undefined")
 		{this.fetchApp(id, dojo.hitch(this, this.launch), args);}
 		else
 		{
-			api.log("preparing to launch app...");
 			try {
 				this.instanceCount++;
-				api.log("constructing new instance...");
-				this.instances[this.instanceCount] = new this.apps[id];
-				this.instances[this.instanceCount].instance = this.instances.length-1;
-                                    var instance = this.instances.length-1;
-                                    this.instances[this.instanceCount].status = "init";
-				dojo.connect(this.instances[this.instanceCount],
-						"init",
-						this.instances[this.instanceCount],
-						function() {
-							this.status = "active";
-						}
-				);
-				dojo.connect(
-					this.instances[this.instanceCount],
-                    "kill",
-                    this.instances[this.instanceCount],
-                    function() {
-                        this.status = "killed";
-			instance = this.instance;
-						//allow the garbage collector to free up memory
-						setTimeout(function(){
-							desktop.app.instances[instance]=null;
-						}, desktop.config.window.animSpeed + 50);
-                    }
-                );
-				api.log("Executing app...");
-				this.instances[this.instanceCount].init((args || {}));
+				var instance = this.instances[this.instanceCount] = new desktop.app.apps["app"+id]({
+					instance: this.instanceCount,
+					args: args
+				});
+				dojo.connect(instance, "kill", instance, function() {
+                    this.status = "killed";
+					var instance = this.instance;
+					//allow the garbage collector to free up memory
+					setTimeout(function(){
+						desktop.app.instances[instance]=null;
+					}, desktop.config.window.animSpeed + 50);
+                });
 			}
 			catch(e) {
-				if(typeof this.instances[instance].debug == "function") { //Program has it's own error handling system.
-					this.instances[instance].debug(e);
+				if(typeof this.instances[this.instanceCount].debug == "function") { //Program has it's own error handling system.
+					this.instances[this.instanceCount].debug(e);
 				}
 				else { // Use psych desktop error handler
-					if(desktop.app.kill(instance) == false) {
+					if(desktop.app.kill(this.instanceCount) == false) {
 						api.ui.alertDialog({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: "+e+"<br><br>Extra Details: The program failed to respond to a kill request. <br><br><br>You can help by copying this and posting it to the Psych Desktop forums."});
-						this.instances[instance].status = "error";
+						this.instances[this.instanceCount].status = "error";
 					}
 					else {
 				            api.ui.alertDialog({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: <textarea>"+dojo.toJson(e)+"</textarea><br>You can help by copying this and posting it to the Psych Desktop forums."});
