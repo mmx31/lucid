@@ -51,4 +51,14 @@ function import($module) {
 	$file = $GLOBALS['path'] . $path . ".php";
 	return require_once($file);
 }
+
+function get_basepath() {
+	$curpath = explode("/", $_SERVER['REQUEST_URI']);
+	while($curpath[count($curpath)-1] != "backend") {
+		array_pop($curpath);
+	}
+	array_pop($curpath);
+	return implode("/", $curpath) . "/";
+}
+session_set_cookie_params(time()+(60*60*24*365), get_basepath());
 ?>
