@@ -577,13 +577,19 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		var node = this.domNode;
 		
 		//first take care of our size if we're maximized
-		if(this.maximized) {
+		if(this.maximized && typeof args == "undefined") {
 			var max = desktop.ui._area.getBox();
 			var viewport = dijit.getViewport();
 			dojo.style(node, "top", max.T+"px");
 			dojo.style(node, "left", max.L+"px");
 			dojo.style(node, "width", (viewport.w - max.R - max.L)+"px");
 			dojo.style(node, "height", (viewport.h - max.B  - max.T)+"px");
+		}
+		else if(this.maximize && typeof args != "undefined") {
+			var fx = desktop.config.fx;
+			desktop.config.fx = 0;
+			this.unmaximize();
+			desktop.config.fx = fx;
 		}
 		
 		// set margin box size, unless it wasn't specified, in which case use current size
@@ -601,7 +607,15 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 
 		// Save the size of my content box.
 		this._contentBox = dijit.layout.marginBox2contentBox(this.containerNode, mb);
-
+		
+		// Offset based on window border size
+		var calcWidth = this.domNode.offsetWidth;
+		var calcHeight = this.domNode.offsetHeight;
+		var bodyWidth = this.containerNode.offsetWidth;
+		var bodyHeight = this.containerNode.offsetHeight;
+		dojo.style(this.domNode, "width", ((calcWidth - bodyWidth)+calcWidth)+"px");
+		dojo.style(this.domNode, "height", ((calcHeight - bodyHeight)+calcHeight)+"px");
+		
 		// Callback for widget to adjust size of it's children
 		this.layout();
 	},
