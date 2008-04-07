@@ -79,15 +79,23 @@ desktop.app = new function()
 			},
 		    load: dojo.hitch(this, function(app, ioArgs)
 			{
-				this.apps[app.id] = new Function("\tthis.id = "+app.id+";\n\tthis.name = \""+app.name+"\";\n\tthis.version = \""+app.version+"\";\n\tthis.instance = -1;\n"+app.code);
-				if(callback)
-				{
-					if(typeof args == "undefined") args = {};
-					callback(parseInt(app.id), args);
-				}
+				this._fetchApp(app, callback);
 			}),
 			handleAs: "json"
 		});
+	}
+	/*
+	 * Method: _fetchApp
+	 * 
+	 * internal method that gets the callback from the xhr made in fetchapp
+	 */
+	this._fetchApp = function(app, callback) {
+		this.apps[app.id] = new Function("\tthis.id = "+app.id+";\n\tthis.name = \""+app.name+"\";\n\tthis.version = \""+app.version+"\";\n\tthis.instance = -1;\n"+app.code);
+		if(callback)
+		{
+			if(typeof args == "undefined") args = {};
+			callback(parseInt(app.id), args);
+		}
 	}
 	/*
 	 * Method: launchByName
