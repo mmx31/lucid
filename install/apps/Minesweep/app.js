@@ -21,9 +21,12 @@
 		dojo.require("dijit.form.FilteringSelect");
 		dojo.require("dojo.data.ItemFileReadStore");
 		dojo.require("dojox.gfx");
-		dojo.require("dojox.gfx.move");
+		dojo.requireLocalization("desktop", "common");
+		dojo.requireLocalization("desktop", "apps");
+		var nls = dojo.i18n.getLocalization("desktop", "common");
+		var app = dojo.i18n.getLocalization("desktop", "apps");
 		this.win = new api.Window({
-			title: "MineSweep",
+			title: app["MineSweep"],
 			width: "200px",
 			height: "230px",
 			resizable: false,
@@ -34,11 +37,12 @@
 			layoutAlign: "top"
 		});
 		this.toolbar.addChild( new dijit.form.Button({
-			label: "Play",
+			label: nls.start,
 			onClick: dojo.hitch(this, this.startGame)
 		}) );
+		this.win.addChild( this.toolbar );
+		
 		var dropdown = new dijit.form.FilteringSelect({
-			//id: "difficultyDropDown",
 			autoComplete: true,
 			searchAttr: "label",
 			style: "width: 90px; font-size: small",
@@ -46,21 +50,19 @@
 				data: {
 					identifier: "value",
 					items: [
-						{ label: "Easy", value: "Easy" },
-						{ label: "Medium", value: "Medium" },
-						{ label: "Hard", value: "Hard" }
+						{ label: nls.easy, value: "Easy" },
+						{ label: nls.medium, value: "Medium" },
+						{ label: nls.hard, value: "Hard" }
 					]
 				}
 			}),
 			onChange: dojo.hitch( this, function(val) {
 				if ( typeof val == "undefined" ) return;
 				this.difficulty = val;
-				console.debug( "Difficulty is now " + this.difficulty );
+				//console.debug( "Difficulty is now " + this.difficulty );
 			})
 		});
 		this.toolbar.addChild( dropdown );
-	
-		this.win.addChild( this.toolbar );
 	
 		this.surfacePane = new dijit.layout.ContentPane({
 			layoutAlign: "client",
@@ -239,10 +241,11 @@
 			x: 0, y:0,
 			width: (this.xSize*20), height: (this.ySize*20)
 		}).setFill([ 225,225,225,0.75 ]);
-
+		
+		var nls = dojo.i18n.getLocalization("desktop", "common");
 		this.resultMessage = this.surface.createText({
 			x: ((this.xSize * 20)/2), y: ((this.ySize * 20)/2),
-			text: "You Lose!",
+			text: nls.youLose,
 			align: "middle"
 		}).setFill("#000000");
 		this.resultMessage.setFont({
@@ -258,9 +261,10 @@
 			width: (this.xSize*20), height: (this.ySize*20)
 		}).setFill([ 225,225,225,0.75 ]);
 
+		var nls = dojo.i18n.getLocalization("desktop", "common");
 		this.resultMessage = this.surface.createText({
 			x: ((this.xSize * 20)/2), y: ((this.ySize * 20)/2),
-			text: "You Win!",
+			text: nls.youWin,
 			align: "middle"
 		}).setFill("#000000");
 		this.resultMessage.setFont({

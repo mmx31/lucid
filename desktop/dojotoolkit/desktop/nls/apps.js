@@ -12,5 +12,6 @@
 	"Task Manager": "Task Manager",
 	"Terminal": "Terminal",
 	"Music Player": "Music Player",
-	"Email Client": "Email Client"
+	"Email Client": "Email Client",
+	"MineSweep": "MineSweep"
 })

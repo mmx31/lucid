@@ -254,13 +254,13 @@ desktop.app = new function()
                 });
 			}
 			catch(e) {
-				if(typeof this.instances[this.instanceCount].debug == "function") { //Program has it's own error handling system.
-					this.instances[this.instanceCount].debug(e);
+				if(typeof instance.debug == "function") { //Program has it's own error handling system.
+					instance.debug(e);
 				}
 				else { // Use psych desktop error handler
-					if(desktop.app.kill(this.instanceCount) == false) {
-						api.ui.alertDialog({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: "+e+"<br><br>Extra Details: The program failed to respond to a kill request. <br><br><br>You can help by copying this and posting it to the Psych Desktop forums."});
-						this.instances[this.instanceCount].status = "error";
+					if(desktop.app.kill(instance.instance) == false) {
+						api.ui.alertDialog({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance.instance+") encountered an error and needs to close.<br><br>Technical Details: "+e+"<br><br>Extra Details: The program failed to respond to a kill request. <br><br><br>You can help by copying this and posting it to the Psych Desktop forums."});
+						instance.status = "error";
 					}
 					else {
 				            api.ui.alertDialog({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: <textarea>"+dojo.toJson(e)+"</textarea><br>You can help by copying this and posting it to the Psych Desktop forums."});

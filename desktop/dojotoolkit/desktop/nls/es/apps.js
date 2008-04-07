@@ -12,5 +12,6 @@
 	"Task Manager": "Administrador de Tareas",
 	"Terminal": "Consola",
 	"Music Player": "Reproductor de Música",
-	"Email Client": "Cliente de correo electrónico"
+	"Email Client": "Cliente de correo electrónico",
+	"MineSweep": "Mina de barrendero"
 })

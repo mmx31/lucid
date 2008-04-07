@@ -54,7 +54,8 @@ function import($module) {
 
 function get_basepath() {
 	$curpath = explode("/", $_SERVER['REQUEST_URI']);
-	while($curpath[count($curpath)-1] != "backend") {
+	$dir = $GLOBALS['installing'] ? "install" : "backend";
+	while($curpath[count($curpath)-1] != $dir) {
 		array_pop($curpath);
 	}
 	array_pop($curpath);

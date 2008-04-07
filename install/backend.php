@@ -16,6 +16,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+	$GLOBALS['installing'] = true;
 	$GLOBALS['path'] = realpath("./../backend") . DIRECTORY_SEPARATOR;
 	require("./../backend/lib/includes.php");
     $act = ($_GET['action'] == "" ? "installprograms" : $_GET['action']);
