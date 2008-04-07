@@ -20,5 +20,11 @@
 	"ok": "OK",
 	"cancel": "Cancele",
 	"loadOrSave": "Carga/Guarde",
-	"path": "Sendero"
+	"path": "Sendero",
+	"play": "Detener",
+	"pause": "Pausa",
+	"stop": "Pare",
+	"volume": "Tomo",
+	"openFile": "Abra archivo",
+	"openUrl": "Abra URL"
 })

@@ -5,7 +5,9 @@
 		dojo.require("dijit.form.Slider");
 		dojo.require("dijit.layout.LayoutContainer");
 		dojo.require("dijit.layout.ContentPane");
+		dojo.requireLocalization("desktop", "common");
 		dojo.requireLocalization("desktop", "apps");
+		var nls = this.nls = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		this.win = new api.Window({
 			title: app["Music Player"],
@@ -16,12 +18,12 @@
 		var toolbar = new dijit.Toolbar({layoutAlign: "top"});
 		dojo.forEach([
 			{
-				label: "Open File",
+				label: nls.openFile,
 				iconClass: "icon-16-actions-document-open",
 				onClick: dojo.hitch(this, this.openFileDialog)
 			},
 			{
-				label: "Open URL",
+				label: nls.openUrl,
 				iconClass: "icon-16-actions-document-open",
 				onClick: dojo.hitch(this, this.openURLDialog)
 			}
@@ -57,18 +59,18 @@
 				iconClass: "icon-32-actions-media-playback-start",
 				onClick: dojo.hitch(this, this.play),
 				showLabel: false,
-				label: "Play"
+				label: nls.play
 			}),
 			stop: new dijit.form.Button({
 				iconClass: "icon-32-actions-media-playback-stop",
 				onClick: dojo.hitch(this, this.stop),
 				showLabel: false,
-				label: "Stop"
+				label: nls.stop
 			}),
 			ticker: document.createElement("div"),
 			volume: new dijit.form.DropDownButton({
 				dropDown: volume,
-				label: "Volume",
+				label: nls.volume,
 				iconClass: "icon-32-status-audio-volume-high",
 				showLabel: false
 			}),
@@ -120,7 +122,7 @@
 			if(this.sound.capabilities.pause) {
 				dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
 				dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
-				this.ui.play.setLabel("Pause");
+				this.ui.play.setLabel(this.nls.pause);
 				this.ui.play.onClick = dojo.hitch(this, this.pause);
 			}
 			this.ui.play.startup();
@@ -133,7 +135,7 @@
 			this.sound.pause();
 			dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
 			dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
-			this.ui.play.setLabel("Play");
+			this.ui.play.setLabel(this.nls.play);
 			this.ui.play.onClick = dojo.hitch(this, this.play);
 			this.stopTicker();
 		}
@@ -153,7 +155,7 @@
 			this.is_playing = false;
 			dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
 			dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
-			this.ui.play.setLabel("Play");
+			this.ui.play.setLabel(this.nls.play);
 			this.ui.play.onClick = dojo.hitch(this, this.play);
 			this.sound.stop();
 			this.stopTicker();
@@ -162,7 +164,7 @@
 	},
 	openURLDialog: function() {
 		api.ui.inputDialog({
-			title: "Open URL",
+			title: this.nls.openUrl,
 			callback: dojo.hitch(this, this.openURL)
 		});
 	},

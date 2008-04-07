@@ -20,5 +20,11 @@
 	"ok": "OK",
 	"cancel": "Cancel",
 	"loadOrSave": "Load/Save",
-	"path": "Path"
+	"path": "Path",
+	"play": "Play",
+	"pause": "Pause",
+	"stop": "Stop",
+	"volume": "Volume",
+	"openFile": "Open File",
+	"openUrl": "Open URL"
 })
