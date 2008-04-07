@@ -11,6 +11,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 	_buttons: {},
 	_labels: {},
 	_storeconnects: [],
+	_winconnects: [],
 	postCreate: function() {
 		dojo.addClass(this.containerNode, "desktopTaskbarApplet");
 		var tbl = document.createElement("table");
@@ -59,7 +60,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		labelNode.textContent = v;
 		domNode.appendChild(labelNode);
 		
-		this._connects[store.getValue(item, "id")] = dojo.connect(domNode, "onclick", dijit.byId(store.getValue(item, "id")), "_onTaskClick");
+		this._winconnects[store.getValue(item, "id")] = dojo.connect(domNode, "onclick", dijit.byId(store.getValue(item, "id")), "_onTaskClick");
 		
 		this._buttons[store.getValue(item, "id")] = domNode;
 		this._labels[store.getValue(item, "id")] = labelNode;
@@ -71,7 +72,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 	},
 	onDelete: function(item) {
 		var node = this._buttons[item.id[0]];
-		dojo.disconnect(this._connects[item.id[0]]);
+		dojo.disconnect(this._winconnects[item.id[0]]);
 		var onEnd = function() {
 			node.parentNode.removeChild(node);
 			node=null;
