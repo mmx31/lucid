@@ -39,6 +39,7 @@
 			this.toolbar.addChild(new dijit.form.Button({label: cm.open, iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this.load)}));
 			this.toolbar.addChild(new dijit.form.Button({label: cm.save, iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, this.save)}));
 			this.toolbar.addChild(new dijit.form.Button({label: "Metadata", iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, this.editMetadata)}));
+			this.toolbar.addChild(new dijit.form.Button({label: "Run", iconClass: "icon-16-actions-media-playback-start", onClick: dojo.hitch(this, this.run)}));
 	
 		this.win.addChild(this.toolbar);
 		this.win.show();
@@ -46,6 +47,11 @@
 		this.newApp();
 	},
 	
+	run: function()
+	{
+		api.ide.execute(this.editor.value);
+	},
+
 	kill: function()
 	{
 		if(typeof this.loadwin != "undefined") {
@@ -67,7 +73,7 @@
 			maturity: "alpha",
 			author: "NewApp Creator"
 		};
-		this.editor.value="this.init = function(args)\n{\n\n/*Insert application start code here*/\n\n}\n\nthis.kill = function()\n{\n\n/*Insert application end code here*/\n\n}";
+		this.editor.value="({\n\n\tinit: function(args)\n\t{\n\n\t\t/*Insert application start code here*/\n\n\t},\n\n\tkill: function()\n\t{\n\n\t\t/*Insert application end code here*/\n\n\t}\n\n})";
 	
 		// Update app string for window title
 		this.currentAppStr = this.app.name + " " + this.app.version;
