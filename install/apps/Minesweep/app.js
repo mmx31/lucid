@@ -87,15 +87,15 @@
 		var tHeight = this.toolbar.domNode.offsetHeight;
 		if ( this.difficulty == "Easy" ) {
 			//console.debug("resizing..");
-			this.win.resize({w: 200, h: 230+tHeight});
+			this.win.resize({w: 200, h: 200+tHeight});
 			this.surface.clear();
 			this.makeBoard(10, 10);
 		} else if ( this.difficulty == "Medium" ) {
-			this.win.resize({w:300, h:330+tHeight});
+			this.win.resize({w:300, h:300+tHeight});
 			this.surface.clear();
 			this.makeBoard(15, 15);
 		} else if ( this.difficulty == "Hard" ) {
-			this.win.resize({w:600, h:330+tHeight});
+			this.win.resize({w:600, h:300+tHeight});
 			this.surface.clear();
 			this.makeBoard(30,15);
 		}
