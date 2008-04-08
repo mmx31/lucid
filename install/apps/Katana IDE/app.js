@@ -253,7 +253,7 @@
 			content=document.createElement("ul");
 			dojo.forEach(data, dojo.hitch(this, function(a){
 				var l = document.createElement("li");
-				l.href="javascript://";
+				l.href="javascript:void(0);";
 				l.innerHTML=(app[a.name] || a.name) + " (" + a.version + " " + a.maturity + ")";
 				l.title=a.id;
 				l.style.cursor="pointer";
