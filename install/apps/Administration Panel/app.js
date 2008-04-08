@@ -268,7 +268,7 @@
 				//make headers
 				for(field in data[0]) {
 					var args = {
-						name: field.charAt(0).toUpperCase() + field.substr(1).toLowerCase(),
+						name: sys[field],
 						field: field
 					};
 					layout[0].cells[0].push(args);
