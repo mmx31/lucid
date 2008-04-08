@@ -33,5 +33,6 @@
 	"url": "URL",
 	"icon": "Icono",
 	"category": "Categoría",
-	"isCategory": "Esta Categoría"
+	"isCategory": "Esta Categoría",
+	"untitled": "No titulado"
 })

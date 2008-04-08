@@ -91,12 +91,13 @@
 	},
 	processNew: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
+		var cmn = dojo.i18n.getLocalization("desktop", "common");
 	    this.editor.disabled = false;
 	    this.editor.value = "";
 	    this.editing = false;
 	    this.fileEditing = "";
 	    this.newAs = true;
-	    this.other.setContent(msg.editingFile.replace("%s", "Untitled"));
+	    this.other.setContent(msg.editingFile.replace("%s", cm.untitled));
 	
 	},
 	processClose: function() {
