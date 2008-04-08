@@ -79,7 +79,10 @@ dojo.mixin(desktop.ui, {
 	 * subscribes to events, overwrites the autoscroll method in dojo.dnd
 	 */
 	init: function() {
-		dojo.subscribe("configApply", this, "_draw");
+		dojo.subscribe("configApply", this, function() {
+			if(desktop.config.fx > 0) setTimeout(dojo.hitch(this, "_draw"), 100);
+			else this._draw();
+		});
 		dojo.require("dojo.dnd.autoscroll");
 		dojo.dnd.autoScroll = function(e) {} //in order to prevent autoscrolling of the window
 	},
