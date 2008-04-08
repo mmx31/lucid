@@ -56,6 +56,7 @@ function get_basepath() {
 	$curpath = explode("/", $_SERVER['REQUEST_URI']);
 	$dir = $GLOBALS['installing'] ? "install" : "backend";
 	while($curpath[count($curpath)-1] != $dir) {
+		if(count($curpath) == 0) return "/";
 		array_pop($curpath);
 	}
 	array_pop($curpath);
