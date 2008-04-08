@@ -26,5 +26,12 @@
 	"stop": "Pare",
 	"volume": "Tomo",
 	"openFile": "Abra archivo",
-	"openUrl": "Abra URL"
+	"openUrl": "Abra URL",
+	"metadata": "Metadatos",
+	"run": "Ejecute",
+	"name": "Nombre",
+	"url": "URL",
+	"icon": "Icono",
+	"category": "Categoría",
+	"isCategory": "Esta Categoría"
 })

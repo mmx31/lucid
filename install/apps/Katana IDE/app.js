@@ -38,8 +38,8 @@
 			this.toolbar.addChild(new dijit.form.Button({label: cm["new"], iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, function btnNewApp() { this.newApp(1); })}));
 			this.toolbar.addChild(new dijit.form.Button({label: cm.open, iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this.load)}));
 			this.toolbar.addChild(new dijit.form.Button({label: cm.save, iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, this.save)}));
-			this.toolbar.addChild(new dijit.form.Button({label: "Metadata", iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, this.editMetadata)}));
-			this.toolbar.addChild(new dijit.form.Button({label: "Run", iconClass: "icon-16-actions-media-playback-start", onClick: dojo.hitch(this, this.run)}));
+			this.toolbar.addChild(new dijit.form.Button({label: cm.metadata, iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, this.editMetadata)}));
+			this.toolbar.addChild(new dijit.form.Button({label: cm.run, iconClass: "icon-16-actions-media-playback-start", onClick: dojo.hitch(this, this.run)}));
 	
 		this.win.addChild(this.toolbar);
 		this.win.show();

@@ -16,6 +16,7 @@
 	    dojo.require("dijit.Dialog");
 	    dojo.require("dojox.validate.web");
 		dojo.requireLocalization("desktop", "common");
+		dojo.requireLocalization("desktop", "messages");
 		dojo.requireLocalization("desktop", "apps");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
@@ -175,7 +176,8 @@
 	
 	addFeedDialog: function()
 	{
-	    dialog = new dijit.TooltipDialog({});
+		var cm = dojo.i18n.getLocalization("desktop", "common");
+	    var dialog = new dijit.TooltipDialog({});
 	    this._form = {
 	        title: new dijit.form.TextBox({required: true}),
 		isCategory: new dijit.form.CheckBox({
@@ -193,8 +195,7 @@
 	        url: new dijit.form.ValidationTextBox({
 			isValid: function(isFocused) {
 				return dojox.validate.isUrl(this.textbox.value);
-			},
-			invalidMessage: "Invalid URL"
+			}
 		}),
 		icon: new dijit.form.FilteringSelect({
 			searchAttr: "name",
@@ -216,36 +217,36 @@
 	    };
 	    var line = document.createElement("div");
 	    var p = document.createElement("span");
-	    p.innerHTML = "Title: ";
+	    p.innerHTML = cm.title+": ";
 	    line.appendChild(p);
 	    line.appendChild(this._form.title.domNode);
 	    var line2 = document.createElement("div");
 	    var p = document.createElement("span");
-	    p.innerHTML = "URL: ";
+	    p.innerHTML = cm.url+": ";
 	    line2.appendChild(p);
 	    line2.appendChild(this._form.url.domNode);
 	
 	    var line3 = document.createElement("div");
 	    var p = document.createElement("span");
-	    p.innerHTML = "Icon: ";
+	    p.innerHTML = cm.icon+": ";
 	    line3.appendChild(p);
 	    line3.appendChild(this._form.icon.domNode);
 	
 	    var line4 = document.createElement("div");
 	    var p = document.createElement("span");
-	    p.innerHTML = "Is Category: ";
+	    p.innerHTML = cm.isCategory+": ";
 	    line4.appendChild(p);
 	    line4.appendChild(this._form.isCategory.domNode);
 	
 	
 	    var line5 = document.createElement("div");
 	    var p = document.createElement("span");
-	    p.innerHTML = "Category: ";
+	    p.innerHTML = cm.category+": ";
 	    line5.appendChild(p);
 	    line5.appendChild(this._form.category.domNode);
 	
 	    var button = new dijit.form.Button({
-	        label: "Add"
+	        label: cm.add
 	    });
 		var div = document.createElement("div");
 		dojo.style(div, "color", "red");
@@ -258,7 +259,8 @@
 			if(!this._form.icon.isValid()) return;
 			this.feedStore.fetch({query: {title: this._form.title.getValue()}, onComplete: dojo.hitch(this, function(f) {
 				if(typeof f[0] != "undefined") {
-					div.innerHTML = "An item with that name already exists";
+					var msg = dojo.i18n.getLocalization("desktop", "messages");
+					div.innerHTML = msg.allreadyExists;
 					return;
 				}
 				var makeItem = dojo.hitch(this, function(items) {
@@ -339,7 +341,6 @@
 	        preventCache: true,
 			xsite: true,
 	        load: dojo.hitch(this, function(data, ioArgs) {
-				if(data == "9") { api.ui.alertDialog({title: "Psych Desktop internal error", message: "cURL not supported by this server<br>enchanced web features disabled"}); return; }
 	            var items = data.getElementsByTagName("item");
 	            var text = "";
 	            dojo.forEach(items, 

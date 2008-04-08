@@ -26,5 +26,12 @@
 	"stop": "Stop",
 	"volume": "Volume",
 	"openFile": "Open File",
-	"openUrl": "Open URL"
+	"openUrl": "Open URL",
+	"metadata": "Metadata",
+	"run": "Run",
+	"name": "Name",
+	"url": "URL",
+	"icon": "Icon",
+	"category": "Category",
+	"isCategory": "Is Category"
 })
