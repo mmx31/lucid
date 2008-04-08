@@ -8,6 +8,7 @@
 	    dojo.require("dijit.layout.ContentPane");
 		dojo.requireLocalization("desktop", "common");
 		dojo.requireLocalization("desktop", "apps");
+		dojo.requireLocalization("desktop", "messages");
 	    if (args.file) {
 	        this.start();
 	        this._processOpen(args.file);
@@ -30,6 +31,7 @@
 	start: function() {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    this.window = new api.Window({
 			title: app["Text Editor"],
 	        onClose: dojo.hitch(this, this.kill)
@@ -78,7 +80,7 @@
 		dojo.style(this.editor, "height", "100%");
 		dojo.style(this.editor, "border", "0px");
 	    box.setContent(this.editor);
-	    this.other.setContent("No file open");
+	    this.other.setContent(msg.noFileOpen);
 	    this.window.addChild(box);
 	    this.window.addChild(this.other);
 	    this.window.width = "320px";
@@ -88,27 +90,28 @@
 		this.processNew();
 	},
 	processNew: function() {
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    this.editor.disabled = false;
 	    this.editor.value = "";
 	    this.editing = false;
 	    this.fileEditing = "";
 	    this.newAs = true;
-	    this.other.setContent("Editing file \"Untitled\"");
+	    this.other.setContent(msg.editingFile.replace("%s", "Untitled"));
 	
 	},
 	processClose: function() {
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    this.editor.disabled = true;
-	    this.editor.value = "open or create a new file.";
 	    this.newAs = false;
 	    this.editing = false;
 	    this.fileEditing = "";
-	    this.other.setContent("No file open");
+	    this.other.setContent(msg.noFileOpen);
 	
 	},
 	processOpen: function() {
-	    this.other.setContent("Opened file dialog");
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    api.ui.fileDialog({
-	        title: "Choose a file to open",
+	        title: msg.chooseFileOpen,
 	        callback: dojo.hitch(this, this._processOpen)
 	    });
 	
@@ -116,10 +119,10 @@
 	
 	_processOpen: function(path) {
 	    if (path == false) {
-	        this.other.setContent("Open canceled");
 	        return false;
 	    }
-	    this.other.setContent("Opening file \"" + path + "\"");
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
+	    this.other.setContent(msg.openingFile.replace("%s", path));
 	    this.newAs = true;
 	    this.editor.disabled = true;
 	    api.fs.read({
@@ -131,7 +134,7 @@
 	            this.newAs = true;
 	            this.editor.disabled = false;
 	            this.fileEditing = array.path;
-	            this.other.setContent("Editing file \"" + array.path + "\"");
+	            this.other.setContent(msg.editingFile.replace("%s", array.path));
 	
 	        })
 	    });
@@ -139,12 +142,13 @@
 	},
 	
 	processSave: function() {
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (this.editing) {
 	        api.fs.write({
 	            path: this.fileEditing,
 	            content: this.editor.value
 	        });
-	        this.other.setContent("File saved!");
+	        this.other.setContent(msg.fileSaved);
 	
 	    }
 	    else {
@@ -154,13 +158,13 @@
 	
 	},
 	processSaveAs: function() {
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (this.newAs) {
 	        api.ui.fileDialog({
-	            title: "Choose a file to save as",
+	            title: msg.chooseFileSave,
 	            callback: dojo.hitch(this, 
 	            function(path) {
 	                if (path == false) {
-	                    this.other.setContent("Save canceled");
 	                    return false;
 	                }
 	                this.editing = true;
