@@ -67,12 +67,12 @@
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 	    var data = desktop.app.getInstances();
-	    var html = "<table style='width: 100%;'><thead><tr style='background-color: #dddddd;'><td>Name</td><td>Instance</td><td>AppID</td><td>Status</td><td>Actions</td></tr></thead><tbody>";
+	    var html = "<table style='width: 100%;'><thead><tr style='background-color: #dddddd;'><td>"+sys.name+"</td><td>"+sys.instance+"</td><td>"+sys.id+"</td><td>"+sys.status+"</td><td>"+sys.actions+"</td></tr></thead><tbody>";
 	    for (var x = 0; x < data.length; x++) {
 	        if (typeof(data[x]) == "object") {
 	            // Error handler, for some reason, it sometimes fucksup.
 	            if (data[x].status != "killed") {
-	                html += "<tr><td>" + app[data[x].name] + "</td><td>" + data[x].instance + "</td><td>" + data[x].appid + "</td><td>" + data[x].status + "</td><td><a href='javascript:void(0);' onClick='desktop.app.instances[" + this.instance + "].executeKill("+ data[x].instance + ")'>"+sys.kill+"</a></td></tr>";
+	                html += "<tr><td>" + app[data[x].name] + "</td><td>" + data[x].instance + "</td><td>" + data[x].appid + "</td><td>" + sys[data[x].status] + "</td><td><a href='javascript:void(0);' onClick='desktop.app.instances[" + this.instance + "].executeKill("+ data[x].instance + ")'>"+sys.kill+"</a></td></tr>";
 	
 	            }
 	
