@@ -3,7 +3,6 @@
 	"instance": "Instance",
 	"id": "ID",
 	"author": "Author",
-	"email": "Email",
 	"version": "Version",
 	"maturity": "Maturity",
 	"category": "Category",
@@ -24,11 +23,14 @@
 	"usersOnline": "Users online",
 	"diskUsage": "Disk Usage",
 	"createNewUser": "Create new user",
-	"username": "Username",
+	"createNewGroup": "Create new group",
 	"name": "Name",
 	"logged": "Logged In",
 	"email": "Email",
 	"lastauth": "Last Authentication",
 	"userDelConfirm": "User deletion confirmation",
-	"delUserFromSys": "Are you sure you want to permanently delete %s from the system?"
+	"appDelConfirm": "App deletion confirmation",
+	"delFromSys": "Are you sure you want to permanently delete %s from the system?",
+	"chUsersPassword": "Change %s's password",
+	"alterPermissions": "Alter Permissions"
 })

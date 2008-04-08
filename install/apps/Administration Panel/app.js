@@ -27,6 +27,7 @@
 		dojo.requireLocalization("desktop", "apps");
 		dojo.requireLocalization("desktop", "system");
 		dojo.requireLocalization("desktop", "common");
+		dojo.requireLocalization("desktop.ui", "accountInfo");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		//make window
@@ -84,6 +85,7 @@
 		users: function() {
 			var sys = dojo.i18n.getLocalization("desktop", "system");
 			var cmn = dojo.i18n.getLocalization("desktop", "common");
+			var usr = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
 			this.toolbar.destroyDescendants();
 			var button = new dijit.form.DropDownButton({
 				label: sys.createNewUser,
@@ -103,7 +105,7 @@
 				for(field in data[0]) {
 					if(field == "permissions" || field == "groups") continue;
 					var args = {
-						name: sys[field],
+						name: sys[field] || usr[field],
 						field: field
 					};
 					if(field == "name" || field == "username" || field == "email") args.editor = dojox.grid.editors.Input;
@@ -141,7 +143,7 @@
 							var row = this._userGrid.model.getRow(this.__rowIndex);
 							api.ui.yesnoDialog({
 								title: sys.userDelConfirm,
-								message: sys.delUserFromSys.replace("%s", row.username),
+								message: sys.delFromSys.replace("%s", row.username),
 								callback: dojo.hitch(this, function(a) {
 									if(a == false) return;
 									this._userStore.deleteItem(row.__dojo_data_item);
@@ -150,11 +152,11 @@
 						})
 					},
 					{
-						label: "Change Password",
+						label: usr.changePassword,
 						onClick: dojo.hitch(this, function(e) {
 							var row = this._userGrid.model.getRow(this.__rowIndex);
 							var win = new api.Window({
-								title: "Change "+row.username+"'s password",
+								title: sys.chUsersPassword.replace("%s", row.username),
 								width: "250px",
 								height: "200px"
 							});
@@ -169,13 +171,13 @@
 							var input1, input2;
 							dojo.forEach([
 								{
-									label: "New password",
+									label: usr.newPassword,
 									widget: input1 = new dijit.form.TextBox({
 										type: "password"
 									})
 								},
 								{
-									label: "Confirm password",
+									label: usr.confirmNewPassword,
 									widget: input2 = new dijit.form.TextBox({
 										type: "password"
 									})
@@ -198,15 +200,15 @@
 							var div = document.createElement("div");
 							dojo.addClass(div, "floatRight");
 							var button = new dijit.form.Button({
-								label: "Ok",
+								label: cmn.ok,
 								onClick: dojo.hitch(this, function() {
-									if(input1.getValue() != input2.getValue()) return errBox.innerHTML = "Two passwords don't match";
+									if(input1.getValue() != input2.getValue()) return errBox.textContent = usr.passwordsDontMatch;
 									this._userStore.setValue(row.__dojo_data_item, "password", input1.getValue());
 									win.close();
 								})
 							})
 							div.appendChild(button.domNode);
-							var cancel = new dijit.form.Button({label: "Cancel", onClick: dojo.hitch(win, "close")});
+							var cancel = new dijit.form.Button({label: cmn.cancel, onClick: dojo.hitch(win, "close")});
 							div.appendChild(cancel.domNode);
 							bottom.setContent(div);
 							win.addChild(bottom);
@@ -215,7 +217,7 @@
 						})
 					},
 					{
-						label: "Alter permissions",
+						label: sys.alterPermissions,
 						onClick: dojo.hitch(this, "permDialog",
 							grid,
 							dojo.hitch(this, function(row){
@@ -247,6 +249,8 @@
 			}));
 		},
 		apps: function() {
+			var sys = dojo.i18n.getLocalization("desktop", "system");
+			var cmn = dojo.i18n.getLocalization("desktop", "common");
 			this.toolbar.destroyDescendants();
 			var button = new dijit.form.Button({
 				label: "Install app package",
@@ -288,12 +292,12 @@
 				var menu = this._appMenu = new dijit.Menu({});
 				dojo.forEach([
 					{
-						label: "Delete",
+						label: cmn["delete"],
 						onClick: dojo.hitch(this, function(e) {
 							var row = this._appGrid.model.getRow(this.__rowIndex);
 							api.ui.yesnoDialog({
-								title: "App deletion confirmation",
-								message: "Are you sure you want to permanently delete "+row.name+" from the system?",
+								title: sys.appDelConfirm,
+								message: sys.delFromSys.replace("%s", row.name),
 								callback: dojo.hitch(this, function(a) {
 									if(a == false) return;
 									this._appStore.deleteItem(row.__dojo_data_item);
@@ -315,13 +319,15 @@
 			}));
 		},
 		groups: function() {
+			var sys = dojo.i18n.getLocalization("desktop", "system");
+			var cmn = dojo.i18n.getLocalization("desktop", "common");
 			this.toolbar.destroyDescendants();
 			var button = new dijit.form.DropDownButton({
-				label: "Create new group",
+				label: sys.createNewGroup,
 				dropDown: this.createGroupDialog()
 			});
 			this.toolbar.addChild(button);
-			this.main.setContent("loading...");
+			this.main.setContent(cmn.loading);
 			desktop.admin.groups.list(dojo.hitch(this, function(data) {
 				for(i=0;i<data.length;i++) {
 					data[i].permissions = dojo.toJson(data[i].permissions);

@@ -25,7 +25,7 @@
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		this.win = new api.Window({
 			title: app["Katana IDE"],
-			onClose: dojo.hitch(this, this.kill)
+			onClose: dojo.hitch(this, "kill")
 		});
 		
 		var client = new dijit.layout.ContentPane({style: "overflow: hidden;", layoutAlign: "client"}, document.createElement("div"));
@@ -123,14 +123,14 @@
 	editMetadata: function()
 	{
 		//TODO: this really shouldn't use IDs.
-		var menus = dojo.i18n.getLocalization("desktop.ui", "menus");
+		var mnu = dojo.i18n.getLocalization("desktop.ui", "menus");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		this.tempCache  = this.editor.value;
-	        this.editor.value = "To continue working, close the metadata window.";
-	        this.editor.disabled = true;
 	        this.winn = new api.Window({
 				title: "Edit Metadata",
+				width: "450px",
+				height: "250px",
 				onClose: dojo.hitch(this, this._editMetadata)
 			});
 			var content = "";
@@ -146,16 +146,12 @@
 		this.winn.addChild(body);
 		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
 		var div = document.createElement("div");
-		dojo.style(div, {
-			position: "absolute",
-			top: "0px",
-			right: "0px"
-		});
+		dojo.addClass(div, "floatRight");
 		var closeButton = new dijit.form.Button({
-			label: cmn.close,
+			label: cmn.save,
 			onClick: dojo.hitch(this.winn, "close")
 		});
-		div.appendChild(button.domNode);
+		div.appendChild(closeButton.domNode);
 		bottom.setContent(div);
 		this.winn.addChild(bottom);
 		this.winn.show();
@@ -173,14 +169,14 @@
 				data: {
 					identifier: "value",
 					items: [
-						{ label: "Accessories", value: "Accessories" },
-						{ label: "Development", value: "Development" },
-						{ label: "Games", value: "Games" },
-						{ label: "Graphics", value: "Graphics" },
-						{ label: "Internet", value: "Internet" },
-						{ label: "Multimedia", value: "Multimedia" },
-						{ label: "Office", value: "Office" },
-						{ label: "System", value: "System" }
+						{ label: mnu.accessories, value: "Accessories" },
+						{ label: mnu.development, value: "Development" },
+						{ label: mnu.games, value: "Games" },
+						{ label: mnu.graphics, value: "Graphics" },
+						{ label: mnu.internet, value: "Internet" },
+						{ label: mnu.multimedia, value: "Multimedia" },
+						{ label: mnu.office, value: "Office" },
+						{ label: mnu.system, value: "System" }
 					]
 				}
 			}),
