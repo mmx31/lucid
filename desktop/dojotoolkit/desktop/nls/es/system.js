@@ -21,7 +21,7 @@
 	"users": "Usuarios",
 	"groups": "Grupos",
 	"permissions": "Permisos",
-	"usersOnline": "usuarios en línea",
+	"usersOnline": "Usuarios en línea",
 	"diskUsage": "Uso de disco",
 	"createNewUser": "Cree nuevo usuario",
 	"username": "Nombre de usuario",

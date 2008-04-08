@@ -239,9 +239,9 @@ desktop.app = new function()
 		else
 		{
 			try {
-				this.instanceCount++;
-				var instance = this.instances[this.instanceCount] = new desktop.app.apps["app"+id]({
-					instance: this.instanceCount,
+				var pid = this.instances.length;
+				var instance = this.instances[pid] = new desktop.app.apps["app"+id]({
+					instance: pid,
 					args: args
 				});
 				dojo.connect(instance, "kill", instance, function() {
