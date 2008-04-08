@@ -14,9 +14,11 @@
 		dojo.require("dijit.Editor");
 		dojo.requireLocalization("desktop", "common");
 		dojo.requireLocalization("desktop", "apps");
+		dojo.requireLocalization("desktop", "messages");
 		
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
 		
 	    this.window = new api.Window({
 			title: app["Word Processor"],
@@ -60,7 +62,7 @@
 			style: "padding: 2px;"
 	    },
 	    document.createElement("div"));
-	    this.other.setContent("No file open");
+	    this.other.setContent(msg.noFileOpen);
 	    this.window.addChild(this.other);
 	    var editor = this.editor = new dijit.Editor({layoutAlign: "client"}, document.body.appendChild(document.createElement("div")));
 		editor.startup();
@@ -83,27 +85,29 @@
 	
 	},
 	processNew: function() {
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    this.editor.setDisabled(false);
 	    this.editor.replaceValue("");
 	    this.editing = false;
 	    this.fileEditing = "";
 	    this.newAs = true;
-	    this.other.setContent("Editing file \"Untitled\"");
+	    this.other.setContent(msg.editingFile.replace("%s", "Untitled"));
 	
 	},
 	processClose: function() {
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    this.editor.setDisabled(true);
 	    this.editor.replaceValue("");
 	    this.newAs = false;
 	    this.editing = false;
 	    this.fileEditing = "";
-	    this.other.setContent("No file open");
+	    this.other.setContent(msg.noFileOpen);
 	
 	},
 	processOpen: function() {
-	    this.other.setContent("Opened file dialog");
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    api.ui.fileDialog({
-	        title: "Choose a file to open",
+	        title: msg.chooseFileOpen,
 		types: [{type: ".html"}],
 	        callback: dojo.hitch(this, this._processOpen)
 	    });
@@ -111,11 +115,11 @@
 	},
 	
 	_processOpen: function(path) {
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (path == false) {
-	        this.other.setContent("Open canceled");
 	        return false;
 	    }
-	    this.other.setContent("Opening file \"" + path + "\"");
+	    this.other.setContent(msg.openingFile.replace("%s", path));
 	    this.newAs = true;
 	    this.editor.setDisabled(true);
 	    api.fs.read({
@@ -127,46 +131,46 @@
 	            this.editing = true;
 	            this.newAs = true;
 	            this.fileEditing = array.path;
-	            this.other.setContent("Editing file \"" + array.path + "\"");
-	
+	            this.other.setContent(msg.editingFile.replace("%s", array.path));
 	        })
 	    });
 	
 	},
 	
 	processSave: function() {
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (this.editing) {
         api.fs.write({
             path: this.fileEditing,
             content: "<html>"+this.editor.getValue()+"</html>"
         });
-        this.other.setContent("File saved!");
+        this.other.setContent(msg.fileSaved);
 
-    }
-    else {
-        this.processSaveAs();
-
-    }
-
-},
-processSaveAs: function() {
-    if (this.newAs) {
-        api.ui.fileDialog({
-            title: "Choose a file to save as",
-            callback: dojo.hitch(this, 
-            function(path) {
-                if (path == false) {
-                    this.other.setContent("Save canceled");
-                    return false;
-                }
-                this.editing = true;
-                this.fileEditing = path;
-                this.newAs = true;
-                this.processSave();
-            })
-        });
-
-    }
-
-}
+	    }
+	    else {
+	        this.processSaveAs();
+	
+	    }
+	
+	},
+	processSaveAs: function() {
+		var msg = dojo.i18n.getLocalization("desktop", "messages");
+	    if (this.newAs) {
+	        api.ui.fileDialog({
+	            title: msg.chooseFileSave,
+	            callback: dojo.hitch(this, 
+	            function(path) {
+	                if (path == false) {
+	                    return false;
+	                }
+	                this.editing = true;
+	                this.fileEditing = path;
+	                this.newAs = true;
+	                this.processSave();
+	            })
+	        });
+	
+	    }
+	
+	}
 })
