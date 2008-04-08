@@ -12,7 +12,10 @@
 	    dojo.require("dijit.Toolbar");
 	    dojo.require("dijit.form.Button");
 	    dojo.require("dijit.Menu");
+		dojo.requireLocalization("desktop", "common");
 		dojo.requireLocalization("desktop", "apps");
+		dojo.requireLocalization("desktop", "system");
+		var nls = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 	    //make window
 	    this.win = new api.Window({
@@ -32,19 +35,20 @@
 	    this.win.show();
 	    this.win.startup();
 	    this.win.onClose = dojo.hitch(this, this.kill);
-	    this.main.setContent("Getting processes...");
+	    this.main.setContent(nls.loading);
 	    this.timer = setTimeout(dojo.hitch(this, this.home), 1000);
 	
 	},
 	
 	executeKill: function(id) {
+		var sys = dojo.i18n.getLocalization("desktop", "system");
 	    if (desktop.app.getInstance(id).status != "killed") {
 	        if(desktop.app.kill(id)) {
-	        api.ui.notify("Instance " + id + " was killed sucessfully.");
+	        api.ui.notify(sys.killSuccess.replace("%s", id));
 		}
 		else {
 			api.ui.notify({
-				message: "Instance " + id + " was NOT killed sucessfully.",
+				message: sys.killFail.replace("%s", id),
 				type: "error"
 			});
 		}
@@ -52,7 +56,7 @@
 	    else {
 	        api.ui.notify({
 	            type: "warning",
-	            message: "This process has already been killed or has exited."
+	            message: sys.allreadyKilled
 	        });
 	
 	    }
@@ -60,14 +64,15 @@
 	
 	},
 	home: function() {
-	    this.main.setContent("Refreshing...");
+		var sys = dojo.i18n.getLocalization("desktop", "system");
+		var app = dojo.i18n.getLocalization("desktop", "apps");
 	    var data = desktop.app.getInstances();
 	    var html = "<table style='width: 100%;'><thead><tr style='background-color: #dddddd;'><td>Name</td><td>Instance</td><td>AppID</td><td>Status</td><td>Actions</td></tr></thead><tbody>";
 	    for (var x = 0; x < data.length; x++) {
 	        if (typeof(data[x]) == "object") {
 	            // Error handler, for some reason, it sometimes fucksup.
 	            if (data[x].status != "killed") {
-	                html += "<tr><td>" + data[x].name + "</td><td>" + data[x].instance + "</td><td>" + data[x].appid + "</td><td>" + data[x].status + "</td><td><a href='javascript:void(0);' onClick='desktop.app.instances[" + this.instance + "].executeKill("+ data[x].instance + ")'>Kill</a></td></tr>";
+	                html += "<tr><td>" + app[data[x].name] + "</td><td>" + data[x].instance + "</td><td>" + data[x].appid + "</td><td>" + data[x].status + "</td><td><a href='javascript:void(0);' onClick='desktop.app.instances[" + this.instance + "].executeKill("+ data[x].instance + ")'>"+sys.kill+"</a></td></tr>";
 	
 	            }
 	
