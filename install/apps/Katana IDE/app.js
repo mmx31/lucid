@@ -19,7 +19,7 @@
 		dojo.require("dojo.data.ItemFileReadStore");
 		dojo.requireLocalization("desktop", "common");
 		dojo.requireLocalization("desktop", "apps");
-		dojo.requireLocalization("desktop", "menus");
+		dojo.requireLocalization("desktop.ui", "menus");
 		dojo.requireLocalization("desktop", "system");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
@@ -123,7 +123,7 @@
 	editMetadata: function()
 	{
 		//TODO: this really shouldn't use IDs.
-		var menus = dojo.i18n.getLocalization("desktop", "menus");
+		var menus = dojo.i18n.getLocalization("desktop.ui", "menus");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		this.tempCache  = this.editor.value;
