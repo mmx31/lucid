@@ -15,8 +15,12 @@
 		dojo.require("dijit.form.Button");
 	    dojo.require("dijit.form.TextBox");
 		dojo.require("dijit.Toolbar");
+		dojo.require("dijit.form.FilteringSelect");
+		dojo.require("dojo.data.ItemFileReadStore");
 		dojo.requireLocalization("desktop", "common");
 		dojo.requireLocalization("desktop", "apps");
+		dojo.requireLocalization("desktop", "menus");
+		dojo.requireLocalization("desktop", "system");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		this.win = new api.Window({
@@ -69,7 +73,7 @@
 			name: "NewApp",
 			email: "AppCreator@iRule.com",
 			version: "1.0",
-			category: "accessories",
+			category: "Accessories",
 			maturity: "alpha",
 			author: "NewApp Creator"
 		};
@@ -118,6 +122,10 @@
 	spawnID: 0,
 	editMetadata: function()
 	{
+		//TODO: this really shouldn't use IDs.
+		var menus = dojo.i18n.getLocalization("desktop", "menus");
+		var sys = dojo.i18n.getLocalization("desktop", "system");
+		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		this.tempCache  = this.editor.value;
 	        this.editor.value = "To continue working, close the metadata window.";
 	        this.editor.disabled = true;
@@ -126,24 +134,63 @@
 				onClose: dojo.hitch(this, this._editMetadata)
 			});
 			var content = "";
-	        content += "Application ID(appid): <span id=\"appid"+this.instance+this.blah+"\">"+this.app.id+"</span><br>";
-	        content += "Application Name: <span id=\"appname"+this.instance+this.blah+"\"></span><br>";
-	        content += "Application Author: <span id=\"appauthor"+this.instance+this.blah+"\"></span><br>";
-	        content += "Application E-mail: <span id =\"appemail"+this.instance+this.blah+"\"></span><br>";
-	        content += "Application Version: <span id=\"appversion"+this.instance+this.blah+"\"></span><br>";
-	        content += "Application Maturity: <span id=\"appmaturity"+this.instance+this.blah+"\"></span><br>";
-	        content += "Application Category: <span id=\"appcategory"+this.instance+this.blah+"\"></span><br>";
-		content += "<p>Closing this window will apply the metadata change.</p>";
+	        content += sys.id+": <span id=\"appid"+this.instance+this.blah+"\">"+this.app.id+"</span><br>";
+	        content += sys.name+": <span id=\"appname"+this.instance+this.blah+"\"></span><br>";
+	        content += sys.author+": <span id=\"appauthor"+this.instance+this.blah+"\"></span><br>";
+	        content += sys.email+": <span id =\"appemail"+this.instance+this.blah+"\"></span><br>";
+	        content += sys.version+": <span id=\"appversion"+this.instance+this.blah+"\"></span><br>";
+	        content += sys.maturity+": <span id=\"appmaturity"+this.instance+this.blah+"\"></span><br>";
+	        content += sys.category+": <span id=\"appcategory"+this.instance+this.blah+"\"></span><br>";
 		var body = new dijit.layout.ContentPane({layoutAlign: "client"});
 		body.setContent(content);
 		this.winn.addChild(body);
+		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
+		var div = document.createElement("div");
+		dojo.style(div, {
+			position: "absolute",
+			top: "0px",
+			right: "0px"
+		});
+		var closeButton = new dijit.form.Button({
+			label: cmn.close,
+			onClick: dojo.hitch(this.winn, "close")
+		});
+		div.appendChild(button.domNode);
+		bottom.setContent(div);
+		this.winn.addChild(bottom);
 		this.winn.show();
 		new dijit.form.TextBox({id: "appname"+this.instance+this.blah, name: "appname"+this.instance+this.blah}, document.getElementById("appname"+this.instance+this.blah));
 		new dijit.form.TextBox({id: "appauthor"+this.instance+this.blah, name: "appauthor"+this.instance+this.blah}, document.getElementById("appauthor"+this.instance+this.blah));
 		new dijit.form.TextBox({id: "appemail"+this.instance+this.blah, name: "appemail"+this.instance+this.blah}, document.getElementById("appemail"+this.instance+this.blah));
 		new dijit.form.TextBox({value: this.app.version, id: "appversion"+this.instance+this.blah, name: "appversion"+this.instance+this.blah}, document.getElementById("appversion"+this.instance+this.blah));
 		new dijit.form.TextBox({id: "appmaturity"+this.instance+this.blah, name: "appmaturity"+this.instance+this.blah}, document.getElementById("appmaturity"+this.instance+this.blah));
-		new dijit.form.TextBox({id: "appcategory"+this.instance+this.blah, name: "appcategory"+this.instance+this.blah}, document.getElementById("appcategory"+this.instance+this.blah));
+		//new dijit.form.TextBox({id: "appcategory"+this.instance+this.blah, name: "appcategory"+this.instance+this.blah}, document.getElementById("appcategory"+this.instance+this.blah));
+
+		var dropdown = new dijit.form.FilteringSelect({
+			autoComplete: true,
+			searchAttr: "label",
+			store: new dojo.data.ItemFileReadStore({
+				data: {
+					identifier: "value",
+					items: [
+						{ label: "Accessories", value: "Accessories" },
+						{ label: "Development", value: "Development" },
+						{ label: "Games", value: "Games" },
+						{ label: "Graphics", value: "Graphics" },
+						{ label: "Internet", value: "Internet" },
+						{ label: "Multimedia", value: "Multimedia" },
+						{ label: "Office", value: "Office" },
+						{ label: "System", value: "System" }
+					]
+				}
+			}),
+			onChange: dojo.hitch( this, function(val) {
+				if ( typeof val == "undefined" ) return;
+			})
+		}, document.getElementById("appcategory"+this.instance+this.blah));
+
+		dijit.byId("appcategory"+this.instance+this.blah).textbox.disabled = true;
+
 		dijit.byId("appname"+this.instance+this.blah).setValue(this.app.name);
 		dijit.byId("appauthor"+this.instance+this.blah).setValue(this.app.author);
 		dijit.byId("appemail"+this.instance+this.blah).setValue(this.app.email);
@@ -198,6 +245,7 @@
 	
 	load: function()
 	{
+		var app = dojo.i18n.getLocalization("desktop", "apps");
 		//create a window with a list of apps to edit.
 		api.ide.getAppList(dojo.hitch(this, function(data){
 			this.loadwin = new api.Window({title: "Select App"});
@@ -206,7 +254,7 @@
 			dojo.forEach(data, dojo.hitch(this, function(a){
 				var l = document.createElement("li");
 				l.href="javascript://";
-				l.innerHTML=a.name+" "+a.version;
+				l.innerHTML=(app[a.name] || a.name) + " (" + a.version + " " + a.maturity + ")";
 				l.title=a.id;
 				l.style.cursor="pointer";
 				dojo.connect(l, "onclick", this, function(e) {
@@ -214,7 +262,7 @@
 					this.loadwin.close();
 	
 					// Update title app str to reflect new file
-					this.currentAppStr = a.name + " " + a.version;
+					this.currentAppStr = (app[a.name] || a.name) + " (" + a.version + " " + a.maturity + ")";
 					this.changed = 0;
 					this.updateTitle();
 	

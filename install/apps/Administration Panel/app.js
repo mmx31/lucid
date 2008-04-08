@@ -25,30 +25,33 @@
 		api.addDojoCss("dojox/grid/_grid/Grid.css");
 		api.addDojoCss("dojox/widget/FileInput/FileInput.css");
 		dojo.requireLocalization("desktop", "apps");
+		dojo.requireLocalization("desktop", "system");
+		dojo.requireLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
+		var sys = dojo.i18n.getLocalization("desktop", "system");
 		//make window
 		this.win = new api.Window({title: app["Administration Panel"], width: "500px", height: "400px", onClose: dojo.hitch(this, "kill")});
 		var split = new dijit.layout.SplitContainer({sizerWidth: 7, orientation: "horizontal", layoutAlign: "client"});
 		var pane = new dijit.layout.ContentPane({sizeMin: 10, sizeShare: 20}, document.createElement("div"));
 			var menu = new dijit.Menu({});
 			menu.domNode.style.width="100%";
-				var item = new dijit.MenuItem({label: "Home",
+				var item = new dijit.MenuItem({label: sys.home,
 							       iconClass: "icon-16-actions-go-home",
 							       onClick: dojo.hitch(this, this.pages.home)});
 				menu.addChild(item);
-				var item = new dijit.MenuItem({label: "Apps",
+				var item = new dijit.MenuItem({label: sys.apps,
 							       iconClass: "icon-16-categories-applications-other",
 							       onClick: dojo.hitch(this, this.pages.apps)});
 				menu.addChild(item);
-				var item = new dijit.MenuItem({label: "Users",
+				var item = new dijit.MenuItem({label: sys.users,
 							       iconClass: "icon-16-apps-system-users",
 							       onClick: dojo.hitch(this, this.pages.users)});
 				menu.addChild(item);
-				var item = new dijit.MenuItem({label: "Groups",
+				var item = new dijit.MenuItem({label: sys.groups,
 							       iconClass: "icon-16-apps-system-users",
 							       onClick: dojo.hitch(this, this.pages.groups)});
 				menu.addChild(item);
-				var item = new dijit.MenuItem({label: "Permissions",
+				var item = new dijit.MenuItem({label: sys.permissions,
 							       iconClass: "icon-16-apps-system-users",
 							       onClick: dojo.hitch(this, this.pages.permissions)});
 				menu.addChild(item);
@@ -68,23 +71,26 @@
 	},
 	pages: {
 		home: function() {
+			var sys = dojo.i18n.getLocalization("desktop", "system");
 			this.toolbar.destroyDescendants();
 			desktop.admin.users.online(dojo.hitch(this, function(data) {
-				var h = "Users online: <div dojoType='dijit.ProgressBar' progress='"+data.online+"' maximum='"+data.total+"'></div>";
+				var h = sys.usersOnline+": <div dojoType='dijit.ProgressBar' progress='"+data.online+"' maximum='"+data.total+"'></div>";
 				desktop.admin.diskspace(dojo.hitch(this, function(data) {
-					h += "Disk Usage: <div dojoType='dijit.ProgressBar' progress='"+(data.total-data.free)+"' maximum='"+data.total+"'></div>"
+					h += sys.diskUsage+": <div dojoType='dijit.ProgressBar' progress='"+(data.total-data.free)+"' maximum='"+data.total+"'></div>"
 					this.main.setContent(h);
 				}));
 			}));
 		},
 		users: function() {
+			var sys = dojo.i18n.getLocalization("desktop", "system");
+			var cmn = dojo.i18n.getLocalization("desktop", "common");
 			this.toolbar.destroyDescendants();
 			var button = new dijit.form.DropDownButton({
-				label: "Create new user",
+				label: sys.createNewUser,
 				dropDown: this.newUserDialog()
 			});
 			this.toolbar.addChild(button);
-			this.main.setContent("loading...");
+			this.main.setContent(cmn.loading);
 			desktop.admin.users.list(dojo.hitch(this, function(data) {
 				for(i=0;i<data.length;i++) {
 					data[i].permissions = dojo.toJson(data[i].permissions);
@@ -97,7 +103,7 @@
 				for(field in data[0]) {
 					if(field == "permissions" || field == "groups") continue;
 					var args = {
-						name: field.charAt(0).toUpperCase() + field.substr(1).toLowerCase(),
+						name: sys[field],
 						field: field
 					};
 					if(field == "name" || field == "username" || field == "email") args.editor = dojox.grid.editors.Input;
@@ -130,12 +136,12 @@
 				var menu = this._userMenu = new dijit.Menu({});
 				dojo.forEach([
 					{
-						label: "Delete",
+						label: cmn["delete"],
 						onClick: dojo.hitch(this, function(e) {
 							var row = this._userGrid.model.getRow(this.__rowIndex);
 							api.ui.yesnoDialog({
-								title: "User deletion confirmation",
-								message: "Are you sure you want to permanently delete "+row.username+" from the system?",
+								title: sys.userDelConfirm,
+								message: sys.delUserFromSys.replace("%s", row.username),
 								callback: dojo.hitch(this, function(a) {
 									if(a == false) return;
 									this._userStore.deleteItem(row.__dojo_data_item);

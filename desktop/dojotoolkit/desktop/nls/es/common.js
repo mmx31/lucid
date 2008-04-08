@@ -34,5 +34,6 @@
 	"icon": "Icono",
 	"category": "Categoría",
 	"isCategory": "Esta Categoría",
-	"untitled": "No titulado"
+	"untitled": "No titulado",
+	"delete": "Borre"
 })
