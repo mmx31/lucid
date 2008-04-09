@@ -43,5 +43,7 @@
 	"appInstallSuccess": "Aplicación de instalación de paquetes con éxito!",
 	"allow": "Permiter",
 	"deny": "Denegar",
-	"default": "Defecto"
+	"default": "Defecto",
+	"groupAlreadyExists": "Grupo con ese nombre ya existe",
+	"manageGroupMembers": "Administrar los miembros de %s"
 })

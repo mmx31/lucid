@@ -266,7 +266,7 @@
 				for(i=0;i<data.length;i++) {
 					data[i].filetypes = data[i].filetypes.join(", ");
 					data[i].name = apps[data[i].name] || data[i].name;
-					data[i].category = mnus[data[i].category];
+					data[i].category = mnus[data[i].category.toLowerCase()];
 				};
 				var layout = [{
 					cells: [[]]
@@ -678,7 +678,7 @@
 			})
 			cont.appendChild(cancel.domNode);
 			var save = new dijit.form.Button({
-				label: "Save",
+				label: cmn.save,
 				onClick: dojo.hitch(this, function() {
 					var newPerms = {};
 					dojo.forEach(list, function(item) {
@@ -698,16 +698,16 @@
 		}));
 	},
 	createGroupDialog: function() {
-		var dialog = new dijit.TooltipDialog({
-			title: "Create a new group"
-		});
+		var sys = dojo.i18n.getLocalization("desktop", "system");
+		var cmn = dojo.i18n.getLocalization("desktop", "common");
+		
+		var dialog = new dijit.TooltipDialog({});
 		var errBox = document.createElement("div");
-		dojo.style(errBox, "color", "red");
 		dialog.containerNode.appendChild(errBox);
 		
 		var line = document.createElement("div");
 	    var p = document.createElement("span");
-	    p.innerHTML = "Name: ";
+	    p.innerHTML = sys.name+": ";
 	    line.appendChild(p);
 		var name = new dijit.form.TextBox({});
 		line.appendChild(name.domNode);
@@ -715,7 +715,7 @@
 		
 		var line = document.createElement("div");
 	    var p = document.createElement("span");
-	    p.innerHTML = "Description: ";
+	    p.innerHTML = sys.description+": ";
 	    line.appendChild(p);
 		var description = new dijit.form.TextBox({});
 		line.appendChild(description.domNode);
@@ -724,7 +724,7 @@
 		var line = document.createElement("div");
 	    var p = document.createElement("span");
 		var button = new dijit.form.Button({
-			label: "Add",
+			label: cmn.create,
 			onClick: dojo.hitch(this, function() {
 				var n = name.getValue();
 				var d = description.getValue();
@@ -732,7 +732,7 @@
 					query: {name: n},
 					onComplete: dojo.hitch(this, function(list) {
 						if(list.length != 0){
-							errBox.textContent = "Group with that name allready exists";
+							errBox.textContent = sys.groupAlreadyExists;
 							return;
 						}
 						errBox.textContent = "";
@@ -761,9 +761,11 @@
 	},
 	
 	groupMemberDialog: function(group) {
+		var sys = dojo.i18n.getLocalization("desktop", "system");
+		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var row = this._groupGrid.model.getRow(this.__rowIndex).__dojo_data_item;
 		var window = new api.Window({
-			title: "Manage "+this._groupStore.getValue(row, "name")+" members",
+			title: sys.manageGroupMembers.replace("%s", this._groupStore.getValue(row, "name")),
 			width: "400px",
 			height: "200px"
 		})
@@ -815,7 +817,7 @@
 				searchAttr: "username"
 			});
 			var b = new dijit.form.Button({
-				label: "Add",
+				label: cmn.add,
 				onClick: dojo.hitch(this, function() {
 					desktop.admin.groups.addMember(
 						this._groupStore.getValue(row, "id"),

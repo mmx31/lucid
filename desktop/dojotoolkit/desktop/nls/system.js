@@ -44,5 +44,7 @@
 	"permsFor": "Permissions for %s",
 	"allow": "Allow",
 	"deny": "Deny",
-	"default": "Default"
+	"default": "Default",
+	"groupAlreadyExists": "Group with that name already exists",
+	"manageGroupMembers": "Manage %s members"
 })
