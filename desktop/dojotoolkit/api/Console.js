@@ -3,44 +3,30 @@ dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
 dojo.provide("api.Console");
 dojo.requireLocalization("api", "console");
-/*
- * Class: api.Console
- * 
- * A console widget that you can embed in an app
- */
 dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained], {
+	//	summary:
+	//		A console widget that you can embed in an app
+	//
+	//	example:
+	//		create a new console alias:
+	//	|	myConsole.aliases.foo = function(params) {
+	//	| 		if(params == "bar") this.stdout.innerHTML += "baz!";
+	//	| 		else this.stdout.innerHTML += "bar!";
+	//	|	}
 	templatePath: dojo.moduleUrl("api", "templates/Console.html"),
-	/*
-	 * Property: path
-	 * 
-	 * The full path that the console is at (can be set at creation, but cannot be changed after)
-	 */
-	path: "/",
-	/*
-	 * Property: history
-	 * 
-	 * The command history
-	 */
+	//	path: String
+	//		The full path that the console is at (can be set at creation, but cannot be changed after)
+	path: "file://",
+	//	history: array
+	//		The command history
 	history: [" "],
-	/*
-	 * Property: hist
-	 * 
-	 * internal variable used for history browsing
-	 */
+	//	hist: Integer
+	//		internal variable used for history browsing
 	hist: 1,
-	/*
-	 * Property: aliases
-	 * 
-	 * A JSON object with command aliases. You can add a method to this and it will be a command
-	 * Each command is passed a 'params' string which is anything that comes after the command.
-	 * Your command must parse the arguments it's passed.
-	 * 
-	 * Example:
-	 * 		> myConsole.aliases.foo = function(params) {
-	 * 		> 	if(params == "bar") this.stdout.innerHTML += "baz!";
-	 * 		> 	else this.stdout.innerHTML += "bar!";
-	 * 		> }
-	 */
+	//	aliases: Object
+	//		A JSON object with command aliases. You can add a method to this and it will be a command
+	//		Each command is passed a 'params' string which is anything that comes after the command.
+	//		Your command must parse the arguments it's passed.
 	aliases: {
 		clear: function(params)
 		{
@@ -184,32 +170,23 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 			}
 		}
 	},
-	/*
-	 * Method: focus
-	 * 
-	 * Focuses the widget
-	 */
 	focus: function() {
+		//	summary:
+		//		Focuses the widget
 		this._input.focus();
 	},
-	/*
-	 * Method: getPath
-	 * 
-	 * Updates the path displayed, and returns the current path
-	 */
 	getPath: function()
 	{
+		//	summary:
+		//		Updates the path displayed, and returns the current path
 		this._path.innerHTML = this.path+"$";
 		return this.path;
 	},
-	/*
-	 * Method: key
-	 * 
-	 * Event handler
-	 * Processes key presses, such as the up and down arrows for browsing history
-	 */
 	key: function(e)
 	{
+		//	summary:
+		//		Event handler
+		//		Processes key presses, such as the up and down arrows for browsing history
 		if(e.keyCode == "38") //up arrow
 		{
 			if(this.history[this.hist-1] != undefined && this.hist != 1)
@@ -238,14 +215,11 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 			}
 		}
 	},
-	/*
-	 * Method: execute
-	 * 
-	 * Event handler
-	 * Called when the user presses the enter/return key
-	 */
 	execute: function(e)
 	{
+		//	summary:
+		//		Event handler
+		//		Called when the user presses the enter/return key
 		dojo.stopEvent(e);
 		if(this._input.value == undefined) this._input.value = " ";
 		this.history[this.history.length] = this._input.value;

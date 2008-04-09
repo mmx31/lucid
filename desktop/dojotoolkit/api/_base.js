@@ -12,20 +12,15 @@ dojo.require("api.Sound");
 dojo.require("api.ui");
 dojo.require("api.Window");
 
-/*
- * Class: api
- * 
- * Method: xhr
- * 
- * an extention of dojo's XHR utilities, but with some extra params to make life easy
- * 
- * Arguments:
- * 		args -	When you give a string such as "api.fs.io.read", you will get the backend's url returned.
- * 				You can also give an object as you would in dojo's XHR methods. However there are two extra params.
- * 				backend - a backend string as described above
- * 				xsite - when true, it makes the call using the server-side proxy (so you can make cross-domain requests)
- */
 api.xhr = function(/*dojo.__ioArgs|String*/args) {
+	//	summary:
+	//		an extention of dojo's XHR utilities, but with some extra params to make life easy
+	//	
+	//	args:
+	//		When you give a string such as "api.fs.io.read", you will get the backend's url returned.
+	//		You can also give an object as you would in dojo's XHR methods. However there are two extra params.
+	//		backend - a backend string as described above
+	//		xsite - when true, it makes the call using the server-side proxy (so you can make cross-domain reques
 	var backend = function(str) {
 		var mod=str.split(".");
 		//TODO: put in something so we can switch to python backends when desired
@@ -66,20 +61,16 @@ api.xhr = function(/*dojo.__ioArgs|String*/args) {
 	//}
 	return dojo.xhrPost(args);
 }
-
-/*
- * Method: addDojoCss
- * 
- * Adds an additional dojo CSS file (usefull for the dojox modules)
- * 
- * Arguments:
- * 		path - the path to the css file (the path to dojo is placed in front)
- * 
- * Example:
- * 		api.addDojoCss("/dojox/widget/somewidget/foo.css");
- */
 api.addDojoCss = function(/*String*/path)
 {
+	//	summary:
+	//		Adds an additional dojo CSS file (useful for the dojox modules)
+	//
+	//	path:
+	//		the path to the css file (the path to dojo is placed in front)
+	//	
+	//	example:
+	//	|	api.addDojoCss("/dojox/widget/somewidget/foo.css");
 	var element = document.createElement("link");
 	element.rel = "stylesheet";
 	element.type = "text/css";
@@ -88,17 +79,14 @@ api.addDojoCss = function(/*String*/path)
 	document.getElementsByTagName("head")[0].appendChild(element);
 }
 
-/*
- * Method: log
- * 
- * logs a string onto any console that is open
- * 
- * Arguments:
- * 		str - the string to log onto the consoles
- */
 api.log = function(/*String*/str) {
+	//	summary:
+	//		logs a string onto any console that is open
+	//	
+	//	str:
+	//		the string to log onto the consoles
 	str = dojo.toJson(str);
 	dojo.query(".consoleoutput").forEach(function(elem) {
-		elem.innerHTML += "<br />"+str;
+		elem.innerHTML += "<div>"+str+"</div>";
 	});
 }
