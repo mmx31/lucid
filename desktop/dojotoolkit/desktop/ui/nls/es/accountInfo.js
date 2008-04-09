@@ -11,6 +11,7 @@
 	"passwordsDontMatch": "Las dos contraseñas no coinciden",
 	"newPassword": "Nueva contraseña",
 	"confirmNewPassword": "Confirme nueva contraseña",
+	"confirmPassword": "Confirme contraseña",
 	"currentPassword": "Contraseña actual",
 	"authenticate": "Verifique",
 	"authSuccess": "Verificación tuvo éxito",

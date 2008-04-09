@@ -480,13 +480,14 @@
 		}));
 	},
 	newUserDialog: function() {
+		var usr = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
 		var dialog = new dijit.TooltipDialog({});
 		var error = document.createElement("div");
 		dialog.containerNode.appendChild(error);
 		
 		var line = document.createElement("div");
 	    var p = document.createElement("span");
-	    p.innerHTML = "Name: ";
+	    p.innerHTML = usr.name+": ";
 	    line.appendChild(p);
 		var name = new dijit.form.TextBox();
 	    line.appendChild(name.domNode);
@@ -494,7 +495,7 @@
 		
 		var line = document.createElement("div");
 	    var p = document.createElement("span");
-	    p.innerHTML = "Username: ";
+	    p.innerHTML = usr.username+": ";
 	    line.appendChild(p);
 		var username = new dijit.form.TextBox();
 	    line.appendChild(username.domNode);
@@ -502,7 +503,7 @@
 		
 		var line = document.createElement("div");
 	    var p = document.createElement("span");
-	    p.innerHTML = "Email: ";
+	    p.innerHTML = usr.email+": ";
 	    line.appendChild(p);
 		var email = new dijit.form.TextBox();
 	    line.appendChild(email.domNode);
@@ -510,7 +511,7 @@
 		
 		var line = document.createElement("div");
 	    var p = document.createElement("span");
-	    p.innerHTML = "Password: ";
+	    p.innerHTML = usr.password+": ";
 	    line.appendChild(p);
 		var password = new dijit.form.TextBox({type: "password"});
 	    line.appendChild(password.domNode);
@@ -518,7 +519,7 @@
 		
 		var line = document.createElement("div");
 	    var p = document.createElement("span");
-	    p.innerHTML = "Confirm Password: ";
+	    p.innerHTML = usr.confirmPassword+": ";
 	    line.appendChild(p);
 		var confpassword = new dijit.form.TextBox({type: "password"});
 	    line.appendChild(confpassword.domNode);
@@ -529,10 +530,10 @@
 			label: "Create",
 			onClick: dojo.hitch(this, function() {
 				dojo.require("dojox.validate.web");
-				if(username.getValue() == "") return error.textContent = "Enter a username";
-				if(!dojox.validate.isEmailAddress(email.getValue())) return error.textContent = "Enter a valid email";
-				if(password.getValue() == "") return error.textContent = "Enter a password";
-				if(password.getValue() != confpassword.getValue()) return error.textContent = "Two passwords don't match";
+				if(username.getValue() == "") return error.textContent = usr.enterUsername;
+				if(!dojox.validate.isEmailAddress(email.getValue())) return error.textContent = usr.enterValidEmail;
+				if(password.getValue() == "") return error.textContent = usr.enterPassword;
+				if(password.getValue() != confpassword.getValue()) return error.textContent = usr.passwordsDontMatch;
 				error.textContent = "";
 				desktop.admin.users.create({
 					name: name.getValue(),
@@ -540,8 +541,8 @@
 					email: email.getValue(),
 					password: password.getValue(),
 					callback: dojo.hitch(this, function(id) {
-						if(id == false) return error.textContent = "Username allready taken";
-						error.textContent = "User created";
+						if(id == false) return error.textContent = usr.usernameAllreadyTaken;
+						error.textContent = usr.userCreated;
 						this._userStore.newItem({
 							name: name.getValue(),
 							username: username.getValue(),
