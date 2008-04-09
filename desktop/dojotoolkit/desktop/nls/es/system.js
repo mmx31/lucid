@@ -11,7 +11,7 @@
 	"actions": "Acciones",
 	"active": "Activo",
 	"killed": "Matado",
-	"zombie": "Zombie",
+	"zombie": "Zombi",
 	"kill": "Matar",
 	"killSuccess": "Instancia %s fue muerto con éxito.",
 	"killFail": "Instancia %s NO fue muerto con éxito.",
@@ -37,5 +37,6 @@
 	"alterPermissions": "Cambie permisos",
 	"installAppPackage": "Instalar el paquete de aplicaciones",
 	"description": "Descripción",
-	"manageGroupMembers": "Administre los miembros del grupo"
+	"manageGroupMembers": "Administre los miembros del grupo",
+	"initial": "Permitir por defecto"
 })

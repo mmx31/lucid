@@ -37,5 +37,6 @@
 	"alterPermissions": "Alter Permissions",
 	"installAppPackage": "Install app package",
 	"description": "Description",
-	"manageGroupMembers": "Manage group members"
+	"manageGroupMembers": "Manage group members",
+	"initial": "Allow by default"
 })

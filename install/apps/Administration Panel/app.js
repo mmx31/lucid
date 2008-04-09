@@ -27,6 +27,7 @@
 		dojo.requireLocalization("desktop", "apps");
 		dojo.requireLocalization("desktop", "system");
 		dojo.requireLocalization("desktop", "common");
+		dojo.requireLocalization("desktop", "permissions");
 		dojo.requireLocalization("desktop.ui", "accountInfo");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
@@ -419,21 +420,25 @@
 			this.toolbar.destroyDescendants();
 			var sys = dojo.i18n.getLocalization("desktop", "system");
 			var cmn = dojo.i18n.getLocalization("desktop", "common");
+			var permNls = dojo.i18n.getLocalization("desktop", "permissions");
 			this.main.setContent(cmn.loading);
 			
 			desktop.admin.permissions.list(dojo.hitch(this, function(data) {
 				var layout = [{
 					cells: [[]]
 				}];
+				for(d in data) {
+					var item = data[d];
+					item.description = permNls[item.name] || item.description;
+				}
 				//make headers
 				for(field in data[0]) {
 					var args = {
-						name: field.charAt(0).toUpperCase() + field.substr(1).toLowerCase(),
+						name: sys[field],
 						field: field
 					};
 					if(field == "initial") {
 						args.editor = dojox.grid.editors.Bool;
-						args.name = "Allow by default";
 					}
 					layout[0].cells[0].push(args);
 				}
@@ -475,9 +480,7 @@
 		}));
 	},
 	newUserDialog: function() {
-		var dialog = new dijit.TooltipDialog({
-			title: "New User"
-		});
+		var dialog = new dijit.TooltipDialog({});
 		var error = document.createElement("div");
 		dialog.containerNode.appendChild(error);
 		
