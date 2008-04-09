@@ -427,8 +427,8 @@
 				var layout = [{
 					cells: [[]]
 				}];
-				for(d in data) {
-					var item = data[d];
+				for(key in data) {
+					var item = data[key];
 					item.description = permNls[item.name] || item.description;
 				}
 				//make headers
