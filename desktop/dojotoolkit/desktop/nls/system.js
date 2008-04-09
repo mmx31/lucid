@@ -38,5 +38,11 @@
 	"installAppPackage": "Install app package",
 	"description": "Description",
 	"manageGroupMembers": "Manage group members",
-	"initial": "Allow by default"
+	"initial": "Allow by default",
+	"installAppInstructions": "Select an app package to install from your local hard disk",
+	"appInstallSuccess": "App package installation successful!",
+	"permsFor": "Permissions for %s",
+	"allow": "Allow",
+	"deny": "Deny",
+	"default": "Default"
 })

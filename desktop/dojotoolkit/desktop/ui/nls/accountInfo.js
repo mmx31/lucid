@@ -30,6 +30,6 @@
 	"enterValidEmail": "Enter a valid email",
 	"enterPassword": "Enter a password",
 	"enterUsername": "Enter a username",
-	"usernameAllreadyTaken": "Username allready taken",
+	"usernameAllreadyTaken": "Username already taken",
 	"userCreated": "User created"
 })

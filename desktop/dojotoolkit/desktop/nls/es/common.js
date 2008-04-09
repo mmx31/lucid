@@ -35,5 +35,7 @@
 	"category": "Categoría",
 	"isCategory": "Esta Categoría",
 	"untitled": "No titulado",
-	"delete": "Borre"
+	"delete": "Borre",
+	"create": "Cree",
+	"error": "Error"
 })

@@ -35,5 +35,7 @@
 	"category": "Category",
 	"isCategory": "Is Category",
 	"untitled": "Untitled",
-	"delete": "Delete"
+	"delete": "Delete",
+	"create": "Create",
+	"error": "Error"
 })

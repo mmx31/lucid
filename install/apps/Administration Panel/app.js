@@ -29,6 +29,7 @@
 		dojo.requireLocalization("desktop", "common");
 		dojo.requireLocalization("desktop", "permissions");
 		dojo.requireLocalization("desktop.ui", "accountInfo");
+		dojo.requireLocalization("desktop.ui", "menus");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		//make window
@@ -252,6 +253,8 @@
 		apps: function() {
 			var sys = dojo.i18n.getLocalization("desktop", "system");
 			var cmn = dojo.i18n.getLocalization("desktop", "common");
+			var apps = dojo.i18n.getLocalization("desktop", "apps");
+			var mnus = dojo.i18n.getLocalization("desktop.ui", "menus");
 			this.toolbar.destroyDescendants();
 			var button = new dijit.form.Button({
 				label: sys.installAppPackage,
@@ -262,6 +265,8 @@
 			desktop.app.list(dojo.hitch(this, function(data) {
 				for(i=0;i<data.length;i++) {
 					data[i].filetypes = data[i].filetypes.join(", ");
+					data[i].name = apps[data[i].name] || data[i].name;
+					data[i].category = mnus[data[i].category];
 				};
 				var layout = [{
 					cells: [[]]
@@ -481,6 +486,7 @@
 	},
 	newUserDialog: function() {
 		var usr = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
+		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var dialog = new dijit.TooltipDialog({});
 		var error = document.createElement("div");
 		dialog.containerNode.appendChild(error);
@@ -527,7 +533,7 @@
 		
 		var line = document.createElement("div");
 	    var button = new dijit.form.Button({
-			label: "Create",
+			label: cmn.create,
 			onClick: dojo.hitch(this, function() {
 				dojo.require("dojox.validate.web");
 				if(username.getValue() == "") return error.textContent = usr.enterUsername;
@@ -561,8 +567,10 @@
 		return dialog;
 	},
 	installPackage: function() {
+		var sys = dojo.i18n.getLocalization("desktop", "system");
+		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var win = new api.Window({
-			title: "Install app package",
+			title: sys.installAppPackage,
 			width: "300px",
 			height: "200px"
 		});
@@ -570,16 +578,16 @@
 		var main = new dijit.layout.ContentPane({layoutAlign: "client"});
 		var div = document.createElement("div");
 		dojo.addClass(div, "tundra");
-		div.innerHTML = "Select an app package to install from your local hard disk:";
+		div.innerHTML = sys.installAppInstructions;
 		var uploader = new dojox.widget.FileInputAuto({
 			name: "uploadedfile",
 			url: api.xhr("core.app.install.package"),
 			onComplete: dojo.hitch(this, function(data,ioArgs,widgetRef) {
 				if(data.status && data.status == "success"){
-					widgetRef.overlay.innerHTML = "App package installation successful!";
+					widgetRef.overlay.innerHTML = sys.appInstallSuccess;
 					this.pages.apps();
 				}else{
-					widgetRef.overlay.innerHTML = "Error: "+data.error;
+					widgetRef.overlay.innerHTML = cmn.error+": "+data.error;
 					console.log('error',data,ioArgs);
 				}
 				dojo.publish("updateMenu", []);
@@ -591,7 +599,7 @@
 		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
 			var cont = document.createElement("div");
 			var close = new dijit.form.Button({
-				label: "Close",
+				label: cmn.close,
 				onClick: dojo.hitch(win, "close")
 			})
 			cont.appendChild(close.domNode);
@@ -603,11 +611,14 @@
 		uploader.startup();
 	},
 	permDialog: function(grid, lbl, permissions, callback) {
+		var sys = dojo.i18n.getLocalization("desktop", "system");
+		var cmn = dojo.i18n.getLocalization("desktop", "common");
+		var perms = dojo.i18n.getLocalization("desktop", "permissions");
 		var row = grid.model.getRow(this.__rowIndex).__dojo_data_item;
 		var perms = permissions(row);
 		this.__rowIndex = null;
 		var win = new api.Window({
-			title: "Permissions for "+lbl(row)
+			title: sys.permsFor.replace("%s", lbl(row))
 		});
 		this.windows.push(win);
 		var main = new dijit.layout.ContentPane({layoutAlign: "client"});
@@ -615,7 +626,7 @@
 		dojo.style(tab, "width", "100%");
 		dojo.style(tab, "height", "100%");
 		dojo.style(tab, "overflow-y", "auto");
-		tab.innerHTML = "<tr><th>Name</td><th>Description</th><th>Allow</th><th>Deny</th><th>Default</th></tr>";
+		tab.innerHTML = "<tr><th>"+sys.name+"</td><th>"+sys.description+"</th><th>"+sys.allow+"</th><th>"+sys.deny+"</th><th>"+sys["default"]+"</th></tr>";
 		var radioWidgets = {};
 		desktop.admin.permissions.list(dojo.hitch(this, function(list) {
 			dojo.forEach(list, function(item) {
@@ -625,7 +636,7 @@
 				td.textContent = item.name;
 				tr.appendChild(td);
 				var td = document.createElement("td");
-				td.textContent = item.description;
+				td.textContent = perms[item.name] || item.description;
 				tr.appendChild(td);
 				
 				var td = document.createElement("td");

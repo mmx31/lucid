@@ -26,5 +26,10 @@
 	"unknown": "(Desconocido)",
 	"restartDesktopForLangChange": "Es necesario reiniciar el ordenador para cambiar el idioma que se produzca",
 	"passwordDirections": "Para cambiar su contraseña, introduzca su contraseña actual en el campo de abajo y haga clic en <b>Verifique</b>.<br />Después de que haya sido verificado, escribe tu nueva contraseña, vuelva a escribirla para la verificación y haga clic en <b>Cambie contraseña</b>.",
-	"sudoExplination": "La solicitud está tratando de realizar una acción que requiere de privilegios. La verificación es necesaria para realizar esta acción."
+	"sudoExplination": "La solicitud está tratando de realizar una acción que requiere de privilegios. La verificación es necesaria para realizar esta acción.",
+	"enterValidEmail": "Escriba una dirección de correo electrónico válida",
+	"enterPassword": "Escriba una contraseña",
+	"enterUsername": "Introduzca un nombre de usuario",
+	"usernameAllreadyTaken": "El nombre de usuario que ya se han adoptado",
+	"userCreated": "El usuario creado"
 })

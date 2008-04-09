@@ -38,5 +38,10 @@
 	"installAppPackage": "Instalar el paquete de aplicaciones",
 	"description": "Descripción",
 	"manageGroupMembers": "Administre los miembros del grupo",
-	"initial": "Permitir por defecto"
+	"initial": "Permitir por defecto",
+	"installAppInstructions": "Seleccione una aplicación de paquetes a instalar desde su disco duro local",
+	"appInstallSuccess": "Aplicación de instalación de paquetes con éxito!",
+	"allow": "Permiter",
+	"deny": "Denegar",
+	"default": "Defecto"
 })
