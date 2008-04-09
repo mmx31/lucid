@@ -7,6 +7,7 @@
 	"maturity": "Madurez",
 	"category": "Categoría",
 	"status": "Estado",
+	"filetypes": "Tipos de archivos",
 	"actions": "Acciones",
 	"active": "Activo",
 	"killed": "Matado",
@@ -30,7 +31,11 @@
 	"lastauth": "Última Autenticación ",
 	"userDelConfirm": "Usuario supresión de confirmación",
 	"appDelConfirm": "Aplicación supresión de confirmación",
+	"groupDelConfirm": "Grupo supresión de confirmación",
 	"delFromSys": "¿Está seguro de que desea suprimir permanentemente %s desde el sistema?",
 	"chUsersPassword": "Cambiar la contraseña de %s",
-	"alterPermissions": "Cambie permisos"
+	"alterPermissions": "Cambie permisos",
+	"installAppPackage": "Instalar el paquete de aplicaciones",
+	"description": "Descripción",
+	"manageGroupMembers": "Administre los miembros del grupo"
 })

@@ -253,7 +253,7 @@
 			var cmn = dojo.i18n.getLocalization("desktop", "common");
 			this.toolbar.destroyDescendants();
 			var button = new dijit.form.Button({
-				label: "Install app package",
+				label: sys.installAppPackage,
 				onClick: dojo.hitch(this, "installPackage")
 			});
 			this.toolbar.addChild(button);
@@ -335,8 +335,8 @@
 				//make headers (need to do it manually unfortunatly)
 				var layout = [{
 					cells: [[
-						{name: "Name", field: "name", editor: dojox.grid.editors.Input},
-						{name: "Description", field: "description", editor: dojox.grid.editors.Input}
+						{name: sys.name, field: "name", editor: dojox.grid.editors.Input},
+						{name: sys.description, field: "description", editor: dojox.grid.editors.Input}
 					]]
 				}];
 				this._groupStore = new dojo.data.ItemFileWriteStore({
@@ -365,12 +365,12 @@
 				var menu = this._groupMenu = new dijit.Menu({});
 				dojo.forEach([
 					{
-						label: "Delete",
+						label: cmn["delete"],
 						onClick: dojo.hitch(this, function(e) {
 							var row = this._groupGrid.model.getRow(this.__rowIndex);
 							api.ui.yesnoDialog({
-								title: "Group deletion confirmation",
-								message: "Are you sure you want to permanently delete "+row.name+" from the system?",
+								title: sys.groupDelConfirm,
+								message: sys.delFromSys.replace("%s", row.name),
 								callback: dojo.hitch(this, function(a) {
 									if(a == false) return;
 									this._groupStore.deleteItem(row.__dojo_data_item);
@@ -379,7 +379,7 @@
 						})
 					},
 					{
-						label: "Alter permissions",
+						label: sys.alterPermissions,
 						onClick: dojo.hitch(this, "permDialog",
 							grid,
 							dojo.hitch(this, function(row) {
@@ -399,7 +399,7 @@
 						)
 					},
 					{
-						label: "Manage group members",
+						label: sys.manageGroupMembers,
 						onClick: dojo.hitch(this, "groupMemberDialog")
 					}
 				], function(item) {
@@ -417,7 +417,9 @@
 		},
 		permissions: function() {
 			this.toolbar.destroyDescendants();
-			this.main.setContent("loading...");
+			var sys = dojo.i18n.getLocalization("desktop", "system");
+			var cmn = dojo.i18n.getLocalization("desktop", "common");
+			this.main.setContent(cmn.loading);
 			
 			desktop.admin.permissions.list(dojo.hitch(this, function(data) {
 				var layout = [{

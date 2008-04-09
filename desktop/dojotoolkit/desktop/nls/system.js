@@ -7,6 +7,7 @@
 	"maturity": "Maturity",
 	"category": "Category",
 	"status": "Status",
+	"filetypes": "Filetypes",
 	"actions": "Actions",
 	"active": "Active",
 	"killed": "Killed",
@@ -30,7 +31,11 @@
 	"lastauth": "Last Authentication",
 	"userDelConfirm": "User deletion confirmation",
 	"appDelConfirm": "App deletion confirmation",
+	"groupDelConfirm": "Group deletion confirmation",
 	"delFromSys": "Are you sure you want to permanently delete %s from the system?",
 	"chUsersPassword": "Change %s's password",
-	"alterPermissions": "Alter Permissions"
+	"alterPermissions": "Alter Permissions",
+	"installAppPackage": "Install app package",
+	"description": "Description",
+	"manageGroupMembers": "Manage group members"
 })
