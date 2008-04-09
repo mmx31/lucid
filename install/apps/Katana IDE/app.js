@@ -134,7 +134,11 @@
 				onClose: dojo.hitch(this, this._editMetadata)
 			});
 			var content = "";
-	        content += sys.id+": <span id=\"appid"+this.instance+this.blah+"\">"+this.app.id+"</span><br>";
+		if ( this.app.id != -1 ) {
+		        content += sys.id+": <span id=\"appid"+this.instance+this.blah+"\">"+this.app.id+"</span><br>";
+		} else {
+			content += sys.id+": <span id=\"appid"+this.instance+this.blah+"\">Not yet assigned</span><br>";
+		}
 	        content += sys.name+": <span id=\"appname"+this.instance+this.blah+"\"></span><br>";
 	        content += sys.author+": <span id=\"appauthor"+this.instance+this.blah+"\"></span><br>";
 	        content += sys.email+": <span id =\"appemail"+this.instance+this.blah+"\"></span><br>";
@@ -235,7 +239,7 @@
 	
 	execute: function()
 	{
-		api.ui.alertDialog({title:"Katana IDE", message:this.editor.value});
+		//api.ui.alertDialog({title:"Katana IDE", message:this.editor.value});
 		api.ide.execute(this.editor.value);
 	},
 	
