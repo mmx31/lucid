@@ -17,6 +17,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 	_popup: null,
 	preload: true,
 	autoRedirect: false,
+	label: "Desktop Login",
 	postCreate: function() {
 		this.inherited(arguments);
 		new dijit.form.TextBox({
