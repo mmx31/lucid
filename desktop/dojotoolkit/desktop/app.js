@@ -235,7 +235,7 @@ desktop.app = new function()
 	{
 		api.log("launching app "+id);
 		if(typeof this.apps["app"+id] == "undefined")
-		{this.fetchApp(id, dojo.hitch(this, this.launch), args);}
+		{this.fetchApp(id, dojo.hitch(this, "launch", id, args));}
 		else
 		{
 			try {
@@ -246,10 +246,10 @@ desktop.app = new function()
 				});
 				dojo.connect(instance, "kill", instance, function() {
                     this.status = "killed";
-					var instance = this.instance;
+					var pid = this.instance;
 					//allow the garbage collector to free up memory
 					setTimeout(function(){
-						desktop.app.instances[instance]=null;
+						desktop.app.instances[pid]=null;
 					}, desktop.config.window.animSpeed + 50);
                 });
 			}

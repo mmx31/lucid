@@ -3,24 +3,6 @@
 	editing: false,
 	fileEditing: "",
 	
-	init: function(args) {
-	    dojo.require("dijit.Toolbar");
-	    dojo.require("dijit.layout.ContentPane");
-		dojo.requireLocalization("desktop", "common");
-		dojo.requireLocalization("desktop", "apps");
-		dojo.requireLocalization("desktop", "messages");
-	    if (args.file) {
-	        this.start();
-	        this._processOpen(args.file);
-	
-	    }
-	    else {
-	        this.start();
-	
-	    }
-	
-	},
-	
 	kill: function() {
 	    if (typeof(this.window) != "undefined") {
 	        this.window.close();
@@ -28,7 +10,12 @@
 	    }
 	},
 	
-	start: function() {
+	init: function(args) {
+	    dojo.require("dijit.Toolbar");
+	    dojo.require("dijit.layout.ContentPane");
+		dojo.requireLocalization("desktop", "common");
+		dojo.requireLocalization("desktop", "apps");
+		dojo.requireLocalization("desktop", "messages");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
@@ -71,8 +58,7 @@
 	    },
 	    document.createElement("div"));
 	    this.other = new dijit.layout.ContentPane({
-	        layoutAlign: "bottom",
-	        style: "height: 10%"
+	        layoutAlign: "bottom"
 	    },
 	    document.createElement("div"));
 		this.editor = document.createElement("textarea");
@@ -87,7 +73,8 @@
 	    this.window.height = "305px";
 	    this.window.show();
 	    this.window.startup();
-		this.processNew();
+		if(args.file) this._processOpen(args.file);
+		else this.processNew();
 	},
 	processNew: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
@@ -113,7 +100,7 @@
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    api.ui.fileDialog({
 	        title: msg.chooseFileOpen,
-	        callback: dojo.hitch(this, this._processOpen)
+	        callback: dojo.hitch(this, "_processOpen")
 	    });
 	
 	},
@@ -128,15 +115,13 @@
 	    this.editor.disabled = true;
 	    api.fs.read({
 	        path: path,
-	        callback: dojo.hitch(this, 
-	        function(array) {
+	        callback: dojo.hitch(this, function(array) {
 	            this.editor.value = array.contents;
 	            this.editing = true;
 	            this.newAs = true;
 	            this.editor.disabled = false;
-	            this.fileEditing = array.path;
-	            this.other.setContent(msg.editingFile.replace("%s", array.path));
-	
+	            this.fileEditing = path;
+	            this.other.setContent(msg.editingFile.replace("%s", path));
 	        })
 	    });
 	
