@@ -46,5 +46,6 @@
 	"deny": "Deny",
 	"default": "Default",
 	"groupAlreadyExists": "Group with that name already exists",
-	"manageGroupMembers": "Manage %s members"
+	"manageGroupMembers": "Manage %s members",
+	"notAssigned": "Not yet assigned"
 })

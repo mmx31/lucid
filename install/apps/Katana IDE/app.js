@@ -137,7 +137,7 @@
 		if ( this.app.id != -1 ) {
 		        content += sys.id+": <span id=\"appid"+this.instance+this.blah+"\">"+this.app.id+"</span><br>";
 		} else {
-			content += sys.id+": <span id=\"appid"+this.instance+this.blah+"\">Not yet assigned</span><br>";
+			content += sys.id+": <span id=\"appid"+this.instance+this.blah+"\">"+sys.notAssigned+"</span><br>";
 		}
 	        content += sys.name+": <span id=\"appname"+this.instance+this.blah+"\"></span><br>";
 	        content += sys.author+": <span id=\"appauthor"+this.instance+this.blah+"\"></span><br>";

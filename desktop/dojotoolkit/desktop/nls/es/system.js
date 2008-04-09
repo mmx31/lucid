@@ -45,5 +45,6 @@
 	"deny": "Denegar",
 	"default": "Defecto",
 	"groupAlreadyExists": "Grupo con ese nombre ya existe",
-	"manageGroupMembers": "Administrar los miembros de %s"
+	"manageGroupMembers": "Administrar los miembros de %s",
+	"notAssigned": "Aún no se ha asignado"
 })
