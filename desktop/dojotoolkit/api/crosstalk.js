@@ -126,10 +126,11 @@ api.crosstalk = new function()
 	 */
 	this._internalCheck2 = function(data, ioArgs)
 	{	// JayM: I tried to optimize the thing as much as possible, add more optimization if needed. 
-		if(data == "") return;
+		if(data == "") { this.setup_timer(); return; }
 		// No events here. (Screwed up code)
 		var handled = false;
 		dojo.forEach(results, function(result) {
+			api.log("processing result...");
 			for(var x = 0; x<api.crosstalk.session.length; x++)
 			{
 				if(api.crosstalk.session[x].suspended != true)
