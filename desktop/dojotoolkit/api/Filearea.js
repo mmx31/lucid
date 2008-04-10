@@ -75,7 +75,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 			if(path.charAt(path.length-1) == "/") dirs.pop();
 			if(path.charAt(0) == "/") dirs.shift();
 			dirs.pop();
-			if(dirs.length == 0) this.setPath("/");
+			if(dirs.length == 0) this.setPath(protocol+"://");
 			else this.setPath(protocol+"://"+dirs.join("/")+"/");
 		}
 	},
@@ -308,10 +308,22 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		this.labelNode.appendChild(textbox.domNode);
 		textbox.focus();
 		var evt = dojo.connect(document, "onmousedown", this, function(e) {
+			if(dijit.getEnclosingWidget(e.target).id == textbox.id) return;
 			dojo.disconnect(evt);
 			var value = textbox.getValue();
+			dojo.forEach([
+				this.textFront,
+				this.textBack,
+				this.textHidden
+			], function(node) {
+				node.textContent = value;
+			});
+			api.fs.rename({
+				path: this.getParent().path+"/"+this.name,
+				newname: value
+			});
+			this.name = value;
 			textbox.destroy();
-			console.log(value);
 		})
 	},
 	deleteFile: function(e)
