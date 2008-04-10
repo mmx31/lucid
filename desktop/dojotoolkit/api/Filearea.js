@@ -234,12 +234,19 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 	//	name: string
 	//		the file's full name
 	name: "File.txt",
+	//	_clickOrigin: object
+	//		the origin of the mouse when we are clicked. Used for DnD.
+	_clickOrigin: {x: 0, y: 0},
+	//	_docNode: domNode
+	//		the domNode that is on the document. Used for DnD.
+	_docNode: null,
 	postCreate: function() {
 		var nc = dojo.i18n.getLocalization("desktop", "common");
 		var nf = dojo.i18n.getLocalization("api", "filearea");
 		
 		this.connect(this.iconNode, "ondblclick", "_onDblClick");
 		this.connect(this.labelNode, "ondblclick", "rename");
+		this.connect(this.domNode, "onmousedown", "_dragStart");
 		
 		var menu = this.menu = new dijit.Menu({});
 		menu.addChild(new dijit.MenuItem({label: nc.open, iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
@@ -276,6 +283,47 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		menu.addChild(new dijit.MenuItem({label: nc.rename, iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, "rename")}));
 		menu.addChild(new dijit.MenuItem({label: nc["delete"], iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, "deleteFile")}));
 		
+	},
+	_dragStart: function(e) {
+		this._clickOrigin = {x: e.clientX, y: e.clientY};
+		this._docMouseUpEvent = dojo.connect(document, "onmouseup", this, "_onRelease");
+		this._onDragEvent = dojo.connect(document, "onmousemove", this, "_onMove");
+		this._docEvents = [
+			dojo.connect(document, "ondragstart", dojo, "stopEvent"),
+			dojo.connect(document, "onselectstart", dojo, "stopEvent")
+		];
+		this._docMouseUpEvent = dojo.connect(document, "onmouseup", this, "_onRelease");
+		dojo.style(document.body, "cursor", "move");
+		dojo.stopEvent(e);
+	},
+	_onMove: function(e) {
+		//if the mouse hasn't moved at least five pixels, don't do anything
+		if((Math.abs(e.clientX - this._clickOrigin.x) < 5
+		|| Math.abs(e.clientY - this._clickOrigin.y) < 5)
+		|| ((Math.abs(e.clientX - this._clickOrigin.x) < 5
+		&& Math.abs(e.clientY - this._clickOrigin.y) < 5))) return;
+		//if we haven't copied ourselves to the document yet, let's do that now
+		if(!this._docNode) {
+			this._docNode = dojo.clone(this.domNode);
+			dojo.style(this._docNode, {
+				zIndex: 1000,
+				position: "absolute"
+			})
+			dojo.addClass(this._docNode, "ghost");
+			document.body.appendChild(this._docNode);
+		}
+		this._docNode.style.top=(e.clientY+1)+"px";
+		this._docNode.style.left=(e.clientX+1)+"px";
+	},
+	_onRelease: function(e) {
+		dojo.disconnect(this._onDragEvent);
+		dojo.disconnect(this._docMouseUpEvent);
+		dojo.forEach(this._docEvents, dojo.disconnect);
+		if(this._docNode) {
+			this._docNode.parentNode.removeChild(this._docNode);
+			this._docNode = null;
+		}
+		dojo.style(document.body, "cursor", "default");
 	},
 	_onDblClick: function(e) {
 		if(this.type=="text/directory") {
