@@ -1,10 +1,8 @@
 dojo.provide("api.Filearea");
-dojo.require("dijit._Widget");
-dojo.require("dijit._Container");
-dojo.require("dijit._Templated");
+dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dijit.Menu");
 
-dojo.declare("api.Filearea", [dijit._Widget, dijit._Container, dijit._Contained], {
+dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 	//	path: String
 	//		the path that the filearea should start at
 	path: "file://",
@@ -135,7 +133,7 @@ dojo.declare("api.Filearea", [dijit._Widget, dijit._Container, dijit._Contained]
 		//		Lays out the icons vertically or horizontally depending on the value of the 'vertical' property
 		var width = this.domNode.offsetWidth;
 		var height = this.domNode.offsetHeight;
-		var spacing = 80;
+		var spacing = 100;
 		var wc = 0; //width counter
 		var hc = 0; //height counter
 		var children = this.getChildren();
@@ -148,7 +146,7 @@ dojo.declare("api.Filearea", [dijit._Widget, dijit._Container, dijit._Contained]
 				left: (!this.vertical ? wc : hc)+"px"
 			});
 			wc += spacing;
-			if(wc >= (this.vertical ? height : width)) {
+			if(wc >= (this.vertical ? height : width)-spacing) {
 				wc = 0;
 				hc += spacing;
 			}

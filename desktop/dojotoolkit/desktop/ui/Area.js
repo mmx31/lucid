@@ -16,7 +16,13 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 	drawn: false,
 	postCreate: function() {
 		var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
-		var filearea = this.filearea = new api.Filearea({path: "file://Desktop/", forDesktop: true, subdirs: false, style: "position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;", overflow: "hidden"});
+		var filearea = this.filearea = new api.Filearea({
+			path: "file://Desktop/",
+			subdirs: false,
+			vertical: true,
+			textShadow: true,
+			style: "position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;", overflow: "hidden"
+		});
 		dojo.addClass(filearea.domNode, "mainFileArea");
 		filearea.menu.addChild(new dijit.MenuSeparator({}));
 		filearea.menu.addChild(new dijit.MenuItem({label: l.wallpaper, iconClass: "icon-16-apps-preferences-desktop-wallpaper", onClick: dojo.hitch(desktop.ui.config, "appearance")}));

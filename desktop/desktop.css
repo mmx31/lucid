@@ -314,10 +314,11 @@ margin: 0px;
 	filter: Opacity(80);
 }
 
-.iconLabel {
+.iconLabel, .shadowHidden, .shadowFront, .shadowBack {
 	width: 80px;
 	position: relative;
 	text-align: center;
+	word-wrap: break-word;
 }
 
 .shadowFront, .shadowBack {
