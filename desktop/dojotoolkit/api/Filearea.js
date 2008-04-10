@@ -1,6 +1,8 @@
 dojo.provide("api.Filearea");
 dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dijit.Menu");
+dojo.requireLocalization("desktop", "common");
+dojo.requireLocalization("api", "filearea");
 
 dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 	//	path: String
@@ -17,13 +19,17 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 	subdirs: true,
 	menu: null,
 	postCreate: function() {
-		this.menu = new dijit.Menu();
-		dojo.connect(this.domNode, "onclick", this, "_onClick");
+		var cm = dojo.i18n.getLocalization("desktop", "common");
+		var nf = dojo.i18n.getLocalization("api", "filearea");
 		
-		if(dojo.isIE){
-			dojo.connect(this.domNode,'onresize', this,"layout");
-		}
-		dojo.connect(window,'onresize',this,"layout");
+		this.connect(this.domNode, "onclick", "_onClick");
+		this.connect(this.domNode, "oncontextmenu", "_onRightClick");
+		
+		var menu = this.menu = new dijit.Menu({});
+		menu.addChild(new dijit.MenuItem({label: nf.createFolder, iconClass: "icon-16-actions-folder-new", onClick: dojo.hitch(this, this._makeFolder)}));
+		menu.addChild(new dijit.MenuItem({label: nf.createFile, iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, this._makeFile)}));
+		menu.addChild(new dijit.MenuSeparator({}));
+		menu.addChild(new dijit.MenuItem({label: cm.refresh, iconClass: "icon-16-actions-view-refresh", onClick: dojo.hitch(this, this.refresh)}));
 	},
 	onItem: function(/*String*/path)
 	{
@@ -93,6 +99,24 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 			})
 		}
 	},
+	_onRightClick: function(e)
+	{
+		//	summary:
+		//		Event Handler
+		//		passes click event to the appropriate child widget
+		//		if a widget wasn't clicked on, we open our own menu
+		var w = dijit.getEnclosingWidget(e.target);
+		if(w.declaredClass == "api.Filearea._Icon")
+		{
+			w.menu._contextMouse();
+			w.menu._openMyself(e);
+		}
+		else
+		{
+			this.menu._contextMouse();
+			this.menu._openMyself(e);
+		}
+	},
 	refresh: function() {
 		//	summary:
 		//		refreshes the area
@@ -133,7 +157,8 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		//		Lays out the icons vertically or horizontally depending on the value of the 'vertical' property
 		var width = this.domNode.offsetWidth;
 		var height = this.domNode.offsetHeight;
-		var spacing = 100;
+		var hspacing = 100;
+		var vspacing = 70;
 		var wc = 0; //width counter
 		var hc = 0; //height counter
 		var children = this.getChildren();
@@ -145,10 +170,10 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				top: (this.vertical ? wc : hc)+"px",
 				left: (!this.vertical ? wc : hc)+"px"
 			});
-			wc += spacing;
-			if(wc >= (this.vertical ? height : width)-spacing) {
+			wc += (this.vertical ? vspacing : hspacing);
+			if(wc >= (this.vertical ? height : width)-(this.vertical ? vspacing : hspacing)) {
 				wc = 0;
-				hc += spacing;
+				hc += (this.vertical ? vspacing : hspacing);
 			}
 		};
 	}
@@ -175,7 +200,46 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 	//		the file's full name
 	name: "File.txt",
 	postCreate: function() {
-		dojo.connect(this.iconNode, "ondblclick", this, "_onDblClick");
+		var nc = dojo.i18n.getLocalization("desktop", "common");
+		var nf = dojo.i18n.getLocalization("api", "filearea");
+		
+		this.connect(this.iconNode, "ondblclick", "_onDblClick");
+		
+		var menu = this.menu = new dijit.Menu({});
+		menu.addChild(new dijit.MenuItem({label: nc.open, iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
+			var menuDl = new dijit.PopupMenuItem({iconClass: "icon-16-actions-document-open", label: nc.download});
+			var menu2 = new dijit.Menu({parentMenu: menuDl});
+			if(!this.isDir) { menu2.addChild(new dijit.MenuItem({label: nf.asFile, onClick: dojo.hitch(this, function(e) {
+				api.fs.download(this.path);
+			})}));
+			menu2.addChild(new dijit.MenuItem({label: nf.asZip ,onClick: dojo.hitch(this, function(e) {
+				api.fs.compressDownload(this.path, "zip");
+			})}));
+			menu2.addChild(new dijit.MenuItem({label: nf.asTgz, onClick: dojo.hitch(this, function(e) {
+				api.fs.compressDownload(this.path, "gzip");
+			})}));
+			menu2.addChild(new dijit.MenuItem({label: nf.asTbz2, onClick: dojo.hitch(this, function(e) {
+				api.fs.compressDownload(this.path, "bzip");
+			})}));
+			}
+			if(this.type == "text/directory") {
+				menu2.addChild(new dijit.MenuItem({label: nf.asZip, onClick: dojo.hitch(this, function(e) {
+					api.fs.downloadFolder(this.path, "zip");
+				})}));
+				menu2.addChild(new dijit.MenuItem({label: nf.asTgz, onClick: dojo.hitch(this, function(e) {
+					api.fs.downloadFolder(this.path, "gzip");
+				})}));
+				menu2.addChild(new dijit.MenuItem({label: nf.asTbz2, onClick: dojo.hitch(this, function(e) {
+					api.fs.downloadFolder(this.path, "bzip");
+				})}));
+			}
+			menu2.startup();
+			menuDl.popup = menu2;
+			menu.addChild(menuDl);
+		menu.addChild(new dijit.MenuSeparator({}));
+		menu.addChild(new dijit.MenuItem({label: "Rename", iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, this._rename_file)}));
+		menu.addChild(new dijit.MenuItem({label: "Delete", iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, this._delete_file)}));
+		
 	},
 	_onDblClick: function() {
 		if(this.type=="text/directory") {
