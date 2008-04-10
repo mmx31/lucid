@@ -50,6 +50,39 @@ desktop.user = new function() {
         });
 	}
 	/*
+	 * Method: getID
+	 *
+	 * Gets the ID of a certain user by certain information
+	 *
+	 * Arguments:
+	 * 	options - an object
+	 *
+	 * Note:
+	 * 	The options argument has upto four keys but at least two
+	 * 	callback - a callback function
+	 * 	username - the username of the user to get ID
+	 * 	name - the name of the user to get ID
+	 * 	email - the email of the user to get ID
+	 *
+	 * 	Returns integer as ID
+	 */
+	this.getID = function(options) {
+		if(!options.username) { options.username = "0"; }
+		if(!options.name) { options.name = "0"; }
+		if(!options.email) { options.email = "0"; }
+		api.xhr({
+	        backend: "core.user.info.translate",
+			content: {
+				username: options.username,
+				name: options.name,
+				email: options.email
+			},
+	        load: function(data, ioArgs) {
+	        	if(options.callback) { options.callback(data); }
+			}
+        });
+	}
+	/*
 	 * Method: authentication
 	 *
 	 * changes/retrieves a user's authentication information

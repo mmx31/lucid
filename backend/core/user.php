@@ -21,6 +21,13 @@
 	if($_GET['section'] == "info")
 	{
 		if ($_GET['action'] == "get") {
+			if($_POST['username']) { $x = "username"; $y = $_POST['username']; }
+			if($_POST['name']) { $x = "name"; $y = $_POST['name']; }
+			if($_POST['email']) { $x = "email"; $y = $_POST['email']; }
+			$u = $User->filter($x, $y);
+			echo $u[0]->id;
+		}
+		if ($_GET['action'] == "convert") {
 			if($_POST['id'] == "0") { $user = $User->get_current(); }
 			else { $user = $User->get($_POST['id']); }
 			$out = new jsonOutput();
