@@ -522,6 +522,9 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	{
 		var ns = dojo.query("div.win", desktop.ui.containerNode);
 		var maxZindex = 10;
+		var alwaysOnTopNum = 0;		// Number of wins with 'alwaysOnTop' property set to true
+		var topWins = new Array();	// Array of reffernces to win widgets with 'alwaysOnTop' property set to true
+		var winWidget;			// Reffernce to window widget by dom node
 		for(i=0;i<ns.length;i++)
 		{
 			if(dojo.style(ns[i], "display") == "none") continue;
@@ -529,12 +532,24 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			{
 				maxZindex = dojo.style(ns[i], "zIndex");
 			}
+			winWidget = dijit.byNode(ns[i]);
+			if ( winWidget.alwaysOnTop == true ) {
+				alwaysOnTopNum++;
+				topWins.push( winWidget );
+			}
 		}
 		var zindex = dojo.style(this.domNode, "zIndex");
 		if(maxZindex != zindex)
 		{
 			maxZindex++;
 			dojo.style(this.domNode, "zIndex", maxZindex);
+			// Check for win widgets with 'alwaysOnTop' property set to true
+			if ( topWins.length > 0 ) {
+				for ( i=0; i < topWins.length; i++ ) {
+					maxZindex++;
+					dojo.style(topWins[i].domNode, "zIndex", maxZindex);
+				}
+			}
 			return true;
 		}
 		return false;
