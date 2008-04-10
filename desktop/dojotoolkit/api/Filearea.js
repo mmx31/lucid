@@ -292,7 +292,6 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			dojo.connect(document, "ondragstart", dojo, "stopEvent"),
 			dojo.connect(document, "onselectstart", dojo, "stopEvent")
 		];
-		this._docMouseUpEvent = dojo.connect(document, "onmouseup", this, "_onRelease");
 		dojo.style(document.body, "cursor", "move");
 		dojo.stopEvent(e);
 	},
@@ -316,14 +315,29 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		this._docNode.style.left=(e.clientX+1)+"px";
 	},
 	_onRelease: function(e) {
-		dojo.disconnect(this._onDragEvent);
 		dojo.disconnect(this._docMouseUpEvent);
+		dojo.disconnect(this._onDragEvent);
 		dojo.forEach(this._docEvents, dojo.disconnect);
-		if(this._docNode) {
-			this._docNode.parentNode.removeChild(this._docNode);
-			this._docNode = null;
-		}
 		dojo.style(document.body, "cursor", "default");
+		if(this._docNode) {
+			var onEnd = dojo.hitch(this, function() {
+				if(this._docNode.parentNode) this._docNode.parentNode.removeChild(this._docNode);
+				this._docNode = null;
+			});
+			if(desktop.config.fx > 0) {
+				var l = dojo.coords(this.domNode);
+				var anim = dojo.animateProperty({
+					node: this._docNode,
+					properties: {
+						top: l.y,
+						left: l.x
+					}
+				})
+				anim.onEnd = onEnd;
+				anim.play();
+			}
+			else onEnd();
+		}
 	},
 	_onDblClick: function(e) {
 		if(this.type=="text/directory") {
