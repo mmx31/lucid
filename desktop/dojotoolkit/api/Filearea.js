@@ -273,8 +273,8 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			menuDl.popup = menu2;
 			menu.addChild(menuDl);
 		menu.addChild(new dijit.MenuSeparator({}));
-		menu.addChild(new dijit.MenuItem({label: "Rename", iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, "rename")}));
-		menu.addChild(new dijit.MenuItem({label: "Delete", iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, "deleteFile")}));
+		menu.addChild(new dijit.MenuItem({label: nc.rename, iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, "rename")}));
+		menu.addChild(new dijit.MenuItem({label: nc["delete"], iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, "deleteFile")}));
 		
 	},
 	_onDblClick: function(e) {
@@ -311,18 +311,20 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			if(dijit.getEnclosingWidget(e.target).id == textbox.id) return;
 			dojo.disconnect(evt);
 			var value = textbox.getValue();
-			dojo.forEach([
-				this.textFront,
-				this.textBack,
-				this.textHidden
-			], function(node) {
-				node.textContent = value;
-			});
 			api.fs.rename({
 				path: this.getParent().path+"/"+this.name,
-				newname: value
+				newname: value,
+				callback: dojo.hitch(this, function() {
+					dojo.forEach([
+						this.textFront,
+						this.textBack,
+						this.textHidden
+					], function(node) {
+						node.textContent = value;
+					});
+					this.name = value;
+				})
 			});
-			this.name = value;
 			textbox.destroy();
 		})
 	},
@@ -330,7 +332,11 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 	{
 		//	summary:
 		//		Delete the file on the filesystem this instance represents
-		api.fs.rm({path: this.path, callback: dojo.hitch(this, "destroy")});
+		api.fs.rm({path: this.getParent().path+"/"+this.name, callback: dojo.hitch(this, function() {
+			var p = this.getParent();
+			this.destroy();
+			p.layout();
+		})});
 	},
 	unhighlight: function() {
 		//	summary:

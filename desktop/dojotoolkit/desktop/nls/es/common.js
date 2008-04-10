@@ -37,5 +37,6 @@
 	"untitled": "No titulado",
 	"delete": "Borre",
 	"create": "Cree",
-	"error": "Error"
+	"error": "Error",
+	"rename": "Cambie nombre"
 })

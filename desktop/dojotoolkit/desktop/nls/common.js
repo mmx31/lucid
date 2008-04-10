@@ -37,5 +37,6 @@
 	"untitled": "Untitled",
 	"delete": "Delete",
 	"create": "Create",
-	"error": "Error"
+	"error": "Error",
+	"rename": "Rename"
 })
