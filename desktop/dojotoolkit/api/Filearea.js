@@ -24,44 +24,24 @@ dojo.declare(
 	"api.Filearea",
 	[dijit._Widget, dijit._Templated, dijit._Container, dijit._Contained],
 {
-	/*
-	 * Property: path
-	 * 
-	 * The current path. You can set this during creation, but not afterword.
-	 */
-	path: "/",
-	/*
-	 * Property: operation
-	 * 
-	 * I forgot what this does. Oh noes.
-	 */
-	operation: [],
-	/*
-	 * Property: iconStyle
-	 * 
-	 * This doesn't do anything yet.
-	 */
-	iconStyle: "list",
-	/*
-	 * Property: overflow
-	 * 
-	 * What should be done when the area is full. Values are just like in CSS (auto, scroll, none, etc)
-	 */
-	overflow: "scroll",
-	/*
-	 * Property: subdirs
-	 * 
-	 * Can the user navigate through subdirectories?
-	 * if not then they open in new browser windows
-	 */
-	subdirs: true,
-	/*
-	 * Property: forDesktop
-	 * 
-	 * I actually think this doesn't do anything anymore. It used to be set to true so it acted like the one on the desktop.
-	 */
-	forDesktop: false,
+	//	summary:
+	//		a filesystem navigation widget
 	templatePath: dojo.moduleUrl("api", "templates/Filearea.html"),
+	//	path: String
+	//		The current path. You can set this during creation, but not afterword.
+	path: "/",
+	//	operation: Array
+	// I forgot what this does. Oh noes.
+	operation: [],
+	//	overflow: String
+	//		What should be done when the area is full. Values are just like in CSS (auto, scroll, none, etc.
+	overflow: "scroll",
+	//	subdirs: boolean
+	//		Can the user navigate through subdirectories? if not then they open in new browser windows
+	subdirs: true,
+	//	forDesktop: boolean
+	//		Is this filearea on the desktop?
+	forDesktop: false,
 	postCreate: function() {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var nf = dojo.i18n.getLocalization("api", "filearea");
@@ -98,13 +78,10 @@ dojo.declare(
 			}
 		});
 	},
-	/*
-	 * Method: refresh
-	 * 
-	 * Refreshes the file list
-	 */
 	refresh: function()
 	{
+		//	summary:
+		//		Refreshes the file list
 		this.source.selectAll().deleteSelectedNodes();
 		dojo.forEach(this.getChildren(), dojo.hitch(this, function(item){
 			item.destroy();
@@ -139,15 +116,11 @@ dojo.declare(
 			})
 		});
 	},
-	/*
-	 * Method: _makeFolder
-	 * 
-	 * Makes a folder in the current dir
-	 * 
-	 * TODO:
-	 * 		Alert the user if that dir allready exists
-	 */
 	_makeFolder: function() {
+		//	summary:
+		//		Makes a folder in the current dir
+		
+		//TODO: Alert the user if that dir allready exists
 		var nf = dojo.i18n.getLocalization("api", "filearea");
 		api.ui.inputDialog({
 			title: nf.createFolder,
@@ -161,15 +134,11 @@ dojo.declare(
 			})
 		});
 	},
-	/*
-	 * Method: _makeFile
-	 * 
-	 * Makes a file in the current dir
-	 * 
-	 * TODO:
-	 * 		Alert the user if that file allready exists
-	 */
 	_makeFile: function() {
+		//	summary:
+		//		Makes a file in the current dir
+		
+		//TODO: Alert the user if that dir allready exists
 		var nf = dojo.i18n.getLocalization("api", "filearea");
 		api.ui.inputDialog({
 			title: nf.createFile,
@@ -183,36 +152,24 @@ dojo.declare(
 			})
 		});
 	},
-	/*
-	 * Method: clearSelection
-	 * 
-	 * Clears the current selection
-	 */
 	clearSelection: function()
 	{
+		//	summary:
+		//		Clears the current selection
 		this.source.selectNone();
 		this.unhighlightChildren();
 	},
-	/*
-	 * Method: unhighlightChildren
-	 * 
-	 * unhilight the widget's children
-	 * 
-	 * TODO:
-	 * 		Doesn't the above function do this allready???
-	 */
 	unhighlightChildren: function() {
+		//	summary:
+		//		unhilight the widget's children
 		dojo.forEach(this.getChildren(), function(c) {
 			c.unhighlight();
 		});
 	},
-	/*
-	 * Method: up
-	 * 
-	 * Navigates up one directory
-	 */
 	up: function()
 	{
+		//	summary:
+		//		Navigates up one directory
 		var path = this.path.split("://");
 		if(typeof path[1] == "undefined") {
 			path = path[0];
@@ -231,13 +188,10 @@ dojo.declare(
 			else this.setPath(protocol+"://"+dirs.join("/")+"/");
 		}
 	},
-	/*
-	 * Method: setPath
-	 * 
-	 * Sets the current path
-	 */
 	setPath: function(path)
 	{
+		//	summary:
+		//		Sets the current path
 		if (this.subdirs) {
 			this.path = path;
 			this.refresh();
@@ -245,14 +199,11 @@ dojo.declare(
 		}
 		else desktop.app.launchHandler(path);
 	},
-	/*
-	 * Method: _onClick
-	 * 
-	 * Event handler
-	 * passes click event to the appropriate child widget's event
-	 */
 	_onClick: function(e)
 	{
+		//	summary:
+		//		Event handler
+		//		passes click event to the appropriate child widget's event
 		var w = dijit.getEnclosingWidget(e.target);
 		if (w.declaredClass == "api.Filearea._Item") {
 			if (dojo.hasClass(e.target, "desktopFileItemIcon")) 
@@ -279,6 +230,10 @@ dojo.declare(
 	 */
 	_onRightClick: function(e)
 	{
+		//	summary:
+		//		Event handler
+		//		passes click event to the appropriate child widget
+		//		if a widget wasn't clicked on, we open our own menu
 		var w = dijit.getEnclosingWidget(e.target);
 		if(w.declaredClass == "api.Filearea._Item")
 		{
@@ -291,41 +246,29 @@ dojo.declare(
 			this.menu._openMyself(e);
 		}
 	},
-	/*
-	 * Method: onItem
-	 * 
-	 * Called when an item is open
-	 * You can overwrite this with your own function.
-	 * Defaults to opening the file
-	 * 
-	 * Arguments:
-	 * 		path - the path to the file
-	 */
 	onItem: function(/*String*/path)
 	{
+		//	summary:
+		//		Called when an item is open
+		//		You can overwrite this with your own function.
+		//		Defaults to opening the file
+		//	path:
+		//		the path to the file
 		desktop.app.launchHandler(path);
 	},
-	/*
-	 * Method: onHighlight
-	 * 
-	 * hook for when an icon is highlighted
-	 * 
-	 * Arguments:
-	 * 		path - the path to the file
-	 */
 	onHighlight: function(/*String*/path)
 	{
+		//	summary:
+		//		hook for when an icon is highlighted
+		//	path:
+		//		the path to the file
 	},
-	/*
-	 * Method: onPathChange
-	 * 
-	 * Event hook for when the path changes
-	 * 
-	 * Arguments:
-	 * 		path - the path to the file
-	 */
 	onPathChange: function(/*String*/path)
 	{
+		//	summary:
+		//		Event hook for when the path changes
+		//	path:
+		//		the path to the file
 	},
 	startup: function()
 	{
@@ -344,26 +287,15 @@ dojo.declare(
 	"api.Filearea._Item",
 	[dijit._Widget, dijit._Templated, dijit._Contained],
 {
-	/*
-	 * Property: iconClass
-	 * 
-	 * The icon class to use
-	 */
+	//	iconClass: String
+	//		the icon class to use
 	iconClass: "",
-	/*
-	 * Property: label
-	 * 
-	 * The label to be shown underneath the icon
-	 */
+	//	label: String
+	//		The label to be shown underneath the icon
 	label: "file",
-	/*
-	 * Property: highlighted
-	 * 
-	 * readonly property that is true if the item is highlighted
-	 * 
-	 * Note:
-	 * 		This is actually used for double click handling, not visual highlighting (I know, it's confusing)
-	 */
+	//	highlighted: Boolean
+	//		readonly property that is true if the item is highlighted
+	//		This is actually used for double click handling, not visual highlighting (I know, it's confusing)
 	highlighted: false,
 	/*
 	 * Property: isDir
