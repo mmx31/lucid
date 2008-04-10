@@ -1,6 +1,7 @@
 dojo.provide("api.Filearea");
 dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dijit.Menu");
+dojo.require("dijit.form.TextBox");
 dojo.requireLocalization("desktop", "common");
 dojo.requireLocalization("api", "filearea");
 
@@ -85,11 +86,9 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 			if (dojo.hasClass(e.target, "fileIcon")) 
 				w._onIconClick();
 			else 
-				if (dojo.hasClass(e.target, "shadowFront") ||
+				if (!(dojo.hasClass(e.target, "shadowFront") ||
 				dojo.hasClass(e.target, "shadowBack") ||
-				dojo.hasClass(e.target, "iconLabel")) 
-					w.rename();
-				else 
+				dojo.hasClass(e.target, "iconLabel"))) 
 					w._onIconClick();
 		}
 		else {
@@ -98,6 +97,42 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				item.unhighlight();
 			})
 		}
+	},
+	_makeFolder: function() {
+		//	summary:
+		//		Makes a folder in the current dir
+		
+		//TODO: Alert the user if that dir allready exists
+		var nf = dojo.i18n.getLocalization("api", "filearea");
+		api.ui.inputDialog({
+			title: nf.createFolder,
+			message: nf.createFolderText,
+			callback: dojo.hitch(this, function(dirname) {
+				if(dirname == "") return;
+				api.fs.mkdir({
+					path: this.path+"/"+escape(dirname),
+					callback: dojo.hitch(this, this.refresh)
+				});
+			})
+		});
+	},
+	_makeFile: function() {
+		//	summary:
+		//		Makes a file in the current dir
+		
+		//TODO: Alert the user if that file allready exists
+		var nf = dojo.i18n.getLocalization("api", "filearea");
+		api.ui.inputDialog({
+			title: nf.createFile,
+			message: nf.createFileText,
+			callback: dojo.hitch(this, function(filename) {
+				if(filename == "") return;
+				api.fs.write({
+					path: this.path+"/"+escape(filename),
+					callback: dojo.hitch(this, this.refresh)
+				});
+			})
+		});
 	},
 	_onRightClick: function(e)
 	{
@@ -204,6 +239,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		var nf = dojo.i18n.getLocalization("api", "filearea");
 		
 		this.connect(this.iconNode, "ondblclick", "_onDblClick");
+		this.connect(this.labelNode, "ondblclick", "rename");
 		
 		var menu = this.menu = new dijit.Menu({});
 		menu.addChild(new dijit.MenuItem({label: nc.open, iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
@@ -237,11 +273,11 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			menuDl.popup = menu2;
 			menu.addChild(menuDl);
 		menu.addChild(new dijit.MenuSeparator({}));
-		menu.addChild(new dijit.MenuItem({label: "Rename", iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, this._rename_file)}));
-		menu.addChild(new dijit.MenuItem({label: "Delete", iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, this._delete_file)}));
+		menu.addChild(new dijit.MenuItem({label: "Rename", iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, "rename")}));
+		menu.addChild(new dijit.MenuItem({label: "Delete", iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, "deleteFile")}));
 		
 	},
-	_onDblClick: function() {
+	_onDblClick: function(e) {
 		if(this.type=="text/directory") {
 			this.getParent().setPath(this.getParent().path+"/"+this.name);
 		}
@@ -265,6 +301,24 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 	rename: function() {
 		//	summary:
 		//		show a textbox that renames the file
+		var textbox = new dijit.form.TextBox({
+			style: "width: 100%; height: 100%; position: absolute; top: 0px; left: 0px; z-index: 100;",
+			value: this.name
+		});
+		this.labelNode.appendChild(textbox.domNode);
+		textbox.focus();
+		var evt = dojo.connect(document, "onmousedown", this, function(e) {
+			dojo.disconnect(evt);
+			var value = textbox.getValue();
+			textbox.destroy();
+			console.log(value);
+		})
+	},
+	deleteFile: function(e)
+	{
+		//	summary:
+		//		Delete the file on the filesystem this instance represents
+		api.fs.rm({path: this.path, callback: dojo.hitch(this, "destroy")});
 	},
 	unhighlight: function() {
 		//	summary:
