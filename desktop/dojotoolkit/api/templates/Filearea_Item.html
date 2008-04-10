@@ -1,7 +1,8 @@
-<div class='desktopFileItem' style='width: 80px; height: 50px; padding: 10px;' dojoAttachPoint='focusNode'>
-	<div class='desktopFileItemIcon ${iconClass}' dojoAttachPoint='iconNode'></div>
-	<div class='desktopFileItemText' style='padding-left: 2px; padding-right: 2px; text-align: center;'>
-		<div dojoAttachPoint='textFront' class='desktopFileItemTextFront'>${label}</div>
-		<div dojoAttachPoint='textBack' class='desktopFileItemTextBack'>${label}</div>
+<div class='fileItem' style='width: 80px; height: 50px; padding: 10px;' dojoAttachPoint='focusNode'>
+	<div class='fileIcon ${iconClass}' dojoAttachPoint='iconNode'></div>
+	<div class='iconLabel' dojoAttachPoint='labelNode'>
+		<div dojoAttachPoint='textFront' class='shadowFront'>${label}</div>
+		<div dojoAttachPoint='textBack' class='shadowBack'>${label}</div>
+		<div dojoAttachPoint='textHidden' class='shadowHidden'>${label}</div>
 	</div>
 </div>
