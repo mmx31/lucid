@@ -101,6 +101,12 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	 */
 	minimized: false,
 	/*
+	 * Property: alwaysOnTop
+	 * 
+	 * Whether or not the window is to always stay on top of other windows
+	 */
+	alwaysOnTop: false,	 	 	 
+	/*
 	 * Property: height
 	 * 
 	 * The window's height in px, or %.
