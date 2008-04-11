@@ -6,5 +6,6 @@
 	"asFile": "como archivo",
 	"asZip": "como ZIP (ZIP)",
 	"asTgz": "como TGZ (GZIP)",
-	"asTbz2": "como TBZ2 (BZIP)"
+	"asTbz2": "como TBZ2 (BZIP)",
+	"parentErr": "Error: No se puede mover/copiar un directorio en sí mismo"
 })

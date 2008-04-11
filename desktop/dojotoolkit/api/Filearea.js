@@ -375,18 +375,21 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			else 
 				onEnd();
 			
-			//TODO: if I am dragged to one of my child directories, don't attempt to copy/move!
+			var nf = dojo.i18n.getLocalization("api", "filearea");
+			if(isParent(newTarget.path)) api.ui.notify({message: nf.parentErr, type: "warning", duration: 5000});
+			
 			if (newTarget.id != this.getParent().id
 			&& !isParent(newTarget.path)
 			&& newTarget.declaredClass == "api.Filearea") {
-				if (e.keyCode == dojo.keys.SHIFT) {
+				if (e.shiftKey) {
 					//copy the file
+					//TODO: alert the user when a file with that name exists?
 					api.fs.copy({
-						path: this.getParent().path + "/" + this.name,
-						newpath: newTarget.path + "/" + this.name,
+						from: this.getParent().path + "/" + this.name,
+						to: newTarget.path + "/" + this.name,
 						callback: function(){
 							newTarget.refresh();
-						//TODO: copy myself and add me to newTarget?
+							//TODO: copy myself and add me to newTarget?
 						}
 					});
 				}

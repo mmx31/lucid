@@ -80,11 +80,43 @@ if($_GET['section'] == "io")
 		$out = new intOutput("ok");
 	}
 	if ($_GET['action'] == "copyFile") {
-		if(isset($newmodule)) {
-			$content = $module->read($sentpath);
-			$newmodule->write($sentnewpath, $content);
+		function modCopy($smodule, $source, $tmodule, $target) {
+			if(get_class($smodule) == get_class($tmodule)) {
+				$smodule->copy($source, $target);
+			}
+			else {
+				$smodule = $module->read($source);
+				$tmodule->write($target, $content);
+			}
 		}
-		else $module->copy($sentpath, $sentnewpath);
+		//function to recursively copy a directory
+		function recursiveCopy($smodule, $source, $tmodule, $target)
+		{
+			$sinfo = $smodule->getFileInfo($source);
+			if($sinfo['type'] == "text/directory")
+			{
+				var_dump($target, $tmodule->createDirectory($target));
+				foreach($smodule->listPath($source) as $entry)
+				{
+					if($entry['type'] == "text/directory")
+					{
+						var_dump($target . '/' . $entry['name']);
+						recursiveCopy($smodule, $source . '/' . $entry['name'] , $tmodule, $target . '/' . $entry['name']);
+						continue;
+					}
+					modCopy($smodule, $entry['path'], $tmodule, $target . '/' . $entry['name']);
+				}
+			
+			}
+			else
+			{
+				modCopy($smodule, $source, $tmodule, $target);
+			}
+		}
+		if(isset($newmodule)) {
+			recursiveCopy($module, $sentpath, $newmodule, $sentnewpath);
+		}
+		else recursiveCopy($module, $sentpath, $module, $sentnewpath);
 		$out = new intOutput("ok");
 	}
 	if ($_GET['action'] == "removeFile" || $_GET['action'] == "removeDir") {
