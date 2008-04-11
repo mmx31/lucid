@@ -319,12 +319,15 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		dojo.disconnect(this._onDragEvent);
 		dojo.forEach(this._docEvents, dojo.disconnect);
 		dojo.style(document.body, "cursor", "default");
+		var newTarget = dijit.getEnclosingWidget(e.target);
+		
 		if(this._docNode) {
 			var onEnd = dojo.hitch(this, function() {
 				if(this._docNode.parentNode) this._docNode.parentNode.removeChild(this._docNode);
 				this._docNode = null;
 			});
-			if(desktop.config.fx > 0) {
+			if(desktop.config.fx > 0
+			&& !(newTarget.declaredClass == "api.Filearea" || newTarget.declaredClass == "api.Filearea._Item")) {
 				var l = dojo.coords(this.domNode);
 				var anim = dojo.animateProperty({
 					node: this._docNode,
