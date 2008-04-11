@@ -341,6 +341,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			}
 			else onEnd();
 		}
+		//TODO: if I am dragged to one of my child directories, don't attempt to copy/move!
 		if(newTarget.id != this.getParent().id
 		&& newTarget.declaredClass == "api.Filearea") {
 			if(e.keyCode == dojo.keys.SHIFT) {
