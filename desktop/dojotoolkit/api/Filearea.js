@@ -341,6 +341,36 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			}
 			else onEnd();
 		}
+		if(newTarget.id != this.getParent().id
+		&& newTarget.declaredClass == "api.Filearea") {
+			if(e.keyCode == dojo.keys.SHIFT) {
+				//copy the file
+				api.fs.copy({
+					path: this.getParent().path+"/"+this.name,
+					newpath: newTarget.path+"/"+this.name,
+					callback: function() {
+						newTarget.refresh();
+						//TODO: copy myself and add me to newTarget?
+					}
+				});
+			}
+			else {
+				//move the file
+				api.fs.rename({
+					path: this.getParent().path+"/"+this.name,
+					newpath: newTarget.path+"/"+this.name,
+					callback:  dojo.hitch(this, function() {
+						var p = this.getParent();
+						p.removeChild(this);
+						p.layout();
+						newTarget.addChild(this);
+						newTarget.layout();
+						this.startup();
+					})
+				});
+			}
+		}
+		//TODO: handle dragging a file into a folder
 	},
 	_onDblClick: function(e) {
 		if(this.type=="text/directory") {
@@ -416,6 +446,12 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			dojo.addClass(this.textFront, "iconLabel");
 			dojo.style(this.textBack, "display", "none");
 			dojo.style(this.textHidden, "display", "none");
+		}
+		else {
+			dojo.addClass(this.textFront, "shadowFront");
+			dojo.removeClass(this.textFront, "iconLabel");
+			dojo.style(this.textBack, "display", "block");
+			dojo.style(this.textHidden, "display", "block");
 		}
 	}
 })

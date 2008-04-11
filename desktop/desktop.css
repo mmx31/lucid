@@ -342,3 +342,8 @@ margin: 0px;
 .shadowHidden {
 	visibility: hidden;
 }
+
+.ghost {
+	opacity: 0.7;
+	filter: Opacity(70);
+}
