@@ -292,7 +292,6 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			dojo.connect(document, "ondragstart", dojo, "stopEvent"),
 			dojo.connect(document, "onselectstart", dojo, "stopEvent")
 		];
-		dojo.style(document.body, "cursor", "move");
 		dojo.stopEvent(e);
 	},
 	_onMove: function(e) {
@@ -310,6 +309,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			})
 			dojo.addClass(this._docNode, "ghost");
 			document.body.appendChild(this._docNode);
+			dojo.style(document.body, "cursor", "move");
 		}
 		this._docNode.style.top=(e.clientY+1)+"px";
 		this._docNode.style.left=(e.clientX+1)+"px";
