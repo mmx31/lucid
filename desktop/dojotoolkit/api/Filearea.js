@@ -23,7 +23,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var nf = dojo.i18n.getLocalization("api", "filearea");
 		
-		this.connect(this.domNode, "onclick", "_onClick");
+		this.connect(this.domNode, "onmousedown", "_onClick");
 		this.connect(this.domNode, "oncontextmenu", "_onRightClick");
 		
 		var menu = this.menu = new dijit.Menu({});
@@ -83,6 +83,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 	{
 		var w = dijit.getEnclosingWidget(e.target);
 		if (w.declaredClass == "api.Filearea._Icon") {
+			w._dragStart(e);
 			if (dojo.hasClass(e.target, "fileIcon")) 
 				w._onIconClick();
 			else 
@@ -97,6 +98,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				item.unhighlight();
 			})
 		}
+		dojo.stopEvent(e);
 	},
 	_makeFolder: function() {
 		//	summary:
@@ -246,7 +248,6 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		
 		this.connect(this.iconNode, "ondblclick", "_onDblClick");
 		this.connect(this.labelNode, "ondblclick", "rename");
-		this.connect(this.domNode, "onmousedown", "_dragStart");
 		
 		var menu = this.menu = new dijit.Menu({});
 		menu.addChild(new dijit.MenuItem({label: nc.open, iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this._onOpen)}));
@@ -292,7 +293,6 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			dojo.connect(document, "ondragstart", dojo, "stopEvent"),
 			dojo.connect(document, "onselectstart", dojo, "stopEvent")
 		];
-		dojo.stopEvent(e);
 	},
 	_onMove: function(e) {
 		//if the mouse hasn't moved at least five pixels, don't do anything
