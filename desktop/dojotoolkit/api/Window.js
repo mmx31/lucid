@@ -163,9 +163,9 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		});
 		
 		if(dojo.isIE){
-			dojo.connect(this.domNode,'onresize', this,"_onResize");
+			this.connect(this.domNode,'onresize',"_onResize");
 		}
-		dojo.connect(window,'onresize',this,"_onResize");
+		this.connect(window,'onresize',"_onResize");
 		this.bringToFront();
 	},
 	/*
