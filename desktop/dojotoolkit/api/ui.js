@@ -253,7 +253,7 @@ api.ui = new function() {
 			label: cm.refresh
 		});
 		toolbar.addChild(button);
-		dialog.addChild(this.toolbar);
+		dialog.addChild(toolbar);
 		var client = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 70, layoutAlign: "client"});
 		var pane = new dijit.layout.ContentPane({sizeMin: 125}, document.createElement("div"));
 		var details = new dijit.layout.ContentPane({layoutAlign: "bottom"}, document.createElement("div"));
@@ -279,9 +279,9 @@ api.ui = new function() {
 			//store.newItem({type: ""});
 		}*/
 		var button = new dijit.form.Button({label: cm.loadOrSave, onClick: dojo.hitch(this, function() { 
-			var p = this.address.getValue();
+			var p = address.getValue();
 			var f = "";
-			//if(object.types) { f = this.select.getValue(); }
+			//if(object.types) { f = select.getValue(); }
 			object.callback(p+f);
 			dialog.close();
 		})});
@@ -294,8 +294,8 @@ api.ui = new function() {
         var p = document.createElement("span");
 		p.innerHTML = cm.path+":";
 		line.appendChild(p);
-		line.appendChild(this.address.domNode);
-		//if(object.types) line.appendChild(this.select.domNode);
+		line.appendChild(address.domNode);
+		//if(object.types) line.appendChild(select.domNode);
 		line.appendChild(button.domNode);
 		line.appendChild(ablah.domNode);
 		all.appendChild(line);

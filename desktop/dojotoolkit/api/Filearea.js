@@ -125,6 +125,10 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		//	summary:
 		//		Called when the path changes
 	},
+	onHighlight: function(path) {
+		//	summary:
+		//		Called when a file is highlighted
+	},
 	up: function() {
 		//	summary:
 		//		make the filearea go up one directory
@@ -566,6 +570,8 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		this.highlighted = true;
 		dojo.addClass(this.labelNode, "selectedItem");
 		dojo.addClass(this.iconNode, "fileIconSelected");
+		var p = this.getParent();
+		p.onHighlight(p.path+"/"+this.name);
 	},
 	_onIconClick: function() {
 		dojo.forEach(this.getParent().getChildren(), function(item) {
