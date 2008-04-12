@@ -287,7 +287,6 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		if(hideExt) {
 			nameOrig = name.substring(0, p);
 		}
-		if(!this.checkForFile(name)) name=nameOrig;
 		while(this.checkForFile(name)) {
 			name = nameOrig + " "+i;
 			if(hideExt) {
@@ -575,14 +574,9 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 							value = value.substring(0, pos-1);
 						}
 					}
-					dojo.forEach([
-						this.textFront,
-						this.textBack,
-						this.textHidden
-					], function(node) {
-						node.textContent = this._formatLabel(value);
-					});
+					this.label = this._formatLabel(value);
 					this.name = value;
+					this.fixStyle();
 				})
 			});
 		})
