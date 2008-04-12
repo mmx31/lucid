@@ -1,8 +1,8 @@
 ({
 	"createFolder": "Create Folder",
 	"createFile": "Create File",
-	"createFolderText": "Enter the new folder's name.<br />Be careful, providing an existing name will overwrite that folder.",
-	"createFileText": "Enter the new file's name.<br />Be careful, providing an existing name will overwrite that file.",
+	"createFolderText": "Enter the new folder's name.",
+	"createFileText": "Enter the new file's name.",
 	"asFile": "As File",
 	"asZip": "as ZIP (ZIP)",
 	"asTgz": "as TGZ (GZIP)",

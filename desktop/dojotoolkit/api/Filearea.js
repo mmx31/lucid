@@ -172,6 +172,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 			message: nf.createFolderText,
 			callback: dojo.hitch(this, function(dirname) {
 				if(dirname == "") return;
+				filename = this._fixDuplicateFilename(filename, "text/directory");
 				api.fs.mkdir({
 					path: this.path+"/"+dirname,
 					callback: dojo.hitch(this, this.refresh)
@@ -190,6 +191,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 			message: nf.createFileText,
 			callback: dojo.hitch(this, function(filename) {
 				if(filename == "") return;
+				filename = this._fixDuplicateFilename(filename, "text/plain");
 				api.fs.write({
 					path: this.path+"/"+filename,
 					callback: dojo.hitch(this, this.refresh)
@@ -562,6 +564,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			dojo.disconnect(evt);
 			var value = textbox.getValue();
 			textbox.destroy();
+			value = this.getParent()._fixDuplicateFilename(value, this.type);
 			api.fs.rename({
 				path: this.getParent().path+"/"+this.name,
 				newname: value,
@@ -577,7 +580,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 						this.textBack,
 						this.textHidden
 					], function(node) {
-						node.textContent = value;
+						node.textContent = this._formatLabel(value);
 					});
 					this.name = value;
 				})
