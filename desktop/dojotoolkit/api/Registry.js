@@ -25,15 +25,15 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 		
 		this._jsonData = null;
 		this.exists(dojo.hitch(this, function(e) {
-			if(e == true) this.url = this._jsonFileUrl = api.xhr("api.Registry.stream.load")
+			if(e == true) this.url = this._jsonFileUrl = api.xhr("api.registry.stream.load")
 			+ "&appid=" + encodeURIComponent(args.appid)
 			+ "&name=" + encodeURIComponent(args.name);
-			else this._jsonData = args.data;
+			else this.data = this._jsonData = args.data;
 		}), true);
 	},
 	_saveEverything: function(saveCompleteCallback, saveFailedCallback, newFileContentString) {
 		api.xhr({
-			backend: ("api.Registry.stream.save"),
+			backend: ("api.registry.stream.save"),
 			content: {
 				value: newFileContentString,
 				appid: this.__desktop_appid,
@@ -59,7 +59,7 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 	exists: function(/*Function*/callback, /*Boolean*/sync)
 	{
 		api.xhr({
-			backend: "api.Registry.info.exists",
+			backend: "api.registry.info.exists",
 			sync: sync,
 			content: {
 				name: this.__desktop_name,
@@ -82,7 +82,7 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 	drop: function(/*Function*/callback)
 	{
 		api.xhr({
-			backend: "api.Registry.stream.delete",
+			backend: "api.registry.stream.delete",
 			content: {
 				name: this.__desktop_name,
 				appid: this.__desktop_appid

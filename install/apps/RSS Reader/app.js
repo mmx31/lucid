@@ -217,7 +217,7 @@
 	    };
 	    var line = document.createElement("div");
 	    var p = document.createElement("span");
-	    p.innerHTML = cm.title+": ";
+	    p.innerHTML = cm.name+": ";
 	    line.appendChild(p);
 	    line.appendChild(this._form.title.domNode);
 	    var line2 = document.createElement("div");

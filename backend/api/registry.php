@@ -55,8 +55,7 @@
 		{
 			$p = $User->get_current();
 			$result = $Registry->filter(array("userid" => $p->id, "appid" => $_POST['appid'], "name" => $_POST['name']));
-			if($result != false) { $out = new intOutput("ok"); }
-			else { $out = new intOutput("generic_err"); }
+			$out = new jsonOutput(array(exists=>($result != false)));
 		}
 	}
 ?>
