@@ -52,14 +52,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				var clip = api._fileareaClipboard;
 				if(clip.type == "") return;
 				if(clip.type == "cut") {
-					var name = clip.name;
-					var i=2;
-					//TODO: this could be bad if the filearea hasn't been refreshed recently...
-					//TODO: append before the extention if it's a file and that file has an extension
-					while(this.checkForFile(name)) {
-						name = clip.name + " "+i;
-						i++;
-					}
+					var name = this._fixDuplicateFilename(clip.name, clip.mimetype);
 					api.fs.move({
 						path: clip.path+"/"+clip.name,
 						newpath: this.path+"/"+name,
@@ -68,23 +61,16 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 								var p = clip.widgetRef.getParent();
 								this.addChild(clip.widgetRef);
 								clip.widgetRef.name = name;
-								clip.widgetRef.startup();
+								clip.widgetRef.label = clip.widgetRef._formatLabel(name);
+								clip.widgetRef.fixStyle();
 								this.layout();
 								p.layout();
-								
 							}
 						})
 					})
 				}
 				if(clip.type == "copy") {
-					var name = clip.name;
-					var i=2;
-					//TODO: this could be bad if the filearea hasn't been refreshed recently...
-					//TODO: append before the extention if it's a file and that file has an extension
-					while(this.checkForFile(name)) {
-						name = clip.name + " "+i;
-						i++;
-					}
+					var name = this._fixDuplicateFilename(clip.name, clip.mimetype);
 					api.fs.copy({
 						from: clip.path+"/"+clip.name,
 						to: this.path+"/"+name,
@@ -288,6 +274,26 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				hc += (this.vertical ? vspacing : hspacing);
 			}
 		};
+	},
+	_fixDuplicateFilename: function(name, type) {
+		var i=2;
+		var nameOrig = name;
+		//TODO: this could be bad if the filearea hasn't been refreshed recently...
+		var p = name.lastIndexOf(".");
+		var ext = name.substring(p+1, name.length);
+		var hideExt = (type != "text/directory" && p != -1);
+		if(hideExt) {
+			nameOrig = name.substring(0, p);
+		}
+		if(!this.checkForFile(name)) name=nameOrig;
+		while(this.checkForFile(name)) {
+			name = nameOrig + " "+i;
+			i++;
+		}
+		if(hideExt) {
+			name += "."+ext;
+		}
+		return name;
 	}
 })
 
@@ -481,14 +487,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			&& newTarget.declaredClass == "api.Filearea") {
 				if (e.shiftKey) {
 					//copy the file
-					var name = this.name;
-					var i=2;
-					//TODO: this could be bad if the filearea hasn't been refreshed recently...
-					//TODO: append before the extention if it's a file and that file has an extension
-					while(newTarget.checkForFile(name)) {
-						name = this.name + " "+i;
-						i++;
-					}
+					var name = newTarget._fixDuplicateFilename(this.name, this.type);
 					api.fs.copy({
 						from: this.getParent().path + "/" + this.name,
 						to: newTarget.path + "/" + name,
@@ -500,14 +499,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 				}
 				else {
 					//move the file
-					var name = this.name;
-					var i=2;
-					//TODO: this could be bad if the filearea hasn't been refreshed recently...
-					//TODO: append before the extention if it's a file and that file has an extension
-					while(newTarget.checkForFile(name)) {
-						name = this.name + " "+i;
-						i++;
-					}
+					var name = newTarget._fixDuplicateFilename(this.name, this.type);
 					api.fs.rename({
 						path: this.getParent().path + "/" + this.name,
 						newpath: newTarget.path + "/" + name,
@@ -515,16 +507,25 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 							var p = this.getParent();
 							p.removeChild(this);
 							p.layout();
+							this.name = name;
+							this.label = this._formatLabel(name);
 							newTarget.addChild(this);
 							newTarget.layout();
-							this.name = name;
-							this.startup();
+							this.fixStyle();
 						})
 					});
 				}
 			}
 			//TODO: handle dragging a file into a folder
 		}
+	},
+	_formatLabel: function(name) {
+		var p = name.lastIndexOf(".");
+		var ext = name.substring(p+1, name.length);
+		if(desktop.config.filesystem.hideExt && this.type!="text/directory" && p != -1) {
+			var label = name.substring(0, p-1);
+		}
+		return label || name;
 	},
 	_onDblClick: function(e) {
 		if(this.type=="text/directory") {
@@ -601,6 +602,9 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		dojo.removeClass(this.iconNode, "fileIconSelected");
 	},
 	startup: function() {
+		return this.fixStyle();
+	},
+	fixStyle: function() {
 		if(!this.getParent().textShadow) {
 			dojo.removeClass(this.textFront, "shadowFront");
 			dojo.addClass(this.textFront, "iconLabel");
