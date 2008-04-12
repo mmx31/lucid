@@ -7,5 +7,8 @@
 	"asZip": "como ZIP (ZIP)",
 	"asTgz": "como TGZ (GZIP)",
 	"asTbz2": "como TBZ2 (BZIP)",
-	"parentErr": "Error: No se puede mover/copiar un directorio en sí mismo"
+	"parentErr": "Error: No se puede mover/copiar un directorio en sí mismo",
+	"cut": "Corte",
+	"copy": "Copie",
+	"paste": "Pegue"
 })

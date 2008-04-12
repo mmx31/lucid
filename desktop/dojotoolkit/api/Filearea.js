@@ -5,6 +5,14 @@ dojo.require("dijit.form.TextBox");
 dojo.requireLocalization("desktop", "common");
 dojo.requireLocalization("api", "filearea");
 
+api._fileareaClipboard = {
+	type: "", // can be 'cut' or 'copy
+	path: "", //the parent directory of the file
+	name: "", //the name of the file
+	mimetype: "", //the file's mimetype
+	widgetRef: null //a reference to the widget
+};
+
 dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 	//	path: String
 	//		the path that the filearea should start at
@@ -36,6 +44,69 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		menu.addChild(new dijit.MenuItem({label: nf.createFile, iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, this._makeFile)}));
 		menu.addChild(new dijit.MenuSeparator({}));
 		menu.addChild(new dijit.MenuItem({label: cm.refresh, iconClass: "icon-16-actions-view-refresh", onClick: dojo.hitch(this, this.refresh)}));
+		menu.addChild(new dijit.MenuSeparator({}));
+		menu.addChild(new dijit.MenuItem({
+			label: nf.paste,
+			iconClass: "icon-16-actions-edit-paste",
+			onClick: dojo.hitch(this, function() {
+				var clip = api._fileareaClipboard;
+				if(clip.type == "") return;
+				if(clip.type == "cut") {
+					var name = clip.name;
+					var i=2;
+					//TODO: this could be bad if the filearea hasn't been refreshed recently...
+					//TODO: append before the extention if it's a file and that file has an extension
+					while(this.checkForFile(name)) {
+						name = clip.name + " "+i;
+						i++;
+					}
+					api.fs.move({
+						path: clip.path+"/"+clip.name,
+						newpath: this.path+"/"+name,
+						callback: dojo.hitch(this, function() {
+							if(clip.widgetRef) {
+								var p = clip.widgetRef.getParent();
+								this.addChild(clip.widgetRef);
+								clip.widgetRef.name = name;
+								clip.widgetRef.startup();
+								this.layout();
+								p.layout();
+								
+							}
+						})
+					})
+				}
+				if(clip.type == "copy") {
+					var name = clip.name;
+					var i=1;
+					//TODO: this could be bad if the filearea hasn't been refreshed recently...
+					//TODO: append before the extention if it's a file and that file has an extension
+					while(this.checkForFile(name)) {
+						name = clip.name + " (copy"+(i==1 ? "" : i)+")";
+						i++;
+					}
+					api.fs.copy({
+						from: clip.path+"/"+clip.name,
+						to: this.path+"/"+name,
+						callback: dojo.hitch(this, function() {
+							this.refresh();
+						})
+					})
+				}
+			})
+		}));
+	},
+	checkForFile: function(/*String*/name) {
+		//	summary:
+		//		checks for a file in this directory with the name provided
+		//	name: the full name (NOT the path) of the file
+		//	returns: true if the file does exist, false if not.
+		var children = this.getChildren();
+		for(i=0; i < children.length; i++) {
+			if(!children[i]) continue;
+			if(children[i].name == name) return true;
+		}
+		return false;
 	},
 	onItem: function(/*String*/path)
 	{
@@ -285,6 +356,33 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			menuDl.popup = menu2;
 			menu.addChild(menuDl);
 		menu.addChild(new dijit.MenuSeparator({}));
+		menu.addChild(new dijit.MenuItem({
+			label: nf.cut,
+			iconClass: "icon-16-actions-edit-cut",
+			onClick: dojo.hitch(this, function() {
+				api._fileareaClipboard = {
+					type: "cut",
+					path: this.getParent().path,
+					name: this.name,
+					mimetype: this.type,
+					widgetRef: this
+				}
+			})
+		}));
+		menu.addChild(new dijit.MenuItem({
+			label: nf.copy,
+			iconClass: "icon-16-actions-edit-copy",
+			onClick: dojo.hitch(this, function() {
+				api._fileareaClipboard = {
+					type: "copy",
+					path: this.getParent().path,
+					name: this.name,
+					mimetype: this.type,
+					widgetRef: this
+				}
+			})
+		}));
+		menu.addChild(new dijit.MenuSeparator({}));
 		menu.addChild(new dijit.MenuItem({label: nc.rename, iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, "rename")}));
 		menu.addChild(new dijit.MenuItem({label: nc["delete"], iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, "deleteFile")}));
 		
@@ -383,10 +481,17 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			&& newTarget.declaredClass == "api.Filearea") {
 				if (e.shiftKey) {
 					//copy the file
-					//TODO: alert the user when a file with that name exists?
+					var name = this.name;
+					var i=1;
+					//TODO: this could be bad if the filearea hasn't been refreshed recently...
+					//TODO: append before the extention if it's a file and that file has an extension
+					while(newTarget.checkForFile(name)) {
+						name = this.name + " (copy"+(i==1 ? "" : i)+")";
+						i++;
+					}
 					api.fs.copy({
 						from: this.getParent().path + "/" + this.name,
-						to: newTarget.path + "/" + this.name,
+						to: newTarget.path + "/" + name,
 						callback: function(){
 							newTarget.refresh();
 							//TODO: copy myself and add me to newTarget?
@@ -395,15 +500,24 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 				}
 				else {
 					//move the file
+					var name = this.name;
+					var i=2;
+					//TODO: this could be bad if the filearea hasn't been refreshed recently...
+					//TODO: append before the extention if it's a file and that file has an extension
+					while(newTarget.checkForFile(name)) {
+						name = this.name + " "+i;
+						i++;
+					}
 					api.fs.rename({
 						path: this.getParent().path + "/" + this.name,
-						newpath: newTarget.path + "/" + this.name,
+						newpath: newTarget.path + "/" + name,
 						callback: dojo.hitch(this, function(){
 							var p = this.getParent();
 							p.removeChild(this);
 							p.layout();
 							newTarget.addChild(this);
 							newTarget.layout();
+							this.name = name;
 							this.startup();
 						})
 					});
@@ -499,5 +613,12 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			dojo.style(this.textBack, "display", "block");
 			dojo.style(this.textHidden, "display", "block");
 		}
+		dojo.forEach([
+			this.textFront,
+			this.textBack,
+			this.textHidden
+		], function(node) {
+			node.textContent = this.label;
+		}, this);
 	}
 })
