@@ -172,7 +172,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 			message: nf.createFolderText,
 			callback: dojo.hitch(this, function(dirname) {
 				if(dirname == "") return;
-				filename = this._fixDuplicateFilename(filename, "text/directory");
+				dirname = this._fixDuplicateFilename(dirname, "text/directory");
 				api.fs.mkdir({
 					path: this.path+"/"+dirname,
 					callback: dojo.hitch(this, this.refresh)
