@@ -290,10 +290,10 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		if(!this.checkForFile(name)) name=nameOrig;
 		while(this.checkForFile(name)) {
 			name = nameOrig + " "+i;
+			if(hideExt) {
+				name += "."+ext;
+			}
 			i++;
-		}
-		if(hideExt) {
-			name += "."+ext;
 		}
 		return name;
 	}
