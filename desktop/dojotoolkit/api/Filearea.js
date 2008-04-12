@@ -78,11 +78,11 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				}
 				if(clip.type == "copy") {
 					var name = clip.name;
-					var i=1;
+					var i=2;
 					//TODO: this could be bad if the filearea hasn't been refreshed recently...
 					//TODO: append before the extention if it's a file and that file has an extension
 					while(this.checkForFile(name)) {
-						name = clip.name + " (copy"+(i==1 ? "" : i)+")";
+						name = clip.name + " "+i;
 						i++;
 					}
 					api.fs.copy({
@@ -482,11 +482,11 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 				if (e.shiftKey) {
 					//copy the file
 					var name = this.name;
-					var i=1;
+					var i=2;
 					//TODO: this could be bad if the filearea hasn't been refreshed recently...
 					//TODO: append before the extention if it's a file and that file has an extension
 					while(newTarget.checkForFile(name)) {
-						name = this.name + " (copy"+(i==1 ? "" : i)+")";
+						name = this.name + " "+i;
 						i++;
 					}
 					api.fs.copy({
