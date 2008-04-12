@@ -57,8 +57,10 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 						path: clip.path+"/"+clip.name,
 						newpath: this.path+"/"+name,
 						callback: dojo.hitch(this, function() {
+							var parentID;
 							if(clip.widgetRef) {
 								var p = clip.widgetRef.getParent();
+								parentID = p.id
 								this.addChild(clip.widgetRef);
 								clip.widgetRef.name = name;
 								clip.widgetRef.label = clip.widgetRef._formatLabel(name);
@@ -66,6 +68,8 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 								this.layout();
 								p.layout();
 							}
+							dojo.publish("filearea:"+this.path, [this.id, parentID]);
+							if(parentID) dojo.publish("filearea:"+p.path, [this.id, parentID]);
 						})
 					})
 				}
@@ -76,6 +80,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 						to: this.path+"/"+name,
 						callback: dojo.hitch(this, function() {
 							this.refresh();
+							dojo.publish("filearea:"+this.path, [this.id]);
 						})
 					})
 				}
@@ -175,7 +180,10 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				dirname = this._fixDuplicateFilename(dirname, "text/directory");
 				api.fs.mkdir({
 					path: this.path+"/"+dirname,
-					callback: dojo.hitch(this, this.refresh)
+					callback: dojo.hitch(this, function() {
+						dojo.publish("filearea:"+this.path, [this.id]);
+						this.refresh();
+					})
 				});
 			})
 		});
@@ -194,7 +202,10 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				filename = this._fixDuplicateFilename(filename, "text/plain");
 				api.fs.write({
 					path: this.path+"/"+filename,
-					callback: dojo.hitch(this, this.refresh)
+					callback: dojo.hitch(this, function() {
+						dojo.publish("filearea:"+this.path, [this.id]);
+						this.refresh();
+					})
 				});
 			})
 		});
@@ -217,9 +228,19 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 			this.menu._openMyself(e);
 		}
 	},
-	refresh: function() {
+	refresh: function(/*String?*/id, /*String?*/targetid) {
 		//	summary:
 		//		refreshes the area
+		//	id:
+		//		the id of the filearea that was updated. Used when other fileareas are communicating which folders are updated.
+		//	targetid:
+		//		the other id of the filearea that was updated. Used when other fileareas are communicating which folders are updated.
+		
+		//if we're the filearea telling everyone that we've updated, or if we were updated already, ignore it
+		if(id == this.id || targetid == this.id) return;
+		//subscribe to any file updates
+		if(this._subscription) dojo.unsubscribe(this._subscription);
+		this._subscription  = dojo.subscribe("filearea:"+this.path, dojo.hitch(this, "refresh"));
 		
 		//clear the area
 		dojo.forEach(this.getChildren(), function(item){
@@ -494,6 +515,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 						to: newTarget.path + "/" + name,
 						callback: function(){
 							newTarget.refresh();
+							dojo.publish("filearea:"+newTarget.path, [newTarget.id]);
 							//TODO: copy myself and add me to newTarget?
 						}
 					});
@@ -513,6 +535,8 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 							newTarget.addChild(this);
 							newTarget.layout();
 							this.fixStyle();
+							dojo.publish("filearea:"+p.path, [p.id, newTarget.id]);
+							dojo.publish("filearea:"+newTarget.path, [p.id, newTarget.id]);
 						})
 					});
 				}
@@ -577,6 +601,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 					this.label = this._formatLabel(value);
 					this.name = value;
 					this.fixStyle();
+					dojo.publish("filearea:"+this.getParent().path, [this.getParent().id]);
 				})
 			});
 		})
@@ -589,6 +614,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			var p = this.getParent();
 			this.destroy();
 			p.layout();
+			dojo.publish("filearea:"+p.path, [p.id]);
 		})});
 	},
 	unhighlight: function() {
