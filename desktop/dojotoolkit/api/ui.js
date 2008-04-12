@@ -236,13 +236,13 @@ api.ui = new function() {
 		var toolbar = new dijit.Toolbar({layoutAlign: "top"});
 		var layout = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
 		var button = new dijit.form.Button({
-			onClick: dojo.hitch(this.file, "setPath", "file://"),
+			onClick: dojo.hitch(file, "setPath", "file://"),
 			iconClass: "icon-16-places-user-home",
 			label: pl.Home
 		});
 		toolbar.addChild(button);
 		var button = new dijit.form.Button({
-			onClick: dojo.hitch(this.file, "up"),
+			onClick: dojo.hitch(file, "up"),
 			iconClass: "icon-16-actions-go-up",
 			label: cm.up
 		});
