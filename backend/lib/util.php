@@ -16,7 +16,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-//error_reporting(0);
+error_reporting(0);
 session_start();
 //get rid of magicquotes
 if (get_magic_quotes_gpc())
