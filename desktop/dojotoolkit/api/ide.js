@@ -20,11 +20,11 @@ api.ide = new function()
 	this.execute = function(/*String*/code)
 	{
 		desktop.app._fetchApp({
-			id: 0,
+			id: -1,
 			name: "testApp",
 			code: code
 		});
-		desktop.app.launch(0);
+		desktop.app.launch(-1);
 	}
 	/*
 	 * Method: save

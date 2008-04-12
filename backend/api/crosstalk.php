@@ -20,42 +20,37 @@
 	import("models.crosstalk");
 	if($_GET['section'] == "io")
 	{
-	    if ($_GET['action'] == "removeEvent")
-		{
-		   	$p = $Crosstalk->filter(Array("userid", "id"), Array($_SESSION['userid'], $_POST['id']));
-			$p[0]->delete();
-			$out = new intOutput("ok");
-		}
 		if ($_GET['action'] == "checkForEvents")
 	    {
-			$result = $Crosstalk->filter("userid", $_SESSION['userid']);
+			$result_user = $Crosstalk->filter("userid", $_SESSION['userid']);
+			$result_public = $Crosstalk->filter("userid", -1);
+			if($result_user == false) $result_user = array();
+			if($result_public == false) $result_public = array();
+			$result = array_merge($result_user, $result_public);
 			$array = array();
-			$output = "<" . "?xml version='1.0' encoding='utf-8' ?" . ">\r\n" . "<crosstalkEvents>";
-			if($result != false)
-			{
-				foreach($result as $row) {
-					array_push($array, array(
-						id => $row->id,
-						sender => $row->sender,
-						appid => $row->appid,
-						instance => $row->instance,
-						message => $row->message
-					));
-				}
+			foreach($result as $row) {
+				array_push($array, array(
+					sender => $row->sender,
+					appid => $row->appid,
+					instance => $row->instance,
+					args => $row->args,
+					topic => $row->topic
+				));
+				$row->delete();
 			}
 			$out = new jsonOutput($array);
 		}
-	    if ($_GET['action'] == "SendEvent")
+	    if ($_GET['action'] == "sendEvent")
 	    {
-				$p = new $Crosstalk();
-				foreach(array("message", "destination", "appid", "instance") as $item) {
-					$p->$item = $_POST[$item];
-				}
-				$p->sender = $_SESSION['userid'];
-				if($p->destination == 0) {
-				$p->destination = $p->sender;
-				$p->save();
+			$p = new $Crosstalk();
+			foreach(array("args", "userid", "appid", "instance", "topic") as $item) {
+				$p->$item = $_POST[$item];
 			}
+			$p->sender = $_SESSION['userid'];
+			if($p->userid == 0) {
+				$p->userid = $p->sender;
+			}
+			$p->save();
 		    $out = new intOutput("ok");
 		}
 	}

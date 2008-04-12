@@ -284,8 +284,10 @@
 		function truncate() {
 			$this->_connect();
 			$table = $this->_link->quoteIdentifier($this->_get_tablename());
-			$this->_link->loadModule('Extended');
 			$this->_query("DELETE FROM ".$table);
+			$this->_link->loadModule('Manager');
+			$this->_link->dropSequence($this->_get_tablename());
+			$this->_link->createSequence($this->_get_tablename());
 		}
 		function make_json($columns=false)
 		{
@@ -315,7 +317,7 @@
 			{
 				$this->_connect();
 				$this->cleanup();
-				$this->_query("DELETE FROM " . $this->_link->quoteIdentifier($this->_get_tablename()) . " WHERE ID=" . $this->id);
+				$this->_query("DELETE FROM " . $this->_link->quoteIdentifier($this->_get_tablename()) . " WHERE id=" . $this->id);
 			}
 		}
 		function cleanup() {

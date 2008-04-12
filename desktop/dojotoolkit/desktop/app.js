@@ -101,6 +101,7 @@ desktop.app = new function()
 				this.instance = info.instance;
 				this.init(info.args);
 				this.status = "active";
+				if(info.callback) info.callback(this);
 			},
 			kill: function() {
 				//cleanup ui, disconnect events, etc.
@@ -230,8 +231,9 @@ desktop.app = new function()
 	 * Arguments:
 	 * 		id - the app's id
 	 * 		args - the arguments to pass to the app (Optional)
+	 * 		callback - a callback once the app has initiated (Optional)
 	 */
-	this.launch = function(/*Integer*/id, /*Object?*/args)
+	this.launch = function(/*Integer*/id, /*Object?*/args, /*Function*/callback)
 	{
 		api.log("launching app "+id);
 		if(typeof this.apps["app"+id] == "undefined")
@@ -242,7 +244,8 @@ desktop.app = new function()
 				var pid = this.instances.length;
 				var instance = this.instances[pid] = new desktop.app.apps["app"+id]({
 					instance: pid,
-					args: args
+					args: args,
+					callback: callback
 				});
 				dojo.connect(instance, "kill", instance, function() {
                     this.status = "killed";

@@ -18,10 +18,11 @@
 */
 	class Crosstalk extends Base
 	{
-		var $sender = array('type' => 'text');
+		var $sender = array('type' => 'integer', 'length' => 11);
 		var $userid = array('type' => 'integer', 'length' => 11);
-		var $appID = array('type' => 'integer', 'length' => 11);
-		var $message = array('type' => 'text');
+		var $appid = array('type' => 'integer', 'length' => 11);
+		var $args = array('type' => 'text');
+		var $topic = array('type' => 'text');
 		var $instance = array('type' => 'integer', 'length' => 11);
 	}
 	global $Crosstalk;

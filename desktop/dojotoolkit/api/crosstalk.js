@@ -8,111 +8,93 @@ api.crosstalk = {
 	//	session: Array
 	//		handler storage
 	session: [],
-	//	assignid: Integer
-	//		ids for storage
-	assignid: 0,
-	/*=====
-	__subscribeArgs: function() {
-		//	instance: Integer
-		//		your app's instance ID (this.instance)
-		//	callback: Function
-		//		a callback function to be called when this instance gets a crosstalk message
-		this.instance = instance;
-		this.callback = callback;
-	},
-	=====*/
-	subscribe: function(/*api.crosstalk.__subscribeArgs*/params)
+	subscribe: function(/*String*/topic, /*Function*/handler, /*Int?*/instance)
 	{
 		//	summary:
 		//		register an event handler
+		//	instance:
+		//		the current app ID. Pass this.id when using in an app.
+		//		to capture system events, omit this
+		//	topic:
+		//		the topic to subscribe to
+		//	handler:
+		//		a handler function that is called when something for this event is published
 		//	returns:
 		//		returns a handle that you can use to unregister the handler (see unregisterHandler)
-		
-		var p = api.crosstalk.session[api.crosstalk.assignid] = new Object();
-		p.suspended = false;
-		p.appid = desktop.app.instances[params.instance].id;
-        p.callback = params.callback;
-        p.instance = params.instance;
-		id = api.crosstalk.assignid;
-		api.crosstalk.assignid++;
-		return id;
+		var session = api.crosstalk.session;
+		var p = session[session.length] = {
+			appid: (instance ? desktop.app.instances[instance].id : -1),
+			callback: handler,
+			instance: instance || -1,
+			topic: topic
+		};
+		return session.length-1;
 	},
 	unsubscribe: function(/*Handle*/handle)
 	{
 		//	summary:
 		//		unregister an event handler
 		//	handle:
-		//		a handle that was returned from registerHandler
-		api.crosstalk.session[handle].suspended = true;
+		//		a handle that was returned from subscribe()
+		api.crosstalk.session[handle] = null;
 	},
 	_internalCheck: function()
 	{
 		//	summary:
 		//		the crosstalk api checker, called every somewhat or so seconds, internally. then will handle it from the registered crap...
-		if (api.crosstalk.session.length == 0) { // no data in array (no handlers registered)
-		//api.log("Crosstalk API: No events to process...");
-			}
-		else { // handlers found. ask to obtain any events.
-		//api.log("Crosstalk API: Checking for events...");
+		
+		//I'm commenting this out because the new system may have to launch the app when an event is recieved
+		
+		//var eventsToHandle = false;
+		//dojo.forEach(this.session, function(i) {
+		//	if(i != null) eventsToHandle=true;
+		//})
+		//if (!eventsToHandle) { // no data in array (no handlers registered)
+		//	//api.log("Crosstalk API: No events to process...");
+		//	this.setup_timer();
+		//}
+		//else { // handlers found. ask to obtain any events.
+			//api.log("Crosstalk API: Checking for events...");
         	api.xhr({
 	        	backend: "api.crosstalk.io.checkForEvents",
 				handleAs: "json",
-	        	load: dojo.hitch(this, this._internalCheck2),
+	        	load: dojo.hitch(this, "_internalCheck2"),
 	        	error: function(type, error) { api.log("Error in Crosstalk call: "+error.message); }
         	});
-		}
+		//}
 	},
 		
-	/*=====
-	__publishArgs: function() {
-		//	userid: int
-		//		the user to send the info to
-		//	appid: int
-		//		the app id to send it to
-		//	instance: int?
-		//		the specific instance to send it to. Defaults to all instances.
-		//	message: string
-		//		the message to send. Use in conjunction with dojo.toJson and dojo.fromJson for objects and arrays
-		this.userid=userid;
-		this.appid=appid;
-		this.instance=instance;
-		this.message=message;
-	},
-	=====*/
-		
-	publish: function(/*api.crosstalk.__publishArgs*/params)
+	publish: function(/*String*/topic, /*Array*/args, /*Int?*/userid, /*Int?*/appid, /*Int?*/instance)
 	{
 		//	summary:
-		//		publish an event to be sent via crosstalk
+		//		publish an event to be sent
+		//	topic:
+		//		the topic name to publish
+		//	args:
+		//		the arguments to pass to the handler
+		//	userid:
+		//		the specific user to send the event to.
+		//		Omit to send to all users (the current user must be an admin to do this)
+		//	appid:
+		//		the appid to send it to. Omit to send as a system event
+		//	instance:
+		//		the specific app instance to send it to.
+		//		omit to send it to all instances
     	api.xhr({
 	    	backend: "api.crosstalk.io.sendEvent",
 			content: {
-				destination: params.userid,
-				message: params.message,
-				appid: params.appid,
-				instance: params.instance
+				topic: topic,
+				userid: userid || -1,
+				args: dojo.toJson(args),
+				appid: appid || -1,
+				instance: instance || -1
 			},
-			handleAs: "xml",
 	    	error: function(type, error) {
-				alert("Error in Crosstalk call: "+error.message);
+				api.log("Error in Crosstalk call: "+error.message);
 				this.setup_timer();
-			},
-	    	mimetype: "text/xml"
+			}
     	});
 	},
-	
-	/*=====
-	_handlerArgs: function() {
-		//	message: String
-		//		the message of the sent event
-		//	appid: int
-		//		the appid that the publish event was given
-		//	instance: int
-		//		the instance the publish event was given
-		//	sender: int
-		//		the userid of the person who sent the message
-	},
-	=====*/
 	
 	_internalCheck2: function(data, ioArgs)
 	{	
@@ -120,70 +102,51 @@ api.crosstalk = {
 		//		the crosstalk api checker, stage2, compare the results with the handled handlers
 		
 		if(data == "") { this.setup_timer(); return; }
-		// No events here. (Screwed up code)
-		var handled = false;
-		dojo.forEach(results, function(result) {
-			api.log("processing result...");
-			for(var x = 0; x<api.crosstalk.session.length; x++)
-			{
-				if(api.crosstalk.session[x].suspended != true
-				&& result.appid == api.crosstalk.session[x].appid
-				&& (result.instance == api.crosstalk.session[x].instance || result.instance == 0))
-				{
-					api.log("Found handler, appid: "+result.appid);
-					var id = result.id; //id of the event in database.
-					api.crosstalk.session[x].callback({
-						message: results[i].firstChild.nodeValue,
-						appid: result.appid,
-						instance: result.instance,
-						sender: result.sender
-					});
-					//remove the event, now. it has been handled.
-			        api.xhr({
-			        	backend: "api.crosstalk.io.removeEvent",
-						content: {
-							id: id
-						},
-			        	error: function(type, error) { alert("Error in CrosstalkRemoval call: "+error.message); }
-			        });
+		// No events here.
+		
+		var checkForHandler = dojo.hitch(this, function(event) {
+			//cycle through the handlers stored and find a handler for the event
+			dojo.forEach(this.session, function(handler) {
+				//matching the appid and topic are required
+				if(handler.appid == event.appid
+				&& handler.topic == event.topic) {
+					//matching the instance isn't
+					//but if it's provided and this handler is not of he correct instance, return
+					if(event.instance != -1
+					&& event.instance != handler.instance) return;
+					//check to see if the topic matches
+					if(event.topic != handler.topic) return;
+					//ok, we found a match
+					handler.callback.apply(dojo.global, dojo.fromJson(event.args));
 					handled = true;
 				}
+			}, this);
+		})
+		
+		dojo.forEach(data, function(event) {
+			var handled = false;
+			checkForHandler(event);
+			if(handled == false && event.instance == -1) {
+				if(event.appid == -1) return; //system call
+				//check to see if there's allready an instance of this app running
+				var instances = desktop.app.getInstances();
+				for(i=0;i<instances.length;i++) {
+					//if there is allready an instance running, it must not handle any crosstalk events. Skip the event.
+					if(instances[i].appid == event.appid) return;
+				}
+				//otherwise, launch the app
+				desktop.app.launch(event.appid, {}, function(app) {
+					//check for a handler again
+					checkForHandler(event);
+					//if there's still no handler, kill the app
+					if(handled == false) app.kill();
+				})
 			}
-			if(handled != true) {
-				//Found unhandled code. Do NOT remove, it may be useful later on.
-				//api.log("Crosstalk API: Unhandled event, appid: "+result.appid")+" instance: "+result.instance+" message: "+results[i].firstChild.nodeValue);
-			}
-		});
+		}, this);
 		this.setup_timer();
-	},
-	handleSystemMessage: function(/*Object*/Object) {
-		//	summary:
-		//		handle system messages (internal, do not use)
-		api.ui.alertDialog({title: "Psych Desktop", message: "<center> <b> System Message (senderID: "+object.sender+") </b> <br> "+object.message+" </center>"});
-	},
-	/*=====
-	__sendSystemMessageArgs: function() {
-		//	userid: int
-		//		who to send the message to. 0 for all users on the system
-		//	message: string
-		//		the message to be sent
-	},
-	=====*/
-	sendSystemMessage: function(/*api.crosstalk.__sendSystemMessageArgs*/obj) {
-		//	summary:
-		//		send system messages
-		//		The current user must be an admin to use this.
-		api.crosstalk.sendEvent({ userid: obj.userid, appid: 0, instance: 0, message: obj.message });
 	},
 	init: function()
 	{
-		var p = api.crosstalk.session[api.crosstalk.assignid] = new Object();
-		p.suspended = false;
-		p.appid = 0;
-        p.callback = api.crosstalk.handleSystemMessage;
-        p.instance = 0;
-		id = api.crosstalk.assignid;
-		api.crosstalk.assignid++;
 		// start checking for events
 		this.setup_timer();
 	},
@@ -191,7 +154,7 @@ api.crosstalk = {
 	{
 		//	summary:
 		//		Starts checking the server for messages
-		this.timer = setTimeout(dojo.hitch(this, this._internalCheck), desktop.config.crosstalkPing);
+		this.timer = setTimeout(dojo.hitch(this, "_internalCheck"), desktop.config.crosstalkPing);
 	},
 	stop: function()
 	{
