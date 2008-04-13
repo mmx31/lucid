@@ -1,4 +1,5 @@
 ({
+	windows: [],
 	init: function(args)
 	{
 		dojo.require("dijit.Toolbar");
@@ -13,39 +14,6 @@
 		dojo.requireLocalization("desktop", "apps");
 		dojo.requireLocalization("desktop", "places");
 		
-		dojo.declare("dojox.widget.FileInput_fileb_remix",
-		dojox.widget.FileInputAuto,
-		{
-			path: "/",
-			url: api.xhr("api.fs.io.upload"),
-			name: "uploadedfile",
-			templateString:"<div class=\"dijitFileInput tundra\">\n\t<input class=\"dijitFileInputReal\" type=\"file\" dojoAttachPoint=\"fileInput\" />\n\t<div class=\"dijitFakeInput\" dojoAttachPoint=\"fakeNodeHolder\">\n\t\t<input class=\"dijitFileInputVisible\" type=\"text\" dojoAttachPoint=\"focusNode, inputNode\" />\n\t\t<span class=\"dijitInline dijitFileInputText\" dojoAttachPoint=\"titleNode\">${label}</span>\n\t\t<span class=\"dijitInline dijitFileInputButton\" dojoAttachPoint=\"cancelNode\" dojoAttachEvent=\"onclick:_onClick\">${cancelText}</span>\n\t</div>\n\t<div class=\"dijitProgressOverlay\" dojoAttachPoint=\"overlay\">&nbsp;</div>\n</div>\n",
-			
-			_sendFile: function(/* Event */e){
-				// summary: triggers the chain of events needed to upload a file in the background.
-				if(!this.fileInput.value || this._sent){ return; }
-				
-				dojo.style(this.fakeNodeHolder,"display","none");
-				dojo.style(this.overlay,"opacity","0");
-				dojo.style(this.overlay,"display","block");
-		
-				this.setMessage(this.uploadMessage);
-		
-				dojo.fadeIn({ node: this.overlay, duration:this.duration }).play();
-				this.fileInput.name="uploadedfile";
-				var _newForm = document.createElement('form');
-				_newForm.setAttribute("enctype","multipart/form-data");
-				var node = dojo.clone(this.fileInput);
-				_newForm.appendChild(this.fileInput);
-				dojo.body().appendChild(_newForm);
-				dojo.io.iframe.send({
-					url: this.url+"&path="+encodeURIComponent(this.path),
-					form: _newForm,
-					handleAs: "json",
-					handle: dojo.hitch(this,"_handleSend")
-				});
-			}
-		});
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var places = dojo.i18n.getLocalization("desktop", "places");
@@ -110,41 +78,10 @@
 				label: cm.refresh
 			});
 			this.toolbar.addChild(button);
-			this.uDiag = new dijit.TooltipDialog({
-				title: cm.upload,
-				onOpen: dojo.hitch(this, function(pos) {
-					this.uploader.path = this.fileArea.path;
-					dojo.connect(closebut, "onClick", this.upbutton, this.upbutton._closeDropDown);
-				}),
-				style: "width: 415px; height: 30px;"
-			});
-			this.uploaderArgs = {
-				path: this.fileArea.path, //TODO: update as path on fileArea changes?
-				onComplete: dojo.hitch(this, function(data, ioArgs, widgetRef){
-					widgetRef.setMessage(data.status+": "+data.details);
-					setTimeout(dojo.hitch(this, function(){
-						this.upbutton._closeDropDown();
-						this.uploader.hide();
-						this.uploader = new dojox.widget.FileInput_fileb_remix(this.uploaderArgs);
-						this.uploadDiv.appendChild(this.uploader.domNode);
-					}),2000);
-				})
-			}
-			this.uploader = new dojox.widget.FileInput_fileb_remix(this.uploaderArgs);
-			var closebut = new dijit.form.Button({
-				label: cm.close,
-				style: "position: absolute; top: 20px; right: 5px;"
-			});
-			this.uploadDiv = document.createElement("div");
-			this.uploadDiv.appendChild(this.uploader.domNode);
-			this.uploadDiv.appendChild(closebut.domNode);
-			this.uDiag.setContent(this.uploadDiv);
-			this.upbutton = new dijit.form.DropDownButton({
-				onClick: dojo.hitch(this.fileArea, this.fileArea.refresh),
+			this.upbutton = new dijit.form.Button({
+				onClick: dojo.hitch(this, "openUploader"),
 				iconClass: "icon-16-actions-mail-send-receive",
 				label: cm.upload,
-				dropDown: this.uDiag,
-				_onBlur: function(e) {}
 			});
 			this.toolbar.addChild(this.upbutton);
 		this.win.addChild(this.toolbar);
@@ -157,7 +94,55 @@
 		this.uploader.startup();
 	},
 	
+	openUploader: function() {
+		var cm = dojo.i18n.getLocalization("desktop", "common");
+		var uploader = new dojox.widget.FileInputAuto({
+			name: "uploadedfile",
+			url: api.xhr("api.fs.io.upload")+"&path="+encodeURIComponent(this.fileArea.path),
+			onComplete: dojo.hitch(this, function(data, ioArgs, widgetRef){
+				widgetRef.setMessage(data.status+": "+data.details);
+				this.fileArea.refresh();
+			})
+		});
+		var win = new api.Window({
+			title: cm.upload,
+			width: "400px",
+			height: "100px"
+		});
+		this.windows.push(win);
+		var cpane = new dijit.layout.ContentPane({
+			layoutAlign: "client",
+			style: "padding: 10px;"
+		});
+		var div = document.createElement("div");
+		dojo.addClass(div, "tundra");
+		div.appendChild(uploader.domNode);
+		cpane.setContent(div);
+		win.addChild(cpane);
+		
+		
+		var bpane = new dijit.layout.ContentPane({
+			layoutAlign: "bottom"
+		});
+		var div = document.createElement("div");
+		var button = new dijit.form.Button({
+			label: cm.close,
+			onClick: dojo.hitch(win, "close")
+		});
+		div.appendChild(button.domNode);
+		dojo.addClass(div, "floatRight");
+		bpane.setContent(div);
+		win.addChild(bpane);
+		
+		dojo.style(uploader.inputNode, "width", "163px");
+		uploader.startup();
+		win.show();
+	},
+	
 	kill: function() {
 		if(!this.win.closed) { this.win.close(); }
+		dojo.forEach(this.windows, function(win) {
+			if(!win.closed) win.close();
+		});
 	}
 })
