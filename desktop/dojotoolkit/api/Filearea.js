@@ -267,11 +267,14 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		dojo.forEach(this.getChildren(), function(item){
 			item.destroy();
 		});
+		//cancel the current xhr if there is one
+		if(this._lsHandle) this._lsHandle.cancel();
 		//list the path
 		this._loadStart();
-		api.fs.ls({
+		this._lsHandle = api.fs.ls({
 			path: this.path,
 			callback: dojo.hitch(this, function(array) {
+				this._lsHandle = null;
 				//make a new widget for each item returned
 				dojo.forEach(array, function(item) {
 					var name = item.name;

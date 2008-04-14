@@ -30,17 +30,17 @@ api.fs = new function()
     */
    this.ls = function(/*Object*/object)
     {
-        api.xhr({
-        backend: "api.fs.io.getFolder",
-		content: {
-			path: object.path
-		},
-		handleAs: "json",
-        load: function(data, ioArgs) {
-	        if(object.callback) { object.callback(data); }
-		},
-        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); },
-		handleAs: "json"
+        return api.xhr({
+	        backend: "api.fs.io.getFolder",
+			content: {
+				path: object.path
+			},
+			handleAs: "json",
+	        load: function(data, ioArgs) {
+		        if(object.callback) { object.callback(data); }
+			},
+	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); },
+			handleAs: "json"
         });
     }
    /*
@@ -62,20 +62,20 @@ api.fs = new function()
     */
    this.read = function(/*Object*/object)
     {
-        api.xhr({
-        backend: "api.fs.io.getFile",
-		content: {
-			path: object.path
-		},
-		handleAs: "json",
-        load: function(data, ioArgs) {
-			var file = {
-				path: object.path,
-				contents: data.contents
-			};
-	        if(object.callback) { object.callback(file); }
-		},
-        error: function(error, ioArgs) { api.log("Error in fs call: "+error.message); }
+        return api.xhr({
+	        backend: "api.fs.io.getFile",
+			content: {
+				path: object.path
+			},
+			handleAs: "json",
+	        load: function(data, ioArgs) {
+				var file = {
+					path: object.path,
+					contents: data.contents
+				};
+		        if(object.callback) { object.callback(file); }
+			},
+	        error: function(error, ioArgs) { api.log("Error in fs call: "+error.message); }
         });
     }
    /*
@@ -97,17 +97,17 @@ api.fs = new function()
     */
    this.write = function(/*Object*/object)
    {
-		api.xhr({
-        backend: "api.fs.io.writeFile",
-		content: {
-			path: object.path,
-			content: object.content
-		},
-		load: function(data, ioArgs)
-		{
-			object.callback(data);
-		},
-        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
+		return api.xhr({
+	        backend: "api.fs.io.writeFile",
+			content: {
+				path: object.path,
+				content: object.content
+			},
+			load: function(data, ioArgs)
+			{
+				object.callback(data);
+			},
+	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
         });
     }
     /*
@@ -134,20 +134,20 @@ api.fs = new function()
 		var newpath_ = object.path.lastIndexOf("/");
 		var newpath = object.path.substring(0, newpath_);
 		newpath = newpath + "/" + object.newname;
-	} else {
-		var newpath = object.newpath;
-	}
-        api.xhr({
-        backend: "api.fs.io.renameFile",
-		content: {
-			path: object.path,
-			newpath: newpath
-		},
-		load: function(data, ioArgs)
-		{
-			object.callback(data);
-		},
-        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
+		} else {
+			var newpath = object.newpath;
+		}
+        return api.xhr({
+	        backend: "api.fs.io.renameFile",
+			content: {
+				path: object.path,
+				newpath: newpath
+			},
+			load: function(data, ioArgs)
+			{
+				object.callback(data);
+			},
+	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
         });
     }
     /*
@@ -161,7 +161,7 @@ api.fs = new function()
     this.rename = function(/*Object*/object)
     {
 		api.log("renaming a file is the same as moving it, technically. - try not to use api.fs.rename.");
-		this.move(object);
+		return this.move(object);
     }
     /*
      * Method: mkdir
@@ -178,16 +178,16 @@ api.fs = new function()
      */
     this.mkdir = function(/*Object*/object)
     {
-        api.xhr({
-        backend: "api.fs.io.createDirectory",
-		content: {
-			path: object.path
-		},
-		load: function(data, ioArgs)
-		{
-			object.callback(data);
-		},
-        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
+        return api.xhr({
+	        backend: "api.fs.io.createDirectory",
+			content: {
+				path: object.path
+			},
+			load: function(data, ioArgs)
+			{
+				object.callback(data);
+			},
+	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
         });
     }
    /*
@@ -205,15 +205,15 @@ api.fs = new function()
     */
    this.rm = function(/*Object*/object)
     {
-        api.xhr({
-        backend: "api.fs.io.removeFile",
-		content: {
-			path: object.path
-		},
-		load: function(data, ioArgs) {
-			object.callback(data);
-		},
-        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
+        return api.xhr({
+	        backend: "api.fs.io.removeFile",
+			content: {
+				path: object.path
+			},
+			load: function(data, ioArgs) {
+				object.callback(data);
+			},
+	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
         });
     }
 	/*
@@ -231,16 +231,16 @@ api.fs = new function()
 	 */
    this.copy = function(/*Object*/object)
     {
-        api.xhr({
-        backend: "api.fs.io.copyFile",
-		content: {
-			path: object.from,
-			newpath: object.to
-		},
-		load: function(data, ioArgs) {
-			object.callback(data);
-		},
-        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
+        return api.xhr({
+	        backend: "api.fs.io.copyFile",
+			content: {
+				path: object.from,
+				newpath: object.to
+			},
+			load: function(data, ioArgs) {
+				object.callback(data);
+			},
+	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
         });
     }
    /*
@@ -258,7 +258,7 @@ api.fs = new function()
     */
    this.rmdir = function(/*Object*/object)
     {
-        api.xhr({
+        return api.xhr({
 	        backend: "api.fs.io.removeDir",
 			content: {
 				path: object.path
@@ -343,7 +343,7 @@ api.fs = new function()
 	 * 		> }
 	 */
 	this.info = function(/*String*/path, /*Function*/callback) {
-		api.xhr({
+		return api.xhr({
 			backend: "api.fs.io.info",
 			content: {
 				path: path
