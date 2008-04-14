@@ -1,36 +1,21 @@
 dojo.require("dijit._Widget");
 dojo.provide("api.Sound");
 
-/* 
- * Class: api.Sound
- * 
- * An API that allows an app to play audio content.
- * Abstracts between HTML5 audio tags, flash-based audio, and embed tags
- */
 dojo.declare("api.Sound", dijit._Widget, {
-	/*
-	 * Property: src
-	 * 
-	 * The path to the sound file to play. (not on the filesystem, just a URL)
-	 */
+	//	summary:
+	//		An API that allows an app to play audio content.
+	//		Abstracts between HTML5 audio tags, flash-based audio, and embed tags
+	//	src: String
+	//		The path to the sound file to play. (not on the filesystem, just a URL)
 	src: "",
-	/*
-	 * Property: loop
-	 * 
-	 * Should the sound loop?
-	 */
+	//	loop: Boolean
+	//		Should the sound loop?
 	loop: false,
-	/*
-	 * Property: autoStart
-	 * 
-	 * Should the sound start playing once it's loaded?
-	 */
+	//	autoStart: Boolean
+	//		Should the sound start playing once it's loaded?
 	autoStart: false,
-	/*
-	 * Property: capabilities
-	 * 
-	 * What can the current backend do/have access to?
-	 */
+	//	capabilities: Object
+	//		What can the current backend do/have access to?
 	capabilities: {
 		play: true,
 		pause: true,
@@ -40,11 +25,6 @@ dojo.declare("api.Sound", dijit._Widget, {
 		volume: true,
 		id3: true
 	},
-	/*
-	 * Property: backend
-	 * 
-	 * The current backend being used. Meant to be used internally
-	 */
 	backend: null,
 	postCreate: function() {
 		this.domNode.style.position="absolute";
@@ -80,96 +60,58 @@ dojo.declare("api.Sound", dijit._Widget, {
 			this[i] = dojo.hitch(this.backend, i);
 		}, this)
 	},
-	/*
-	 * Method: play
-	 * 
-	 * Play the sound
-	 */
-	play: function() {},
-	/*
-	 * Method: pause
-	 * 
-	 * Pause the sound
-	 */
-	pause: function() {},
-	/*
-	 * Method: stop
-	 * 
-	 * Stop the sound
-	 */
-	stop: function() {},
-	/*
-	 * Method: volume
-	 * Set or get the volume
-	 * 
-	 * Arguments:
-	 * 		volume - the new volume (1 being the highest, 0 being the lowest)
-	 * 		
-	 * 		When the volume argument is skipped, it will return the current volume
-	 */
-	volume: function(/*Integer?*/volume) {},
-	/*
-	 * Method: position
-	 * Set or get the position
-	 * 
-	 * Arguments:
-	 * 		position - the new position (in miliseconds)
-	 * 		
-	 * 		When the position argument is skipped, it will return the current position
-	 */
-	position: function(/*Integer?*/position) {},
-	/*
-	 * Method: duration
-	 * Returns the duration of the file (in miliseconds)
-	 */
-	duration: function() {},
-	/*
-	 * Method: id3
-	 * Returns id3 information
-	 */
-	id3: function() {},
+	play: function() {
+		//	summary:
+		//		Play the sound
+	},
+	pause: function() {
+		//	summary:
+		//		Pause the sound
+	},
+	stop: function() {
+		//	summary:
+		//		Stop the sound
+	},
+	volume: function(/*Float|Int?*/volume) {
+		//	summary:
+		//		Set or get the volume
+		//		When the volume argument is skipped, it will return the current volume
+		//		Otherwise this function will set the volume.
+		//	volume:
+		//		the new volume (1 being the highest, 0 being the lowest)
+	},
+	position: function(/*Integer?*/position) {
+		//	summary:
+		//		Set or get the position
+		//		When the position argument is skipped, it will return the current position
+		//	position:
+		//		the new position (in miliseconds)
+	},
+	duration: function() {
+		//	summary:
+		//		Returns the duration of the file (in miliseconds)
+	},
+	id3: function() {
+		//	summary:
+		//		Returns id3 information (if available)
+	},
 	uninitialize: function() {
 		this.backend.uninitialize();
 		document.body.removeChild(this.domNode);
 	}
 });
 
-/*
- * Class: api.Sound._backend
- * 
- * The base sound backend class
- */
 dojo.declare("api.Sound._backend", null, {
+	//	summary:
+	//		The base sound backend class
+	//		Most of these properties are repeated in api.Sound, see that for more info
 	id: "",
-	/*
-	 * Property: domNode
-	 * 
-	 * A domNode that things like embed elements can be added to
-	 */
+	//	domNode: domNode
+	//	A domNode that things like embed elements can be added to
 	domNode: null,
-	/*
-	 * Property: src
-	 * 
-	 * The path to the sound file to play. (not on the filesystem, just a URL)
-	 */
 	src: "",
-	/*
-	 * Property: loop
-	 * 
-	 * Should the sound loop?
-	 */
 	loop: false,
-	/*
-	 * Property: autoStart
-	 * 
-	 * Should the sound start playing once it's loaded?
-	 */
 	autoStart: false,
-	/*
-	 * Property: capabilities
-	 * 
-	 * What can this backend do/have access to?
-	 */
 	capabilities: {
 		play: true,
 		pause: true,
@@ -179,94 +121,40 @@ dojo.declare("api.Sound._backend", null, {
 		volume: true,
 		id3: true
 	},
-	/*
-	 * Method: startup
-	 * 
-	 * do startup tasks here such as embedding an applet
-	 */
 	startup: function() {
+		//	summary:
+		//		do startup tasks here such as embedding an applet
 	},
 	constructor: function(args) {
 		this.src = args.src;
 		this.loop = args.loop || false;
 		this.autoStart = args.autoStart || false;
 	},
-	/*
-	 * Method: play
-	 * 
-	 * Play the sound
-	 */
 	play: function() {},
-	/*
-	 * Method: pause
-	 * 
-	 * Pause the sound
-	 */
 	pause: function() {},
-	/*
-	 * Method: stop
-	 * 
-	 * Stop the sound
-	 */
 	stop: function() {},
-	/*
-	 * Method: uninitailize
-	 * 
-	 * cleanup for when the class is destroyed
-	 */
-	uninitialize: function() {},
-	/*
-	 * Method: volume
-	 * Set or get the volume
-	 * 
-	 * Arguments:
-	 * 		volume - the new volume (1 being the highest, 0 being the lowest)
-	 * 		
-	 * 		When the volume argument is skipped, it will return the current volume
-	 */
+	uninitialize: function() {
+		//	summary:
+		//		cleanup for when the class is destroyed
+	},
 	volume: function(/*Integer?*/volume) {},
-	/*
-	 * Method: position
-	 * Set or get the position
-	 * 
-	 * Arguments:
-	 * 		position - the new position (in miliseconds)
-	 * 		
-	 * 		When the position argument is skipped, it will return the current position
-	 */
 	position: function(/*Integer?*/position) {},
-	/*
-	 * Method: duration
-	 * Returns the duration of the file (in miliseconds)
-	 */
 	duration: function() {},
-	/*
-	 * Method: id3
-	 * Returns id3 information
-	 */
 	id3: function() {},
-	/*
-	 * Method: testCompat
-	 * 
-	 * test for compatiblility
-	 * Returns:
-	 * 		true - the backend is compatible with the environment (and will work)
-	 * 		false - the backend is incompatible with the environment (and will not work)
-	 */
 	testCompat: function() {
+		//	summary:
+		//		test for compatibility
+		//	returns:
+		//		true when the backend is compatible with the environment (and will work)
+		//		false when the backend is incompatible with the environment (and will not work)
 		return true;
 	}
 });
 	
-/*
- * Class: api.Sound.html
- * 
- * Sound backend for the HTML5 audio tag
- * 
- * See:
- * 		<_backend>
- */
 dojo.declare("api.Sound.html", api.Sound._backend, {
+	//	summary:
+	//		Sound backend for the HTML5 audio tag
+	//		See api.Sound._backend for more info
 	htmlSound: null,
 	testCompat: function() {
 			return typeof Audio != "undefined";
@@ -300,15 +188,10 @@ dojo.declare("api.Sound.html", api.Sound._backend, {
 	}
 });
 	
-/*
- * Class: api.Sound.flash
- * 
- * Sound backend for a flash player
- * 
- * See:
- * 		<_backend>
- */
 dojo.declare("api.Sound.flash", api.Sound._backend, {
+	//	summary:
+	//		Sound backend for adobe flash player
+	//		See api.Sound._backend for more info
 	_startPos: 0,
 	playing: false,
 	play: function() {
@@ -356,17 +239,12 @@ dojo.declare("api.Sound.flash", api.Sound._backend, {
 	}
 });
 	
-/*
- * Class: api.Sound.embed
- * 
- * Sound backend for embed tags.
- * There is a known issue where XHRs are cut off when the embed tag is created.
- * We have no clue why this happens. If you know, please get in touch with us.
- * 
- * See:
- * 		<_backend>
- */
 dojo.declare("api.Sound.embed", api.Sound._backend, {
+	//	summary:
+	//		Sound backend for the embed tag
+	//		There is a known issue where XHRs are cut off when the embed tag is created.
+	//		We have no clue why this happens. If you know, please get in touch with us.
+	//		See api.Sound._backend for more info
 	capabilities: {
 		play: true,
 		pause: false,
