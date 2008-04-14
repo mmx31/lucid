@@ -1,11 +1,11 @@
 ({
-	blah: 0,
-	
 	// this.changed - Bool - Whether current file or app has been modified
 	changed: 0,
 	
 	// this.currentAppStr - String - Name and version of currently opened file or app
 	currentAppStr: "",
+	
+	metaUi: {}, //metadata input widgets
 	
 	init: function(args)
 	{
@@ -70,11 +70,11 @@
 		this.app = {
 			id: -1,
 			code: "",
-			name: "NewApp",
-			email: "AppCreator@iRule.com",
+			name: "New App",
+			email: "AppCreator@example.com",
 			version: "1.0",
 			category: "Accessories",
-			maturity: "alpha",
+			maturity: "Alpha",
 			author: "NewApp Creator"
 		};
 		this.editor.value="({\n\n\tinit: function(args)\n\t{\n\n\t\t/*Insert application start code here*/\n\n\t},\n\n\tkill: function()\n\t{\n\n\t\t/*Insert application end code here*/\n\n\t}\n\n})";
@@ -133,20 +133,72 @@
 				height: "250px",
 				onClose: dojo.hitch(this, this._editMetadata)
 			});
-			var content = "";
-		if ( this.app.id != -1 ) {
-		        content += sys.id+": <span id=\"appid"+this.instance+this.blah+"\">"+this.app.id+"</span><br>";
-		} else {
-			content += sys.id+": <span id=\"appid"+this.instance+this.blah+"\">"+sys.notAssigned+"</span><br>";
-		}
-	        content += sys.name+": <span id=\"appname"+this.instance+this.blah+"\"></span><br>";
-	        content += sys.author+": <span id=\"appauthor"+this.instance+this.blah+"\"></span><br>";
-	        content += sys.email+": <span id =\"appemail"+this.instance+this.blah+"\"></span><br>";
-	        content += sys.version+": <span id=\"appversion"+this.instance+this.blah+"\"></span><br>";
-	        content += sys.maturity+": <span id=\"appmaturity"+this.instance+this.blah+"\"></span><br>";
-	        content += sys.category+": <span id=\"appcategory"+this.instance+this.blah+"\"></span><br>";
+			var div = document.createElement("div");
+			
+			var row = document.createElement("div");
+			row.textContent = sys.id+": "+(this.app.id == -1 ? sys.notAssigned : this.app.id);
+			div.appendChild(row);
+			
+			var row = document.createElement("div");
+			row.textContent = sys.name+": ";
+			this.metaUi.name = new dijit.form.TextBox({value: this.app.name});
+			row.appendChild(this.metaUi.name.domNode);
+			div.appendChild(row);
+			
+			var row = document.createElement("div");
+			row.textContent = sys.author+": ";
+			this.metaUi.author = new dijit.form.TextBox({value: this.app.author});
+			row.appendChild(this.metaUi.author.domNode);
+			div.appendChild(row);
+			
+			var row = document.createElement("div");
+			row.textContent = sys.email+": ";
+			this.metaUi.email = new dijit.form.TextBox({value: this.app.email});
+			row.appendChild(this.metaUi.email.domNode);
+			div.appendChild(row);
+			
+			var row = document.createElement("div");
+			row.textContent = sys.version+": ";
+			this.metaUi.version = new dijit.form.TextBox({value: this.app.version});
+			row.appendChild(this.metaUi.version.domNode);
+			div.appendChild(row);
+			
+			var row = document.createElement("div");
+			row.textContent = sys.maturity+": ";
+			this.metaUi.maturity = new dijit.form.TextBox({value: this.app.maturity});
+			row.appendChild(this.metaUi.maturity.domNode);
+			div.appendChild(row);
+			
+			var row = document.createElement("div");
+			row.textContent = sys.category+": ";
+			this.metaUi.category = new dijit.form.FilteringSelect({
+				autoComplete: true,
+				searchAttr: "label",
+				value: this.app.category,
+				store: new dojo.data.ItemFileReadStore({
+					data: {
+						identifier: "value",
+						items: [
+							{ label: mnu.accessories, value: "Accessories" },
+							{ label: mnu.development, value: "Development" },
+							{ label: mnu.games, value: "Games" },
+							{ label: mnu.graphics, value: "Graphics" },
+							{ label: mnu.internet, value: "Internet" },
+							{ label: mnu.multimedia, value: "Multimedia" },
+							{ label: mnu.office, value: "Office" },
+							{ label: mnu.system, value: "System" }
+						]
+					}
+				}),
+				onChange: dojo.hitch( this, function(val) {
+					if ( typeof val == "undefined" ) return;
+				})
+			});
+			row.appendChild(this.metaUi.category.domNode);
+			div.appendChild(row);
+			
 		var body = new dijit.layout.ContentPane({layoutAlign: "client"});
-		body.setContent(content);
+		body.setContent(div);
 		this.winn.addChild(body);
 		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
 		var div = document.createElement("div");
@@ -159,44 +211,6 @@
 		bottom.setContent(div);
 		this.winn.addChild(bottom);
 		this.winn.show();
-		new dijit.form.TextBox({id: "appname"+this.instance+this.blah, name: "appname"+this.instance+this.blah}, document.getElementById("appname"+this.instance+this.blah));
-		new dijit.form.TextBox({id: "appauthor"+this.instance+this.blah, name: "appauthor"+this.instance+this.blah}, document.getElementById("appauthor"+this.instance+this.blah));
-		new dijit.form.TextBox({id: "appemail"+this.instance+this.blah, name: "appemail"+this.instance+this.blah}, document.getElementById("appemail"+this.instance+this.blah));
-		new dijit.form.TextBox({value: this.app.version, id: "appversion"+this.instance+this.blah, name: "appversion"+this.instance+this.blah}, document.getElementById("appversion"+this.instance+this.blah));
-		new dijit.form.TextBox({id: "appmaturity"+this.instance+this.blah, name: "appmaturity"+this.instance+this.blah}, document.getElementById("appmaturity"+this.instance+this.blah));
-		//new dijit.form.TextBox({id: "appcategory"+this.instance+this.blah, name: "appcategory"+this.instance+this.blah}, document.getElementById("appcategory"+this.instance+this.blah));
-
-		var dropdown = new dijit.form.FilteringSelect({
-			autoComplete: true,
-			searchAttr: "label",
-			store: new dojo.data.ItemFileReadStore({
-				data: {
-					identifier: "value",
-					items: [
-						{ label: mnu.accessories, value: "Accessories" },
-						{ label: mnu.development, value: "Development" },
-						{ label: mnu.games, value: "Games" },
-						{ label: mnu.graphics, value: "Graphics" },
-						{ label: mnu.internet, value: "Internet" },
-						{ label: mnu.multimedia, value: "Multimedia" },
-						{ label: mnu.office, value: "Office" },
-						{ label: mnu.system, value: "System" }
-					]
-				}
-			}),
-			onChange: dojo.hitch( this, function(val) {
-				if ( typeof val == "undefined" ) return;
-			})
-		}, document.getElementById("appcategory"+this.instance+this.blah));
-
-		dijit.byId("appcategory"+this.instance+this.blah).textbox.disabled = true;
-
-		dijit.byId("appname"+this.instance+this.blah).setValue(this.app.name);
-		dijit.byId("appauthor"+this.instance+this.blah).setValue(this.app.author);
-		dijit.byId("appemail"+this.instance+this.blah).setValue(this.app.email);
-		dijit.byId("appversion"+this.instance+this.blah).setValue(this.app.version);
-		dijit.byId("appcategory"+this.instance+this.blah).setValue(this.app.category);
-		dijit.byId("appmaturity"+this.instance+this.blah).setValue(this.app.maturity);
 	},
 	
 	_editMetadata: function()
