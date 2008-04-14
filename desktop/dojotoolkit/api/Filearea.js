@@ -39,6 +39,11 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		}
 		this.connect(window,'onresize',"layout");
 		
+		var sNode = this.scrollNode = document.createElement("div");
+		dojo.style(sNode, "position", "relative");
+		this.domNode.appendChild(sNode);
+		dojo.style(this.domNode, "overflow", "auto");
+		
 		var menu = this.menu = new dijit.Menu({});
 		menu.addChild(new dijit.MenuItem({label: nf.createFolder, iconClass: "icon-16-actions-folder-new", onClick: dojo.hitch(this, this._makeFolder)}));
 		menu.addChild(new dijit.MenuItem({label: nf.createFile, iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, this._makeFile)}));
@@ -315,6 +320,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				hc += (this.vertical ? vspacing : hspacing);
 			}
 		};
+		dojo.style(this.scrollNode, (this.vertical ? "height" : "width"), hc+"px");
 	},
 	_fixDuplicateFilename: function(name, type) {
 		var i=2;
