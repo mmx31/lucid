@@ -219,25 +219,25 @@
 		var nameChanged = 0;	// Has app name been changed?
 		var versionChanged = 0;	// Has app version been changed?
 	
-		if ( this.app.name != dijit.byId("appname"+this.instance+this.blah).getValue() ) {
+		if ( this.app.name != this.appUi.name.getValue() ) {
 			nameChanged = 1;
 			anyChanged = 1;
 		}
-		if ( this.app.version != dijit.byId("appversion"+this.instance+this.blah).getValue() ) {
+		if ( this.app.version != this.appUi.version.getValue() ) {
 			versionChanged = 1;
 			anyChanged = 1;
 		}
-		if ( this.app.author != dijit.byId("appauthor"+this.instance+this.blah).getValue() ) anyChanged = 1;
-		if ( this.app.email != dijit.byId("appemail"+this.instance+this.blah).getValue() ) anyChanged = 1;
-		if ( this.app.category != dijit.byId("appcategory"+this.instance+this.blah).getValue() ) anyChanged = 1;
-		if ( this.app.maturity != dijit.byId("appmaturity"+this.instance+this.blah).getValue() ) anyChanged = 1;
+		if ( this.app.author != this.appUi.author.getValue() ) anyChanged = 1;
+		if ( this.app.email != this.appUi.email.getValue() ) anyChanged = 1;
+		if ( this.app.category != this.appUi.category.getValue() ) anyChanged = 1;
+		if ( this.app.maturity != this.appUi.maturity.getValue() ) anyChanged = 1;
 		
-		this.app.name = dijit.byId("appname"+this.instance+this.blah).getValue();
-		this.app.author = dijit.byId("appauthor"+this.instance+this.blah).getValue();
-		this.app.email = dijit.byId("appemail"+this.instance+this.blah).getValue();
-		this.app.version = dijit.byId("appversion"+this.instance+this.blah).getValue();
-		this.app.category = dijit.byId("appcategory"+this.instance+this.blah).getValue();
-		this.app.maturity = dijit.byId("appmaturity"+this.instance+this.blah).getValue();
+		this.app.name = this.appUi.name.getValue();
+		this.app.author = this.appUi.author.getValue();
+		this.app.email = this.appUi.email.getValue();
+		this.app.version = this.appUi.version.getValue();
+		this.app.category = this.appUi.category.getValue();
+		this.app.maturity = this.appUi.maturity.getValue();
 		this.editor.value = this.tempCache;
 	        this.editor.disabled = false;
 		this.blah++;
