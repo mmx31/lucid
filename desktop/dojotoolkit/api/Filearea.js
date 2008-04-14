@@ -593,6 +593,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			dojo.disconnect(evt);
 			var value = textbox.getValue();
 			textbox.destroy();
+			if(value == this.name) return;
 			value = this.getParent()._fixDuplicateFilename(value, this.type);
 			api.fs.rename({
 				path: this.getParent().path+"/"+this.name,
