@@ -47,5 +47,6 @@
 	"default": "Default",
 	"groupAlreadyExists": "Group with that name already exists",
 	"manageGroupMembers": "Manage %s members",
-	"notAssigned": "Not yet assigned"
+	"notAssigned": "Not yet assigned",
+	"launchingApp": "Launching app %s..."
 })
