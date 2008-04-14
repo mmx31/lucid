@@ -34,6 +34,12 @@ if (get_magic_quotes_gpc())
 	}
 }
 
+//for debugging
+function desktop_errorHandler($exception) {
+	internal_error("generic_err", $exception->getMessage());
+}
+set_exception_handler("desktop_errorHandler");
+
 //util functions
 function internal_error($type, $msg="")
 {
@@ -41,7 +47,7 @@ function internal_error($type, $msg="")
 	header('FirePHP-Data: {"msg":"' . addslashes($msg) . '"}');
 	$p = new intOutput();
 	$p->set($type);
-	error_log($msg);
+	error_log("Lucid Error: " . $type . " (" . $msg . ")");
 	die();
 }
 

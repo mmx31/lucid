@@ -84,6 +84,24 @@
 				label: cm.upload,
 			});
 			this.toolbar.addChild(this.upbutton);
+			var load = this.loadNode = document.createElement("div");
+			dojo.addClass(load, "icon-loading-indicator");
+			dojo.style(load, {
+				display: "none",
+				position: "absolute",
+				top: "0px",
+				right: "0px",
+				margin: "7px"
+			});
+			this.toolbar.domNode.appendChild(load);
+			
+			dojo.connect(this.fileArea, "_loadStart", this, function() {
+				dojo.style(load, "display", "block");
+			});
+			dojo.connect(this.fileArea, "_loadEnd", this, function() {
+				dojo.style(load, "display", "none");
+			});
+			
 		this.win.addChild(this.toolbar);
 		this.win.addChild(this.pathbar);
 		this.win.addChild(this.client);
