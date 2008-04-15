@@ -59,39 +59,31 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				if(clip.type == "cut") {
 					var name = this._fixDuplicateFilename(clip.name, clip.mimetype);
 					this._loadStart();
-					api.fs.move({
-						path: clip.path+"/"+clip.name,
-						newpath: this.path+"/"+name,
-						callback: dojo.hitch(this, function() {
-							var parentID;
-							if(clip.widgetRef) {
-								var p = clip.widgetRef.getParent();
-								parentID = p.id
-								this.addChild(clip.widgetRef);
-								clip.widgetRef.name = name;
-								clip.widgetRef.label = clip.widgetRef._formatLabel(name);
-								clip.widgetRef.fixStyle();
-								this.layout();
-								p.layout();
-							}
-							dojo.publish("filearea:"+this.path, [this.id, parentID]);
-							if(parentID) dojo.publish("filearea:"+p.path, [this.id, parentID]);
-							this._loadEnd();
-						})
-					})
+					api.filesystem.move(clip.path+"/"+clip.name, this.path+"/"+name, dojo.hitch(this, function() {
+						var parentID;
+						if(clip.widgetRef) {
+							var p = clip.widgetRef.getParent();
+							parentID = p.id
+							this.addChild(clip.widgetRef);
+							clip.widgetRef.name = name;
+							clip.widgetRef.label = clip.widgetRef._formatLabel(name);
+							clip.widgetRef.fixStyle();
+							this.layout();
+							p.layout();
+						}
+						dojo.publish("filearea:"+this.path, [this.id, parentID]);
+						if(parentID) dojo.publish("filearea:"+p.path, [this.id, parentID]);
+						this._loadEnd();
+					}))
 				}
 				if(clip.type == "copy") {
 					var name = this._fixDuplicateFilename(clip.name, clip.mimetype);
 					this._loadStart();
-					api.fs.copy({
-						from: clip.path+"/"+clip.name,
-						to: this.path+"/"+name,
-						callback: dojo.hitch(this, function() {
-							this._loadEnd();
-							this.refresh();
-							dojo.publish("filearea:"+this.path, [this.id]);
-						})
-					})
+					api.filesystem.copy(clip.path+"/"+clip.name, this.path+"/"+name, dojo.hitch(this, function() {
+						this._loadEnd();
+						this.refresh();
+						dojo.publish("filearea:"+this.path, [this.id]);
+					}))
 				}
 			})
 		}));
@@ -199,13 +191,10 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 			callback: dojo.hitch(this, function(dirname) {
 				if(dirname == "") return;
 				dirname = this._fixDuplicateFilename(dirname, "text/directory");
-				api.fs.mkdir({
-					path: this.path+"/"+dirname,
-					callback: dojo.hitch(this, function() {
-						dojo.publish("filearea:"+this.path, [this.id]);
-						this.refresh();
-					})
-				});
+				api.filesystem.createDirectory(this.path+"/"+dirname, dojo.hitch(this, function() {
+					dojo.publish("filearea:"+this.path, [this.id]);
+					this.refresh();
+				}));
 			})
 		});
 	},
@@ -221,13 +210,10 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 			callback: dojo.hitch(this, function(filename) {
 				if(filename == "") return;
 				filename = this._fixDuplicateFilename(filename, "text/plain");
-				api.fs.write({
-					path: this.path+"/"+filename,
-					callback: dojo.hitch(this, function() {
-						dojo.publish("filearea:"+this.path, [this.id]);
-						this.refresh();
-					})
-				});
+				api.filesystem.writeFileContents(this.path+"/"+filename, "", dojo.hitch(this, function() {
+					dojo.publish("filearea:"+this.path, [this.id]);
+					this.refresh();
+				}));
 			})
 		});
 	},
@@ -271,33 +257,30 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		if(this._lsHandle) this._lsHandle.cancel();
 		//list the path
 		this._loadStart();
-		this._lsHandle = api.fs.ls({
-			path: this.path,
-			callback: dojo.hitch(this, function(array) {
-				this._lsHandle = null;
-				//make a new widget for each item returned
-				dojo.forEach(array, function(item) {
-					var name = item.name;
-					var p = name.lastIndexOf(".");
-					var ext = name.substring(p+1, name.length);
-					var icon = desktop.config.filesystem.icons[ext.toLowerCase()];
-					if(desktop.config.filesystem.hideExt && item.type!="text/directory" && p != -1) {
-						var label = name.substring(0, p-1);
-					}
-					var wid = new api.Filearea._Icon({
-						label: label || name,
-						name: name,
-						path: item.path,
-						type: item.type,
-						iconClass: (item.type=="text/directory" ? "icon-32-places-folder" : (icon || "icon-32-mimetypes-text-x-generic"))
-					});
-					this.addChild(wid);
-				}, this);
-				//invoke a layout so that everything is positioned correctly
-				this.layout();
-				this._loadEnd();
-			})
-		});
+		this._lsHandle = api.filesystem.listDirectory(this.path, dojo.hitch(this, function(array) {
+			this._lsHandle = null;
+			//make a new widget for each item returned
+			dojo.forEach(array, function(item) {
+				var name = item.name;
+				var p = name.lastIndexOf(".");
+				var ext = name.substring(p+1, name.length);
+				var icon = desktop.config.filesystem.icons[ext.toLowerCase()];
+				if(desktop.config.filesystem.hideExt && item.type!="text/directory" && p != -1) {
+					var label = name.substring(0, p-1);
+				}
+				var wid = new api.Filearea._Icon({
+					label: label || name,
+					name: name,
+					path: item.path,
+					type: item.type,
+					iconClass: (item.type=="text/directory" ? "icon-32-places-folder" : (icon || "icon-32-mimetypes-text-x-generic"))
+				});
+				this.addChild(wid);
+			}, this);
+			//invoke a layout so that everything is positioned correctly
+			this.layout();
+			this._loadEnd();
+		}));
 	},
 	layout: function() {
 		//	summary:
@@ -383,30 +366,18 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		menu.addChild(new dijit.MenuItem({label: nc.open, iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, "_onDblClick")}));
 			var menuDl = new dijit.PopupMenuItem({iconClass: "icon-16-actions-document-open", label: nc.download});
 			var menu2 = new dijit.Menu({parentMenu: menuDl});
-			if(!this.isDir) { menu2.addChild(new dijit.MenuItem({label: nf.asFile, onClick: dojo.hitch(this, function(e) {
-				api.fs.download(this.path);
+			menu2.addChild(new dijit.MenuItem({label: nf.asFile, onClick: dojo.hitch(this, function(e) {
+				api.filesystem.download(this.path);
 			})}));
 			menu2.addChild(new dijit.MenuItem({label: nf.asZip ,onClick: dojo.hitch(this, function(e) {
-				api.fs.compressDownload(this.path, "zip");
+				api.filesystem.download(this.path, "zip");
 			})}));
 			menu2.addChild(new dijit.MenuItem({label: nf.asTgz, onClick: dojo.hitch(this, function(e) {
-				api.fs.compressDownload(this.path, "gzip");
+				api.filesystem.download(this.path, "gzip");
 			})}));
 			menu2.addChild(new dijit.MenuItem({label: nf.asTbz2, onClick: dojo.hitch(this, function(e) {
-				api.fs.compressDownload(this.path, "bzip");
+				api.filesystem.download(this.path, "bzip");
 			})}));
-			}
-			if(this.type == "text/directory") {
-				menu2.addChild(new dijit.MenuItem({label: nf.asZip, onClick: dojo.hitch(this, function(e) {
-					api.fs.downloadFolder(this.path, "zip");
-				})}));
-				menu2.addChild(new dijit.MenuItem({label: nf.asTgz, onClick: dojo.hitch(this, function(e) {
-					api.fs.downloadFolder(this.path, "gzip");
-				})}));
-				menu2.addChild(new dijit.MenuItem({label: nf.asTbz2, onClick: dojo.hitch(this, function(e) {
-					api.fs.downloadFolder(this.path, "bzip");
-				})}));
-			}
 			menu2.startup();
 			menuDl.popup = menu2;
 			menu.addChild(menuDl);
@@ -539,37 +510,29 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 				if (e.shiftKey) {
 					//copy the file
 					var name = newTarget._fixDuplicateFilename(this.name, this.type);
-					api.fs.copy({
-						from: this.getParent().path + "/" + this.name,
-						to: newTarget.path + "/" + name,
-						callback: function(){
-							_loadParent._loadEnd();
-							newTarget.refresh();
-							dojo.publish("filearea:"+newTarget.path, [newTarget.id]);
-							//TODO: copy myself and add me to newTarget?
-						}
+					api.filesystem.copy(this.getParent().path + "/" + this.name, newTarget.path + "/" + name, function(){
+						_loadParent._loadEnd();
+						newTarget.refresh();
+						dojo.publish("filearea:"+newTarget.path, [newTarget.id]);
+						//TODO: copy myself and add me to newTarget?
 					});
 				}
 				else {
 					//move the file
 					var name = newTarget._fixDuplicateFilename(this.name, this.type);
-					api.fs.rename({
-						path: this.getParent().path + "/" + this.name,
-						newpath: newTarget.path + "/" + name,
-						callback: dojo.hitch(this, function(){
-							_loadParent._loadEnd();
-							var p = this.getParent();
-							p.removeChild(this);
-							p.layout();
-							this.name = name;
-							this.label = this._formatLabel(name);
-							newTarget.addChild(this);
-							newTarget.layout();
-							this.fixStyle();
-							dojo.publish("filearea:"+p.path, [p.id, newTarget.id]);
-							dojo.publish("filearea:"+newTarget.path, [p.id, newTarget.id]);
-						})
-					});
+					api.filesystem.move(this.getParent().path + "/" + this.name, newTarget.path + "/" + name, dojo.hitch(this, function(){
+						_loadParent._loadEnd();
+						var p = this.getParent();
+						p.removeChild(this);
+						p.layout();
+						this.name = name;
+						this.label = this._formatLabel(name);
+						newTarget.addChild(this);
+						newTarget.layout();
+						this.fixStyle();
+						dojo.publish("filearea:"+p.path, [p.id, newTarget.id]);
+						dojo.publish("filearea:"+newTarget.path, [p.id, newTarget.id]);
+					}));
 				}
 			}
 			//TODO: handle dragging a file into a folder
@@ -623,35 +586,31 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			if(value == this.name) return;
 			value = this.getParent()._fixDuplicateFilename(value, this.type);
 			this.getParent()._loadStart();
-			api.fs.rename({
-				path: this.getParent().path+"/"+this.name,
-				newname: value,
-				callback: dojo.hitch(this, function() {
-					if(desktop.config.filesystem.hideExt) {
-						var pos = value.lastIndexOf(".");
-						if(pos != -1) {
-							value = value.substring(0, pos-1);
-						}
+			api.filesystem.move(this.getParent().path+"/"+this.name, value, dojo.hitch(this, function() {
+				if(desktop.config.filesystem.hideExt) {
+					var pos = value.lastIndexOf(".");
+					if(pos != -1) {
+						value = value.substring(0, pos-1);
 					}
-					this.label = this._formatLabel(value);
-					this.name = value;
-					this.fixStyle();
-					dojo.publish("filearea:"+this.getParent().path, [this.getParent().id]);
-					this.getParent()._loadEnd();
-				})
-			});
+				}
+				this.label = this._formatLabel(value);
+				this.name = value;
+				this.fixStyle();
+				dojo.publish("filearea:"+this.getParent().path, [this.getParent().id]);
+				this.getParent()._loadEnd();
+			}));
 		})
 	},
 	deleteFile: function(e)
 	{
 		//	summary:
 		//		Delete the file on the filesystem this instance represents
-		api.fs.rm({path: this.getParent().path+"/"+this.name, callback: dojo.hitch(this, function() {
+		api.filesystem.remove(this.getParent().path+"/"+this.name, dojo.hitch(this, function() {
 			var p = this.getParent();
 			this.destroy();
 			p.layout();
 			dojo.publish("filearea:"+p.path, [p.id]);
-		})});
+		}));
 	},
 	unhighlight: function() {
 		//	summary:

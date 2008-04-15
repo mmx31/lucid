@@ -122,18 +122,15 @@ desktop.app = {
 		var l = file.lastIndexOf(".");
 		var ext = file.substring(l + 1, file.length);
 		if (ext == "desktop") {
-			api.fs.read({
-				path: file,
-				callback: dojo.hitch(this, function(file){
-					var c = file.contents.split("\n");
-					desktop.app.launch(c[0], dojo.fromJson(c[1]));
-				})
-			});
+			api.filesystem.readFileContents(file, dojo.hitch(this, function(file){
+				var c = file.contents.split("\n");
+				desktop.app.launch(c[0], dojo.fromJson(c[1]));
+			}));
 			return;
 		}
 		else {
 			if(!format) {
-				api.fs.info(file, dojo.hitch(this, function(f){
+				api.filesystem.info(file, dojo.hitch(this, function(f){
 					var type = f.type;
 					this._launchHandler(file, type, args);
 				}));

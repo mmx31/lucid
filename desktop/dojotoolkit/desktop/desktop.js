@@ -13,7 +13,7 @@ dojo.require("desktop.user");
 		"api.crosstalk",
 		"api.Registry",
 		"api.Filearea",
-		"api.fs",
+		"api.filesystem",
 		"api.ide",
 		"api.Mail",
 		"api.Sound",

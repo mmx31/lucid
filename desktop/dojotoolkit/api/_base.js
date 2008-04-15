@@ -4,7 +4,7 @@ dojo.require("api.flash.flash");
 dojo.require("api.Console");
 dojo.require("api.crosstalk");
 dojo.require("api.Filearea");
-dojo.require("api.fs");
+dojo.require("api.filesystem");
 dojo.require("api.ide");
 dojo.require("api.Mail");
 dojo.require("api.Registry");

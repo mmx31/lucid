@@ -29,15 +29,15 @@
 				'description' => 'Can make cross-domain requests by using the server as a proxy'
 			),
 			array(
-				'name' => 'api.fs.download',
+				'name' => 'api.filesystem.download',
 				'description' => 'Can download files'
 			),
 			array(
-				'name' => 'api.fs.upload',
+				'name' => 'api.filesystem.upload',
 				'description' => 'Can upload files'
 			),
 			array(
-				'name' => 'api.fs.remote',
+				'name' => 'api.filesystem.remote',
 				'description' => 'Can connect to remote file servers'
 			),
 			array(

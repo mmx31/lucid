@@ -15,7 +15,7 @@ class FileFs extends BaseFs {
 	}
 	function _getFileInfo($file, $realPath=false) {
 		$r = array();
-		$r['path'] = $file;
+		$r['path'] = $file; //TODO: this is it's real path, get it's vfs path?
 		$f = ($realPath ? "" : $this->_basePath()) . $file;
 		$r['name'] = basename($f);
 		if(is_dir($f)) {

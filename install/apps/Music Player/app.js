@@ -187,7 +187,7 @@
 	openFile: function(file) {
 		if (file) {
 			this.sound = new api.Sound({
-				src: api.fs.embed(file)
+				src: api.filesystem.embed(file)
 			});
 			this.play();
 			file = file.split("/");

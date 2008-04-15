@@ -240,7 +240,7 @@ dojo.mixin(desktop.ui, {
 					api.ui.fileDialog({
 						callback: function(path) {
 							if(path) {
-								var p = api.fs.embed(path);
+								var p = api.filesystem.embed(path);
 								for(key in desktop.config.wallpaper.storedList) {
 									var val = desktop.config.wallpaper.storedList[key];
 									if(val == p) return;

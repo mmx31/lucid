@@ -59,6 +59,6 @@
 			
 			this.dragPane.domNode.appendChild(this.imgNode);
 		}
-		dojo.query("img", this.imgNode)[0].src = api.fs.embed(path);
+		dojo.query("img", this.imgNode)[0].src = api.filesystem.embed(path);
 	}
 })

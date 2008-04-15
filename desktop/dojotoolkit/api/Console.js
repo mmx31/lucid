@@ -111,8 +111,7 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		{
 			var n = dojo.i18n.getLocalization("api", "console");
 			if(params == "") params = this.path;
-			api.fs.ls({path: params, callback: dojo.hitch(this, function(array)
-			{
+			api.filesystem.listDirectory(params, dojo.hitch(this, function(array) {
 				var i = 0;
 				while(i < array.length) {
 					if(array[i].isDir == true) {
@@ -123,8 +122,7 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 					}
 				i++;
 				}
-			i = 0;
-			})});
+			}));
 		},
 		mkdir: function(params)
 		{
@@ -133,7 +131,7 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 				this.stdout.innerHTML += "mkdir: "+n.needDirName+"<br />";
 			}
 			else {
-				api.fs.mkdir({path: params});
+				api.filesystem.createDirectory(params);
 			}
 		},
 		rm: function(params)
@@ -143,17 +141,7 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 				this.stdout.innerHTML += "rm: "+n.needFileName+"<br />";
 			}
 			else {
-				api.fs.rm({path: params});
-			}
-		},
-		rmdir: function(params)
-		{
-			var n = dojo.i18n.getLocalization("api", "console");
-			if(params == "") {
-				this.stdout.innerHTML += "rmdir: "+n.needDirName+"<br />";
-			}
-			else {
-				api.fs.rmdir({path: params});
+				api.filesystem.remove(params);
 			}
 		},
 		cat: function(params)
@@ -163,10 +151,9 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 				this.stdout.innerHTML +="cat: "+n.needFileName+"<br />";
 			}
 			else {
-				api.fs.read({path: this.path + params, callback: dojo.hitch(this, function(array)
-				{
-					this.stdout.innerHTML += array[0].contents.replace("\n", "<br />")+"<br />";
-				})});
+				api.filesystem.readFileContents(this.path + params, dojo.hitch(this, function(content) {
+					this.stdout.innerHTML += content.replace("\n", "<br />")+"<br />";
+				}));
 			}
 		}
 	},

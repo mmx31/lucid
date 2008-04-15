@@ -123,30 +123,22 @@
 	    this.other.setContent(msg.openingFile.replace("%s", path));
 	    this.newAs = true;
 	    this.editor.setDisabled(true);
-	    api.fs.read({
-	        path: path,
-	        callback: dojo.hitch(this, 
-	        function(array) {
+	    api.filesystem.readFileContents(path, dojo.hitch(this, function(content) {
 	            this.editor.setDisabled(false);
-	            this.editor.replaceValue(array.contents);
+	            this.editor.replaceValue(content);
 	            this.editing = true;
 	            this.newAs = true;
-	            this.fileEditing = array.path;
-	            this.other.setContent(msg.editingFile.replace("%s", array.path));
-	        })
-	    });
+	            this.fileEditing = path;
+	            this.other.setContent(msg.editingFile.replace("%s", path));
+        }));
 	
 	},
 	
 	processSave: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (this.editing) {
-        api.fs.write({
-            path: this.fileEditing,
-            content: "<html>"+this.editor.getValue()+"</html>"
-        });
+        api.filesystem.writeFileContents(this.fileEditing, "<html>"+this.editor.getValue()+"</html>");
         this.other.setContent(msg.fileSaved);
-
 	    }
 	    else {
 	        this.processSaveAs();
