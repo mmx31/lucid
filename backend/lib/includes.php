@@ -30,6 +30,6 @@
 	);
 	foreach($includes as $include)
 	{
-		if(!is_null($include)) require_once($GLOBALS['path'] . $include);
+		if(!is_null($include)) @require_once($GLOBALS['path'] . $include);
 	}
 ?>
