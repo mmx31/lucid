@@ -17,7 +17,6 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 error_reporting(0);
-session_start();
 //get rid of magicquotes
 if (get_magic_quotes_gpc())
 {
@@ -33,6 +32,21 @@ if (get_magic_quotes_gpc())
 		$_GET[$key] = stripslashes($value);
 	}
 }
+
+//sessions and cookies
+function get_basepath() {
+	$curpath = explode("/", $_SERVER['REQUEST_URI']);
+	$dir = $GLOBALS['installing'] ? "install" : "backend";
+	while($curpath[count($curpath)-1] != $dir) {
+		if(count($curpath) == 0) return "/";
+		array_pop($curpath);
+	}
+	array_pop($curpath);
+	return implode("/", $curpath) . "/";
+}
+session_set_cookie_params(60*60*24*365, get_basepath());
+session_name("desktop_session");
+session_start();
 
 //for debugging
 function desktop_errorHandler($exception) {
@@ -57,16 +71,4 @@ function import($module) {
 	$file = $GLOBALS['path'] . $path . ".php";
 	return require_once($file);
 }
-
-function get_basepath() {
-	$curpath = explode("/", $_SERVER['REQUEST_URI']);
-	$dir = $GLOBALS['installing'] ? "install" : "backend";
-	while($curpath[count($curpath)-1] != $dir) {
-		if(count($curpath) == 0) return "/";
-		array_pop($curpath);
-	}
-	array_pop($curpath);
-	return implode("/", $curpath) . "/";
-}
-session_set_cookie_params(time()+(60*60*24*365), get_basepath());
 ?>
