@@ -7,46 +7,41 @@ dojo.provide("desktop.admin");
  * The user must be an administrator to use these, otherwise the
  * server-side code will prevent any action from being taken.
  */
-desktop.admin = new function()
-{
-	/*
-	 * Method: diskspace
-	 * 
-	 * Gets the amount of free space on the server
-	 * 
-	 * Arguments:
-	 * 		callback - a callback function. Passes an object as an argument with two properties: 'free', and 'total'
-	 */
-	this.diskspace = function(/*Function*/callback) {
-		api.xhr({
+desktop.admin = {
+	diskspace: function(/*Function*/callback) {
+		//	summary:
+		//		Gets the amount of free space on the server
+		//	callback:
+		//		a callback function. Passes an object as an argument with two properties: 'free', and 'total'
+		return api.xhr({
 			backend: "core.administration.general.diskspace",
 			load: callback,
 			handleAs: "json"
 		});
-	}
-	/*
-	 * Class: desktop.admin.permission
-	 * 
-	 * Permission/group management
-	 */
-	this.permissions = {
-		/*
-		 * Method: list
-		 * 
-		 * List the permissions on the system
-		 * 
-		 * Arguments:
-		 * 		callback - a callback function to pass the results to.
-		 * 
-		 * 		The callback will get a single array of values as it's first argument.
-		 * 		Each slot in the array will be an object with the permission's information:
-		 * 		> {
-		 * 		> 	name: string, //the permission's name
-		 * 		> 	description: string, //what this permission restricts
-		 * 		> 	initial: bool //the default value if it's not specified by the user's groups/permissions
-		 * 		> }
-		 */
+	},
+	permissions: {
+		//	summary:
+		//		Permission/group management
+		/*=====
+		_listArgs: {
+			//	name: String
+			//		the name of the permission
+			name: "",
+			//	description: String
+			//		what this permission restricts
+			description: "",
+			//	initial: Boolean
+			//		the default value if it's not specified by the user's groups/permissions
+			initial: true
+		},
+		=====*/
 		list: function(/*Function*/callback) {
+			//	summary:
+			//		List the permissions on the system
+			//	callback:
+			//		a callback function to pass the results to.
+			//		The callback will get a single array of values as it's first argument.
+			//		Each slot in the array will be a desktop.admin._listArgs object with the permission's information
 			api.xhr({
 				backend: "core.administration.permissions.list",
 				load: callback,
@@ -75,13 +70,13 @@ desktop.admin = new function()
 				}
 			});
 		}
-	}
+	},
 	/*
 	 * Class: desktop.admin.groups
 	 * 
 	 * Group management functions
 	 */
-	this.groups = {
+	groups: {
 		/*
 		 * Method: list
 		 * 
@@ -238,7 +233,7 @@ desktop.admin = new function()
 				}
 			})
 		}
-	}
+	},
 	/*
 	 * Class: desktop.admin.users
 	 * 
@@ -247,7 +242,7 @@ desktop.admin = new function()
 	 * Note:
 	 * 		for modifying user information see <desktop.user>
 	 */
-	this.users = {
+	users: {
 		/*
 		 * Method: list
 		 * 
