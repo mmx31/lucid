@@ -10,18 +10,19 @@ class PublicFs extends FileFs {
 	}
 }
 */
-import("models.user");
 class PublicFs extends BaseFs {
 	var $_username;
-	function _basePath($path=false) {
-		return "../../public/" . ($path ? $path : "");
+	function _startup() {
 	}
-        function _getRealPath($path) {
-                return $this->_basePath($path);
-        }
+	function _basePath($path=false) {
+		return $GLOBALS['path'] . "/../public/" . ($path ? $path : "");
+	}
+	function _getRealPath($path) {
+		return $this->_basePath($path);
+	}
 	function _getFileInfo($file, $realPath=false) {
 		$r = array();
-		$r['path'] = $file;
+		$r['path'] = $file; //TODO: this is it's real path, get it's vfs path?
 		$f = ($realPath ? "" : $this->_basePath()) . $file;
 		$r['name'] = basename($f);
 		if(is_dir($f)) {
@@ -42,7 +43,7 @@ class PublicFs extends BaseFs {
 		return $r;
 	}
 	function _listPath($path) {
-	    $dir = opendir($this->_basePath() . $path);
+	    $dir = opendir($this->_basePath($path));
 		if(!$dir){
 			return false;
 		} else {
@@ -51,7 +52,7 @@ class PublicFs extends BaseFs {
 				if($file == '..' || $file == '.'){
 					continue;
 				} else {
-					array_push($arr, $this->_getFileInfo($file, true));
+					array_push($arr, $this->_getFileInfo($this->_basePath($path . "/" . $file), true));
 				}
 			}
 			return $arr;
@@ -76,7 +77,7 @@ class PublicFs extends BaseFs {
 	}
 	function _createDirectory($path) {
 		$path = $this->_basePath($path);
-		return mkdir($path, 0777, true);
+		return mkdir($path);
 	}
 	function _copy($source, $destination) {
 		$source = $this->_basePath($source);
