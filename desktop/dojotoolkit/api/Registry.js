@@ -1,25 +1,20 @@
 dojo.provide("api.Registry");
 dojo.require("dojo.data.ItemFileWriteStore");
 
-/*
- * Class: api.Registry
- * 
- * An API that allows storage in a table format for users.
- * This is basically a persistant dojo.data store with write capabilities.
- * See dojo's documentation on dojo.data for more info.
- * We have only documented the methods and arguments that we have added.
- * 
- * Arguments:
- * 		Asside from the regular arguments you'd feed to a datastore, we've added these:
- * 
- * 		name - the name of the store
- * 		appid - the current app's ID. (this.id)
- * 		data - this argument differs from a regular datastore; if the database exists on the server then it is ignored and the server-side data is used.
- */
 dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
+	//	summary:
+	//		An API that allows storage in a table format for users.
+	//		This is basically a persistant dojo.data store with write capabilities.
+	//		See dojo's documentation on dojo.data for more info.
 	__desktop_name: "",
 	__desktop_appid: 0,
 	constructor: function(/*Object*/args) {
+		//	args: {name: String}
+		//		the name of the store
+		//	args: {appid: Integer}
+		//		the current app's ID. (this.id)
+		//	args: {data: Object}
+		//		this argument differs from a regular datastore; if the database exists on the server then it is ignored and the server-side data is used.
 		this.__desktop_name = args.name;
 		this.__desktop_appid = args.appid;
 		
@@ -47,17 +42,14 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 			}
 		});
 	},
-	/*
-	 * Method: exists
-	 * 
-	 * Checks if this store exists on the server
-	 * 
-	 * Arguments:
-	 * 		callback - a callback function. The first argument passed to it is true if it does exist, false if it does not.
-	 * 		sync - should the call be syncronous? defaults to false
-	 */
 	exists: function(/*Function*/callback, /*Boolean*/sync)
 	{
+		//	summary:
+		//		Checks if this store exists on the server
+		//	callback:
+		//		a callback function. The first argument passed to it is true if it does exist, false if it does not.
+		//	sync:
+		//		should the call be syncronous? defaults to false
 		api.xhr({
 			backend: "api.registry.info.exists",
 			sync: sync,
@@ -71,16 +63,12 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 			handleAs: "json"
 		});
 	},
-	/*
-	 * Method: drop
-	 * 
-	 * Deletes the store on the server.
-	 * 
-	 * Arguments:
-	 * 		callback - a callback function. The first argument passed to it is true if deletion was successful, false if it failed.
-	 */
-	drop: function(/*Function*/callback)
+	drop: function(/*Function?*/callback)
 	{
+		//	summary:
+		//		Deletes the store on the server.
+		//	callback:
+		//		a callback function. The first argument passed to it is true if deletion was successful, false if it failed.
 		api.xhr({
 			backend: "api.registry.stream.delete",
 			content: {
@@ -96,4 +84,3 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 		});
 	}
 });
-api.reg = api.Registry;

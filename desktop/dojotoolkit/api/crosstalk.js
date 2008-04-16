@@ -1,10 +1,7 @@
 dojo.provide("api.crosstalk");
-/* 
- * Class: api.crosstalk
- * 
- * An API that allows an app to communicate with other applications on a system-wide level. 
- */
 api.crosstalk = {
+	//	summary:
+	//		An API that allows an app to communicate with other applications on a system-wide level. 
 	//	session: Array
 	//		handler storage
 	session: [],
