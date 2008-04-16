@@ -20,15 +20,12 @@
 	import("models.user");
 	if($_GET['section'] == "info")
 	{
-		if ($_GET['action'] == "translate") {
-			if($_POST['username'] != "0") { $x = "username"; $y = $_POST['username']; }
-			if($_POST['name'] != "0") { $x = "name"; $y = $_POST['name']; }
-			if($_POST['email'] != "0") { $x = "email"; $y = $_POST['email']; }
-			$u = $User->filter($x, $y);
-			echo $u[0]->id;
-		}
 		if ($_GET['action'] == "get") {
-			if($_POST['id'] == "0") { $user = $User->get_current(); }
+			if($_POST['username']) { $x = "username"; $y = $_POST['username']; }
+			if($_POST['name']) { $x = "name"; $y = $_POST['name']; }
+			if($_POST['email']) { $x = "email"; $y = $_POST['email']; }
+			if($x && $y) $user = $User->filter($x, $y);
+			else if($_POST['id'] == "0") { $user = $User->get_current(); }
 			else { $user = $User->get($_POST['id']); }
 			$out = new jsonOutput();
 			$out->append("id", $user->id);
@@ -87,22 +84,6 @@
 			}
 			$user->save();
 			$out = new intOutput("ok");
-		}
-	}
-	if($_GET['section'] == "authentication")
-	{
-		if($_GET['action'] == "get")
-		{
-			$cur = $User->get_current();
-			if($cur->has_permission($_POST["permission"])) { $out = new intOutput("ok"); }
-			else { $out = new intOutput("generic_err");; }
-		}
-		if($_GET['action'] == "set")
-		{
-			$cur = $User->get_current();
-			$_POST["password"] = crypt($_POST["password"], $GLOBALS['conf']['salt']);
-			if($_POST["password"] == $cur->password) { $cur->add_permission($_POST["permission"]); $cur->save(); $out = new intOutput("ok"); }
-			else { $out = new intOutput("generic_err"); }
 		}
 	}
 	if($_GET['section'] == "auth")

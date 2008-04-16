@@ -4,132 +4,79 @@ dojo.provide("desktop.user");
  *
  * functions that can be used to do user-related tasks
  */
-desktop.user = new function() {
-	this.init = function() {
+desktop.user = {
+	init: function() {
 		this.beforeUnloadEvent = dojo.addOnUnload(function(e)
 		{
 			desktop.config.save(true);
 			//desktop.user.logout();
 		});
-	}
-	/*
-	 * Method: get
-	 *
-	 * Gets the information of a certain user
-	 *
-	 * Arguments:
-	 * 	options - an object
-	 *
-	 * Note:
-	 * 	The options argument has two keys; id and callback.
-	 * 	callback - a callback function
-	 * 	id - the id of the user to get. If this is not provided then the current user's information will be fetched.
-	 *
-	 * 	The callback function gets passed an object with the following info
-	 * 	> {
-	 * 	>	id: integer //the user's id
-	 * 	>	name: string //the user's name
-	 * 	>	username: string //the user's username
-	 * 	>	email: string //the user's email
-	 * 	>	permissions: array //the user's permissions
-	 * 	>	groups: array //the user's groups
-	 * 	>	lastAuth: string //a timestamp from when the user last logged in
-	 * 	> }
-	 */
-	this.get = function(/*Object*/options) {
+	},
+	/*=====
+	_getArgs: {
+		//	id: Integer?
+		//		the Id of the user. If not provided, you must provide a name, username, or email.
+		id: 1,
+		//	name: String?
+		//		the name of the user.
+		name: "",
+		//	username: String?
+		//		the username of the user.
+		username: "",
+		//	email: String?
+		//		the email of the user.
+		email: "",
+		//	callback: Function
+		//		A callback function. First argument is a desktop.user._setArgs object, excluding the callback property
+		callback: function(info) {}
+	},
+	=====*/
+	get: function(/*desktop.user._getArgs*/options) {
+		//	summary:
+		//		Gets the information of a certain user
 		if(!options.id) { options.id = "0"; }
 		api.xhr({
 	        backend: "core.user.info.get",
 			content: {
-				id: options.id
+				id: options.id,
+				name: options.name,
+				email: options.email,
+				username: options.username
 			},
 	        load: function(data, ioArgs) {
 				data = dojo.fromJson(data);
 	        	if(options.callback) { options.callback(data); }
 			}
         });
-	}
-	/*
-	 * Method: getID
-	 *
-	 * Gets the ID of a certain user by certain information
-	 *
-	 * Arguments:
-	 * 	options - an object
-	 *
-	 * Note:
-	 * 	The options argument has upto four keys but at least two
-	 * 	callback - a callback function
-	 * 	username - the username of the user to get ID
-	 * 	name - the name of the user to get ID
-	 * 	email - the email of the user to get ID
-	 *
-	 * 	Returns integer as ID
-	 */
-	this.getID = function(options) {
-		if(!options.username) { options.username = "0"; }
-		if(!options.name) { options.name = "0"; }
-		if(!options.email) { options.email = "0"; }
-		api.xhr({
-	        backend: "core.user.info.translate",
-			content: {
-				username: options.username,
-				name: options.name,
-				email: options.email
-			},
-	        load: function(data, ioArgs) {
-	        	if(options.callback) { options.callback(data); }
-			}
-        });
-	}
-	/*
-	 * Method: authentication
-	 *
-	 * changes/retrieves a user's authentication information
-	 *
-	 * Arguments:
-	 * 	op - an object with some arguments. See notes
-	 *
-	 * Notes:
-	 * 	The op argument can have the following keys.
-	 *      > {
-	 *      >       action: string //The action (get or set)
-	 *      >       permission: string //The permission to get or set
-	 *      >       password: string //Only required if setting a permission
-	 *      > }
-	 */
-	this.authentication = function(/*Object*/op) {
-		var callback = op.callback || false;
-		delete op.callback;
-		api.xhr({
-			backend: "core.user.authentication."+op.action,
-			content: op,
-			load: function(data) {
-				if(callback) callback(data);
-			}
-		})		
-	}
-	/*
-	 * Method: set
-	 *
-	 * changes a user's information
-	 *
-	 * Arguments:
-	 * 	op - an object with some arguments. See notes
-	 *
-	 * Notes:
-	 * 	The op argument can have the following keys.
-	 *      > {
-	 *      >       id: integer //the user's id. If excluded, the current user will be used
-	 *      >       name: string //the user's new name. Stays the same when not provided.
-	 *      >       username: string //the user's username. Cannot change if you're not the admin. Stays the same when not provided.
-	 *      >       email: string //the user's new email. Stays the same when not provided.
-	 *      >       permissions: array //the user's new permissions. Stays the same when not provided.
-	 *      >       groups: array //the user's new groups. Stays the same when not provided.
-	 *      >		callback: function //a callback function. Not required.
-	 *      > }
-	 */
-	this.set = function(/*Object*/op) {
+	},
+	/*=====
+	_setArgs: {
+		//	id: Integer
+		//		the user's id. If excluded, the current user will be used
+		id: 1,
+		//	name: String?
+		//		the user's new name. Stays the same when not provided.
+		name: "Foo Barson", //
+		//	username: String?
+		//		the user's username. Cannot change if you're not the admin. Stays the same when not provided.
+		username: "foobar",
+		//	email: String?
+		//		the user's new email. Stays the same when not provided.
+		email: "foo@bar.com",
+		//	permissions: Array?
+		//		the user's new permissions. Stays the same when not provided. Must be an admin to set.
+		permissions: [],
+		//	groups: Array?
+		//		the user's new groups. Stays the same when not provided. Must be an admin to set.
+		groups: [],
+		//	callback: Function?
+		//		a callback function. Not required.
+		callback: function() {}
+	},
+	=====*/
+	set: function(/*desktop.user._setArgs*/op) {
+		//	summary:
+		//		changes a user's information
 		var callback = op.callback || false;
 		delete op.callback;
 		if(typeof op.permissions != "undefined") op.permissions = dojo.toJson(op.permissions);
@@ -141,14 +88,11 @@ desktop.user = new function() {
 				if(callback) callback(data);
 			}
 		})		
-	}
-	/*
-	 * Method: logout
-	 *
-	 * logs a user out
-	 */
-	this.logout = function()
+	},
+	logout: function()
 	{
+		//	summary:
+		//		logs a user out
 		if(desktop.reload) { return false; }
 		desktop.config.save(true);
 		dojo.publish("desktoplogout", []);
