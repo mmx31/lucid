@@ -422,6 +422,7 @@ desktop.app = {
 			content: {
 				id: appID
 			},
+			notify: false,
 			load: function(data, ioArgs)
 			{
 				if(callback) callback(/*desktop.app._saveAppArgs*/data);

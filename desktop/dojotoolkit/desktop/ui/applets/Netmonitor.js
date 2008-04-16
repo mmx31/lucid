@@ -29,7 +29,7 @@ dojo.declare("desktop.ui.applets.Netmonitor", desktop.ui.Applet, {
 			position: ["above", "below", "after", "before"]
 		});
 		this._onXhr = dojo.connect(api, "xhr", this, function(args) {
-			if(args.backend && args.backend == "core.app.fetch.full") {
+			if(args.backend && args.backend == "core.app.fetch.full" && args.notify !== false) {
 				this.tooltip.label = "<div style='float: left;' class='icon-loading-indicator'></div> " + l.launchingApp.replace("%s", args.content.id);
 				this.tooltip.open(this.containerNode);
 				var onEnd = dojo.connect(dojo.Deferred.prototype,"_fire",this,function(m) {
