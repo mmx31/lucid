@@ -8,7 +8,7 @@ class FileFs extends BaseFs {
 		$this->_username = $cur->username;
 	}
 	function _basePath($path=false) {
-		return "../../files/".$this->_username . "/" . ($path ? $path : "");
+		return $GLOBALS['path'] . "/../files/".$this->_username . "/" . ($path ? $path : "");
 	}
 	function _getRealPath($path) {
 		return $this->_basePath($path);

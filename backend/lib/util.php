@@ -36,7 +36,7 @@ if (get_magic_quotes_gpc())
 //sessions and cookies
 function get_basepath() {
 	$curpath = explode("/", $_SERVER['REQUEST_URI']);
-	$dir = $GLOBALS['installing'] ? "install" : "backend";
+	$dir = $GLOBALS['installing'] ? "install" : ($GLOBALS['mobile'] ? "mobile" : "backend");
 	while($curpath[count($curpath)-1] != $dir) {
 		if(count($curpath) == 0) return "/";
 		array_pop($curpath);
@@ -69,6 +69,6 @@ function import($module) {
 	$module = explode(".", $module);
 	$path = implode(DIRECTORY_SEPARATOR, $module);
 	$file = $GLOBALS['path'] . $path . ".php";
-	return require_once($file);
+	return @include_once($file);
 }
 ?>

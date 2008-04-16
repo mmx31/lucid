@@ -92,12 +92,12 @@
 		function make_userdir()
 		{
 			$blah = $this->username;
-			if(!is_dir("../../files/".$blah)){
+			if(!is_dir($GLOBALS['path']."/../files/".$blah)){
 				//Create user environment for first time
-				mkdir("../../files/".$blah);
-				mkdir("../../files/".$blah."/Documents");
-				mkdir("../../files/".$blah."/Desktop");
-				$ourFileName = "../../files/".$blah."/Desktop/welcome.txt";
+				mkdir($GLOBALS['path']."/../files/".$blah);
+				mkdir($GLOBALS['path']."/../files/".$blah."/Documents");
+				mkdir($GLOBALS['path']."/../files/".$blah."/Desktop");
+				$ourFileName = $GLOBALS['path']."/../files/".$blah."/Desktop/welcome.txt";
 				$ourFileHandle = fopen($ourFileName, 'w') or die("Could not open file");
 				fwrite($ourFileHandle, "Welcome to Psych Desktop, ".$this->username."\r\n Your new account is installed and ready.");
 				fclose($ourFileHandle);

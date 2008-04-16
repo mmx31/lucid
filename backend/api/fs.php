@@ -159,8 +159,8 @@ if($_GET['section'] == "io")
 			));
 		}
 		if(isset($_FILES['uploadedfile']['name'])) {
-			if($content = file_get_contents($_FILES['uploadedfile']['tmp_name'])
-			&& $module->write($sentpath . "/" . basename( $_FILES['uploadedfile']['name']), $content)) {
+			$content = file_get_contents($_FILES['uploadedfile']['tmp_name']);
+			if($content !== false && $module->write($sentpath . "/" . $_FILES['uploadedfile']['name'], $content)) {
 				$out = new textareaOutput(array(
 					status => "success",
 					details => $_FILES['uploadedfile']['name']
@@ -170,6 +170,9 @@ if($_GET['section'] == "io")
 					status => "failed",
 					details => "Contact administrator; could not write to disk"
 				));
+			}
+			if(is_file($GLOBALS['path']."../apps/tmp/".$_FILES['uploadedfile']['name'])) {
+				unlink($GLOBALS['path']."../apps/tmp/".$_FILES['uploadedfile']['name']);
 			}
 		}
 		else {

@@ -41,25 +41,23 @@ desktop.admin = {
 			//	callback:
 			//		a callback function to pass the results to.
 			//		The callback will get a single array of values as it's first argument.
-			//		Each slot in the array will be a desktop.admin._listArgs object with the permission's information
+			//		Each slot in the array will be a desktop.admin.permissions._listArgs object with the permission's information
 			api.xhr({
 				backend: "core.administration.permissions.list",
 				load: callback,
 				handleAs: "json"
 			})
 		},
-		/*
-		 * Method: setDefault
-		 * 
-		 * Set the default value of a permission
-		 * 
-		 * Arguments:
-		 * 		permission - the id of the permission to modify
-		 * 		value - the default value of the permission
-		 * 		callback - a callback function once the operation is completed
-		 */
 		setDefault: function(/*String*/permission, /*Boolean*/value, /*Function?*/callback) {
-			api.xhr({
+			//	summary:
+			//		Set the default value of a permission
+			//	permission:
+			//		the id of the permission to modify
+			//	value:
+			//		the default value of the permission
+			//	callback:
+			//		a callback function once the operation is completed
+			return api.xhr({
 				backend: "core.administration.permissions.setDefault",
 				content: {
 					id: permission,
@@ -71,12 +69,10 @@ desktop.admin = {
 			});
 		}
 	},
-	/*
-	 * Class: desktop.admin.groups
-	 * 
-	 * Group management functions
-	 */
 	groups: {
+		//	summary:
+		//		Group management functions
+		
 		/*
 		 * Method: list
 		 * 
@@ -92,7 +88,9 @@ desktop.admin = {
 		 * 		> }
 		 */
 		list: function(/*Function*/callback) {
-			api.xhr({
+			//	summary:
+			//		Lists groups on the server
+			return api.xhr({
 				backend: "core.administration.groups.list",
 				load: callback|| function(){},
 				handleAs: "json"
