@@ -53,7 +53,7 @@
 	
 	run: function()
 	{
-		api.ide.execute(this.editor.value);
+		desktop.app.execString(this.editor.value);
 	},
 
 	kill: function()
@@ -95,13 +95,13 @@
 		if(one == 7) api.ui.alertDialog({title: "Katana IDE", message:"Permissions error. Contact your administrator."});
 		else api.ui.alertDialog({title: "Katana IDE", message:"Error: "+one+"<br>Please try again or report this bug."});
 		});
-		api.ide.save(this.app);
+		desktop.app.save(this.app);
 	},
 	
 	saved: function(id)
 	{
 		desktop.app.apps=[];
-		api.ide.load(id, dojo.hitch(this, function(data) {
+		desktop.app.get(id, dojo.hitch(this, function(data) {
 			var scroll = this.editor.scrollTop;
 			var startPos = this.editor.selectionStart;
 			var endPos = this.editor.selectionEnd;
@@ -251,51 +251,44 @@
 		}
 	},
 	
-	execute: function()
-	{
-		//api.ui.alertDialog({title:"Katana IDE", message:this.editor.value});
-		api.ide.execute(this.editor.value);
-	},
-	
 	load: function()
 	{
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		//create a window with a list of apps to edit.
-		api.ide.getAppList(dojo.hitch(this, function(data){
-			this.loadwin = new api.Window({title: "Select App"});
-			var pane = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
-			content=document.createElement("ul");
-			dojo.forEach(data, dojo.hitch(this, function(a){
-				var l = document.createElement("li");
-				l.href="javascript:void(0);";
-				l.innerHTML=(app[a.name] || a.name) + " (" + a.version + " " + a.maturity + ")";
-				l.title=a.id;
-				l.style.cursor="pointer";
-				dojo.connect(l, "onclick", this, function(e) {
-					console.debug(this);
-					this.loadwin.close();
-	
-					// Update title app str to reflect new file
-					this.currentAppStr = (app[a.name] || a.name) + " (" + a.version + " " + a.maturity + ")";
-					this.changed = 0;
-					this.updateTitle();
-	
-					api.ide.load(parseInt(e.target.title), dojo.hitch(this, function(data) {
-						this.editor.value=data.code;
-						this.app = data;
-					}));
-				});
-				content.appendChild(l);
-			}));
-			pane.setContent(content);
-			this.loadwin.addChild(pane);
-			this.loadwin.show();
-			this.loadwin.startup();
-			
-			new dijit.form.Button({label: "Open", onClick: dojo.hitch(this, function() {
-				
-			})});
+		var data = desktop.app.appList;
+		this.loadwin = new api.Window({title: "Select App"});
+		var pane = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
+		content=document.createElement("ul");
+		dojo.forEach(data, dojo.hitch(this, function(a){
+			var l = document.createElement("li");
+			l.href="javascript:void(0);";
+			l.innerHTML=(app[a.name] || a.name) + " (" + a.version + " " + a.maturity + ")";
+			l.title=a.id;
+			l.style.cursor="pointer";
+			dojo.connect(l, "onclick", this, function(e) {
+				console.debug(this);
+				this.loadwin.close();
+
+				// Update title app str to reflect new file
+				this.currentAppStr = (app[a.name] || a.name) + " (" + a.version + " " + a.maturity + ")";
+				this.changed = 0;
+				this.updateTitle();
+
+				desktop.app.get(parseInt(e.target.title), dojo.hitch(this, function(data) {
+					this.editor.value=data.code;
+					this.app = data;
+				}));
+			});
+			content.appendChild(l);
 		}));
+		pane.setContent(content);
+		this.loadwin.addChild(pane);
+		this.loadwin.show();
+		this.loadwin.startup();
+		
+		new dijit.form.Button({label: "Open", onClick: dojo.hitch(this, function() {
+			
+		})});
 	},
 	
 	onKey: function(e)

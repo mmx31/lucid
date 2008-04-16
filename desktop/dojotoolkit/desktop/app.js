@@ -311,6 +311,140 @@ desktop.app = {
 			desktop.app.instances[instance].status = "zombie";
 			return false;
 		}
+	},
+	
+	//IDE functions
+	execString: function(/*String*/code)
+	{
+		//	summary:
+		//		Executes an app's string that does not exist on the system as if it were a real app
+		desktop.app._fetchApp({
+			id: -1,
+			name: "testApp",
+			code: code
+		});
+		desktop.app.launch(-1);
+	},
+	/*=====
+	_saveArgs: {
+		//	id: Integer
+		//		the id of the app. if excluded, creates a new app
+		id: 1,
+		//	name: String
+		//		the name of the app
+		name: "my supercool app",
+		//	author: String
+		//		the person who wrote the app
+		author: "foo barson",
+		//	email: String
+		//		the email address of the author
+		email: "foo@barson.org",
+		//	version: String
+		//		the version of the app
+		version: "1.0",
+		//	maturity: String
+		//		The development stage of the app. Can be "Alpha", "Beta", or "Stable"
+		maturity: "Alpha",
+		//	category: String
+		//		The app's category
+		//		Can be "Accessories", "Development", "Games", "Graphics", "Internet", "Multimedia", "Office", "Other", or "System"
+		category: "Accessories",
+		//	code: String
+		//		the app's code
+		code: "({init: function(args) { alert('hi'); }})",
+		//	callback: Function
+		//		a callback function. First argument is the ID of the app just saved
+		callback: function(id) {}
+	},
+	=====*/
+	save: function(/*desktop.app._saveArgs*/app)
+	{
+		//	summary:
+		//		saves an app to the server
+		if(typeof app.id != "undefined" &&
+	        typeof app.name != "undefined" &&
+	        typeof app.author != "undefined" &&
+	        typeof app.email != "undefined" &&
+	        typeof app.version != "undefined" &&
+	        typeof app.maturity != "undefined" &&
+	        typeof app.category != "undefined" &&
+	        typeof app.code != "undefined")
+		{
+			  api.log("IDE API: Saving application...");
+	          api.xhr({
+	               backend: "api.ide.io.save",
+	               content : {
+	                    id: app.id,
+	                    name: app.name,
+	                    author: app.author,
+	                    email: app.email,
+	                    version: app.version,
+	                    maturity: app.maturity,
+	                    category: app.category,
+	                    code: app.code
+	               },
+		       error: function(data, ioArgs) {
+						if(app.error) app.error(data, ioArgs);
+						api.log("IDE API: Save error");
+			},
+	               load: function(data, ioArgs){
+						app.callback(data.id);
+						api.log("IDE API: Save Sucessful");
+						delete desktop.app.apps[parseInt(data.id)];
+						api.xhr({
+							backend: "core.app.fetch.list",
+							load: dojo.hitch(this, function(data, ioArgs) {
+								this.appList = data;
+								dojo.publish("updateMenu", [data]);
+							}),
+							handleAs: "json"
+						});
+				   },
+				   handleAs: "json"
+	          });
+	     }
+		 else
+		 {
+			api.log("IDE API: Error! Could not save. Not all strings in the object are defined.");
+		 	return false;
+		 }
+	},
+	get: function(/*Integer*/appID, /*Function*/callback)
+	{
+		//	summary:
+		//		Loads an app's information from the server w/o caching
+		//	appID:
+		//		the id of the app to fetch
+		//	callback:
+		//		A callback function. Gets passed a desktop.app._saveArgs object, excluding the callback.
+		api.xhr({
+			backend: "core.app.fetch.full",
+			content: {
+				id: appID
+			},
+			load: function(data, ioArgs)
+			{
+				if(callback) callback(/*desktop.app._saveAppArgs*/data);
+			},
+			handleAs: "json"
+		});
+	},
+	remove: function(/*Integer*/id, /*Function*/callback) {
+		//	summary:
+		//		removes an app from the system
+		//	id:
+		//		the app's id
+		//	callback:
+		//		a callback function once the app has been removed
+		api.xhr({
+			backend: "api.ide.io.remove",
+			content: {
+				id: id
+			},
+			load: function(d) {
+				callback(d=="0");
+			}
+		})
 	}
 }
 
