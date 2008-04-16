@@ -1,32 +1,19 @@
 dojo.provide("desktop.version");
 dojo.provide("desktop.config");
 
-/*
- * Class: desktop
- * 
- * Property: version
- * 
- * The version of the desktop
- */
 desktop.version = "SVN";
 
-/*
- * Class: desktop.config
- * 
- * Contains configuraton for the desktop.
- */
 desktop.config = {
+	//	summary:
+	//		Contains configuraton for the desktop.
 	init: function(cback) {
 		desktop.config.load(cback);
 		setInterval(dojo.hitch(desktop.config, "save"), 1000*60);
 		dojo.subscribe("desktoplogout", dojo.hitch(desktop.config, "save"));
 	},
-	/*
-	 * Method: load
-	 * 
-	 * Loads the configuration from the server
-	 */
 	load: function(cback) {
+		//	summary:
+		//		Loads the configuration from the server
 		api.xhr({
 	        backend: "core.config.stream.load",
 	        load: function(data, ioArgs) {
@@ -45,12 +32,11 @@ desktop.config = {
 			}
         });
 	},
-	/*
-	 * Method: save
-	 * 
-	 * Saves the current configuration to the server
-	 */
-	save: function(sync) {
+	save: function(/*Boolean?*/sync) {
+		//	summary:
+		//		Saves the current configuration to the server
+		//	sync:
+		//		Should the call be synchronous? defaults to false
 		if(typeof sync == "undefined") sync=false;
 		var conf = dojo.toJson(desktop.config);
 		api.xhr({
@@ -59,38 +45,23 @@ desktop.config = {
             content: {value: conf}
         });
 	},
-	/*
-	 * Method: apply
-	 * 
-	 * Applies the current configuration settings
-	 */
 	apply: function()
 	{
+		//	summary:
+		//		Applies the current configuration settings
 		dojo.publish("configApply", [desktop.config]);
 	},
-	/*
-	 * Property: fx
-	 * 
-	 * Intensity of desktop effects (3 = insane, 0 = none)
-	 */
+	//	fx: Integer
+	//		Intensity of desktop effects (3 = insane, 0 = none)
 	fx: 2,
-	/*
-	 * Property: debug
-	 * 
-	 * Whether or not the desktop should output information involving debugging
-	 */
+	//	debug: Boolean
+	//		Whether or not the desktop should output information involving debugging
 	debug: true,
-	/*
-	 * Property: crosstalkPing
-	 * 
-	 * Crosstalk ping interval (in miliseconds)
-	 */
+	//	crosstalkPing: Integer
+	//		Crosstalk ping interval (in miliseconds)
 	crosstalkPing: 800,
-	/*
-	 * Property: panels
-	 * 
-	 * an array of each panel's settings and applets
-	 */
+	//	panels:	Array
+	//		an array of each panel's settings and applets
 	panels: [
 		{
 			thickness: 24,
@@ -117,33 +88,21 @@ desktop.config = {
                         ]
                 }
 	],
-	/*
-	 * Property: locale
-	 * 
-	 * The locale of the user
-	 * more details here: http://dojotoolkit.org/book/dojo-book-0-9/part-3-programmatic-dijit-and-dojo/i18n/specifying-locale
-	 */
+	//	locale: String
+	//		The locale of the user
+	//		more details here: http://dojotoolkit.org/book/dojo-book-0-9/part-3-programmatic-dijit-and-dojo/i18n/specifying-locale
 	locale: dojo.locale,
-	/*
-	 * Property: toasterPos
-	 * 
-	 * Position the toaster popup will appear
-	 * Can be one of: ["br-up", "br-left", "bl-up", "bl-right", "tr-down", "tr-left", "tl-down", "tl-right"]
-	 * 
-	 * TODO:
-	 * 		this needs a configuration tool
-	 */
+	//	toasterPos: String
+	//		Position the toaster popup will appear
+	//		Can be one of: ["br-up", "br-left", "bl-up", "bl-right", "tr-down", "tr-left", "tl-down", "tl-right"]
+	//TODO: this needs a configuration tool
 	toasterPos: "tr-down",
-	/*
-	 * Property: wallpaper
-	 * 
-	 * wallpaper information
-	 * 
-	 * image - the image to display
-	 * color - the background color of the wallpaper
-	 * style - can be "centered", "tiled", or "fillscreen"
-	 * storedList - an array of wallpapers that the user can pick from in the wallpaper dialog
-	 */
+	//	wallpaper: Object
+	//		Wallpaper information
+	//		image - the image to display
+	//		color - the background color of the wallpaper
+	//		style - can be "centered", "tiled", or "fillscreen"
+	//		storedList - an array of wallpapers that the user can pick from in the wallpaper dialog
 	wallpaper: {
 		image: "./themes/Minuit/wallpaper.png",
 		color: "#696969",
@@ -154,39 +113,26 @@ desktop.config = {
 			"./themes/tsunami/wallpaper.jpg"
 		]
 	},
-	/*
-	 * Property: theme
-	 * 
-	 * The user's preferred theme
-	 */
+	//	theme: String
+	//		The user's preferred theme
 	theme: "Minuit",
-	/*
-	 * Property: theme
-	 * 
-	 * An array of app ids to launch at startup
-	 */
+	//	startupapps: Array
+	//		An array of app ids to launch at startup
 	startupapps: [],
-	/*
-	 * Property: window
-	 * 
-	 * window settings
-	 * 
-	 * constrain - should the window be constrained to the screen's edge?
-	 * animSpeed - how fast the fade/maximize/minimize animations should be in miliseconds
-	 */
+	//	window: Object
+	//		window settings
+	//		constrain - should the window be constrained to the screen's edge?
+	//		animSpeed - how fast the fade/maximize/minimize animations should be in miliseconds
 	window: {
 		constrain: false,
 		animSpeed: 275
 	},
 	
-	/*
-	 * Property: filesystem
-	 * 
-	 * Some filesystem options (primarily for filearea)
-	 * 
-	 * hideExt - should the file extentions be hidden?
-	 * icons - a json object containing icons for each file extention
-	 */
+	//	filesystem: Object
+	//		Some filesystem options (primarily for filearea)
+	//		hideExt - should the file extentions be hidden?
+	//		icons - a json object containing icons for each file extention
+	//		places - array of bookmarked places on the filesystem
 	filesystem: {
 		places: [
 			{name: "Home", path: "file://", icon: "icon-16-places-user-home"},
