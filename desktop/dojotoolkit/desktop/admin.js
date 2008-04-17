@@ -1,13 +1,10 @@
 dojo.provide("desktop.admin");
-/*
- * Class: desktop.admin
- * 
- * Contains administration functions
- * 
- * The user must be an administrator to use these, otherwise the
- * server-side code will prevent any action from being taken.
- */
+
 desktop.admin = {
+	//	summary:
+	//		Contains administration functions
+	//		The user must be an administrator to use these, otherwise the
+	//		server-side code will prevent any action from being taken.
 	diskspace: function(/*Function*/callback) {
 		//	summary:
 		//		Gets the amount of free space on the server
@@ -72,44 +69,33 @@ desktop.admin = {
 	groups: {
 		//	summary:
 		//		Group management functions
-		
-		/*
-		 * Method: list
-		 * 
-		 * Lists groups on the server
-		 * 
-		 * Arguments:
-		 * 		callback - a callback function. First arg is an array with group objects:
-		 * 		> {
-		 * 		> 	id: integer, //the group's ID
-		 * 		> 	name: string, //the group's name
-		 * 		> 	description: string, //the group's description
-		 * 		> 	permissions: array //the group's permissions
-		 * 		> }
-		 */
+		/*=====
+		_listArgs: {
+			//	name: String
+			//		the name of the permission
+			name: "",
+			//	description: String
+			//		what this permission restricts
+			description: "",
+			//	permissions: Object
+			//		An object with permission information for the group
+			permissions: {}
+		},
+		=====*/
 		list: function(/*Function*/callback) {
 			//	summary:
 			//		Lists groups on the server
+			//	callback:
+			//		a callback function. First arg is an array with desktop.admin.groups._listArgs objects
 			return api.xhr({
 				backend: "core.administration.groups.list",
 				load: callback|| function(){},
 				handleAs: "json"
 			});
 		},
-		/*
-		 * Method: add
-		 * 
-		 * Creates a new group
-		 * 
-		 * Arguments:
-		 * 		args - an object containing additional arguments:
-		 * 		> {
-		 * 		> 	name: string, //the name of the new group
-		 * 		> 	description: string, //the description for the new group
-		 * 		> 	permissions: object //the permissions for the group. example: {"some.permission": true, "other.permission": false}
-		 * 		> }
-		 */
-		add: function(/*Object*/args) {
+		add: function(/*desktop.admin.groups._listArgs*/args) {
+			//	summary:
+			//		Creates a new group
 			var callback = args.callback;
 			delete args.callback;
 			args.permissions = dojo.toJson(args.permissions || {});
@@ -122,16 +108,13 @@ desktop.admin = {
 				handleAs: "json"
 			})
 		},
-		/*
-		 * Method: remove
-		 * 
-		 * Remove a group from the system
-		 * 
-		 * Arguments:
-		 * 		id - the id of the group to remove
-		 * 		callback - a callback function once the operation is complete
-		 */
 		remove: function(/*Integer*/id, /*Function?*/callback) {
+			//	summary:
+			//		Remove a group from the system
+			//	id:
+			//		the id of the group to remove
+			//	callback:
+			//		a callback function once the operation is complete
 			api.xhr({
 				backend: "core.administration.groups.delete",
 				content: {
@@ -142,21 +125,9 @@ desktop.admin = {
 				}
 			});
 		},
-		/*
-		 * Method: set
-		 * 
-		 * Set group information
-		 * 
-		 * Arguments:
-		 * 		args - an object containing additional arguments:
-		 * 		> {
-		 * 		> 	id: integer, //the id of the group to modify
-		 * 		> 	name: string, //the new name of the group (optional)
-		 * 		> 	description: string, //the new description of the group (optional)
-		 * 		> 	permissions: object //the permissions of the group
-		 * 		> }
-		 */
-		set: function(/*Object*/args) {
+		set: function(/*desktop.admin.groups._listArgs*/args) {
+			//	summary:
+			//		Set group information
 			var callback = args.callback;
 			delete args.callback;
 			if(typeof args.permissions != "undefined") args.permissions = dojo.toJson(args.permissions);
@@ -168,16 +139,13 @@ desktop.admin = {
 				}
 			})
 		},
-		/*
-		 * Method: getMembers
-		 * 
-		 * Get the members of a group
-		 * 
-		 * Arguments:
-		 * 		id - the id of the group to get the members of
-		 * 		callback - callback function. First argument is an array of the users. See api.user.get for the attributes of each object in the array.
-		 */
 		getMembers: function(/*Integer*/id, /*Function*/callback) {
+			//	summary:
+			//		Get the members of a group
+			//	id:
+			//		the id of the group to get the members of
+			//	callback:
+			//		callback function. First argument is an array of the users. See desktop.user.get for the attributes of each object in the array.
 			api.xhr({
 				backend: "core.administration.groups.getMembers",
 				content: {
@@ -187,17 +155,15 @@ desktop.admin = {
 				handleAs: "json"
 			})
 		},
-		/*
-		 * Method: addMember
-		 * 
-		 * adds a user to a group
-		 * 
-		 * Arguments:
-		 * 		id - the group ID
-		 * 		userid - the user's id
-		 * 		callback - a callback for once the operation has been completed
-		 */
 		addMember: function(/*Integer*/id, /*Ineger*/userid, /*Function?*/callback) {
+			//	summary:
+			//		adds a user to a group
+			//	id:
+			//		the group ID
+			//	userid:
+			//		the user's id
+			//	callback:
+			//		a callback for once the operation has been completed
 			api.xhr({
 				backend: "core.administration.groups.addMember",
 				content: {
@@ -209,17 +175,15 @@ desktop.admin = {
 				}
 			})
 		},
-		/*
-		 * Method: removeMember
-		 * 
-		 * removes a user from a group
-		 * 
-		 * Arguments:
-		 * 		id - the group ID
-		 * 		userid - the user's id
-		 * 		callback - a callback for once the operation has been completed
-		 */
 		removeMember: function(/*Integer*/id, /*Integer*/userid, /*Function?*/callback) {
+			//	summary:
+			//		removes a user from a group
+			//	id:
+			//		the group ID
+			//	userid:
+			//		the user's id
+			//	callback:
+			//		a callback for once the operation has been completed
 			api.xhr({
 				backend: "core.administration.groups.removeMember",
 				content: {
@@ -232,37 +196,15 @@ desktop.admin = {
 			})
 		}
 	},
-	/*
-	 * Class: desktop.admin.users
-	 * 
-	 * Some user management functions
-	 * 
-	 * Note:
-	 * 		for modifying user information see <desktop.user>
-	 */
 	users: {
-		/*
-		 * Method: list
-		 * 
-		 * List all users
-		 * 
-		 * Arguments:
-		 * 		callback - a callback function. Gets passed an array of user objects
-		 * 
-		 * Note:
-		 * 		This is what each user object consists of:
-		 * 		> {
-		 * 		> 	id: (integer), //user's numerical id. This is NOT their username!
-		 * 		> 	name: (string), //user's real name
-		 * 		> 	username: (string), //user's username
-		 * 		> 	logged: (bool), //is the user logged in?
-		 * 		> 	email: (string), //the user's email
-		 * 		> 	permissions: (array), //array of user's permissions
-		 * 		> 	groups: (array), //array of the user's groups
-		 * 		>	lastauth: (string) //the time that the user last logged in
-		 * 		> }
-		 */
+		//	summary:
+		//		Some user management functions
+		//		for modifying user information see desktop.user
 		list: function(/*Function*/callback) {
+			//	summary:
+			//		list all users on the system
+			//	callback:
+			//		a callback function. Gets passed an array of desktop.user._setArgs objects
 			api.xhr({
 				backend: ("core.administration.users.list"),
 				load: function(data, ioArgs) {
@@ -270,24 +212,12 @@ desktop.admin = {
 				}
 			});
 		},
-		/*
-		 * Method: create
-		 * 
-		 * Creates a user on the system
-		 * 
-		 * Arguments:
-		 * 		info - an object with additional parameters
-		 * 		> {
-		 * 		> 	name: (string), //user's real name
-		 * 		> 	username: (string), //user's username
-		 * 		> 	email: (string), //the user's email
-		 * 		> 	permissions: (array), //array of user's permissions
-		 * 		> 	groups: (array), //array of the user's groups
-		 * 		> 	password: (string), //the user's password
-		 * 		> 	callback: (function) //a callback function once the new user has been created. first argument will be the ID of the new user, except when the username allready exists. In that case the first argument will be false.
-		 * 		> }
-		 */
-		create: function(/*Object*/info) {
+		create: function(/*desktop.user._setArgs*/info) {
+			//	summary:
+			//		Creates a user on the system
+			//	info:
+			//		A desktop.user._setArgs object, however, the callback gets passed the id of the new user as it's first argument.
+			//		Also, you cannot specify the user's id. it is generated by the server.
 			var callback = info.callback;
 			delete info.callback;
 			info.permissions = dojo.toJson(info.permissions);
@@ -301,17 +231,15 @@ desktop.admin = {
 				handleAs: "json"
 			});
 		},
-		/*
-		 * Method: remove
-		 * 
-		 * Permanently removes (deletes) a user from the system
-		 * 
-		 * Arguments:
-		 * 		id - the id of the user to delete (NOT the username)
-		 * 		callback - a callback function once the process is complete. passes a single parameter. If it's false the user's deletion failed. If true, it was successful.
-		 */
-		remove: function(id, callback)
+		remove: function(/*Integer*/id, /*Function*/callback)
 		{
+			//	summary:
+			//		Permanently removes (deletes) a user from the system
+			//	id:
+			//		the id of the user to delete (NOT the username)
+			//	callback:
+			//		a callback function once the process is complete. passes a single parameter.
+			//		If it's false the user's deletion failed. If true, it was successful.
 			api.xhr({
 				backend: "core.administration.users.delete",
 				content: {
@@ -323,19 +251,13 @@ desktop.admin = {
 				}
 			});
 		},
-		/*
-		 * Method: online
-		 * 
-		 * Gets the number of users currently using the system.
-		 * 
-		 * Arguments:
-		 * 		callback - a callback function. Passes a single object as a parameter:
-		 * 					> {
-		 * 					> 	total: (int), //Total users registered in the system
-		 * 					> 	online: (int) //Total users currently online
-		 * 					> }
-		 */
-		online: function(callback) {
+		online: function(/*Function*/callback) {
+			//	summary:
+			//		Gets the number of users currently using the system.
+			//	callback:
+			//		a callback function. Passes a single object as a parameter, with two keys;
+			//		'total', the total number of users on the system, and 'online', the number of users currently online. 
+			//		Both are integers.
 			api.xhr({
 				backend: "core.administration.users.online",
 				load: callback,
