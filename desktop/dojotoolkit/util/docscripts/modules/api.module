@@ -1,0 +1,29 @@
+<?php
+
+function api_code_location() {
+	return '../../api/';
+}
+
+function api_project_name() {
+	return 'api';
+}
+
+function api_resource_name($namespace, $file) {
+  return $file;
+}
+
+function api_package_name($namespace, $file) {
+  //return;
+  $parts = explode('/', $file);
+  if ($parts[0] == '_base') {
+		return $namespace;
+  }
+	$file_parts = explode('.', array_pop($parts));
+	if (in_array('tests', $parts)) return;
+	array_pop($file_parts);
+	array_push($parts, implode('.', $file_parts));
+	array_unshift($parts, $namespace);
+  return implode('.', $parts);
+}
+
+?>
