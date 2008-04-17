@@ -1,10 +1,7 @@
 dojo.provide("desktop.user");
-/*
- * Class: desktop.user
- *
- * functions that can be used to do user-related tasks
- */
 desktop.user = {
+	//	summary:
+	//		functions that can be used to do user-related tasks
 	init: function() {
 		this.beforeUnloadEvent = dojo.addOnUnload(function(e)
 		{
