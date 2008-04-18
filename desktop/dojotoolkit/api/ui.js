@@ -3,27 +3,19 @@ dojo.require("dijit.layout.ContentPane");
 dojo.require("dojox.widget.Toaster");
 dojo.requireLocalization("desktop", "common");
 
-/* 
- * Class: api.ui
- * 
- * An API that provides things like dialogs and such
- */
 api.ui = new function() {
-	/*
-	 * Method: alertDialog
-	 * 
-	 * Shows a simple alert dialog
-	 * 
-	 * Arguments:
-	 * 		object - an object containing additional parameters
-	 * 		> {
-	 * 		> 	title: string, //the title of the window
-	 * 		> 	message: string, //the message to be shown in the body of the window
-	 * 		> 	callback: function //a callback that is called when the dialog is closed
-	 * 		> }
-	 */
+	//	summary:
+	//		An API that provides things like dialogs and such
 	this.alertDialog = function(/*Object*/object)
 	{
+		//	summary:
+		//		Shows a simple alert dialog
+		//	object: {title: String}
+		//		the title of the dialog
+		//	object: {message: String}
+		//		the message to be shown in the body of the window
+		//	object: {callback: Function?}
+		//		a callback that is called when the dialog is closed
 		dojo.require("dijit.Dialog");
 		var div = dojo.doc.createElement("div");
 		div.innerHTML = "<center> "+object.message+" </center>";
@@ -33,21 +25,16 @@ api.ui = new function() {
 			dojo.connect(box, 'onUnload', object.callback);
 		}
 	}
-	/*
-	 * Method: authenticationDialog
-	 * 
-	 * Shows a simple authentication dialog
-	 * 
-	 * Arguments:
-	 * 		object - an object containing additional parameters
-	 * 		> {
-	 * 		> 	permission: string, //The permission to authenticate
-	 * 		> 	program: string, //The program that wants this authentication (for UI only)
-	 * 		> 	callback: function //Will return 0 or 1 to this when authenticated
-	 * 		> }
-	 */
 	this.authenticationDialog = function(/*Object*/object)
 	{
+		//	summary:
+		//		Shows a simple authentication dialog
+		//	object: {permission: String}
+		//		The permission to authenticate
+		//	object: {program: String?}
+		//		The program that wants this authentication (for UI only)
+		//	object: {callback: Function}
+		//		Will return 0 or 1 to this when authenticated
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var ac = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
 		if(this.authenticationWin) this.authenticationWin.bringToFront();
@@ -112,24 +99,18 @@ api.ui = new function() {
 		}
 				
 	}
-	/*
-	 * Method: inputDialog
-	 * 
-	 * A dialog with a text field
-	 * 
-	 * Arguments:
-	 * 		object - an object containing additional parameters
-	 * 		> {
-	 * 		> 	title: string, //the title of the dialog's window
-	 * 		> 	message: string, //a message to display above the text field and buttons
-	 * 		> 	callback: function //a callback function. The first argument is the inputted string if the user clicked OK, but false if the user clicked cancel or closed the window.
-	 * 		> }
-	 * 
-	 * Example:
-	 * 		> api.ui.inputDialog({title: "UI Test", message: "What is your name?", callback: api.log});
-	 */
 	this.inputDialog = function(/*Object*/object)
 	{
+		//	summary:
+		//		A dialog with a text field
+		//	object: {title: String}
+		//		the title of the dialog
+		//	object: {message: String}
+		//		a message to display above the text field and buttons
+		//	object: {callback: Function?}
+		//		a callback function. The first argument is the inputted string if the user clicked OK, but false if the user clicked cancel or closed the window.
+		//	example:
+		//	|	api.ui.inputDialog({title: "UI Test", message: "What is your name?", callback: api.log});
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var dialog = new api.Window();
 		dialog.title = object.title;	
@@ -157,27 +138,22 @@ api.ui = new function() {
 		dialog.show();
 		dialog.startup();
 	}
-	/*
-	 * Method: yesnoDialog
-	 * 
-	 * A yes or no dialog
-	 * 
-	 * Arguments:
-	 * 		object - an object containing additional parameters
-	 * 		> {
-	 * 		> 	title: string, //the title of the dialog's window
-	 * 		> 	message: string, //a message to display above the yes/no buttons
-	 * 		> 	callback: function //a callback function. The first argument is true if the user clicked yes, and false if the user clicked no or closed the window.
-	 * 		> }
-	 * 
-	 * Example:
-	 * 		> api.ui.yesnoDialog({title: "UI Test", message: "Did you sign your NDA?", callback: function(p) {
-	 * 		> 	if(p) alert("Good for you!");
-	 * 		> 	else alert("Then sign it allready!");
-	 * 		> });
-	 */
 	this.yesnoDialog = function(/*Object*/object)
 	{
+		//	summary:
+		//		A yes or no dialog
+		//	object: {title: String}
+		//		the title of the dialog
+		//	object: {message: String}
+		//		a message to display above the yes/no buttons
+		//	object: {callback: Function?}
+		//		a callback function. The first argument is true if the user clicked yes, and false if the user clicked no or closed the window.
+		//	example:
+		//	|	api.ui.yesnoDialog({title: "UI Test", message: "Did you sign your NDA?", callback: function(p) {
+		//	|		if(p) alert("Good for you!");
+		//	|		else alert("Then sign it allready!");
+		//	|	});
+		
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var dialog = new api.Window();
 		dialog.title = object.title;	
@@ -218,6 +194,14 @@ api.ui = new function() {
 	 */
 	this.fileDialog = function(/*Object*/object)
 	{
+		//	summary:
+		//		Shows a file selector dialog
+		//	object: {title: String}
+		//		the title of the dialog
+		//	object: {types: Array?}
+		//		array which contains an object. e.g types[0].type = "txt"; types[0].typeShown = ".txt (Text)";
+		//	object: {callback: Function?}
+		//		a callback function. returns the path to the file/folder selected as a string
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var pl = dojo.i18n.getLocalization("desktop", "places");
 		dojo.require("dijit.layout.SplitContainer");
@@ -312,21 +296,18 @@ api.ui = new function() {
 		file.refresh();
 		dialog.startup();
 	}
-	/*
-	 * Method: notify
-	 * 
-	 * Show a toaster popup (similar to libnotify)
-	 * 
-	 * Arguments:
-	 * 		message - the message to show. If an object, takes the following parameters:
-	 * 		> {
-	 * 		> 	message: string, // the message to show
-	 * 		> 	type: string, //type of message. Can be "message", "warning", "error", or "fatal"
-	 * 		> 	duration: integer //how long should the message be displayed in milliseconds
-	 * 		> }
-	 */
 	this.notify = function(/*String|Object*/message)
 	{
+		//	summary:
+		//		Show a toaster popup (similar to libnotify)
+		//	message:
+		//		the message to show. If an object is passed, it takes three parameters.
+		//	message: {message: String}
+		//		the message to show
+		//	message: {type: String?}
+		//		type of message. Can be "message", "warning", "error", or "fatal"
+		//	message: {duration: Integer?}
+		//		how long should the message be displayed in milliseconds
 		dojo.publish("desktop_notification", [message]);
 	}
 	this.init = function() {
