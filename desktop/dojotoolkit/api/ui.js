@@ -1,5 +1,6 @@
 dojo.provide("api.ui");
 dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit.form.FilteringSelect");
 dojo.require("dojox.widget.Toaster");
 dojo.requireLocalization("desktop", "common");
 
@@ -179,19 +180,6 @@ api.ui = new function() {
 		dialog.show();
 		dialog.startup();
 	}
-	/*
-	 * Method: fileDialog
-	 * 
-	 * Shows a file selector dialog
-	 * 
-	 * Arguments:
-	 * 		object - an object containing additional parameters
-	 * 		> {
-	 * 		> 	title: string, //the title of the dialog's windows
-	 *		>	types: array, //array which contains an object. e.g types[0].type = "txt"; types[0].typeShown = ".txt (Text)";
-	 * 		> 	callback: function //a callback function. returns the path to the file/folder selected as a string
-	 * 		> }
-	 */
 	this.fileDialog = function(/*Object*/object)
 	{
 		//	summary:
@@ -199,7 +187,7 @@ api.ui = new function() {
 		//	object: {title: String}
 		//		the title of the dialog
 		//	object: {types: Array?}
-		//		array which contains an object. e.g types[0].type = "txt"; types[0].typeShown = ".txt (Text)";
+		//		array which contains an object. e.g types[0].type = "txt"; types[0].label = ".txt (Text)";
 		//	object: {callback: Function?}
 		//		a callback function. returns the path to the file/folder selected as a string
 		var cm = dojo.i18n.getLocalization("desktop", "common");
@@ -253,19 +241,23 @@ api.ui = new function() {
 		}, this);
 		pane.setContent(menu.domNode);
    		var address = new dijit.form.TextBox({value: "file://"});
-		/*if(object.types) {
+		if(object.types) {
 			var store = this.internalStore = new dojo.data.ItemFileWriteStore({
 				data: {
 					identifier: "type",
+					label: "label",
 					items: object.types
 				}
 			});
-			//store.newItem({type: ""});
-		}*/
+			store.newItem({type: "", label: ""});
+			var select = new dijit.form.FilteringSelect({
+				store: store
+			});
+		}
 		var button = new dijit.form.Button({label: cm.loadOrSave, onClick: dojo.hitch(this, function() { 
 			var p = address.getValue();
 			var f = "";
-			//if(object.types) { f = select.getValue(); }
+			if(object.types) { f = select.getValue(); }
 			object.callback(p+f);
 			dialog.close();
 		})});
@@ -279,7 +271,7 @@ api.ui = new function() {
 		p.innerHTML = cm.path+":";
 		line.appendChild(p);
 		line.appendChild(address.domNode);
-		//if(object.types) line.appendChild(select.domNode);
+		if(object.types) line.appendChild(select.domNode);
 		line.appendChild(button.domNode);
 		line.appendChild(ablah.domNode);
 		all.appendChild(line);
