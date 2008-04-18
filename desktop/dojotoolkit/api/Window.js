@@ -4,26 +4,7 @@ dojo.require("dojo.dnd.move");
 dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dojox.fx.easing");
 dojo.require("dijit._Templated");
-/*
- * Class: api.Window
- * 
- * Summary:
- * 		The window constructor
- * 
- * Example:
- * 		(start code)
- * 		win = new api.Window();
- * 		win.title = "foo";
- * 		win.height =  "200px";
- * 		win.width = "20%";
- * 		widget = new dijit.layout.ContentPane();
- * 		widget.setContent("baz");
- * 		win.addChild(widget);
- * 		win.show();
- * 		win.startup();
- * 		setTimeout(dojo.hitch(win, win.destroy), 1000*5);
- * 		(end code)
- */
+
 dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	//	summary:
 	//		The window widget
@@ -40,41 +21,23 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	//	|	win.startup();
 	//	|	setTimeout(dojo.hitch(win, "destroy"), 1000*5);
 	templatePath: dojo.moduleUrl("api", "templates/Window.html"),
-	/*
-	 * Property: _winListItem
-	 * 
-	 * The store item that represents this window on desktop.ui._windowList
-	 */
+	//	_winListItem: storeItem
+	//		The store item that represents this window on desktop.ui._windowList
 	_winListItem: null,
-	/*
-	 * Property: closed
-	 * 
-	 * Is the window closed?
-	 */
+	//	closed: Boolean
+	//		Is the window closed?
 	closed: false,
-	/*
-	 * Property: onClose
-	 * 
-	 * What to do on destroying of the window
-	 */
 	onClose: function() {
-		
+		//	summary:
+		//		What to do on destroying of the window
 	},
-	/*
-	 * Property: onResize
-	 * 
-	 * What to do on the resizing of the window
-	 */
 	onResize: function() {
-		
+		//	summary:
+		//		What to do on the resizing of the window
 	},
-	/*
-	 * Property: onMinimize
-	 * 
-	 * What to do on the minimizing of the window
-	 */
 	onMinimize: function() {
-		
+		//	summary:
+		//		What to do on the minimizing of the window
 	},
 	/*
 	 * Property: onMaximize
@@ -82,80 +45,45 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	 * What to do upon maximize of window
 	 */
 	onMaximize: function() {
-		
+		//	summary:
+		//		What to do upon maximize of window
 	},
-	/*
-	 * Property: showMaximize
-	 * 
-	 * Show whether or not to show the maximize button
-	 */
+	//	showMaximize: Boolean
+	//		Whether or not to show the maximize button
 	showMaximize: true,
-	/*
-	 * Property: showMinimize
-	 * 
-	 * Show whether or not to show the minimize button
-	 */
+	//	showMinimize: Boolean
+	//		Whether or not to show the minimize button
 	showMinimize: true,
-	/*
-	 * Property: showClose
-	 * 
-	 * Show whether or not to show the close button
-	 */
+	//	showClose: Boolean
+	//		Whether or not to show the close button
 	showClose: true,
-	/*
-	 * Property: maximized
-	 * 
-	 * Whether or not the window is maximized
-	 */
+	//	maximized: Boolean
+	//		Whether or not the window is maximized
 	maximized: false,
-	/*
-	 * Property: minimized
-	 * 
-	 * Whether or not the window is minimized
-	 */
+	//	minimized: Boolean
+	//		Whether or not the window is minimized
 	minimized: false,
-	/*
-	 * Property: alwaysOnTop
-	 * 
-	 * Whether or not the window is to always stay on top of other windows
-	 */
+	//	allwaysOnTop: boolean
+	//		Whether or not the window is to always stay on top of other windows
 	alwaysOnTop: false,	 	 	 
-	/*
-	 * Property: height
-	 * 
-	 * The window's height in px, or %.
-	 */
+	//	height: String
+	//		The window's height in px, or %.
 	height: "480px",
-	/*
-	 * Property: width
-	 * 
-	 * The window's width in px, or %.
-	 */
+	//	width: String
+	//		The window's width in px, or %.
 	width: "600px",
-	/*
-	 * Property: title
-	 * 
-	 * The window's title
-	 */
+	//	title: String
+	//		The window's title
 	title: "",
-	/*
-	 * Property: resizable
-	 * 
-	 * Weather or not the window is resizable.
-	 */
+	//	resizable: Boolean
+	//		Weather or not the window is resizable.
 	resizable: true,
-	/*
-	 * Property: pos
-	 * 
-	 * Internal variable used by the window maximizer
-	 */
+	//	pos: Object
+	//		Internal variable used by the window maximizer
 	pos: {},
-	/*
-	 * Property: _minimizeAnim
-	 * 
-	 * Set to true when the window is in the middle of a minimize animation.
-	 * This is to prevent a bug where the size is captured mid-animation and restores weird.
-	 */
+	//	_minimizeAnim: Boolean
+	//		Set to true when the window is in the middle of a minimize animation.
+	//		This is to prevent a bug where the size is captured mid-animation and restores weird.
 	_minimizeAnim: false,
 	postCreate: function() {
 		this.domNode.title="";
@@ -182,53 +110,46 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		this.connect(window,'onresize',"_onResize");
 		this.bringToFront();
 	},
-	/*
-	 * Method: show
-	 *  
-	 * Shows the window
-	 */
 	show: function()
 	{
-			desktop.ui.containerNode.appendChild(this.domNode);
-			dojo.style(this.domNode, "width", this.width);
-			dojo.style(this.domNode, "height", this.height);
-			this.titleNode.innerHTML = this.title;
-			this._winListItem = desktop.ui._windowList.newItem({
-				label: this.title,
-				icon: this.icon,
-				id: this.id
+		//	summary:
+		//		Shows the window
+		desktop.ui.containerNode.appendChild(this.domNode);
+		dojo.style(this.domNode, "width", this.width);
+		dojo.style(this.domNode, "height", this.height);
+		this.titleNode.innerHTML = this.title;
+		this._winListItem = desktop.ui._windowList.newItem({
+			label: this.title,
+			icon: this.icon,
+			id: this.id
+		});
+		if(this.maximized == true) this.maximize();
+		dojo.style(this.domNode, "display", "block");
+		var calcWidth = this.domNode.offsetWidth;
+		var calcHeight = this.domNode.offsetHeight;
+		var bodyWidth = this.containerNode.offsetWidth;
+		var bodyHeight = this.containerNode.offsetHeight;
+		dojo.style(this.domNode, "width", ((calcWidth - bodyWidth)+calcWidth)+"px");
+		dojo.style(this.domNode, "height", ((calcHeight - bodyHeight)+calcHeight)+"px");
+		if (desktop.config.fx >= 2) {
+			if (desktop.config.fx < 3) this._toggleBody(false);
+			dojo.style(this.domNode, "opacity", 0);
+			var anim = dojo.fadeIn({
+				node: this.domNode,
+				duration: desktop.config.window.animSpeed
 			});
-			if(this.maximized == true) this.maximize();
-			dojo.style(this.domNode, "display", "block");
-			var calcWidth = this.domNode.offsetWidth;
-			var calcHeight = this.domNode.offsetHeight;
-			var bodyWidth = this.containerNode.offsetWidth;
-			var bodyHeight = this.containerNode.offsetHeight;
-			dojo.style(this.domNode, "width", ((calcWidth - bodyWidth)+calcWidth)+"px");
-			dojo.style(this.domNode, "height", ((calcHeight - bodyHeight)+calcHeight)+"px");
-			if (desktop.config.fx >= 2) {
-				if (desktop.config.fx < 3) this._toggleBody(false);
-				dojo.style(this.domNode, "opacity", 0);
-				var anim = dojo.fadeIn({
-					node: this.domNode,
-					duration: desktop.config.window.animSpeed
-				});
-				dojo.connect(anim, "onEnd", this, function() {
-					if (desktop.config.fx < 3) this._toggleBody(true);
-					this.resize();
-				});
-				anim.play();
-			} else this.resize();
+			dojo.connect(anim, "onEnd", this, function() {
+				if (desktop.config.fx < 3) this._toggleBody(true);
+				this.resize();
+			});
+			anim.play();
+		} else this.resize();
 	},
-	/*
-	 * Method: _toggleBody
-	 * 
-	 * Toggles the display of the window's body
-	 * 
-	 * Arguments:
-	 * 		show - If true the body is shown, if false then the body is hidden.
-	 */
-	_toggleBody: function(show) {
+	_toggleBody: function(/*Boolean*/show) {
+		//	summary:
+		//		Toggles the display of the window's body
+		//	show:
+		//		If true the body is shown, if false then the body is hidden.
 		if(show) {
 			dojo.style(this.containerNode, "display", "block");
 			dojo.style(this.dragContainerNode, "display", "none");
@@ -238,28 +159,20 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			dojo.style(this.dragContainerNode, "display", "block");
 		}
 	},
-	/*
-	 * Method: setTitle
-	 * 
-	 * Sets window title after window creation
-	 * 
-	 * Arguments:
-	 * 		title - The new title
-	 */
-	setTitle: function(title) {
+	setTitle: function(/*String*/title) {
+		//	summary:
+		//		Sets window title after window creation
+		//	title:
+		//		The new title
 		this.titleNode.innerHTML = title;
 		desktop.ui._windowList.setValue(this._winListItem, "label", title);
 		this.title = title;
 	},
-	/*
-	 * Method: _getPoints
-	 * 
-	 * Get the points of a box (as if it were on an xy plane)
-	 * 
-	 * Arguments:
-	 * 		box - the box. {x: 24 (x position), y: 25 (y position), w: 533 (width), h: 435 (height)}
-	 */
 	_getPoints: function(/*Object*/box) {
+		//	summary:
+		//		Get the points of a box (as if it were on an xy plane)
+		//	box:
+		//		the box. {x: 24 (x position), y: 25 (y position), w: 533 (width), h: 435 (height)}
 		return {
 			tl: {x: box.x, y: box.y},
 			tr: {x: box.x+box.w, y: box.y},
@@ -267,14 +180,11 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			br: {x: box.x+box.w, y: box.y+box.h}
 		}
 	},
-	/*
-	 * Method: _onTaskClick
-	 * 
-	 * Called when the task button on a panel is clicked on
-	 * Minimizes/restores the window
-	 */
 	_onTaskClick: function()
 	{
+		//	summary:
+		//		Called when the task button on a panel is clicked on
+		//		Minimizes/restores the window
 		var s = this.domNode.style.display;
 		if(s == "none")
 		{
@@ -286,43 +196,31 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			if(!this.bringToFront()) this.minimize();
 		}
 	},
-	/*
-	 * Method: _toggleMaximize
-	 * 
-	 * Toggles the window being maximized
-	 */
 	_toggleMaximize: function() {
+		//	summary:
+		//		Toggles the window being maximized
 		if(this.maximized == true) this.unmaximize();
 		else this.maximize();
 	},
-	/*
-	 * Method: makeResizer
-	 * 
-	 * Internal method that makes a resizer for the window.
-	 */
 	makeResizer: function() {
+		//	summary:
+		//		Internal method that makes a resizer for the window.
 		dojo.style(this.sizeHandle.domNode, "display", "block");
 	},
-	/*
-	 * Method: killResizer
-	 * 
-	 * Internal method that gets rid of the resizer on the window.
-	 */
 	killResizer: function()
 	{
+		//	summary:
+		//		Internal method that gets rid of the resizer on the window.
 		/*dojo.disconnect(this._dragging);
 		dojo.disconnect(this._resizeEvent);
 		dojo.disconnect(this._doconmouseup);
 		this.sizeHandle.style.cursor = "default";*/
 		dojo.style(this.sizeHandle.domNode, "display", "none");
 	},
-	/* 
-	 * Method: minimize
-	 * 
-	 * Minimizes the window to the taskbar
-	 */
 	minimize: function()
 	{
+		//	summary:
+		//		Minimizes the window to the taskbar
 		if(this._minimizeAnim && desktop.config.fx >= 2) return;
 		this.onMinimize();
 		if(desktop.config.fx >= 2)
@@ -365,13 +263,10 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		}
 		this.minimized = true;
 	},
-	/*
-	 * Method: restore
-	 * 
-	 * Restores the window from the taskbar
-	 */
 	restore: function()
 	{
+		//	summary:
+		//		Restores the window from the taskbar
 		if(this._minimizeAnim && desktop.config.fx >= 2) return;
 		this.domNode.style.display = "inline";
 		if(desktop.config.fx >= 2)
@@ -399,13 +294,10 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		}
 		this.minimized = false;
 	},
-	/*
-	 * Method: maximize
-	 * 
-	 * Maximizes the window
-	 */
 	maximize: function()
 	{
+		//	summary:
+		//		Maximizes the window
 		this.onMaximize();
 		this.maximized = true;
 		var viewport = dijit.getViewport();
@@ -450,13 +342,10 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			this.resize();
 		}
 	},
-	/*
-	 * Method: makeDragger
-	 * 
-	 * internal method to make the window moveable
-	 */
 	makeDragger: function()
 	{
+		//	summary:
+		//		internal method to make the window moveable
 		if(desktop.config.window.constrain) 
 		{
 			this._drag = new dojo.dnd.move.parentConstrainedMoveable(this.domNode, {
@@ -479,13 +368,10 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			}
 		}));
 	},
-	/*
-	 * Method: unmaximize
-	 * 
-	 * UnMaximizes the window
-	 */
 	unmaximize: function()
 	{
+		//	summary:
+		//		Unmaximizes the window
 		dojo.removeClass(this.domNode, "win-maximized");
 		this.makeDragger();
 		if(this.resizable == true)
@@ -523,17 +409,13 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		}
 		this.maximized = false;
 	},
-	/*
-	 * Method: bringToFront
-	 * 
-	 * Brings the window to the front of the stack
-	 * 
-	 * Returns:	
-	 * 		false - it had to be rased
-	 * 		true - it was allready on top.
-	 */
 	bringToFront: function()
 	{
+		//	summary:
+		//		Brings the window to the front of the stack
+		//	returns:
+		//		true if it had to be raised
+		//		false if it was already on top
 		var ns = dojo.query("div.win", desktop.ui.containerNode);
 		var maxZindex = 10;
 		var alwaysOnTopNum = 0;		// Number of wins with 'alwaysOnTop' property set to true
@@ -574,13 +456,10 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		if(this._drag) this._drag.destroy();
 		if(this.sizeHandle) this.sizeHandle.destroy();
 	},
-	/* 
-	 * Method: close
-	 * 
-	 * closes the window
-	 */
 	close: function()
 	{
+		//	summary:
+		//		closes the window
 		if (!this.closed) {
 			this.closed = true;
 			if(this._winListItem) desktop.ui._windowList.deleteItem(this._winListItem);
@@ -602,15 +481,11 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			else onEnd();
 		}
 	},
-	/*
-	 * Method: resize
-	 * 
-	 * Explicitly set the window's size (in pixels)
-	 * 
-	 * Arguments:
-	 * 		args - {w: int, h: int, l: int, t: int}
-	 */
 	resize: function(/*Object?*/args){
+		//	summary:
+		//		Explicitly set the window's size (in pixels)
+		//	args:
+		//		{w: int, h: int, l: int, t: int}
 		var node = this.domNode;
 		
 		//first take care of our size if we're maximized
@@ -661,50 +536,36 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		// Callback for widget to adjust size of it's children
 		this.layout();
 	},
-	/*
-	 * Method: layout
-	 * 
-	 * Layout the widget
-	 */
 	layout: function(){
+		//	summary:
+		//		Layout the widge
 		dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());
 	},
-	/*
-	 * Method: addChild
-	 * 
-	 * Add a child to the window
-	 * 
-	 * Arguments:
-	 * 		child - the child to add
-	 * 		insertIndex - at what index to insert the widget (optional)
-	 */
 	addChild: function(/*Widget*/ child, /*Integer?*/ insertIndex){
+		//	summary:
+		//		Add a child to the window
+		//	child:
+		//		the child to add
+		//	insertIndex:
+		//		at what index to insert the widget
 		dijit._Container.prototype.addChild.apply(this, arguments);
 		if(this._started){
 			dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());
 		}
 	},
-	/*
-	 * Method: removeChild
-	 * 
-	 * Remove a child from the widget
-	 * 
-	 * Arguments:
-	 * 		widget - the widget to remove
-	 */
 	removeChild: function(/*Widget*/ widget){
+		//	summary:
+		//		Remove a child from the widget
+		//	widget:
+		//		the widget to remove
 		dijit._Container.prototype.removeChild.apply(this, arguments);
 		if(this._started){
 			dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());
 		}
 	},
-	/*
-	 * Method: _onResize
-	 * 
-	 * Event handler
-	 * Resizes the window when the screen is resized.
-	 */
 	_onResize: function(e) {
+		//	summary:
+		//		Event handler. Resizes the window when the screen is resized.
 		if (this.maximized && !this.minimized) {
 			var max = desktop.ui._area.getBox();
 			var c = dojo.coords(this.domNode);
@@ -720,12 +581,9 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		}
 		this.resize();
 	},
-	/*
-	 * Method: startup
-	 * 
-	 * starts the widget up
-	 */
 	startup: function() {
+		//	summary:
+		//		starts the widget up
 		this.inherited("startup", arguments);
 		this.resize();
 	}

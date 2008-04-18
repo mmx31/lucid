@@ -4,12 +4,13 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 	<script type="text/javascript">
+		var djConfig = {usePlainJson: true};
+		(function(){
 			var matches = document.cookie.match(new RegExp("(?:^|; )desktopLocale=([^;]*)"));
 			var cookie = matches ? decodeURIComponent(matches[1]) : false;
-			if(cookie !== false && cookie != "NONE")
-				var djConfig = {locale:cookie, usePlainJson: true};
-			else
-				var djconfig = {usePlainJson: true};
+			if (cookie !== false && cookie != "NONE") 
+				djConfig.locale = cookie;
+		})();
 	</script>
 	<script type="text/javascript" src="./dojotoolkit/dojo/dojo.js"></script>
 	<script type="text/javascript" src="./dojotoolkit/desktop/desktop.js"></script>
