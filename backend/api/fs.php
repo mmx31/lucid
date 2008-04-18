@@ -21,13 +21,33 @@ import("api.vfs.Base");
 import("models.user");
 
 //check for mimetype function, if not make one so that it uses the Fileinfo pecl module
-if (!function_exists('mime_content_type ')) {
-    function mime_content_type($filename) {
-        $finfo    = finfo_open(FILEINFO_MIME);
-        $mimetype = finfo_file($finfo, $filename);
-        finfo_close($finfo);
-        return $mimetype;
-    }
+if (!function_exists('mime_content_type')) {
+	if(function_exists('finfo_open')) {
+	    function mime_content_type($filename) {
+	        $finfo    = finfo_open(FILEINFO_MIME);
+	        $mimetype = finfo_file($finfo, $filename);
+	        finfo_close($finfo);
+	        return $mimetype;
+	    }
+	}
+	else if(class_exists('System_Command')) {
+		function mime_content_type($file) {
+			$cmd = new System_Command;
+			if(!$cmd->which("file")) {
+				unset($cmd);
+				return false;
+			}
+			$cmd->pushCommand("file", "-bi '{$file}'");
+	        $res = $cmd->execute();
+	        unset($cmd);
+			return $res;
+		}
+	}
+	else {
+		function mime_content_type($file) {
+			return false;
+		}
+	}
 }
 
 if($_GET['section'] == "io")
