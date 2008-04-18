@@ -47,18 +47,24 @@ api.xhr = function(/*dojo.__ioArgs|String*/args) {
 	else if(args.app) {
 		args.url = "../apps/"+args.app+"/"+args.url;
 	}
-	var callback = args.load;
-	args.load = function(data, ioArgs) {
-		if(typeof parseInt(data) == "number" && parseInt(data) > 0) {
-			console.error(data); //TODO: we should alert the user in some cases, or possibly retry the request
+	var df = new dojo.Deferred();
+	if(args.load) df.addCallback(args.load);
+	if(args.error) df.addCallback(args.error);
+	
+	var xhr = dojo.xhrPost(dojo.mixin(args, {
+		load: function(data) {
+			if(typeof parseInt(data) == "number" && parseInt(data) > 0) {
+				console.error(data); //TODO: we should alert the user in some cases, or possibly retry the request
+			}
+			df.callback(data);
+		},
+		error: function(err) {
+			console.error(err);
+			df.errback(err);
 		}
-		callback.apply(dojo.global, arguments);
-	}
-	//comment filtering is tricky in certain cases...
-	//if(args.handleAs == "json") {
-	//	args.handleAs="json-comment-filtered";
-	//}
-	return dojo.xhrPost(args);
+	}));
+	df.canceler = dojo.hitch(xhr, "cancel");
+	return df;
 }
 api.addDojoCss = function(/*String*/path)
 {
