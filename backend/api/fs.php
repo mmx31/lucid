@@ -19,6 +19,17 @@
 require("../lib/includes.php");
 import("api.vfs.Base");
 import("models.user");
+
+//check for mimetype function, if not make one so that it uses the Fileinfo pecl module
+if (!function_exists('mime_content_type ')) {
+    function mime_content_type($filename) {
+        $finfo    = finfo_open(FILEINFO_MIME);
+        $mimetype = finfo_file($finfo, $filename);
+        finfo_close($finfo);
+        return $mimetype;
+    }
+}
+
 if($_GET['section'] == "io")
 {
 	if(isset($_GET['path'])) $sentpath = $_GET['path'];

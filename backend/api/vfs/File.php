@@ -25,12 +25,6 @@ class FileFs extends BaseFs {
 			$r["modified"] = date ("F d Y H:i:s.", filemtime($f));
 			$r["size"] = filesize($f);
 			$r["type"] = mime_content_type($f);
-			if($r["type"] === false && function_exists("finfo_open")) {
-				//fallback on the Fileinfo PECL extention
-				$finfo = finfo_open(FILEINFO_MIME);
-				$r["type"] = finfo_file($finfo, $f);
-				finfo_close($finfo);
-			}
 			//TODO: guess mimetype based on extension?
 		}
 		return $r;
