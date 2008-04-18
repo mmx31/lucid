@@ -49,7 +49,7 @@ api.xhr = function(/*dojo.__ioArgs|String*/args) {
 	}
 	var df = new dojo.Deferred();
 	if(args.load) df.addCallback(args.load);
-	if(args.error) df.addCallback(args.error);
+	if(args.error) df.addErrback(args.error);
 	
 	var xhr = dojo.xhrPost(dojo.mixin(args, {
 		load: function(data) {

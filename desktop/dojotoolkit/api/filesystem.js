@@ -79,6 +79,8 @@ api.filesystem = {
 			load: function(data, ioArgs)
 			{
 				if(callback) callback(data=="0");
+				var p = path.lastIndexOf("/");
+				dojo.publish("filearea:"+path.substring(0, p+1), []);
 			},
 	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
         });

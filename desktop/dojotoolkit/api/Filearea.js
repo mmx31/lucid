@@ -561,7 +561,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		dojo.addClass(this.labelNode, "selectedItem");
 		dojo.addClass(this.iconNode, "fileIconSelected");
 		var p = this.getParent();
-		p.onHighlight(p.path+"/"+this.name);
+		p.onHighlight(p.path+(p.path.charAt(p.path.length-1) == "/" ? "" : "/")+this.name);
 	},
 	_onIconClick: function() {
 		dojo.forEach(this.getParent().getChildren(), function(item) {

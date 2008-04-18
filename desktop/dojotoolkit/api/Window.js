@@ -25,6 +25,20 @@ dojo.require("dijit._Templated");
  * 		(end code)
  */
 dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
+	//	summary:
+	//		The window widget
+	//	example:
+	//	|	var win = new api.Window({
+	//	|		title: "Foo",
+	//	|		height: "200px",
+	//	|		width: "400px"
+	//	|	});
+	//	|	var widget = new dijit.layout.ContentPane();
+	//	|	widget.setContent("baz");
+	//	|	win.addChild(widget);
+	//	|	win.show();
+	//	|	win.startup();
+	//	|	setTimeout(dojo.hitch(win, "destroy"), 1000*5);
 	templatePath: dojo.moduleUrl("api", "templates/Window.html"),
 	/*
 	 * Property: _winListItem

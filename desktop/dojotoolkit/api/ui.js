@@ -4,10 +4,10 @@ dojo.require("dijit.form.FilteringSelect");
 dojo.require("dojox.widget.Toaster");
 dojo.requireLocalization("desktop", "common");
 
-api.ui = new function() {
+api.ui = {
 	//	summary:
 	//		An API that provides things like dialogs and such
-	this.alertDialog = function(/*Object*/object)
+	alertDialog: function(/*Object*/object)
 	{
 		//	summary:
 		//		Shows a simple alert dialog
@@ -25,8 +25,8 @@ api.ui = new function() {
 		if(object.callback) {
 			dojo.connect(box, 'onUnload', object.callback);
 		}
-	}
-	this.authenticationDialog = function(/*Object*/object)
+	},
+	authenticationDialog: function(/*Object*/object)
 	{
 		//	summary:
 		//		Shows a simple authentication dialog
@@ -99,8 +99,8 @@ api.ui = new function() {
 		win.startup();
 		}
 				
-	}
-	this.inputDialog = function(/*Object*/object)
+	},
+	inputDialog: function(/*Object*/object)
 	{
 		//	summary:
 		//		A dialog with a text field
@@ -138,8 +138,8 @@ api.ui = new function() {
 		dialog.showClose = false;
 		dialog.show();
 		dialog.startup();
-	}
-	this.yesnoDialog = function(/*Object*/object)
+	},
+	yesnoDialog: function(/*Object*/object)
 	{
 		//	summary:
 		//		A yes or no dialog
@@ -179,8 +179,8 @@ api.ui = new function() {
 		dialog.showClose = false;
 		dialog.show();
 		dialog.startup();
-	}
-	this.fileDialog = function(/*Object*/object)
+	},
+	fileDialog: function(/*Object*/object)
 	{
 		//	summary:
 		//		Shows a file selector dialog
@@ -287,8 +287,8 @@ api.ui = new function() {
 		dialog.show();
 		file.refresh();
 		dialog.startup();
-	}
-	this.notify = function(/*String|Object*/message)
+	},
+	notify: function(/*String|Object*/message)
 	{
 		//	summary:
 		//		Show a toaster popup (similar to libnotify)
@@ -301,8 +301,8 @@ api.ui = new function() {
 		//	message: {duration: Integer?}
 		//		how long should the message be displayed in milliseconds
 		dojo.publish("desktop_notification", [message]);
-	}
-	this.init = function() {
+	},
+	init: function() {
 		api.addDojoCss("dojox/widget/Toaster/Toaster.css"); //TODO: theme it!
 		var toaster = new dojox.widget.Toaster({
 			messageTopic: "desktop_notification",
