@@ -372,7 +372,7 @@ desktop.app = {
 		{
 			  api.log("IDE API: Saving application...");
 	          api.xhr({
-	               backend: "api.ide.io.save",
+	               backend: "core.app.write.save",
 	               content : {
 	                    id: app.id,
 	                    name: app.name,
@@ -438,7 +438,7 @@ desktop.app = {
 		//	callback:
 		//		a callback function once the app has been removed
 		api.xhr({
-			backend: "api.ide.io.remove",
+			backend: "core.app.write.remove",
 			content: {
 				id: id
 			},

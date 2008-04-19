@@ -3,20 +3,14 @@ dojo.require("desktop.ui.applets.Menu");
 dojo.require("dijit.Menu");
 dojo.requireLocalization("desktop.ui", "menus");
 dojo.requireLocalization("desktop", "places");
-/*
- * Class: desktop.ui.applets.Menubar
- * 
- * An extention of desktop.ui.applets.Menu except it seperates the application, places, and system menus into their own buttons
- */
 dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
+	//	summary:
+	//		An extention of desktop.ui.applets.Menu except it seperates the application, places, and system menus into their own buttons
 	dispName: "Menu Bar",
 	_drawn: false,
-	/*
-	 * Method: _makeSystemMenu
-	 * 
-	 * Makes the system menu
-	 */
 	_makeSystemMenu: function() {
+		//	summary:
+		//		Makes the system menu
 		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
 		var m = new dijit.Menu();
 		dojo.forEach([
@@ -46,12 +40,9 @@ dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 		], m.addChild, m);
 		return m;
 	},
-	/*
-	 * Method: _makePlacesMenu
-	 * 
-	 * Makes the places menu
-	 */
 	_makePlacesMenu: function() {
+		//	summary:
+		//		Makes the places menu
 		var l = dojo.i18n.getLocalization("desktop", "places");
 		var m = new dijit.Menu();
 		dojo.forEach(desktop.config.filesystem.places, function(place) {
@@ -63,12 +54,9 @@ dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 		}, this);
 		return m;
 	},
-	/*
-	 * Method: _drawButton
-	 * 
-	 * Draws the button for the applet
-	 */
 	_drawButton: function() {
+		//	summary:
+		//		Draws the button for the applet
 		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
 		if(this._drawn) {
 			this._appMenuButton.dropDown = this._menu;

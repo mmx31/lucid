@@ -24,40 +24,13 @@
 		$cur = $User->get_current();
 		if($_GET['action'] == "package" && $cur->has_permission("api.ide"))
 		{
+			import("lib.package");
 			$out = new textareaOutput();	
 			if(isset($_FILES['uploadedfile']['name'])) {
 			$target_path = '../../apps/tmp/appzip.zip';
-			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
-				import("lib.unzip");
-				$zip = new dUnzip2($target_path);
-				$zip->getList();
-				if (!file_exists("../../apps/tmp/unzipped")) { mkdir("../../apps/tmp/unzipped"); }
-				$zip->unzipAll('../../apps/tmp/unzipped');
-				import("lib.xml");
-				$xml = new Xml;
-				if(!file_exists("../../apps/tmp/unzipped/appmeta.xml")) { $out->append("error", "missing app metadata"); die(); }
-				$in = $xml->parse('../../apps/tmp/unzipped/appmeta.xml', 'FILE');
-				$app = new $App();
-				$app->name = $in[name];
-				$app->author = $in[author];
-				$app->email = $in[email];
-				$app->version = $in[version];
-				$app->maturity = $in[maturity];
-				$app->category = $in[category];
-				$app->filetypes = Zend_Json::decode($in['filetypes'] ? $in['filetypes'] : "[]");
-				$installfile = $in[installFile];
-				$message = $in[installMessage];
-				$message2 = $in[installedMessage];
-				$templine = '';
-				$file2 = fopen("../../apps/tmp/unzipped/$installfile", "r");
-				while(!feof($file2)) {
-					$templine = $templine . fgets($file2, 4096);
-				}
-				fclose ($file2); 
-				$app->code = $templine;
-				$app->save();
+			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)
+			&& package::install($target_path)) {
 				$out->append("status", "success");
-				rmdir("../../apps/tmp/unzipped");
 			} else{
 			   $out->append("error", "Problem accessing uploaded file");
 			}
@@ -96,4 +69,27 @@
 			$out->set($list);
 		}
 	}
-?>
+	if($_GET['section'] == "write")
+	{
+		if($_GET['action'] == "save")
+		{
+			import("models.user");
+			$user = $User->get_current();
+			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
+			if($_POST['id'] == -1) { $app = new App(); }
+			else { $app = $App->get($_POST['id']); }
+			foreach(array('name', 'author', 'email', 'code', 'version', 'maturity', 'category') as $item) {
+				$app->$item = $_POST[$item];
+			}
+			$app->save();
+			$out = new jsonOutput();
+			$out->append("id", $app->id);
+		}
+		if($_GET['action'] == "remove") {
+			import("models.user");
+			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
+			$app = $App->get($_POST['id']);
+			$app->delete();
+			$out = new intOutput("ok");
+		}
+	}

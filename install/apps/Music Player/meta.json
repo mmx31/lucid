@@ -1,0 +1,10 @@
+{
+	"type": "application",
+	"name": "Music Player",
+	"author": "Psychcf",
+	"email": "will@psychdesigns.net",
+	"version": "1.0",
+	"maturity": "Stable",
+	"category": "Multimedia",
+	"filetypes": ["audio/*"]
+}

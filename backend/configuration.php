@@ -1,10 +1,9 @@
 <?php
 	$GLOBALS['db'] = Array(
-		"database" => "mysql://mysql:mysql@localhost/desktop",
+		"database" => "sqlite:////var/db/desktop.db?mode=666",
 		"prefix" => ""
 	);
 	$GLOBALS['conf'] = Array(
-		"salt" => "ecdc216cc493c682dd88938c55e9150c",
+		"salt" => "209396fa02d27141759eff7117e17cb8",
 		"public" => true
 	);
-?>

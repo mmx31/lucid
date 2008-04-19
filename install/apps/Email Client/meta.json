@@ -1,0 +1,10 @@
+{
+	"type": "application",
+	"name": "Email Client",
+	"author": "Psychcf",
+	"email": "will@psychdesigns.net",
+	"version": "1.0",
+	"maturity": "Stable",
+	"category": "Office",
+	"filetypes": []
+}

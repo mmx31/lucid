@@ -29,4 +29,3 @@
 	}
 	global $App;
 	$App = new App();
-?>

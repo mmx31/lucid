@@ -45,4 +45,3 @@
 	}
 	global $Group;
 	$Group = new Group();
-?>

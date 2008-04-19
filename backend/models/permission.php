@@ -37,4 +37,3 @@
 	}
 	global $Permission;
 	$Permission = new Permission();
-?>

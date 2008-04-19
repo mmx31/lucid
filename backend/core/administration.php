@@ -243,4 +243,3 @@
 		}
 	}
 	else internal_error("permission_denied");
-?>

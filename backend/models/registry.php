@@ -25,4 +25,3 @@
 	}
 	global $Registry;
 	$Registry = new Registry();
-?>

@@ -106,7 +106,6 @@
 		$writebuffer .= "\t\t\"salt\" => \"" . $conf_secretword . "\",\n";
 		$writebuffer .= "\t\t\"public\" => " . ($conf_public == "true" ? "true" : "false") . "\n";
 		$writebuffer .= "\t);\n";
-		$writebuffer .= "?" . ">";
 		if (is_writable("../backend/configuration.php")) {
 	        $handle = fopen("../backend/configuration.php", 'w');
 	        fwrite($handle, $writebuffer);
@@ -143,38 +142,15 @@
 		$xml = new Xml; 
 		$out->append("Initalizing application installer...", "...done");
 		$dir = opendir("./apps/");
+		import("lib.package");
 		while(($file = readdir($dir)) !== false){
 			if($file{0} == '.'){
 				continue;
 			}
 			else {
 			if(is_dir("./apps/" . $file)){
-				if(!file_exists("./apps/" . $file . "/appmeta.xml")) { continue; }
-				$in = $xml->parse('./apps/'.$file.'/appmeta.xml', 'FILE');
-				$app = new $App();
-				$app->name = $in[name];
-				$app->author = $in[author];
-				$app->email = $in[email];
-				$app->version = $in[version];
-				$app->maturity = $in[maturity];
-				$app->category = $in[category];
-				$app->filetypes = Zend_Json::decode($in['filetypes'] ? $in['filetypes'] : "[]");
-				$installfile = $in[installFile];
-				$message = $in[installMessage];
-				$message2 = $in[installedMessage];
-				/* no optional files required for the core apps
-				$fr = $in[filesRequired];
-				$frt = $in[filesCopyTo];
-				$frf = $in[filesCopyFrom]; */
-				$templine = '';
-				$file2 = fopen("./apps/$file/$installfile", "r");
-				while(!feof($file2)) {
-					$templine = $templine . fread($file2, 4096);
-				}
-				fclose ($file2); 
-				$app->code = $templine;
-				$app->save();
-				$out->append($message, $message2);
+				$result = package::install("./apps/".$file . "/", false);
+				$out->append("installing ".$file."...", ($result ? "...done" : "...error" ));
 				}
 			}
 		}
@@ -186,7 +162,7 @@
 			"../files/",
 			"../public/",
 			"../apps/",
-			"../apps/tmp/",
+			"../tmp/",
 			"../backend/configuration.php"
 		);
 		$out = new jsonOutput();
@@ -216,4 +192,3 @@
 			}
 		}
 	}
-?>

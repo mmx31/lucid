@@ -27,4 +27,3 @@
 	}
 	global $Crosstalk;
 	$Crosstalk = new Crosstalk();
-?>

@@ -46,4 +46,3 @@ if($_GET['section'] == "stream")
 		}
 	}
 }
-?>

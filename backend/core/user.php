@@ -155,4 +155,3 @@
 			echo $GLOBALS['conf']['public'];
 		}
 	}
-?>

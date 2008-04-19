@@ -190,4 +190,3 @@
 	}
 	global $User;
 	$User = new User();
-?>

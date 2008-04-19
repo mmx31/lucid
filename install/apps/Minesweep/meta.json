@@ -1,0 +1,10 @@
+{
+	"type": "application",
+	"name": "MineSweep",
+	"author": "NefariousD",
+	"email": "nefariousd@gmail.com",
+	"version": "1.0",
+	"maturity": "Stable",
+	"category": "Games",
+	"filetypes": []
+}

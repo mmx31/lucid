@@ -1,10 +1,7 @@
 dojo.provide("desktop.ui.applets.Separator");
-/*
- * Class: desktop.ui.applets.Separator
- * 
- * A basic Separator applet
- */
 dojo.declare("desktop.ui.applets.Separator", desktop.ui.Applet, {
+	//	summary:
+	//		A basic Separator applet
 	dispName: "Separator",
 	postCreate: function() {
 		dojo.addClass(this.containerNode, "separator");

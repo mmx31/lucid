@@ -34,4 +34,3 @@
 			@include_once($GLOBALS['path'] . $include);
 		}
 	}
-?>

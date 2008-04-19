@@ -4,14 +4,10 @@ dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
 dojo.require("dijit.Menu");
 dojo.requireLocalization("desktop.ui", "appearance");
-/*
- * 
- * Class: desktop.ui.Area
- *  
- * Summary:
- * 		the main UI area of the desktop. This is where panels, wallpaper, and most other things are drawn.
- */
+
 dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Container], {
+	//	summary:
+	//		the main UI area of the desktop. This is where panels, wallpaper, and most other things are drawn.
 	templateString: "<div class=\"uiArea\"><div dojoAttachPoint=\"containerNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10;\"></div><div dojoAttachPoint=\"wallpaperNode\" class=\"wallpaper\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 1;\"></div></div>",
 	drawn: false,
 	postCreate: function() {
@@ -35,13 +31,10 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 		}
 		dojo.connect(window,'onresize',this,"resize");
 	},
-	/*
-	 * Method: getBox
-	 * 
-	 * gets the ammount of space the panels are taking up on each side of the screen.
-	 * Used to calculate the size of the windows when maximized.
-	 */
 	getBox: function() {
+		//	summary:
+		//		gets the ammount of space the panels are taking up on each side of the screen.
+		//		Used to calculate the size of the windows when maximized.
 		var thicknesses = {BR: 0, BL: 0, BC: 0, TR: 0, TL: 0, TC: 0, LT: 0, LC: 0, LB: 0, RT: 0, RC: 0, RB: 0};
 		dojo.query(".desktopPanel").forEach(function(panel, i) {
 			var w = dijit.byNode(panel);
@@ -68,14 +61,10 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 		}
 		return max;
 	},
-	/*
-	 * Method: resize
-	 * 
-	 * Event handler
-	 * Does some cleanup when the window is resized. For example it moves the filearea.
-	 * Also called when a panel is moved.
-	 */
 	resize: function(e) {
+		//	summary:
+		//		Does some cleanup when the window is resized. For example it moves the filearea.
+		//		Also called when a panel is moved.
 		var max = this.getBox();
 		var viewport = dijit.getViewport();
 		dojo.style(this.filearea.domNode, "top", max.T+"px");
@@ -93,12 +82,9 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 			
 		}, this);
 	},
-	/*
-	 * Method: updateWallpaper
-	 * 
-	 * Updates the wallpaper based on what's in desktop.config. Called when the configuration is applied.
-	 */
 	updateWallpaper: function() {
+		//	summary:
+		//		Updates the wallpaper based on what's in desktop.config. Called when the configuration is applied.
 		var image = desktop.config.wallpaper.image;
 		var color = desktop.config.wallpaper.color;
 		var style = desktop.config.wallpaper.style;

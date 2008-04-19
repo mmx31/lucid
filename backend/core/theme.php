@@ -49,4 +49,3 @@ if($_GET['section'] == "get")
 		$blah->set($p);
 	}
 }
-?>

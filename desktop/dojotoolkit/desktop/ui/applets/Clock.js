@@ -1,12 +1,9 @@
 dojo.provide("desktop.ui.applets.Clock");
 dojo.require("dijit._Calendar");
 dojo.require("dojo.date");
-/*
- * Class: desktop.ui.applets.Clock
- * 
- * A clock applet with a popup calendar
- */
 dojo.declare("desktop.ui.applets.Clock", desktop.ui.Applet, {
+	//	summary:
+	//		A clock applet with a drop-down calendar
 	dispName: "Clock",
 	postCreate: function() {
 		var calendar = new dijit._Calendar({});

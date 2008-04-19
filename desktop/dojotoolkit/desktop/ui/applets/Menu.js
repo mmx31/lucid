@@ -3,12 +3,9 @@ dojo.require("dijit.Menu");
 dojo.requireLocalization("desktop.ui", "menus");
 dojo.requireLocalization("desktop", "places");
 dojo.requireLocalization("desktop", "apps");
-/*
- * Class: desktop.ui.applets.Menu
- * 
- * A simple menu applet
- */
 dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
+	//	summary:
+	//		A simple menu applet
 	dispName: "Main Menu",
 	postCreate: function() {
 		this._getApps();
@@ -23,12 +20,9 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		if(this._menu) this._menu.destroy();
 		this.inherited("uninitialize", arguments);
 	},
-	/*
-	 * Method: _makePrefsMenu
-	 * 
-	 * Creates a preferences menu and returns it
-	 */
 	_makePrefsMenu: function() {
+		//	summary:
+		//		Creates a preferences menu and returns it
 		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
 		var pMenu = new dijit.Menu();
 		dojo.forEach([
@@ -47,12 +41,9 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		});
 		return pMenu;
 	},
-	/*
-	 * Method: _drawButton
-	 * 
-	 * Creates a drop down button for the applet.
-	 */
 	_drawButton: function() {
+		//	summary:
+		//		Creates a drop down button for the applet.
 		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
 		dojo.require("dijit.form.Button");
 		if (this._menubutton) {
@@ -82,61 +73,54 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		b.startup();
 		this._menubutton = b;
 	},
-	/*
-	 * Method: _getApps
-	 * 
-	 * Gets the app list from the server and makes a menu for them
-	 */
 	_getApps: function() {
+		//	summary:
+		//		Gets the app list from the server and makes a menu for them
 		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
 		var ap = dojo.i18n.getLocalization("desktop", "apps");
-		api.xhr({
-			backend: "core.app.fetch.list",
-			load: dojo.hitch(this, function(data, ioArgs){
-				data = dojo.fromJson(data);
-				if (this._menu) {
-					this._menu.destroy();
-				}
-				var menu = this._menu = new dijit.Menu({});
-				var cats = {};
-				for(item in data)
+
+		data = desktop.app.appList;
+		if (this._menu) {
+			this._menu.destroy();
+		}
+		var menu = this._menu = new dijit.Menu({});
+		var cats = {};
+		for(item in data)
+		{
+			cats[data[item].category] = true;
+		}
+		list = [];
+		for(cat in cats)
+		{
+			list.push(cat);
+		}
+		list.sort();
+		for(cat in list)
+		{
+			var cat = list[cat];
+			//cat.meow();
+			var category = new dijit.PopupMenuItem({
+				iconClass: "icon-16-categories-applications-"+cat.toLowerCase(),
+				label: l[cat.toLowerCase()] || cat
+			});
+			var catMenu = new dijit.Menu({parentMenu: category});
+			for(app in data)
+			{
+				if(data[app].category == cat)
 				{
-					cats[data[item].category] = true;
-				}
-				list = [];
-				for(cat in cats)
-				{
-					list.push(cat);
-				}
-				list.sort();
-				for(cat in list)
-				{
-					var cat = list[cat];
-					//cat.meow();
-					var category = new dijit.PopupMenuItem({
-						iconClass: "icon-16-categories-applications-"+cat.toLowerCase(),
-						label: l[cat.toLowerCase()] || cat
+					var item = new dijit.MenuItem({
+						label: ap[data[app].name] || data[app].name
 					});
-					var catMenu = new dijit.Menu({parentMenu: category});
-					for(app in data)
-					{
-						if(data[app].category == cat)
-						{
-							var item = new dijit.MenuItem({
-								label: ap[data[app].name] || data[app].name
-							});
-							dojo.connect(item, "onClick", dojo.hitch(desktop.app, "launch", data[app].id));
-							catMenu.addChild(item);
-						}
-					}
-					catMenu.startup();
-					category.popup = catMenu;
-					menu.addChild(category);
+					dojo.connect(item, "onClick", dojo.hitch(desktop.app, "launch", data[app].id));
+					catMenu.addChild(item);
 				}
-				menu.domNode.style.display="none";
-				menu.startup();
-				this._drawButton();
-			})
-		});
+			}
+			catMenu.startup();
+			category.popup = catMenu;
+			menu.addChild(category);
+		}
+		menu.domNode.style.display="none";
+		menu.startup();
+		this._drawButton();
 	}
 });

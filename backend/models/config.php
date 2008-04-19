@@ -23,4 +23,3 @@
 	}
 	global $Config;
 	$Config = new Config();
-?>

@@ -354,4 +354,3 @@
 			$this->_link->createSequence($this->_get_tablename());
 		}
 	}
-?>

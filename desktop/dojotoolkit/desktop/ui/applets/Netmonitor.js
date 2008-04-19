@@ -1,12 +1,10 @@
 dojo.provide("desktop.ui.applets.Netmonitor");
 dojo.require("dijit.Tooltip");
 dojo.requireLocalization("desktop", "system");
-/*
- * Class: desktop.ui.applets.Netmonitor
- * 
- * A network monitor applet that blinks when an xhr is made
- */
+
 dojo.declare("desktop.ui.applets.Netmonitor", desktop.ui.Applet, {
+	//	summary:
+	//		A network monitor applet that blinks when an xhr is made
 	dispName: "Network Monitor",
 	appletIcon: "icon-32-status-network-transmit-receive",
 	postCreate: function() {
@@ -40,11 +38,6 @@ dojo.declare("desktop.ui.applets.Netmonitor", desktop.ui.Applet, {
 		})
 		this.inherited("postCreate", arguments);
 	},
-	/*
-	 * Method: removeClasses
-	 * 
-	 * Removes all icon classes from the icon node
-	 */
 	removeClasses: function() {
 		dojo.removeClass(this.containerNode, "icon-22-status-network-receive");
 		dojo.removeClass(this.containerNode, "icon-22-status-network-transmit");

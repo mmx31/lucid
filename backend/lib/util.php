@@ -71,4 +71,3 @@ function import($module) {
 	$file = $GLOBALS['path'] . $path . ".php";
 	return @include_once($file);
 }
-?>

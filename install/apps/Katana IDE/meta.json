@@ -1,0 +1,10 @@
+{
+	"type": "application",
+	"name": "Katana IDE",
+	"author": "Psychcf + NefariousD",
+	"email": "will@psychdesigns.net",
+	"version": "1.0",
+	"maturity": "Stable",
+	"category": "Development",
+	"filetypes": []
+}

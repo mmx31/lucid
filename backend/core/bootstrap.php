@@ -27,4 +27,3 @@ if($_GET['section'] == "check")
 		if($c !== false) $c->writeLocaleCookie();
 	}
 }
-?>

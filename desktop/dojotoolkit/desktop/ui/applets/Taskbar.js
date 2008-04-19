@@ -1,10 +1,7 @@
 dojo.provide("desktop.ui.applets.Taskbar");
-/*
- * Class: desktop.ui.applets.Taskbar
- * 
- * A window list applet that you can minimize windows to
- */
 dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
+	//	summary:
+	//		A window list applet that you can minimize windows to
 	dispName: "Window List",
 	fullspan: true,
 	_buttons: {},

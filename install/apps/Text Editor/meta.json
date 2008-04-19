@@ -1,0 +1,10 @@
+{
+	"type": "application",
+	"name": "Text Editor",
+	"author": "Jaymacdonald",
+	"email": "Jaymac407@gmail.com",
+	"version": "1.0",
+	"maturity": "Stable",
+	"category": "Accessories",
+	"filetypes": ["text/*"]
+}
