@@ -24,7 +24,6 @@ if($_GET['section'] == "get")
 	if($_GET['action'] == "list")
 	{
 	    $dir = opendir($GLOBALS['path']."/../desktop/themes/");
-		$blah = new jsonOutput;
 		$p = array();
 		while(($file = readdir($dir)) !== false) {
 			if($file == '..' || $file == '.' || $file{0} == '.'){
@@ -38,11 +37,14 @@ if($_GET['section'] == "get")
 				}
 			}
 		}
-		$blah->set($p);
+		$out = new jsonOutput($p);
 	}
 }
-$cur = $User->get_current();
-if($_GET['section'] == "package" && $cur->has_permission("desktop.admin")) {
+if($_GET['section'] == "package") {
+	import("models.user");
+	$cur = $User->get_current();
+}
+if($_GET['section'] == "package" && $cur->has_permission("core.administration")) {
 	if($_GET['action'] == "install")
 	{
 		import("lib.package");
@@ -61,5 +63,6 @@ if($_GET['section'] == "package" && $cur->has_permission("desktop.admin")) {
 	if($_GET['action'] == "remove") {
 		$name = str_replace("..", "", $_POST['name']);
 		rmdir($GLOBALS['path']."/../desktop/themes/".$name);
+		$out = new intOutput("ok");
 	}
 }

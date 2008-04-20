@@ -159,22 +159,35 @@
 	if($act == "checkpermissions")
 	{
 		$dirs = array(
+			"../backend/configuration.php",
 			"../files/",
 			"../public/",
 			"../apps/",
 			"../tmp/",
-			"../backend/configuration.php"
+			"../desktop/themes/"
 		);
+		/*$dir = opendir("../desktop/themes/");
+		while(($file = readdir($dir)) !== false){
+			if($file{0} == '.'){
+				continue;
+			}
+			else {
+				if(is_dir("../desktop/themes/" . $file)){
+					array_push($dirs, "../desktop/themes/".$file);
+				}
+			}
+		}*/
 		$out = new jsonOutput();
 		foreach($dirs as $dir)
 		{
+			$key = str_replace("../", "", $dir);
 			if(!is_writable($dir))
 			{
-				$out->append($dir, "not writable (chmod to 777 or chown to webserver's user)");
+				$out->append($key, "not writable (chmod to 777 or chown to webserver's user)");
 			}
 			else
 			{
-				$out->append($dir, "ok");
+				$out->append($key, "ok");
 			}
 		}
 	}

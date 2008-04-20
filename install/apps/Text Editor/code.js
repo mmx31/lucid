@@ -69,8 +69,6 @@
 	    this.other.setContent(msg.noFileOpen);
 	    this.window.addChild(box);
 	    this.window.addChild(this.other);
-	    this.window.width = "320px";
-	    this.window.height = "305px";
 	    this.window.show();
 	    this.window.startup();
 		if(args.file) this._processOpen(args.file);

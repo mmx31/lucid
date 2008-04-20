@@ -33,15 +33,6 @@ desktop.theme = {
 			dojo.byId("desktop_theme_"+e).href ="./themes/"+desktop.config.theme+"/"+e+".css";
 		});
 	},
-	/*
-	 * Method: list
-	 * 
-	 * Pases a list of the themes to the callback provided
-	 * 
-	 * Arguments:
-	 * 		callback - a callback function
-	 * 		sync - should the call be syncronous? (defaults to false)
-	 */
 	/*=====
 	_listArgs: {
 		//	sysname: String
@@ -81,5 +72,25 @@ desktop.theme = {
 			sync: sync || false,
 			handleAs: "json"
 		});
+	},
+	remove: function(/*String*/name, /*String?*/onComplete, /*String?*/onError) {
+		//	summary:
+		//		removes a theme from the system
+		//		must be an administrator to use this
+		//	name:
+		//		the name of the theme to remove
+		//	onComplete:
+		//		a callback once the action has been completed
+		//	onError:
+		//		a callback if there's an error
+		var df = api.xhr({
+			backend: "core.theme.package.remove",
+			content: {
+				name: name
+			}
+		});
+		df.addCallback(onComplete);
+		df.addErrback(onError);
+		return df;
 	}
 }

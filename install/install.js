@@ -236,7 +236,7 @@ install = new function() {
 		var text = "Unknown error";
 		if(num == "6") text = "Database query error";
 		if(num == "4") text = "Database connection error";
-		dojo.byId("taskList").innerHTML = "<div class='installError'>***Installation Error***</div>"
+		dojo.byId("taskList").innerHTML += "<div class='installError'>***Installation Error***</div>"
 		+ "<div class='installError'>"+text+"</div>";
 	}
 	this.tasks = {

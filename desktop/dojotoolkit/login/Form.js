@@ -129,7 +129,10 @@ dojo.declare("login.Form", dijit.form.Form, {
 		dojo.stopEvent(e);
 		if(this.submitNode.disabled == true) return;
 		var contents = this.getValues();
-		dojo.cookie("desktopWindowPref", contents.windowAct, 365);
+		dojo.cookie("desktopWindowPref", contents.windowAct, {
+			expires: 365,
+			path: window.location.pathname
+		});
 		this.errorNode.innerHTML = "";
 		this.submitNode.disabled=true;
 		if(contents.username && contents.password)
