@@ -98,7 +98,7 @@ class jsonOutput extends objOutput {
 	function __destruct() {
 		if($this->dooutput) {
 			//header("Content-Type: text/json-comment-filtered; charset=utf-8");
-			//header("Content-Type: text/json; charset=utf-8");
+			header("Content-Type: text/json; charset=utf-8");
 			if(isset($php_errormsg))
 			{
 				$this->append("core_error", $php_errormsg);

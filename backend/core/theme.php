@@ -18,12 +18,12 @@
 	*/
 error_reporting(0); //<<<<<<<<<<<<<<<<<<<LEAVE THIS ALONE!!!
 require("../lib/includes.php");
-import("lib.xml");
+import("lib.Json.Json");
 if($_GET['section'] == "get")
 {
 	if($_GET['action'] == "list")
 	{
-	    $dir = opendir("../../desktop/themes/");
+	    $dir = opendir($GLOBALS['path']."/../desktop/themes/");
 		$blah = new jsonOutput;
 		$p = array();
 		while(($file = readdir($dir)) !== false) {
@@ -31,18 +31,10 @@ if($_GET['section'] == "get")
 					continue;
 			} else {
 				$t = strtolower($file);
-				if(is_dir("../../desktop/themes/" . $file)){
-					$xml = new Xml;
-					$in = $xml->parse('../../desktop/themes/'.$file.'/themeMeta.xml', 'FILE');
+				if(is_dir($GLOBALS['path']."/../desktop/themes/" . $file)){
+					$json = file_get_contents($GLOBALS['path'].'/../desktop/themes/'.$file.'/meta.json');
+					$in = Zend_Json::decode($json);
 					$p[] = array("sysname" => $file, "name" => $in["name"], "author" => $in["author"], "email" => $in["email"], "version" => $in["version"], "wallpaper" => $in["wallpaper"], "preview" => $in["preview"]);
-					/*
-					$blah->append("name", $in["name"]);
-					$blah->append("author", $in["author"]);
-					$blah->append("email", $in["email"]);
-					$blah->append("version", $in["version"]);
-					$blah->append("wallpaper", $in["wallpaper"]);
-					$blah->append("preview", $in["preview"]);
-					*/
 				}
 			}
 		}

@@ -41,9 +41,53 @@ class package {
 		if(is_dir($path."/files")) rename($path."/files", $backendDir);
 	}
 	function _install_theme($info, $path) {
-		
+		$newpath = $GLOBALS['path']."/../desktop/themes/".strtolower($info['name']);
+		rename($path."/".strtolower($info['name']), $newpath);
+		rename($path."/meta.json", $newpath."/meta.json");
+	}
+	function _install_translation($info, $path) {
+		function rsearch($path) {
+			$dirs = array();
+			while(($file = readdir($dir)) !== false){
+				if($file{0} == '.'){
+					continue;
+				}
+				else {
+					if(is_dir($path . "/" . $file)) {
+						if($file == "nls") $dirs[] = $path."/".$nls;
+						else {
+							$search = rsearch($path . "/" . $file);
+							$dirs=array_merge($dirs, $search);
+						}
+					}
+				}
+			}
+		}
+		$dirs = rsearch($path);
+		foreach($dirs as $dir) {
+			$dir = substr($dir, 0, count($path));
+			if(!is_dir($GLOBALS['path']."/../desktop/dojotoolkit/".$dir."/".$info['locale'])) {
+				rename($path."/".$dir, $GLOBALS['path']."/../".$dir);
+			}
+		}
 	}
 	function _install_update($info, $path) {
-		
+		function rcopy($path, $newpath) {
+			while(($file = readdir($dir)) !== false){
+				if($file{0} == '.'){
+					continue;
+				}
+				else {
+					if(is_dir($path . "/" . $file)) {
+						mkdir($newpath . "/" . $file);
+						rcopy($path . "/" . $file, $newpath . "/" . $file);
+					}
+					else {
+						copy($path . "/" . $file, $newpath . "/" . $file);
+					}
+				}
+			}
+		}
+		rcopy($path."/root/", $GLOBALS['path']."/../");
 	}
 }
