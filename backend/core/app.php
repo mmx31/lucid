@@ -27,15 +27,15 @@
 			import("lib.package");
 			$out = new textareaOutput();	
 			if(isset($_FILES['uploadedfile']['name'])) {
-			$target_path = '../../apps/tmp/appzip.zip';
-			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)
-			&& package::install($target_path)) {
-				$out->append("status", "success");
-			} else{
-			   $out->append("error", "Problem accessing uploaded file");
-			}
-		} else { $out->append("error", "No File Uploaded"); }
-	}
+				$target_path = '../../tmp/'.$_FILES['uploadedfile']['name'];
+				if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)
+				&& package::install($target_path)) {
+					$out->append("status", "success");
+				} else{
+				   $out->append("error", "Problem accessing uploaded file");
+				}
+			} else { $out->append("error", "No File Uploaded"); }
+		}
 	}
     if($_GET['section'] == "fetch")
 	{
@@ -90,6 +90,7 @@
 			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
 			$app = $App->get($_POST['id']);
 			$app->delete();
+			rmdir($GLOBALS['path']."/../apps/".$_POST['id']);
 			$out = new intOutput("ok");
 		}
 	}

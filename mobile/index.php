@@ -1,5 +1,10 @@
 <?php
 	$message = "";
+	if($_POST['path']) $_POST['path'] = str_replace("..", "", $_POST['path']);
+	if($_GET['path']) $_GET['path'] = str_replace("..", "", $_GET['path']);
+	if($_POST['dirname']) $_POST['dirname'] = str_replace("..", "", $_POST['dirname']);
+	if($_FILES['upload']['name']) $_FILES['upload']['name'] = str_replace("..", "", $_FILES['upload']['name']);
+	if($_GET['download']) $_GET['download'] = str_replace("..", "", $_GET['download']);
 	$GLOBALS['mobile'] = true;
 	$GLOBALS['path'] = dirname(dirname(__FILE__)) . "/backend/";
 	require("../backend/lib/includes.php");

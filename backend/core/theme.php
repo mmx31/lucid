@@ -41,3 +41,25 @@ if($_GET['section'] == "get")
 		$blah->set($p);
 	}
 }
+$cur = $User->get_current();
+if($_GET['section'] == "package" && $cur->has_permission("desktop.admin")) {
+	if($_GET['action'] == "install")
+	{
+		import("lib.package");
+		$out = new textareaOutput();	
+		if(isset($_FILES['uploadedfile']['name'])) {
+			$_FILES['uploadedfile']['name'] = str_replace("..", "", $_FILES['uploadedfile']['name']);
+			$target_path = '../../tmp/'.$_FILES['uploadedfile']['name'];
+			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)
+			&& package::install($target_path)) {
+				$out->append("status", "success");
+			} else{
+			   $out->append("error", "Problem accessing uploaded file");
+			}
+		} else { $out->append("error", "No File Uploaded"); }
+	}
+	if($_GET['action'] == "remove") {
+		$name = str_replace("..", "", $_POST['name']);
+		rmdir($GLOBALS['path']."/../desktop/themes/".$name);
+	}
+}

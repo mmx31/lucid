@@ -59,7 +59,7 @@ if($_GET['section'] == "io")
 	$protocolPart = explode("://", $sentpath, 2);
 	if($protocolPart[0] == $_POST['path']) { $protocol = "file"; }
 	else { $sentpath = $protocolPart[1]; $protocol = $protocolPart[0]; }
-	
+	$sentpath = str_replace("..", "", $sentpath);
 	//construct the class
 	$class = ucwords($protocol);
 	import("api.vfs." . $class);
@@ -103,6 +103,7 @@ if($_GET['section'] == "io")
 			}
 		}
 		$sentnewpath = "/" . $sentnewpath;
+		$sentnewpath = str_replace("..", "", $sentnewpath);
 	}
 	
 	//figure out what do do
@@ -190,6 +191,7 @@ if($_GET['section'] == "io")
 			));
 		}
 		if(isset($_FILES['uploadedfile']['name'])) {
+			$_FILES['uploadedfile']['name']=str_replace("..", "", $_FILES['uploadedfile']['name']);
 			$content = file_get_contents($_FILES['uploadedfile']['tmp_name']);
 			if($content !== false && $module->write($sentpath . "/" . $_FILES['uploadedfile']['name'], $content)) {
 				$out = new textareaOutput(array(
@@ -201,9 +203,6 @@ if($_GET['section'] == "io")
 					status => "failed",
 					details => "Contact administrator; could not write to disk"
 				));
-			}
-			if(is_file($GLOBALS['path']."../apps/tmp/".$_FILES['uploadedfile']['name'])) {
-				unlink($GLOBALS['path']."../apps/tmp/".$_FILES['uploadedfile']['name']);
 			}
 		}
 		else {

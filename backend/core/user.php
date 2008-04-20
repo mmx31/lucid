@@ -131,6 +131,7 @@
 		{
 			if($GLOBALS['conf']['public'] == true)
 			{
+				$_POST['username'] = str_replace("..", "", $_POST['username']);
 				$u = $User->filter("username", $_POST['username']);
 				if(isset($u[0])) { $out = new intOutput("generic_err"); }
 				else

@@ -223,6 +223,10 @@ dojo.declare("login._RegisterDialog", dijit.Dialog, {
 		this.errorNode.innerHTML = "";
 		if(contents.username && contents.email && contents.password && contents.confPassword)
 		{
+			if(contents.username.indexOf("..") != -1) {
+				this.errorNode.innerHTML = "Username cannot contain two consecutive '.'s";
+				return;
+			}
 			if(contents.password == contents.confPassword)
 			{
 				if(dojox.validate.isEmailAddress(contents.email))
@@ -239,7 +243,7 @@ dojo.declare("login._RegisterDialog", dijit.Dialog, {
 							}
 							if(data == "1")
 							{
-								this.errorNode.innerHTML = "Username allready exists";
+								this.errorNode.innerHTML = "Username already exists";
 								this.submitNode.disabled=false;
 							}
 							else if(data == "0")

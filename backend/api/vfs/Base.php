@@ -11,6 +11,7 @@ class BaseFs {
 		if($this->_type == "filesystem") {
 			$p = explode("://", $url, 2);
 			$this->path = isset($p[1]) ? $p[1] : $url;
+			$this->path = str_replace("..", "", $this->path);
 		}
 		else if($this->_type == "server") {
 			//parse the URL for server connection details
@@ -43,7 +44,7 @@ class BaseFs {
 			$t = explode("./", $file, 1);
 			if(isset($t[1])) $file = $this->path . "/" . $t[1];
 		}
-		return $file;
+		return str_replace("..", "", $file);
 	}
 	function getRealPath($path) {
 		$path = $this->_getPath($path);

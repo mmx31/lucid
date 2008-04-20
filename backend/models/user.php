@@ -92,6 +92,7 @@
 		function make_userdir()
 		{
 			$blah = $this->username;
+			$blah = str_replace("..", "", $blah);
 			if(!is_dir($GLOBALS['path']."/../files/".$blah)){
 				//Create user environment for first time
 				mkdir($GLOBALS['path']."/../files/".$blah);

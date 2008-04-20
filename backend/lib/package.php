@@ -89,5 +89,6 @@ class package {
 			}
 		}
 		rcopy($path."/root/", $GLOBALS['path']."/../");
+		@include($path . "/update.php");
 	}
 }

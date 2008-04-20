@@ -10,6 +10,12 @@ class FtpFs extends BaseFs {
 		if((!$this->_link) || (!$login)) internal_error("generic_err", $this->_link ? "Authentication Error" : "Connection Error");
 		@ftp_pasv($this->_link,true);
 	}
+	function _getRealPath($path) {
+		$p=$this->_read($path);
+		$tfile=$GLOBALS['path']."/../tmp/".basename($path);
+		file_put_contents($tfile, $p);
+		return $tfile;
+	}
 	function __destroy() {
 		ftp_close($this->_link);
 	}
