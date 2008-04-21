@@ -128,9 +128,11 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		//normalize the path
 		var parts = path.split("://");
 		var protocol = parts[0];
-		var loc = parts[1] || parts[0];
-		if(!parts[1])
+		var loc = parts.slice(1, parts.length).join("");
+		if(parts.length == 1) {
 			protocol = "file";
+			loc=path;
+		}
 		while(loc.indexOf("//") != -1) {
 			loc = loc.replace("//", "/");
 		}
