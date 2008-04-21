@@ -96,7 +96,7 @@ dojo.declare("desktop.ui.Applet", [dijit._Widget, dijit._Templated, dijit._Conta
 			if(!size) size = dojo.style(this.getParent().domNode, this.getParent().getOrientation() == "horizontal" ? "width" : "height");
 			var nextApplet = size;
 			var children = this.getParent().getChildren();
-			for(a in children) {
+			for(var a in children) {
 				var child = children[a];
 				if(child.pos > this.pos) {
 					nextApplet = child.pos*size;

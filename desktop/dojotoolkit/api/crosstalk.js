@@ -127,7 +127,7 @@ api.crosstalk = {
 				if(event.appid == -1) return; //system call
 				//check to see if there's allready an instance of this app running
 				var instances = desktop.app.getInstances();
-				for(i=0;i<instances.length;i++) {
+				for(var i=0;i<instances.length;i++) {
 					//if there is allready an instance running, it must not handle any crosstalk events. Skip the event.
 					if(instances[i].appid == event.appid) return;
 				}

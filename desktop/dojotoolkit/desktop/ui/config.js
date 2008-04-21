@@ -87,7 +87,7 @@ desktop.ui.config = {
 					callback: function(path) {
 						if(path) {
 							var p = api.filesystem.embed(path);
-							for(key in desktop.config.wallpaper.storedList) {
+							for(var key in desktop.config.wallpaper.storedList) {
 								var val = desktop.config.wallpaper.storedList[key];
 								if(val == p) return;
 							}
@@ -167,7 +167,7 @@ desktop.ui.config = {
 			
 			if(!item.wallpaper) return;
 			var wallimg = "./themes/"+item.sysname+"/"+item.wallpaper;
-			for(i in desktop.config.wallpaper.storedList){
+			for(var i in desktop.config.wallpaper.storedList){
 				var litem = desktop.config.wallpaper.storedList[i];
 				if(litem == wallimg) return;
 			}
@@ -225,7 +225,7 @@ desktop.ui.config = {
 		}
 		var div = document.createElement("div");
 		dojo.style(div, "padding", "20px");
-		for(key in rows) {
+		for(var key in rows) {
 			var row = document.createElement("div");
 			dojo.style(row, "margin", "10px");
 			rows[key].params.name = "visualeffects_picker";
@@ -302,7 +302,7 @@ desktop.ui.config = {
 		
 		var langs = [];
 		var intLangs = dojo.i18n.getLocalization("desktop", "languages");
-		for(key in intLangs) {
+		for(var key in intLangs) {
 			langs.push({value: key, label: intLangs[key]});
 		}
 		
@@ -337,7 +337,7 @@ desktop.ui.config = {
 		}
 		var div = document.createElement("div");
 		var elems = {};
-		for(key in rows) {
+		for(var key in rows) {
 			var row = document.createElement("div");
 			dojo.style(row, "marginBottom", "5px");
 			row.innerHTML = l[key]+":&nbsp;";
@@ -369,7 +369,7 @@ desktop.ui.config = {
 		}});
 		dojo.connect(win, "onClose", this, function() {
 			var args = {};
-			for(key in elems) {
+			for(var key in elems) {
 				var elem = elems[key];
 				if(typeof elem.isValid != "undefined") {
 					if(!elem.isValid()) continue;

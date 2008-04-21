@@ -169,6 +169,9 @@
 		if($_GET['section'] == "users")
 		{
 			if($_GET['action'] == "create") {
+				$_POST['username'] = str_replace("..", "", $_POST['username']);
+				$_POST['username'] = str_replace("/", "", $_POST['username']);
+				$_POST['username'] = str_replace("\\", "", $_POST['username']);
 				$exUser = $User->filter("username", $_POST['username']);
 				if($exUser != false) {
 					$out = new jsonOutput(array(

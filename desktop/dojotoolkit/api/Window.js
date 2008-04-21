@@ -421,7 +421,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		var alwaysOnTopNum = 0;		// Number of wins with 'alwaysOnTop' property set to true
 		var topWins = new Array();	// Array of reffernces to win widgets with 'alwaysOnTop' property set to true
 		var winWidget;			// Reffernce to window widget by dom node
-		for(i=0;i<ns.length;i++)
+		for(var i=0;i<ns.length;i++)
 		{
 			if(dojo.style(ns[i], "display") == "none") continue;
 			if(dojo.style(ns[i], "zIndex") > maxZindex)

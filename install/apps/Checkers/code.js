@@ -192,7 +192,7 @@
 				if(typeof board[ex][ey] != "undefined" && board[ex][ey].circle._checkers_color != shape._checkers_color) {
 					if(typeof board[(x/50)-1] != "undefined" && typeof board[(x/50)-1][(y/50)-1] == "undefined") {
 						this.surface.remove(board[ex][ey].circle);
-						for(i in this.pieces) {
+						for(var i in this.pieces) {
 							var piece = this.pieces[i];
 							if(piece)
 							{

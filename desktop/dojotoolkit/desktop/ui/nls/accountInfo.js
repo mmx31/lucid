@@ -31,5 +31,6 @@
 	"enterPassword": "Enter a password",
 	"enterUsername": "Enter a username",
 	"usernameAllreadyTaken": "Username already taken",
-	"userCreated": "User created"
+	"userCreated": "User created",
+	"cannotContain": "Username cannot contain \"%s\""
 })

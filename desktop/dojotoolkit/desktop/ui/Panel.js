@@ -144,7 +144,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				}
 			}
 		};
-		for(key in rows) {
+		for(var key in rows) {
 			var row = document.createElement("div");
 			dojo.style(row, "marginBottom", "5px");
 			row.innerHTML = (l[key] || key)+":&nbsp;";
@@ -190,11 +190,11 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		], function(i) {
 			dojo.style(div, i.k, i.v);
 		});
-		for(key in desktop.ui.appletList) {
+		for(var key in desktop.ui.appletList) {
 			var header = document.createElement("h4");
 			header.innerText = a[key] || key;
 			div.appendChild(header);
-			for(applet in desktop.ui.appletList[key]) {
+			for(var applet in desktop.ui.appletList[key]) {
 				var name = desktop.ui.appletList[key][applet];
 				var iconClass = desktop.ui.applets[name].prototype.appletIcon;
 				var dispName = desktop.ui.applets[name].prototype.dispName;
@@ -345,7 +345,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			R: "Right",
 			B: "Bottom"
 		}
-		for(sk in sides) {
+		for(var sk in sides) {
 			dojo.removeClass(this.domNode, "desktopPanel"+sides[sk]);
 		}
 		dojo.addClass(this.domNode, "desktopPanel"+sides[this.placement.charAt(0)]);
@@ -364,7 +364,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		else s[this.getOrientation() == "horizontal" ? "top" : "left"] -= count;
 		if(desktop.config.fx) {
 			var props = {};
-			for(key in s) {
+			for(var key in s) {
 				props[key] = {end: s[key], unit: "px"};
 			}
 			dojo.animateProperty({
@@ -374,7 +374,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			}).play();
 		}
 		else {
-			for(key in s) {
+			for(var key in s) {
 				dojo.style(this.domNode, key, s[key]+"px");
 			}
 		}

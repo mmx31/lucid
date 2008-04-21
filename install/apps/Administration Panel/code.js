@@ -103,7 +103,7 @@
 			this.toolbar.addChild(button);
 			this.main.setContent(cmn.loading);
 			desktop.admin.users.list(dojo.hitch(this, function(data) {
-				for(i=0;i<data.length;i++) {
+				for(var i=0;i<data.length;i++) {
 					data[i].permissions = dojo.toJson(data[i].permissions);
 					data[i].groups = dojo.toJson(data[i].groups);
 				};
@@ -111,7 +111,7 @@
 					cells: [[]]
 				}];
 				//make headers
-				for(field in data[0]) {
+				for(var field in data[0]) {
 					if(field == "permissions" || field == "groups") continue;
 					var args = {
 						name: sys[field] || usr[field],
@@ -270,7 +270,7 @@
 			this.toolbar.addChild(button);
 			
 			desktop.app.list(dojo.hitch(this, function(data) {
-				for(i=0;i<data.length;i++) {
+				for(var i=0;i<data.length;i++) {
 					data[i].filetypes = data[i].filetypes.join(", ");
 					data[i].name = apps[data[i].name] || data[i].name;
 					data[i].category = mnus[data[i].category.toLowerCase()];
@@ -279,7 +279,7 @@
 					cells: [[]]
 				}];
 				//make headers
-				for(field in data[0]) {
+				for(var field in data[0]) {
 					var args = {
 						name: sys[field],
 						field: field
@@ -342,7 +342,7 @@
 			this.toolbar.addChild(button);
 			this.main.setContent(cmn.loading);
 			desktop.admin.groups.list(dojo.hitch(this, function(data) {
-				for(i=0;i<data.length;i++) {
+				for(var i=0;i<data.length;i++) {
 					data[i].permissions = dojo.toJson(data[i].permissions);
 				};
 				//make headers (need to do it manually unfortunatly)
@@ -439,12 +439,12 @@
 				var layout = [{
 					cells: [[]]
 				}];
-				for(key in data) {
+				for(var key in data) {
 					var item = data[key];
 					item.description = permNls[item.name] || item.description;
 				}
 				//make headers
-				for(field in data[0]) {
+				for(var field in data[0]) {
 					var args = {
 						name: sys[field],
 						field: field
@@ -488,7 +488,7 @@
 			this.toolbar.addChild(button);
 			
 			desktop.theme.list(dojo.hitch(this, function(data) {
-				for(i=0;i<data.length;i++) {
+				for(var i=0;i<data.length;i++) {
 					data[i].preview = "<img style='width: 150px; height: 130px;' src='./themes/"+data[i].sysname+"/"+data[i].preview+"' />";
 				};
 				var layout = [{
@@ -552,7 +552,7 @@
 	},
 	makeUserStore: function(callback) {
 		desktop.admin.users.list(dojo.hitch(this, function(data) {
-			for(i=0;i<data.length;i++) {
+			for(var i=0;i<data.length;i++) {
 				data[i].permissions = dojo.toJson(data[i].permissions);
 				data[i].groups = dojo.toJson(data[i].groups);
 			};
@@ -618,6 +618,18 @@
 			onClick: dojo.hitch(this, function() {
 				dojo.require("dojox.validate.web");
 				if(username.getValue() == "") return error.textContent = usr.enterUsername;
+				if(username.indexOf("..") != -1) {
+					error.textContent = usr.cannotContain.replace("%s", "..");
+					return;
+				}
+				if(username.indexOf("/") != -1) {
+					error.textContent = usr.cannotContain.replace("%s", "/");
+					return;
+				}
+				if(username.indexOf("\\") != -1) {
+					error.textContent = usr.cannotContain.replace("%s", "\\");
+					return;
+				}
 				if(!dojox.validate.isEmailAddress(email.getValue())) return error.textContent = usr.enterValidEmail;
 				if(password.getValue() == "") return error.textContent = usr.enterPassword;
 				if(password.getValue() != confpassword.getValue()) return error.textContent = usr.passwordsDontMatch;

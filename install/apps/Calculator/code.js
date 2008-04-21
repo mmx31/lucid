@@ -107,7 +107,7 @@
 		}
 		//Check for stray decimal points
 		var parts = v.split(".");
-		for(i=0; i<parts.length;i++) {
+		for(var i=0; i<parts.length;i++) {
 			if(parts[i] == "" && i!=0) return false;
 			if(parseInt(parts[i].charAt(0))+"" == "NaN" && i != 0) return false;
 		}

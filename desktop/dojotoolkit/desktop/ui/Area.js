@@ -54,7 +54,7 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 			else thicknesses[w.placement] += w.thickness;
 		}, this);
 		var max = {B: 0, T: 0, L: 0, R: 0};
-		for(k in thicknesses) {
+		for(var k in thicknesses) {
 			if(max[k.charAt(0)] < thicknesses[k]) {
 				max[k.charAt(0)] = thicknesses[k];
 			}

@@ -102,7 +102,7 @@
 			var folder = this.treeStore.getValue(this.currentItem, "sysname");
 			var account = this.treeStore.getValue(this.currentItem, "parentAccount");
 			var mailObj = false;
-			for(key in this.mail) {
+			for(var key in this.mail) {
 				if(this.prefs.getValue(this.mail[key].prefItem, "id") == account) {
 					mailObj = this.mail[key].down;
 					break;
@@ -144,9 +144,9 @@
 	},
 	_refreshHost: function(rootitem, mail) {
 		mail.down.countMessages("UNSEEN", dojo.hitch(this, function(f) {
-			for(key in f) {
+			for(var key in f) {
 				if(!this.folders[key] || this.folders[key] < f[key]) {
-					for(k in f) {
+					for(var k in f) {
 						this.treeStore.fetch({query: {name: k+"_"+this.treeStore.getValue(rootitem, "name")}, queryOptions: {deep: true}, scope: this, onComplete: function(item) {
 							var label = k+(f[k] > 0 ? " ("+f[k]+")" : "");
 							if(typeof item[0] == "undefined") {

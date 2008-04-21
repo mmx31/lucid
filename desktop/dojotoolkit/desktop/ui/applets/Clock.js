@@ -16,7 +16,7 @@ dojo.declare("desktop.ui.applets.Clock", desktop.ui.Applet, {
 			var p = dojo.date.locale.format(new Date());
 			/*if(this.getParent().getOrientation() == "vertical") {
 				var v = "";
-				for(i=0; i<p.length; i++) {
+				for(var i=0; i<p.length; i++) {
 					v += "<div style='text-align: center;'>" + p.charAt(i) + "</div>";
 				}
 				p = v;

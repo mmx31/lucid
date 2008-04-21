@@ -32,7 +32,7 @@ dojo.declare("api.Sound", dijit._Widget, {
 		this.domNode.style.top="-999px";
 		document.body.appendChild(this.domNode);
 		var backends = ["html", "flash", "embed"];
-		for(k in backends) {
+		for(var k in backends) {
 			var i = backends[k];
 			var backend = new api.Sound[i]({
 				src: this.src,

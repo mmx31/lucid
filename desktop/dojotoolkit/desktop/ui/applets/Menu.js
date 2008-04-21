@@ -79,23 +79,23 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
 		var ap = dojo.i18n.getLocalization("desktop", "apps");
 
-		data = desktop.app.appList;
+		var data = desktop.app.appList;
 		if (this._menu) {
 			this._menu.destroy();
 		}
 		var menu = this._menu = new dijit.Menu({});
 		var cats = {};
-		for(item in data)
+		for(var item in data)
 		{
 			cats[data[item].category] = true;
 		}
-		list = [];
-		for(cat in cats)
+		var list = [];
+		for(var cat in cats)
 		{
 			list.push(cat);
 		}
 		list.sort();
-		for(cat in list)
+		for(var cat in list)
 		{
 			var cat = list[cat];
 			//cat.meow();
@@ -104,7 +104,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 				label: l[cat.toLowerCase()] || cat
 			});
 			var catMenu = new dijit.Menu({parentMenu: category});
-			for(app in data)
+			for(var app in data)
 			{
 				if(data[app].category == cat)
 				{

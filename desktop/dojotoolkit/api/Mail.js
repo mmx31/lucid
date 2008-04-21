@@ -128,7 +128,7 @@ dojo.declare("api.Mail.gridModel", dojox.grid.data.Dynamic, {
 				end: inRowIndex + inCount
 			}),
 			load: dojo.hitch(this, function(data) {
-				for(item in data) { this.setRow(data[item], parseInt(item)+1); }
+				for(var item in data) { this.setRow(data[item], parseInt(item)+1); }
 			}),
 			handleAs: "json"
 		});

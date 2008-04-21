@@ -32,7 +32,7 @@ desktop.app = {
 		//		Launches the apps specified in desktop.config to launch on startup
 		dojo.unsubscribe(this.onConfigApply);
 		g = desktop.config.startupapps;
-		for(f in g)
+		for(var f in g)
 		{
 			if((typeof f) == "number")
 			desktop.app.launch(g[f]);

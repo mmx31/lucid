@@ -31,5 +31,6 @@
 	"enterPassword": "Escriba una contraseña",
 	"enterUsername": "Introduzca un nombre de usuario",
 	"usernameAllreadyTaken": "El nombre de usuario que ya se han adoptado",
-	"userCreated": "El usuario creado"
+	"userCreated": "El usuario creado",
+	"cannotContain": "El nombre de usuario no puede usar \"%s\""
 })

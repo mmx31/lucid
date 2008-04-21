@@ -230,6 +230,14 @@ dojo.declare("login._RegisterDialog", dijit.Dialog, {
 				this.errorNode.innerHTML = "Username cannot contain two consecutive '.'s";
 				return;
 			}
+			if(contents.username.indexOf("/") != -1) {
+				this.errorNode.innerHTML = "Username cannot contain any slashes";
+				return;
+			}
+			if(contents.username.indexOf("\\") != -1) {
+				this.errorNode.innerHTML = "Username cannot contain any slashes";
+				return;
+			}
 			if(contents.password == contents.confPassword)
 			{
 				if(dojox.validate.isEmailAddress(contents.email))
