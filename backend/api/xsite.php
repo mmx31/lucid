@@ -22,38 +22,34 @@ $user = $User->get_current();
 
 if($user->has_permission("api.xsite"))
 {
-	$url = $_POST['path'];
-	// Is Curl on this server?
-	if (!function_exists('curl_init')) { internal_error("feature_not_available"); }
-	// Open the Curl session
-	$session = curl_init();
-	curl_setopt($session, CURLOPT_URL,$url);
-	curl_setopt($session, CURLOPT_FAILONERROR, 1);
-	curl_setopt($session, CURLOPT_FOLLOWLOCATION, 1);// allow redirects 
-	
-	$postvars = '';
-	while ($element = current($_POST)) {
-		$postvars .= key($_POST).'='.$element.'&';
-		next($_POST);
+	$url = $_REQUEST['path'];
+	import("lib.net.Request");
+	$p = new HTTP_Request($url, array(
+		allowRedirects => true
+	));
+	$p->setMethod(HTTP_REQUEST_METHOD_GET);
+	$v=false;
+	foreach($_POST as $key=>$value) {
+		if($key == "path") continue;
+		if(!$v) {
+			$v=true;
+			$p->setMethod(HTTP_REQUEST_METHOD_POST);
+		}
+		$p->addPostData($key, $value);
 	}
-	curl_setopt ($session, CURLOPT_POST, true);
-	curl_setopt ($session, CURLOPT_POSTFIELDS, $postvars);
-	
-	curl_setopt($session, CURLOPT_HEADER, false);
-	curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
-	
-	// Make the call
-	$xml = curl_exec($session);
-	
-	//Print contentType header
-	$type = curl_getinfo($session, CURLINFO_CONTENT_TYPE);
+	foreach($_GET as $key=>$value) {
+		if($key == "path") continue;
+		$p->addQueryString($key, $value);
+	}
+	$p->sendRequest();
+
+	$type=$p->getResponseHeader("Content-Type");
 	header("Content-Type: $type");
-	
-	echo $xml;
-	/*print_r(curl_getinfo($session)); 
-echo "\n\ncURL error number:" .curl_errno($session); 
-echo "\n\ncURL error:" . curl_error($session); */
-	curl_close($session);
+
+	$body = $p->getResponseBody();
+	echo $body;
+
+	$p->disconnect();
 }
 else {
 	internal_error("permission_denied");
