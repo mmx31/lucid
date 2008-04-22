@@ -25,6 +25,10 @@ class package {
 		return true;
 	}
 	
+	function remove($path) {
+		//TODO
+	}
+	
 	function _install_application($info, $path) {
 		global $App;
 		$app = new $App();

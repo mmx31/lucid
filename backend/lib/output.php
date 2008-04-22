@@ -59,7 +59,8 @@ class intOutput {
 		"db_query_err" => 6,
 		"permission_denied" => 7,
 		"mail_connect_err" => 8,
-		"feature_not_available" => 9
+		"feature_not_available" => 9,
+		"object_not_found" => 10
 	);
 	function __construct($val=false) {
 		if($val !== false) $this->set($val);
