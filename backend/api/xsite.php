@@ -28,6 +28,8 @@ if($user->has_permission("api.xsite"))
 		allowRedirects => true
 	));
 	$p->setMethod(HTTP_REQUEST_METHOD_GET);
+	//	required for some ajax apis
+	$p->addHeader("Referer", "http://".$_SERVER['SERVER_NAME']."/");
 	$v=false;
 	foreach($_POST as $key=>$value) {
 		if($key == "path") continue;
