@@ -19,48 +19,62 @@ api.filesystem = {
 		modified: "F d Y H:i:s."
 	},
 	=====*/
-	listDirectory: function(/*String*/path, /*Function*/callback)
+	listDirectory: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError)
     {
 		//	summary:
 		//		Lists the files/folders of a given path
 		//	path:
 		//		the path to list
-		//	callback:
-		//		a callback function. The first argument passed is an array of api.filesystem._fileInfo objects
-        return api.xhr({
+		//	onComplete:
+		//		a callback function to fire on completion. The first argument passed is an array of api.filesystem._fileInfo objects
+		//	onError:
+		//		a callback function to fire on error
+        var df =  api.xhr({
 	        backend: "api.fs.io.getFolder",
-			content: {
-				path: path
-			},
-			handleAs: "json",
-	        load: function(data, ioArgs) {
-		        if(callback) callback(data);
-			},
-	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); },
-			handleAs: "json"
-        });
+		content: {
+			path: path
+		},
+		handleAs: "json"
+	});
+	
+	if(onComplete) df.addCallback(onComplete);
+	if(onError) df.addErrback(onError);
+	
+	return df;
     },
-	readFileContents: function(/*String*/path, /*Function*/callback)
+	readFileContents: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError)
     {
 		//	summary:
 		//		Reads a file's contents
 		//	path:
 		//		the path to the file to be read
-		//	callback:
-		//		a callback function. The first argument is the contents of the file
-        return api.xhr({
+		//	onComplete:
+		//		a callback function to fire on completion. The first argument is the contents of the file
+		//	onError:
+		//		a callback function to fire on error
+	var df = new dojo.Deferred();
+        var xhr = api.xhr({
 	        backend: "api.fs.io.getFile",
-			content: {
-				path: path
-			},
-			handleAs: "json",
-	        load: function(data, ioArgs) {
-				if(callback) callback(data.contents);
-			},
-	        error: function(error, ioArgs) { api.log("Error in fs call: "+error.message); }
-        });
+		content: {
+			path: path
+		},
+		handleAs: "json",
+		load: function(data, ioArgs) {
+			df.callback(data.contents);	
+		},
+		error: function(e) {
+			df.errback(e);
+		}
+	});
+	
+	df.canceler = dojo.hitch(xhr, "cancel");
+	
+	if(onComplete) df.addCallback(onComplete);
+	if(onError) df.addErrback(onError);
+	
+	return df;
     },
-   writeFileContents: function(/*String*/path, /*String*/content, /*Function?*/callback)
+   writeFileContents: function(/*String*/path, /*String*/content, /*Function?*/onComplete, /*Function?*/onError)
    {
    		//	summary:
 		//		Writes data to a file
@@ -68,24 +82,33 @@ api.filesystem = {
 		//		the path to the file
 		//	content:
 		//		the content to write to the file
-		//	callback:
+		//	onComplete:
 		//		a callback once the saving is complete. First argument is true if successful, false if it failed.
-		return api.xhr({
-	        backend: "api.fs.io.writeFile",
+		//	onError:
+		//		a callback function to fire on error
+	var df = api.xhr({
+			backend: "api.fs.io.writeFile",
 			content: {
 				path: path,
 				content: content
 			},
 			load: function(data, ioArgs)
 			{
-				if(callback) callback(data=="0");
+				df.callback(data=="0");
 				var p = path.lastIndexOf("/");
 				dojo.publish("filearea:"+path.substring(0, p+1), []);
 			},
-	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
+			error: function(e) {
+				df.errback(e);
+			}
         });
+	
+	if(onComplete) df.addCallback(onComplete);
+	if(onError) df.addErrback(onError);
+	
+	return df;
     },
-    move: function(/*String*/from, /*String*/to, /*Function?*/callback)
+    move: function(/*String*/from, /*String*/to, /*Function?*/onComplete, /*Function?*/onError)
     {
 		//	summary:
 		//		moves or renames a file
@@ -93,66 +116,96 @@ api.filesystem = {
 		//		the source file
 		//	to:
 		//		the new filename or path. If only a filename is specified, the file will stay in it's source's directory
-		if(to.indexOf("/") == -1) {
-			var i = from.lastIndexOf("/");
-			var newpath = from.substring(0, i);
-			newpath += "/" + to;
-		} else {
-			var newpath = to;
-		}
-        return api.xhr({
+		//	onComplete:
+		//		callback function to be fired upon completion
+		//	onError:
+		//		callback function to be fired upon error
+	if(to.indexOf("/") == -1) {
+		var i = from.lastIndexOf("/");
+		var newpath = from.substring(0, i);
+		newpath += "/" + to;
+	} else {
+		var newpath = to;
+	}
+	
+        var df = api.xhr({
 	        backend: "api.fs.io.renameFile",
-			content: {
-				path: from,
-				newpath: newpath
-			},
-			load: function(data, ioArgs)
-			{
-				if(callback) callback(data);
-			},
-	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
+		content: {
+			path: from,
+			newpath: newpath
+		},
+		load: function(data, ioArgs)
+		{
+			df.callback(data);
+		},
+	        error: function(e) {
+			df.addErrback(e);
+		}
         });
+	
+	if(onComplete) df.addCallback(onComplete);
+	if(onError) df.addErrback(onError);
+	
+	return df;
     },
-    createDirectory: function(/*String*/path, /*Function?*/callback)
+    createDirectory: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError)
     {
 		//	summary:
 		//		Creates a directory
 		//	path:
 		//		the path of the new directory to create
-		//	callback:
+		//	onComplete:
 		//		A callback function once the operation is completed. First param is true if successful, false if it failed.
-        return api.xhr({
+		//	onError:
+		//		A callback to be fired on error
+        var df = api.xhr({
 	        backend: "api.fs.io.createDirectory",
-			content: {
-				path: path
-			},
-			load: function(data, ioArgs)
-			{
-				if(callback) callback(data=="0");
-			},
-	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
+		content: {
+			path: path
+		},
+		load: function(data, ioArgs)
+		{
+			df.callback(data=="0");
+		},
+	        error: function(e) {
+			df.errback(e);
+		}
         });
+	
+	if(onComplete) df.addCallback(onComplete);
+	if(onError) df.addErrback(onError);
+	
+	return df;
     },
-	remove: function(/*String*/path, /*Function?*/callback)
+    remove: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError)
     {
 		//	summary:
 		//		removes a file or directory
 		//	path:
 		//		the path to the file or directory
-		//	callback:
-		//		a callback function. First param is true if successful, false if failed
-        return api.xhr({
+		//	onComplete:
+		//		a callback function to be fired on completion. First param is true if successful, false if failed
+		//	onError:
+		//		a callback function to be fired on error
+        var df = api.xhr({
 	        backend: "api.fs.io.removeFile",
-			content: {
-				path: path
-			},
-			load: function(data, ioArgs) {
-				if(callback) callback(data=="0");
-			},
-	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
+		content: {
+			path: path
+		},
+		load: function(data, ioArgs) {
+			df.callback(data=="0");
+		},
+	        error: function(e) {
+			df.errback(e);
+		}
         });
+	
+	if(onComplete) df.addCallback(onComplete);
+	if(onError) df.addErrback(onError);
+	
+	return df;
     },
-	copy: function(/*String*/from, /*String*/to, /*Function?*/callback)
+    copy: function(/*String*/from, /*String*/to, /*Function?*/onComplete, /*Function?*/onError)
     {
 		//	summary:
 		//		Copies a file
@@ -160,19 +213,28 @@ api.filesystem = {
 		//		the path to the original file
 		//	to:
 		//		the path to the new copy of the file
-		//	callback:
+		//	onComplete:
 		//		a callback function once the task is done. First param is true if successful, false if it failed.
-        return api.xhr({
+		//	onError:
+		//		a callback function to be fired on error
+        var df = api.xhr({
 	        backend: "api.fs.io.copyFile",
-			content: {
-				path: from,
-				newpath: to
-			},
-			load: function(data, ioArgs) {
-				if(callback) callback(data=="0");
-			},
-	        error: function(error, ioArgs) { api.log("Error in filesystem call: "+error.message); }
+		content: {
+			path: from,
+			newpath: to
+		},
+		load: function(data, ioArgs) {
+			df.callback(data=="0");
+		},
+	        error: function(e) {
+			df.errback(e);
+		}
         });
+	
+	if(onComplete) df.addCallback(onComplete);
+	if(onError) df.addErrback(onError);
+	
+	return df;
     },
 	download: function(/*String*/path, /*String?*/as) {
 		//	summary:
@@ -197,22 +259,32 @@ api.filesystem = {
 		//		a string containing a url
 		return api.xhr("api.fs.io.display") + "&path=" + path;
 	},
-	info: function(/*String*/path, /*Function*/callback) {
+	info: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError) {
 		//	summary:
 		//		fetches information about a file
 		//	path:
 		//		the path to the file
-		//	callback:
-		//		a callback function. First argument is an api.filesystem._fileInfo object
-		return api.xhr({
+		//	onComplete:
+		//		a callback function to be fired on completion. First argument is an api.filesystem._fileInfo object
+		//	onError:
+		//		a callback function to be fire on an error.
+		var df = api.xhr({
 			backend: "api.fs.io.info",
 			content: {
 				path: path
 			},
 			load: function(data, args) {
-				callback(data);
+				df.callback(data);
 			},
+			error: function(e) {
+				df.errback(e);
+			},			
 			handleAs: "json"
 		})
+		
+		if(onComplete) df.addCallback(onComplete);
+		if(onError) df.addErrback(onError);
+		
+		return df;
 	}
 }
