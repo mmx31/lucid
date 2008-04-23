@@ -24,7 +24,7 @@ class Package extends Base {
 	var $version = array('type' => "text");
 	var $dependencies = array('type' => 'array');
 	var $category = array('type' => "text");
-	var $status = array('type' => 'string');
+	var $status = array('type' => 'text');
 }
 
 global $Package;

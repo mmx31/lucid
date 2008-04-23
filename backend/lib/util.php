@@ -17,6 +17,10 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 error_reporting(0);
+//make sure no responces are being cached
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+header("Cache-Control: no-cache");
+header("Pragma: no-cache");
 //get rid of magicquotes
 if (get_magic_quotes_gpc())
 {

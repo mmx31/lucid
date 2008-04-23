@@ -23,6 +23,7 @@
 		dojo.requireLocalization("desktop", "system");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
+		var sys = dojo.i18n.getLocalization("desktop", "system");
 		this.win = new api.Window({
 			title: app["Katana IDE"],
 			onClose: dojo.hitch(this, "kill")
@@ -44,6 +45,9 @@
 			this.toolbar.addChild(new dijit.form.Button({label: cm.save, iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, this.save)}));
 			this.toolbar.addChild(new dijit.form.Button({label: cm.metadata, iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, this.editMetadata)}));
 			this.toolbar.addChild(new dijit.form.Button({label: cm.run, iconClass: "icon-16-actions-media-playback-start", onClick: dojo.hitch(this, this.run)}));
+			this.toolbar.addChild(new dijit.form.Button({label: cm.kill, iconClass: "icon-16-actions-media-playback-stop", onClick: dojo.hitch(this, function() {
+				desktop.app.kill(-1);
+			})}));
 	
 		this.win.addChild(this.toolbar);
 		this.win.show();
@@ -62,6 +66,7 @@
 			if(!this.loadwin.closed) this.loadwin.close();
 		}
 		if(!this.win.closed)this.win.close();
+		desktop.app.kill(-1);
 	},
 	
 	newApp: function(showmeta)
