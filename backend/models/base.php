@@ -217,6 +217,17 @@
 			$this->_connect();
 			return $this->_link->escape($str);
 		}
+		function _getFilter($name) {
+			foreach(array(
+				"__not" => "!="
+			) as $search=>$act) {
+				$p=explode($search, $name);
+				if($p[0] != $name) {
+					return array($p[0], $act);
+				}
+			}
+			return array($name, "=");
+		}
 		function filter($field, $value=false)
 		{
 			$this->_connect();
@@ -227,17 +238,35 @@
 				$list = array();
 				foreach($field as $key => $value)
 				{
-					array_push($list, $this->_escape($key) . "=" . $this->_link->quote($value) . "");
+					$act = $this->_getFilter($key);
+					if(is_array($value)) {
+						foreach($value as $val) {
+							array_push($list, $this->_escape($act[0]) . $act[1] . $this->_link->quote($val) . "");
+						}
+					}
+					else
+						array_push($list, $this->_escape($act[0]) . $act[1] . $this->_link->quote($value) . "");
 				}
 				$query .= implode(" AND ", $list);
 			}
 			else {
-				$field = $this->_link->quoteIdentifier($field);
-				$value = $this->_link->quote($value);
-				$query = "SELECT * FROM ${tablename} WHERE ${field}=${value}";
+				$act = $this->_getFilter($field);
+				$field = $this->_link->quoteIdentifier($act[0]);
+				if(is_array($value)) {
+					$arr = array();
+					foreach($value as $val) {
+						array_push($arr, $field . $act[1] . $val);
+					}
+					$query = "SELECT * FROM ${tablename} WHERE";
+					$query .= implode(" AND ". $arr);
+				}
+				else {
+					$value = $this->_link->quote($value);
+					$query = "SELECT * FROM ${tablename} WHERE " . $field . $act[1] . $value;
+				}
 			}
 			$this->_query($query); 
-			$list = Array();
+			$list = array();
 			foreach($this->_result as $line)
 			{
 				array_push($list, $this->_makeModel($line));

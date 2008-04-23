@@ -60,3 +60,62 @@
 			//TODO
 		}
 	}
+	if($_GET['section'] == "repository") {
+		if($_GET['action'] == "reload") {
+			$repos = $Repository->all();
+			$existingPackages = array();
+			foreach($repos as $repo) {
+				$p=new HTTP_Request($repo->url."/packages.json", array(
+					allowRedirects => true
+				));
+				$p->setMethod(HTTP_REQUEST_METHOD_GET);
+				$p->sendRequest();
+				
+				$content=$p->getResponseBody();
+				$p->disconnect();
+				import("lib.Json.Json");
+				$packages = Zend_Json::decode($content);
+				foreach($packages as $pinfo) {
+					$res = $Package->filter(array(
+						'name' => $pinfo['name'],
+						'source' => $repo['url'],
+						'version' => $pinfo['version'],
+						'category' => $pinfo['category']
+					));
+					if($res !== false)
+						$pak = $res[0];
+					else
+						$pak = new $Package();
+					foreach(array(
+						'name' => $pinfo['name'],
+						'description' => $pinfo['description'],
+						'type' => $pinfo['type'],
+						'source' => $repo['url'],
+						'version' => $pinfo['version'],
+						'dependencies' => $pinfo['dependencies'],
+						'category' => $pinfo['category']
+					) as $key=>$value) {
+						$pak->$key = $value;
+					}
+					$pak->save();
+					array_push($existingPackages, $pak->id);
+				}
+			}
+			$old=$Package->filter("id__not", $existingPackages);
+			foreach($old as $pack) {
+				if($pack->source != "" && $pack->status == "uninstalled") {
+					//if it's not installed and it's not a custom package, remove it
+					$pack->delete();
+				}
+			}
+			$out = new intOutput("ok");
+		}
+		if($_GET['action'] == "add") {
+			
+		}
+		if($_GET['action'] == "remove") {
+			$repo = $Repository->get($_POST['id']);
+			$repo->delete();
+			$out = new intOutput("ok");
+		}
+	}
