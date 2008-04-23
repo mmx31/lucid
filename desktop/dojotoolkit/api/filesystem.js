@@ -86,27 +86,28 @@ api.filesystem = {
 		//		a callback once the saving is complete.
 		//	onError:
 		//		a callback function to fire on error
-	var df = api.xhr({
-			backend: "api.fs.io.writeFile",
-			content: {
-				path: path,
-				content: content
-			},
-			load: function(data, ioArgs)
-			{
-				df[data=="0" ? "callback":"errback"]();
-				var p = path.lastIndexOf("/");
-				dojo.publish("filearea:"+path.substring(0, p+1), []);
-			},
-			error: function(e) {
-				df.errback(e);
-			}
-        });
-	
-	if(onComplete) df.addCallback(onComplete);
-	if(onError) df.addErrback(onError);
-	
-	return df;
+		var df = new dojo.Deferred();
+		var xhr=api.xhr({
+				backend: "api.fs.io.writeFile",
+				content: {
+					path: path,
+					content: content
+				},
+				load: function(data, ioArgs)
+				{
+					df[data=="0" ? "callback":"errback"]();
+					var p = path.lastIndexOf("/");
+					dojo.publish("filearea:"+path.substring(0, p+1), []);
+				},
+				error: function(e) {
+					df.errback(e);
+				}
+	        });
+		df.canceler = dojo.hitch(xhr, "cancel");
+		if(onComplete) df.addCallback(onComplete);
+		if(onError) df.addErrback(onError);
+		
+		return df;
     },
     move: function(/*String*/from, /*String*/to, /*Function?*/onComplete, /*Function?*/onError)
     {
@@ -120,33 +121,33 @@ api.filesystem = {
 		//		callback function to be fired upon completion
 		//	onError:
 		//		callback function to be fired upon error
-	if(to.indexOf("/") == -1) {
-		var i = from.lastIndexOf("/");
-		var newpath = from.substring(0, i);
-		newpath += "/" + to;
-	} else {
-		var newpath = to;
-	}
-	
-        var df = api.xhr({
-	        backend: "api.fs.io.renameFile",
-		content: {
-			path: from,
-			newpath: newpath
-		},
-		load: function(data, ioArgs)
-		{
-			df.callback();
-		},
-        error: function(e) {
-			df.errback(e);
+		if(to.indexOf("/") == -1) {
+			var i = from.lastIndexOf("/");
+			var newpath = from.substring(0, i);
+			newpath += "/" + to;
+		} else {
+			var newpath = to;
 		}
+		var df = new dojo.Deferred();
+        var xhr = api.xhr({
+	        backend: "api.fs.io.renameFile",
+			content: {
+				path: from,
+				newpath: newpath
+			},
+			load: function(data, ioArgs)
+			{
+				df[data=="0" ? "callback":"errback"]();
+			},
+	        error: function(e) {
+				df.errback(e);
+			}
         });
-	
-	if(onComplete) df.addCallback(onComplete);
-	if(onError) df.addErrback(onError);
-	
-	return df;
+		df.canceler = dojo.hitch(xhr, "cancel");
+		if(onComplete) df.addCallback(onComplete);
+		if(onError) df.addErrback(onError);
+		
+		return df;
     },
     createDirectory: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError)
     {
@@ -158,24 +159,25 @@ api.filesystem = {
 		//		A callback function once the operation is completed. First param is true if successful, false if it failed.
 		//	onError:
 		//		A callback to be fired on error
-        var df = api.xhr({
+		var df = new dojo.Deferred();
+        var xhr = api.xhr({
 	        backend: "api.fs.io.createDirectory",
-		content: {
-			path: path
-		},
-		load: function(data, ioArgs)
-		{
-			df[data=="0" ? "callback":"errback"]();
-		},
-	        error: function(e) {
-			df.errback(e);
-		}
+			content: {
+				path: path
+			},
+			load: function(data, ioArgs)
+			{
+				df[data=="0" ? "callback":"errback"]();
+			},
+		        error: function(e) {
+				df.errback(e);
+			}
         });
-	
-	if(onComplete) df.addCallback(onComplete);
-	if(onError) df.addErrback(onError);
-	
-	return df;
+		df.canceler = dojo.hitch(xhr, "cancel");
+		if(onComplete) df.addCallback(onComplete);
+		if(onError) df.addErrback(onError);
+		
+		return df;
     },
     remove: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError)
     {
@@ -187,23 +189,24 @@ api.filesystem = {
 		//		a callback function to be fired on completion. First param is true if successful, false if failed
 		//	onError:
 		//		a callback function to be fired on error
-        var df = api.xhr({
+		var df = new dojo.Deferred();
+        var xhr = api.xhr({
 	        backend: "api.fs.io.removeFile",
-		content: {
-			path: path
-		},
-		load: function(data, ioArgs) {
-			df[data=="0" ? "callback":"errback"]();
-		},
-        error: function(e) {
-			df.errback(e);
-		}
+			content: {
+				path: path
+			},
+			load: function(data, ioArgs) {
+				df[data=="0" ? "callback":"errback"]();
+			},
+	        error: function(e) {
+				df.errback(e);
+			}
         });
-	
-	if(onComplete) df.addCallback(onComplete);
-	if(onError) df.addErrback(onError);
-	
-	return df;
+		df.canceler = dojo.hitch(xhr, "cancel");
+		if(onComplete) df.addCallback(onComplete);
+		if(onError) df.addErrback(onError);
+		
+		return df;
     },
     copy: function(/*String*/from, /*String*/to, /*Function?*/onComplete, /*Function?*/onError)
     {
@@ -217,24 +220,25 @@ api.filesystem = {
 		//		a callback function once the task is done. First param is true if successful, false if it failed.
 		//	onError:
 		//		a callback function to be fired on error
-        var df = api.xhr({
+		var df = new dojo.Deferred();
+        var xhr = api.xhr({
 	        backend: "api.fs.io.copyFile",
-		content: {
-			path: from,
-			newpath: to
-		},
-		load: function(data, ioArgs) {
-			df[data=="0" ? "callback":"errback"]();
-		},
-        error: function(e) {
-			df.errback(e);
-		}
+			content: {
+				path: from,
+				newpath: to
+			},
+			load: function(data, ioArgs) {
+				df[data=="0" ? "callback":"errback"]();
+			},
+	        error: function(e) {
+				df.errback(e);
+			}
         });
-	
-	if(onComplete) df.addCallback(onComplete);
-	if(onError) df.addErrback(onError);
-	
-	return df;
+		df.canceler = dojo.hitch(xhr, "cancel");
+		if(onComplete) df.addCallback(onComplete);
+		if(onError) df.addErrback(onError);
+		
+		return df;
     },
 	download: function(/*String*/path, /*String?*/as) {
 		//	summary:
@@ -268,20 +272,21 @@ api.filesystem = {
 		//		a callback function to be fired on completion. First argument is an api.filesystem._fileInfo object
 		//	onError:
 		//		a callback function to be fire on an error.
-		var df = api.xhr({
+		var df = new dojo.Deferred();
+		var xhr = api.xhr({
 			backend: "api.fs.io.info",
 			content: {
 				path: path
 			},
 			load: function(data, args) {
-				df[data=="0" ? "callback":"errback"]();
+				df.callback(data);
 			},
 			error: function(e) {
 				df.errback(e);
 			},			
 			handleAs: "json"
 		})
-		
+		df.canceler = dojo.hitch(xhr, "cancel");
 		if(onComplete) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
 		
