@@ -59,6 +59,24 @@
 		if($_GET['action'] == "remove") {
 			//TODO
 		}
+		if($_GET['action'] == "info") {
+			$id=$_POST['id'];
+			$pak = $Package->get($id);
+			$info = array();
+			foreach(array(
+				"id",
+				"name",
+				"description",
+				"source",
+				"version",
+				"dependancies",
+				"category",
+				"status"
+			) as $key) {
+				$info[$key] = $pak->$key;
+			}
+			$out = new jsonOutput($info);
+		}
 	}
 	if($_GET['section'] == "repository") {
 		if($_GET['action'] == "reload") {
@@ -111,11 +129,39 @@
 			$out = new intOutput("ok");
 		}
 		if($_GET['action'] == "add") {
-			
+			$repo = new $Repository();
+			foreach(array("url", "enabled") as $key) {
+				$repo->$key = $_POST[$key];
+			}
+			$repo->save();
+			$out = new intOutput("ok");
 		}
 		if($_GET['action'] == "remove") {
 			$repo = $Repository->get($_POST['id']);
 			$repo->delete();
 			$out = new intOutput("ok");
+		}
+		if($_GET['action'] == "enable") {
+			$repo = $Repository->get($_POST['id']);
+			$repo->enabled = 1;
+			$repo->save();
+			$out = new intOutput("ok");
+		}
+		if($_GET['action'] == "disable") {
+			$repo = $Repository->get($_POST['id']);
+			$repo->enabled = 0;
+			$repo->save();
+			$out = new intOutput("ok");
+		}
+		if($_GET['action'] == "list") {
+			$repos = $Repository->all();
+			$list=array();
+			foreach($repos as $repo) {
+				array_push($list, array(
+					"url" => $repo->url,
+					"enabled" => $repo->enabled
+				));
+			}
+			$out = new jsonOutput($list);
 		}
 	}
