@@ -83,7 +83,7 @@ api.filesystem = {
 		//	content:
 		//		the content to write to the file
 		//	onComplete:
-		//		a callback once the saving is complete. First argument is true if successful, false if it failed.
+		//		a callback once the saving is complete.
 		//	onError:
 		//		a callback function to fire on error
 	var df = api.xhr({
@@ -94,7 +94,7 @@ api.filesystem = {
 			},
 			load: function(data, ioArgs)
 			{
-				df.callback(data=="0");
+				df[data=="0" ? "callback":"errback"]();
 				var p = path.lastIndexOf("/");
 				dojo.publish("filearea:"+path.substring(0, p+1), []);
 			},
@@ -136,10 +136,10 @@ api.filesystem = {
 		},
 		load: function(data, ioArgs)
 		{
-			df.callback(data);
+			df.callback();
 		},
-	        error: function(e) {
-			df.addErrback(e);
+        error: function(e) {
+			df.errback(e);
 		}
         });
 	
@@ -165,7 +165,7 @@ api.filesystem = {
 		},
 		load: function(data, ioArgs)
 		{
-			df.callback(data=="0");
+			df[data=="0" ? "callback":"errback"]();
 		},
 	        error: function(e) {
 			df.errback(e);
@@ -193,9 +193,9 @@ api.filesystem = {
 			path: path
 		},
 		load: function(data, ioArgs) {
-			df.callback(data=="0");
+			df[data=="0" ? "callback":"errback"]();
 		},
-	        error: function(e) {
+        error: function(e) {
 			df.errback(e);
 		}
         });
@@ -224,9 +224,9 @@ api.filesystem = {
 			newpath: to
 		},
 		load: function(data, ioArgs) {
-			df.callback(data=="0");
+			df[data=="0" ? "callback":"errback"]();
 		},
-	        error: function(e) {
+        error: function(e) {
 			df.errback(e);
 		}
         });
@@ -274,7 +274,7 @@ api.filesystem = {
 				path: path
 			},
 			load: function(data, args) {
-				df.callback(data);
+				df[data=="0" ? "callback":"errback"]();
 			},
 			error: function(e) {
 				df.errback(e);
