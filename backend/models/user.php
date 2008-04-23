@@ -134,7 +134,7 @@
 		}
 		function crypt_password()
 		{
-			$this->password = crypt($this->password, $GLOBALS['conf']['salt']);
+			$this->password = $this->set_password($this->password);
 		}
 		function check_password($provided)
 		{
