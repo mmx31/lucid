@@ -19,7 +19,7 @@ api.ui = {
 		//		a callback that is called when the dialog is closed
 		dojo.require("dijit.Dialog");
 		var div = dojo.doc.createElement("div");
-		div.innerHTML = "<center> "+object.message+" </center>";
+		div.innerHTML = "<center> "+(object.message||"")+" </center>";
 		var box = new dijit.Dialog({title: object.title, style: object.style || ""}, div);
 		box.show();
 		if(object.callback) {
@@ -126,7 +126,7 @@ api.ui = {
 		var line = document.createElement("div");
         var p = document.createElement("span");
 		var q = document.createElement("span");
-		p.innerHTML = "<center>"+object.message+"</center>";
+		p.innerHTML = "<center>"+(object.message||"")+"</center>";
 		line.appendChild(p);
 		all.appendChild(line);
 		all.style.textAlign = "center";
@@ -168,7 +168,7 @@ api.ui = {
 		var line = document.createElement("div");
         var p = document.createElement("span");
 		var q = document.createElement("span");
-		p.innerHTML = "<center>"+object.message+"</center>";
+		p.innerHTML = "<center>"+(object.message||"")+"</center>";
 		line.appendChild(p);
 		all.appendChild(line);
 		all.style.textAlign = "center";
