@@ -45,8 +45,8 @@
 			this.toolbar.addChild(new dijit.form.Button({label: cm.save, iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, this.save)}));
 			this.toolbar.addChild(new dijit.form.Button({label: cm.metadata, iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, this.editMetadata)}));
 			this.toolbar.addChild(new dijit.form.Button({label: cm.run, iconClass: "icon-16-actions-media-playback-start", onClick: dojo.hitch(this, this.run)}));
-			this.toolbar.addChild(new dijit.form.Button({label: cm.kill, iconClass: "icon-16-actions-media-playback-stop", onClick: dojo.hitch(this, function() {
-				desktop.app.kill(-1);
+			this.toolbar.addChild(new dijit.form.Button({label: sys.kill, iconClass: "icon-16-actions-media-playback-stop", onClick: dojo.hitch(this, function() {
+				desktop.app.kill(666);
 			})}));
 	
 		this.win.addChild(this.toolbar);

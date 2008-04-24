@@ -319,7 +319,7 @@ desktop.app = {
 		//	summary:
 		//		Executes an app's string that does not exist on the system as if it were a real app
 		desktop.app._fetchApp({
-			id: -1,
+			id: 666, //anyone who has 666 apps installed is a madman
 			name: "testApp",
 			code: code
 		});
