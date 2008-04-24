@@ -87,6 +87,7 @@
 		}
 		if($_GET['action'] == "remove") {
 			import("models.user");
+			$user = $User->get_current();
 			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
 			$app = $App->get($_POST['id']);
 			$app->delete();
