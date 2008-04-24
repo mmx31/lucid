@@ -32,14 +32,15 @@ class FtpFs extends BaseFs {
 		return true;
 	}
 	function _getFileInfo($path) {
-		$curdir = ftp_pwd($this->_link);
-		$isDir = @ftp_chdir($this->_link, $path);
-		ftp_chdir($this->_link, $curdir);
+		//$curdir = ftp_pwd($this->_link);
+		//$isDir = @ftp_chdir($this->_link, $path);
+		//ftp_chdir($this->_link, $curdir);
+		$size = ftp_size($this->_link, $path);
 		return array(
 			name => basename($path),
 			modified => ftp_mdtm($this->_link, $path),
-			size => ftp_size($this->_link, $path),
-			type => ($isDir ? "text/directory" : "text/plain") //TODO: figure out mimetype?
+			size => $size,
+			type => ($size == -1 ? "text/directory" : "text/plain") //TODO: figure out mimetype?
 		);
 	}
 	function _listPath($path) {
