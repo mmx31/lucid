@@ -27,6 +27,11 @@ class FileFs extends BaseFs {
 			$r["type"] = mime_content_type($f);
 			//TODO: guess mimetype based on extension?
 		}
+		//get ID3 info if available
+		$id3 = id3_get_tag($f);
+		foreach($id3 as $key=>$value) {
+			$r["id3".str_replace(" ", "", ucwords($key))] = $value;
+		}
 		return $r;
 	}
 	function _listPath($path) {
@@ -85,4 +90,3 @@ class FileFs extends BaseFs {
 		return file_put_contents($path, $content);
 	}
 }
-?>

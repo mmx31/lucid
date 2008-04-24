@@ -120,5 +120,3 @@ class BaseFs {
 		return true;
 	}
 }
-
-?>

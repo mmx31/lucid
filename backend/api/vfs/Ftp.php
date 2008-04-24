@@ -101,4 +101,3 @@ class FtpFs extends BaseFs {
 		@ftp_rmdir($this->_link, $path);
 	}
 }
-?>

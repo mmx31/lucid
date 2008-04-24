@@ -12,8 +12,6 @@ class PublicFs extends FileFs {
 */
 class PublicFs extends BaseFs {
 	var $_username;
-	function _startup() {
-	}
 	function _basePath($path=false) {
 		return $GLOBALS['path'] . "/../public/" . ($path ? $path : "");
 	}
@@ -32,13 +30,12 @@ class PublicFs extends BaseFs {
 			$r["modified"] = date ("F d Y H:i:s.", filemtime($f));
 			$r["size"] = filesize($f);
 			$r["type"] = mime_content_type($f);
-			if($r["type"] === false && function_exists("finfo_open")) {
-				//fallback on the Fileinfo PECL extention
-				$finfo = finfo_open(FILEINFO_MIME);
-				$r["type"] = finfo_file($finfo, $f);
-				finfo_close($finfo);
-			}
 			//TODO: guess mimetype based on extension?
+		}
+		//get ID3 info if available
+		$id3 = id3_get_tag($f);
+		foreach($id3 as $key=>$value) {
+			$r["id3".str_replace(" ", "", ucwords($key))] = $value;
 		}
 		return $r;
 	}
@@ -98,4 +95,3 @@ class PublicFs extends BaseFs {
 		return file_put_contents($path, $content);
 	}
 }
-?>
