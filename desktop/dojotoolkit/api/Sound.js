@@ -156,6 +156,15 @@ dojo.declare("api.Sound.html", api.Sound._backend, {
 	//		Sound backend for the HTML5 audio tag
 	//		See api.Sound._backend for more info
 	htmlSound: null,
+	capabilities: {
+		play: true,
+		pause: true,
+		stop: true,
+		duration: true,
+		position: true,
+		volume: true,
+		id3: false
+	},
 	testCompat: function() {
 			return typeof Audio != "undefined";
 	},
