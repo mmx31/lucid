@@ -33,9 +33,11 @@ class PublicFs extends BaseFs {
 			//TODO: guess mimetype based on extension?
 		}
 		//get ID3 info if available
-		$id3 = id3_get_tag($f);
-		foreach($id3 as $key=>$value) {
-			$r["id3".str_replace(" ", "", ucwords($key))] = $value;
+		if(function_exists("id3_get_tag")) {
+			$id3 = id3_get_tag($f);
+			foreach($id3 as $key=>$value) {
+				$r["id3".str_replace(" ", "", ucwords($key))] = $value;
+			}
 		}
 		return $r;
 	}
