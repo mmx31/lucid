@@ -70,15 +70,21 @@ desktop.app = {
 			constructor: function(info) {
 				this.status = "init";
 				this.instance = info.instance;
-				this.init(info.args);
+				try {
+					this.init(info.args||{});
+				}
+				catch(e) {
+					console.error(e);
+				}
 				this.status = "active";
-				if(info.callback) info.callback(this);
+				if(typeof info.callback == "function") info.callback(this);
 			},
 			kill: function() {
 				//cleanup ui, disconnect events, etc.
 			}
 		});
 		dojo.extend(desktop.app.apps["app"+app.id], eval("("+app.code+")"));
+		
 		if(callback)
 		{
 			if(typeof args == "undefined") args = {};
@@ -195,8 +201,8 @@ desktop.app = {
 		else
 		{
 			try {
-				var pid = this.instances.length;
-				var instance = this.instances[pid] = new desktop.app.apps["app"+id]({
+				var pid = desktop.app.instances.length;
+				var instance = desktop.app.instances[pid] = new desktop.app.apps["app"+id]({
 					instance: pid,
 					args: args,
 					callback: callback
@@ -207,22 +213,10 @@ desktop.app = {
 					//allow the garbage collector to free up memory
 					setTimeout(function(){
 						desktop.app.instances[pid]=null;
-					}, desktop.config.window.animSpeed + 50);
+					}, desktop.config.window.animSpeed + 1000);
                 });
 			}
 			catch(e) {
-				if(typeof instance.debug == "function") { //Program has it's own error handling system.
-					instance.debug(e);
-				}
-				else { // Use psych desktop error handler
-					if(desktop.app.kill(instance.instance) == false) {
-						api.ui.alertDialog({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance.instance+") encountered an error and needs to close.<br><br>Technical Details: "+e+"<br><br>Extra Details: The program failed to respond to a kill request. <br><br><br>You can help by copying this and posting it to the Psych Desktop forums."});
-						instance.status = "error";
-					}
-					else {
-				            api.ui.alertDialog({title: "Psych Desktop", message: "Application ID:"+id+" (Instance:"+instance+") encountered an error and needs to close.<br><br>Technical Details: <textarea>"+dojo.toJson(e)+"</textarea><br>You can help by copying this and posting it to the Psych Desktop forums."});
-					}
-				}
 				console.error(e);
 			}
 		}

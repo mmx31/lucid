@@ -1,9 +1,9 @@
 ({
 	kill: function() {
+	    clearTimeout(this.timer);
 	    if (!this.win.closed) {
 	        this.win.close();
 	    }
-	    clearTimeout(this.timer);
 	},
 	init: function(args) {
 	    dojo.require("dijit.layout.LayoutContainer");
@@ -20,8 +20,9 @@
 	    //make window
 	    this.win = new api.Window({
 	        title: app["Task Manager"],
-	        width: "500px",
-	        height: "400px"
+	        width: "350px",
+	        height: "450px",
+			onClose: dojo.hitch(this, "kill")
 	    });
 	    //var layout = new dijit.layout.LayoutContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
 	    this.main = new dijit.layout.ContentPane({

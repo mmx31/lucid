@@ -14,7 +14,7 @@
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		this.win = new api.Window({
 			title: app["Web Browser"],
-			onClose: dojo.hitch(this, this.kill)
+			onClose: dojo.hitch(this, "kill")
 		});
 		this.Iframe = document.createElement("iframe");
 		dojo.style(this.Iframe, "width", "100%");

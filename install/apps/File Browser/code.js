@@ -19,7 +19,7 @@
 		var places = dojo.i18n.getLocalization("desktop", "places");
 		this.win = new api.Window({
 			title: app["File Browser"],
-			onClose: dojo.hitch(this, this.kill)
+			onClose: dojo.hitch(this, "kill")
 		});
 			this.client = new dijit.layout.SplitContainer({layoutAlign: "client"});
 			this.fileArea = new api.Filearea({path: (args.path || "file://"), sizeShare: 70})
@@ -109,7 +109,6 @@
 		this.win.startup();
 		this.win.onDestroy = dojo.hitch(this, this.kill);
 		this.fileArea.refresh();
-		this.uploader.startup();
 	},
 	
 	openUploader: function() {

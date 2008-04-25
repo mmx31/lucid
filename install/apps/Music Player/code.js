@@ -13,7 +13,7 @@
 			title: app["Music Player"],
 			width: "500px",
 			height: "150px",
-			onClose: dojo.hitch(this, this.kill)
+			onClose: dojo.hitch(this, "kill")
 		});
 		var toolbar = new dijit.Toolbar({layoutAlign: "top"});
 		dojo.forEach([
@@ -233,8 +233,8 @@
 		return m+":"+(s < 10 ? "0"+s : s );
 	},
 	kill: function() {
-		if(!this.win.closed) this.win.close();
-		if(this.sound) this.sound.destroy();
 		this.stopTicker();
+		if(this.sound) this.sound.destroy();
+		if(!this.win.closed) this.win.close();
 	}
 })

@@ -3,9 +3,8 @@
 	editing: false,
 	fileEditing: "",
 	kill: function() {
-	    if (!this.window.closed) {
+	    if (!this.window.closed)
 	        this.window.close();
-	    }
 	},
 	init: function(args) {
 		dojo.require("dijit.Toolbar");

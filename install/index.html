@@ -24,10 +24,11 @@
 					<input dojoType="dijit.form.RadioButton" id="installtype-new" type="radio" name="type" value="clean" />
 					<label for="installtype-new"><b>I want to do a clean installation</b></label>
 					<p>Do a new installation, and create a new admin user</p>
-					
+				<div style="display: none;">
 					<input dojoType="dijit.form.RadioButton" id="installtype-cms" type="radio" name="type" value="CMS" disabled="true" />
 					<label for="installtype-cms"><b>I want to do a clean installation, but intergrate it with a CMS</b></label>
 					<p>Do a new installation, then configure it to intergrate with a user table from a CMS</p>
+				</div>
 					<!-- We should support drupal, joomla/mambo, phpnuke, and some others -->
 					
 					<input dojoType="dijit.form.RadioButton" id="installtype-reset" type="radio" name="type" value="reset" />

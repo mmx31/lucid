@@ -4,10 +4,8 @@
 	fileEditing: "",
 	
 	kill: function() {
-	    if (typeof(this.window) != "undefined") {
+	    if(!this.window.closed)
 	        this.window.close();
-	
-	    }
 	},
 	
 	init: function(args) {
@@ -19,9 +17,10 @@
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
+		
 	    this.window = new api.Window({
 			title: app["Text Editor"],
-	        onClose: dojo.hitch(this, this.kill)
+	        onClose: dojo.hitch(this, "kill")
 	    });
 	    var toolbar = new dijit.Toolbar({
 	        layoutAlign: "top"
@@ -76,7 +75,7 @@
 	},
 	processNew: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
-		var cmn = dojo.i18n.getLocalization("desktop", "common");
+		var cm = dojo.i18n.getLocalization("desktop", "common");
 	    this.editor.disabled = false;
 	    this.editor.value = "";
 	    this.editing = false;
