@@ -40,18 +40,12 @@
 		this.win.addChild(client);
 		
 		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
-			this.toolbar.addChild(new dijit.form.Button({label: cm["new"], iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, function btnNewApp() { this.newApp(1); })}));
-			this.toolbar.addChild(new dijit.form.Button({label: cm.open, iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, this.load)}));
-			this.toolbar.addChild(new dijit.form.Button({label: cm.save, iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, this.save)}));
-			this.toolbar.addChild(new dijit.form.Button({label: cm.metadata, iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, this.editMetadata)}));
-			this.toolbar.addChild(new dijit.form.Button({label: cm.run, iconClass: "icon-16-actions-media-playback-start", onClick: dojo.hitch(this, this.run)}));
-			this.toolbar.addChild(new dijit.form.Button({label: sys.kill, iconClass: "icon-16-actions-media-playback-stop", onClick: dojo.hitch(this, function() {
-				for(key in desktop.app.instances) {
-					var instance = desktop.app.instances[key];
-					if(!instance) continue;
-					if(instance.id == -1) desktop.app.kill(instance.instance);
-				}
-			})}));
+			this.toolbar.addChild(new dijit.form.Button({label: cm["new"], iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, "newApp", 1)}));
+			this.toolbar.addChild(new dijit.form.Button({label: cm.open, iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, "load")}));
+			this.toolbar.addChild(new dijit.form.Button({label: cm.save, iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, "save")}));
+			this.toolbar.addChild(new dijit.form.Button({label: cm.metadata, iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, "editMetadata")}));
+			this.toolbar.addChild(new dijit.form.Button({label: cm.run, iconClass: "icon-16-actions-media-playback-start", onClick: dojo.hitch(this, "run")}));
+			this.toolbar.addChild(new dijit.form.Button({label: sys.kill, iconClass: "icon-16-actions-media-playback-stop", onClick: dojo.hitch(this, "killExec")}));
 	
 		this.win.addChild(this.toolbar);
 		this.win.show();
@@ -63,6 +57,14 @@
 	{
 		desktop.app.execString(this.editor.value);
 	},
+	
+	killExec: function() {
+		for(key in desktop.app.instances) {
+			var instance = desktop.app.instances[key];
+			if(!instance) continue;
+			if(instance.id == -1) desktop.app.kill(instance.instance);
+		}
+	},
 
 	kill: function()
 	{
@@ -70,7 +72,7 @@
 			if(!this.loadwin.closed) this.loadwin.close();
 		}
 		if(!this.win.closed)this.win.close();
-		desktop.app.kill(-1);
+		this.killExec();
 	},
 	
 	newApp: function(showmeta)
