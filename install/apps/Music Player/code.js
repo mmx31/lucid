@@ -84,13 +84,13 @@
 			this.stopTicker();
 		});
 		var ticker = this.ui.ticker;
-		dojo.forEach([
-			{p: "border", v: "1px solid gray"},
-			{p: "backgroundColor", v: "black"},
-			{p: "color", v: "gray"}
-		], function(a){
-			dojo.style(ticker, a.p, a.v);
-		});
+		dojo.style(ticker, {
+			border: "1px solid gray",
+			backgroundColor: "black",
+			color: "gray",
+			width: "60%",
+			position: "relative"
+		})
 		ticker.innerHTML = "&nbsp;0:00/00:00&nbsp;";
 		var client = new dijit.Toolbar({layoutAlign: "client"});
 		for(var name in this.ui) {
@@ -203,9 +203,16 @@
 	},
 	updateTicker: function() {
 		var c = this.sound.capabilities;
+		if(c.id3) {
+			var i = this.sound.id3();
+			console.log(i);
+			var output = "<div>"+i.songname+"</div><div>"+i.artist+" - "+i.album+"</div>";
+		}
+		else
+			var output = this.filename;
 		if(!(c.position && c.duration)) {
-		this.box.domNode.innerHTML = "&nbsp;" + this.filename + "&nbsp;&nbsp;" + "?:??/?:??" + "&nbsp;";
-		return;
+			this.box.domNode.innerHTML = output + "<div style='position: absolute; top:25%; right: 0px;'>" + "?:??/?:??" + "</div>";
+			return;
 		}
 		var p = this.sound.position();
 		var d = this.sound.duration();
@@ -216,7 +223,7 @@
 		this.ignoreOnChange=false;
 		var pos = this.formatTime(p);
 		var dur = this.formatTime(d);
-		this.box.domNode.innerHTML = "&nbsp;" + this.filename + "&nbsp;&nbsp;" + pos + "/" + dur + "&nbsp;";
+		this.box.domNode.innerHTML = output + "<div style='position: absolute; top:25%; right: 0px;'>" + pos + "/" + dur + "</div>";
 	},
 	formatTime: function(ms) {
 		var ts = ms/1000;
