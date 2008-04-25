@@ -205,7 +205,6 @@
 		var c = this.sound.capabilities;
 		if(c.id3) {
 			var i = this.sound.id3();
-			console.log(i);
 			var output = "<div>"+i.songname+"</div><div>"+i.artist+" - "+i.album+"</div>";
 		}
 		else
