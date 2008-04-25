@@ -28,9 +28,9 @@
 		var store = this.feedStore = new api.Registry({
 			appid: this.id,
 			name: "rssFeeds",
-			identifier: "id",
 			data: {
 				label: "label",
+				identifier: "id",
 				items: [
 					{
 						id: 0,
