@@ -204,7 +204,7 @@
 		this.squareFillNormal( square );
 		square.mouseover = square.connect("onmouseover", this, function blah() { this.squareFillOver(square); });
 		square.mouseout = square.connect("onmouseout", this, function blah2() { this.squareFillNormal(square); });
-		square.mousedown = square.connect("onclick", this, function (e) {
+		square.mousedown = square.connect("onmouseup", this, function (e) {
 			dojo.stopEvent(e);
 			if(e.button == 2) this.squareFillMarked(square);
 			else this.squareReveal(square);
@@ -213,7 +213,7 @@
 		});
 		square.mouseright = square.connect("oncontextmenu", this, function (e) { 
 			dojo.stopEvent(e);
-			this.squareFillMarked(square);
+			//this.squareFillMarked(square);
 		});
               
 		// Square is not yet revealed by default
