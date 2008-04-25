@@ -20,10 +20,10 @@
 		dojo.style(this.Iframe, "width", "100%");
 		dojo.style(this.Iframe, "height", "100%");
 		dojo.style(this.Iframe, "border", "0px");
-		this.urlbox = new dijit.form.TextBox({onExecute: dojo.hitch(this, this.go), style: "width: 80%;"});
+		this.urlbox = new dijit.form.TextBox({style: "width: 80%;"});
 		var form = new dijit.Toolbar({layoutAlign: "top"});
 		form.addChild(this.urlbox);
-		form.addChild(new dijit.form.Button({label: cm.go, onClick: dojo.hitch(this, this.go), style: "width: 10%;"}));
+		form.addChild(new dijit.form.Button({iconClass: "icon-22-actions-go-jump", label: cm.go, onClick: dojo.hitch(this, this.go), style: "width: 10%;"}));
 		form.startup();
 		this.win.addChild(form);
 		var client = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));

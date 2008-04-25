@@ -15,6 +15,8 @@
 	"download": "Descarge",
 	"up": "Sube",
 	"refresh": "Actualizar",
+	"back": "Espalda",
+	"forward": "Adelante",
 	"yes": "Sí",
 	"no": "No",
 	"ok": "OK",

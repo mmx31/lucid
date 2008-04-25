@@ -133,25 +133,25 @@ desktop.app = {
 		//	format:
 		//		the mimetype of the file to save bandwidth checking it on the server
 		if(!args) args = {};
-		var l = file.lastIndexOf(".");
-		var ext = file.substring(l + 1, file.length);
-		if (ext == "desktop") {
-			api.filesystem.readFileContents(file, dojo.hitch(this, function(file){
-				var c = file.contents.split("\n");
-				desktop.app.launch(c[0], dojo.fromJson(c[1]));
+		if(file) {
+			var l = file.lastIndexOf(".");
+			var ext = file.substring(l + 1, file.length);
+			if (ext == "desktop") {
+				api.filesystem.readFileContents(file, dojo.hitch(this, function(file){
+					var c = file.contents.split("\n");
+					desktop.app.launch(c[0], dojo.fromJson(c[1]));
+				}));
+				return;
+			}
+		}
+		if(!format) {
+			api.filesystem.info(file, dojo.hitch(this, function(f){
+				var type = f.type;
+				this._launchHandler(file, type, args);
 			}));
-			return;
 		}
 		else {
-			if(!format) {
-				api.filesystem.info(file, dojo.hitch(this, function(f){
-					var type = f.type;
-					this._launchHandler(file, type, args);
-				}));
-			}
-			else {
-				this._launchHandler(file, format, args);
-			}
+			this._launchHandler(file, format, args);
 		}
 	},
 	_launchHandler: function(/*String*/file, /*String*/type, /*Object?*/args) {
@@ -168,7 +168,7 @@ desktop.app = {
 			for (app in this.appList) {
 				for (key in this.appList[app].filetypes) {
 					if (this.appList[app].filetypes[key] == "text/directory") {
-						args.path = file;
+						if(file) args.path = file;
 						desktop.app.launch(this.appList[app].id, args);
 						return;
 					}
@@ -181,7 +181,7 @@ desktop.app = {
 				for (key in this.appList[app].filetypes) {
 					var parts = this.appList[app].filetypes[key].split("/");
 					if (parts[0] == typeParts[0] && (parts[1] == "*" || parts[1] == typeParts[1])) {
-						args.file = file;
+						if(file) args.file = file;
 						desktop.app.launch(this.appList[app].id, args);
 						return;
 					}

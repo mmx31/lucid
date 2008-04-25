@@ -15,6 +15,8 @@
 	"download": "Download",
 	"up": "Up",
 	"refresh": "Refresh",
+	"back": "Back",
+	"forward": "Forward",
 	"yes": "Yes",
 	"no": "No",
 	"ok": "OK",
