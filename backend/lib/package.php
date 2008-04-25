@@ -19,14 +19,26 @@ class package {
 		$info = Zend_Json::decode($info);
 		if($info == false) return false;
 		$method="_install_".$info['type'];
-		package::$method($info, $unzipPath);
+		$ret = package::$method($info, $unzipPath);
 		
 		if($unzip) rmdir($unzipPath);
-		return true;
+		$info['installedFiles']=$ret;
+		return $info;
 	}
 	
-	function remove($path) {
-		//TODO
+	function remove($package) {
+		global $Package;
+		$packages = $Package->filter("name", $package);
+		if(!$packages) internal_error("object_not_found", "Package does not exist");
+		foreach($packages as $pak) {
+			if($pak->status == "installed") {
+				if($pak->type == "update") {
+					//cannot uninstall updates
+					return false;
+				}
+			}
+		}
+		internal_error("object_not_found", "Matches for package found, but none are installed");
 	}
 	
 	function _install_application($info, $path) {
@@ -43,11 +55,13 @@ class package {
 		$app->save();
 		$backendDir = $GLOBALS['path']."../apps/".$app->id;
 		if(is_dir($path."/files")) rename($path."/files", $backendDir);
+		return array("/apps/".$app->id);
 	}
 	function _install_theme($info, $path) {
 		$newpath = $GLOBALS['path']."/../desktop/themes/".strtolower($info['name']);
 		rename($path."/".strtolower($info['name']), $newpath);
 		rename($path."/meta.json", $newpath."/meta.json");
+		return array("/desktop/themes/".strtolower($info['name']));
 	}
 	function _install_translation($info, $path) {
 		function rsearch($path) {
@@ -68,12 +82,15 @@ class package {
 			}
 		}
 		$dirs = rsearch($path);
+		$installedFiles = array();
 		foreach($dirs as $dir) {
 			$dir = substr($dir, 0, count($path));
 			if(!is_dir($GLOBALS['path']."/../desktop/dojotoolkit/".$dir."/".$info['locale'])) {
-				rename($path."/".$dir, $GLOBALS['path']."/../".$dir);
+				rename($path."/".$dir, $GLOBALS['path']."/../desktop/dojotoolkit/".$dir);
+				array_push($installedFiles, "desktop/dojotoolkit/".$dir);
 			}
 		}
+		return $installedFiles;
 	}
 	function _install_update($info, $path) {
 		function rcopy($path, $newpath) {
@@ -94,5 +111,6 @@ class package {
 		}
 		rcopy($path."/root/", $GLOBALS['path']."/../");
 		@include($path . "/update.php");
+		return array(); //cannot uninstall updates
 	}
 }
