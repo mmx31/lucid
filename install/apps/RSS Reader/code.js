@@ -129,12 +129,9 @@
 	        layoutAlign: "client"
 	    });
 		
-		var model = new dijit.tree.TreeStoreModel({
-			store: this.feedStore,
-			query: {category: true}
-		})
 	    this.left = new dijit.Tree({
-	        model: model,
+			store: this.feedStore,
+			query: {category: true},
 			getIconClass: function(item){
 				if(item != null && this.model.store.hasAttribute(item, "iconClass"))
 					return this.model.store.getValue(item, "iconClass");
