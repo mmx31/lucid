@@ -126,34 +126,65 @@ class textareaOutput extends jsonOutput {
 	}
 }
 
-class xmlOutput {
-	// see http://us2.php.net/manual/en/ref.xmlwriter.php
-	var $_xml;
-	var $dooutput = false;
-	function __construct() {
-		$this->_xml = new XMLWriter;
-		$this->_xml->openMemory();
-		$this->_xml->startDocument();
-	}
-	function __call($name, $args) {
-		if(method_exists($this, $name))
-			return call_user_func_array(array($this, $name), $args);
-		return call_user_func_array(array($this->_xml, $name), $args);
-	}
+class filterableOutput extends jsonOutput {
 	function __destruct() {
 		if($this->dooutput) {
-			header('Content-type: text/xml; charset=utf-8"');
-			$this->_xml->endDocument();
-			echo $this->_xml->outputMemory(true);
+			//header("Content-Type: text/json-comment-filtered; charset=utf-8");
+			header("Content-Type: text/json; charset=utf-8");
+			$this->_filter();
+			$this->_sort();
+			$numRows = count($this->output);
+			$this->_page();
+			$json = Zend_Json::encode(array('numRows'=>$numRows, 'items'=>$this->output, 'identity'=>'id'));
+			echo $json;
 		}
 	}
-	function attribute($name, $value) {
-		$this->_xml->writeAttribute($name, $value);
-	}
-	function attributes($arr) {
-		foreach($arr as $key => $val) {
-			$this->attribute($key, $val);
+	function _filter() {
+		$allItems = $this->output;
+		$q = "";
+		if (array_key_exists("q", $_REQUEST)) {
+			$q = $_REQUEST['q'];
+		}else if (array_key_exists("name", $_REQUEST)) {
+			$q = $_REQUEST['name'];
 		}
+		
+		if (strlen($q) && $q[strlen($q)-1]=="*") {
+			$q = substr($q, 0, strlen($q)-1);
+		}
+		$ret = array();
+		foreach ($allItems as $item) {
+			if (!$q || strpos(strtolower($item['name']), strtolower($q))===0) {
+				$ret[] = $item;
+			}
+		}
+		$this->output = $ret;
+	}
+	function _sort() {
+		$ret = $this->output;
+		if (array_key_exists("sort", $_REQUEST)) {
+			$sort = $_REQUEST['sort'];
+			// Check if $sort starts with "-" then we have a DESC sort.
+			$desc = strpos($sort, '-')===0 ? true : false;
+			$sort = strpos($sort, '-')===0 ? substr($sort, 1) : $sort;
+			if (in_array($sort, array_keys($ret[0]))) {
+				$toSort = array();
+				foreach ($ret as $i) $toSort[$i[$sort]] = $i;
+				if ($desc) krsort($toSort); else ksort($toSort);
+				$newRet = array();
+				foreach ($toSort as $i) $newRet[] = $i;
+				$ret = $newRet;
+			}
+		}
+		$this->output = $ret;
+	}
+	function _page() {
+		$ret = $this->output;
+		if (array_key_exists("start", $_REQUEST)) {
+			$ret = array_slice($ret, $_REQUEST['start']);
+		}
+		if (array_key_exists("count", $_REQUEST)) {
+			$ret = array_slice($ret, 0, $_REQUEST['count']);
+		}
+		$this->output = $ret;
 	}
 }
-
