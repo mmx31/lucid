@@ -69,6 +69,14 @@ desktop.app = {
 			status: "",
 			constructor: function(info) {
 				this.status = "init";
+				dojo.connect(this, "kill", this, function() {
+                    this.status = "killed";
+					var pid = this.instance;
+					//allow the garbage collector to free up memory
+					setTimeout(function(){
+						desktop.app.instances[pid]=null;
+					}, desktop.config.window.animSpeed + 1000);
+                });
 				this.instance = info.instance;
 				try {
 					this.init(info.args||{});
@@ -207,14 +215,6 @@ desktop.app = {
 					args: args,
 					callback: callback
 				});
-				dojo.connect(instance, "kill", instance, function() {
-                    this.status = "killed";
-					var pid = this.instance;
-					//allow the garbage collector to free up memory
-					setTimeout(function(){
-						desktop.app.instances[pid]=null;
-					}, desktop.config.window.animSpeed + 1000);
-                });
 			}
 			catch(e) {
 				console.error(e);

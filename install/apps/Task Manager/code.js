@@ -35,9 +35,8 @@
 	    this.win.addChild(this.main);
 	    this.win.show();
 	    this.win.startup();
-	    this.win.onClose = dojo.hitch(this, this.kill);
-	    this.main.setContent(nls.loading);
-	    this.timer = setTimeout(dojo.hitch(this, this.home), 1000);
+	    this.timer = setTimeout(dojo.hitch(this, "home"), 1000);
+		this.home();
 	
 	},
 	
