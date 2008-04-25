@@ -38,7 +38,7 @@
 		});
 		this.toolbar.addChild( new dijit.form.Button({
 			label: nls.start,
-			onClick: dojo.hitch(this, this.startGame)
+			onClick: dojo.hitch(this, "startGame")
 		}) );
 		this.win.addChild( this.toolbar );
 		
@@ -76,11 +76,16 @@
 		this.win.show();
 		this.win.startup();
 		
-		dijit.byId(dropdown.id).textbox.disabled = true;
+		dropdown.textbox.disabled = true;
 		dropdown.setValue("Easy");
 	
 		dojo.connect(this.surfacePane.containerNode, "oncontextmenu", dojo, "stopEvent");
+		
 		this.makeBoard(10, 10);
+		setTimeout(dojo.hitch(this, function() {
+			var tHeight = this.toolbar.domNode.offsetHeight;
+			this.win.resize({w: 200, h: 200+tHeight});
+		}), 200);
 	},
 
 	startGame: function()
@@ -89,7 +94,7 @@
 		var tHeight = this.toolbar.domNode.offsetHeight;
 		if ( this.difficulty == "Easy" ) {
 			//console.debug("resizing..");
-			this.win.resize({w: 200, h: 200+tHeight});
+			
 			this.surface.clear();
 			this.makeBoard(10, 10);
 		} else if ( this.difficulty == "Medium" ) {
