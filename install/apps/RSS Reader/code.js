@@ -12,12 +12,14 @@
 	    dojo.require("dijit.form.Button");
 	    dojo.require("dijit.form.FilteringSelect");
 	    dojo.require("dijit.form.CheckBox");
-	    dojo.require("dojo.data.ItemFileReadStore");
+	    dojo.require("dojo.data.ItemFileWriteStore");
 	    dojo.require("dijit.Dialog");
+	    dojo.require("dojox.grid.Grid");
 	    dojo.require("dojox.validate.web");
 		dojo.requireLocalization("desktop", "common");
 		dojo.requireLocalization("desktop", "messages");
 		dojo.requireLocalization("desktop", "apps");
+		api.addDojoCss("dojox/grid/_grid/Grid.css");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 	
@@ -141,13 +143,30 @@
 	    this.left.startup();
 	    client.addChild(this.left);
 	
-	    this.right = new dijit.layout.ContentPane({
-	        style: "overflow: auto;",
+	    this.right = new dijit.layout.SplitContainer({
 	        minsize: 50,
-	        sizeShare: 30
-	
-	    },
-	    document.createElement("div"));
+	        sizeShare: 30,
+			orientation: "vertical"
+	    });
+			this.gridStore = new dojo.data.ItemFileWriteStore({
+				data: {
+					identifier: "Title",
+					items: []
+				}
+			});
+			var grid = this.grid = new dojox.Grid({
+				structure: [{
+					cells: [[
+						{field: "Date", label: "Date"},
+						{field: "Title", label: "Title", width: 15}
+					]]
+				}],
+				model: new dojox.grid.data.DojoData(null, null, {store: this.gridStore, query: {Title: "*"}})
+			})
+			dojo.connect(grid, "onRowClick", this, "showItem");
+			this.right.addChild(grid);
+			var cpane = this.contentArea = new dijit.layout.ContentPane({});
+			this.right.addChild(cpane);
 	    client.addChild(this.right);
 	
 	    this.win.addChild(client);
@@ -333,27 +352,43 @@
 	},
 	fetchFeed: function(url)
 	{
+		this.gridStore.close();
+		this.gridStore = new dojo.data.ItemFileWriteStore({
+			data: {
+				identifier: "Title",
+				items: []
+			}
+		});
+		this.grid.setModel(new dojox.grid.data.DojoData(null, null, {store: this.gridStore, query: {Title: "*"}}));
 	    api.xhr({
 	        url: url,
 	        preventCache: true,
 			xsite: true,
 	        load: dojo.hitch(this, function(data, ioArgs) {
 	            var items = data.getElementsByTagName("item");
-	            var text = "";
-	            dojo.forEach(items, 
-	            function(item) {
+	            dojo.forEach(items, function(item) {
 	                var title = item.getElementsByTagName("title")[0].textContent;
 	                var content = item.getElementsByTagName("description")[0].textContent;
 	                var url = item.getElementsByTagName("link")[0].textContent;
-	                text += "<div style='border: 1px solid black;'><h4><a href='javascript:desktop.app.launchHandler(null, {url: \"" + escape(url) + "\"}, \"text/x-uri\")'>" + title + "</a></h4><p>" + content + "</p></div>";
-	
-	            });
-	            this.right.setContent(text);
+	                var date = item.getElementsByTagName("pubDate")[0].textContent;
+	                this.gridStore.newItem({Title: title, Content: content, Date: date, Url: url});
+	            }, this);
 	
 	        }),
 	        handleAs: "xml"
 	
 	    });
 	
+	},
+	showItem: function() {
+		var s = this.grid.selection.getSelected();
+		var row = this.grid.model.getRow(s[0]);
+		var title = this.gridStore.getValue(row.__dojo_data_item, "Title");
+		var url = this.gridStore.getValue(row.__dojo_data_item, "Url");
+		var content = this.gridStore.getValue(row.__dojo_data_item, "Content");
+		
+		var text = "<div style='background-color: #eee; padding: 3px;'><a href='javascript:desktop.app.launchHandler(null, {url: \"" + escape(url) + "\"}, \"text/x-uri\")'>" + title + "</a></div><p>" + content + "</p>";
+		
+		this.contentArea.setContent(text);
 	}
 })
