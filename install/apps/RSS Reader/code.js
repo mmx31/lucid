@@ -157,8 +157,8 @@
 			var grid = this.grid = new dojox.Grid({
 				structure: [{
 					cells: [[
-						{field: "Date", label: "Date"},
-						{field: "Title", label: "Title", width: 15}
+						{field: "Date", name: "Date"},
+						{field: "Title", name: "Title", width: 15}
 					]]
 				}],
 				model: new dojox.grid.data.DojoData(null, null, {store: this.gridStore, query: {Title: "*"}})
