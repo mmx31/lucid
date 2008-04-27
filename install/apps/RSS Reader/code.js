@@ -12,11 +12,12 @@
 	    dojo.require("dijit.form.Button");
 	    dojo.require("dijit.form.FilteringSelect");
 	    dojo.require("dijit.form.CheckBox");
+	    dojo.require("dijit.Dialog");
 	    dojo.require("dojo.data.ItemFileWriteStore");
 	    dojo.require("dojo.date.locale");
-	    dojo.require("dijit.Dialog");
 	    dojo.require("dojox.grid.Grid");
 	    dojo.require("dojox.validate.web");
+	    dojo.require("dojox.encoding.digests.MD5");
 		dojo.requireLocalization("desktop", "common");
 		dojo.requireLocalization("desktop", "messages");
 		dojo.requireLocalization("desktop", "apps");
@@ -95,6 +96,15 @@
 				]
 			}
 		});
+		this.hashStore = new api.Registry({
+			appid: this.id,
+			name: "feedItemHashes",
+			data: {
+				label: "label",
+				identifier: "hash",
+				items: []
+			}
+		});
 	    this.toolbar = new dijit.Toolbar({
 	        layoutAlign: "top"
 	    });
@@ -162,7 +172,16 @@
 						{field: "Title", name: cm.title, width: 15}
 					]]
 				}],
-				model: new dojox.grid.data.DojoData(null, null, {store: this.gridStore, query: {Title: "*"}})
+				model: new dojox.grid.data.DojoData(null, null, {store: this.gridStore, query: {Title: "*"}}),
+				onStyleRow: dojo.hitch(this, function(inRow) {
+					if (this.grid.model.getRow(inRow.index) === undefined)
+    					return;
+					if(this.gridStore.getValue(this.grid.model.getRow(inRow.index).__dojo_data_item, "Read"))
+						inRow.customStyles = '';
+					else
+						inRow.customStyles = 'font-weight: bold;';
+					dojox.Grid.prototype.onStyleRow.apply(this.grid, arguments);
+				})
 			})
 			dojo.connect(grid, "onRowClick", this, "showItem");
 			this.right.addChild(grid);
@@ -186,7 +205,19 @@
 	},
 	
 	removeFeed: function(t) {
-		if (!this.feedStore.isItem(this.currentFeed)) return;
+		if(!this.feedStore.isItem(this.currentFeed)) return;
+		if(this.feedStore.getValue(this.currentFeed, "category") == false) {
+			//delete any hashes
+			this.hashStore.fetch({
+				query: {feed: this.feedStore.getValue(this.currentFeed, "url")},
+				onItem: dojo.hitch(this, function(item) {
+					this.hashStore.deleteItem(item);
+				}),
+				onComplete: dojo.hitch(this, function() {
+					this.hashStore.save();
+				})
+			});
+		}
 		this.feedStore.deleteItem(this.currentFeed);
 		this.feedStore.save();
 	},
@@ -332,13 +363,14 @@
 	    }
 	},
 	refresh: function() {
-		this.feedStore.fetch({onItem: dojo.hitch(this, function(item) {
+		/*this.feedStore.fetch({onItem: dojo.hitch(this, function(item) {
 			this.updateCount(item);
-		})})
+		})})*/
+		this.fetchFeed(this.feedStore.getValue(this.currentFeed, "url"));
 	},
 	
 	updateCount: function(item) {
-		var store = this.feedStore
+		/*var store = this.feedStore
 		api.xhr({
 	        url: store.getValue(item, "url"),
 	        preventCache: true,
@@ -349,10 +381,11 @@
 			},
 	        handleAs: "xml"
 	
-	    });	
+	    });	*/
 	},
 	fetchFeed: function(url)
 	{
+		var FEED_URL = url;
 		this.gridStore.close();
 		this.gridStore = new dojo.data.ItemFileWriteStore({
 			data: {
@@ -367,15 +400,53 @@
 			xsite: true,
 	        load: dojo.hitch(this, function(data, ioArgs) {
 	            var items = data.getElementsByTagName("item");
+				var hashes = [];
+				var newHashes = false;
 	            dojo.forEach(items, function(item) {
 	                var title = item.getElementsByTagName("title")[0].textContent;
 	                var content = item.getElementsByTagName("description")[0].textContent;
 	                var url = item.getElementsByTagName("link")[0].textContent;
 	                var date = item.getElementsByTagName("pubDate")[0].textContent;
-					var date = dojo.date.locale.format(new Date(date));
-	                this.gridStore.newItem({Title: title, Content: content, Date: date, Url: url});
+					date = dojo.date.locale.format(new Date(date));
+					var hash = dojox.encoding.digests.MD5(title);
+					hashes.push(hash);
+					this.hashStore.fetch({
+						query: {hash: hash},
+						onComplete: dojo.hitch(this, function(items) {
+							this.gridStore.newItem({
+								Read: !(items.length == 0 || !this.hashStore.getValue(items[0], "read")),
+								Title: title,
+								Content: content,
+								Date: date,
+								Url: url
+							});
+							if(items.length == 0) {
+								this.hashStore.newItem({
+									hash: hash,
+									feed: FEED_URL,
+									read: false
+								});
+								newHashes = true;
+							}
+						})
+					});
 	            }, this);
-	
+				//remove old hashes
+				var change = false;
+				this.hashStore.fetch({
+					query: {feed: FEED_URL},
+					onItem: dojo.hitch(this, function(item) {
+						for(var key in hashes) {
+							var hash = hashes[key];
+							if(hash == this.hashStore.getValue(item, "hash")) return;
+						}
+						this.hashStore.deleteItem(item);
+						change = true;
+					}),
+					onComplete: dojo.hitch(this, function() {
+						if((change || newHashes) || (change && newHashes)) this.hashStore.save();
+					})
+				})
 	        }),
 	        handleAs: "xml"
 	
@@ -388,9 +459,31 @@
 		var title = this.gridStore.getValue(row.__dojo_data_item, "Title");
 		var url = this.gridStore.getValue(row.__dojo_data_item, "Url");
 		var content = this.gridStore.getValue(row.__dojo_data_item, "Content");
+		var hash = dojox.encoding.digests.MD5(title);
 		
-		var text = "<div style='background-color: #eee; padding: 3px;'><a href='javascript:desktop.app.launchHandler(null, {url: \"" + escape(url) + "\"}, \"text/x-uri\")'>" + title + "</a></div><p>" + content + "</p>";
+		this.hashStore.fetch({
+			query: {hash: hash},
+			onComplete: dojo.hitch(this, function(items) {
+				if(this.hashStore.getValue(items[0], "read") == false) {
+					this.hashStore.setValue(items[0], "read", true);
+					this.hashStore.save();
+				}
+			})
+		});
+		this.gridStore.fetch({
+			query: {Title: title},
+			onComplete: dojo.hitch(this, function(items) {
+				this.gridStore.setValue(items[0], "Read", true);
+			})
+		});
+		
+		this.grid.update();
+		
+		var text = "<div style='background-color: #eee; padding: 3px;'><a href='"+url+"'>" + title + "</a></div><p>" + content + "</p>";
 		
 		this.contentArea.setContent(text);
+		dojo.query("a", this.contentArea.domNode).forEach(function(node) {
+			node.href="javascript:desktop.app.launchHandler(null, {url: \"" + escape(node.href) + "\"}, \"text/x-uri\")";
+		});
 	}
 })
