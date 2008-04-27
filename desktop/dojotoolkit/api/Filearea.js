@@ -56,8 +56,35 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 			onClick: dojo.hitch(this, function() {
 				var clip = api._fileareaClipboard;
 				if(clip.type == "") return;
+				var isParent = dojo.hitch(this, function(target, clip) {
+						if(clip.mimetype != "text/directory") return false; //can't be a parent if we're not a dir!
+						var tPath = target.split("://");
+						var sPath = clip.path.split("://");
+						//if we're not even using the same protocol we can't be a parent of the target
+						if(sPath[0] != tPath[0]) return false;
+						sPath[1] += clip.name;
+						tPath = tPath[1].split("/");
+						sPath = sPath[1].split("/");
+						var sCount = 0;
+						var tCount = 0;
+						var sFixedPath = "/";
+						var tFixedPath = "/";
+						while(sCount <= sPath.length-1 && tCount <= tPath.length-1) {
+							while(sPath[sCount] == "") sCount++;
+							while(tPath[tCount] == "") tCount++;
+							if(typeof tPath[tCount] == "undefined") tPath[tCount] = "";
+							if(typeof sPath[sCount] == "undefined") sPath[sCount] = "";
+							sFixedPath += sPath[sCount]+"/";
+							tFixedPath += tPath[tCount]+"/";
+							sCount++;
+							tCount++;
+						}
+						if(tFixedPath.indexOf(sFixedPath) == 0) return true;
+						return false;
+					})
 				if(clip.type == "cut") {
 					var name = this._fixDuplicateFilename(clip.name, clip.mimetype);
+					if(isParent(this.path+name, clip)) return api.ui.notify({message: nf.parentErr, type: "warning", duration: 5000});
 					this._loadStart();
 					api.filesystem.move(clip.path+clip.name, this.path+name, dojo.hitch(this, function() {
 						var parentID;
@@ -78,6 +105,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				}
 				if(clip.type == "copy") {
 					var name = this._fixDuplicateFilename(clip.name, clip.mimetype);
+					if(isParent(this.path+name, clip)) return api.ui.notify({message: nf.parentErr, type: "warning", duration: 5000});
 					this._loadStart();
 					api.filesystem.copy(clip.path+clip.name, this.path+name, dojo.hitch(this, function() {
 						this._loadEnd();
@@ -417,16 +445,16 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			var menuDl = new dijit.PopupMenuItem({iconClass: "icon-16-actions-document-open", label: nc.download});
 			var menu2 = new dijit.Menu({parentMenu: menuDl});
 			menu2.addChild(new dijit.MenuItem({label: nf.asFile, onClick: dojo.hitch(this, function(e) {
-				api.filesystem.download(this.path);
+				api.filesystem.download(this.getParent().path+this.name);
 			})}));
 			menu2.addChild(new dijit.MenuItem({label: nf.asZip ,onClick: dojo.hitch(this, function(e) {
-				api.filesystem.download(this.path, "zip");
+				api.filesystem.download(this.getParent().path+this.name, "zip");
 			})}));
 			menu2.addChild(new dijit.MenuItem({label: nf.asTgz, onClick: dojo.hitch(this, function(e) {
-				api.filesystem.download(this.path, "gzip");
+				api.filesystem.download(this.getParent().path+this.name, "gzip");
 			})}));
 			menu2.addChild(new dijit.MenuItem({label: nf.asTbz2, onClick: dojo.hitch(this, function(e) {
-				api.filesystem.download(this.path, "bzip");
+				api.filesystem.download(this.getParent().path+this.name, "bzip");
 			})}));
 			menu2.startup();
 			menuDl.popup = menu2;
@@ -467,6 +495,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		dojo.forEach(this._subscriptions, dojo.unsubscribe);
 	},
 	_dragStart: function(e) {
+		if(e.button != 0) return;
 		this._clickOrigin = {x: e.clientX, y: e.clientY};
 		this._docMouseUpEvent = dojo.connect(document, "onmouseup", this, "_onRelease");
 		this._onDragEvent = dojo.connect(document, "onmousemove", this, "_onMove");

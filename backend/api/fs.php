@@ -228,8 +228,14 @@ if($_GET['section'] == "io")
 			if($_GET["as"] == "zip") { $newzip = new zip_file("compressed.zip"); }
 			if($_GET["as"] == "gzip") { $newzip = new gzip_file("compressed.tgz"); }
 			if($_GET["as"] == "bzip") { $newzip = new bzip_file("compressed.tbz2"); }
-			$newzip->set_options(array('inmemory' => 1, 'recurse' => 1, 'storepaths' => 1));
-			$newzip->add_files($module->getRealPath($sentpath));
+			$realpath = $module->getRealPath($sentpath);
+			$newzip->set_options(array(
+				'inmemory' => 1,
+				'recurse' => 1,
+				'storepaths' => 1,
+				'basedir' => dirname($realpath)
+			));
+			$newzip->add_files(basename($realpath));
 			$newzip->create_archive();
 			$newzip->download_file();
 		}
@@ -239,8 +245,14 @@ if($_GET['section'] == "io")
 				if($_GET["as"] == "zip") { $newzip = new zip_file("compressed.zip"); }
 				if($_GET["as"] == "gzip") { $newzip = new gzip_file("compressed.tgz"); }
 				if($_GET["as"] == "bzip") { $newzip = new bzip_file("compressed.tbz2"); }
-				$newzip->set_options(array('inmemory' => 1, 'recurse' => 1, 'storepaths' => 1));
-				$newzip->add_files(array($module->getRealPath($sentpath)));
+				$realpath = $module->getRealPath($sentpath);
+				$newzip->set_options(array(
+					'inmemory' => 1,
+					'recurse' => 1,
+					'storepaths' => 1,
+					'basedir' => dirname($realpath)
+				));
+				$newzip->add_files(basename($realpath));
 				$newzip->create_archive();
 				$newzip->download_file();
 			}

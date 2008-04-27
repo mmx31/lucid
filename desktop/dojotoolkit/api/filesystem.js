@@ -250,7 +250,7 @@ api.filesystem = {
 		//		Possible values are "zip", "gzip", or "bzip"
 		//		When this argument is not provided, it downloads the uncompressed file.
 		//		If downloading a directory, this argument defaults to "zip".
-		var url = api.xhr("api.fs.io.download") + "&path=" + escapeURIComponent(path) + (as ? "&as=" + escapeURIComponent(as) : "");
+		var url = api.xhr("api.fs.io.download") + "&path=" + encodeURIComponent(path) + (as ? "&as=" + encodeURIComponent(as) : "");
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	},

@@ -33,7 +33,8 @@ if($_GET['section'] == "get")
 				if(is_dir($GLOBALS['path']."/../desktop/themes/" . $file)){
 					$json = file_get_contents($GLOBALS['path'].'/../desktop/themes/'.$file.'/meta.json');
 					$in = Zend_Json::decode($json);
-					$p[] = array("sysname" => $file, "name" => $in["name"], "author" => $in["author"], "email" => $in["email"], "version" => $in["version"], "wallpaper" => $in["wallpaper"], "preview" => $in["preview"]);
+					$in["sysname"] = $file;
+					$p[] = $in;
 				}
 			}
 		}
