@@ -53,5 +53,6 @@
 	"notAssigned": "Aún no se ha asignado",
 	"launchingApp": "Lanzamiento aplicación %s...",
 	"themes": "Temas",
-	"preview": "Preview"
+	"preview": "Preview",
+	"markAsRead": "Marcar como leído"
 })

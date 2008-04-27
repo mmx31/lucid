@@ -128,6 +128,12 @@
 	
 	    });
 	    this.toolbar.addChild(button);
+		var button = new dijit.form.Button({
+	        label: cm.markAsRead,
+	        onClick: dojo.hitch(this, "markAllRead")
+	
+	    });
+	    this.toolbar.addChild(button);
 	    this.win.addChild(this.toolbar);
 	
 	    this.hiddenBar = new dijit.layout.ContentPane({
@@ -367,6 +373,29 @@
 			this.updateCount(item);
 		})})*/
 		this.fetchFeed(this.feedStore.getValue(this.currentFeed, "url"));
+	},
+	
+	markAllRead: function() {
+		/*this.feedStore.fetch({onItem: dojo.hitch(this, function(item) {
+			this.updateCount(item);
+		})})*/
+		this.hashStore.fetch({
+			query: {feed: this.feedStore.getValue(this.currentFeed, "url")},
+			onItem: dojo.hitch(this, function(item) {
+				this.hashStore.setValue(item, "read", true);
+				console.log(item);
+			})
+		});
+		this.hashStore.save();
+		this.gridStore.fetch({
+			query: {Title:"*"},
+			onItem: dojo.hitch(this, function(item) {
+				this.gridStore.setValue(item, "Read", true);
+			}),
+			onComplete: dojo.hitch(this, function() {
+				this.grid.refresh();
+			})
+		});
 	},
 	
 	updateCount: function(item) {

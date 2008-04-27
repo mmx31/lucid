@@ -42,5 +42,6 @@
 	"error": "Error",
 	"rename": "Rename",
 	"title": "Title",
-	"date": "Date"
+	"date": "Date",
+	"markAsRead": "Mark as read"
 })
