@@ -477,7 +477,7 @@
 			})
 		});
 		
-		this.grid.update();
+		this.grid.refresh();
 		
 		var text = "<div style='background-color: #eee; padding: 3px;'><a href='"+url+"'>" + title + "</a></div><p>" + content + "</p>";
 		
