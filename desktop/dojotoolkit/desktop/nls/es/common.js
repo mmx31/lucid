@@ -40,5 +40,7 @@
 	"delete": "Borre",
 	"create": "Cree",
 	"error": "Error",
-	"rename": "Cambie nombre"
+	"rename": "Cambie nombre",
+	"title": "Título",
+	"date": "Fecha"
 })

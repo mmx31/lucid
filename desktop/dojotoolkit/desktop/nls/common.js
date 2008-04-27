@@ -40,5 +40,7 @@
 	"delete": "Delete",
 	"create": "Create",
 	"error": "Error",
-	"rename": "Rename"
+	"rename": "Rename",
+	"title": "Title",
+	"date": "Date"
 })

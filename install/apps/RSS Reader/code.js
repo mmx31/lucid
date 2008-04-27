@@ -13,6 +13,7 @@
 	    dojo.require("dijit.form.FilteringSelect");
 	    dojo.require("dijit.form.CheckBox");
 	    dojo.require("dojo.data.ItemFileWriteStore");
+	    dojo.require("dojo.date.locale");
 	    dojo.require("dijit.Dialog");
 	    dojo.require("dojox.grid.Grid");
 	    dojo.require("dojox.validate.web");
@@ -157,8 +158,8 @@
 			var grid = this.grid = new dojox.Grid({
 				structure: [{
 					cells: [[
-						{field: "Date", name: "Date"},
-						{field: "Title", name: "Title", width: 15}
+						{field: "Date", name: cm.date},
+						{field: "Title", name: cm.title, width: 15}
 					]]
 				}],
 				model: new dojox.grid.data.DojoData(null, null, {store: this.gridStore, query: {Title: "*"}})
@@ -371,6 +372,7 @@
 	                var content = item.getElementsByTagName("description")[0].textContent;
 	                var url = item.getElementsByTagName("link")[0].textContent;
 	                var date = item.getElementsByTagName("pubDate")[0].textContent;
+					var date = dojo.date.locale.format(new Date(date));
 	                this.gridStore.newItem({Title: title, Content: content, Date: date, Url: url});
 	            }, this);
 	
