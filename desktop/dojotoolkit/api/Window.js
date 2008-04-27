@@ -131,6 +131,11 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		var bodyHeight = this.containerNode.offsetHeight;
 		dojo.style(this.domNode, "width", ((calcWidth - bodyWidth)+calcWidth)+"px");
 		dojo.style(this.domNode, "height", ((calcHeight - bodyHeight)+calcHeight)+"px");
+		var viewport = dijit.getViewport();
+		dojo.style(this.domNode, {
+			top: ((viewport.h/2) - (((calcHeight - bodyHeight)+calcHeight)/2))+"px",
+			left: ((viewport.w/2) - (((calcWidth - bodyWidth)+calcWidth)/2))+"px"
+		});
 		if (desktop.config.fx >= 2) {
 			if (desktop.config.fx < 3) this._toggleBody(false);
 			dojo.style(this.domNode, "opacity", 0);
