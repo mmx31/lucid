@@ -1,6 +1,7 @@
 dojo.provide("desktop.ui.applets.Netmonitor");
 dojo.require("dijit.Tooltip");
 dojo.requireLocalization("desktop", "system");
+dojo.requireLocalization("desktop", "apps");
 
 dojo.declare("desktop.ui.applets.Netmonitor", desktop.ui.Applet, {
 	//	summary:
@@ -9,6 +10,7 @@ dojo.declare("desktop.ui.applets.Netmonitor", desktop.ui.Applet, {
 	appletIcon: "icon-32-status-network-transmit-receive",
 	postCreate: function() {
 		var l = dojo.i18n.getLocalization("desktop", "system");
+		var apploc = dojo.i18n.getLocalization("desktop", "apps");
 		dojo.addClass(this.containerNode, "icon-22-status-network-idle");
 		this._xhrStart = dojo.connect(dojo,"_ioSetArgs",this,function(m)
 		{
@@ -28,7 +30,12 @@ dojo.declare("desktop.ui.applets.Netmonitor", desktop.ui.Applet, {
 		});
 		this._onXhr = dojo.connect(api, "xhr", this, function(args) {
 			if(args.backend && args.backend == "core.app.fetch.full" && args.notify !== false) {
-				this.tooltip.label = "<div style='float: left;' class='icon-loading-indicator'></div> " + l.launchingApp.replace("%s", args.content.id);
+				var appName = false;
+				dojo.forEach(desktop.app.appList, function(app) {
+					if(app.id == args.content.id)
+						appName = "\""+(apploc[app.name] || app.name)+"\"";
+				});
+				this.tooltip.label = "<div style='float: left;' class='icon-loading-indicator'></div> " + l.launchingApp.replace("%s", appName || args.content.id);
 				this.tooltip.open(this.containerNode);
 				var onEnd = dojo.connect(dojo.Deferred.prototype,"_fire",this,function(m) {
 					dojo.disconnect(onEnd);
