@@ -17,7 +17,7 @@ class FileFs extends BaseFs {
 		global $User;
 		$cur = $User->get_current();
 		$quota = $cur->quota;
-		$current = $this->_getSize($this->_basePath);
+		$current = $this->_getSize($this->_basePath());
 		$total = $quota - $current;
 		return $total;
 	}
@@ -25,7 +25,7 @@ class FileFs extends BaseFs {
 		global $User;
 		$cur = $User->get_current();
 		$quota = $cur->quota;
-		$current = $this->_getSize($this->_basePath);
+		$current = $this->_getSize($this->_basePath());
 		if($current >= $quota) {
 			if($quota == 0) { return true; } //no quota
 			$blah = new intOutput();
