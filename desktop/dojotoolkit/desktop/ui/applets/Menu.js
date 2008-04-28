@@ -97,11 +97,18 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		if (this._menubutton) {
 			this._menubutton.destroy();
 		}
+		this._menu.addChild(new dijit.MenuSeparator());
+		this._menu.addChild(new dijit.PopupMenuItem({
+			label: l.places,
+			iconClass: "icon-16-places-folder",
+			popup: this._makePlacesMenu()
+		}))
 		this._menu.addChild(new dijit.PopupMenuItem({
 			label: l.system,
 			iconClass: "icon-16-categories-preferences-system",
 			popup: this._makeSystemMenu()
 		}))
+		this._menu.addChild(new dijit.MenuSeparator());
 		this._menu.addChild(new dijit.MenuItem({
 			label: l.logOut, 
 			iconClass: "icon-16-actions-system-log-out",
@@ -171,7 +178,12 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 			}
 			catMenu.startup();
 			category.popup = catMenu;
-			menu.addChild(category);
+			if(cat == "Preferences" || cat == "System") {
+				catMenu.destroy();
+				category.destroy();
+			}
+			else
+				menu.addChild(category);
 		}
 		menu.domNode.style.display="none";
 		menu.startup();
