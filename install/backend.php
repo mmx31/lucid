@@ -74,6 +74,7 @@
 		$user->username = $_POST['username'];
 		$user->email = $_POST['email'];
 		$user->password = $_POST['password'];
+		$user->quota = 0; //no quota
 		$user->crypt_password();
 		$user->add_permission("core.administration");
 		$user->add_permission("api.ide");
