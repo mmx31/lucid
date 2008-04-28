@@ -13,6 +13,14 @@ class FileFs extends BaseFs {
 	function _getRealPath($path) {
 		return $this->_basePath($path);
 	}
+	function _getRemainingQuota() {
+		global $User;
+		$cur = $User->get_current();
+		$quota = $cur->quota;
+		$current = $this->_getSize($this->_basePath);
+		$total = $quota - $current;
+		return $total;
+	}
 	function _checkUserQuota() {
 		global $User;
 		$cur = $User->get_current();
@@ -153,6 +161,9 @@ class FileFs extends BaseFs {
 	function _read($path) {
 		$path = $this->_basePath($path);
 		return file_get_contents($path);
+	}
+	function _quota() {
+		return _getRemainingQuota();
 	}
 	function _write($path, $content) {
 		$this->_checkUserQuota();
