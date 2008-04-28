@@ -197,7 +197,9 @@
 							{ label: mnu.internet, value: "Internet" },
 							{ label: mnu.multimedia, value: "Multimedia" },
 							{ label: mnu.office, value: "Office" },
-							{ label: mnu.system, value: "System" }
+							{ label: mnu.system, value: "System" },
+							{ label: mnu.administration, value: "Administration" },
+							{ label: mnu.preferences, value: "Preferences" }
 						]
 					}
 				}),
@@ -230,25 +232,25 @@
 		var nameChanged = 0;	// Has app name been changed?
 		var versionChanged = 0;	// Has app version been changed?
 	
-		if ( this.app.name != this.appUi.name.getValue() ) {
+		if ( this.app.name != this.metaUi.name.getValue() ) {
 			nameChanged = 1;
 			anyChanged = 1;
 		}
-		if ( this.app.version != this.appUi.version.getValue() ) {
+		if ( this.app.version != this.metaUi.version.getValue() ) {
 			versionChanged = 1;
 			anyChanged = 1;
 		}
-		if ( this.app.author != this.appUi.author.getValue() ) anyChanged = 1;
-		if ( this.app.email != this.appUi.email.getValue() ) anyChanged = 1;
-		if ( this.app.category != this.appUi.category.getValue() ) anyChanged = 1;
-		if ( this.app.maturity != this.appUi.maturity.getValue() ) anyChanged = 1;
+		if ( this.app.author != this.metaUi.author.getValue() ) anyChanged = 1;
+		if ( this.app.email != this.metaUi.email.getValue() ) anyChanged = 1;
+		if ( this.app.category != this.metaUi.category.getValue() ) anyChanged = 1;
+		if ( this.app.maturity != this.metaUi.maturity.getValue() ) anyChanged = 1;
 		
-		this.app.name = this.appUi.name.getValue();
-		this.app.author = this.appUi.author.getValue();
-		this.app.email = this.appUi.email.getValue();
-		this.app.version = this.appUi.version.getValue();
-		this.app.category = this.appUi.category.getValue();
-		this.app.maturity = this.appUi.maturity.getValue();
+		this.app.name = this.metaUi.name.getValue();
+		this.app.author = this.metaUi.author.getValue();
+		this.app.email = this.metaUi.email.getValue();
+		this.app.version = this.metaUi.version.getValue();
+		this.app.category = this.metaUi.category.getValue();
+		this.app.maturity = this.metaUi.maturity.getValue();
 		this.editor.value = this.tempCache;
 	        this.editor.disabled = false;
 		this.blah++;
