@@ -178,7 +178,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 			}
 			catMenu.startup();
 			category.popup = catMenu;
-			if(cat == "Preferences" || cat == "System") {
+			if(cat == "Preferences" || cat == "Administration") {
 				catMenu.destroy();
 				category.destroy();
 			}
