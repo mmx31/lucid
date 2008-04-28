@@ -24,17 +24,17 @@
 /**
  * @see Zend_Mail_Storage_Abstract
  */
-require_once 'Zend/Mail/Storage/Abstract.php';
+import("lib.mail.Storage.Abstract");
 
 /**
  * @see Zend_Mail_Protocol_Pop3
  */
-require_once 'Zend/Mail/Protocol/Pop3.php';
+import("lib.mail.Protocol.Pop3");
 
 /**
  * @see Zend_Mail_Message
  */
-require_once 'Zend/Mail/Message.php';
+import("lib.mail.Message");
 
 
 /**
@@ -112,7 +112,7 @@ class Zend_Mail_Storage_Pop3 extends Zend_Mail_Storage_Abstract
             /**
              * @see Zend_Mail_Storage_Exception
              */
-            require_once 'Zend/Mail/Storage/Exception.php';
+            import("lib.mail.Storage.Exception");
             throw new Zend_Mail_Storage_Exception('not implemented');
         }
 
@@ -135,7 +135,7 @@ class Zend_Mail_Storage_Pop3 extends Zend_Mail_Storage_Abstract
             /**
              * @see Zend_Mail_Storage_Exception
              */
-            require_once 'Zend/Mail/Storage/Exception.php';
+            import("lib.mail.Storage.Exception");
             throw new Zend_Mail_Storage_Exception('not implemented');
         }
 
@@ -177,7 +177,7 @@ class Zend_Mail_Storage_Pop3 extends Zend_Mail_Storage_Abstract
             /**
              * @see Zend_Mail_Storage_Exception
              */
-            require_once 'Zend/Mail/Storage/Exception.php';
+            import("lib.mail.Storage.Exception");
             throw new Zend_Mail_Storage_Exception('need at least user in params');
         }
 
@@ -279,7 +279,7 @@ class Zend_Mail_Storage_Pop3 extends Zend_Mail_Storage_Abstract
         /**
          * @see Zend_Mail_Storage_Exception
          */
-        require_once 'Zend/Mail/Storage/Exception.php';
+        import("lib.mail.Storage.Exception");
         throw new Zend_Mail_Storage_Exception('unique id not found');
     }
 

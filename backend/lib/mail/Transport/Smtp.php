@@ -24,22 +24,22 @@
 /**
  * @see Zend_Loader
  */
-require_once 'Zend/Loader.php';
+import("lib.Zend_Loader");
 
 /**
  * @see Zend_Mime
  */
-require_once 'Zend/Mime.php';
+import("lib.mime.Mime");
 
 /**
  * @see Zend_Mail_Protocol_Smtp
  */
-require_once 'Zend/Mail/Protocol/Smtp.php';
+import('lib.mail.Protocol.Stmp');
 
 /**
  * @see Zend_Mail_Transport_Abstract
  */
-require_once 'Zend/Mail/Transport/Abstract.php';
+import('lib.mail.Transport.Abstract');
 
 
 /**
@@ -229,7 +229,7 @@ class Zend_Mail_Transport_Smtp extends Zend_Mail_Transport_Abstract
             /**
              * @see Zend_Mail_Transport_Exception
              */
-            require_once 'Zend/Mail/Transport/Exception.php';
+            import("lib.mail.Transport.Exception");
             throw new Zend_Mail_Transport_Exception('_prepareHeaders requires a registered Zend_Mail object');
         }
 

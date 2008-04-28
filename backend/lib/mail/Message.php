@@ -23,7 +23,7 @@
 /**
  * Zend_Mail_Part
  */
-require_once 'Zend/Mail/Part.php';
+import("lib.mail.Part");
 
 
 /**
@@ -59,7 +59,7 @@ class Zend_Mail_Message extends Zend_Mail_Part
                     /**
                      * @see Zend_Mail_Exception
                      */
-                    require_once 'Zend/Mail/Exception.php';
+                    import("lib.mail.Exception");
                     throw new Zend_Mail_Exception('could not open file');
                 }
             } else {

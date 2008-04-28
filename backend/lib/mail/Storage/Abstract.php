@@ -82,7 +82,7 @@ abstract class Zend_Mail_Storage_Abstract implements Countable, ArrayAccess, See
         /**
          * @see Zend_Mail_Storage_Exception
          */
-        require_once 'Zend/Mail/Storage/Exception.php';
+        import("lib.mail.Storage.Exception");
         throw new Zend_Mail_Storage_Exception($var . ' not found');
     }
 
@@ -264,7 +264,7 @@ abstract class Zend_Mail_Storage_Abstract implements Countable, ArrayAccess, See
         /**
          * @see Zend_Mail_Storage_Exception
          */
-        require_once 'Zend/Mail/Storage/Exception.php';
+        import("lib.mail.Storage.Exception");
         throw new Zend_Mail_Storage_Exception('cannot write mail messages via array access');
      }
 
