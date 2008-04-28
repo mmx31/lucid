@@ -112,6 +112,12 @@ class BaseFs {
 	function _read($path) {
 		return "";
 	}
+	function quota() {
+		return $this->_quota();
+	}
+	function _quota() {
+		return 0;
+	}
 	function write($path, $content) {
 		$path = $this->_getPath($path);
 		return $this->_write($path, $content);
