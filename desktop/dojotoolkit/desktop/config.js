@@ -59,7 +59,7 @@ desktop.config = {
 	debug: true,
 	//	crosstalkPing: Integer
 	//		Crosstalk ping interval (in miliseconds)
-	crosstalkPing: 800,
+	crosstalkPing: 1500,
 	//	panels:	Array
 	//		an array of each panel's settings and applets
 	panels: [
