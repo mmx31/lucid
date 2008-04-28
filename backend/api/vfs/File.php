@@ -17,6 +17,7 @@ class FileFs extends BaseFs {
 		global $User;
 		$cur = $User->get_current();
 		$quota = $cur->quota;
+		if($quota == 0) { return 0; } //no quota
 		$current = $this->_getSize($this->_basePath());
 		$total = $quota - $current;
 		return $total;
@@ -27,7 +28,7 @@ class FileFs extends BaseFs {
 		$quota = $cur->quota;
 		$current = $this->_getSize($this->_basePath());
 		if($current >= $quota) {
-			if($quota == 0) { return true; } //no quota
+			if($quota == 0) { return 0; } //no quota
 			$blah = new intOutput();
 			$blah->set("quota_exceeded");
 			die();
@@ -58,7 +59,7 @@ class FileFs extends BaseFs {
 					$size += filesize($path);
 				}elseif(is_dir($path))
 				{
-					$handlesize = recursive_directory_size($path);
+					$handlesize = $this->_getSize($path);
 					if($handlesize >= 0)
 					{
 						$size += $handlesize;
@@ -164,7 +165,7 @@ class FileFs extends BaseFs {
 	}
 	function _quota($remaining) {
 		if($remaining == "remaining") {
-		return _getRemainingQuota();
+		return $this->_getRemainingQuota();
 		}
 		else if($remaining == "quota") {
 		global $User;
