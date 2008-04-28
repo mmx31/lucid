@@ -1,3 +1,5 @@
+if(!dojo._hasResource["api.Window"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource["api.Window"] = true;
 dojo.provide("api.Window");
 dojo.require("dojox.layout.ResizeHandle");
 dojo.require("dojo.dnd.move");
@@ -20,7 +22,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	//	|	win.show();
 	//	|	win.startup();
 	//	|	setTimeout(dojo.hitch(win, "destroy"), 1000*5);
-	templatePath: dojo.moduleUrl("api", "templates/Window.html"),
+	templateString:"<div class=\"win\" style=\"display: none;\" dojoattachevent=\"onmousedown: bringToFront\">\n\t<div class=\"win-tl\">\n\t\t<div class=\"win-tr\">\n\t\t\t<div class=\"win-tc\" dojoattachevent=\"onmousedown: bringToFront\">\n\t\t\t\t<div dojoattachpoint=\"titleNode,handle\" class=\"win-title\">${title}</div>\n\t\t\t\t<div class=\"win-buttons\">\n\t\t\t\t\t<div dojoattachevent=\"onmouseup: close\" class=\"win-close\"></div>\n\t\t\t\t\t<div dojoattachevent=\"onmouseup: _toggleMaximize\" class=\"win-max\"></div>\n\t\t\t\t\t<div dojoattachevent=\"onmouseup: minimize\" class=\"win-min\"></div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div class=\"win-bmw\">\n\t\t<div class=\"win-ml\">\n\t\t\t<div class=\"win-mr\">\n\t\t\t\t<div class=\"win-mc\" style=\"overflow: hidden;\" dojoattachpoint=\"containerNode\"></div>\n\t\t\t\t<div class=\"win-mc\" style=\"display: none;\" dojoattachpoint=\"dragContainerNode\"></div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"win-bl\">\n\t\t\t<div class=\"win-br\">\n\t\t\t\t<div class=\"win-bc\"></div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div dojoattachpoint=\"sizeHandle\" class=\"win-resize\"></div>\n\t</div>\n</div>\n",
 	//	_winListItem: storeItem
 	//		The store item that represents this window on desktop.ui._windowList
 	_winListItem: null,
@@ -469,9 +471,8 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			this.closed = true;
 			if(this._winListItem) desktop.ui._windowList.deleteItem(this._winListItem);
 			this._winListItem = false;
+			this.onClose();
 			var onEnd = dojo.hitch(this, function() {
-				this.onClose();
-				this.domNode.parentNode.removeChild(this.domNode);
 				this.destroy();
 			})
 			if (desktop.config.fx >= 2) {
@@ -600,3 +601,5 @@ dojo.extend(dijit._Widget, {
 	//		See the LayoutContainer description for details on this parameter.
 	layoutAlign: 'none'
 });
+
+}
