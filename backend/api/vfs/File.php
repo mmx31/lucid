@@ -162,8 +162,16 @@ class FileFs extends BaseFs {
 		$path = $this->_basePath($path);
 		return file_get_contents($path);
 	}
-	function _quota() {
+	function _quota($remaining) {
+		if($remaining == "remaining") {
 		return _getRemainingQuota();
+		}
+		else if($remaining == "quota") {
+		global $User;
+		$cur = $User->get_current();
+		$quota = $cur->quota;
+		return $quota;
+		}
 	}
 	function _write($path, $content) {
 		$this->_checkUserQuota();

@@ -111,6 +111,9 @@ if($_GET['section'] == "io")
 	    $module->createDirectory($sentpath);
 		$out = new intOutput("ok");
 	}
+	if ($_GET['action'] == "getQuota") {
+		$module->quota($_POST['type']);
+	}
 	if ($_GET['action'] == "copyFile") {
 		function modCopy($smodule, $source, $tmodule, $target) {
 			if(get_class($smodule) == get_class($tmodule)) {
