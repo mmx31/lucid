@@ -13,17 +13,81 @@ class FileFs extends BaseFs {
 	function _getRealPath($path) {
 		return $this->_basePath($path);
 	}
+	function _checkUserQuota() {
+		global $User;
+		$cur = $User->get_current();
+		$quota = $cur->quota;
+		$current = $this->_getSize($this->_basePath);
+		if($current >= $quota) {
+			if($quota == 0) { return true; } //no quota
+			$blah = new intOutput();
+			$blah->set("quota_exceeded");
+			die();
+		}
+		return true;
+	}
+		
+	function _getSize($directory) //works for files and folders
+	{
+	$size = 0;
+	if(substr($directory,-1) == '/')
+	{
+		$directory = substr($directory,0,-1);
+	}
+	if(!file_exists($directory) || !is_dir($directory) || !is_readable($directory))
+	{
+		return filesize($directory);
+	}
+	if($handle = opendir($directory))
+	{
+		while(($file = readdir($handle)) !== false)
+		{
+			$path = $directory.'/'.$file;
+			if($file != '.' && $file != '..')
+			{
+				if(is_file($path))
+				{
+					$size += filesize($path);
+				}elseif(is_dir($path))
+				{
+					$handlesize = recursive_directory_size($path);
+					if($handlesize >= 0)
+					{
+						$size += $handlesize;
+					}else{
+						return -1;
+					}
+				}
+			}
+		}
+		closedir($handle);
+	}
+	if($format == TRUE)
+	{
+		if($size / 1048576 > 1)
+		{
+			return round($size / 1048576, 1).' MB';
+		}elseif($size / 1024 > 1)
+		{
+			return round($size / 1024, 1).' KB';
+		}else{
+			return round($size, 1).' bytes';
+		}
+	}else{
+		return $size;
+	}
+	} 
 	function _getFileInfo($file, $realPath=false) {
 		$r = array();
 		$r['path'] = $file; //TODO: this is it's real path, get it's vfs path?
 		$f = ($realPath ? "" : $this->_basePath()) . $file;
 		$r['name'] = basename($f);
+		$r["size"] = $this->_getSize($f);
 		if(is_dir($f)) {
 			$r["type"] = "text/directory";
 		}
 		else if(is_file($f)) {
 			$r["modified"] = date ("F d Y H:i:s.", filemtime($f));
-			$r["size"] = filesize($f);
 			$r["type"] = mime_content_type($f);
 			//TODO: guess mimetype based on extension?
 		}
@@ -70,15 +134,18 @@ class FileFs extends BaseFs {
 	    }
 	}
 	function _createDirectory($path) {
+		$this->_checkUserQuota();
 		$path = $this->_basePath($path);
 		return mkdir($path);
 	}
 	function _copy($source, $destination) {
+		$this->_checkUserQuota();
 		$source = $this->_basePath($source);
 		$destination = $this->_basePath($destination);
 		return copy($source, $destination);
 	}
 	function _rename($oldpath, $newpath) {
+		$this->_checkUserQuota();
 		$oldpath = $this->_basePath($oldpath);
 		$newpath = $this->_basePath($newpath);
 		return rename($oldpath, $newpath);
@@ -88,6 +155,7 @@ class FileFs extends BaseFs {
 		return file_get_contents($path);
 	}
 	function _write($path, $content) {
+		$this->_checkUserQuota();
 		$path = $this->_basePath($path);
 		return file_put_contents($path, $content);
 	}

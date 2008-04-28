@@ -26,6 +26,7 @@
 		var $permissions = array('type' => 'array');
 		var $groups = array('type' => 'array');
 		var $lastauth = array('type' => 'timestamp');
+		var $quota = array('type' => 'integer', 'default' => 26214400);
 		
 		function get_current()
 		{

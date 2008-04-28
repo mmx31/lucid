@@ -61,7 +61,8 @@ class intOutput {
 		"mail_connect_err" => 8,
 		"feature_not_available" => 9,
 		"object_not_found" => 10,
-		"already_installed" => 11
+		"already_installed" => 11,
+		"quota_exceeded" => 12
 	);
 	function __construct($val=false) {
 		if($val !== false) $this->set($val);
