@@ -8,52 +8,6 @@ dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 	//		An extention of desktop.ui.applets.Menu except it seperates the application, places, and system menus into their own buttons
 	dispName: "Menu Bar",
 	_drawn: false,
-	_makeSystemMenu: function() {
-		//	summary:
-		//		Makes the system menu
-		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
-		var m = new dijit.Menu();
-		dojo.forEach([
-			new dijit.PopupMenuItem({
-				label: l.preferences,
-				iconClass: "icon-16-categories-preferences-desktop",
-				popup: this._makePrefsMenu()
-			}),
-			new dijit.MenuSeparator(),
-			new dijit.MenuItem({
-				label: l.about,
-				iconClass: "icon-16-apps-help-browser",
-				onClick: function() {
-					api.ui.alertDialog({
-						title: l.about,
-						style: "width: 400px;",
-						message: "<h2>Psych Desktop</h2><b>Version "+desktop.version+"</b><br /><br />Brought to you by:<ul style='padding: 0px; height: 150px; overflow-y: auto;'><li>Will \"Psychcf\" Riley<div style=\"font-size: 10pt;\">Developer/Project Manager</div></li><li>Jay MacDonald<div style=\"font-size: 10pt;\">Developer/Assistant Project Manager</div></li><li>David \"mmx\" Clayton<div style=\"font-size: 10pt;\">UI Designer/Lead Artist</div></li><li>Corey \"nefariousD\" Martin<div style=\"font-size: 10pt;\">Community Contributor</div></li></ul>"
-					})
-				}
-			}),
-			new dijit.MenuSeparator(),
-			new dijit.MenuItem({
-				label: l.logOut, 
-				iconClass: "icon-16-actions-system-log-out",
-				onClick: desktop.user.logout
-			})
-		], m.addChild, m);
-		return m;
-	},
-	_makePlacesMenu: function() {
-		//	summary:
-		//		Makes the places menu
-		var l = dojo.i18n.getLocalization("desktop", "places");
-		var m = new dijit.Menu();
-		dojo.forEach(desktop.config.filesystem.places, function(place) {
-			var item = new dijit.MenuItem({label: l[place.name] || place.name,
-				iconClass: place.icon || "icon-16-places-folder",
-				onClick: function() { desktop.app.launchHandler(place.path, {}, "text/directory"); }
-			});
-			m.addChild(item);
-		}, this);
-		return m;
-	},
 	_drawButton: function() {
 		//	summary:
 		//		Draws the button for the applet
@@ -89,6 +43,14 @@ dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 			b.domNode.style.height="100%";
 			b.startup();
 			if(i.label == l.applications) this._appMenuButton = b;
+			if(i.label == l.system) {
+				b.dropDown.addChild(new dijit.MenuSeparator());
+				b.dropDown.addChild(new dijit.MenuItem({
+					label: l.logOut, 
+					iconClass: "icon-16-actions-system-log-out",
+					onClick: desktop.user.logout
+				}))
+			}
 		}, this);
 	}
 });

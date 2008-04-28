@@ -13,5 +13,6 @@
 	"about": "Acerca de Psych Desktop",
 	"logOut": "Cerrar sesión",
 	"appearance": "Apariencia",
-	"accountInfo": "Información de la cuenta"
+	"accountInfo": "Información de la cuenta",
+	"administration": "Administración"
 })

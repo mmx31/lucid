@@ -7,6 +7,8 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 	//	summary:
 	//		A simple menu applet
 	dispName: "Main Menu",
+	_prefsMenu: [],
+	_adminMenu: [],
 	postCreate: function() {
 		this._getApps();
 		//this._interval = setInterval(dojo.hitch(this, this._getApps), 1000*60);
@@ -20,10 +22,26 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		if(this._menu) this._menu.destroy();
 		this.inherited("uninitialize", arguments);
 	},
-	_makePrefsMenu: function() {
+	_makePlacesMenu: function() {
+		//	summary:
+		//		Makes the places menu
+		var l = dojo.i18n.getLocalization("desktop", "places");
+		var m = new dijit.Menu();
+		dojo.forEach(desktop.config.filesystem.places, function(place) {
+			var item = new dijit.MenuItem({label: l[place.name] || place.name,
+				iconClass: place.icon || "icon-16-places-folder",
+				onClick: function() { desktop.app.launchHandler(place.path, {}, "text/directory"); }
+			});
+			m.addChild(item);
+		}, this);
+		return m;
+	},
+	_makeSystemMenu: function(items) {
 		//	summary:
 		//		Creates a preferences menu and returns it
 		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
+		var sMenu = new dijit.Menu({});
+
 		var pMenu = new dijit.Menu();
 		dojo.forEach([
 			{
@@ -39,7 +57,37 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		], function(args) {
 			pMenu.addChild(new dijit.MenuItem(args));
 		});
-		return pMenu;
+		dojo.forEach(this._prefsMenu, function(item) {
+			pMenu.addChild(item);
+		}, this);
+		sMenu.addChild(new dijit.PopupMenuItem({
+			popup: pMenu,
+			label: l.preferences,
+			iconClass: "icon-16-categories-preferences-desktop"
+		}));
+		
+		var aMenu = new dijit.Menu();
+		dojo.forEach(this._adminMenu, function(item) {
+			aMenu.addChild(item);
+		}, this);
+		sMenu.addChild(new dijit.PopupMenuItem({
+			popup: aMenu,
+			label: l.administration,
+			iconClass: "icon-16-categories-applications-system"
+		}));
+		sMenu.addChild(new dijit.MenuSeparator())
+		sMenu.addChild(new dijit.MenuItem({
+			label: l.about,
+			iconClass: "icon-16-apps-help-browser",
+			onClick: function() {
+				api.ui.alertDialog({
+					title: l.about,
+					style: "width: 400px;",
+					message: "<h2>Psych Desktop</h2><b>Version "+desktop.version+"</b><br /><br />Brought to you by:<ul style='padding: 0px; height: 150px; overflow-y: auto;'><li>Will \"Psychcf\" Riley<div style=\"font-size: 10pt;\">Developer/Project Manager</div></li><li>Jay MacDonald<div style=\"font-size: 10pt;\">Developer/Assistant Project Manager</div></li><li>David \"mmx\" Clayton<div style=\"font-size: 10pt;\">UI Designer/Lead Artist</div></li><li>Corey \"nefariousD\" Martin<div style=\"font-size: 10pt;\">Community Contributor</div></li></ul>"
+				})
+			}
+		}))
+		return sMenu;
 	},
 	_drawButton: function() {
 		//	summary:
@@ -50,9 +98,9 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 			this._menubutton.destroy();
 		}
 		this._menu.addChild(new dijit.PopupMenuItem({
-			label: l.preferences,
-			iconClass: "icon-16-categories-preferences-desktop",
-			popup: this._makePrefsMenu()
+			label: l.system,
+			iconClass: "icon-16-categories-preferences-system",
+			popup: this._makeSystemMenu()
 		}))
 		this._menu.addChild(new dijit.MenuItem({
 			label: l.logOut, 
@@ -112,7 +160,13 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 						label: ap[data[app].name] || data[app].name
 					});
 					dojo.connect(item, "onClick", dojo.hitch(desktop.app, "launch", data[app].id));
-					catMenu.addChild(item);
+					if(cat == "Preferences") {
+						this._prefsMenu.push(item);
+					}
+					else if(cat=="Administration") {
+						this._adminMenu.push(item);
+					}
+					else catMenu.addChild(item);
 				}
 			}
 			catMenu.startup();

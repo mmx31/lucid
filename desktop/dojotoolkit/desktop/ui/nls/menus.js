@@ -14,5 +14,6 @@
 	"about": "About Psych Desktop",
 	"logOut": "Log Out",
 	"appearance": "Appearance",
-	"accountInfo": "Account Information"
+	"accountInfo": "Account Information",
+	"administration": "Administration"
 })
