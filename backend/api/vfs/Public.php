@@ -1,4 +1,12 @@
 <?php
+/*
+	Copyright (c) 2004-2008, The Dojo Foundation & Lucid Contributors
+	All Rights Reserved.
+
+	Licensed under the Academic Free License version 2.1 or above.
+*/
+
+
 //PHP completely fails as a programming language, so we can't do this (that would be far too maintainable!)
 //Let's copy the entire class instead! Yeah, awesome idea!!! (not...)
 /*
