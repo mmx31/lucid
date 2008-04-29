@@ -8,7 +8,7 @@
  | Email bugs/suggestions to darksnoopy@shaw.ca
  +--------------------------------------------------
  | This script has been created and released under
- | the GNU GPL and is free to use and redistribute
+ | the GNU GPL or the BSD License and is free to use and redistribute
  | only if this copyright statement is not removed
  +--------------------------------------------------*/
 
