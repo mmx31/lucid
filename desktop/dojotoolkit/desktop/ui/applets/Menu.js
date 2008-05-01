@@ -83,7 +83,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 				api.ui.alertDialog({
 					title: l.about,
 					style: "width: 400px;",
-					message: "<h2>Psych Desktop</h2><b>Version "+desktop.version+"</b><br /><br />Brought to you by:<ul style='padding: 0px; height: 150px; overflow-y: auto;'><li>Will \"Psychcf\" Riley<div style=\"font-size: 10pt;\">Developer/Project Manager</div></li><li>Jay MacDonald<div style=\"font-size: 10pt;\">Developer/Assistant Project Manager</div></li><li>David \"mmx\" Clayton<div style=\"font-size: 10pt;\">UI Designer/Lead Artist</div></li><li>Corey \"nefariousD\" Martin<div style=\"font-size: 10pt;\">Community Contributor</div></li></ul>"
+					message: "<h2>Psych Desktop</h2><b>Version "+desktop.version+"</b><br /><br />Brought to you by:<ul style='padding: 0px; height: 150px; overflow-y: auto;'><li>Will \"Psychcf\" Riley<div style=\"font-size: 10pt;\">Developer/Project Manager</div></li><li>Jay MacDonald<div style=\"font-size: 10pt;\">Developer/Assistant Project Manager</div></li><li>David \"mmx\" Clayton<div style=\"font-size: 10pt;\">UI Designer/Lead Artist</div></li><li>Corey \"nefariousD\" Martin<div style=\"font-size: 10pt;\">Community Contributor</div></li><li>Nicola Rizzo<div style=\"font-size: 10pt;\">CodeTextArea widget in IDE</div></li></ul>"
 				})
 			}
 		}))
@@ -166,7 +166,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 					var item = new dijit.MenuItem({
 						label: ap[data[app].name] || data[app].name
 					});
-					dojo.connect(item, "onClick", dojo.hitch(desktop.app, "launch", data[app].id));
+					dojo.connect(item, "onClick", dojo.hitch(desktop.app, "launch", data[app].sysname));
 					if(cat == "Preferences") {
 						this._prefsMenu.push(item);
 					}

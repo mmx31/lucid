@@ -1,5 +1,6 @@
 {
 	"type": "application",
+	"sysname": "AdminPanel",
 	"name": "Administration Panel",
 	"author": "Psychcf",
 	"email": "will@psychdesigns.net",

@@ -1,5 +1,6 @@
 {
 	"type": "application",
+	"sysname": "MineSweep",
 	"name": "MineSweep",
 	"author": "NefariousD",
 	"email": "nefariousd@gmail.com",

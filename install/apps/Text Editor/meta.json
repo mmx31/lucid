@@ -1,5 +1,6 @@
 {
 	"type": "application",
+	"sysname": "TextEditor",
 	"name": "Text Editor",
 	"author": "Jaymacdonald",
 	"email": "Jaymac407@gmail.com",

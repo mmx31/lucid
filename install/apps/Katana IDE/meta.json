@@ -1,5 +1,6 @@
 {
 	"type": "application",
+	"sysname": "KatanaIDE",
 	"name": "Katana IDE",
 	"author": "Psychcf + NefariousD",
 	"email": "will@psychdesigns.net",

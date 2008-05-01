@@ -28,20 +28,19 @@ dojo.declare("desktop.ui.applets.Netmonitor", desktop.ui.Applet, {
 		this.tooltip = new dijit.Tooltip({
 			position: ["above", "below", "after", "before"]
 		});
-		this._onXhr = dojo.connect(api, "xhr", this, function(args) {
-			if(args.backend && args.backend == "core.app.fetch.full" && args.notify !== false) {
-				var appName = false;
-				dojo.forEach(desktop.app.appList, function(app) {
-					if(app.id == args.content.id)
-						appName = "\""+(apploc[app.name] || app.name)+"\"";
-				});
-				this.tooltip.label = "<div style='float: left;' class='icon-loading-indicator'></div> " + l.launchingApp.replace("%s", appName || args.content.id);
-				this.tooltip.open(this.containerNode);
-				var onEnd = dojo.connect(dojo.Deferred.prototype,"_fire",this,function(m) {
-					dojo.disconnect(onEnd);
-					this.tooltip.close();
-				});
-			}
+		this._onLaunch = dojo.subscribe("launchApp", this, function(name) {
+			if(typeof dojo._loadedModules["desktop.apps."+name] != "undefined") return;
+			var appName = false;
+			dojo.forEach(desktop.app.appList, function(app) {
+				if(app.sysname == name)
+					appName = "\""+(apploc[app.name] || app.name)+"\"";
+			});
+			this.tooltip.label = "<div style='float: left;' class='icon-loading-indicator'></div> " + l.launchingApp.replace("%s", appName || name);
+			this.tooltip.open(this.containerNode);
+			var onEnd = dojo.subscribe("launchAppEnd",this,function() {
+				dojo.unsubscribe(onEnd);
+				this.tooltip.close();
+			});
 		})
 		this.inherited("postCreate", arguments);
 	},
@@ -54,7 +53,7 @@ dojo.declare("desktop.ui.applets.Netmonitor", desktop.ui.Applet, {
 	uninitialize: function() {
 		dojo.disconnect(this._xhrStart);
 		dojo.disconnect(this._xhrEnd);
-		dojo.disconnect(this._onXhr);
+		dojo.unsubscribe(this._onLaunch);
 		this.inherited("uninitialize", arguments);
 	}
 });

@@ -1,5 +1,6 @@
 {
 	"type": "application",
+	"sysname": "WordProcessor",
 	"name": "Word Processor",
 	"author": "Jaymacdonald",
 	"email": "Jaymac407@gmail.com",

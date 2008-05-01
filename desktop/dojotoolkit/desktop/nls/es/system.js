@@ -1,5 +1,6 @@
 ({
 	"name": "Nombre",
+	"sysname": "Nombre de Systema",
 	"instance": "Instancia",
 	"id": "ID",
 	"author": "Autor",

@@ -1,5 +1,6 @@
 {
 	"type": "application",
+	"sysname": "WebBrowser",
 	"name": "Web Browser",
 	"author": "Psychcf",
 	"email": "will@psychdesigns.net",

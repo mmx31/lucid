@@ -1,5 +1,6 @@
 {
 	"type": "application",
+	"sysname": "Checkers",
 	"name": "Checkers",
 	"author": "Psychcf",
 	"email": "will@psychdesigns.net",

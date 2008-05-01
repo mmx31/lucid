@@ -1,5 +1,6 @@
 {
 	"type": "application",
+	"sysname": "EmailClient",
 	"name": "Email Client",
 	"author": "Psychcf",
 	"email": "will@psychdesigns.net",

@@ -1,5 +1,6 @@
 {
 	"type": "application",
+	"sysname": "TaskManager",
 	"name": "Task Manager",
 	"author": "Jaymacdonald",
 	"email": "Jaymac407@gmail.com",

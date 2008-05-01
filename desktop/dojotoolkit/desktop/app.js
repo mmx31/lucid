@@ -1,4 +1,5 @@
 dojo.provide("desktop.app");
+dojo.require("desktop.apps._App");
 
 desktop.app = {
 	//	summary:
@@ -34,92 +35,8 @@ desktop.app = {
 		g = desktop.config.startupapps;
 		for(var f in g)
 		{
-			if((typeof f) == "number")
 			desktop.app.launch(g[f]);
 		}
-	},
-	fetchApp: function(/*Integer*/appID, /*Function*/callback, /*anything?*/args)
-	{
-		//	summary:
-		//		Fetches an app and stores it into the cache
-		//	appID:
-		//		the app's ID
-		//	callback:
-		//		a callback function (once the app has been fetched)
-		//	args:
-		//		an argument to be passed to the callback function
-		api.xhr({
-		    backend: "core.app.fetch.full",
-			content: {
-				id: parseInt(appID)
-			},
-		    load: dojo.hitch(this, function(app, ioArgs)
-			{
-				this._fetchApp(app, callback);
-			}),
-			handleAs: "json"
-		});
-	},
-	_fetchApp: function(app, callback) {
-		dojo.declare("desktop.app.apps.app"+app.id, null, {
-			id: app.id,
-			name: app.name,
-			version: app.version,
-			instance: -1,
-			status: "",
-			constructor: function(info) {
-				this.status = "init";
-				dojo.connect(this, "kill", this, function() {
-                    this.status = "killed";
-					var pid = this.instance;
-					//allow the garbage collector to free up memory
-					setTimeout(function(){
-						desktop.app.instances[pid]=null;
-					}, desktop.config.window.animSpeed + 1000);
-                });
-				this.instance = info.instance;
-				try {
-					this.init(info.args||{});
-				}
-				catch(e) {
-					console.error(e);
-				}
-				this.status = "active";
-				if(typeof info.callback == "function") info.callback(this);
-			},
-			kill: function() {
-				//cleanup ui, disconnect events, etc.
-			}
-		});
-		dojo.extend(desktop.app.apps["app"+app.id], eval("("+app.code+")"));
-		
-		if(callback)
-		{
-			if(typeof args == "undefined") args = {};
-			callback(parseInt(app.id), args);
-		}
-	},
-	launchByName: function(/*String*/name, /*Object?*/args)
-	{
-		//	summary:
-		//		Fetches an app by name and stores it into the cache
-		//	name:
-		//		the name of the app
-		//	args:
-		//		arguments to pass to the app
-		api.log("translating app name "+name+" to id...");
-		api.xhr({
-		    backend: "core.app.fetch.id",
-			content: {
-				name: name
-			},
-		    load: dojo.hitch(this, function(data, ioArgs)
-			{
-				if(typeof data.appid != "undefined") { this.launch(data.appid, args); }
-				else { api.log("translation failed. invalid app name"); }
-			}),
-			handleAs: "json"
-		});
 	},
 	launchHandler: function(/*String?*/file, /*Object?*/args, /*String?*/format) {
 		//	summary:
@@ -169,7 +86,7 @@ desktop.app = {
 				for (key in this.appList[app].filetypes) {
 					if (this.appList[app].filetypes[key] == "text/directory") {
 						if(file) args.path = file;
-						desktop.app.launch(this.appList[app].id, args);
+						desktop.app.launch(this.appList[app].sysname, args);
 						return;
 					}
 				}
@@ -182,7 +99,7 @@ desktop.app = {
 					var parts = this.appList[app].filetypes[key].split("/");
 					if (parts[0] == typeParts[0] && (parts[1] == "*" || parts[1] == typeParts[1])) {
 						if(file) args.file = file;
-						desktop.app.launch(this.appList[app].id, args);
+						desktop.app.launch(this.appList[app].sysname, args);
 						return;
 					}
 				}
@@ -193,39 +110,45 @@ desktop.app = {
 			message: "Cannot open " + file + ", no app associated with " + type
 		});
 	},
-	launch: function(/*Integer*/id, /*Object?*/args, /*Function*/callback)
+	launch: function(/*String*/name, /*Object?*/args, /*Function*/callback)
 	{
 		//	summary:
 		//		Fetches an app if it's not in the cache, then launches it.
-		//	id:
-		//		the app's id
+		//	name:
+		//		the app's name
 		//	args:
 		//		the arguments to be passed to the app
 		//	callback:
 		//		a callback once the app has initiated
-		api.log("launching app "+id);
-		if(typeof this.apps["app"+id] == "undefined")
-		{this.fetchApp(id, dojo.hitch(this, "launch", id, args));}
-		else
-		{
-			try {
-				var pid = desktop.app.instances.length;
-				var instance = desktop.app.instances[pid] = new desktop.app.apps["app"+id]({
-					instance: pid,
-					args: args,
-					callback: callback
-				});
-			}
-			catch(e) {
-				console.error(e);
-			}
+		dojo.publish("launchApp", [name]);
+		api.log("launching app "+name);
+		dojo.require("desktop.apps."+name);
+		var pid = false;
+		try {
+			pid = desktop.app.instances.length;
+			var realName = "";
+			dojo.forEach(desktop.app.appList, function(item) {
+				if(item.sysname == name) realName = item.name;
+			})
+			var instance = desktop.app.instances[pid] = new desktop.apps[name]({
+				sysname: name,
+				name: realName,
+				instance: pid,
+				args: args,
+				callback: callback
+			});
 		}
+		catch(e) {
+			console.error(e);
+		}
+		dojo.publish("launchAppEnd", [name]);
+		return pid;
 	},
 	/*=====
 	_listCallbackItem: {
-		//	id: Int
-		//		the app's id
-		id: 0,
+		//	sysname: String
+		//		the app's system name
+		sysname: 0,
 		//	name: String
 		//		the app's name
 		name: "",
@@ -267,20 +190,20 @@ desktop.app = {
 		
 		//TODO: this behaves way too differently from getInstance.
 		//		it returns different keys, and does not return an array with references to the actual instance.
-		this.returnObject = new Array();
+		var returnObject = [];
 		for(var x = 0; x<desktop.app.instances.length; x++){
 				if (desktop.app.instances[x] != null) {
 					var i = desktop.app.instances[x];
-					this.returnObject[x] = {
+					returnObject.push({
 						instance: x,
 						status: i.status,
-						appid: i.id,
+						sysname: i.sysname,
 						name: i.name,
 						version: i.version
-					};
+					});
 				}
 		}
-		return this.returnObject;
+		return returnObject;
 	},
 	getInstance: function(/*Integer*/instance) {
 		//	summary:
@@ -308,22 +231,11 @@ desktop.app = {
 	},
 	
 	//IDE functions
-	execString: function(/*String*/code)
-	{
-		//	summary:
-		//		Executes an app's string that does not exist on the system as if it were a real app
-		desktop.app._fetchApp({
-			id: -1, //anyone who has 666 apps installed is a madman
-			name: "testApp",
-			code: code
-		});
-		desktop.app.launch(-1);
-	},
 	/*=====
 	_saveArgs: {
-		//	id: Integer
-		//		the id of the app. if excluded, creates a new app
-		id: 1,
+		//	sysname: Integer
+		//		the unique system name of the app. Cannot contain spaces.
+		sysname: "",
 		//	name: String
 		//		the name of the app
 		name: "my supercool app",
@@ -355,7 +267,7 @@ desktop.app = {
 	{
 		//	summary:
 		//		saves an app to the server
-		if(typeof app.id != "undefined" &&
+		if(typeof app.sysname != "undefined" &&
 	        typeof app.name != "undefined" &&
 	        typeof app.author != "undefined" &&
 	        typeof app.email != "undefined" &&
@@ -368,7 +280,7 @@ desktop.app = {
 	          api.xhr({
 	               backend: "core.app.write.save",
 	               content : {
-	                    id: app.id,
+	                    sysname: app.sysname,
 	                    name: app.name,
 	                    author: app.author,
 	                    email: app.email,
@@ -382,7 +294,7 @@ desktop.app = {
 						api.log("IDE API: Save error");
 			},
 	               load: function(data, ioArgs){
-						app.callback(data.id);
+						app.callback(data.sysname);
 						api.log("IDE API: Save Sucessful");
 						delete desktop.app.apps[parseInt(data.id)];
 						api.xhr({
@@ -403,38 +315,40 @@ desktop.app = {
 		 	return false;
 		 }
 	},
-	get: function(/*Integer*/appID, /*Function*/callback)
+	get: function(/*String*/name, /*String?*/file, /*Function*/callback)
 	{
 		//	summary:
 		//		Loads an app's information from the server w/o caching
-		//	appID:
-		//		the id of the app to fetch
+		//	name:
+		//		the system name of the app to fetch
+		//	file:
+		//		the filename to open. If excluded, the callback will get an array of filenames
 		//	callback:
 		//		A callback function. Gets passed a desktop.app._saveArgs object, excluding the callback.
 		api.xhr({
 			backend: "core.app.fetch.full",
 			content: {
-				id: appID
+				sysname: name,
+				filename: file
 			},
-			notify: false,
 			load: function(data, ioArgs)
 			{
-				if(callback) callback(/*desktop.app._saveAppArgs*/data);
+				if(callback) callback(/*desktop.app._saveAppArgs|Array*/data);
 			},
 			handleAs: "json"
 		});
 	},
-	remove: function(/*Integer*/id, /*Function*/callback) {
+	remove: function(/*String*/name, /*Function*/callback) {
 		//	summary:
 		//		removes an app from the system
-		//	id:
-		//		the app's id
+		//	name:
+		//		the app's system name
 		//	callback:
 		//		a callback function once the app has been removed
 		api.xhr({
 			backend: "core.app.write.remove",
 			content: {
-				id: id
+				sysname: name
 			},
 			load: function(d) {
 				callback(d=="0");

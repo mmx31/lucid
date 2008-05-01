@@ -22,9 +22,9 @@ class package {
 		}
 		else
 			$unzipPath = $path;
-		$info = file_get_contents($unzipPath."/meta.json");
+		$info = @file_get_contents($unzipPath."/meta.json");
 		if($info == false) return false;
-		$info = Zend_Json::decode($info);
+		$info = @Zend_Json::decode($info);
 		if($info == false) return false;
 		$method="_install_".$info['type'];
 		$ret = package::$method($info, $unzipPath);
@@ -48,10 +48,40 @@ class package {
 		}
 		internal_error("object_not_found", "Matches for package found, but none are installed");
 	}
-	
+	function _recursive_copy( $source, $target )
+    {
+        if ( is_dir( $source ) )
+        {
+            @mkdir( $target );
+           
+            $d = dir( $source );
+           
+            while ( FALSE !== ( $entry = $d->read() ) )
+            {
+                if ( $entry{0} == '.' )
+                {
+                    continue;
+                }
+               
+                $Entry = $source . '/' . $entry;           
+                if ( is_dir( $Entry ) )
+                {
+                    package::_recursive_copy( $Entry, $target . '/' . $entry );
+                    continue;
+                }
+                copy( $Entry, $target . '/' . $entry );
+            }
+           
+            $d->close();
+        }else
+        {
+            copy( $source, $target );
+        }
+    }
 	function _install_application($info, $path) {
 		global $App;
 		$app = new $App();
+		$app->sysname = $info['sysname'];
 		$app->name = $info['name'];
 		$app->author = $info['author'];
 		$app->email = $info['email'];
@@ -59,16 +89,23 @@ class package {
 		$app->maturity = $info['maturity'];
 		$app->category = $info['category'];
 		$app->filetypes = $info['filetypes'];
-		$app->code = file_get_contents($path."/code.js");
 		$app->save();
-		$backendDir = $GLOBALS['path']."../apps/".$app->id;
-		if(is_dir($path."/files")) rename($path."/files", $backendDir);
-		return array("/apps/".$app->id);
+		$backendDir = $GLOBALS['path']."../apps/".$app->sysname;
+		if(is_dir($path."/files")) package::_recursive_copy($path."/backends", $backendDir);
+		$sysDir = $GLOBALS['path']."../desktop/dojotoolkit/desktop/apps/".$app->sysname;
+		if(is_dir($path."/".$app->sysname)) package::_recursive_copy($path."/".$app->sysname, $sysDir);
+		$appFile = $GLOBALS['path']."../desktop/dojotoolkit/desktop/apps/".$app->sysname.".js";
+		copy($path."/".$app->sysname.".js", $appFile);
+		return array(
+			"/apps/".$app->sysname,
+			"/desktop/dojotoolkit/desktop/apps/".$app->sysname,
+			"/desktop/dojotoolkit/desktop/apps/".$app->sysname.".js"
+		);
 	}
 	function _install_theme($info, $path) {
 		$newpath = $GLOBALS['path']."/../desktop/themes/".strtolower($info['name']);
-		rename($path."/".strtolower($info['name']), $newpath);
-		rename($path."/meta.json", $newpath."/meta.json");
+		copy($path."/".strtolower($info['name']), $newpath);
+		copy($path."/meta.json", $newpath."/meta.json");
 		return array("/desktop/themes/".strtolower($info['name']));
 	}
 	function _install_translation($info, $path) {

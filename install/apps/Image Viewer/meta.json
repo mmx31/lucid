@@ -1,5 +1,6 @@
 {
 	"type": "application",
+	"sysname": "ImageViewer",
 	"name": "Image Viewer",
 	"author": "Psychcf",
 	"email": "will@psychdesigns.net",

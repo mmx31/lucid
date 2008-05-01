@@ -1,5 +1,6 @@
 {
 	"type": "application",
+	"sysname": "Calculator",
 	"name": "Calculator",
 	"author": "Psychcf",
 	"email": "will@psychdesigns.net",

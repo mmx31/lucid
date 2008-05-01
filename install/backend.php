@@ -154,7 +154,8 @@
 			"../public/",
 			"../apps/",
 			"../tmp/",
-			"../desktop/themes/"
+			"../desktop/themes/",
+			"../desktop/dojotoolkit/desktop/apps/"
 		);
 		/*$dir = opendir("../desktop/themes/");
 		while(($file = readdir($dir)) !== false){

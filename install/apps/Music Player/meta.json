@@ -1,5 +1,6 @@
 {
 	"type": "application",
+	"sysname": "MusicPlayer",
 	"name": "Music Player",
 	"author": "Psychcf",
 	"email": "will@psychdesigns.net",

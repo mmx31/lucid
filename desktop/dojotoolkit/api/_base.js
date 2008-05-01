@@ -94,4 +94,5 @@ api.log = function(/*String*/str) {
 	dojo.query(".consoleoutput").forEach(function(elem) {
 		elem.innerHTML += "<div>"+str+"</div>";
 	});
+	console.log(str);
 }

@@ -6,7 +6,7 @@
 	"Administration Panel": "Panel de Administración",
 	"Checkers": "Damas",
 	"Calculator": "Calculadora",
-	"RSS Reader": "Lector de RSS",
+	"Feed Reader": "Lector de Alimentaciónes",
 	"Word Processor": "Procesador de textos",
 	"Text Editor": "Editor de textos",
 	"Task Manager": "Administrador de Tareas",

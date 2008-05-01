@@ -30,19 +30,42 @@
 	}
     if($_GET['section'] == "fetch")
 	{
-		if($_GET['action'] == "id")
-		{
-			$appname = $_POST["name"];
-			$p = $App->filter("name", $appname);
-			$p = $p[0];
-			$out = new jsonOutput();
-			$out->append("appid", $p->id);
-		}
 		if($_GET['action'] == "full")
 		{
-			header("Content-type: text/json");
-			$p = $App->get($_POST['id']);
-			echo $p->make_json();
+			if(isset($_POST['filename'])) {
+				$p = $App->filter("sysname", $_POST['sysname']);
+				$p = $p[0];
+				$out = new jsonOutput();
+				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "filetypes") as $key) {
+					$out->append($key, $p->$key);
+				}
+			}
+			else {
+				function jsSearch($path) {
+					$files = array();
+					while(($file = readdir($dir)) !== false){
+						if($file{0} == '.'){
+							continue;
+						}
+						else {
+							if(is_dir($path . "/" . $file)) {
+								$search = rsearch($path . "/" . $file);
+							}
+							else if(is_file($path . "/" . $file) && count(preg_match("/*\.js$/", $file) > 0)){
+								$files[] = $path . "/" . $file;
+							}
+						}
+					}
+					return $files;
+				}
+				$files = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname']."/");
+				$files[] = $GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname'].".js";
+				$finalList = array();
+				foreach($files as $file) {
+					$finalList[] = str_replace($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/", "/", $file);
+				}
+				$out = new jsonOutput($finalList);
+			}
 		}
 		if($_GET['action'] == "list")
 		{
@@ -52,7 +75,7 @@
 			foreach($p as $d => $v)
 			{
 				$item = array();
-				foreach(array("id", "name", "author", "email", "maturity", "category", "version", "filetypes") as $key) {
+				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "filetypes") as $key) {
 					$item[$key] = $v->$key;
 				}
 				array_push($list, $item);
@@ -67,22 +90,28 @@
 			import("models.user");
 			$user = $User->get_current();
 			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
-			if($_POST['id'] == -1) { $app = new App(); }
-			else { $app = $App->get($_POST['id']); }
-			foreach(array('name', 'author', 'email', 'code', 'version', 'maturity', 'category') as $item) {
+			$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
+			$p = $App->filter("sysname", $_POST['sysname']);
+			if($p === false) { $app = new App(array(sysname => $_POST['sysname'])); }
+			else { $p = $p[0]; }
+			foreach(array('name', 'author', 'email', 'version', 'maturity', 'category') as $item) {
 				$app->$item = $_POST[$item];
 			}
 			$app->save();
+			//TODO: implement saving changes back to files
 			$out = new jsonOutput();
-			$out->append("id", $app->id);
+			$out->append("sysname", $app->sysname);
 		}
 		if($_GET['action'] == "remove") {
 			import("models.user");
+			$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
 			$user = $User->get_current();
 			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
-			$app = $App->get($_POST['id']);
+			$app = $App->filter($_POST['sysname']);
+			$app = $app[0];
 			$app->delete();
-			rmdir($GLOBALS['path']."/../apps/".$_POST['id']);
+			rmdir($GLOBALS['path']."/../apps/".$_POST['sysname']);
+			rmdir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname']);
 			$out = new intOutput("ok");
 		}
 	}
