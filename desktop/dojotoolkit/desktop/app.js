@@ -122,7 +122,7 @@ desktop.app = {
 		//		a callback once the app has initiated
 		dojo.publish("launchApp", [name]);
 		api.log("launching app "+name);
-		dojo.require("desktop.apps."+name);
+		dojo["require"]("desktop.apps."+name);
 		var pid = false;
 		try {
 			pid = desktop.app.instances.length;
