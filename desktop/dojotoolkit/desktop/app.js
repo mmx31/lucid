@@ -178,7 +178,7 @@ desktop.app = {
 		//	callback:
 		//		a callback function. First argument passed is an array with desktop.app._listCallbackItem objects for each app.
 		api.xhr({
-			backend: "core.app.fetch.list",
+			backend: "core.app.fetch.listAll",
 			load: callback,
 			handleAs: "json"
 		});

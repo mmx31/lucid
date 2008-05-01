@@ -28,20 +28,45 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		var client = new dijit.layout.SplitContainer({
 			layoutAlign: "client"
 		});
-		var appStore = this.appStore = new dojo.data.ItemFileWriteStore({
-			data: {
-				identity: "sysname",
-				label: "name",
-				items: desktop.app.appList
-			}
+		var right = this.tabArea = new dijit.layout.TabContainer({
+			sizeShare: 70
 		});
-		var left = new dijit.Tree({
-			store: appStore
-		})
-		client.addChild(left);
-		
-		var right = this.tabArea = new dijit.layout.TabContainer({});
-		client.addChild(right);
+		desktop.app.list(function(apps) {
+			for(var i in apps) {
+				if(apps[i].filename) continue;
+				var files = apps[i].files;
+				delete apps[i].files;
+				apps[i]._children = [];
+				for(var f in files) {
+					apps[i]._children.push({
+						_reference: apps[i].sysname+files[f]
+					})
+					var fileItem = {
+						sysname: apps[i].sysname+files[f],
+						label: files[f].substring(files[f].lastIndexOf("/", files[f].length)) || files[f],
+						filename: files[f],
+						appname: apps[i].sysname
+					}
+					apps.push(fileItem);
+				}
+			}
+			var appStore = this.appStore = new dojo.data.ItemFileWriteStore({
+				data: {
+					identity: "sysname",
+					label: "name",
+					items: apps
+				}
+			});
+			var left = new dijit.Tree({
+				store: appStore,
+				query: {category: "*"},
+				sizeMin: 0,
+				sizeShare: 30
+			})
+			dojo.connect(left, "onClick", this, "onItem");
+			client.addChild(left);
+			client.addChild(right);
+		});
 		
 		this.win.addChild(client);
 		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
@@ -56,22 +81,64 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		this.win.show();
 		this.win.startup();
 		
-		this.makeTab("NewApp.js","dojo.provide(\"desktop.apps.NewApp\");\r\n\r\n"
-								+"dojo.declare(\"desktop.apps.NewApp\", desktop.apps._App, {\r\n"
-								+"	init: function(args) {\r\n",
+	},
+	makeTab: function(appname, filename, content) {
+		var div = dojo.doc.createElement("div");
+		dojo.style(div, {
+			width: "100%",
+			height: "100%",
+			overflow: "hidden"
+		})
+		var cpane = new dijit.layout.ContentPane({
+			closable: true,
+			title: filename.substring(filename.lastIndexOf("/", filename.length)) || filename,
+			ide_info: {
+				fileName: filename,
+				appName: appname
+			}
+		});
+		//var editor = new desktop.apps.KatanaIDE.CodeTextArea({});
+		//div.appendChild(editor.domNode);
+		//editor.write(content, false);
+		
+		var editor = document.createElement("textarea");
+		dojo.style(editor, {
+			width: "100%",
+			height: "100%",
+			border: "0px none"
+		})
+		editor.textContent = content;
+		div.appendChild(editor);
+		
+		cpane.setContent(div);
+		this.tabArea.addChild(cpane);
+	},
+	_newApp: function(name) {
+		this.makeTab(name, "/"+name+".js","dojo.provide(\"desktop.apps."+name+"\");\r\n\r\n"
+								+"dojo.declare(\"desktop.apps."+name+"\", desktop.apps._App, {\r\n"
+								+"	init: function(args) {\r\n"
 								+"		/*Startup code goes here*/\r\n"
 								+"	}\r\n"
-								+"	kill: function(args) {\r\n",
+								+"	kill: function(args) {\r\n"
 								+"		/*Cleanup code goes here*/\r\n"
-								+"	}\r\n");
+								+"	}\r\n"
+								+"});");
 	},
-	makeTab: function(filename, content) {
-		var editor = new desktop.apps.KatanaIDE.CodeTextArea({
-			closable: true,
-			title: filename.substring(filename.lastIndexOf("/", filename.length)) || filename
-		})
-		this.tabArea.addChild(editor);
-		editor.write(content, false);
+	onItem: function(item) {
+		var store = this.appStore;
+		if(!store.isItem(item)) return;
+		var filename = store.getValue(item, "filename");
+		if(!filename) return;
+		var app = store.getValue(item, "appname");
+		var tac = this.tabArea.getChildren();
+		for(var i in this.tabArea.getChildren()) {
+			if(tac[i].ide_info.fileName == filename && tac[i].ide_info.appName == app) {
+				return this.tabArea.selectChild(tac[i]);
+			}
+		}
+		desktop.app.get(app, filename, dojo.hitch(this, function(content) {
+			this.newTab(app, filename, content);
+		}))
 	},
 	run: function()
 	{

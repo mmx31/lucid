@@ -10,6 +10,25 @@
 	require("../lib/includes.php");
 	import("models.app");
 	import("models.user");
+	
+	function jsSearch($path, $strip = "") {
+		$files = array();
+		while(($file = readdir($dir)) !== false){
+			if($file{0} == '.'){
+				continue;
+			}
+			else {
+				if(is_dir($path . "/" . $file)) {
+					$search = rsearch($path . "/" . $file);
+				}
+				else if(is_file($path . "/" . $file) && count(preg_match("/*\.js$/", $file) > 0)){
+					$files[] = str_replace($strip, $strip === "" ? "" : "/", $path . "/" . $file);
+				}
+			}
+		}
+		return $files;
+	}
+	
     if($_GET['section'] == "install")
 	{
 		$cur = $User->get_current();
@@ -41,30 +60,11 @@
 				}
 			}
 			else {
-				function jsSearch($path) {
-					$files = array();
-					while(($file = readdir($dir)) !== false){
-						if($file{0} == '.'){
-							continue;
-						}
-						else {
-							if(is_dir($path . "/" . $file)) {
-								$search = rsearch($path . "/" . $file);
-							}
-							else if(is_file($path . "/" . $file) && count(preg_match("/*\.js$/", $file) > 0)){
-								$files[] = $path . "/" . $file;
-							}
-						}
-					}
-					return $files;
-				}
-				$files = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname']."/");
-				$files[] = $GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname'].".js";
-				$finalList = array();
-				foreach($files as $file) {
-					$finalList[] = str_replace($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/", "/", $file);
-				}
-				$out = new jsonOutput($finalList);
+				$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
+				$files = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname']."/",
+									$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/");
+				$files[] = "/".$_POST['sysname'].".js";
+				$out = new jsonOutput($files);
 			}
 		}
 		if($_GET['action'] == "list")
@@ -78,6 +78,25 @@
 				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "filetypes") as $key) {
 					$item[$key] = $v->$key;
 				}
+				array_push($list, $item);
+			}
+			$out->set($list);
+		}
+		if($_GET['action'] == "listAll")
+		{
+			$p = $App->all();
+			$out = new jsonOutput();
+			$list = array();
+			foreach($p as $d => $v)
+			{
+				$item = array();
+				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "filetypes") as $key) {
+					$item[$key] = $v->$key;
+				}
+				if(is_dir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$item['sysname']."/"))
+					$item["files"] = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$item['sysname']."/",
+												$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/");
+				$item["files"][] = "/".$_POST['sysname'].".js";
 				array_push($list, $item);
 			}
 			$out->set($list);
