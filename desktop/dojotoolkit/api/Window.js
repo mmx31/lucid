@@ -132,8 +132,13 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		dojo.style(this.domNode, "width", ((calcWidth - bodyWidth)+calcWidth)+"px");
 		dojo.style(this.domNode, "height", ((calcHeight - bodyHeight)+calcHeight)+"px");
 		var viewport = dijit.getViewport();
+		var topCount = 0;
+		dojo.query(".desktopPanelTop", "desktop_ui_Area_0").forEach(function(panel) {
+			topCount += panel.offsetHeight;
+		});
+		var topStyle = ((viewport.h/2) - (((calcHeight - bodyHeight)+calcHeight)/2));
 		dojo.style(this.domNode, {
-			top: ((viewport.h/2) - (((calcHeight - bodyHeight)+calcHeight)/2))+"px",
+			top: (topStyle > topCount ? topStyle : topCount)+"px",
 			left: ((viewport.w/2) - (((calcWidth - bodyWidth)+calcWidth)/2))+"px"
 		});
 		if (desktop.config.fx >= 2) {
