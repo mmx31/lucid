@@ -31,7 +31,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		var right = this.tabArea = new dijit.layout.TabContainer({
 			sizeShare: 70
 		});
-		desktop.app.list(function(apps) {
+		desktop.app.list(dojo.hitch(this, function(apps) {
 			for(var i in apps) {
 				if(apps[i].filename) continue;
 				var files = apps[i].files;
@@ -66,7 +66,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			dojo.connect(left, "onClick", this, "onItem");
 			client.addChild(left);
 			client.addChild(right);
-		});
+		}));
 		
 		this.win.addChild(client);
 		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});

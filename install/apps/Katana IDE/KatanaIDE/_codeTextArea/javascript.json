@@ -1,0 +1,25 @@
+{
+	"window": {
+		className:"keyword",
+        children: {
+            "document": {
+                className:"keyword"
+                "body": {
+                    className:"keyword"
+                }, 
+                "focus()": {
+                    className:"keyword"
+                },
+                "forms": {
+                    className:"keyword"
+                }, 
+                "getElementById()": {
+                    className:"keyword"
+                } 
+            }, 
+            "function": {
+                className:"keyword"
+            }
+        }
+	}
+}

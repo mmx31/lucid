@@ -1,8 +1,5 @@
 dojo.provide("desktop.apps.KatanaIDE.CodeTextArea");
 
-// This editor widget was written by Nicola Rizzo
-// website: http://www.nicolarizzo.com
-
 dojo.require("dijit._editor.selection");
 dojo.require("dijit._editor.range");
 

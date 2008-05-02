@@ -13,15 +13,16 @@
 	
 	function jsSearch($path, $strip = "") {
 		$files = array();
+		$dir = opendir($path);
 		while(($file = readdir($dir)) !== false){
 			if($file{0} == '.'){
 				continue;
 			}
 			else {
 				if(is_dir($path . "/" . $file)) {
-					$search = rsearch($path . "/" . $file);
+					$search = jsSearch($path . "/" . $file);
 				}
-				else if(is_file($path . "/" . $file) && count(preg_match("/*\.js$/", $file) > 0)){
+				else if(is_file($path . "/" . $file) && count(preg_match("/\.js$/", $file) > 0)){
 					$files[] = str_replace($strip, $strip === "" ? "" : "/", $path . "/" . $file);
 				}
 			}
@@ -93,10 +94,12 @@
 				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "filetypes") as $key) {
 					$item[$key] = $v->$key;
 				}
-				if(is_dir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$item['sysname']."/"))
-					$item["files"] = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$item['sysname']."/",
+				if(is_dir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$item['sysname']))
+					$item["files"] = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$v->sysname."/",
 												$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/");
-				$item["files"][] = "/".$_POST['sysname'].".js";
+				else
+					$item['files'] = array();
+				$item["files"][] = "/".$v->sysname.".js";
 				array_push($list, $item);
 			}
 			$out->set($list);
