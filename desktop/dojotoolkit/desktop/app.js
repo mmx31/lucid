@@ -333,7 +333,10 @@ desktop.app = {
 			},
 			load: function(data, ioArgs)
 			{
-				if(callback) callback(/*desktop.app._saveAppArgs|Array*/data);
+				if(data.contents)
+					callback(/*String*/data.contents);
+				else
+					callback(/*Array*/data);
 			},
 			handleAs: "json"
 		});

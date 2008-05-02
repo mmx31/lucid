@@ -53,16 +53,16 @@
 		if($_GET['action'] == "full")
 		{
 			if(isset($_POST['filename'])) {
-				$p = $App->filter("sysname", $_POST['sysname']);
-				$p = $p[0];
-				$out = new jsonOutput();
-				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "filetypes") as $key) {
-					$out->append($key, $p->$key);
-				}
+				$_POST['filename'] = str_replace("..", "", $_POST['filename']);
+				$file = $GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['filename'];
+				$content = file_get_contents($file);
+				$out = new jsonOutput(array(
+					"contents" => $content
+				));
 			}
 			else {
 				$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
-				$files = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname']."/",
+				$files = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname'],
 									$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/");
 				$files[] = "/".$_POST['sysname'].".js";
 				$out = new jsonOutput($files);
@@ -95,7 +95,7 @@
 					$item[$key] = $v->$key;
 				}
 				if(is_dir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$item['sysname']))
-					$item["files"] = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$v->sysname."/",
+					$item["files"] = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$v->sysname,
 												$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/");
 				else
 					$item['files'] = array();

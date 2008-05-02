@@ -36,23 +36,25 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 				if(apps[i].filename) continue;
 				var files = apps[i].files;
 				delete apps[i].files;
-				apps[i]._children = [];
+				var children = [];
 				for(var f in files) {
-					apps[i]._children.push({
-						_reference: apps[i].sysname+files[f]
-					})
 					var fileItem = {
 						sysname: apps[i].sysname+files[f],
+						name: files[f],
 						label: files[f].substring(files[f].lastIndexOf("/", files[f].length)) || files[f],
 						filename: files[f],
 						appname: apps[i].sysname
 					}
 					apps.push(fileItem);
+					children.push({
+						_reference: apps[i].sysname+files[f]
+					})
 				}
+				apps[i].children = children;
 			}
 			var appStore = this.appStore = new dojo.data.ItemFileWriteStore({
 				data: {
-					identity: "sysname",
+					identifier: "sysname",
 					label: "name",
 					items: apps
 				}
@@ -91,7 +93,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		})
 		var cpane = new dijit.layout.ContentPane({
 			closable: true,
-			title: filename.substring(filename.lastIndexOf("/", filename.length)) || filename,
+			title: filename.substring(filename.lastIndexOf("/")+1) || filename,
 			ide_info: {
 				fileName: filename,
 				appName: appname
@@ -112,6 +114,8 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		
 		cpane.setContent(div);
 		this.tabArea.addChild(cpane);
+		this.tabArea.selectChild(cpane);
+		this.tabArea.layout();
 	},
 	_newApp: function(name) {
 		this.makeTab(name, "/"+name+".js","dojo.provide(\"desktop.apps."+name+"\");\r\n\r\n"
@@ -131,13 +135,14 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		if(!filename) return;
 		var app = store.getValue(item, "appname");
 		var tac = this.tabArea.getChildren();
-		for(var i in this.tabArea.getChildren()) {
+		for(var i in tac) {
+			if(typeof tac[i] != "object") continue;
 			if(tac[i].ide_info.fileName == filename && tac[i].ide_info.appName == app) {
 				return this.tabArea.selectChild(tac[i]);
 			}
 		}
 		desktop.app.get(app, filename, dojo.hitch(this, function(content) {
-			this.newTab(app, filename, content);
+			this.makeTab(app, filename, content);
 		}))
 	},
 	run: function()
