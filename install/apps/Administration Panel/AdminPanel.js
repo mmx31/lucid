@@ -620,15 +620,15 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 			onClick: dojo.hitch(this, function() {
 				dojo.require("dojox.validate.web");
 				if(username.getValue() == "") return error.textContent = usr.enterUsername;
-				if(username.indexOf("..") != -1) {
+				if(username.getValue().indexOf("..") != -1) {
 					error.textContent = usr.cannotContain.replace("%s", "..");
 					return;
 				}
-				if(username.indexOf("/") != -1) {
+				if(username.getValue().indexOf("/") != -1) {
 					error.textContent = usr.cannotContain.replace("%s", "/");
 					return;
 				}
-				if(username.indexOf("\\") != -1) {
+				if(username.getValue().indexOf("\\") != -1) {
 					error.textContent = usr.cannotContain.replace("%s", "\\");
 					return;
 				}

@@ -5,6 +5,7 @@
 	"name": "Name",
 	"language": "Language",
 	"changePasswordAction": "Change Password...",
+	"password": "Password",
 	"general": "General",
 	"changePassword": "Change password",
 	"passwordsMatch": "The two passwords match",
