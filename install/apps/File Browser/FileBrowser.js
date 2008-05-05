@@ -50,7 +50,6 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 			});
 			this.pathbar.addChild(this.pathbox);
 			this.goButton = new dijit.form.Button({
-				style: "position: absolute; top: 0px; right: 0px;",
 				label: cm.go,
 				onClick: dojo.hitch(this, function() {
 					this.fileArea.setPath(this.pathbox.getValue());
