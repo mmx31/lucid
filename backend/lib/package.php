@@ -52,7 +52,7 @@ class package {
     {
         if ( is_dir( $source ) )
         {
-            @mkdir( $target );
+            @mkdir( $target, 777 );
            
             $d = dir( $source );
            
