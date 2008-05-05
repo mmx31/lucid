@@ -90,32 +90,34 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			width: "100%",
 			height: "100%",
 			overflow: "hidden"
-		})
+		});
+		
+		var editor = new desktop.apps.KatanaIDE.CodeTextArea({
+			width: "100%",
+			height: "100%",
+			plugins: "BlinkingCaret GoToLineDialog Bookmarks MatchingBrackets",
+			colorsUrl: dojo.moduleUrl("desktop.apps.KatanaIDE.data", "javascript_dojo_color.json"),
+			autocompleteUrl: dojo.moduleUrl("desktop.apps.KatanaIDE.data", "javascript_dojo_ac.json")
+		});
+		div.appendChild(editor.domNode);
+		
 		var cpane = new dijit.layout.ContentPane({
 			closable: true,
 			title: filename.substring(filename.lastIndexOf("/")+1) || filename,
 			ide_info: {
 				fileName: filename,
-				appName: appname
+				appName: appname,
+				editor: editor
 			}
 		});
-		//var editor = new desktop.apps.KatanaIDE.CodeTextArea({});
-		//div.appendChild(editor.domNode);
-		//editor.write(content, false);
-		
-		var editor = document.createElement("textarea");
-		dojo.style(editor, {
-			width: "100%",
-			height: "100%",
-			border: "0px none"
-		})
-		editor.textContent = content;
-		div.appendChild(editor);
 		
 		cpane.setContent(div);
 		this.tabArea.addChild(cpane);
 		this.tabArea.selectChild(cpane);
-		this.tabArea.layout();
+		editor.startup();
+		editor.massiveWrite(content);
+		editor.setCaretPosition(0, 0); 
+		setTimeout(dojo.hitch(this.tabArea, "layout"), 100);
 	},
 	_newApp: function(name) {
 		this.makeTab(name, "/"+name+".js","dojo.provide(\"desktop.apps."+name+"\");\r\n\r\n"
@@ -144,6 +146,10 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		desktop.app.get(app, filename, dojo.hitch(this, function(content) {
 			this.makeTab(app, filename, content);
 		}))
+	},
+	save: function() {
+		var pane = this.tabArea.selectedChildWidget;
+		
 	},
 	run: function()
 	{

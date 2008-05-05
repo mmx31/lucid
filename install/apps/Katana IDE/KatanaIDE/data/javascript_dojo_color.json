@@ -1,0 +1,29 @@
+{
+	"window|document": {
+        className: "browser"
+    },
+    "dojo|dijit|dojox": {
+        className: "dojo"
+    },
+    "fixEvent|publish|subscribe|xhrGet|xhrPost": {
+        className: "dojo-method"
+    },
+    "abstract|boolean|break|byte|case|catch|char|class|const|continue|debugger|default|delete|do|double|else|enum|export|extends|final|finally|float|for|function|goto|if|implements|import|in|instanceof|int|interface|long|native|new|null|package|private|protected|public|return|short|static|super|switch|synchronized|this|throw|throws|transient|try|typeof|var|void|volatile|while|with": {
+        className: "keyword"
+    },
+    "appendChild|cloneNode|getElementById|getElementsByTagName|getElementsByName|removeChild": {
+        className: "dom-method"
+    },
+    "onfocus|onblur|onchange|onclick|ondblclick|onerror|onfocus|onkeydown|onkeypress|onkeyup|onload|onmousedown|onmousemove|onmouseout|onmouseover|onmouseup|onreset|onresize|onselect|onsubmit|onunload": {
+        className: "event"
+    },
+    "true|false": {
+        className: "boolean"
+    },
+    "back|behavior|cldr|colors|currency|data|date|dnd|fx|i18n|io|number|parser|regexp|rpc|string": {
+        className: "dojoNamespace"
+    },
+    "Color|Deferred|NodeList|addClass|addOnLoad|addOnUnload|animateProperty|attr|baseUrl|blendColors|body|boxModel|byId|clone|colorFromArray|colorFromHex|colorFromRgb|colorFromString|config|connect|connectPublisher|contentBox|coords|declare|delegate|deprecated|disconnect|doc|eval|every|exists|experimental|extend|fadeIn|fadeOut|filter|fixEvent|forEach|formToJson|formToObject|formToQuery|fromJson|getComputedStyle|getObject|global|hasAttr|hasClass|hitch|indexOf|isAIR|isAlien|isArray|isArrayLike|isBrowser|isDescendant|isFF|isFunction|isGears|isIE|isKhtml|isMobile|isMoz|isMozilla|isObject|isOpera|isQuirks|isRhino|isSpidermonkey|isString|keys|lastIndexOf|loaded|locale|map|marginBox|mixin|moduleUrl|objectToQuery|partial|place|platformRequire|provide|publish|query|queryToObject|rawXhrPost|rawXhrPut|registerModulePath|removeAttr|removeClass|require|requireAfterIf|requireIf|requireLocalization|setContext|setObject|setSelectable|some|stopEvent|style|subscribe|toJson|toJsonIndentStr|toggleClass|trim|unloaded|unsubscribe|version|withDoc|withGlobal|xhr|xhrDelete|xhrGet|xhrPost|xhrPut|": {
+        className: "dojoFunction"
+    }
+}

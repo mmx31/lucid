@@ -1,0 +1,268 @@
+{   
+	links: [
+		{
+			link : "", 
+			target : "window"
+		}
+	],
+    children: {
+		"dijit":{
+			
+		},
+		"dojo":{
+			children: {
+				Color: {
+				},
+				Deferred: {
+				},
+				NodeList: {
+				},
+				addClass: {
+				},
+				addOnLoad: {
+				},
+				addOnUnload: {
+				},
+				animateProperty: {
+				},
+				attr: {
+				},
+				baseUrl: {
+				},
+				blendColors: {
+				},
+				body: {
+				},
+				boxModel: {
+				},
+				byId: {
+				},
+				clone: {
+				},
+				colorFromArray: {
+				},
+				colorFromHex: {
+				},
+				colorFromRgb: {
+				},
+				colorFromString: {
+				},
+				config: {
+				},
+				connect: {
+				},
+				connectPublisher: {
+				},
+				contentBox: {
+				},
+				coords: {
+				},
+				declare: {
+				},
+				delegate: {
+				},
+				deprecated: {
+				},
+				disconnect: {
+				},
+				doc: {
+				},
+				eval: {
+				},
+				every: {
+				},
+				exists: {
+				},
+				experimental: {
+				},
+				extend: {
+				},
+				fadeIn: {
+				},
+				fadeOut: {
+				},
+				filter: {
+				},
+				fixEvent: {
+				},
+				forEach: {
+				},
+				formToJson: {
+				},
+				formToObject: {
+				},
+				formToQuery: {
+				},
+				fromJson: {
+				},
+				getComputedStyle: {
+				},
+				getObject: {
+				},
+				global: {
+				},
+				hasAttr: {
+				},
+				hasClass: {
+				},
+				hitch: {
+				},
+				indexOf: {
+				},
+				isAIR: {
+				},
+				isAlien: {
+				},
+				isArray: {
+				},
+				isArrayLike: {
+				},
+				isBrowser: {
+				},
+				isDescendant: {
+				},
+				isFF: {
+				},
+				isFunction: {
+				},
+				isGears: {
+				},
+				isIE: {
+				},
+				isKhtml: {
+				},
+				isMobile: {
+				},
+				isMoz: {
+				},
+				isMozilla: {
+				},
+				isObject: {
+				},
+				isOpera: {
+				},
+				isQuirks: {
+				},
+				isRhino: {
+				},
+				isSpidermonkey: {
+				},
+				isString: {
+				},
+				keys: {
+				},
+				lastIndexOf: {
+				},
+				loaded: {
+				},
+				locale: {
+				},
+				map: {
+				},
+				marginBox: {
+				},
+				mixin: {
+				},
+				moduleUrl: {
+				},
+				objectToQuery: {
+				},
+				partial: {
+				},
+				place: {
+				},
+				platformRequire: {
+				},
+				provide: {
+				},
+				publish: {
+				},
+				query: {
+				},
+				queryToObject: {
+				},
+				rawXhrPost: {
+				},
+				rawXhrPut: {
+				},
+				registerModulePath: {
+				},
+				removeAttr: {
+				},
+				removeClass: {
+				},
+				require: {
+				},
+				requireAfterIf: {
+				},
+				requireIf: {
+				},
+				requireLocalization: {
+				},
+				setContext: {
+				},
+				setObject: {
+				},
+				setSelectable: {
+				},
+				some: {
+				},
+				stopEvent: {
+				},
+				style: {
+				},
+				subscribe: {
+				},
+				toJson: {
+				},
+				toJsonIndentStr: {
+				},
+				toggleClass: {
+				},
+				trim: {
+				},
+				unloaded: {
+				},
+				unsubscribe: {
+				},
+				version: {
+				},
+				withDoc: {
+				},
+				withGlobal: {
+				},
+				xhr: {
+				},
+				xhrDelete: {
+				},
+				xhrGet: {
+				},
+				xhrPost: {
+				},
+				xhrPut: {
+				}
+			}
+		},
+    	"window": {
+            link: {},
+            children: {
+                "document": {
+                    children: {
+                        "body": {
+                        	children: {
+                        	}
+                        },
+                        "focus": {
+                        },
+                        "forms": {
+                        },
+                        "getElementById()": {
+                        }
+                    }
+                }, 
+                "function": {
+                }
+            }
+    	}
+    }
+}

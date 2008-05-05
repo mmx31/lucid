@@ -102,35 +102,36 @@ dojo.declare(
 				}
 			}
 			this.leftBand.id = this.id + "leftBand";
-			this.lines.style.width = (dojo.coords(this.domNode).w - dojo.coords(this.leftBand).w) + "px";
+			this.codeLines.style.width = (dojo.coords(this.domNode).w - dojo.coords(this.leftBand).w) + "px";
             this.loadDictionary(this.autocompleteUrl, dojo.hitch(this, this._autocompleteFiller));
             this.loadDictionary(this.colorsUrl, dojo.hitch(this, this._colorsFiller));
-            this.linesCollection = this.lines.getElementsByTagName("div");
-            this.setDimensions();
+            this.linesCollection = this.codeLines.getElementsByTagName("div");
+        },
+		startup: function() {
+			this.setDimensions();
             this.loadPlugins();
             this._initializeInternals();
             this._initializeDoc();
             this._initializeClipboard();
             this._initializeSuggestionsPopup();
             this._initializeRange();
-			this._addRowNumber({position: 1, rows:100});
-			var _self = this;
-	    	dojo.subscribe(this.id + "::addNewLine", dojo.hitch(this, _self._addRowNumber));
-	    	dojo.subscribe(this.id + "::removeLine", dojo.hitch(this, _self._removeRowNumber));
+			this._addRowNumber({position: 1, rows:1});
+	    	dojo.subscribe(this.id + "::addNewLine", dojo.hitch(this, "_addRowNumber"));
+	    	dojo.subscribe(this.id + "::removeLine", dojo.hitch(this, "_removeRowNumber"));
 			
             // initial status
             this._command = "";
 
             this.attachEvents();
-            document.body.focus();
-            dojo.connect(dojo.body(), "onclick", this, function(e){ 
-				e.stopPropagation();
-				return false; 
-			});
+            //document.body.focus();
+            //dojo.connect(dojo.body(), "onclick", this, function(e){ 
+			//	dojo.stopEvent(e);
+			//	return false; 
+			//});
             dojo.connect(this.domNode, "onmouseup", this, "setCaretPositionAtPointer");
-            dojo.connect(this.domNode, "onclick", this, "blur");
+            //dojo.connect(this.domNode, "onclick", this, "blur");
             this.setCaretPosition(0, 0); 
-        },
+		},
 		resize: function(args){
 			this.domNode.parentNode.style.width = args.w + "px";
 			this.domNode.style.height = args.h + "px";
@@ -178,7 +179,7 @@ dojo.declare(
         },
 		clearDocument: function(){
 			this.setCaretPosition(0, 0);
-			this.lines.innerHTML = "";
+			this.codeLines.innerHTML = "";
 			this.leftBand.getElementsByTagName("ol")[0].innerHTML = "";
 			this._addRowNumber({position: 1, rows:100});
 			this._initializeDoc();
@@ -1002,7 +1003,7 @@ dojo.declare(
 			}
         },
 		getContent: function(){
-			return this.lines.innerText || this.lines.textContent || '';
+			return this.codeLines.innerText || this.codeLines.textContent || '';
 		},
         getSelectionStartToken: function(){
         	return this._range.startContainer.parentNode;
@@ -1228,7 +1229,7 @@ dojo.declare(
             this.lineHeight = dojo.contentBox(this.currentLineHighLight).h;
         },
         attachEvents: function(){
-            var node = document;
+            var node = this.domNode;
             this._eventHandlers.push(dojo.connect(node, "onkeypress", this, "keyPressHandler"));
             this._eventHandlers.push(dojo.connect(node, "onkeyup", this, "keyUpHandler"));
         },
@@ -1284,8 +1285,8 @@ dojo.declare(
             var newLine = this.createLine();
 			var insertionPoint = 0;
             if(position=="end"){
-                this.lines.appendChild(newLine);
-				insertionPoint = this.lines.length + 1;
+                this.codeLines.appendChild(newLine);
+				insertionPoint = this.codeLines.length + 1;
             }else{
                 dojo.place(newLine, lines[this.y], "after");
 				insertionPoint = this.y + 1;
@@ -1501,7 +1502,7 @@ dojo.declare(
             var _savedPreviousToken = this.previousToken;
             this.substCaretPosition();
 			var startCoords = { x: this.x, y: this.y };
-            var _initialContent = this.lines.innerHTML;
+            var _initialContent = this.codeLines.innerHTML;
             var _index = this._getTextDelimiter(_initialContent);
             var _firstFragment = _initialContent.substring(0, _index);
             var _lastFragment = _initialContent.substring(_index);
@@ -1556,11 +1557,11 @@ dojo.declare(
 			var _insertionPoint = this.y;
             var newContent = _firstFragment + _parsedContent + _lastFragment;
             if(!dojo.isIE){
-            	this.lines.innerHTML = newContent;
+            	this.codeLines.innerHTML = newContent;
             }else{
-            	this.lines.innerHTML = "";
+            	this.codeLines.innerHTML = "";
             	var container = document.createElement("div");
-            	this.lines.appendChild(container);
+            	this.codeLines.appendChild(container);
             	container.outerHTML = newContent;
             }
 
@@ -1587,7 +1588,7 @@ dojo.declare(
             var _savedPreviousToken = this.previousToken;
             this.substCaretPosition();
 			var startCoords = { x: this.x, y: this.y };
-            var _initialContent = this.lines.innerHTML;
+            var _initialContent = this.codeLines.innerHTML;
             var _index = this._getTextDelimiter(_initialContent);
             var _firstFragment = _initialContent.substring(0, _index);
             var _lastFragment = _initialContent.substring(_index);
@@ -1669,11 +1670,11 @@ dojo.declare(
 			var _insertionPoint = this.y;
             var newContent = _firstFragment + _parsedContent + _lastFragment;
             if(!dojo.isIE){
-            	this.lines.innerHTML = newContent;
+            	this.codeLines.innerHTML = newContent;
             }else{
-            	this.lines.innerHTML = "";
+            	this.codeLines.innerHTML = "";
             	var container = document.createElement("div");
-            	this.lines.appendChild(container);
+            	this.codeLines.appendChild(container);
             	container.outerHTML = newContent;
             }
 
@@ -1832,7 +1833,7 @@ dojo.declare(
         },
         _initializeDoc: function(){
             var newLine = this.createLine();
-            this.lines.appendChild(newLine);
+            this.codeLines.appendChild(newLine);
             this.currentLine = newLine;
         },
         _removeRowNumber: function(/*integer*/ rowsToRemove){

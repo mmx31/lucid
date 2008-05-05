@@ -148,7 +148,8 @@ desktop.apps.KatanaIDE._codeTextArea.plugins.Bookmarks.startup = function(args){
 		_action = "remove";
 	};
 
-	var leftBandMenu = new dijit.Menu({targetNodeIds: [source.leftBand.id], id:[source.leftBand.id] + "-menu"});
+	var leftBandMenu = new dijit.Menu({id:[source.leftBand.id] + "-menu"});
+	leftBandMenu.bindDomNode(source.leftBand);
 
 	var onMenuOpen = function(e){
 		targetLine = parseInt((e.y - areaCoords.y) / lineHeight);

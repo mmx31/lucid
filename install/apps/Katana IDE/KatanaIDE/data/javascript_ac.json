@@ -1,0 +1,31 @@
+{   
+	links: [
+		{
+			link : "", 
+			target : "window"
+		}
+	],
+    children: {
+    	"window": {
+            link: {},
+            children: {
+                "document": {
+                    children: {
+                        "body": {
+                        	children: {
+                        	}
+                        },
+                        "focus": {
+                        },
+                        "forms": {
+                        },
+                        "getElementById()": {
+                        }
+                    }
+                }, 
+                "function": {
+                }
+            }
+    	}
+    }
+}
