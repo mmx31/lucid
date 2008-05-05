@@ -1,6 +1,6 @@
 dojo.provide("desktop.apps.TextEditor")
 
-dojo.declare("destkop.apps.TextEditor", desktop.apps._App, {
+dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	newAs: false,
 	editing: false,
 	fileEditing: "",
