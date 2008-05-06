@@ -15,7 +15,7 @@ class package {
 	function install($path, $unzip=true) {
 		if($unzip) {
 			$zip = new dUnzip2($path);
-			$unzipPath=$GLOBALS['path']."/../tmp/".basename($path)."/";
+			$unzipPath=$GLOBALS['path']."/../tmp/".basename($path)."_contents/";
 			$zip->getList();
 			if (!file_exists($unzipPath)) { mkdir($unzipPath); }
 			$zip->unzipAll($unzipPath);
@@ -52,7 +52,7 @@ class package {
     {
         if ( is_dir( $source ) )
         {
-            @mkdir( $target, 777 );
+            @mkdir( $target, 0777 );
            
             $d = dir( $source );
            
@@ -104,7 +104,8 @@ class package {
 	}
 	function _install_theme($info, $path) {
 		$newpath = $GLOBALS['path']."/../desktop/themes/".strtolower($info['name']);
-		copy($path."/".strtolower($info['name']), $newpath);
+		@mkdir($newpath, 0777);
+		package::_recursive_copy($path."/".strtolower($info['name']), $newpath);
 		copy($path."/meta.json", $newpath."/meta.json");
 		return array("/desktop/themes/".strtolower($info['name']));
 	}

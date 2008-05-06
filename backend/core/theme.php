@@ -7,7 +7,6 @@
 */
 
 
-error_reporting(0); //<<<<<<<<<<<<<<<<<<<LEAVE THIS ALONE!!!
 require("../lib/includes.php");
 import("lib.Json.Json");
 if($_GET['section'] == "get")
@@ -44,11 +43,11 @@ if($_GET['section'] == "package" && $cur->has_permission("core.administration"))
 		if(isset($_FILES['uploadedfile']['name'])) {
 			$_FILES['uploadedfile']['name'] = str_replace("..", "", $_FILES['uploadedfile']['name']);
 			$target_path = '../../tmp/'.$_FILES['uploadedfile']['name'];
-			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)
-			&& package::install($target_path)) {
-				$out->append("status", "success");
+			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
+				if(package::install($target_path)) $out->append("status", "success");
+				else $out->append("error", "Problem installing package");
 			} else{
-			   $out->append("error", "Problem accessing uploaded file");
+			   $out->append("error", "Problem accessing uploaded package");
 			}
 		} else { $out->append("error", "No File Uploaded"); }
 	}
