@@ -680,7 +680,7 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 			onComplete: dojo.hitch(this, function(data,ioArgs,widgetRef) {
 				if(data.status && data.status == "success"){
 					widgetRef.overlay.innerHTML = sys.appInstallSuccess;
-					this.pages.apps();
+					this.pages.apps.call(this, []);
 				}else{
 					widgetRef.overlay.innerHTML = cmn.error+": "+data.error;
 					console.log('error',data,ioArgs);
@@ -724,7 +724,7 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 			onComplete: dojo.hitch(this, function(data,ioArgs,widgetRef) {
 				if(data.status && data.status == "success"){
 					widgetRef.overlay.innerHTML = sys.themeInstallSuccess;
-					this.pages.apps();
+					this.pages.themes.call(this, []);
 				}else{
 					widgetRef.overlay.innerHTML = cmn.error+": "+data.error;
 					console.log('error',data,ioArgs);
