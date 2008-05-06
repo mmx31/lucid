@@ -125,15 +125,34 @@
 			$out->append("sysname", $app->sysname);
 		}
 		if($_GET['action'] == "remove") {
+			function rmdir_recurse($file) {
+			    if (is_dir($file) && !is_link($file)) {
+			        foreach(glob($file.'/*') as $sf) {
+			            if ( !rmdir_recurse($sf) ) {
+			                return false;
+			            }
+			        }
+			        return rmdir($file);
+			    } else {
+			        return unlink($file);
+			    }
+			}
+			
 			import("models.user");
-			$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
 			$user = $User->get_current();
 			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
-			$app = $App->filter($_POST['sysname']);
+			$app = $App->filter("sysname", $_POST['sysname']);
 			$app = $app[0];
 			$app->delete();
-			rmdir($GLOBALS['path']."/../apps/".$_POST['sysname']);
-			rmdir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname']);
+			$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
+			foreach(array(
+				$GLOBALS['path']."/../apps/".$_POST['sysname'],
+				$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname'],
+				$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname'].".js"
+			) as $dir) {
+				if(is_dir($dir)) rmdir_recurse($dir);
+				else if(is_file($dir)) unlink($dir);
+			}
 			$out = new intOutput("ok");
 		}
 	}
