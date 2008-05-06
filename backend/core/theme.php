@@ -52,8 +52,20 @@ if($_GET['section'] == "package" && $cur->has_permission("core.administration"))
 		} else { $out->append("error", "No File Uploaded"); }
 	}
 	if($_GET['action'] == "remove") {
-		$name = str_replace("..", "", $_POST['name']);
-		rmdir($GLOBALS['path']."/../desktop/themes/".$name);
+		function rmdir_recurse($file) {
+		    if (is_dir($file) && !is_link($file)) {
+		        foreach(glob($file.'/*') as $sf) {
+		            if ( !rmdir_recurse($sf) ) {
+		                return false;
+		            }
+		        }
+		        return rmdir($file);
+		    } else {
+		        return unlink($file);
+		    }
+		}
+		$name = str_replace("..", "", $_POST['themename']);
+		rmdir_recurse($GLOBALS['path']."/../desktop/themes/".$name);
 		$out = new intOutput("ok");
 	}
 }
