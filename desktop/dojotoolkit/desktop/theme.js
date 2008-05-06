@@ -86,7 +86,7 @@ desktop.theme = {
 		var df = api.xhr({
 			backend: "core.theme.package.remove",
 			content: {
-				name: name
+				themename: name
 			}
 		});
 		df.addCallback(onComplete);
