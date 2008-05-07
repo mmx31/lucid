@@ -90,7 +90,9 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		this.makeDragger();
 		this.sizeHandle = new dojox.layout.ResizeHandle({
 			targetContainer: this.domNode,
-			activeResize: true
+			activeResize: (desktop.config.fx >= 2),
+			animateSizing: false,
+			animateDuration: desktop.config.window.animSpeed
 		}, this.sizeHandle);
 		if(!this.resizable)
 		{
