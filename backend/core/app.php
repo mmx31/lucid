@@ -116,7 +116,7 @@
 				$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
 				$p = $App->filter("sysname", $_POST['sysname']);
 				if($p === false) { $app = new App(array(sysname => $_POST['sysname'])); }
-				else { $p = $p[0]; }
+				else { $app = $p[0]; }
 				foreach(array('name', 'author', 'email', 'version', 'maturity', 'category') as $item) {
 					if(isset($_POST[$item]))
 						$app->$item = $_POST[$item];

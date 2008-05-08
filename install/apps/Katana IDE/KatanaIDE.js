@@ -7,6 +7,7 @@ dojo.require("dijit.form.Textarea");
 dojo.require("dijit.form.Button");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.Toolbar");
+dojo.require("dijit.Dialog");
 dojo.require("dijit.form.FilteringSelect");
 dojo.require("dojo.data.ItemFileWriteStore");
 dojo.requireLocalization("desktop", "common");
@@ -16,6 +17,8 @@ dojo.requireLocalization("desktop", "system");
 
 dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 	files: [], //file information
+	appInfo: {}, //application information
+	metaUi: {}, //metadata form UI
 	init: function(args) {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
@@ -31,9 +34,14 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		var right = this.tabArea = new dijit.layout.TabContainer({
 			sizeShare: 70
 		});
+		dojo.connect(right, "selectChild", this, function(wid) {
+			if(!wid.ide_info) return;
+			this.setMeta(this.appInfo[wid.ide_info.appName]);
+		});
 		desktop.app.list(dojo.hitch(this, function(apps) {
 			for(var i in apps) {
 				if(apps[i].filename) continue;
+				this.appInfo[apps[i].sysname] = apps[i];
 				var files = apps[i].files;
 				delete apps[i].files;
 				var children = [];
@@ -63,7 +71,8 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 				store: appStore,
 				query: {category: "*"},
 				sizeMin: 0,
-				sizeShare: 30
+				sizeShare: 30,
+				style: "overflow: auto;"
 			})
 			dojo.connect(left, "onClick", this, "onItem");
 			client.addChild(left);
@@ -74,7 +83,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
 //			this.toolbar.addChild(new dijit.form.Button({label: cm["new"], iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, "newApp", 1)}));
 			this.toolbar.addChild(new dijit.form.Button({label: cm.save, iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, "save")}));
-//			this.toolbar.addChild(new dijit.form.Button({label: cm.metadata, iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, "editMetadata")}));
+			this.toolbar.addChild(new dijit.form.DropDownButton({label: cm.metadata, iconClass: "icon-16-actions-document-properties", dropDown: this._makeMetaDialog()}));
 			this.toolbar.addChild(new dijit.form.Button({label: cm.run, iconClass: "icon-16-actions-media-playback-start", onClick: dojo.hitch(this, "run")}));
 			this.toolbar.addChild(new dijit.form.Button({label: sys.kill, iconClass: "icon-16-actions-media-playback-stop", onClick: dojo.hitch(this, "killExec")}));
 	
@@ -119,8 +128,109 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		editor.setCaretPosition(0, 0); 
 		setTimeout(dojo.hitch(this.tabArea, "layout"), 100);
 	},
+	_makeMetaDialog: function() {
+		var mnu = dojo.i18n.getLocalization("desktop.ui", "menus");
+		var sys = dojo.i18n.getLocalization("desktop", "system");
+		var cmn = dojo.i18n.getLocalization("desktop", "common");
+		var div = document.createElement("div");
+		
+		var row = document.createElement("div");
+		row.textContent = sys.id+": ";
+		this.metaUi.sysname = new dijit.form.TextBox({value: "", disabled: true});
+		row.appendChild(this.metaUi.sysname.domNode);
+		div.appendChild(row);
+		
+		var row = document.createElement("div");
+		row.textContent = sys.name+": ";
+		this.metaUi.name = new dijit.form.TextBox({value: ""});
+		row.appendChild(this.metaUi.name.domNode);
+		div.appendChild(row);
+		
+		var row = document.createElement("div");
+		row.textContent = sys.author+": ";
+		this.metaUi.author = new dijit.form.TextBox({value: ""});
+		row.appendChild(this.metaUi.author.domNode);
+		div.appendChild(row);
+		
+		var row = document.createElement("div");
+		row.textContent = sys.email+": ";
+		this.metaUi.email = new dijit.form.TextBox({value: ""});
+		row.appendChild(this.metaUi.email.domNode);
+		div.appendChild(row);
+		
+		var row = document.createElement("div");
+		row.textContent = sys.version+": ";
+		this.metaUi.version = new dijit.form.TextBox({value: ""});
+		row.appendChild(this.metaUi.version.domNode);
+		div.appendChild(row);
+		
+		var row = document.createElement("div");
+		row.textContent = sys.maturity+": ";
+		this.metaUi.maturity = new dijit.form.TextBox({value: ""});
+		row.appendChild(this.metaUi.maturity.domNode);
+		div.appendChild(row);
+		
+		var row = document.createElement("div");
+		row.textContent = sys.category+": ";
+		this.metaUi.category = new dijit.form.FilteringSelect({
+			autoComplete: true,
+			searchAttr: "label",
+			store: new dojo.data.ItemFileReadStore({
+				data: {
+					identifier: "value",
+					items: [
+						{ label: mnu.accessories, value: "Accessories" },
+						{ label: mnu.development, value: "Development" },
+						{ label: mnu.games, value: "Games" },
+						{ label: mnu.graphics, value: "Graphics" },
+						{ label: mnu.internet, value: "Internet" },
+						{ label: mnu.multimedia, value: "Multimedia" },
+						{ label: mnu.office, value: "Office" },
+						{ label: mnu.system, value: "System" },
+						{ label: mnu.administration, value: "Administration" },
+						{ label: mnu.preferences, value: "Preferences" }
+					]
+				}
+			}),
+			onChange: dojo.hitch( this, function(val) {
+				if ( typeof val == "undefined" ) return;
+			})
+		});
+		row.appendChild(this.metaUi.category.domNode);
+		div.appendChild(row);
+		
+		var closeButton = new dijit.form.Button({
+			label: cmn.save,
+			onClick: dojo.hitch(this, "saveMeta")
+		});
+		div.appendChild(closeButton.domNode);
+		
+		var dialog = new dijit.TooltipDialog({}, div);
+		return dialog;
+	},
+	saveMeta: function() {
+		var data = {};
+		for(var key in this.metaUi) {
+			data[key] = this.metaUi[key].getValue();
+		}
+		desktop.app.save(data);
+	},
+	setMeta: function(info) {
+		for(var key in this.metaUi) {
+			this.metaUi[key].setValue(info[key]);
+		}
+	},
 	_newApp: function(name) {
-		this.makeTab(name, "/"+name+".js","dojo.provide(\"desktop.apps."+name+"\");\r\n\r\n"
+		this.appInfo[name] = {
+			sysname: name,
+			name: "",
+			author: "",
+			email: "",
+			version: "1.0",
+			maturity: "Alpha",
+			category: "Accessories"
+		}
+		var defaultContent = "dojo.provide(\"desktop.apps."+name+"\");\r\n\r\n"
 								+"dojo.declare(\"desktop.apps."+name+"\", desktop.apps._App, {\r\n"
 								+"	init: function(args) {\r\n"
 								+"		/*Startup code goes here*/\r\n"
@@ -128,7 +238,12 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 								+"	kill: function(args) {\r\n"
 								+"		/*Cleanup code goes here*/\r\n"
 								+"	}\r\n"
-								+"});");
+								+"});"
+		this.makeTab(name, "/"+name+".js", defaultContent);
+		desktop.app.save(dojo.mixin(this.appInfo[name], {
+			filename: "/"+name+".js",
+			content: defaultContent
+		}));
 	},
 	onItem: function(item) {
 		var store = this.appStore;
