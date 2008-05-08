@@ -233,33 +233,37 @@ desktop.app = {
 	//IDE functions
 	/*=====
 	_saveArgs: {
-		//	sysname: Integer
+		//	sysname: String?
 		//		the unique system name of the app. Cannot contain spaces.
 		sysname: "",
-		//	name: String
+		//	name: String?
 		//		the name of the app
 		name: "my supercool app",
-		//	author: String
+		//	author: String?
 		//		the person who wrote the app
 		author: "foo barson",
-		//	email: String
+		//	email: String?
 		//		the email address of the author
 		email: "foo@barson.org",
-		//	version: String
+		//	version: String?
 		//		the version of the app
 		version: "1.0",
-		//	maturity: String
+		//	maturity: String?
 		//		The development stage of the app. Can be "Alpha", "Beta", or "Stable"
 		maturity: "Alpha",
-		//	category: String
+		//	category: String?
 		//		The app's category
 		//		Can be "Accessories", "Development", "Games", "Graphics", "Internet", "Multimedia", "Office", "Other", or "System"
 		category: "Accessories",
-		//	code: String
-		//		the app's code
-		code: "({init: function(args) { alert('hi'); }})",
+		//	filename: String?
+		//		the path to the filename to write the code to. Relative to the app's namespace.
+		//		provide "<appSysnameHere>.js" to write to the main file
+		filename: "",
+		//	contents: String?
+		//		the new code to write to the file specified
+		contents: "({init: function(args) { alert('hi'); }})",
 		//	callback: Function
-		//		a callback function. First argument is the ID of the app just saved
+		//		a callback function. First argument is the ID of the app just saved (if a sysname was provided)
 		callback: function(id) {}
 	},
 	=====*/
@@ -267,34 +271,18 @@ desktop.app = {
 	{
 		//	summary:
 		//		saves an app to the server
-		if(typeof app.sysname != "undefined" &&
-	        typeof app.name != "undefined" &&
-	        typeof app.author != "undefined" &&
-	        typeof app.email != "undefined" &&
-	        typeof app.version != "undefined" &&
-	        typeof app.maturity != "undefined" &&
-	        typeof app.category != "undefined" &&
-	        typeof app.code != "undefined")
+		if((app.sysname||app.filename)||(app.sysname&&app.filename))
 		{
 			  api.log("IDE API: Saving application...");
 	          api.xhr({
 	               backend: "core.app.write.save",
-	               content : {
-	                    sysname: app.sysname,
-	                    name: app.name,
-	                    author: app.author,
-	                    email: app.email,
-	                    version: app.version,
-	                    maturity: app.maturity,
-	                    category: app.category,
-	                    code: app.code
-	               },
+	               content : app,
 		       error: function(data, ioArgs) {
 						if(app.error) app.error(data, ioArgs);
 						api.log("IDE API: Save error");
 			},
 	               load: function(data, ioArgs){
-						app.callback(data.sysname);
+						app.callback(data.sysname||true);
 						api.log("IDE API: Save Sucessful");
 						delete desktop.app.apps[parseInt(data.id)];
 						api.xhr({
@@ -311,7 +299,7 @@ desktop.app = {
 	     }
 		 else
 		 {
-			api.log("IDE API: Error! Could not save. Not all strings in the object are defined.");
+			api.log("IDE API: Error! Could not save. Not all required strings in the object are defined.");
 		 	return false;
 		 }
 	},

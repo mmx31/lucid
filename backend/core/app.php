@@ -112,17 +112,23 @@
 			import("models.user");
 			$user = $User->get_current();
 			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
-			$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
-			$p = $App->filter("sysname", $_POST['sysname']);
-			if($p === false) { $app = new App(array(sysname => $_POST['sysname'])); }
-			else { $p = $p[0]; }
-			foreach(array('name', 'author', 'email', 'version', 'maturity', 'category') as $item) {
-				$app->$item = $_POST[$item];
+			if(isset($_POST['sysname'])) {
+				$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
+				$p = $App->filter("sysname", $_POST['sysname']);
+				if($p === false) { $app = new App(array(sysname => $_POST['sysname'])); }
+				else { $p = $p[0]; }
+				foreach(array('name', 'author', 'email', 'version', 'maturity', 'category') as $item) {
+					if(isset($_POST[$item]))
+						$app->$item = $_POST[$item];
+				}
+				$app->save();
 			}
-			$app->save();
-			//TODO: implement saving changes back to files
-			$out = new jsonOutput();
-			$out->append("sysname", $app->sysname);
+			if(isset($_POST['filename'])) {
+				$_POST['filename'] = str_replace("..", "", $_POST['filename']);
+				file_put_contents($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['filename'], $_POST['content']);
+			}
+			$out = new jsonOutput(array(status => "ok"));
+			if($app) $out->append("sysname", $app->sysname);
 		}
 		if($_GET['action'] == "remove") {
 			function rmdir_recurse($file) {

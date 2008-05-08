@@ -9,7 +9,7 @@ dojo.declare("desktop.apps._App", null, {
 	constructor: function(info) {
 		this.status = "init";
 		this.name = info.name;
-		this.sysname = info.sysname;
+		this.id = this.sysname = this.declaredClass.substring(this.declaredClass.lastIndexOf("."));
 		dojo.connect(this, "kill", this, function() {
             this.status = "killed";
 			var pid = this.instance;

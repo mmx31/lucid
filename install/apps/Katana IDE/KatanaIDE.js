@@ -73,8 +73,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		this.win.addChild(client);
 		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
 //			this.toolbar.addChild(new dijit.form.Button({label: cm["new"], iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, "newApp", 1)}));
-//			this.toolbar.addChild(new dijit.form.Button({label: cm.open, iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, "load")}));
-//			this.toolbar.addChild(new dijit.form.Button({label: cm.save, iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, "save")}));
+			this.toolbar.addChild(new dijit.form.Button({label: cm.save, iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, "save")}));
 //			this.toolbar.addChild(new dijit.form.Button({label: cm.metadata, iconClass: "icon-16-actions-document-properties", onClick: dojo.hitch(this, "editMetadata")}));
 			this.toolbar.addChild(new dijit.form.Button({label: cm.run, iconClass: "icon-16-actions-media-playback-start", onClick: dojo.hitch(this, "run")}));
 			this.toolbar.addChild(new dijit.form.Button({label: sys.kill, iconClass: "icon-16-actions-media-playback-stop", onClick: dojo.hitch(this, "killExec")}));
@@ -115,7 +114,8 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		this.tabArea.addChild(cpane);
 		this.tabArea.selectChild(cpane);
 		editor.startup();
-		editor.massiveWrite(content);
+		if(content != "")
+			editor.massiveWrite(content);
 		editor.setCaretPosition(0, 0); 
 		setTimeout(dojo.hitch(this.tabArea, "layout"), 100);
 	},
@@ -149,7 +149,11 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 	},
 	save: function() {
 		var pane = this.tabArea.selectedChildWidget;
-		
+		var content = pane.ide_info.editor.getContent();
+		desktop.app.save({
+			filename: pane.ide_info.fileName,
+			content: content
+		});
 	},
 	run: function()
 	{

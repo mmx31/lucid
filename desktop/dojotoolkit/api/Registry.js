@@ -7,16 +7,16 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 	//		This is basically a persistant dojo.data store with write capabilities.
 	//		See dojo's documentation on dojo.data for more info.
 	__desktop_name: "",
-	__desktop_appid: 0,
+	__desktop_appname: 0,
 	constructor: function(/*Object*/args) {
 		//	args: {name: String}
 		//		the name of the store
-		//	args: {appid: Integer}
-		//		the current app's ID. (this.id)
+		//	args: {appname: String}
+		//		the current app's name. (this.sysname)
 		//	args: {data: Object}
 		//		this argument differs from a regular datastore; if the database exists on the server then it is ignored and the server-side data is used.
 		this.__desktop_name = args.name;
-		this.__desktop_appid = args.appid;
+		this.__desktop_appname = args.appname;
 		
 		this._jsonData = null;
 		this.exists(dojo.hitch(this, function(e) {
@@ -31,7 +31,7 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 			backend: ("api.registry.stream.save"),
 			content: {
 				value: newFileContentString,
-				appid: this.__desktop_appid,
+				appid: this.__desktop_appname,
 				name: this.__desktop_name
 			},
 			load: function(data, ioArgs) {
@@ -55,7 +55,7 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 			sync: sync,
 			content: {
 				name: this.__desktop_name,
-				appid: this.__desktop_appid
+				appid: this.__desktop_appname
 			},
 			load: function(data, ioArgs) {
 				callback(data.exists);
@@ -73,7 +73,7 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 			backend: "api.registry.stream.delete",
 			content: {
 				name: this.__desktop_name,
-				appid: this.__desktop_appid
+				appid: this.__desktop_appname
 			},
 			load: function(data, ioArgs) {
 				if(callback)
