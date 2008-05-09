@@ -10,6 +10,7 @@ dojo.require("api.Registry");
 dojo.require("api.Sound");
 dojo.require("api.ui");
 dojo.require("api.Window");
+dojo.require("dojox.encoding.base64");
 
 api.xhr = function(/*dojo.__ioArgs|String*/args) {
 	//	summary:
@@ -38,7 +39,14 @@ api.xhr = function(/*dojo.__ioArgs|String*/args) {
 	}
 	if(args.xsite) {
 		if(!dojo.isObject(args.content)) args.content = {};
-		args.content.path = args.url;
+		args.content["DESKTOP_XSITE_PARAMS"] = dojo.toJson({
+			url: args.url,
+			authinfo: {
+				username: dojox.encoding.base64.encode(args.auth.username.split("")),
+				password: dojox.encoding.base64.encode(args.auth.password.split(""))
+			}
+		});
+		delete args.auth;
 		args.url = "../backend/api/xsite.php";
 	}
 	else if(args.backend) {

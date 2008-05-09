@@ -28,6 +28,7 @@ dojo.require("desktop.ui.applets.Menubar");
 dojo.require("desktop.ui.applets.Netmonitor");
 dojo.require("desktop.ui.applets.Separator");
 dojo.require("desktop.ui.applets.Taskbar");
+dojo.require("desktop.ui.applets.Twitter");
 
 dojo.requireLocalization("desktop.ui", "appearance");
 dojo.requireLocalization("desktop.ui", "accountInfo");
@@ -127,6 +128,7 @@ dojo.mixin(desktop.ui, {
 	//		These are used when showing the "Add to panel" dialog
 	appletList: {
 		"Accessories": ["Clock"],
+		"Internet": ["Twitter"],
 		"Desktop & Windows": ["Taskbar"],
 		"System": ["Netmonitor"],
 		"Utilities": ["Menu", "Menubar", "Separator"]

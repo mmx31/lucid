@@ -43,5 +43,6 @@
 	"rename": "Rename",
 	"title": "Title",
 	"date": "Date",
-	"markAsRead": "Mark as read"
+	"markAsRead": "Mark as read",
+	"login": "Log in"
 })

@@ -42,5 +42,6 @@
 	"error": "Error",
 	"rename": "Cambie nombre",
 	"title": "Título",
-	"date": "Fecha"
+	"date": "Fecha",
+	"login": "Iniciar sesión"
 })
