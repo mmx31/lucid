@@ -489,7 +489,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		menu.addChild(new dijit.MenuSeparator({}));
 		menu.addChild(new dijit.MenuItem({label: nc.rename, iconClass: "icon-16-apps-preferences-desktop-font", onClick: dojo.hitch(this, "rename")}));
 		menu.addChild(new dijit.MenuItem({label: nc["delete"], iconClass: "icon-16-actions-edit-delete", onClick: dojo.hitch(this, "deleteFile")}));
-		
+		menu.startup();
 	},
 	uninitialize: function() {
 		dojo.forEach(this._subscriptions, dojo.unsubscribe);
