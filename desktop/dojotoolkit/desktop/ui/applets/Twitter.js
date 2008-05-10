@@ -135,8 +135,11 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 							+dojo.date.locale.format(date)+"</a>";
 			dojo.query("a", row).forEach(function(node) {
 				dojo.connect(node, "onclick", node, function(e) {
-					desktop.app.launchHandler(null, {url: this.href}, "text/x-uri");
-					e.preventDefault();
+					if(!e.shiftKey
+					&& !e.ctrlKey) {
+						desktop.app.launchHandler(null, {url: this.href}, "text/x-uri");
+						e.preventDefault();
+					}
 				})
 			});
 			div.appendChild(row);
