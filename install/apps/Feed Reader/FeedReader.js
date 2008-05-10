@@ -29,7 +29,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 	
 	    this.win = new api.Window({
-	        title: app["RSS Reader"],
+	        title: app["Feed Reader"],
 	        onClose: dojo.hitch(this, this.kill)
 	    });
 		var store = this.feedStore = new api.Registry({
