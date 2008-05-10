@@ -14,18 +14,17 @@ $user = $User->get_current();
 
 if($user->has_permission("api.xsite"))
 {
-	$params = Zend_Json::decode($_REQUEST['DESKTOP_XSITE_PARAMS']);
+	$params = Zend_Json::decode($_POST['DESKTOP_XSITE_PARAMS']);
 	$url = $params["url"];
 	import("lib.net.Request");
 	$reqArgs = array(
 		allowRedirects => true
 	);
-	if(isset($params["authinfo"])) {
-		$reqArgs["user"] = base64_decode($params["authinfo"]["username"]);
-		$reqArgs["pass"] = base64_decode($params["authinfo"]["password"]);
-	}
 	$p = new HTTP_Request($url, $reqArgs);
 	$p->setMethod(HTTP_REQUEST_METHOD_GET);
+	if(isset($params["authinfo"])) {
+		$p->addHeader('Authorization', 'Basic ' . $params["authinfo"]);
+	}
 	//	required for some ajax apis
 	$p->addHeader("Referer", "http://".$_SERVER['SERVER_NAME']."/");
 	$v=false;
@@ -42,7 +41,7 @@ if($user->has_permission("api.xsite"))
 		$p->addQueryString($key, $value);
 	}
 	$p->sendRequest();
-
+	$type=$p->getResponseHeader("Content-Type");
 	header("Content-Type: $type");
 	foreach(array(
 		"400" => "Bad syntax",
@@ -59,7 +58,6 @@ if($user->has_permission("api.xsite"))
 			header("HTTP/1.0 ".$key." ".value);
 	}
 
-	$type=$p->getResponseHeader("Content-Type");
 	
 	$body = $p->getResponseBody();
 	echo $body;

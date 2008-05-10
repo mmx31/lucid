@@ -39,13 +39,18 @@ api.xhr = function(/*dojo.__ioArgs|String*/args) {
 	}
 	if(args.xsite) {
 		if(!dojo.isObject(args.content)) args.content = {};
-		args.content["DESKTOP_XSITE_PARAMS"] = dojo.toJson({
-			url: args.url,
-			authinfo: {
-				username: dojox.encoding.base64.encode(args.auth.username.split("")),
-				password: dojox.encoding.base64.encode(args.auth.password.split(""))
+		var xsiteArgs = {
+			url: args.url
+		}
+		if(args.auth) {
+			var b = [];
+			var s = args.auth.username + ":" + args.auth.password;
+			for(var i = 0; i < s.length; ++i){
+				b.push(s.charCodeAt(i));
 			}
-		});
+			xsiteArgs.authinfo = dojox.encoding.base64.encode(b);
+		}
+		args.content["DESKTOP_XSITE_PARAMS"] = dojo.toJson(xsiteArgs);
 		delete args.auth;
 		args.url = "../backend/api/xsite.php";
 	}

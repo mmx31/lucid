@@ -21,9 +21,14 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 	startup: function() {
 		if(!this.settings.key)
 			this.settings.key = dojox.encoding.crypto.Blowfish.encrypt(Math.random(), Math.random());
-		if(!this.settings.username) {
+		if(!this.settings.username)
 			this.drawLoginForm();
-		}
+		else
+			this.getInfo();
+		this.timer = setInterval(dojo.hitch(this, "getInfo"), 1000*60*5);
+	},
+	uninitialize: function() {
+		clearInterval(this.timer);
 	},
 	drawLoginForm: function(error) {
 		for(var key in this.loginUi) {
@@ -58,7 +63,6 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 		this.dialog.setContent(div);
 	},
 	getInfo: function() {
-		console.log(this.settings);
 		if(!this.settings.username) {
 			var authInfo = {
 				username: this.loginUi.username.getValue(),
@@ -84,16 +88,31 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 	drawInfo: function(data) {
 		if(!this.settings.username) {
 			this.settings = dojo.mixin(this.settings, {
-				username: dojox.encoding.crypto.Blowfish.decrypt(this.loginUi.username.getValue(), this.settings.key),
-				password: dojox.encoding.crypto.Blowfish.decrypt(this.loginUi.password.getValue(), this.settings.key)
+				username: dojox.encoding.crypto.Blowfish.encrypt(this.loginUi.username.getValue(), this.settings.key),
+				password: dojox.encoding.crypto.Blowfish.encrypt(this.loginUi.password.getValue(), this.settings.key)
 			});
 			this.loginUi.username.setValue("");
 			this.loginUi.password.setValue("");
 		}
 		var div = document.createElement("div");
+		var count = 0;
 		dojo.forEach(data, function(item) {
+			if(count++ > 5) return;
 			var row = document.createElement("div");
-			row.innerHTML = item.text;
+			dojo.style(row, {
+				width: "300px",
+				padding: "5px",
+				backgroundColor: (count % 2 ? "white" : "#eee")
+			});
+			var date = new Date(item.created_at);
+			row.innerHTML = "<img width=32 height=32 style='width: 32px; height: 32px; margin-right: 5px; float: left;' src='"+item.user.profile_image_url+"' />"
+							+"<a href='http://twitter.com/"+item.user.screen_name+"'>"+item.user.name+"</a> "
+							+item.text
+							+" <a href='http://www.twitter.com/"+item.user.screen_name+"/statuses/"+item.id+"'>"
+							+dojo.date.locale.format(date)+"</a>";
+			dojo.query("a", row).forEach(function(node) {
+				node.href="javascript:desktop.app.launchHandler(null, {url: \"" + escape(node.href) + "\"}, \"text/x-uri\")";
+			});
 			div.appendChild(row);
 		})
 		this.dialog.setContent(div);
