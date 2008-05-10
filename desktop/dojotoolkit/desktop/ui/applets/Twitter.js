@@ -2,6 +2,7 @@ dojo.provide("desktop.ui.applets.Twitter");
 dojo.require("dijit.form.Button");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.Dialog");
+dojo.require("dijit.form.Textarea");
 dojo.require("dojox.encoding.crypto.Blowfish");
 dojo.require("dojox.validate.web");
 dojo.requireLocalization("desktop.ui", "accountInfo");
@@ -96,6 +97,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 			this.loginUi.password.setValue("");
 		}
 		var div = document.createElement("div");
+		this.makeTextbox(div);
 		var count = 0;
 		dojo.forEach(data, function(item) {
 			if(count++ > 5) return;
@@ -130,5 +132,62 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 			div.appendChild(row);
 		})
 		this.dialog.setContent(div);
+	},
+	makeTextbox: function(div) {
+		var header = document.createElement("div");
+		dojo.style(header, "position", "relative");
+		header.textContent = "What are you doing?";
+		var counter = document.createElement("div");
+		dojo.style(counter, {
+			position: "absolute",
+			top: "0px",
+			right: "0px"
+		});
+		counter.textContent = "140";
+		header.appendChild(counter);
+		div.appendChild(header);
+		var area = document.createElement("div");
+		var button = new dijit.form.Button({
+			label: "Update",
+			onClick: dojo.hitch(this, function() {
+				this.postUpdate(this.textbox.getValue());
+			})
+		});
+		var tb = this.textbox = new dijit.form.Textarea({
+			intermediateChanges: true,
+			style: "width: 300px;",
+			onChange: function(value) {
+				var length = value.split("").length;
+				counter.textContent = 140 - length;
+				button.setDisabled(length >= 140);
+			}
+		});
+		area.appendChild(tb.domNode);
+		div.appendChild(area);
+		
+		var bRow = document.createElement("div");
+		dojo.style(bRow, "textAlign", "center");
+		bRow.appendChild(button.domNode);
+		div.appendChild(bRow);
+		
+	},
+	postUpdate: function(string) {
+		if(string == "") return;
+		api.xhr({
+			xsite: true,
+			url: "http://twitter.com/statuses/update.json",
+			content: {
+				status: string
+			},
+			auth: {
+				username: dojox.encoding.crypto.Blowfish.decrypt(this.settings.username, this.settings.key),
+				password: dojox.encoding.crypto.Blowfish.decrypt(this.settings.password, this.settings.key)
+			},
+			load: dojo.hitch(this, function() {
+				this.textbox.setValue("");
+				this.getInfo();
+			}),
+			handleAs: "json"
+		})
 	}
 });
