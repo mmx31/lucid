@@ -123,7 +123,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 				dojo.forEach(newItems, function(item) { allItems.push(item); });
 			}
 			dojo.forEach(allItems, function(item) {
-				if(dojox.validate.isUrl(item))
+				if(dojox.validate.isUrl(item) && typeof parseInt(item.charAt(0)) != "number")
 					text += "<a href='"+item+"'>"+(item.length >= 28 ? item.substring(0, 28)+"..." : item)+"</a> ";
 				else
 					text += item+" "
