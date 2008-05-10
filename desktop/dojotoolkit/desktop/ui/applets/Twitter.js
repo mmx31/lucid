@@ -134,7 +134,10 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 							+"<a href='http://www.twitter.com/"+item.user.screen_name+"/statuses/"+item.id+"'>"
 							+dojo.date.locale.format(date)+"</a>";
 			dojo.query("a", row).forEach(function(node) {
-				node.href="javascript:desktop.app.launchHandler(null, {url: \"" + escape(node.href) + "\"}, \"text/x-uri\")";
+				dojo.connect(node, "onclick", node, function(e) {
+					desktop.app.launchHandler(null, {url: this.href}, "text/x-uri");
+					e.preventDefault();
+				})
 			});
 			div.appendChild(row);
 		})

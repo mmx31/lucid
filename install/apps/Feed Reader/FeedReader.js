@@ -516,7 +516,10 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		
 		this.contentArea.setContent(text);
 		dojo.query("a", this.contentArea.domNode).forEach(function(node) {
-			node.href="javascript:desktop.app.launchHandler(null, {url: \"" + escape(node.href) + "\"}, \"text/x-uri\")";
+			dojo.connect(node, "onclick", node, function(e) {
+				desktop.app.launchHandler(null, {url: this.href}, "text/x-uri");
+				e.preventDefault();
+			})
 		});
 	}
 })
