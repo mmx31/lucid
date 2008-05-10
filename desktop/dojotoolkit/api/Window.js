@@ -317,9 +317,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		if(this._drag) this._drag.onMouseUp(); this._drag.destroy();
 		this.killResizer();
 		this.pos.top = dojo.style(this.domNode, "top");
-		//this.pos.bottom = dojo.style(this.domNode, "bottom");
 		this.pos.left = dojo.style(this.domNode, "left");
-		//this.pos.right = dojo.style(this.domNode, "right");
 		this.pos.width = dojo.style(this.domNode, "width");
 		this.pos.height = dojo.style(this.domNode, "height");
 		var win = this.domNode;
@@ -390,7 +388,6 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		{		
 			this.makeResizer();
 		}
-		var win = this.domNode;
 		if(desktop.config.fx >= 2)
 		{
 			if(desktop.config.fx < 3) this._toggleBody(false);
@@ -413,11 +410,13 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		}
 		else
 		{
-			win.style.top = this.pos.top+"px";
-			win.style.left = this.pos.left+"px";
-			win.style.height= this.pos.height+"px";
-			win.style.width= this.pos.width+"px";
-			this.resize();
+			dojo.style(this.domNode, {
+				top: this.pos.top+"px",
+				left: this.pos.left+"px",
+				height: this.pos.height+"px",
+				width: this.pos.width+"px"
+			});
+			setTimeout(dojo.hitch(this, "resize"), 100)
 		}
 		this.maximized = false;
 	},

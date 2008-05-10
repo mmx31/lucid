@@ -27,10 +27,9 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 			this.drawLoginForm();
 		else
 			this.getInfo();
-		this.timer = setInterval(dojo.hitch(this, "getInfo"), 1000*60*5);
 	},
 	uninitialize: function() {
-		clearInterval(this.timer);
+		clearTimeout(this.timer);
 	},
 	drawLoginForm: function(error) {
 		for(var key in this.loginUi) {
@@ -78,6 +77,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 				password: dojox.encoding.crypto.Blowfish.decrypt(this.settings.password, this.settings.key)
 			}
 		}
+		this.timer = setTimeout(dojo.hitch(this, "getInfo"), 1000*60*5);
 		api.xhr({
 			xsite: true,
 			url: "http://twitter.com/statuses/friends_timeline.json",
@@ -96,8 +96,15 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 			this.loginUi.username.setValue("");
 			this.loginUi.password.setValue("");
 		}
-		var div = document.createElement("div");
-		this.makeTextbox(div);
+		if(!this.contentNode) {
+			var main = document.createElement("div");
+			this.makeTextbox(main);
+			this.contentNode = document.createElement("div");
+			main.appendChild(this.contentNode);
+			this.dialog.setContent(main);
+		}
+		var div = this.contentNode;
+		div.innerHTML = "";
 		var count = 0;
 		dojo.forEach(data, function(item) {
 			if(count++ > 5) return;
@@ -131,7 +138,6 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 			});
 			div.appendChild(row);
 		})
-		this.dialog.setContent(div);
 	},
 	makeTextbox: function(div) {
 		var header = document.createElement("div");
