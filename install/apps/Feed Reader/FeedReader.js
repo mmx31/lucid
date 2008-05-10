@@ -176,7 +176,9 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			var grid = this.grid = new dojox.Grid({
 				structure: [{
 					cells: [[
-						{field: "Date", name: cm.date},
+						{field: "Date", name: cm.date, formatter: function(str) {
+							return dojo.date.locale.format(new Date(str));
+						}},
 						{field: "Title", name: cm.title, width: 15}
 					]]
 				}],
@@ -438,7 +440,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	                var content = item.getElementsByTagName("description")[0].textContent;
 	                var url = item.getElementsByTagName("link")[0].textContent;
 	                var date = item.getElementsByTagName("pubDate")[0].textContent;
-					date = dojo.date.locale.format(new Date(date));
+					date = new Date(date);
 					var hash = dojox.encoding.digests.MD5(title);
 					hashes.push(hash);
 					this.hashStore.fetch({
