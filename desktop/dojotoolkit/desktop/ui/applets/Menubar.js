@@ -1,6 +1,8 @@
 dojo.provide("desktop.ui.applets.Menubar");
 dojo.require("desktop.ui.applets.Menu");
 dojo.require("dijit.Menu");
+dojo.require("dijit.Toolbar");
+dojo.require("dijit.form.Button");
 dojo.requireLocalization("desktop.ui", "menus");
 dojo.requireLocalization("desktop", "places");
 dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
@@ -8,6 +10,11 @@ dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 	//		An extention of desktop.ui.applets.Menu except it seperates the application, places, and system menus into their own buttons
 	dispName: "Menu Bar",
 	_drawn: false,
+	postCreate: function() {
+		this._prefsMenu = [];
+		this._adminMenu = [];
+		this.inherited("postCreate", arguments);
+	},
 	_drawButton: function() {
 		//	summary:
 		//		Draws the button for the applet
@@ -19,8 +26,6 @@ dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 			return;
 		}
 		else this._drawn = true;
-		dojo.require("dijit.Toolbar");
-		dojo.require("dijit.form.Button");
 		var tbar = new dijit.Toolbar();
 		this.addChild(tbar);
 		dojo.forEach([

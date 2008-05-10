@@ -10,6 +10,8 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 	_prefsMenu: [],
 	_adminMenu: [],
 	postCreate: function() {
+		this._prefsMenu = [];
+		this._adminMenu = [];
 		this._getApps();
 		//this._interval = setInterval(dojo.hitch(this, this._getApps), 1000*60);
 		dojo.addClass(this.containerNode, "menuApplet");
@@ -155,11 +157,13 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		{
 			var cat = list[cat];
 			//cat.meow();
-			var category = new dijit.PopupMenuItem({
-				iconClass: "icon-16-categories-applications-"+cat.toLowerCase(),
-				label: l[cat.toLowerCase()] || cat
-			});
-			var catMenu = new dijit.Menu({parentMenu: category});
+			if(!(cat == "Preferences" || cat == "Administration")) {
+				var category = new dijit.PopupMenuItem({
+					iconClass: "icon-16-categories-applications-"+cat.toLowerCase(),
+					label: l[cat.toLowerCase()] || cat
+				});
+				var catMenu = new dijit.Menu({parentMenu: category});
+			}
 			for(var app in data)
 			{
 				if(data[app].category == cat)
@@ -179,11 +183,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 			}
 			catMenu.startup();
 			category.popup = catMenu;
-			if(cat == "Preferences" || cat == "Administration") {
-				catMenu.destroy();
-				category.destroy();
-			}
-			else
+			if(!(cat == "Preferences" || cat == "Administration"))
 				menu.addChild(category);
 		}
 		menu.domNode.style.display="none";
