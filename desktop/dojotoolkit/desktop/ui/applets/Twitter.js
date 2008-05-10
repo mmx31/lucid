@@ -3,6 +3,7 @@ dojo.require("dijit.form.Button");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.Dialog");
 dojo.require("dojox.encoding.crypto.Blowfish");
+dojo.require("dojox.validate.web");
 dojo.requireLocalization("desktop.ui", "accountInfo");
 dojo.requireLocalization("desktop", "common");
 
@@ -105,10 +106,23 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 				backgroundColor: (count % 2 ? "white" : "#eee")
 			});
 			var date = new Date(item.created_at);
+			var text = "";
+			var items=item.text.split("\n")
+			var allItems = [];
+			for(var i in items) {
+				var newItems = items[i].split(" ");
+				dojo.forEach(newItems, function(item) { allItems.push(item); });
+			}
+			dojo.forEach(allItems, function(item) {
+				if(dojox.validate.isUrl(item))
+					text += "<a href='"+item+"'>"+(item.length >= 28 ? item.substring(0, 28)+"..." : item)+"</a> ";
+				else
+					text += item+" "
+			});
 			row.innerHTML = "<img width=32 height=32 style='width: 32px; height: 32px; margin-right: 5px; float: left;' src='"+item.user.profile_image_url+"' />"
 							+"<a href='http://twitter.com/"+item.user.screen_name+"'>"+item.user.name+"</a> "
-							+item.text
-							+" <a href='http://www.twitter.com/"+item.user.screen_name+"/statuses/"+item.id+"'>"
+							+text
+							+"<a href='http://www.twitter.com/"+item.user.screen_name+"/statuses/"+item.id+"'>"
 							+dojo.date.locale.format(date)+"</a>";
 			dojo.query("a", row).forEach(function(node) {
 				node.href="javascript:desktop.app.launchHandler(null, {url: \"" + escape(node.href) + "\"}, \"text/x-uri\")";
