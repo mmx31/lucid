@@ -87,6 +87,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 				})
 			}
 		}))
+		sMenu.startup();
 		return sMenu;
 	},
 	_drawButton: function() {
