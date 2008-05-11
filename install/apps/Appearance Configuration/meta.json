@@ -1,0 +1,11 @@
+{
+	"type": "application",
+	"sysname": "AppearanceConfig",
+	"name": "Appearance",
+	"author": "Psychcf",
+	"email": "will@psychdesigns.net",
+	"version": "1.0",
+	"maturity": "Stable",
+	"category": "Preferences",
+	"filetypes": []
+}

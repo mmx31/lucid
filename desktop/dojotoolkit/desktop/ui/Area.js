@@ -21,7 +21,7 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 		});
 		dojo.addClass(filearea.domNode, "mainFileArea");
 		filearea.menu.addChild(new dijit.MenuSeparator({}));
-		filearea.menu.addChild(new dijit.MenuItem({label: l.wallpaper, iconClass: "icon-16-apps-preferences-desktop-wallpaper", onClick: dojo.hitch(desktop.ui.config, "appearance")}));
+		filearea.menu.addChild(new dijit.MenuItem({label: l.wallpaper, iconClass: "icon-16-apps-preferences-desktop-wallpaper", onClick: dojo.hitch(desktop.app, "launch", "AppearanceConfig")}));
 		filearea.refresh();
 		dojo.style(filearea.domNode, "zIndex", 1);
 		this.containerNode.appendChild(filearea.domNode);

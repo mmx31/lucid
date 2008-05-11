@@ -45,20 +45,6 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		var sMenu = new dijit.Menu({});
 
 		var pMenu = new dijit.Menu();
-		dojo.forEach([
-			{
-				label: l.appearance,
-				iconClass: "icon-16-apps-preferences-desktop-theme",
-				onClick: function() { desktop.ui.config.appearance(); }
-			},
-			{
-				label: l.accountInfo,
-				iconClass: "icon-16-apps-system-users",
-				onClick: function() { desktop.ui.config.account(); }
-			}
-		], function(args) {
-			pMenu.addChild(new dijit.MenuItem(args));
-		});
 		dojo.forEach(this._prefsMenu, function(item) {
 			pMenu.addChild(item);
 		}, this);
