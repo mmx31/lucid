@@ -76,7 +76,7 @@
 			foreach($p as $d => $v)
 			{
 				$item = array();
-				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "filetypes") as $key) {
+				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "icon", "filetypes") as $key) {
 					$item[$key] = $v->$key;
 				}
 				array_push($list, $item);

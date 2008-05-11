@@ -7,5 +7,6 @@
 	"version": "1.0",
 	"maturity": "Stable",
 	"category": "System",
+	"icon": "icon-16-apps-utilities-system-monitor",
 	"filetypes": []
 }

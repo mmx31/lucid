@@ -24,6 +24,18 @@ desktop.app = {
 			backend: "core.app.fetch.list",
 			load: dojo.hitch(this, function(data, ioArgs) {
 				this.appList = data;
+				var style = document.createElement("style");
+				style.type="text/css";
+				var contents = "";
+				dojo.forEach(data, function(item) {
+					if(!item.icon || item.icon.indexOf(".") === -1) return;
+					contents += ".icon-app-"+item.sysname+" {"
+								+"width: 16px; height: 16px;"
+								+"background-image: url('"+dojo.moduleUrl("desktop.apps."+item.sysname, item.icon)+"');"
+								+"}";
+				});
+				style.textContent = contents;
+				document.getElementsByTagName("head")[0].appendChild(style);
 			}),
 			handleAs: "json"
 		});

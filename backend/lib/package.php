@@ -89,6 +89,7 @@ class package {
 		$app->maturity = $info['maturity'];
 		$app->category = $info['category'];
 		$app->filetypes = $info['filetypes'];
+		if($info['icon']) $app->icon = $info['icon'];
 		$app->save();
 		$backendDir = $GLOBALS['path']."../apps/".$app->sysname;
 		if(is_dir($path."/files")) package::_recursive_copy($path."/backends", $backendDir);

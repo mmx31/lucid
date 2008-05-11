@@ -7,5 +7,6 @@
 	"version": "1.0",
 	"maturity": "Stable",
 	"category": "Office",
+	"icon": "icon-16-apps-internet-mail",
 	"filetypes": []
 }

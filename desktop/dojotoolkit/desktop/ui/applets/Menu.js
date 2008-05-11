@@ -155,7 +155,8 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 				if(data[app].category == cat)
 				{
 					var item = new dijit.MenuItem({
-						label: ap[data[app].name] || data[app].name
+						label: ap[data[app].name] || data[app].name,
+						iconClass: data[app].icon ? (data[app].icon.indexOf(".") === -1 ? data[app].icon : "icon-app-"+data[app].sysname) : null
 					});
 					dojo.connect(item, "onClick", dojo.hitch(desktop.app, "launch", data[app].sysname));
 					if(cat == "Preferences") {
