@@ -40,14 +40,14 @@ function get_basepath() {
 	return implode("/", $curpath) . "/";
 }
 
-$time = 3600;
+$time = 60*60*24*365;
 $ses = 'desktop_session';
 session_set_cookie_params($time, get_basepath());
 session_name($ses);
 session_start();
 
 if (isset($_COOKIE[$ses]))
-  setcookie($ses, $_COOKIE[$ses], time() + $time, "/");
+  setcookie($ses, $_COOKIE[$ses], time() + $time, get_basepath());
 
 //for debugging
 function desktop_errorHandler($exception) {
