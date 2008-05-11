@@ -15,6 +15,7 @@ dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		this.win = new api.Window({
 			title: app["Image Viewer"],
+			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
 		var toolbar = new dijit.Toolbar({layoutAlign: "top"});

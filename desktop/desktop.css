@@ -162,6 +162,11 @@ margin: 0px;
 	position: absolute;
 }
 
+.win-icon {
+	float: left;
+	margin-right: 5px;
+}
+
 /*if not IE we can use the method that works :D */
 
 .win > .win-bmw,

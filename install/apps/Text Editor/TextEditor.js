@@ -22,6 +22,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 		
 	    this.window = new api.Window({
 			title: app["Text Editor"],
+			iconClass: this.iconClass,
 	        onClose: dojo.hitch(this, "kill")
 	    });
 	    var toolbar = new dijit.Toolbar({

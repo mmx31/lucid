@@ -6,6 +6,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var win = this.win = new api.Window({
 			title: l.accountInfo,
+			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
 		var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding-bottom: 5px;"});

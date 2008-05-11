@@ -27,6 +27,9 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	//	closed: Boolean
 	//		Is the window closed?
 	closed: false,
+	//	iconClass: String?
+	//		the class to give the icon node
+	iconClass: "",
 	onClose: function() {
 		//	summary:
 		//		What to do on destroying of the window
@@ -122,7 +125,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		this.titleNode.innerHTML = this.title;
 		this._winListItem = desktop.ui._windowList.newItem({
 			label: this.title,
-			icon: this.icon,
+			icon: this.iconClass,
 			id: this.id
 		});
 		if(this.maximized == true) this.maximize();

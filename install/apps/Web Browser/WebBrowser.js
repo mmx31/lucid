@@ -16,6 +16,7 @@ dojo.declare("desktop.apps.WebBrowser", desktop.apps._App, {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		this.win = new api.Window({
 			title: app["Web Browser"],
+			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
 		this.Iframe = document.createElement("iframe");

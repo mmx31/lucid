@@ -7,6 +7,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 		var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
 		var win = this.wallWin = new api.Window({
 			title: l.appearancePrefs,
+			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
 		var tabs = new dijit.layout.TabContainer({layoutAlign: "client"});

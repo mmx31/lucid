@@ -15,6 +15,7 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 			title: app["Music Player"],
 			width: "500px",
 			height: "150px",
+			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
 		var toolbar = new dijit.Toolbar({layoutAlign: "top"});

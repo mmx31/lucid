@@ -25,6 +25,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		this.win = new api.Window({
 			title: app["Katana IDE"],
+			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
 		

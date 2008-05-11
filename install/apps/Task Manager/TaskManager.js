@@ -24,6 +24,7 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 	        title: app["Task Manager"],
 	        width: "400px",
 	        height: "450px",
+			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 	    });
 	    //var layout = new dijit.layout.LayoutContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));

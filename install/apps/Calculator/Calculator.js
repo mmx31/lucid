@@ -15,6 +15,7 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 			title: app["Calculator"],
 			width: "200px",
 			height: "270px",
+			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
 		var textbox = new dijit.form.TextBox({

@@ -8,6 +8,7 @@ dojo.declare("desktop.apps.Terminal", desktop.apps._App, {
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		this.win = new api.Window({
 			title: app["Terminal"],
+			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
 		this.term = new api.Console({layoutAlign: "client", path: (args.path || "/")})

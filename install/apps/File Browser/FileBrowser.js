@@ -21,6 +21,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		var places = dojo.i18n.getLocalization("desktop", "places");
 		this.win = new api.Window({
 			title: app["File Browser"],
+			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
 			this.client = new dijit.layout.SplitContainer({layoutAlign: "client"});

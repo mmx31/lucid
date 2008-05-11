@@ -139,13 +139,17 @@ desktop.app = {
 		try {
 			pid = desktop.app.instances.length;
 			var realName = "";
+			var icon = "";
 			dojo.forEach(desktop.app.appList, function(item) {
-				if(item.sysname == name) realName = item.name;
+				if(item.sysname != name) return;
+				realName = item.name;
+				icon = item.icon;
 			})
 			var instance = desktop.app.instances[pid] = new desktop.apps[name]({
 				sysname: name,
 				name: realName,
 				instance: pid,
+				icon: icon,
 				args: args,
 				callback: callback
 			});

@@ -37,6 +37,7 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 		//make window
 		this.win = new api.Window({
 			title: app["Administration Panel"],
+			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
 		var split = new dijit.layout.SplitContainer({sizerWidth: 7, orientation: "horizontal", layoutAlign: "client"});

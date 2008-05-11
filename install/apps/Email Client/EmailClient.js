@@ -39,6 +39,7 @@ dojo.declare("desktop.apps.EmailClient", desktop.apps._App, {
 		}});
 		this.win = new api.Window({
 			title: app["Email Client"],
+			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, this.kill)
 		});
 		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});

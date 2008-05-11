@@ -23,6 +23,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 		
 	    this.window = new api.Window({
 			title: app["Word Processor"],
+			iconClass: this.iconClass,
 	        onClose: dojo.hitch(this, this.kill)
 	    });
 	    var toolbar = new dijit.Toolbar({

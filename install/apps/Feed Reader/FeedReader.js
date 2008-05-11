@@ -29,6 +29,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	
 	    this.win = new api.Window({
 	        title: app["Feed Reader"],
+			iconClass: this.iconClass,
 	        onClose: dojo.hitch(this, this.kill)
 	    });
 		var store = this.feedStore = new api.Registry({

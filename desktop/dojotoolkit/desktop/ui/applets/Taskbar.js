@@ -47,7 +47,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		dojo.addClass(domNode, "taskBarItem");
 		if(this.getParent().getOrientation() == "horizontal") dojo.addClass(domNode, "taskBarItemHorizontal");
 		else dojo.addClass(domNode, "taskBarItemVertical");
-		if(store.hasAttribute(item, "icon")) domNode.innerHTML = "<img src='"+store.getValue(item, "icon")+"' />";
+		if(store.hasAttribute(item, "icon")) domNode.innerHTML = "<div class='"+store.getValue(item, "icon")+"' style='float: left;' />";
 		var v = store.getValue(item, "label");
 		if(v.length >= 18) {
 			v = v.slice(0, 18) + "...";
