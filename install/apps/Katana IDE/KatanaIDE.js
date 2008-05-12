@@ -8,12 +8,14 @@ dojo.require("dijit.form.Button");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.Toolbar");
 dojo.require("dijit.Dialog");
+dojo.require("dijit.Menu");
 dojo.require("dijit.form.FilteringSelect");
 dojo.require("dojo.data.ItemFileWriteStore");
 dojo.requireLocalization("desktop", "common");
 dojo.requireLocalization("desktop", "apps");
 dojo.requireLocalization("desktop.ui", "menus");
 dojo.requireLocalization("desktop", "system");
+dojo.requireLocalization("api", "filearea");
 
 dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 	files: [], //file information
@@ -76,6 +78,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 				sizeShare: 30,
 				style: "overflow: auto;"
 			})
+			this.makeMenu(left);
 			dojo.connect(left, "onClick", this, "onItem");
 			client.addChild(left);
 			client.addChild(right);
@@ -92,7 +95,39 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		this.win.addChild(this.toolbar);
 		this.win.show();
 		this.win.startup();
-		
+	},
+	makeMenu: function(tree) {
+		var cm = dojo.i18n.getLocalization("desktop", "common");
+		var nf = dojo.i18n.getLocalization("api", "filearea");
+		var menu = new dijit.Menu({});
+		dojo.connect(menu, "_openMyself", this, function(e){
+			this._contextItem = dijit.getEnclosingWidget(e.target).item || false;
+			menu.getChildren().forEach(function(i){ if(i.setDisabled) i.setDisabled(!this._contextItem); }, this);
+		});
+		menu.bindDomNode(tree.domNode);
+		//add menu items
+		menu.addChild(new dijit.MenuItem({
+			label: nf.createFolder,
+			iconClass: "icon-16-actions-folder-new",
+			onClick: dojo.hitch(this, function() {
+				//TODO: 
+			})
+		}))
+		menu.addChild(new dijit.MenuItem({
+			label: nf.createFile,
+			iconClass: "icon-16-actions-file-new",
+			onClick: dojo.hitch(this, function() {
+				//TODO: 
+			})
+		}))
+		menu.addChild(new dijit.MenuSeparator({}));
+		menu.addChild(new dijit.MenuItem({
+			label: cm["delete"],
+			iconClass: "icon-16-actions-edit-delete",
+			onClick: dojo.hitch(this, function() {
+				//TODO: 
+			})
+		}))
 	},
 	makeTab: function(appname, filename, content) {
 		var div = dojo.doc.createElement("div");
