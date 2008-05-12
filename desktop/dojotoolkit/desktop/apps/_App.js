@@ -10,7 +10,7 @@ dojo.declare("desktop.apps._App", null, {
 	constructor: function(info) {
 		this.status = "init";
 		this.name = info.name;
-		this.id = this.sysname = this.declaredClass.substring(this.declaredClass.lastIndexOf("."));
+		this.id = this.sysname = this.declaredClass.substring(this.declaredClass.lastIndexOf(".")+1);
 		this.iconClass = info.icon ? (info.icon.indexOf(".") === -1 ? info.icon : "icon-app-"+this.sysname) : "";
 		dojo.connect(this, "kill", this, function() {
             this.status = "killed";

@@ -19,12 +19,12 @@
 				continue;
 			}
 			else {
+				$newFile = str_replace($strip, $strip === "" ? "" : "/", $path . "/" . $file);
 				if(is_dir($path . "/" . $file)) {
-					$search = jsSearch($path . "/" . $file);
+					$files[$file] = jsSearch($path . "/" . $file, $strip);
 				}
-				else if(is_file($path . "/" . $file) && count(preg_match("/\.js$/", $file) > 0)){
-					$files[] = str_replace($strip, $strip === "" ? "" : "/", $path . "/" . $file);
-				}
+				else
+					$files[$file] = "";
 			}
 		}
 		return $files;
@@ -62,9 +62,10 @@
 			}
 			else {
 				$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
-				$files = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname'],
+				$files=array();
+				$files[$_POST['sysname']] = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname'],
 									$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/");
-				$files[] = "/".$_POST['sysname'].".js";
+				$files[$_POST['sysname'].".js"] = "";
 				$out = new jsonOutput($files);
 			}
 		}
@@ -94,12 +95,11 @@
 				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "filetypes") as $key) {
 					$item[$key] = $v->$key;
 				}
+				$item["files"] = array();
 				if(is_dir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$item['sysname']))
-					$item["files"] = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$v->sysname,
+					$item["files"][$v->sysname] = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$v->sysname,
 												$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/");
-				else
-					$item['files'] = array();
-				$item["files"][] = "/".$v->sysname.".js";
+				$item["files"][$v->sysname.".js"] = "";
 				array_push($list, $item);
 			}
 			$out->set($list);

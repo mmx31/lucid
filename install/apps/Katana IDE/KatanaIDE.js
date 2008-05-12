@@ -45,21 +45,22 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 				this.appInfo[apps[i].sysname] = apps[i];
 				var files = apps[i].files;
 				delete apps[i].files;
-				var children = [];
-				for(var f in files) {
-					var fileItem = {
-						sysname: apps[i].sysname+files[f],
-						name: files[f],
-						label: files[f].substring(files[f].lastIndexOf("/", files[f].length)) || files[f],
-						filename: files[f],
-						appname: apps[i].sysname
+				var makeChildren = function(files, parent) {
+					var children = [];
+					for(var f in files) {
+						var fileItem = {
+							sysname: apps[i].sysname+(parent ? parent+"/" : "")+f,
+							name: f,
+							filename: (parent ? parent+"/" : "")+f,
+							appname: apps[i].sysname
+						}
+						if(typeof files[f] == "object") fileItem.children = makeChildren(files[f], (parent ? parent+"/" : "")+f)
+						//apps.push(fileItem);
+						children.push(fileItem);
 					}
-					apps.push(fileItem);
-					children.push({
-						_reference: apps[i].sysname+files[f]
-					})
+					return children;
 				}
-				apps[i].children = children;
+				apps[i].children = makeChildren(files);
 			}
 			var appStore = this.appStore = new dojo.data.ItemFileWriteStore({
 				data: {
@@ -85,8 +86,8 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 //			this.toolbar.addChild(new dijit.form.Button({label: cm["new"], iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, "newApp", 1)}));
 			this.toolbar.addChild(new dijit.form.Button({label: cm.save, iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, "save")}));
 			this.toolbar.addChild(new dijit.form.DropDownButton({label: cm.metadata, iconClass: "icon-16-actions-document-properties", dropDown: this._makeMetaDialog()}));
-			this.toolbar.addChild(new dijit.form.Button({label: cm.run, iconClass: "icon-16-actions-media-playback-start", onClick: dojo.hitch(this, "run")}));
-			this.toolbar.addChild(new dijit.form.Button({label: sys.kill, iconClass: "icon-16-actions-media-playback-stop", onClick: dojo.hitch(this, "killExec")}));
+//			this.toolbar.addChild(new dijit.form.Button({label: cm.run, iconClass: "icon-16-actions-media-playback-start", onClick: dojo.hitch(this, "run")}));
+//			this.toolbar.addChild(new dijit.form.Button({label: sys.kill, iconClass: "icon-16-actions-media-playback-stop", onClick: dojo.hitch(this, "killExec")}));
 	
 		this.win.addChild(this.toolbar);
 		this.win.show();
@@ -251,6 +252,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		if(!store.isItem(item)) return;
 		var filename = store.getValue(item, "filename");
 		if(!filename) return;
+		if(store.hasAttribute(item, "children")) return;
 		var app = store.getValue(item, "appname");
 		var tac = this.tabArea.getChildren();
 		for(var i in tac) {
@@ -271,18 +273,6 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			content: content
 		});
 	},
-	run: function()
-	{
-		desktop.app.execString(this.editor.value);
-	},
-	
-	killExec: function() {
-		for(key in desktop.app.instances) {
-			var instance = desktop.app.instances[key];
-			if(!instance) continue;
-			if(instance.id == -1) desktop.app.kill(instance.instance);
-		}
-	},
 
 	kill: function()
 	{
@@ -290,7 +280,6 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			if(!this.loadwin.closed) this.loadwin.close();
 		}
 		if(!this.win.closed)this.win.close();
-		this.killExec();
 	}
 });
 
