@@ -495,7 +495,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		dojo.forEach(this._subscriptions, dojo.unsubscribe);
 	},
 	_dragStart: function(e) {
-		if(e.button != 0) return;
+		if(e.button != (dojo.isIE ? 1 : 0)) return;
 		this._clickOrigin = {x: e.clientX, y: e.clientY};
 		this._docMouseUpEvent = dojo.connect(document, "onmouseup", this, "_onRelease");
 		this._onDragEvent = dojo.connect(document, "onmousemove", this, "_onMove");
