@@ -29,7 +29,7 @@ if($user->has_permission("api.xsite"))
 	$p->addHeader("Referer", "http://".$_SERVER['SERVER_NAME']."/");
 	$v=false;
 	foreach($_POST as $key=>$value) {
-		if($key == "DESKTOP_XSITE_PARAMS") continue;
+		if($key == "DESKTOP_XSITE_PARAMS" || $key == "dojo_preventCache") continue;
 		if(!$v) {
 			$v=true;
 			$p->setMethod(HTTP_REQUEST_METHOD_POST);
