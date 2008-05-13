@@ -15,8 +15,8 @@
 		if($_GET['action'] == "save")
 		{
 			$p = $User->get_current();
-			$result = $Registry->filter(array("userid" => $p->id, "appid" => $_POST['appid'], "name" => $_POST['name']));
-			if(!isset($result[0])) { $u = new $Registry(); $u->userid = $p->id; $u->name=$_POST['name']; $u->appid = $_POST['appid']; }
+			$result = $Registry->filter(array("userid" => $p->id, "appname" => $_POST['appname'], "name" => $_POST['name']));
+			if(!isset($result[0])) { $u = new $Registry(); $u->userid = $p->id; $u->name=$_POST['name']; $u->appname = $_POST['appname']; }
 			else { $u = $result[0]; }
 			$u->value = $_POST['value'];
 			$u->save();
@@ -25,7 +25,7 @@
 		if($_GET['action'] == "load")
 		{
 			$p = $User->get_current();
-			$result = $Registry->filter(array("userid" => $p->id, "appid" => $_GET['appid'], "name" => $_GET['name']));
+			$result = $Registry->filter(array("userid" => $p->id, "appname" => $_GET['appname'], "name" => $_GET['name']));
 			if($result != false)
 			{
 				$result = $result[0];
@@ -35,7 +35,7 @@
 		if($_GET['action'] == "delete")
 		{
 			$p = $User->get_current();
-			$result = $Registry->filter(array("userid" => $p->id, "appid" => $_POST['appid'], "name" => $_POST['name']));			
+			$result = $Registry->filter(array("userid" => $p->id, "appname" => $_POST['appname'], "name" => $_POST['name']));			
 			if(isset($result[0])) { $result[0]->delete(); $out = new jsonOutput(array(exists=>true)); }
 			else { $out = new jsonOutput(array(exists=>false)); }
 		}
@@ -45,7 +45,7 @@
 		if($_GET['action'] == "exists")
 		{
 			$p = $User->get_current();
-			$result = $Registry->filter(array("userid" => $p->id, "appid" => $_POST['appid'], "name" => $_POST['name']));
+			$result = $Registry->filter(array("userid" => $p->id, "appname" => $_POST['appname'], "name" => $_POST['name']));
 			$out = new jsonOutput(array(exists=>($result != false)));
 		}
 	}

@@ -33,7 +33,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	        onClose: dojo.hitch(this, this.kill)
 	    });
 		var store = this.feedStore = new api.Registry({
-			appid: this.id,
+			appname: this.sysname,
 			name: "rssFeeds",
 			data: {
 				label: "label",
@@ -86,13 +86,6 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 								title: "Psychcf's blog",
 								url: "http://psychdesigns.net/psych/rss.xml",
 								category: false
-							},
-							{
-								id: 7,
-								label: "Jay's blog",
-								title: "Jay's blog",
-								url: "http://www.jaymacdesigns.net/feed/",
-								category: false
 							}
 						]
 					}
@@ -100,7 +93,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			}
 		});
 		this.hashStore = new api.Registry({
-			appid: this.id,
+			appname: this.sysname,
 			name: "feedItemHashes",
 			data: {
 				label: "label",
@@ -441,8 +434,9 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	                var content = item.getElementsByTagName("description")[0].textContent;
 	                var url = item.getElementsByTagName("link")[0].textContent;
 	                var date = item.getElementsByTagName("pubDate")[0].textContent;
+	                var guid = item.getElementsByTagName("guid")[0].textContent;
 					date = new Date(date);
-					var hash = dojox.encoding.digests.MD5(title);
+					var hash = dojox.encoding.digests.MD5(guid);
 					hashes.push(hash);
 					this.hashStore.fetch({
 						query: {hash: hash},
@@ -452,7 +446,8 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 								Title: title,
 								Content: content,
 								Date: date,
-								Url: url
+								Url: url,
+								Guid: guid
 							});
 							if(items.length == 0) {
 								this.hashStore.newItem({
@@ -493,7 +488,8 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		var title = this.gridStore.getValue(row.__dojo_data_item, "Title");
 		var url = this.gridStore.getValue(row.__dojo_data_item, "Url");
 		var content = this.gridStore.getValue(row.__dojo_data_item, "Content");
-		var hash = dojox.encoding.digests.MD5(title);
+		var guid = this.gridStore.getValue(row.__dojo_data_item, "Guid");
+		var hash = dojox.encoding.digests.MD5(guid);
 		
 		this.hashStore.fetch({
 			query: {hash: hash},
@@ -513,7 +509,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		
 		this.grid.refresh();
 		
-		var text = "<div style='background-color: #eee; padding: 3px;'><a href='"+url+"'>" + title + "</a></div><p>" + content + "</p>";
+		var text = "<div style='background-color: #eee; padding: 3px;'><a href='"+url+"'>" + title + "</a></div><div style='padding: 5px;'>" + content + "</div>";
 		
 		this.contentArea.setContent(text);
 		dojo.query("a", this.contentArea.domNode).forEach(function(node) {

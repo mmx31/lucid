@@ -21,7 +21,7 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 		this._jsonData = null;
 		this.exists(dojo.hitch(this, function(e) {
 			if(e == true) this.url = this._jsonFileUrl = api.xhr("api.registry.stream.load")
-			+ "&appid=" + encodeURIComponent(args.appid)
+			+ "&appname=" + encodeURIComponent(args.appname)
 			+ "&name=" + encodeURIComponent(args.name);
 			else this.data = this._jsonData = args.data;
 		}), true);
@@ -31,7 +31,7 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 			backend: ("api.registry.stream.save"),
 			content: {
 				value: newFileContentString,
-				appid: this.__desktop_appname,
+				appname: this.__desktop_appname,
 				name: this.__desktop_name
 			},
 			load: function(data, ioArgs) {
@@ -55,7 +55,7 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 			sync: sync,
 			content: {
 				name: this.__desktop_name,
-				appid: this.__desktop_appname
+				appname: this.__desktop_appname
 			},
 			load: function(data, ioArgs) {
 				callback(data.exists);
@@ -73,7 +73,7 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 			backend: "api.registry.stream.delete",
 			content: {
 				name: this.__desktop_name,
-				appid: this.__desktop_appname
+				appname: this.__desktop_appname
 			},
 			load: function(data, ioArgs) {
 				if(callback)
