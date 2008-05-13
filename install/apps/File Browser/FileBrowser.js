@@ -83,7 +83,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 			this.upbutton = new dijit.form.Button({
 				onClick: dojo.hitch(this, "openUploader"),
 				iconClass: "icon-16-actions-mail-send-receive",
-				label: cm.upload,
+				label: cm.upload
 			});
 			this.toolbar.addChild(this.upbutton);
 			var load = this.loadNode = document.createElement("div");
