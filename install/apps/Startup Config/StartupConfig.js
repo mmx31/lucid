@@ -8,7 +8,7 @@ dojo.declare("desktop.apps.StartupConfig", desktop.apps._App, {
 	init: function(args) {
 		var appNls = dojo.i18n.getLocalization("desktop", "apps");
 		var win = this.win = new api.Window({
-			title: appNls["Startup"],
+			title: appNls["Startup Applications"],
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill"),
 			width: "300px",
