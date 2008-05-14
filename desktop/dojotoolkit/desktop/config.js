@@ -24,10 +24,14 @@ desktop.config = {
 				}
 				data = dojo.fromJson(data);
 				desktop.config = dojo.mixin(desktop.config, data);
-				for(var a=0;a<desktop.config.startupapps.length;a++) {
-					desktop.app.launch(desktop.config.startupapps[a]);
-				}
 				desktop.config.apply();
+				
+				setTimeout(function() {
+					for(var a=0;a<desktop.config.startupApps.length;a++) {
+						desktop.app.launch(desktop.config.startupApps[a]);
+					}
+				}, 200);
+				
 				if(cback) cback();
 			}
         });
@@ -116,9 +120,9 @@ desktop.config = {
 	//	theme: String
 	//		The user's preferred theme
 	theme: "Minuit",
-	//	startupapps: Array
+	//	startupApps: Array
 	//		An array of app ids to launch at startup
-	startupapps: [],
+	startupApps: [],
 	//	window: Object
 	//		window settings
 	//		constrain - should the window be constrained to the screen's edge?

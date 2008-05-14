@@ -13,5 +13,8 @@
 	"Terminal": "Terminal",
 	"Music Player": "Music Player",
 	"Email Client": "Email Client",
-	"MineSweep": "MineSweep"
+	"MineSweep": "MineSweep",
+	"Appearance": "Appearance",
+	"Account Information": "Account Information",
+	"Startup": "Startup"
 })

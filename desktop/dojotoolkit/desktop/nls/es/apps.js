@@ -13,5 +13,8 @@
 	"Terminal": "Consola",
 	"Music Player": "Reproductor de Música",
 	"Email Client": "Cliente de correo electrónico",
-	"MineSweep": "Mina de barrendero"
+	"MineSweep": "Mina de barrendero",
+	"Appearance": "Apariencia",
+	"Account Information": "Información de la cuenta",
+	"Startup": "Arranque"
 })

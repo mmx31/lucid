@@ -1,4 +1,26 @@
 dojo.provide("desktop.apps.AdminPanel");
+dojo.require("dijit.layout.SplitContainer");
+dojo.require("dijit.layout.LayoutContainer");
+dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit.ProgressBar");
+dojo.require("dijit.Toolbar");
+dojo.require("dijit.form.Button");
+dojo.require("dijit.form.CheckBox");
+dojo.require("dijit.form.TextBox");
+dojo.require("dijit.form.FilteringSelect");
+dojo.require("dojox.grid.Grid");
+dojo.require("dojo.data.ItemFileWriteStore");
+dojo.require("dijit.Menu");
+dojo.require("dijit.Dialog");
+dojo.require("dojox.widget.FileInputAuto");
+api.addDojoCss("dojox/grid/_grid/Grid.css");
+api.addDojoCss("dojox/widget/FileInput/FileInput.css");
+dojo.requireLocalization("desktop", "apps");
+dojo.requireLocalization("desktop", "system");
+dojo.requireLocalization("desktop", "common");
+dojo.requireLocalization("desktop", "permissions");
+dojo.requireLocalization("desktop.ui", "accountInfo");
+dojo.requireLocalization("desktop.ui", "menus");
 
 dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 	kill: function() {
@@ -10,28 +32,6 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 	},
 	windows: [],
 	init: function(args) {
-		dojo.require("dijit.layout.SplitContainer");
-		dojo.require("dijit.layout.LayoutContainer");
-		dojo.require("dijit.layout.ContentPane");
-		dojo.require("dijit.ProgressBar");
-		dojo.require("dijit.Toolbar");
-		dojo.require("dijit.form.Button");
-		dojo.require("dijit.form.CheckBox");
-		dojo.require("dijit.form.TextBox");
-		dojo.require("dijit.form.FilteringSelect");
-		dojo.require("dojox.grid.Grid");
-		dojo.require("dojo.data.ItemFileWriteStore");
-		dojo.require("dijit.Menu");
-		dojo.require("dijit.Dialog");
-		dojo.require("dojox.widget.FileInputAuto");
-		api.addDojoCss("dojox/grid/_grid/Grid.css");
-		api.addDojoCss("dojox/widget/FileInput/FileInput.css");
-		dojo.requireLocalization("desktop", "apps");
-		dojo.requireLocalization("desktop", "system");
-		dojo.requireLocalization("desktop", "common");
-		dojo.requireLocalization("desktop", "permissions");
-		dojo.requireLocalization("desktop.ui", "accountInfo");
-		dojo.requireLocalization("desktop.ui", "menus");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		//make window
