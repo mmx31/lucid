@@ -16,5 +16,5 @@
 	"MineSweep": "MineSweep",
 	"Appearance": "Appearance",
 	"Account Information": "Account Information",
-	"Startup": "Startup"
+	"Startup Applications": "Startup Applications"
 })
