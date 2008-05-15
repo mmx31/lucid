@@ -28,18 +28,16 @@ class FileFs extends BaseFs {
 		if($quota == 0) { return 0; } //no quota
 		$current = $this->_getSize($this->_basePath("/"));
 		$total = $quota - $current;
-		return $total;
+		return intval($total);
 	}
 	function _checkUserQuota1() {
 		global $User;
 		$cur = $User->get_current();
 		$quota = $cur->quota;
-		return $quota;
+		return intval($quota);
 	}
 	function _checkUserQuota() {
-		global $User;
-		$cur = $User->get_current();
-		$quota = $cur->quota;
+		$quota = $this->_checkUserQuota1();
 		$current = $this->_getSize($this->_basePath("/"));
 		if($current >= $quota) {
 			if($quota == 0) { return 0; } //no quota
