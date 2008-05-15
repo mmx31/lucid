@@ -651,8 +651,14 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 							groups: "[]",
 							permissions: "[]",
 							email: email.getValue(),
-							id: id
+							id: id,
+							quota: -1
 						});
+						name.setValue("");
+						username.setValue("");
+						email.setValue("");
+						password.setValue("");
+						confpassword.setValue("");
 					})
 				});
 			})

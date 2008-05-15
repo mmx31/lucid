@@ -17,7 +17,7 @@
 		var $permissions = array('type' => 'array');
 		var $groups = array('type' => 'array');
 		var $lastauth = array('type' => 'timestamp');
-		var $quota = array('type' => 'integer', 'default' => 26214400);
+		var $quota = array('type' => 'integer', 'default' => -1);
 		
 		function get_current()
 		{
@@ -179,6 +179,17 @@
 		}
 		function add_permission($perm) {
 			$this->permissions[$perm] = true;
+		}
+		function get_quota() {
+			if($this->quota == -1) {
+				import("models.quota");
+				global $Quota;
+				//TODO: check group quotas
+				$default = $Quota->filter("type", "user");
+				$default = $default[0];
+				return $default->size;
+			}
+			else return $this->quota;
 		}
 	}
 	global $User;

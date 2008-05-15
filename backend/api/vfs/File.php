@@ -33,7 +33,7 @@ class FileFs extends BaseFs {
 	function _checkUserQuota1() {
 		global $User;
 		$cur = $User->get_current();
-		$quota = $cur->quota;
+		$quota = $cur->get_quota();
 		return intval($quota);
 	}
 	function _checkUserQuota() {

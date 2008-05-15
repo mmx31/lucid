@@ -13,6 +13,7 @@
     $act = ($_GET['action'] == "" ? "installprograms" : $_GET['action']);
 	if($act == "installpermissions") {
 		import("models.permission");
+		import("models.quota");
 		$out = new jsonOutput();
 		foreach(array(
 			array(
@@ -53,6 +54,19 @@
 			$out->append("Adding " . $args['name'] . " permission...", "...done");
 			$perm = new $Permission($args);
 			$perm->save();
+		}
+		foreach(array(
+			array(
+				'type' => 'user',
+				'size' => 26214400
+			),
+			array(
+				'type' => 'group'
+			)
+		) as $args) {
+			$out->append("Adding " . $args['type'] . " quota...", "...done");
+			$q = new $Quota($args);
+			$q->save();
 		}
 	}
 	if($act == "installadmin")
