@@ -24,7 +24,7 @@
 					$files[$file] = jsSearch($path . "/" . $file, $strip);
 				}
 				else
-					$files[$file] = "";
+					$files[] = $file;
 			}
 		}
 		return $files;
@@ -65,7 +65,7 @@
 				$files=array();
 				$files[$_POST['sysname']] = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname'],
 									$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/");
-				$files[$_POST['sysname'].".js"] = "";
+				$files[] = $_POST['sysname'].".js";
 				$out = new jsonOutput($files);
 			}
 		}
@@ -99,7 +99,7 @@
 				if(is_dir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$item['sysname']))
 					$item["files"][$v->sysname] = jsSearch($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$v->sysname,
 												$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/");
-				$item["files"][$v->sysname.".js"] = "";
+				$item["files"][] = $v->sysname.".js";
 				array_push($list, $item);
 			}
 			$out->set($list);
