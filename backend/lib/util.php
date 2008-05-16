@@ -39,15 +39,16 @@ function get_basepath() {
 	array_pop($curpath);
 	return implode("/", $curpath) . "/";
 }
+$sesPath = $GLOBALS['path']."/../tmp/sessions/";
+if(!is_dir($sesPath)) mkdir($sesPath);
+session_save_path($sesPath);
 
 $time = 60*60*24*365;
-$ses = 'desktop_session';
+session_name('desktop_session');
 session_set_cookie_params($time, get_basepath());
-session_name($ses);
+ini_set("session.gc_maxlifetime",$time);
 session_start();
 
-if (isset($_COOKIE[$ses]))
-  setcookie($ses, $_COOKIE[$ses], time() + $time, get_basepath());
 
 //for debugging
 function desktop_errorHandler($exception) {
