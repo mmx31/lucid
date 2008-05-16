@@ -50,13 +50,14 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 				var makeChildren = function(files, parent) {
 					var children = [];
 					for(var f in files) {
+						var fName = typeof files[f] == "object" ? f : files[f];
 						var fileItem = {
-							sysname: apps[i].sysname+(parent ? parent+"/" : "")+f,
-							name: f,
-							filename: (parent ? parent+"/" : "")+f,
+							sysname: apps[i].sysname+(parent ? parent+"/" : "")+fName,
+							name: fName,
+							filename: (parent ? parent+"/" : "")+fName,
 							appname: apps[i].sysname
 						}
-						if(typeof files[f] == "object") fileItem.children = makeChildren(files[f], (parent ? parent+"/" : "")+f)
+						if(typeof files[f] == "object") fileItem.children = makeChildren(files[f], (parent ? parent+"/" : "")+fName)
 						//apps.push(fileItem);
 						children.push(fileItem);
 					}
