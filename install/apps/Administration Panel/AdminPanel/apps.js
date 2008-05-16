@@ -18,6 +18,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 				data[i].filetypes = data[i].filetypes.join(", ");
 				data[i].name = apps[data[i].name] || data[i].name;
 				data[i].category = mnus[data[i].category.toLowerCase()];
+				delete data[i].files;
 			};
 			var layout = [{
 				cells: [[]]
