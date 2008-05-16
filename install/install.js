@@ -351,7 +351,8 @@ install = new function() {
 				content: {
 					db_url: form.db_url,
 					db_prefix: form.db_prefix,
-					conf_public: form.conf_public
+					conf_public: form.conf_public,
+					conf_throttle: form.conf_throttle
 				},
 				load: function(data, args){
 					try{

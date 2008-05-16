@@ -92,6 +92,7 @@
 		$db_url = addslashes($_POST['db_url']);
 		$db_prefix = addslashes($_POST['db_prefix']);
 		$conf_public = $_POST['conf_public'];
+		$conf_throttle = $_POST['conf_throttle'];
 		$out->append("Parsing form values...", "...done");
 		$characters = 10;
 		$possible = '23456789bcdfghjkmnpqrstvwxyz'; 
@@ -110,7 +111,8 @@
 		$writebuffer .= "\t);\n";
 		$writebuffer .= "\t$" . "GLOBALS['conf'] = Array(\n";
 		$writebuffer .= "\t\t\"salt\" => \"" . $conf_secretword . "\",\n";
-		$writebuffer .= "\t\t\"public\" => " . ($conf_public == "true" ? "true" : "false") . "\n";
+		$writebuffer .= "\t\t\"public\" => " . ($conf_public == "true" ? "true" : "false") . ",\n";
+		$writebuffer .= "\t\t\"crosstalkThrottle\" => " . ($conf_throttle == "true" ? "true" : "false") . "\n";
 		$writebuffer .= "\t);\n";
 		if (is_writable("../backend/configuration.php")) {
 	        $handle = fopen("../backend/configuration.php", 'w');

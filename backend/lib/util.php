@@ -27,17 +27,7 @@ if (get_magic_quotes_gpc())
 		$_GET[$key] = stripslashes($value);
 	}
 }
-//check loads
-if(function_exists('sys_getloadavg')) { //We have a UNIX system! Yay!
-	$load = sys_getloadavg();
-	if ($load[0] > 75) {
-	    header('HTTP/1.1 503 Too busy, try again later');
-	    die('Server too busy. Please try again later.');
-	}
-}
-else {	//We have a windows user :(
-	//die('you windows n00b');
-}
+
 //sessions and cookies
 function get_basepath() {
 	$curpath = explode("/", $_SERVER['REQUEST_URI']);
