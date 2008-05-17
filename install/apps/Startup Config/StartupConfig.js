@@ -16,7 +16,7 @@ dojo.declare("desktop.apps.StartupConfig", desktop.apps._App, {
 		});
 		var cpane = new dijit.layout.ContentPane({
 			layoutAlign: "client",
-			style: "overflow-y: auto;"
+			style: "overflow-y: auto; padding: 5px;"
 		});
 		var div = document.createElement("div");
 		dojo.forEach(desktop.app.appList, function(app) {
