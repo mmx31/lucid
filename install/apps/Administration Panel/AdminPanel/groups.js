@@ -18,7 +18,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			//make headers (need to do it manually unfortunatly)
 			var layout = [{
 				cells: [[
-					{name: sys.name, field: "name", editor: dojox.grid.editors.Input},
+					{name: sys.name, field: "name"},
 					{name: sys.description, field: "description", editor: dojox.grid.editors.Input}
 				]]
 			}];
@@ -84,6 +84,19 @@ dojo.extend(desktop.apps.AdminPanel, {
 				{
 					label: sys.manageGroupMembersGeneric,
 					onClick: dojo.hitch(this, "groupMemberDialog")
+				},
+				{
+					label: sys.modifyQuotaGeneric,
+					onClick: dojo.hitch(this, function() {
+						var row = this._groupGrid.model.getRow(this.__rowIndex);
+						var info = {
+							name: this._groupStore.getValue(row.__dojo_data_item, "name"),
+							size: this._groupStore.getValue(row.__dojo_data_item, "quota")
+						};
+						this.makeQuotaWin(info, dojo.hitch(this, function(value) {
+							this._groupStore.setValue(row.__dojo_data_item, "quota", value);
+						}));
+					})
 				}
 			], function(item) {
 				var menuItem = new dijit.MenuItem(item);
@@ -148,7 +161,8 @@ dojo.extend(desktop.apps.AdminPanel, {
 									id: id,
 									name: n,
 									description: d,
-									permissions: "[]"
+									permissions: "[]",
+									quota: -1
 								})
 							})
 						})

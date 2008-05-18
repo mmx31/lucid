@@ -41,12 +41,12 @@ dojo.extend(desktop.apps.AdminPanel, {
 			this.win.startup();
 		}))
 	},
-	makeQuotaRow: function(item) {
+	makeQuotaRow: function(item, showDefault) {
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var row = document.createElement("div");
 				
 		//widgets
-		var val = item.size == 0 ? 26214400 : item.size;
+		var val = item.size < 1 ? 26214400 : item.size;
 		var unit = "B";
 		dojo.forEach([
 			"KB",
@@ -81,19 +81,34 @@ dojo.extend(desktop.apps.AdminPanel, {
 				}
 			})
 		});
+		var onChange = function(v) {
+			if(!v) return;
+			valueWid.setDisabled(this.value != "custom");
+			unitWid.setDisabled(this.value != "custom");
+		}
 		var cb_custom = new dijit.form.RadioButton({
 			name: this.sysname+this.instance+"radio"+item.type,
-			onChange: function(v) {
-				valueWid.setDisabled(!v);
-				unitWid.setDisabled(!v);
-			}
+			value: "custom",
+			onChange: onChange
 		});
 		cb_custom.setAttribute("checked", item.size != 0);
-		cb_custom.onChange(item.size != 0);
 		var cb_unlimited = new dijit.form.RadioButton({
-			name: this.sysname+this.instance+"radio"+item.type
+			name: this.sysname+this.instance+"radio"+item.type,
+			value: "unlimited",
+			onChange: onChange
 		})
 		cb_unlimited.setAttribute("checked", item.size == 0);
+		var cb_default;
+		if(showDefault) {
+			cb_default = new dijit.form.RadioButton({
+				name: this.sysname+this.instance+"radio"+item.type,
+				value: "default",
+				onChange: onChange
+			});
+			cb_default.setAttribute("checked", item.size == -1);
+		}
+		valueWid.setDisabled(item.size <= 0);
+		unitWid.setDisabled(item.size <= 0);
 		//put widgets in body
 		var row1 = document.createElement("div");
 		row1.appendChild(cb_custom.domNode);
@@ -106,11 +121,20 @@ dojo.extend(desktop.apps.AdminPanel, {
 		unLabel.textContent = sys.unlimited;
 		row2.appendChild(unLabel);
 		row.appendChild(row2);
+		if(showDefault) {
+			var row3 = document.createElement("div");
+			var defLabel = document.createElement("span");
+			defLabel.textContent = sys["default"];
+			row3.appendChild(cb_default.domNode);
+			row3.appendChild(defLabel);
+			row.appendChild(row3);
+		}
 		
 		return {
 			node: row,
 			getValue: function() {
 				if(cb_unlimited.checked) return 0;
+				if(showDefault && cb_default.checked) return -1;
 				var val = valueWid.getValue();
 				dojo.forEach([
 					{unit: "GB", size: 1073741824},
@@ -123,5 +147,40 @@ dojo.extend(desktop.apps.AdminPanel, {
 				return val;
 			}
 		};
+	},
+	makeQuotaWin: function(item, callback) {
+		var cmn = dojo.i18n.getLocalization("desktop", "common");
+		var sys = dojo.i18n.getLocalization("desktop", "system");
+		item.type = item.name;
+		var ui = this.makeQuotaRow(item, true);
+		var win = new api.Window({
+			title: sys.modifyQuota.replace("%s", item.name),
+			width: "400px",
+			height: "100px"
+		});
+		var cpane = new dijit.layout.ContentPane({layoutAlign: "client"});
+		cpane.setContent(ui.node);
+		win.addChild(cpane);
+		//bottom part
+		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
+		var cont = document.createElement("div");
+		var cancel = new dijit.form.Button({
+			label: "Cancel",
+			onClick: dojo.hitch(win, "close")
+		})
+		cont.appendChild(cancel.domNode);
+		var save = new dijit.form.Button({
+			label: cmn.save,
+			onClick: dojo.hitch(this, function() {
+				callback(ui.getValue());
+				win.close();
+			})
+		})
+		cont.appendChild(save.domNode);
+		dojo.addClass(cont, "floatRight");
+		bottom.setContent(cont);
+		win.addChild(bottom);
+		this.windows.push(win);
+		win.show();
 	}
 });

@@ -42,6 +42,8 @@
 	"installThemePackage": "Install theme package",
 	"description": "Description",
 	"manageGroupMembersGeneric": "Manage group members",
+	"modifyQuotaGeneric": "Modify quota",
+	"modifyQuota": "Modify %s's quota",
 	"initial": "Allow by default",
 	"installAppInstructions": "Select an app package to install from your local hard disk",
 	"installThemeInstructions": "Select a theme package to install from your local hard disk",

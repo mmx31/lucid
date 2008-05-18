@@ -22,7 +22,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			}];
 			//make headers
 			for(var field in data[0]) {
-				if(field == "permissions" || field == "groups") continue;
+				if(field == "permissions" || field == "groups" || field == "quota") continue;
 				var args = {
 					name: sys[field] || usr[field],
 					field: field
@@ -153,6 +153,19 @@ dojo.extend(desktop.apps.AdminPanel, {
 							})
 						})
 					)
+				},
+				{
+					label: sys.modifyQuotaGeneric,
+					onClick: dojo.hitch(this, function() {
+						var row = this._userGrid.model.getRow(this.__rowIndex);
+						var info = {
+							name: this._userStore.getValue(row.__dojo_data_item, "username"),
+							size: this._userStore.getValue(row.__dojo_data_item, "quota")
+						};
+						this.makeQuotaWin(info, dojo.hitch(this, function(value) {
+							this._userStore.setValue(row.__dojo_data_item, "quota", value);
+						}));
+					})
 				}
 			], function(item) {
 				var menuItem = new dijit.MenuItem(item);

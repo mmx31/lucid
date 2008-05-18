@@ -41,6 +41,8 @@
 	"installThemePackage": "Instalar el paquete de temas",
 	"description": "Descripción",
 	"manageGroupMembersGeneric": "Administre los miembros del grupo",
+	"modifyQuotaGeneric": "Modifique la cuota",
+	"modifyQuota": "Modifique la cuota de %s",
 	"initial": "Permitir por defecto",
 	"installAppInstructions": "Seleccione una aplicación de paquetes a instalar desde su disco duro local",
 	"installThemeInstructions": "Seleccione una tema de paquetes a instalar desde su disco duro local",

@@ -67,7 +67,8 @@
 						id => $group->id,
 						name => $group->name,
 						description => $group->description,
-						permissions => $group->permissions
+						permissions => $group->permissions,
+						quota => $group->quota
 					));
 				}
 				$output = new jsonOutput($out);
@@ -90,7 +91,7 @@
 				import("lib.Json.Json");
 				import("models.group");
 				$p = $Group->get($_POST['id']);
-				foreach(array("name", "description", "permissions") as $key) {
+				foreach(array("description", "permissions", "quota") as $key) {
 					if(!isset($_POST[$key])) continue;
 					if($key == "permissions") $p->$key = Zend_Json::decode($_POST[$key]);
 					else $p->$key = $_POST[$key];
@@ -212,7 +213,8 @@
 						"email",
 						"permissions",
 						"groups",
-						"lastauth"
+						"lastauth",
+						"quota"
 					) as $key) {
 						$o[$key] = $v->$key;
 					}

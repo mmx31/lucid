@@ -66,6 +66,8 @@ desktop.user = {
 		//	groups: Array?
 		//		the user's new groups. Stays the same when not provided. Must be an admin to set.
 		groups: [],
+		//	quota: Integer?
+		//		the user's disk quota, in bytes
 		//	callback: Function?
 		//		a callback function. Not required.
 		callback: function() {}
