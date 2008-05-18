@@ -235,5 +235,32 @@
 				$o->append("total", $total);
 			}
 		}
+		if($_GET['section'] == "quota")
+		{
+			if($_GET['action'] == "list") {
+				import("models.quota");
+				$list = $Quota->all();
+				$fin = array();
+				foreach($list as $item) {
+					array_push($fin, array(
+						type => $item->type,
+						size => $item->size
+					));
+				}
+				$out = new jsonOutput($fin);
+			}
+			if($_GET['action'] == "set") {
+				import("models.quota");
+				import("lib.Json.Json");
+				$values = Zend_Json::decode($_POST['quotas']);
+				foreach($values as $key => $value) {
+					$p=$Quota->filter("type", $key);
+					if($p == false) continue;
+					$p[0]->size = (int)$value;
+					$p[0]->save();
+				}
+				$out = new intOutput("ok");
+			}
+		}
 	}
 	else internal_error("permission_denied");

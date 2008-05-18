@@ -64,6 +64,10 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 			       iconClass: "icon-16-apps-system-users",
 			       onClick: dojo.hitch(this, this.permissions)});
 				menu.addChild(item);
+				var item = new dijit.MenuItem({label: sys.quota,
+			       iconClass: "icon-16-devices-drive-harddisk",
+			       onClick: dojo.hitch(this, this.quota)});
+				menu.addChild(item);
 				var item = new dijit.MenuItem({label: sys.themes,
 			       iconClass: "icon-16-apps-preferences-desktop-theme",
 			       onClick: dojo.hitch(this, this.themes)});
@@ -187,5 +191,6 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 dojo.require("desktop.apps.AdminPanel.apps");
 dojo.require("desktop.apps.AdminPanel.groups");
 dojo.require("desktop.apps.AdminPanel.permissions");
+dojo.require("desktop.apps.AdminPanel.quota");
 dojo.require("desktop.apps.AdminPanel.themes");
 dojo.require("desktop.apps.AdminPanel.users");

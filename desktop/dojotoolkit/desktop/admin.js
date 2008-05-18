@@ -264,5 +264,41 @@ desktop.admin = {
 				handleAs: "json"
 			});
 		}
+	},
+	quota: {
+		//	summary:
+		//		methods that can be used to set default quotas for objects on the system (groups, users)
+		//	description:
+		//		Quotas restrict the ammount of disk usage a user or group can use.
+		//		If a quota is set to 0, then the quota would be limitless.
+		//		if a specific object has a quota of -1, then it looks up the default quota for a user or group.
+		//		you can use these functions to set that default value.
+		list: function(/*Function*/callback) {
+			//	summary:
+			//		list the different quotas that you can set
+			api.xhr({
+				backend: "core.administration.quota.list",
+				load: callback,
+				handleAs: "json"
+			})
+		},
+		set: function(/*Object*/quotas, /*Function?*/callback) {
+			//	summary:
+			//		Sets a default quota for a system object
+			//	quotas:
+			//		an object containing each quota's new value.
+			//		quota sizes are in bytes.
+			//		|{
+			//		|	user: 1024,
+			//		|	group: 0
+			//		|}
+			api.xhr({
+				backend: "core.administration.quota.set",
+				content: {
+					quotas: dojo.toJson(quotas)
+				},
+				load: callback || function() {}
+			})
+		}
 	}
 }

@@ -40,7 +40,7 @@
 	"installAppPackage": "Instalar el paquete de aplicaciones",
 	"installThemePackage": "Instalar el paquete de temas",
 	"description": "Descripción",
-	"manageGroupMembers": "Administre los miembros del grupo",
+	"manageGroupMembersGeneric": "Administre los miembros del grupo",
 	"initial": "Permitir por defecto",
 	"installAppInstructions": "Seleccione una aplicación de paquetes a instalar desde su disco duro local",
 	"installThemeInstructions": "Seleccione una tema de paquetes a instalar desde su disco duro local",
@@ -55,5 +55,7 @@
 	"launchingApp": "Lanzamiento aplicación %s...",
 	"themes": "Temas",
 	"preview": "Preview",
-	"markAsRead": "Marcar como leído"
+	"markAsRead": "Marcar como leído",
+	"quota": "Cuota",
+	"unlimited": "Ilimitado"
 })

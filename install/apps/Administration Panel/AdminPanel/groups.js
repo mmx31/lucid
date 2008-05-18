@@ -82,7 +82,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 					)
 				},
 				{
-					label: sys.manageGroupMembers,
+					label: sys.manageGroupMembersGeneric,
 					onClick: dojo.hitch(this, "groupMemberDialog")
 				}
 			], function(item) {

@@ -20,6 +20,7 @@
 	"home": "Home",
 	"apps": "Apps",
 	"users": "Users",
+	"users": "Users",
 	"groups": "Groups",
 	"permissions": "Permissions",
 	"usersOnline": "Users online",
@@ -40,7 +41,7 @@
 	"installAppPackage": "Install app package",
 	"installThemePackage": "Install theme package",
 	"description": "Description",
-	"manageGroupMembers": "Manage group members",
+	"manageGroupMembersGeneric": "Manage group members",
 	"initial": "Allow by default",
 	"installAppInstructions": "Select an app package to install from your local hard disk",
 	"installThemeInstructions": "Select a theme package to install from your local hard disk",
@@ -55,5 +56,7 @@
 	"notAssigned": "Not yet assigned",
 	"launchingApp": "Launching app %s...",
 	"themes": "Themes",
-	"preview": "Preivew"
+	"preview": "Preivew",
+	"quota": "Quota",
+	"unlimited": "Unlimited"
 })

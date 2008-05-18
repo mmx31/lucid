@@ -15,6 +15,7 @@
 		import("models.permission");
 		import("models.quota");
 		$out = new jsonOutput();
+		$Permission->truncate();
 		foreach(array(
 			array(
 				'name' => 'api.xsite',
@@ -55,6 +56,7 @@
 			$perm = new $Permission($args);
 			$perm->save();
 		}
+		$Quota->truncate();
 		foreach(array(
 			array(
 				'type' => 'user',
@@ -195,20 +197,6 @@
 			else
 			{
 				$out->append($key, "ok");
-			}
-		}
-	}
-	if($act == "listApps")
-	{
-		$dir = opendir("./apps/");
-		while(($file = readdir($dir)) !== false) {
-			if($file == '..' || $file == '.' || $file{0} == '.'){
-					continue;
-			} else {
-				$t = strtolower($file);
-				if(is_dir("../../desktop/themes/" . $file)){
-					echo($file."\n");
-				}
 			}
 		}
 	}

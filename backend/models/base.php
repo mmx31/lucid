@@ -178,7 +178,7 @@
 				}
 			}
 			$this->_link->loadModule('Extended');
-			$this->_link->autoExecute($this->_get_tablename(), $arr,
+			$this->_link->autoExecute($this->_link->quoteIdentifier($this->_get_tablename()), $arr,
 				(is_numeric($this->id) ? MDB2_AUTOQUERY_UPDATE : MDB2_AUTOQUERY_INSERT),
 				(is_numeric($this->id) ? "id = ".$this->id : null));
 			if(!is_numeric($this->id)) $this->id = $arr['id'];
