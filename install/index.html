@@ -16,15 +16,30 @@
 			<div dojoType="dijit.layout.StackContainer" id="wizard" widgetid="wizard">
 				<div dojoType="dijit.layout.ContentPane" title="Start" id="start">
 					<div class="title">Welcome to the Psych Desktop installer!</div>
-					Before you start the installation, you need to change some file permissions:<br /> 
-					<div id="perms">please wait...</div>
+					<p>
+						This will install and configure Psych Desktop for your server.
+						You can use this installer to install a new system,	or reset your current system.
+					</p>
+					<p>
+						The installer requires that you have some sort of DBMS backend for the desktop to use,
+						such as (but not limited to) SQLite, mySQL, or pgSQL. You may use table prefixes if you only have
+						access to one database on your server. If you have not done so already, please
+						get the information for the database backend ready, and if necesary, create a database for the desktop to use.
+					</p>
+					<p>
+						Installation should only take a few minuites.
+					</p>
+					<p>
+						Once it is installed you will be able to use and customize the desktop,
+						as well as create more user accounts or groups, and configure user permissions.
+					</p>
 				</div>
 				<div dojoType="dijit.layout.ContentPane" title="Installation Type">
 					<div class="title">What type of installation do you want?</div>
 					<input dojoType="dijit.form.RadioButton" id="installtype-new" type="radio" name="type" value="clean" />
 					<label for="installtype-new"><b>I want to do a clean installation</b></label>
 					<p>Do a new installation, and create a new admin user</p>
-				<div style="display: none;">
+				<div style="display: none;"> <!-- remove for now, no CMS support -->
 					<input dojoType="dijit.form.RadioButton" id="installtype-cms" type="radio" name="type" value="CMS" disabled="true" />
 					<label for="installtype-cms"><b>I want to do a clean installation, but intergrate it with a CMS</b></label>
 					<p>Do a new installation, then configure it to intergrate with a user table from a CMS</p>
@@ -34,6 +49,11 @@
 					<input dojoType="dijit.form.RadioButton" id="installtype-reset" type="radio" name="type" value="reset" />
 					<label for="installtype-reset"><b>I want to reset my existing installation</b></label>
 					<p>Keeps your settings and users, but re-installs apps and other things</p>
+				</div>
+				<div dojoType="dijit.layout.ContentPane" title="Permissions" id="permissions">
+					<div class="title">Permissions Check</div>
+					Before you start the installation, you need to change some file permissions:<br /> 
+					<div id="perms">please wait...</div>
 				</div>
 				<div dojoType="dijit.layout.ContentPane" title="Database" onclick="install.fixurlStr(arguments[0]);" onkeyup="install.fixurlStr(arguments[0]);">
 					<div class="title">Database Settings</div>

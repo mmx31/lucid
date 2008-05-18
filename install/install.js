@@ -18,7 +18,7 @@ install = new function() {
 			}
 		}
 		install.currentPage = page;
-		if(page.title == "Start" || 
+		if(page.title == "Permissions" || 
 		   page.title == "Installation Type" ||
 		   page.title == "Database" ||
 		   page.title == "Admin Setup" ||
@@ -61,7 +61,7 @@ install = new function() {
 	this.onLoad = function() {
 		dojo.subscribe("wizard-selectChild", install.selected);
 		install.selected(dijit.byId("start"));
-		dijit.byId("next").setDisabled(install.currentPage);
+		//dijit.byId("next").setDisabled(install.currentPage);
 		install.getPerms();
 		setInterval(install.getPerms, 2000);
 		setInterval(install.checkDbInput, 1000);
@@ -104,7 +104,7 @@ install = new function() {
 	}
 	this.getPerms = function()
 	{
-		if (install.currentPage.title == "Start") {
+		if (install.currentPage.title == "Permissions") {
 			dojo.xhrGet({
 				url: "./backend.php?action=checkpermissions",
 				load: function(data, args){
