@@ -345,18 +345,21 @@ desktop.app = {
 			handleAs: "json"
 		});
 	},
-	remove: function(/*String*/name, /*Function*/callback) {
+	remove: function(/*String?*/name, /*String?*/filePath, /*Function?*/callback) {
 		//	summary:
 		//		removes an app from the system
 		//	name:
 		//		the app's system name
+		//	filePath:
+		//		the path to the specific file to remove
 		//	callback:
 		//		a callback function once the app has been removed
+		var args = {};
+		if(name) args.sysname = name
+		if(filePath) args.filePath = filePath;
 		api.xhr({
 			backend: "core.app.write.remove",
-			content: {
-				sysname: name
-			},
+			content: args,
 			load: function(d) {
 				callback(d=="0");
 			}

@@ -147,15 +147,33 @@
 			import("models.user");
 			$user = $User->get_current();
 			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
-			$app = $App->filter("sysname", $_POST['sysname']);
-			$app = $app[0];
-			$app->delete();
-			$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
-			foreach(array(
-				$GLOBALS['path']."/../apps/".$_POST['sysname'],
-				$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname'],
-				$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname'].".js"
-			) as $dir) {
+			if($_POST['sysname']) {
+				//delete the whole app
+				$app = $App->filter("sysname", $_POST['sysname']);
+				$app = $app[0];
+				$app->delete();
+				$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
+				foreach(array(
+					$GLOBALS['path']."/../apps/".$_POST['sysname'],
+					$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname'],
+					$GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['sysname'].".js"
+				) as $dir) {
+					if(is_dir($dir)) rmdir_recurse($dir);
+					else if(is_file($dir)) unlink($dir);
+				}
+			}
+			else {
+				//delete just that file
+				
+				//first, check to see if it's the main file
+				//this cannot be removed
+				
+				$parts = explode("/", $_POST['filePath']);
+				if(!(count($parts) >= 2 && $parts[0] != "")) internal_error("generic_err");
+				
+				//if it's all good, delete it.
+				$_POST['filePath'] = str_replace("..", "", $_POST['filePath']);
+				$dir = $GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['filePath'];
 				if(is_dir($dir)) rmdir_recurse($dir);
 				else if(is_file($dir)) unlink($dir);
 			}

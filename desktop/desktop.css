@@ -27,6 +27,7 @@ margin: 0px;
 
 .desktopPanel {
 	font-size: 10pt;
+	height: inherit;
 }
 .desktopPanel-start, .desktopPanel-end, .desktopPanel-middle {
 	height: inherit;

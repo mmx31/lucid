@@ -131,7 +131,11 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		var menu = new dijit.Menu({});
 		dojo.connect(menu, "_openMyself", this, function(e){
 			this._contextItem = dijit.getEnclosingWidget(e.target).item || false;
-			menu.getChildren().forEach(function(i){ if(i.setDisabled) i.setDisabled(!this._contextItem); }, this);
+			menu.getChildren().forEach(function(i){
+				if(i.setDisabled)
+					i.setDisabled(!(this._contextItem
+									&& this.appStore.getValue(this._contextItem, "filename")));
+			}, this);
 		});
 		menu.bindDomNode(tree.domNode);
 		//add menu items
@@ -154,7 +158,12 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			label: cm["delete"],
 			iconClass: "icon-16-actions-edit-delete",
 			onClick: dojo.hitch(this, function() {
-				//TODO: 
+				var fname = this.appStore.getValue(this._contextItem, "filename");
+				desktop.app.remove(null, fname, dojo.hitch(this, function(result) {
+					if(!result) return;
+					this.appStore.deleteItem(this._contextItem);
+					this._contextItem = null;
+				}));
 			})
 		}))
 	},
