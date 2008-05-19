@@ -155,6 +155,12 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		}))
 		menu.addChild(new dijit.MenuSeparator({}));
 		menu.addChild(new dijit.MenuItem({
+			label: nf.rename,
+			onClick: dojo.hitch(this, function() {
+				//TODO: 
+			})
+		}))
+		menu.addChild(new dijit.MenuItem({
 			label: cm["delete"],
 			iconClass: "icon-16-actions-edit-delete",
 			onClick: dojo.hitch(this, function() {
