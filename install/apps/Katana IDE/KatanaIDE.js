@@ -16,6 +16,7 @@ dojo.requireLocalization("desktop", "apps");
 dojo.requireLocalization("desktop.ui", "menus");
 dojo.requireLocalization("desktop", "system");
 dojo.requireLocalization("api", "filearea");
+dojo.requireLocalization("desktop.apps.KatanaIDE", "ide");
 
 dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 	files: [], //file information
@@ -25,10 +26,22 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
+		var ideLocale = dojo.i18n.getLocalization("desktop.apps.KatanaIDE", "ide");
 		this.win = new api.Window({
 			title: app["Katana IDE"],
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
+		});
+		
+		this.store = new api.Registry({
+			name: "settings",
+			appname: this.sysname,
+			data: {
+				identifier: "key",
+				items: [
+					{key: "useEditorLite", value: false}
+				]
+			}
 		});
 		
 		var client = new dijit.layout.SplitContainer({
@@ -92,7 +105,22 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			this.toolbar.addChild(new dijit.form.DropDownButton({label: cm.metadata, iconClass: "icon-16-actions-document-properties", dropDown: this._makeMetaDialog()}));
 //			this.toolbar.addChild(new dijit.form.Button({label: cm.run, iconClass: "icon-16-actions-media-playback-start", onClick: dojo.hitch(this, "run")}));
 //			this.toolbar.addChild(new dijit.form.Button({label: sys.kill, iconClass: "icon-16-actions-media-playback-stop", onClick: dojo.hitch(this, "killExec")}));
-	
+			this.store.fetchItemByIdentity({
+				identity: "useEditorLite",
+				onItem: dojo.hitch(this, function(item) {
+					var button;
+					this.toolbar.addChild(button = new dijit.form.ToggleButton({
+						label: ideLocale.syntaxHighlight,
+						iconClass: "dijitCheckBoxIcon",
+						onChange: dojo.hitch(this, function(v) {
+							this.store.setValue(item, "value", !v);
+							this.store.save();
+						})
+					}));
+					button.setAttribute("checked", !this.store.getValue(item, "value"));
+				})
+			});
+			
 		this.win.addChild(this.toolbar);
 		this.win.show();
 		this.win.startup();
@@ -137,34 +165,38 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			height: "100%",
 			overflow: "hidden"
 		});
-		
-		var editor = new desktop.apps.KatanaIDE.CodeTextArea({
-			width: "100%",
-			height: "100%",
-			plugins: "BlinkingCaret GoToLineDialog Bookmarks MatchingBrackets",
-			colorsUrl: dojo.moduleUrl("desktop.apps.KatanaIDE.data", "javascript_dojo_color.json"),
-			autocompleteUrl: dojo.moduleUrl("desktop.apps.KatanaIDE.data", "javascript_dojo_ac.json")
-		});
-		div.appendChild(editor.domNode);
-		
-		var cpane = new dijit.layout.ContentPane({
-			closable: true,
-			title: filename.substring(filename.lastIndexOf("/")+1) || filename,
-			ide_info: {
-				fileName: filename,
-				appName: appname,
-				editor: editor
-			}
-		});
-		
-		cpane.setContent(div);
-		this.tabArea.addChild(cpane);
-		this.tabArea.selectChild(cpane);
-		editor.startup();
-		if(content != "")
-			editor.massiveWrite(content);
-		editor.setCaretPosition(0, 0); 
-		setTimeout(dojo.hitch(this.tabArea, "layout"), 100);
+		this.store.fetchItemByIdentity({
+			identity: "useEditorLite",
+			onItem: dojo.hitch(this, function(item) {
+				var editor = new desktop.apps.KatanaIDE[!this.store.getValue(item, "value") ? "CodeTextArea" : "EditorLite"]({
+					width: "100%",
+					height: "100%",
+					plugins: "BlinkingCaret GoToLineDialog Bookmarks MatchingBrackets",
+					colorsUrl: dojo.moduleUrl("desktop.apps.KatanaIDE.data", "javascript_dojo_color.json"),
+					autocompleteUrl: dojo.moduleUrl("desktop.apps.KatanaIDE.data", "javascript_dojo_ac.json")
+				});
+				div.appendChild(editor.domNode);
+				
+				var cpane = new dijit.layout.ContentPane({
+					closable: true,
+					title: filename.substring(filename.lastIndexOf("/")+1) || filename,
+					ide_info: {
+						fileName: filename,
+						appName: appname,
+						editor: editor
+					}
+				});
+				
+				cpane.setContent(div);
+				this.tabArea.addChild(cpane);
+				this.tabArea.selectChild(cpane);
+				editor.startup();
+				if(content != "")
+					editor.massiveWrite(content);
+				editor.setCaretPosition(0, 0); 
+				setTimeout(dojo.hitch(this.tabArea, "layout"), 100);
+			})
+		})
 	},
 	_makeMetaDialog: function() {
 		var mnu = dojo.i18n.getLocalization("desktop.ui", "menus");
@@ -320,4 +352,5 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 });
 
 dojo.require("desktop.apps.KatanaIDE.CodeTextArea");
+dojo.require("desktop.apps.KatanaIDE.EditorLite");
 api.addDojoCss("desktop/apps/KatanaIDE/codeEditor.css");

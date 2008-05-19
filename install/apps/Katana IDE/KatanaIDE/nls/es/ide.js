@@ -1,0 +1,3 @@
+({
+	"syntaxHighlighting": "Resaltar la sintaxis"
+})

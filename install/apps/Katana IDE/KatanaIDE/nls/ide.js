@@ -1,0 +1,3 @@
+({
+	"syntaxHighlight": "Syntax Highlighting"
+})
