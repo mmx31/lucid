@@ -1,0 +1,49 @@
+ .dijitToggleButton .dijitRadio,
+ .dijitToggleButton .dijitRadioIcon {
+	background-image: url('../images/checkmarkNoBorder.gif');
+}
+
+ .dijitRadio,
+ .dijitRadioIcon	{		/* inside a toggle button */
+	background-image: url('../images/checkmark.gif'); /* checkbox sprite image */
+	background-repeat: no-repeat;
+	width: 16px;
+	height: 16px;
+	margin: 0;
+	padding: 0;
+}
+
+ .dijitRadio,
+ .dijitToggleButton .dijitRadioIcon {
+	/* unselected */
+	background-position: -112px;
+}
+
+ .dijitRadioChecked,
+ .dijitToggleButtonChecked .dijitRadioIcon {
+	/* selected */
+	background-position: -96px;
+}
+
+ .dijitRadioDisabled {
+	/* unselected and disabled */
+	background-position: -144px;
+}
+
+ .dijitRadioCheckedDisabled {
+	/* selected but disabled */
+	background-position: -128px;
+}
+
+ .dijitRadioHover,
+ .dijitRadioFocused {
+	/* hovering over an unselected enabled radio button */
+	background-position: -176px;
+}
+
+ .dijitRadioCheckedHover,
+ .dijitRadioCheckedFocused {
+	/* hovering over a selected enabled radio button */
+	background-position: -160px;
+}
+

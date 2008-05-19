@@ -1,0 +1,54 @@
+ .dijitMenu {
+	border: 1px solid #7eabcd;
+	margin: 0px;
+	padding: 0px;
+}
+
+ .dijitMenuItem {
+	background-color: #f7f7f7;
+	font: menu;
+	margin: 0;
+}
+ .dijitMenuPreviousButton,  .dijitMenuNextButton {
+	font-style: italic;
+}
+ .dijitMenuItem td {
+	padding:2px;
+}
+
+ .dijitMenuItemHover {
+	background-color: #60a1ea;
+	color:#fff;
+}
+
+ .dijitMenuItemIcon {
+	width: 16px;
+	height: 16px;
+}
+
+ .dijitMenuExpand {
+	display:none;
+}
+ .dijitMenuExpandEnabled {
+	width:16px;
+	height:16px;
+	background:url('images/arrowRight.gif') no-repeat center center;
+	display:block;
+}
+
+ .dijitMenuExpandInner {
+	display:none;
+}
+
+ .dijitMenuSeparator {
+	background-color: #f7f7f7;
+}
+
+/* separator can be two pixels -- set border of either one to 0px to have only one */
+ .dijitMenuSeparatorTop {
+	border-bottom: 1px solid #9b9b9b;
+}
+
+ .dijitMenuSeparatorBottom {
+	border-top: 1px solid #e8e8e8;
+}
