@@ -163,12 +163,14 @@
  ****/
 .dijit_a11y * {
 	background-image:none !important;
-	background-color:transparent !important;
 }
 
 .dijit_a11y .dijitCalendarIncrementControl .dijitA11ySideArrow {
 	padding-left:.2em;
 	visibility:visible !important;
+}
+.dj_ie6 .dijit_a11y .dijitCalendarIncrementControl {
+	font-size:.75em !important;
 }
 
 .dijit_a11y .dijitCalendarSelectedDate {
@@ -188,7 +190,9 @@
 	color:black !important;
 }
 .dijit_a11y .dijitButtonNode {
-	border:1px solid black !important;
+	border-color: black!important;
+	border-style: outset!important;
+	border-width: medium!important;
 }
 
 .dijit_a11y .dijitButtonDisabled .dijitButtonNode,
@@ -198,7 +202,8 @@
 .dijit_a11y .dijitComboBoxDisabled .dijitButtonNode,
 .dijit_a11y .dijitSpinnerDisabled .dijitButtonNode,
 .dijit_a11y .dijitSpinnerDisabled .dijitInputField {
-	border-style: dotted !important;
+	border-style: outset!important;
+	border-width: medium!important;
 	border-color: #999 !important;
 	color:#999 !important;
 }
@@ -212,8 +217,7 @@
 	display: none !important;
 }
 .dijitButtonNode .dijitArrowButtonInner {
-	background-repeat: no-repeat;
-	background-position: center;
+	background:no-repeat center;
 	width: 16px;
 }
 .dijitComboBox .dijitArrowButtonInner {
@@ -537,7 +541,7 @@ table .dijitComboButton .dijitButtonNode {
 	position:static;
 	width:100%;
 	text-align:center;
-	background-color:transparent;
+	background-color:transparent !important;
 }
 
 /* progress bar in vertical mode - TODO: remove? no longer supported? */
@@ -729,6 +733,14 @@ body .dijitAlignClient { position: absolute; }
 	cursor: n-resize;
 }
 
+.dijit_a11y .dijitSplitterH {
+	border-top:1px solid #d3d3d3 !important;
+	border-bottom:1px solid #d3d3d3 !important;
+}
+.dijit_a11y .dijitSplitterV {
+	border-left:1px solid #d3d3d3 !important;
+	border-right:1px solid #d3d3d3 !important;
+}
 
 /* ContentPane */
 
@@ -797,6 +809,12 @@ img.dijitColorPaletteUnder {
 	/* -moz-border-radius:0; */	
 }
 
+.dijit_a11y .dijitPaletteCell {
+	background-color:transparent !important;
+}
+.dijit_a11y .dijitPaletteImg {
+	background-color:transparent !important;
+}
 
 /* Accordion */
 
@@ -1125,7 +1143,7 @@ img.dijitColorPaletteUnder {
 	top: 0;
 	z-index: 998;
 	display: none;
-	background: transparent;
+	background: transparent !important;
 }
 
 .dijitDialogUnderlay {
@@ -1510,4 +1528,8 @@ img.dijitColorPaletteUnder {
 	width: 0.5em;
 	margin-left: 2px;
 	overflow: visible;
+}
+.dijit_a11y .dijitSpinnerButtonContainer .dijitButtonNode {
+	border-width: 1px 0px 0px 1px;
+	border-style: solid !important;
 }

@@ -4,7 +4,7 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._editor.selection");
 dojo.require("dijit._editor.html");
 dojo.require("dojo.i18n");
-dojo.requireLocalization("dijit", "Textarea");
+dojo.requireLocalization("dijit.form", "Textarea");
 
 // used to restore content when user leaves this page then comes back
 // but do not try doing dojo.doc.write if we are using xd loading.
@@ -328,8 +328,15 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		// Safari's selections go all out of whack if we do it inline,
 		// so for now IE is our only hero
 		//if(typeof dojo.doc.body.contentEditable != "undefined"){
-		if(dojo.isIE || dojo.isSafari || dojo.isOpera){ // contentEditable, easy
-			var burl = dojo.moduleUrl("dojo", "resources/blank.html")+"";
+		if(dojo.isIE || dojo.isSafari || dojo.isOpera){ // contentEditable, easy		
+
+			if(dojo.config["useXDomain"] && !dojo.config["dojoBlankHtmlUrl"]){
+				console.debug("dijit._editor.RichText: When using cross-domain Dojo builds,"
+				+ " please save dojo/resources/blank.html to your domain and set djConfig.dojoBlankHtmlUrl"
+				+ " to the path on your domain to blank.html");
+			}
+
+			var burl = dojo.config["dojoBlankHtmlUrl"] || (dojo.moduleUrl("dojo", "resources/blank.html")+"");
 			var ifr = this.editorObject = this.iframe = dojo.doc.createElement('iframe');
 			ifr.id = this.id+"_iframe";
 			ifr.src = burl;
@@ -462,7 +469,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 //			ifrs.scrolling = this.height ? "auto" : "vertical";
 			this.editorObject = this.iframe;
 			// get screen reader text for mozilla here, too
-			this._localizedIframeTitles = dojo.i18n.getLocalization("dijit", "Textarea");
+			this._localizedIframeTitles = dojo.i18n.getLocalization("dijit.form", "Textarea");
 			// need to find any associated label element and update iframe document title
 			var label=dojo.query('label[for="'+this.id+'"]');
 			if(label.length){
@@ -1224,6 +1231,15 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 	setValue: function(/*String*/html){
 		// summary:
 		//		this function set the content. No undo history is preserved
+
+		if(!this.isLoaded){
+			// try again after the editor is finished loading
+			this.onLoadDeferred.addCallback(dojo.hitch(this, function(){
+				this.setValue(html);
+			}));
+			return;
+		}
+
 		if(this.textarea && (this.isClosed || !this.isLoaded)){
 			this.textarea.value=html;
 		}else{
@@ -1232,6 +1248,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			node.innerHTML = html;
 			this._preDomFilterContent(node);
 		}
+
 		this.onDisplayChanged();
 	},
 

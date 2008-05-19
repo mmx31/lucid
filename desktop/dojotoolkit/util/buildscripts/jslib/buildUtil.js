@@ -23,7 +23,7 @@ buildUtil.DojoBuildOptions = {
 		helpText: "The build will be stamped with this version string."
 	},
 	"localeList": {
-		defaultValue: "cs,de-de,en-gb,en-us,es-es,fr-fr,hu,it-it,ja-jp,ko-kr,pl,pt-br,ru,zh-tw,zh-cn",
+		defaultValue: "ar,cs,da,de-de,el,en-gb,en-us,es-es,fi-fi,fr-fr,he-il,hu,it-it,ja-jp,ko-kr,nl-nl,no,pl,pt-br,pt-pt,ru,sv,tr,zh-tw,zh-cn",
 		helpText: "The set of locales to use when flattening i18n bundles."
 	},
 	
@@ -455,7 +455,7 @@ buildUtil.getDependencyList = function(/*Object*/dependencies, /*String or Array
 				//Find the dojo.i18n line. Start at the end of depList because it is likely closer
 				//to the end than the beginning.
 				var i18nXdEntry = null;
-				for(var i18nIndex = depList.length - 1; i18nIndex >= 0; i--){
+				for(var i18nIndex = depList.length - 1; i18nIndex >= 0; i18nIndex--){
 					if(depList[i18nIndex].match(/\/dojo\/i18n\.js$/)){
 						i18nXdEntry = depList.splice(i18nIndex, 1)[0];
 						break;
