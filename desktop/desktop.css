@@ -18,6 +18,8 @@ margin: 0px;
 .dijit .desktopPanel .desktopApplet .dijitButtonNode,
 .dijit .desktopPanel .desktopApplet .dijitToolbar {
 	background: transparent none repeat scroll 0%;
+	padding: 0px;
+	padding-bottom: 1px;
 }
 .dijit .desktopPanel .desktopApplet .dijitToolbar {
 	border: 0px none;
@@ -26,6 +28,10 @@ margin: 0px;
 .desktopPanel {
 	font-size: 10pt;
 }
+.desktopPanel-start, .desktopPanel-end, .desktopPanel-middle {
+	height: inherit;
+}
+
 .wallpaper {
 	z-index: 0;
 	height: 100%;
@@ -238,6 +244,7 @@ margin: 0px;
 /* Applets */
 .desktopApplet {
 	position: absolute;
+	height: inherit;
 }
 .desktopPanelHorizontal .desktopApplet {
 	height: 100%;
