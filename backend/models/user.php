@@ -183,8 +183,27 @@
 		function get_quota() {
 			if($this->quota == -1) {
 				import("models.quota");
+				import("models.user");
+				import("models.group");
 				global $Quota;
-				//TODO: check group quotas
+				global $User;
+				global $Group;
+				$cur = $User->get_current(); 
+				$groups = $cur->groups();
+				if($groups) {			//Groups found
+					$attempt = array();
+					for($i=0;$i<count($groups);$i++) {
+						$group = $Group->filter("name", $groups[$i]);
+						if($group->quota != -1 || $group->quota != $null) {	//Group quota isn't not set
+							$attempt[] = $group->quota;	//Add group quota to sorting array
+						}
+						else {
+							$blah = $Quota->filter("type", "group");
+							$attempt[] = $blah;
+						}
+					}
+					return min($attempt);
+				}
 				$default = $Quota->filter("type", "user");
 				$default = $default[0];
 				return $default->size;
