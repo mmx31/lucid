@@ -85,6 +85,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 					items: apps
 				}
 			});
+			//TODO: move files using DnD?
 			var left = new dijit.Tree({
 				store: appStore,
 				query: {category: "*"},
