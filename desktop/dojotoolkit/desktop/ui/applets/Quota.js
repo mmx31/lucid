@@ -6,6 +6,7 @@ dojo.declare("desktop.ui.applets.Quota", desktop.ui.Applet, {
 	//		A bar showing the user's quota
 	dispName: "Quota",
 	appletIcon: "icon-32-devices-drive-harddisk",
+	path: "file://",
 	postCreate: function() {
 		var bar = this.pBar = new dijit.ProgressBar({
 			indeterminate: true,
@@ -15,12 +16,13 @@ dojo.declare("desktop.ui.applets.Quota", desktop.ui.Applet, {
 		});
 		this.addChild(bar);
 		bar.startup();
-		this.timer = setInterval(dojo.hitch(this, "update"), 1000*10);
-		this.update();
+		this.timer = dojo.subscribe("fsSizeChange", this, "update");
+		this.update(this.path);
 		this.inherited("postCreate", arguments);
 	},
-	update: function() {
-		api.filesystem.getQuota("file://", dojo.hitch(this, function(v) {
+	update: function(path) {
+		if(path.indexOf(this.path) != 0) return;
+		api.filesystem.getQuota(path, dojo.hitch(this, function(v) {
 			this.pBar.update({
 				maximum: v.total,
 				progress: v.used,
@@ -29,6 +31,6 @@ dojo.declare("desktop.ui.applets.Quota", desktop.ui.Applet, {
 		}));
 	},
 	uninitialize: function() {
-		clearInterval(this.timer);
+		dojo.unsubscribe(this.timer);
 	}
 });

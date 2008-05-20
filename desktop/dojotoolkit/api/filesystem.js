@@ -106,7 +106,9 @@ api.filesystem = {
 		df.canceler = dojo.hitch(xhr, "cancel");
 		if(onComplete) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
-		
+		df.addCallback(function() {
+			dojo.publish("fsSizeChange", [path]);
+		})
 		return df;
     },
     move: function(/*String*/from, /*String*/to, /*Function?*/onComplete, /*Function?*/onError)
@@ -205,7 +207,9 @@ api.filesystem = {
 		df.canceler = dojo.hitch(xhr, "cancel");
 		if(onComplete) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
-		
+		df.addCallback(function() {
+			dojo.publish("fsSizeChange", [path]);
+		})
 		return df;
     },
     copy: function(/*String*/from, /*String*/to, /*Function?*/onComplete, /*Function?*/onError)
@@ -237,7 +241,9 @@ api.filesystem = {
 		df.canceler = dojo.hitch(xhr, "cancel");
 		if(onComplete) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
-		
+		df.addCallback(function() {
+			dojo.publish("fsSizeChange", [to]);
+		})
 		return df;
     },
 	getQuota: function(/*String*/path, /*Function*/onComplete, /*Function?*/onError) {

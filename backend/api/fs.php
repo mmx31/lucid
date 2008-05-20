@@ -117,7 +117,7 @@ if($_GET['section'] == "io")
 				$smodule->copy($source, $target);
 			}
 			else {
-				$smodule = $module->read($source);
+				$content = $smodule->read($source);
 				$tmodule->write($target, $content);
 			}
 		}
@@ -127,12 +127,11 @@ if($_GET['section'] == "io")
 			$sinfo = $smodule->getFileInfo($source);
 			if($sinfo['type'] == "text/directory")
 			{
-				var_dump($target, $tmodule->createDirectory($target));
+				$tmodule->createDirectory($target);
 				foreach($smodule->listPath($source) as $entry)
 				{
 					if($entry['type'] == "text/directory")
 					{
-						var_dump($target . '/' . $entry['name']);
 						recursiveCopy($smodule, $source . '/' . $entry['name'] , $tmodule, $target . '/' . $entry['name']);
 						continue;
 					}

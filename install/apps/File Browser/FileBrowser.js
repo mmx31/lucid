@@ -121,6 +121,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 			onComplete: dojo.hitch(this, function(data, ioArgs, widgetRef){
 				widgetRef.setMessage(data.status+": "+data.details);
 				this.fileArea.refresh();
+				dojo.publish("fsSizeChange", [this.fileArea.path]);
 			})
 		});
 		var win = new api.Window({
