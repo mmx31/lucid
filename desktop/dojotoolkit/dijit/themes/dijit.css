@@ -217,8 +217,7 @@
 	display: none !important;
 }
 .dijitButtonNode .dijitArrowButtonInner {
-	background-repeat: no-repeat
-	background-position: center;
+	background:no-repeat center;
 	width: 16px;
 }
 .dijitComboBox .dijitArrowButtonInner {

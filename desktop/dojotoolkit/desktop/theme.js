@@ -4,7 +4,7 @@ desktop.theme = {
 	//		Theme manager
 	//	fileList: Array
 	//		The different CSS files to load for each theme
-	fileList: ["theme", "window", "icons", "dijit"],
+	fileList: ["dijit", "theme", "window", "icons"],
 	draw: function()
 	{
 		dojo.addClass(document.body, "dijit");

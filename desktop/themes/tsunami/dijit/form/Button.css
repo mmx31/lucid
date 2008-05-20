@@ -9,11 +9,11 @@
  .dijitButtonNode {
 	/* enabled state - inner */
 	/* border:1px outset #a0a0a0; */
-	border:1px solid #c0c0c0;
-	border-bottom:1px solid #9b9b9b;
-	border-right:1px solid #9b9b9b;
+	border:1px solid #8ba0bd;
+	border-bottom:1px solid #657c9c;
+	border-right:1px solid #657c9c;
 	padding: 0.2em;
-	background:#fff url("../images/buttonEnabled.png") repeat-x bottom left;
+	background:#bcd5f0 url("../images/buttonEnabled.png") repeat-x top left;
 }
 .dj_ie  .dijitButtonNode {
 	zoom: 1;
@@ -24,7 +24,7 @@
 }
 
  .dijitComboBox .dijitButtonNode {
-	border: 0px;
+	border-width: 0px 0px 0px 1px;
 }
 
  .dijitArrowButton {
@@ -48,9 +48,9 @@
  .dijitSpinnerDisabled,
  .dijitSpinnerDisabled .dijitButtonNode {
 	/* disabled state - inner */
-	border-color: #d5d5d5 #bdbdbd #bdbdbd #d5d5d5;
+	border-color: #b9bbdd #b9bbdd #b9bbdd #b9bbdd;
 	/*color:#b4b4b4;*/
-	background:#e4e4e4 url("../images/buttonDisabled.png") top repeat-x;
+	background:#c3d3e5 url("../images/buttonDisabled.png") top repeat-x;
 	opacity: 0.60; /* Safari, Opera and Mozilla */
 }
 .dj_ie  .dijitButtonDisabled .dijitButtonNode *,
@@ -71,11 +71,8 @@
  .dijitSpinnerDownArrowHover .dijitDownArrowButton {
 	/* hover state - inner */
 	/* TODO: change from Hover to Selected so that button is still highlighted while drop down is being used */
-	border-color:#a5beda;
-	border-bottom-color:#5c7590;
-	border-right-color:#5c7590;
 	color:#000;
-	background:#fcfdff url("../images/buttonHover.png") repeat-x bottom;
+	background:#acc5e2 url("../images/buttonHover.png") repeat-x top left;
 }
 
  .dijitSpinnerUpArrowActive .dijitUpArrowButton,
@@ -89,25 +86,24 @@
 	/* active state - inner (for when you are pressing a normal button, or
 	 * when a toggle button is in a depressed state
 	 */
-	border-color:#366dba;
-	background: #ededed url("../images/buttonActive.png") bottom repeat-x;
+	border-color:#657c9c;
+	background: #91b4e5 url("../images/buttonActive.png") top left repeat-x;
 }
-
 
 
  .dijitArrowButtonInner {
-	background:url("../images/arrowDown.png") no-repeat center center !important;
+	background:url("../images/spriteArrows.png") no-repeat left top !important;
+	width: 11px !important;
 }
- .dijitUpArrowButton .dijitArrowButtonInner { background-image:url("../images/arrowUp.png"); }
+ .dijitUpArrowButton .dijitArrowButtonInner { 
+	background:url("../images/spriteArrows.png") no-repeat -22px top; 
+	width: 11px;
+}
 .dj_ie6  .dijitArrowButtonInner {
-	background-image:url("../images/arrowDown.gif");
+	background:url("../images/spriteArrows.gif") no-repeat left top;
+	width: 11px;
 }
 .dj_ie6  .dijitUpArrowButton .dijitArrowButtonInner {
-	background-image:url("../images/arrowUp.gif");
-}
- .dijitComboBox .dijitArrowButton .dijitArrowButtonInner {
-	background:url("../images/comboArrowDown.gif") no-repeat center center;
-}
- .dijitComboBoxHover .dijitArrowButtonInner {
-	/* TODO: url("../images/arrowDownHover.png") but in IE6 it flickers some? */
+	background:url("../images/spriteArrows.gif") no-repeat -22px top;
+	width: 11px;
 }

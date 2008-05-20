@@ -35,19 +35,6 @@ dojo.require("desktop.user");
 			object.prototype[method]();
 		}
 	}
-	var link = function(file, id)
-        {
-            var element = document.createElement("link");
-            element.rel = "stylesheet";
-            element.type = "text/css";
-            element.media = "screen";
-            element.href = file;
-            element.id = id;
-            document.getElementsByTagName("head")[0].appendChild(element);
-        }
-        link("desktop.css", "corestyle");
-        link("./dojotoolkit/dijit/themes/dijit.css", "dijit");
-        link("./dojotoolkit/dijit/themes/dijit_rtl.css", "dijit_rtl");
 	dojo.addOnLoad(function() {
 		api.xhr({
 			backend: "core.bootstrap.check.loggedin",
