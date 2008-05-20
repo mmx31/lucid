@@ -240,29 +240,32 @@ api.filesystem = {
 		
 		return df;
     },
-	getQuota: function(/*String*/type, /*Function?*/onComplete, /*Function?*/onError) {
+	getQuota: function(/*String*/path, /*Function*/onComplete, /*Function?*/onError) {
 		//	summary:
-		//		Gets the filesystem quota
-		//	type:
-		//		Can either be 'remaining' or 'quota'. Remaining will just get how much of the filesystem is left to use.
-		//		Whilst quota will get the full quota amount.
-		//		Both are returned in bytes. (like filesize).
+		//		Gets the ammount of space available, and the ammount of space used for the path specified
 		//	onComplete:
-		//		a callback function once the task is done. First param is true if successful, false if it failed.
+		//		a callback function once the task is done. First argument is an object with the following keys:
+		//		|{
+		//		|	total: 0, //the quota limit
+		//		|	remaining: 0, //the remaining space
+		//		|	used: 0 //the used portion of the quota
+		//		|}
+		//		All measurements are in bytes
 		//	onError:
 		//		a callback function to be fired on error
 		var df = new dojo.Deferred();
         var xhr = api.xhr({
 	        backend: "api.fs.io.getQuota",
 			content: {
-				type: type
+				path: path
 			},
 			load: function(data, ioArgs) {
-				df[data=="0" ? "callback":"errback"]();
+				df.callback(data);
 			},
 	        error: function(e) {
 				df.errback(e);
-			}
+			},
+			handleAs: "json"
         });
 		df.canceler = dojo.hitch(xhr, "cancel");
 		if(onComplete) df.addCallback(onComplete);

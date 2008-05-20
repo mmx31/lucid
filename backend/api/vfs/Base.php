@@ -119,7 +119,7 @@ class BaseFs {
 	function _read($path) {
 		return "";
 	}
-	function quota($remaining) {
+	function quota($remaining="quota") {
 		return $this->_quota($remaining);
 	}
 	function _quota($remaining) {

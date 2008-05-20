@@ -259,6 +259,7 @@ margin: 0px;
 	left: 0px;
 	background-color: #666;
 	display: none;
+	z-index: 1000;
 }
 .desktopPanelHorizontal .desktopAppletHandle {
 	height: 100%;

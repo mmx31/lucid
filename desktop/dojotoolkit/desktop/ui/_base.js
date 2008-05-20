@@ -28,6 +28,7 @@ dojo.require("desktop.ui.applets.Netmonitor");
 dojo.require("desktop.ui.applets.Separator");
 dojo.require("desktop.ui.applets.Taskbar");
 dojo.require("desktop.ui.applets.Twitter");
+dojo.require("desktop.ui.applets.Quota");
 
 dojo.requireLocalization("desktop.ui", "appearance");
 dojo.requireLocalization("desktop.ui", "accountInfo");
@@ -129,7 +130,7 @@ dojo.mixin(desktop.ui, {
 		"Accessories": ["Clock"],
 		"Internet": ["Twitter"],
 		"Desktop & Windows": ["Taskbar"],
-		"System": ["Netmonitor"],
+		"System": ["Netmonitor", "Quota"],
 		"Utilities": ["Menu", "Menubar", "Separator"]
 	}
 });

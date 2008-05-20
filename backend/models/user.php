@@ -188,18 +188,18 @@
 				global $Quota;
 				global $User;
 				global $Group;
-				$cur = $User->get_current(); 
-				$groups = $cur->groups();
-				if($groups) {			//Groups found
+				$groups = $this->groups;
+				if($groups && !empty($groups)) {			//Groups found
 					$attempt = array();
-					for($i=0;$i<count($groups);$i++) {
-						$group = $Group->filter("name", $groups[$i]);
-						if($group->quota != -1 || $group->quota != $null) {	//Group quota isn't not set
+					foreach($groups as $groupName) {
+						$group = $Group->filter("name", $groupName);
+						$group = $group[0];
+						if($group->quota != -1) {
 							$attempt[] = $group->quota;	//Add group quota to sorting array
 						}
 						else {
 							$blah = $Quota->filter("type", "group");
-							$attempt[] = $blah;
+							$attempt[] = $blah->size;
 						}
 					}
 					return min($attempt);

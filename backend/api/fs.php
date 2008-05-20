@@ -103,7 +103,13 @@ if($_GET['section'] == "io")
 		$out = new intOutput("ok");
 	}
 	if ($_GET['action'] == "getQuota") {
-		$module->quota($_POST['type']);
+		$total = $module->quota("quota");
+		$remaining = $module->quota("remaining");
+		$out = new jsonOutput(array(
+			'total' => $total,
+			'remaining' => $remaining,
+			'used' => $total - $remaining
+		));
 	}
 	if ($_GET['action'] == "copyFile") {
 		function modCopy($smodule, $source, $tmodule, $target) {

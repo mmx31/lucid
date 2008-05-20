@@ -24,7 +24,7 @@ class FileFs extends BaseFs {
 	function _getRemainingQuota() {
 		global $User;
 		$cur = $User->get_current();
-		$quota = $cur->quota;
+		$quota = $cur->get_quota();
 		if($quota == 0) { return 0; } //no quota
 		$current = $this->_getSize($this->_basePath("/"));
 		$total = $quota - $current;
@@ -184,7 +184,7 @@ class FileFs extends BaseFs {
 		else if($remaining == "quota") {
 		global $User;
 		$cur = $User->get_current();
-		$quota = $cur->quota;
+		$quota = $cur->get_quota();
 		return $quota;
 		}
 	}
