@@ -1,4 +1,6 @@
 dojo.provide("desktop.user");
+dojo.require("dojox.encoding.base64");
+
 desktop.user = {
 	//	summary:
 	//		functions that can be used to do user-related tasks
@@ -78,6 +80,15 @@ desktop.user = {
 		//		changes a user's information
 		var callback = op.callback || false;
 		delete op.callback;
+		if(op.password) {
+			//base64 encode it
+			var b = [];
+			for(var i = 0; i < op.password.length; ++i){
+				b.push(op.password.charCodeAt(i));
+			}
+			op.password = dojox.encoding.base64.encode(b);
+			delete b;
+		}
 		if(typeof op.permissions != "undefined") op.permissions = dojo.toJson(op.permissions);
 		if(typeof op.groups != "undefined") op.groups = dojo.toJson(op.groups);
 		api.xhr({
@@ -111,5 +122,26 @@ desktop.user = {
 				}
 			}
 		});
+	},
+	authenticate: function(/*String*/password, /*Function?*/callback) {
+		//	summary:
+		//		re-authenticates the user so that he/she can change their password
+		//first, base64 encode the password to stay at least somewhat secure
+		var b = [];
+		for(var i = 0; i < password.length; ++i){
+			b.push(password.charCodeAt(i));
+		}
+		password = dojox.encoding.base64.encode(b);
+		delete b;
+		//then, send it to the server
+		api.xhr({
+			backend: "core.user.auth.login",
+			content: {
+				password: password
+			},
+			load: function(data) {
+				callback(data == "0");
+			}
+		})
 	}
 }

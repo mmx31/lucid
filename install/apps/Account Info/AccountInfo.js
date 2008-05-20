@@ -194,19 +194,15 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 				current.setDisabled(true);
 				this.authButton.setDisabled(true);
 				
-				desktop.user.authentication({
-					permission: "core.user.set.password",
-					action: "set",
-					password: current.getValue(),
-					callback: dojo.hitch(this, function(data) {
-						current.setDisabled(data == "0");
-						authButton.setDisabled(data == "0");
-						newpasswd.setDisabled(data != "0");
-						confpasswd.setDisabled(data != "0");
-						row4.textContent = (data == "0" ? l.authSuccess : l.authFail);
-						this._authTimeout = setTimeout(resetForm, 5*60*1000);
-					})
-				})
+				desktop.user.authenticate(current.getValue(), dojo.hitch(this, function(data) {
+					current.setDisabled(data);
+					authButton.setDisabled(data);
+					newpasswd.setDisabled(!data);
+					confpasswd.setDisabled(!data);
+					row4.textContent = (data ? l.authSuccess : l.authFail);
+					this._authTimeout = setTimeout(resetForm, 5*60*1000);
+				}))
+				current.setValue("");
 			})
 		})
 		row1.appendChild(authButton.domNode);

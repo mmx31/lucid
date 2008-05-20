@@ -53,7 +53,7 @@
 					&& $now['day'] == $lauth['day']
 					&& $now['hour'] == $lauth['hour']
 					&& ((($now['minuite']*60)+$now['second']) - (($lauth['minuite']*60)+$lauth['second'])) < 5*60/*$user->has_permission("core.user.set.password")*/) {
-						$user->set_password($val);
+						$user->set_password(base64_decode($val));
 					}
 					continue;
 				}
@@ -63,7 +63,7 @@
 					$val = Zend_Json::decode($val);
 				}
 				if($key == "password") {
-					$user->set_password($val);
+					$user->set_password(base64_decode($val));
 					continue;
 				}
 				if($key == "username") {
@@ -81,8 +81,11 @@
 	{
 		if($_GET['action'] == "login")
 		{
-			$cur = $User->get_current();
-			if(!isset($_POST['username'])) $_POST['username'] = $cur->username;
+			if(!isset($_POST['username'])) {
+				$cur = $User->get_current();
+				$_POST['username'] = $cur->username;
+				$_POST['password'] = base64_decode($_POST['password']);
+			}
 			$p = $User->authenticate($_POST['username'], $_POST['password']);
 			if($p != FALSE) {
 				if($p->has_permission("core.user.auth.login")) {
