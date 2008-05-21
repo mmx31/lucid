@@ -539,12 +539,14 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			this._dragTopicPublished = false;
 		}
 		var newTarget = dijit.getEnclosingWidget(e.target);
-		var targetPath = (newTarget.declaredClass != "api.Filearea"
-			? (newTarget.type == "text/directory" ? newTarget.getParent().path+newTarget.name+"/" : newTarget.getParent().path)
-			: newTarget.path);
+		if(newTarget.declaredClass && (newTarget.declaredClass == "api.Filearea" || newTarget.declaredClass == "api.Filearea._Icon")) 
+			var targetPath = (newTarget.declaredClass != "api.Filearea"
+				? (newTarget.type == "text/directory" ? newTarget.getParent().path+newTarget.name+"/" : newTarget.getParent().path)
+				: newTarget.path);
 		if (this._docNode) {
 			//Determine if we're the parent of what we're being dragged into
 			var isParent = dojo.hitch(this, function(target) {
+				if(!target) return;
 				if(this.type != "text/directory") return false; //can't be a parent if we're not a dir!
 				var tPath = target.split("://");
 				var sPath = this.getParent().path.split("://");
