@@ -129,13 +129,14 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 	makeMenu: function(tree) {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var nf = dojo.i18n.getLocalization("api", "filearea");
+		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var menu = new dijit.Menu({});
 		dojo.connect(menu, "_openMyself", this, function(e){
 			this._contextItem = dijit.getEnclosingWidget(e.target).item || false;
 			menu.getChildren().forEach(function(i){
 				if(i.setDisabled)
 					i.setDisabled(!(this._contextItem
-									&& this.appStore.getValue(this._contextItem, "filename")));
+									&& (this.appStore.getValue(this._contextItem, "filename") || i.label == cm["delete"])));
 			}, this);
 		});
 		menu.bindDomNode(tree.domNode);
@@ -149,14 +150,14 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		}))
 		menu.addChild(new dijit.MenuItem({
 			label: nf.createFile,
-			iconClass: "icon-16-actions-file-new",
+			iconClass: "icon-16-actions-document-new",
 			onClick: dojo.hitch(this, function() {
 				//TODO: 
 			})
 		}))
 		menu.addChild(new dijit.MenuSeparator({}));
 		menu.addChild(new dijit.MenuItem({
-			label: nf.rename,
+			label: cm.rename,
 			onClick: dojo.hitch(this, function() {
 				//TODO: 
 			})
@@ -166,11 +167,23 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			iconClass: "icon-16-actions-edit-delete",
 			onClick: dojo.hitch(this, function() {
 				var fname = this.appStore.getValue(this._contextItem, "filename");
-				desktop.app.remove(null, fname, dojo.hitch(this, function(result) {
-					if(!result) return;
-					this.appStore.deleteItem(this._contextItem);
-					this._contextItem = null;
-				}));
+				var sname = this.appStore.getValue(this._contextItem, "sysname");
+				var doDelete = dojo.hitch(this, function() {
+					desktop.app.remove(fname ? null : sname, fname || null, dojo.hitch(this, function(result) {
+						if(!result) return;
+						this.appStore.deleteItem(this._contextItem);
+						this._contextItem = null;
+					}));
+				})
+				if(!fname) 
+					api.ui.yesnoDialog({
+						title: sys.appDelConfirm,
+						message: sys.delFromSys.replace("%s", this.appStore.getValue(this._contextItem, "name")),
+						callback: dojo.hitch(this, function(a) {
+							if(a) doDelete();
+						})
+					})
+				else doDelete();
 			})
 		}))
 	},
