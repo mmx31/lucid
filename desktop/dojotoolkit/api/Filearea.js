@@ -595,7 +595,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			
 			var nf = dojo.i18n.getLocalization("api", "filearea");
 			if(isParent(targetPath)) api.ui.notify({message: nf.parentErr, type: "warning", duration: 5000});
-			if(newTarget.id != this.getParent().id
+			if(((e.shiftKey && newTarget.type != "text/directory") || newTarget.id != this.getParent().id)
 			&& newTarget.id != this.id
 			&& !isParent(targetPath)
 			&& (newTarget.declaredClass == "api.Filearea" || newTarget.declaredClass == "api.Filearea._Icon")) {
@@ -606,7 +606,9 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 					if(newTarget.declaredClass == "api.Filearea") 
 						var name = newTarget._fixDuplicateFilename(this.name, this.type);
 					else
-						var name = this.name;
+						var name = (newTarget.type == "text/directory" ? 
+									this.name : //TODO: fix the name server side? or at least show an error message...
+									newTarget.getParent()._fixDuplicateFilename(this.name, this.type));
 					api.filesystem.copy(this.getParent().path + "/" + this.name, targetPath + name, function(){
 						_loadParent._loadEnd();
 						if(newTarget.declaredClass == "api.Filearea") newTarget.refresh();
