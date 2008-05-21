@@ -86,6 +86,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 					var name = this._fixDuplicateFilename(clip.name, clip.mimetype);
 					if(isParent(this.path+name, clip)) return api.ui.notify({message: nf.parentErr, type: "warning", duration: 5000});
 					this._loadStart();
+					if(clip.widgetRef && clip.widgetRef.getParent().path == this.path) return;
 					api.filesystem.move(clip.path+clip.name, this.path+name, dojo.hitch(this, function() {
 						var parentID;
 						if(clip.widgetRef) {
