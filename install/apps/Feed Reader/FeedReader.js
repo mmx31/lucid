@@ -433,10 +433,16 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	                var title = item.getElementsByTagName("title")[0].textContent;
 	                var content = item.getElementsByTagName("description")[0].textContent;
 	                var url = item.getElementsByTagName("link")[0].textContent;
-	                var date = item.getElementsByTagName("pubDate")[0].textContent;
-	                var guid = item.getElementsByTagName("guid")[0].textContent;
-					date = new Date(date);
-					var hash = dojox.encoding.digests.MD5(guid);
+	                var date = (item.getElementsByTagName("pubDate")[0] ||
+								item.getElementsByTagName("dc:date")[0] || {textContent: ""}).textContent;
+	                var guid = (item.getElementsByTagName("guid")[0] || {textContent: ""}).textContent;
+					var dateObj = new Date(date);
+					if(isNaN(dateObj.getDay())) {
+						//must be an ISO string
+						dateObj = dojo.date.stamp.fromISOString(date);
+					}
+					date = dateObj;
+					var hash = dojox.encoding.digests.MD5(guid||title);
 					hashes.push(hash);
 					this.hashStore.fetch({
 						query: {hash: hash},
@@ -445,7 +451,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 								Read: !(items.length == 0 || !this.hashStore.getValue(items[0], "read")),
 								Title: title,
 								Content: content,
-								Date: date,
+								Date: date.toString(),
 								Url: url,
 								Guid: guid
 							});
@@ -489,7 +495,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		var url = this.gridStore.getValue(row.__dojo_data_item, "Url");
 		var content = this.gridStore.getValue(row.__dojo_data_item, "Content");
 		var guid = this.gridStore.getValue(row.__dojo_data_item, "Guid");
-		var hash = dojox.encoding.digests.MD5(guid);
+		var hash = dojox.encoding.digests.MD5(guid || title);
 		
 		this.hashStore.fetch({
 			query: {hash: hash},
