@@ -621,7 +621,9 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 					if(newTarget.declaredClass == "api.Filearea") 
 						var name = newTarget._fixDuplicateFilename(this.name, this.type);
 					else
-						var name = this.name;
+						var name = (newTarget.type == "text/directory" ? 
+									this.name : //TODO: fix the name server side? or at least show an error message...
+									newTarget.getParent()._fixDuplicateFilename(this.name, this.type));
 					api.filesystem.move(this.getParent().path + "/" + this.name, targetPath + name, dojo.hitch(this, function(){
 						_loadParent._loadEnd();
 						var p = this.getParent();
