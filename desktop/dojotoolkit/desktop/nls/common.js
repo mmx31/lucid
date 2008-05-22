@@ -44,5 +44,6 @@
 	"title": "Title",
 	"date": "Date",
 	"markAsRead": "Mark as read",
-	"login": "Log in"
+	"login": "Log in",
+	"create": "Create"
 })

@@ -22,11 +22,13 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 	files: [], //file information
 	appInfo: {}, //application information
 	metaUi: {}, //metadata form UI
+	windows: [],
 	init: function(args) {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var ideLocale = dojo.i18n.getLocalization("desktop.apps.KatanaIDE", "ide");
+		this.windows = [];
 		this.win = new api.Window({
 			title: app["Katana IDE"],
 			iconClass: this.iconClass,
@@ -101,7 +103,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		
 		this.win.addChild(client);
 		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
-//			this.toolbar.addChild(new dijit.form.Button({label: cm["new"], iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, "newApp", 1)}));
+			this.toolbar.addChild(new dijit.form.Button({label: cm["new"], iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, "newApp", 1)}));
 			this.toolbar.addChild(new dijit.form.Button({label: cm.save, iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, "save")}));
 			this.toolbar.addChild(new dijit.form.DropDownButton({label: cm.metadata, iconClass: "icon-16-actions-document-properties", dropDown: this._makeMetaDialog()}));
 //			this.toolbar.addChild(new dijit.form.Button({label: cm.run, iconClass: "icon-16-actions-media-playback-start", onClick: dojo.hitch(this, "run")}));
@@ -171,6 +173,12 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 				var doDelete = dojo.hitch(this, function() {
 					desktop.app.remove(fname ? null : sname, fname || null, dojo.hitch(this, function(result) {
 						if(!result) return;
+						this.tabArea.getChildren().forEach(function(wid) {
+							if(wid.ide_info.appName == sname){
+								this.tabArea.removeChild(wid);
+								wid.destroy();
+							}
+						}, this);
 						this.appStore.deleteItem(this._contextItem);
 						this._contextItem = null;
 					}));
@@ -319,18 +327,64 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			this.metaUi[key].setValue(info[key]);
 		}
 	},
-	_newApp: function(name) {
-		this.appInfo[name] = {
-			sysname: name,
+	newApp: function() {
+		var ideLocale = dojo.i18n.getLocalization("desktop.apps.KatanaIDE", "ide");
+		var cmn = dojo.i18n.getLocalization("desktop", "common");
+		
+		var win = new api.Window({
+			title: ideLocale.createNewApp,
+			width: "350px",
+			height: "150px"
+		});
+		this.windows.push(win);
+		var cpane = new dijit.layout.ContentPane({
+			layoutAlign: "client",
+			style: "padding: 5px;"
+		});
+		var div = document.createElement("div");
+		
+		var row = document.createElement("div");
+		row.textContent = ideLocale.sysname+": ";
+		var sysBox = new dijit.form.TextBox({required: true});
+		row.appendChild(sysBox.domNode);
+		div.appendChild(row);
+		
+		var row = document.createElement("div");
+		row.textContent = ideLocale.dispname+": ";
+		var dispBox = new dijit.form.TextBox({required: true});
+		row.appendChild(dispBox.domNode);
+		div.appendChild(row);
+		
+		var saveButton = new dijit.form.Button({
+			label: cmn.create,
+			onClick: dojo.hitch(this, function() {
+				if (dispBox.getValue() != "" && sysBox.getValue() != "") {
+					this._newApp({
+						name: dispBox.getValue(),
+						sysname: sysBox.getValue()
+					})
+					win.close();
+				}
+			})
+		});
+		div.appendChild(saveButton.domNode);
+		
+		cpane.setContent(div);
+		win.addChild(cpane);
+		win.show();
+	},
+	_newApp: function(info) {
+		this.appInfo[info.sysname] = dojo.mixin({
+			sysname: "",
 			name: "",
 			author: "",
 			email: "",
 			version: "1.0",
 			maturity: "Alpha",
 			category: "Accessories"
-		}
-		var defaultContent = "dojo.provide(\"desktop.apps."+name+"\");\r\n\r\n"
-								+"dojo.declare(\"desktop.apps."+name+"\", desktop.apps._App, {\r\n"
+		}, info);
+		var defaultContent = "dojo.provide(\"desktop.apps."+info.sysname+"\");\r\n\r\n"
+								+"dojo.declare(\"desktop.apps."+info.sysname+"\", desktop.apps._App, {\r\n"
 								+"	init: function(args) {\r\n"
 								+"		/*Startup code goes here*/\r\n"
 								+"	}\r\n"
@@ -338,11 +392,22 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 								+"		/*Cleanup code goes here*/\r\n"
 								+"	}\r\n"
 								+"});"
-		this.makeTab(name, "/"+name+".js", defaultContent);
-		desktop.app.save(dojo.mixin(this.appInfo[name], {
-			filename: "/"+name+".js",
+		this.makeTab(info.sysname, "/"+info.sysname+".js", defaultContent);
+		desktop.app.save(dojo.mixin(dojo.clone(this.appInfo[info.sysname]), {
+			filename: "/"+info.sysname+".js",
 			content: defaultContent
 		}));
+		//make the store item
+		var root = this.appStore.newItem(this.appInfo[info.sysname]);
+		this.appStore.newItem({
+			sysname: info.sysname+"/"+info.sysname+".js",
+			name: info.sysname+".js",
+			filename: "/"+info.sysname+".js",
+			appname: info.sysname
+		}, {
+			parent: root,
+			attribute: "children"
+		})
 	},
 	onItem: function(item) {
 		var store = this.appStore;
@@ -369,10 +434,19 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			filename: pane.ide_info.fileName,
 			content: content
 		});
+		//var lm = dojo._loadedModules;
+		//for(var key in lm) {
+		//	if(key.indexOf("desktop.apps."+pane.ide_info.appName) == 0) {
+		//		delete lm[key];
+		//	}
+		//}
 	},
 
 	kill: function()
 	{
+		dojo.forEach(this.windows, function(win) {
+			if(!win.closed) win.close();
+		});
 		if(typeof this.loadwin != "undefined") {
 			if(!this.loadwin.closed) this.loadwin.close();
 		}

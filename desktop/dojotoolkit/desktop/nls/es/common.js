@@ -43,5 +43,6 @@
 	"rename": "Cambie nombre",
 	"title": "Título",
 	"date": "Fecha",
-	"login": "Iniciar sesión"
+	"login": "Iniciar sesión",
+	"create": "Crear"
 })
