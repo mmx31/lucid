@@ -408,11 +408,23 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			label: cmn.create,
 			onClick: dojo.hitch(this, function() {
 				if (dispBox.getValue() != "" && sysBox.getValue() != "") {
-					this._newApp({
-						name: dispBox.getValue(),
-						sysname: sysBox.getValue()
+					this.appStore.fetch({
+						query: {
+							sysname: sysBox.getValue()
+						},
+						onComplete: dojo.hitch(this, function(items) {
+							var nf = dojo.i18n.getLocalization("api", "filearea");
+							if(items.length != 0) return api.ui.notify({
+								type: "warning",
+								message: nf.alreadyExists
+							})
+							this._newApp({
+								name: dispBox.getValue(),
+								sysname: sysBox.getValue()
+							})
+							win.close();
+						})
 					})
-					win.close();
 				}
 			})
 		});
@@ -443,17 +455,30 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 								+"});"
 		this.makeTab(info.sysname, "/"+info.sysname+".js", defaultContent);
 		desktop.app.save(dojo.mixin(dojo.clone(this.appInfo[info.sysname]), {
-			id: info.sysname+(new Date()).toString(),
 			filename: "/"+info.sysname+".js",
 			content: defaultContent
 		}));
+		desktop.app.createFolder(info.sysname);
 		//make the store item
-		var root = this.appStore.newItem(this.appInfo[info.sysname]);
+		var root = this.appStore.newItem(dojo.mixin(dojo.clone(this.appInfo[info.sysname]), {
+			id: info.sysname+(new Date()).toString()
+		}));
 		this.appStore.newItem({
 			id: info.sysname+"/"+info.sysname+".js"+(new Date()).toString(),
 			name: info.sysname+".js",
 			filename: "/"+info.sysname+".js",
-			appname: info.sysname
+			appname: info.sysname,
+			folder: false
+		}, {
+			parent: root,
+			attribute: "children"
+		})
+		this.appStore.newItem({
+			id: info.sysname+"/"+info.sysname+"/"+(new Date()).toString(),
+			name: info.sysname,
+			filename: "/"+info.sysname+"/",
+			appname: info.sysname,
+			folder: true
 		}, {
 			parent: root,
 			attribute: "children"
