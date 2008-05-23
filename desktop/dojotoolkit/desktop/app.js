@@ -319,6 +319,23 @@ desktop.app = {
 		 	return false;
 		 }
 	},
+	createFolder: function(/*String*/path, /*Function?*/callback) {
+		//	summary:
+		//		creates a folder for an app
+		//	path:
+		//		the path to the folder to create, relative to the apps directory
+		//	callback:
+		//		a callback function once the operation is complete
+		return api.xhr({
+			backend: "core.app.write.createFolder",
+			content: {
+				dirname: path
+			},
+			load: function(d) {
+				callback(d == "0");
+			}
+		})
+	},
 	get: function(/*String*/name, /*String?*/file, /*Function*/callback)
 	{
 		//	summary:

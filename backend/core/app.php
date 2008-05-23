@@ -130,6 +130,14 @@
 			$out = new jsonOutput(array(status => "ok"));
 			if($app) $out->append("sysname", $app->sysname);
 		}
+		if($_GET['action'] == "createFolder") {
+			import("models.user");
+			$user = $User->get_current();
+			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
+			$_POST['dirname'] = str_replace("..", "", $_POST['dirname']);
+			mkdir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['dirname']);
+			$out = new intOutput("ok");
+		}
 		if($_GET['action'] == "remove") {
 			function rmdir_recurse($file) {
 			    if (is_dir($file) && !is_link($file)) {

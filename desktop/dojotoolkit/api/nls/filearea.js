@@ -8,6 +8,7 @@
 	"asTgz": "as TGZ (GZIP)",
 	"asTbz2": "as TBZ2 (BZIP)",
 	"parentErr": "Error: Cannot move/copy a directory into itself",
+	"alreadyExists": "A file with that name already exists",
 	"cut": "Cut",
 	"copy": "Copy",
 	"paste": "Paste"
