@@ -6,6 +6,7 @@
 	Licensed under the Academic Free License version 2.1 or above.
 */
 
+	require("../lib/includes.php");
 	//check loads, crosstalk can be hefty on the server
 	if(function_exists('sys_getloadavg') && $GLOBALS['config']['crosstalkThrottle']) { //We have a UNIX system! Yay!
 		$load = sys_getloadavg();
@@ -17,7 +18,6 @@
 	else {	//We have a windows user :(
 		//die('you windows n00b');
 	}
-	require("../lib/includes.php");
 	import("models.crosstalk");
 	if($_GET['section'] == "io")
 	{
