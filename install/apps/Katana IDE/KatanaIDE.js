@@ -204,9 +204,10 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 					message: nf.createFileText,
 					callback: dojo.hitch(this, function(filename) {
 						if(filename == "") return;
-						filename = filename.replace("..", "").replace("/", "");
 						var path = this.appStore.getValue(this._contextItem, "filename");
 						var appname = this.appStore.getValue(this._contextItem, "appname");
+						var fileOrig = path+"/"+filename;
+						filename = filename.replace("..", "").replace("/", "");
 						this.appStore.fetch({
 							query: {
 								appname: appname,
@@ -218,9 +219,14 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 									type: "warning",
 									message: nf.alreadyExists
 								})
+								var defaultContent = "dojo.provide(\"desktop.apps."
+									+fileOrig.substring(0, fileOrig.length-3)
+									.replace(".", "")
+									.replace("/", ".")
+									+"\");\n\n";
 								desktop.app.save({
 									filename: path+"/"+filename,
-									contents: ""
+									content: filename.match(".js$") ? defaultContent : " "
 								});
 								this.appStore.newItem({
 									id: appname+"/"+path+"/"+filename+(new Date()).toString(),
@@ -517,7 +523,6 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		})
 	},
 	onItem: function(item) {
-		console.log(item);
 		var store = this.appStore;
 		if(!store.isItem(item)) return;
 		var filename = store.getValue(item, "filename");

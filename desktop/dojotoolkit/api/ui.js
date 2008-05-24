@@ -108,6 +108,8 @@ api.ui = {
 		//		the title of the dialog
 		//	object: {message: String}
 		//		a message to display above the text field and buttons
+		//	object: {initial: String}
+		//		the initial contents of the dialog
 		//	object: {callback: Function?}
 		//		a callback function. The first argument is the inputted string if the user clicked OK, but false if the user clicked cancel or closed the window.
 		//	example:
@@ -119,7 +121,7 @@ api.ui = {
 		dialog.height = "150px";
 		var onClose = dojo.connect(dialog, "onClose", null, function() {object.callback(false)});
 		var details = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
-		var text = new dijit.form.TextBox({value: ""});
+		var text = new dijit.form.TextBox({value: object.initial || ""});
 		all = document.createElement("div");
 		var blah = new dijit.form.Button({label: cm.ok, onClick: dojo.hitch(this, function() {  dojo.disconnect(onClose); object.callback(text.getValue()); dialog.close(); })});
 		var ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function() {  dojo.disconnect(onClose); object.callback(false); dialog.close(); })});

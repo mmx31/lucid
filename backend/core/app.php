@@ -112,7 +112,7 @@
 			import("models.user");
 			$user = $User->get_current();
 			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
-			if(isset($_POST['sysname'])) {
+			if(!isset($_POST['filename'])) {
 				$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
 				$p = $App->filter("sysname", $_POST['sysname']);
 				if($p === false) { $app = new App(array(sysname => $_POST['sysname'])); }
