@@ -145,7 +145,10 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			menu.getChildren().forEach(function(i){
 				if(i.setDisabled)
 					i.setDisabled(!(this._contextItem
-									&& (this.appStore.getValue(this._contextItem, "filename") || i.label == cm["delete"])));
+									&& ((i.label == nf.createFolder || i.label == nf.createFile) ? 
+											this.appStore.getValue(this._contextItem, "folder") :
+											this.appStore.getValue(this._contextItem, "filename")
+									 || i.label == cm["delete"])));
 			}, this);
 		});
 		menu.bindDomNode(tree.domNode);
@@ -163,12 +166,12 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 						dirname = dirname.replace("..", "").replace("/", "");
 						var path = this.appStore.getValue(this._contextItem, "filename");
 						var appname = this.appStore.getValue(this._contextItem, "appname");
-						
 						this.appStore.fetch({
 							query: {
 								appname: appname,
 								filename: path+"/"+dirname
 							},
+							queryOptions: {deep: true},
 							onComplete: dojo.hitch(this, function(items) {
 								if(items.length != 0) return api.ui.notify({
 									type: "warning",
@@ -183,7 +186,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 									folder: true
 								}, {
 									parent: this._contextItem,
-									property: "children"
+									attribute: "children"
 								})
 							})
 						})
@@ -201,7 +204,36 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 					message: nf.createFileText,
 					callback: dojo.hitch(this, function(filename) {
 						if(filename == "") return;
-						//TODO: 
+						filename = filename.replace("..", "").replace("/", "");
+						var path = this.appStore.getValue(this._contextItem, "filename");
+						var appname = this.appStore.getValue(this._contextItem, "appname");
+						this.appStore.fetch({
+							query: {
+								appname: appname,
+								filename: path+"/"+filename
+							},
+							queryOptions: {deep: true},
+							onComplete: dojo.hitch(this, function(items) {
+								if(items.length != 0) return api.ui.notify({
+									type: "warning",
+									message: nf.alreadyExists
+								})
+								desktop.app.save({
+									filename: path+"/"+filename,
+									contents: ""
+								});
+								this.appStore.newItem({
+									id: appname+"/"+path+"/"+filename+(new Date()).toString(),
+									name: filename,
+									filename: path+"/"+filename,
+									appname: appname,
+									folder: false
+								}, {
+									parent: this._contextItem,
+									attribute: "children"
+								})
+							})
+						})
 					})
 				});
 			})
@@ -485,6 +517,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		})
 	},
 	onItem: function(item) {
+		console.log(item);
 		var store = this.appStore;
 		if(!store.isItem(item)) return;
 		var filename = store.getValue(item, "filename");

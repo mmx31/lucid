@@ -135,7 +135,7 @@
 			$user = $User->get_current();
 			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
 			$_POST['dirname'] = str_replace("..", "", $_POST['dirname']);
-			mkdir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['dirname']);
+			mkdir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['dirname'], 0777);
 			$out = new intOutput("ok");
 		}
 		if($_GET['action'] == "remove") {
