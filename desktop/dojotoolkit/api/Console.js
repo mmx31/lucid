@@ -49,7 +49,7 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		echo: function(params)
 		{
-			this.write(eval('('+params+')')+"\n");
+			this.write(params+"\n");
 			this.detach();
 		},
 		reload: function(params)
@@ -63,14 +63,16 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		{
 			var n = dojo.i18n.getLocalization("api", "console");
 			var text = n.helpHeader;
-			dojo.forEach(["reload", "ls", "cat", "mkdir", "rm", "rmdir", "ps", "kill", "clear", "logout"], function(a) {
+			dojo.forEach(["reload", "echo", "ls", "cd", "pwd", "cat", "mkdir", "rm", "rmdir", "ps", "kill", "clear", "logout"], function(a) {
 				var s = a;
 				if(a == "ls"
 				|| a == "mkdir"
-				|| a == "rmdir") s += " ["+n.dir+"]";
+				|| a == "rmdir"
+				|| a == "cd") s += " ["+n.dir+"]";
 				if(a == "cat"
 				|| a == "rm") s += " ["+n.file+"]";
 				if(a == "kill") s += " ["+n.instance+"]";
+				if(a == "echo") s += " ["+n.text+"]";
 				s += ("- "+n[a+"Help"] || "Oh noes, I forgot what this does");
 				text += s+"\n";
 			}, this);
@@ -105,17 +107,17 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		cd: function(params)
 		{
-			if (params[0] != "/") {
+			if (params.charAt(0) != "/") {
 				if (params != "") {
-					params = (this.path[this.path.length-1] == "/" ? "" : "/") + params;
-					this.path += params;
+					params = (this.path.charAt(this.path.length-1) == "/" ? "" : "/") + params;
+					this.path = this.fixPath(this.path+params);
 				}
 				else {
-					this.path = "/";
+					this.path = this.fixPath("file://");
 				}
 			}
 			else 
-				this.path = params;
+				this.path = this.fixPath(params || "/");
 			this.detach();
 			//TODO: check to see if the directory even exists
 		},
@@ -174,6 +176,10 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 					this.detach();
 				}));
 			}
+		},
+		pwd: function(params) {
+			this.write(this.formatPath(this.path)+"\n");
+			this.detach();
 		}
 	},
 	postCreate: function() {
@@ -185,15 +191,20 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		//	summary:
 		//		Event handler
 		//		Processes key presses, such as the up and down arrows for browsing history
-		if(e.keyCode == dojo.keys.UP_ARROW)
+		if(e.ctrlKey && e.keyChar == "c") {
+			if(typeof this.appAttached == "number")
+				desktop.app.kill(this.appAttached);
+		}
+		else if(e.keyCode == dojo.keys.UP_ARROW)
 		{
 		}
 		else if(e.keyCode == dojo.keys.DOWN_ARROW)
 		{
 		}
 		else if(e.keyCode == dojo.keys.ENTER) {
-			this.write(":"+this.path+"$ "+this.stdin+"\n");
-			this.execute(this.stdin);
+			this.inputLine(true);
+			var lines = this.stdin.split("\n");
+			this.execute(lines[lines.length-1]);
 		}
 		else if(e.keyCode == dojo.keys.BACKSPACE) {
 			this.stdin = this.stdin.substring(0, this.stdin.length-1);
@@ -204,13 +215,19 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 			this.drawScreen();
 		}
 	},
+	inputLine: function(write) {
+		var lines = this.stdin.split("\n");
+		var text = ":"+this.formatPath(this.path)+"$ "+lines[lines.length-1]+"\n";
+		if(write) this.write(text);
+		return text;
+	},
 	write: function(text) {
 		this.stdout += text;
 		this.drawScreen();
 	},
 	drawScreen: function() {
 		var text = this.stdout;
-		if(!this.appAttached) text += ":"+this.path+"$ "+this.stdin;
+		if(this.appAttached === false) text += this.inputLine();
 		this.domNode.textContent = "";
 		dojo.forEach(text.split("\n"), function(val, i) {
 			var row = document.createElement("div");
@@ -218,23 +235,62 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 			this.domNode.appendChild(row);
 		}, this)
 	},
+	fixPath: function(path) {
+		if(path.charAt(0) == "~") path = "/"+path.substring(1);
+		if(path.charAt(0) == "/") path = "file:/"+path;
+		path = path.split("://");
+		while(path[1].indexOf("//") != -1)
+			path[1] = path[1].replace("//", "/");
+		path = path.join("://");
+		return path;
+	},
+	formatPath: function(path) {
+		if(path.indexOf("file://" == 0)) {
+			path = "/"+path.substring(("file://").length);
+		}
+		if(path == "/") path = "~";
+		return path;
+	},
 	execute: function(value) {
 		this.appAttached = true;
-		this.stdin="";
+		this.write("\n");
+		this.stdin = "";
+		if(value == "") return this.detach();
 		var cmd = (value.split(" "))[0];
 		var params = value.substring(cmd.length+1, value.length);
 		if(typeof this.aliases[cmd] == "function") {
 			this.aliases[cmd].apply(this, [params]);
 		}
 		else {
-			if(value != "") try {
-				this.write(eval(value)+"\n");
-			}
-			catch(e) {
-				this.write(e.message+"\n");
-			}
-			this.detach();
+			if(!this.execApp(cmd, params))
+				this.execJs(value);
 		}
+	},
+	execApp: function(cmd, params) {
+		for(var i in desktop.app.appList) {
+			var app = desktop.app.appList[i];
+			if(app.sysname.toLowerCase() != cmd.toLowerCase()) continue;
+			var args = {};
+			//parse params
+			dojo.forEach(params.split("--"), function(text) {
+				var parsedArg = dojo.trim(text).split("=");
+				if(parsedArg[0])
+					args[parsedArg[0]] = parsedArg[1] || true;
+			});
+			var pid = this.appAttached = desktop.app.launch(app.sysname, args);
+			dojo.connect(desktop.app.instances[pid], "kill", this, "detach");
+			return true;
+		}
+		return false;
+	},
+	execJs: function(value) {
+		try {
+			this.write(eval(value)+"\n");
+		}
+		catch(e) {
+			this.write(e.message+"\n");
+		}
+		this.detach();
 	},
 	detach: function() {
 		this.appAttached = false;
