@@ -1,5 +1,5 @@
 ({
-	"helpHeader": "--Psych Desktop Console--<br />You can type any javascript you want to evaluate this console.<br />Or, you can use these commands:<br />",
+	"helpHeader": "--Psych Desktop Console--\nYou can type any javascript you want to evaluate this console.\nOr, you can use these commands:\n",
 	"reloadHelp": "reload the desktop without logging out",
 	"lsHelp": "list files in [dir]",
 	"catHelp": "read the file [file] and print it out onto the console",

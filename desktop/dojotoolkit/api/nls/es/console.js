@@ -1,5 +1,5 @@
 ({
-	"helpHeader": "--Consola de Psych Desktop--<br />Puedes escribir cualquier javascript quiera evaluar esta consola.<br />O, puede usar estos comandos:<br />",
+	"helpHeader": "--Consola de Psych Desktop--\nPuedes escribir cualquier javascript quiera evaluar esta consola.\nO, puede usar estos comandos:\n",
 	"reloadHelp": "Volver a cargar el escritorio sin necesidad de acceder a",
 	"lsHelp": "En la lista de archivos [dir]",
 	"catHelp": "Leer el archivo [archivo] y de impresión a cabo en la consola",

@@ -47,22 +47,6 @@ margin: 0px;
 	font-family: monospace;
 	font-size: 10pt;
 }
-.console form b {
-	position: absolute;
-	top: 0px;
-	left: 0px;
-}
-.consoleinput {
-	padding-left: 26px;
-	width: 100%;
-	font-family: monospace;
-	font-size: 10pt;
-}
-.console form
-{
-	margin: 0px;
-	position: relative;
-}
 /* Hide that damn dojo.io.iframe */
 #dojoIoIframe {
 	display: none;
