@@ -25,10 +25,10 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 	stdout: "",
 	//	histList: array
 	//		The command history
-	histList: [" "],
+	histList: [],
 	//	histSlot: Integer
 	//		internal variable used for history browsing
-	histSlot: 1,
+	histSlot: -1,
 	//	 appAttached: bool
 	//		is an app attached to the console?
 	appAttached: false,
@@ -197,14 +197,31 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		}
 		else if(e.keyCode == dojo.keys.UP_ARROW)
 		{
+			var length = this.histList.length;
+			length = length-(length == 0 ? 0 : 1);
+			if(this.histSlot >= length) return;
+			this.histSlot++;
+			this.stdin = this.histList[length-this.histSlot];
+			this.drawScreen();
 		}
 		else if(e.keyCode == dojo.keys.DOWN_ARROW)
 		{
+			if(this.histSlot <= -1) return;
+			this.histSlot--;
+			if(this.histSlot <= -1) {
+				this.stdin="";
+				this.histSlot = -1;
+			}
+			else {
+				var length = this.histList.length;
+				this.stdin = this.histList[(length-(length == 0 ? 0 : 1))-this.histSlot]
+			}
+			this.drawScreen();
 		}
 		else if(e.keyCode == dojo.keys.ENTER) {
 			this.inputLine(true);
-			var lines = this.stdin.split("\n");
-			this.execute(lines[lines.length-1]);
+			this.histList.push(this.stdin);
+			this.execute(this.stdin);
 		}
 		else if(e.keyCode == dojo.keys.BACKSPACE) {
 			this.stdin = this.stdin.substring(0, this.stdin.length-1);
@@ -253,6 +270,7 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 	},
 	execute: function(value) {
 		this.appAttached = true;
+		this.histSlot = -1;
 		this.write("\n");
 		this.stdin = "";
 		if(value == "") return this.detach();
