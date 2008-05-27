@@ -362,6 +362,26 @@ desktop.app = {
 			handleAs: "json"
 		});
 	},
+	renameFile: function(/*String*/origName, /*String*/newName, /*Function?*/callback) {
+		//	summary:
+		//		renames a file in the app directory
+		//	origName:
+		//		the original name of the file
+		//	newName:
+		//		the new name of the file
+		//	callback:
+		//		a callback function once the action is complete
+		return api.xhr({
+			backend: "core.app.write.rename",
+			content: {
+				origName: origName,
+				newName: newName
+			},
+			load: function(d) {
+				callback(d=="0")
+			}
+		});
+	},
 	remove: function(/*String?*/name, /*String?*/filePath, /*Function?*/callback) {
 		//	summary:
 		//		removes an app from the system

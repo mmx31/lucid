@@ -248,7 +248,50 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		menu.addChild(new dijit.MenuItem({
 			label: cm.rename,
 			onClick: dojo.hitch(this, function() {
-				//TODO: 
+				var nf = dojo.i18n.getLocalization("api", "filearea");
+				var cmn = dojo.i18n.getLocalization("desktop", "common");
+				api.ui.inputDialog({
+					title: cmn.rename,
+					initial: this.appStore.getValue(this._contextItem, "name"),
+					callback: dojo.hitch(this, function(filename) {
+						if(filename == "") return;
+						var path = this.appStore.getValue(this._contextItem, "filename");
+						var appname = this.appStore.getValue(this._contextItem, "appname");
+						var fileOrig = path+"/"+filename;
+						filename = filename.replace("..", "").replace("/", "");
+						var newPath = path.substring(0, path.lastIndexOf("/"))+"/"+filename;
+						this.appStore.fetch({
+							query: {
+								appname: appname,
+								filename: newPath
+							},
+							queryOptions: {deep: true},
+							onComplete: dojo.hitch(this, function(items) {
+								if(items.length != 0) return api.ui.notify({
+									type: "warning",
+									message: nf.alreadyExists
+								})
+								desktop.app.renameFile(
+									this.appStore.getValue(this._contextItem, "filename"),
+									newPath,
+									dojo.hitch(this, function(s) {
+										if(!s) return;
+										this.tabArea.getChildren().forEach(function(item) {
+											if(!item.ide_info) return;
+											if(item.ide_info.fileName == this.appStore.getValue(this._contextItem, "filename")) {
+												item.setAttribute("title", filename);
+												item.ide_info.fileName = newPath;
+											}
+										}, this);
+										this.appStore.setValue(this._contextItem, "name", filename);
+										this.appStore.setValue(this._contextItem, "filename", newPath);
+										this.onItem(this._contextItem);
+									})
+								);
+							})
+						})
+					})
+				});
 			})
 		}))
 		menu.addChild(new dijit.MenuItem({

@@ -187,4 +187,47 @@
 			}
 			$out = new intOutput("ok");
 		}
+		if($_GET['action'] == "rename") {
+			//cannot rename the main file
+			$parts = explode("/", $_POST['origName']);
+				if(!(count($parts) >= 2 && $parts[0] != "")) internal_error("generic_err");
+			
+			function recursive_rename( $source, $target )
+		    {
+		        if ( is_dir( $source ) )
+		        {
+		            @mkdir( $target, 0777 );
+		           
+		            $d = dir( $source );
+		           
+		            while ( FALSE !== ( $entry = $d->read() ) )
+		            {
+		                if ( $entry{0} == '.' )
+		                {
+		                    continue;
+		                }
+		               
+		                $Entry = $source . '/' . $entry;           
+		                if ( is_dir( $Entry ) )
+		                {
+		                    recursive_rename( $Entry, $target . '/' . $entry );
+		                    continue;
+		                }
+		                rename( $Entry, $target . '/' . $entry );
+		            }
+		           
+		            $d->close();
+		        }else
+		        {
+		            return rename( $source, $target );
+		        }
+				return true;
+		    }
+			
+			$_POST['origName'] = $GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/"
+				. str_replace("..", "", $_POST['origName']);
+			$_POST['newName'] = $GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/" 
+				. str_replace("..", "", $_POST['newName']);
+			$out = new intOutput(recursive_rename($_POST['origName'], $_POST['newName']) ? "ok":"generic_err");
+		}
 	}
