@@ -12,7 +12,10 @@ dojo.declare("desktop.apps.Terminal", desktop.apps._App, {
 			onClose: dojo.hitch(this, "kill")
 		});
 		this.term = new api.Console({layoutAlign: "client", path: (args.path || "/")})
-		this.term.aliases.exit = dojo.hitch(this, "kill");
+		var killMyself = dojo.hitch(this, "kill");
+		this.term.aliases.exit = function(params){
+			killMyself();
+		}
 		this.win.addChild(this.term);
 		this.win.show();
 		this.win.startup();
