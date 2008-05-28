@@ -8,7 +8,7 @@ dojo.requireLocalization("desktop.ui", "appearance");
 dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Container], {
 	//	summary:
 	//		the main UI area of the desktop. This is where panels, wallpaper, and most other things are drawn.
-	templateString: "<div class=\"uiArea\"><div dojoAttachPoint=\"containerNode\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10;\"></div><div dojoAttachPoint=\"wallpaperNode\" class=\"wallpaper\" style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 1;\"></div></div>",
+	templatePath: dojo.moduleUrl("desktop.ui.templates", "ui_Area.htm"),
 	drawn: false,
 	postCreate: function() {
 		var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
@@ -17,13 +17,17 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 			subdirs: false,
 			vertical: true,
 			textShadow: true,
-			style: "position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;", overflow: "hidden"
+			overflow: "hidden"
 		});
+		dojo.addClass(filearea.domNode, "uiArea");
 		dojo.addClass(filearea.domNode, "mainFileArea");
 		filearea.menu.addChild(new dijit.MenuSeparator({}));
-		filearea.menu.addChild(new dijit.MenuItem({label: l.wallpaper, iconClass: "icon-16-apps-preferences-desktop-wallpaper", onClick: dojo.hitch(desktop.app, "launch", "AppearanceConfig")}));
+		filearea.menu.addChild(new dijit.MenuItem({
+			label: l.wallpaper,
+			iconClass: "icon-16-apps-preferences-desktop-wallpaper",
+			onClick: dojo.hitch(desktop.app, "launch", "AppearanceConfig")
+		}));
 		filearea.refresh();
-		dojo.style(filearea.domNode, "zIndex", 1);
 		this.containerNode.appendChild(filearea.domNode);
 		
 		if(dojo.isIE){
@@ -98,7 +102,7 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 			return;
 		}
 		else if(style == "centered" || style == "tiled")
-			dojo.style(this.wallpaperNode, "backgroundImage", "url("+image+")");
+			dojo.style(this.wallpaperNode, "backgroundImage", "url('"+image+"')");
 			if(this.wallpaperImageNode) {
 				 this.wallpaperImageNode.parentNode.removeChild(this.wallpaperImageNode);
 				 this.wallpaperImageNode = false;
@@ -119,12 +123,16 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 		}
 		var rule;
 		try {
-			rule = document.styleSheets[0].cssRules[0].style;
+			try {
+				rule = document.styleSheets[0].cssRules[0].style;
+			}
+			catch(e) {
+				rule = document.styleSheets[0].rules[0].style;
+			}
+			rule.backgroundColor = desktop.config.wallpaper.color;
 		}
 		catch(e) {
-			rule = document.styleSheets[0].rules[0].style;
+			//oh well...
 		}
-		rule.backgroundColor = desktop.config.wallpaper.color;
-
 	}
 });

@@ -34,7 +34,7 @@ margin: 0px;
 }
 
 .wallpaper {
-	z-index: 0;
+	z-index: 10;
 	height: 100%;
 	width: 100%;
 	text-align: center;
@@ -215,7 +215,7 @@ margin: 0px;
 }
 
 .floatLeft {
-	float: left; /* I know this is stupid, but you can't really set the float property in js */
+	float: left; /* I know this is stupid, but you can't set the float property in js */
 }
 .floatRight {
 	float: right;
@@ -267,12 +267,24 @@ margin: 0px;
 	height: 100%;
 }
 .uiArea {
-	width: 100%;
-	height: 100%;
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	z-index: 500;
+	width: 100%;
+	height: 100%;
+	z-index: 10;
+	background: none;
+}
+.uiAreaContainer {
+	background: none;
+	z-index: 90;
+}
+.uiAreaWidget {
+	display: none;
+	z-index: 100;
+}
+.mainFileArea {
+	z-index: 10;
 }
 /****** Widget Layer *******/
 .widgetLayer {	

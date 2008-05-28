@@ -7,6 +7,7 @@ desktop.theme = {
 	fileList: ["dijit", "theme", "window", "icons"],
 	draw: function()
 	{
+		if(dojo.isIE) document.execCommand('BackgroundImageCache', false, true);
 		dojo.addClass(document.body, "dijit");
 		dojo.forEach(this.fileList, function(e)
 		{
@@ -14,7 +15,7 @@ desktop.theme = {
 			element.rel = "stylesheet";
 			element.type = "text/css";
 			element.media = "screen";
-			element.href = "./themes/"+(desktop.config.theme ? desktop.config.theme : "green")+"/"+e+".css";
+			element.href = "./themes/"+(desktop.config.theme ? desktop.config.theme : "minuit")+"/"+e+".css";
 			element.id = "desktop_theme_"+e;
 			document.getElementsByTagName("head")[0].appendChild(element);
 		});

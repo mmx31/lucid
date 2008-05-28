@@ -15,28 +15,12 @@ dojo.declare("login.Form", dijit.form.Form, {
 	templateString: null,
 	templatePath: dojo.moduleUrl("login", "Form.html"),
 	_popup: null,
+	widgetsInTemplate: true,
 	preload: true,
 	autoRedirect: false,
 	label: "Desktop Login",
 	postCreate: function() {
 		this.inherited(arguments);
-		new dijit.form.TextBox({
-			name: "username"
-		}, this.usernameInputNode);
-		new dijit.form.TextBox({
-			type: "password",
-			name: "password"
-		}, this.passwordInputNode);
-		new dijit.form.RadioButton({
-			name: "windowAct",
-			checked: (dojo.cookie("desktopWindowPref") != "current"),
-			value: "new"
-		}, this.newWindowNode);
-		new dijit.form.RadioButton({
-			name: "windowAct",
-			value: "current",
-			checked: (dojo.cookie("desktopWindowPref") == "current")
-		}, this.currentWindowNode);
 		if(this.preloadDesktop) {
 			var ontype = dojo.connect(this.domNode, "onkeydown", this, function() {
 				dojo.disconnect(ontype);
@@ -55,7 +39,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 					if(this.autoRedirect) {
 						if(dojo.cookie("desktopWindowPref") == "current") {
 							this.errorNode.innerHTML = "You are allready logged in. Redirecting to desktop...";
-							this.submitNode.disabled = true;
+							this.submitNode.setDisabled(true);
 							window.location = dojo.baseUrl+"../../index.html";
 						}
 						else if(winClosed) {
@@ -68,7 +52,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 						else {
 							if (this._popUp()) {
 								this.errorNode.innerHTML = "You are allready logged in. Window opened.";
-								this.submitNode.disabled = true;
+								this.submitNode.setDisabled(true);
 								this._winCheck();
 							}
 							else {
@@ -109,7 +93,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 	_winCheck: function() {
 		if(this._popup.closed === false) {setTimeout(dojo.hitch(this, "_winCheck"), 500);}
 		else {
-			this.submitNode.disabled=false;
+			this.submitNode.setDisabled(false);
 			this.errorNode.innerHTML = "";
 			this.checkForLogin(true);
 		}
@@ -158,29 +142,29 @@ dojo.declare("login.Form", dijit.form.Form, {
 							}
 							else {
 								this.errorNode.innerHTML = "Your popup blocker is blocking the Psych Desktop window.";
-								this.submitNode.disabled = false;
+								this.submitNode.setDisabled(false);
 							}
 						}
 					}
 					else if(data == "1")
 					{
 						this.errorNode.innerHTML = "Incorrect username or password.";
-						this.submitNode.disabled=false;
+						this.submitNode.setDisabled(false);
 					}
 					else if(data == "4" || data == "5" || data == "6")
 					{
 						this.errorNode.innerHTML = "A database error occured. Check Psych Desktop is installed correctly or contact the Administrator.";
-						this.submitNode.disabled=false;
+						this.submitNode.setDisabled(false);
 					}
 					else if(data == "7")
 					{
 						this.errorNode.innerHTML = "You do not have permission to login. Contact the Administrator.";
-						this.submitNode.disabled=false;
+						this.submitNode.setDisabled(false);
 					}
 					else
 					{
 						this.errorNode.innerHTML = "Unknown Error occured. Check your installation.";
-						this.submitNode.disabled=false;
+						this.submitNode.setDisabled(false);
 					}
 				})
 			});
@@ -188,7 +172,7 @@ dojo.declare("login.Form", dijit.form.Form, {
 		else
 		{
 			this.errorNode.innerHTML = "Please provide both a username and a password";
-			this.submitNode.disabled=false;
+			this.submitNode.setDisabled(false);
 		}
 		return false;
 	},
@@ -255,7 +239,7 @@ dojo.declare("login._RegisterDialog", dijit.Dialog, {
 							if(data == "1")
 							{
 								this.errorNode.innerHTML = "Username already exists";
-								this.submitNode.disabled=false;
+								this.submitNode.setDisabled(false);
 							}
 							else if(data == "0")
 							{
@@ -268,19 +252,19 @@ dojo.declare("login._RegisterDialog", dijit.Dialog, {
 				else
 				{
 					this.errorNode.innerHTML = "Please enter a valid email";
-					this.submitNode.disabled=false;
+					this.submitNode.setDisabled(false);
 				}
 			}
 			else
 			{
 				this.errorNode.innerHTML = "Two passwords don't match";
-				this.submitNode.disabled=false;
+				this.submitNode.setDisabled(false);
 			}
 		}
 		else
 		{
 			this.errorNode.innerHTML = "Please fill in all fields";
-			this.submitNode.disabled=false;
+			this.submitNode.setDisabled(false);
 		}
 		return false;
 	}
@@ -311,12 +295,12 @@ dojo.declare("login._ResetPassDialog", dijit.Dialog, {
 						if(data == "2")
 						{
 							this.errorNode.innerHTML = "Email on file and username don't match";
-							this.submitNode.disabled=false;
+							this.submitNode.setDisabled(false);
 						}
 						else if(data == "1")
 						{
 							this.errorNode.innerHTML = "No such user";
-							this.submitNode.disabled=false;
+							this.submitNode.setDisabled(false);
 						}
 						else if(data == "0")
 						{
@@ -329,13 +313,13 @@ dojo.declare("login._ResetPassDialog", dijit.Dialog, {
 			else
 			{
 				this.errorNode.innerHTML = "Please enter a valid email";
-				this.submitNode.disabled=false;
+				this.submitNode.setDisabled(false);
 			}
 		}
 		else
 		{
 			this.errorNode.innerHTML = "Please fill out all fields";
-			this.submitNode.disabled=false;
+			this.submitNode.setDisabled(false);
 		}
 		return false;
 	}
