@@ -33,13 +33,6 @@ margin: 0px;
 	height: inherit;
 }
 
-.wallpaper {
-	z-index: 10;
-	height: 100%;
-	width: 100%;
-	text-align: center;
-	background-position: 50% 50%;
-}
 .console 
 {
 	overflow: auto;
@@ -276,7 +269,6 @@ margin: 0px;
 	background: none;
 }
 .uiAreaContainer {
-	background: none;
 	z-index: 90;
 }
 .uiAreaWidget {
@@ -285,6 +277,10 @@ margin: 0px;
 }
 .mainFileArea {
 	z-index: 10;
+}
+.wallpaper {
+	z-index: 20;
+	background-position: 50% 50%;
 }
 /****** Widget Layer *******/
 .widgetLayer {	
