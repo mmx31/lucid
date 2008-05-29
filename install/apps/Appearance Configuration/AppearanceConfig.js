@@ -189,9 +189,9 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 			var wallimg = dojo.moduleUrl("desktop.resources.themes."+item.sysname, item.wallpaper);
 			for(var i in desktop.config.wallpaper.storedList){
 				var litem = desktop.config.wallpaper.storedList[i];
-				if(litem == wallimg) return;
+				if(litem == wallimg.path) return;
 			}
-			desktop.config.wallpaper.storedList.push(wallimg);
+			desktop.config.wallpaper.storedList.push(wallimg.path);
 		}
 		desktop.theme.list(function(list) {
 			dojo.forEach(list, makeThumb);
