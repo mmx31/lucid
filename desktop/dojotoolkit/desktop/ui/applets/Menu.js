@@ -30,7 +30,8 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		var l = dojo.i18n.getLocalization("desktop", "places");
 		var m = new dijit.Menu();
 		dojo.forEach(desktop.config.filesystem.places, function(place) {
-			var item = new dijit.MenuItem({label: l[place.name] || place.name,
+			var item = new dijit.MenuItem({
+				label: l[place.name] || place.name,
 				iconClass: place.icon || "icon-16-places-folder",
 				onClick: function() { desktop.app.launchHandler(place.path, {}, "text/directory"); }
 			});

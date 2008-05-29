@@ -5,10 +5,13 @@ html, body {
 }
 
 /******************** Taskbar ********************/
+.desktopPanel * {
+	color: #fff;
+}
 .desktopPanel {
   background: url('./images/panelback.png');
   height: 35px;
-  color: white;
+  color: #fff;
 }
 .desktopPanelTop {
   background:url(./images/panelbacktop.png) repeat-x;
