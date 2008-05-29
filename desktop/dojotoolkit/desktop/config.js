@@ -108,14 +108,10 @@ desktop.config = {
 	//		style - can be "centered", "tiled", or "fillscreen"
 	//		storedList - an array of wallpapers that the user can pick from in the wallpaper dialog
 	wallpaper: {
-		image: "./themes/Minuit/wallpaper.png",
+		image: "./dojotoolkit/desktop/resources/Minuit/wallpaper.png",
 		color: "#696969",
 		style: "centered",
-		storedList: [
-			"./themes/green/wallpaper.jpg",
-			"./themes/default/wallpaper.png",
-			"./themes/tsunami/wallpaper.jpg"
-		]
+		storedList: []
 	},
 	//	theme: String
 	//		The user's preferred theme
