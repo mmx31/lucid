@@ -13,15 +13,15 @@ if($_GET['section'] == "get")
 {
 	if($_GET['action'] == "list")
 	{
-	    $dir = opendir($GLOBALS['path']."/../desktop/themes/");
+	    $dir = opendir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/resources/themes/");
 		$p = array();
 		while(($file = readdir($dir)) !== false) {
 			if($file == '..' || $file == '.' || $file{0} == '.'){
 					continue;
 			} else {
 				$t = strtolower($file);
-				if(is_dir($GLOBALS['path']."/../desktop/themes/" . $file)){
-					$json = file_get_contents($GLOBALS['path'].'/../desktop/themes/'.$file.'/meta.json');
+				if(is_dir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/resources/themes/" . $file)){
+					$json = file_get_contents($GLOBALS['path'].'/../desktop/dojotoolkit/desktop/resources/themes/'.$file.'/meta.json');
 					$in = Zend_Json::decode($json);
 					$in["sysname"] = $file;
 					$p[] = $in;
@@ -65,7 +65,7 @@ if($_GET['section'] == "package" && $cur->has_permission("core.administration"))
 		    }
 		}
 		$name = str_replace("..", "", $_POST['themename']);
-		rmdir_recurse($GLOBALS['path']."/../desktop/themes/".$name);
+		rmdir_recurse($GLOBALS['path']."/../desktop/dojotoolkit/desktop/resources/themes/".$name);
 		$out = new intOutput("ok");
 	}
 }

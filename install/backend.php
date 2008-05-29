@@ -172,17 +172,17 @@
 			"../public/",
 			"../apps/",
 			"../tmp/",
-			"../desktop/themes/",
+			"../desktop/dojotoolkit/desktop/resources/themes/",
 			"../desktop/dojotoolkit/desktop/apps/"
 		);
-		/*$dir = opendir("../desktop/themes/");
+		/*$dir = opendir("../desktop/dojotoolkit/desktop/resources/themes/");
 		while(($file = readdir($dir)) !== false){
 			if($file{0} == '.'){
 				continue;
 			}
 			else {
-				if(is_dir("../desktop/themes/" . $file)){
-					array_push($dirs, "../desktop/themes/".$file);
+				if(is_dir("../desktop/dojotoolkit/desktop/resources/themes/" . $file)){
+					array_push($dirs, "../desktop/dojotoolkit/desktop/resources/themes/".$file);
 				}
 			}
 		}*/

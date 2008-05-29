@@ -155,7 +155,7 @@ install = new function() {
 	this.doInstall = function()
 	{
 		dojo.byId("taskList").innerHTML = "";
-		form = dijit.byId("form").getValues();
+		var form = dijit.byId("form").getValues();
 		if (form.type == "reset") {
 			this.tasks.apps(dojo.hitch(this, function(umm){
 				if(umm) {

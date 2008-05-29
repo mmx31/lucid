@@ -166,7 +166,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 			var img = document.createElement("img");
 			dojo.style(img, "width", "100%");
 			dojo.style(img, "height", "100%");
-			img.src = "./themes/"+item.sysname+"/"+item.preview;
+			img.src = dojo.moduleUrl("desktop.resources.themes."+item.sysname, item.preview);
 			img.name = item.name;
 			img.title = item.name;
 			p.appendChild(img);
@@ -186,7 +186,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 			area.appendChild(p);
 			
 			if(!item.wallpaper) return;
-			var wallimg = "./themes/"+item.sysname+"/"+item.wallpaper;
+			var wallimg = dojo.moduleUrl("desktop.resources.themes."+item.sysname, item.wallpaper);
 			for(var i in desktop.config.wallpaper.storedList){
 				var litem = desktop.config.wallpaper.storedList[i];
 				if(litem == wallimg) return;

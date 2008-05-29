@@ -9,16 +9,6 @@ desktop.theme = {
 	{
 		if(dojo.isIE) document.execCommand('BackgroundImageCache', false, true);
 		dojo.addClass(document.body, "dijit");
-		dojo.forEach(this.fileList, function(e)
-		{
-			var element = document.createElement("link");
-			element.rel = "stylesheet";
-			element.type = "text/css";
-			element.media = "screen";
-			element.href = "./themes/"+(desktop.config.theme ? desktop.config.theme : "minuit")+"/"+e+".css";
-			element.id = "desktop_theme_"+e;
-			document.getElementsByTagName("head")[0].appendChild(element);
-		});
 		dojo.subscribe("configApply", this, function(conf) {
 			desktop.theme.set(conf.theme);
 		});
@@ -30,8 +20,20 @@ desktop.theme = {
 		//	theme:
 		//		the theme to use
 		desktop.config.theme = theme;
-		dojo.forEach(this.fileList, function(e) {
-			dojo.byId("desktop_theme_"+e).href ="./themes/"+desktop.config.theme+"/"+e+".css";
+		dojo.forEach(this.fileList, function(e)
+		{
+			var elem = dojo.byId("desktop_theme_"+e);
+			if(elem) {
+				elem.parentNode.removeChild(elem);
+				elem = null;
+			}
+			var element = document.createElement("link");
+			element.rel = "stylesheet";
+			element.type = "text/css";
+			element.media = "screen";
+			element.href = dojo.moduleUrl("desktop.resources.themes."+theme, e+".css");
+			element.id = "desktop_theme_"+e;
+			document.getElementsByTagName("head")[0].appendChild(element);
 		});
 	},
 	/*=====

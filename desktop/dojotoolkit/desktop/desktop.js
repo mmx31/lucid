@@ -56,5 +56,9 @@ dojo.require("desktop.user");
 				}
 			}
 		});
+		//if debugging, put console in a window
+		if(dojo.config.isDebug) {
+			var console = dojo.byId("firebugToolbar")
+		}
 	});
 })();

@@ -15,7 +15,8 @@ dojo.extend(desktop.apps.AdminPanel, {
 		
 		desktop.theme.list(dojo.hitch(this, function(data) {
 			for(var i=0;i<data.length;i++) {
-				data[i].preview = "<img style='width: 150px; height: 130px;' src='./themes/"+data[i].sysname+"/"+data[i].preview+"' />";
+				var src = dojo.moduleUrl("desktop.resources.themes."+data[i].sysname, data[i].preview);
+				data[i].preview = "<img style='width: 150px; height: 130px;' src='"+src+"' />";
 			};
 			var layout = [{
 				cells: [[]]
