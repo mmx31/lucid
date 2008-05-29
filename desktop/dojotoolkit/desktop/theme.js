@@ -8,7 +8,6 @@ desktop.theme = {
 	draw: function()
 	{
 		if(dojo.isIE) document.execCommand('BackgroundImageCache', false, true);
-		dojo.addClass(document.body, "dijit");
 		dojo.subscribe("configApply", this, function(conf) {
 			desktop.theme.set(conf.theme);
 		});
