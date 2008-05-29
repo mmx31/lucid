@@ -11,8 +11,10 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 	postCreate: function() {
 		dojo.addClass(this.containerNode, "desktopTaskbarApplet");
 		var tbl = document.createElement("table");
+		var tbody = document.createElement("tbody");
 		var tr = this.trNode = document.createElement("tr");
-		tbl.appendChild(tr);
+		tbody.appendChild(tr);
+		tbl.appendChild(tbody);
 		this.containerNode.appendChild(tbl);
 		this.inherited("postCreate", arguments);
 	},
@@ -47,13 +49,16 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		dojo.addClass(domNode, "taskBarItem");
 		if(this.getParent().getOrientation() == "horizontal") dojo.addClass(domNode, "taskBarItemHorizontal");
 		else dojo.addClass(domNode, "taskBarItemVertical");
-		if(store.hasAttribute(item, "icon")) domNode.innerHTML = "<div class='"+store.getValue(item, "icon")+"' style='float: left;' />";
+		
 		var v = store.getValue(item, "label");
 		if(v.length >= 18) {
 			v = v.slice(0, 18) + "...";
 		}
-		var labelNode = document.createElement("span");
-		labelNode.textContent = v;
+		
+		if(store.hasAttribute(item, "icon")) domNode.innerHTML = "<div class='"+store.getValue(item, "icon")+"' style='float: left;'></div>";
+		
+		var labelNode = document.createElement("div");
+		labelNode.innerHTML = v;
 		domNode.appendChild(labelNode);
 		
 		this._winconnects[store.getValue(item, "id")] = dojo.connect(domNode, "onclick", dijit.byId(store.getValue(item, "id")), "_onTaskClick");
