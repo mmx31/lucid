@@ -7,9 +7,9 @@
 */
 
 /**********Page stuff*************/
-html body {
-overflow: hidden;
-margin: 0px;
+html, body {
+	overflow: hidden;
+	margin: 0px;
 }
 
 .desktopApplet .dijit button {

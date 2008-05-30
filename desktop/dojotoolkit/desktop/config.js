@@ -23,6 +23,8 @@ desktop.config = {
 					return;
 				}
 				data = dojo.fromJson(data);
+				if(data.save) data.save = desktop.config.save;
+				if(data.load) data.load = desktop.config.load;
 				desktop.config = dojo.mixin(desktop.config, data);
 				desktop.config.apply();
 				
@@ -42,11 +44,15 @@ desktop.config = {
 		//	sync:
 		//		Should the call be synchronous? defaults to false
 		if(typeof sync == "undefined") sync=false;
-		var conf = dojo.toJson(desktop.config);
+		var config = {}
+		for(var key in desktop.config) {
+			if(dojo.isFunction(desktop.config[key])) continue;
+			config[key] = dojo.clone(desktop.config[key]);
+		}
 		api.xhr({
             backend: "core.config.stream.save",
 			sync: sync,
-            content: {value: conf}
+            content: {value: dojo.toJson(config)}
         });
 	},
 	apply: function()

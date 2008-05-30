@@ -89,8 +89,8 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 	onSubmit: function(tb) {
 		this.answerShown = true;
 		var v = tb.getValue().replace(/([0-9])\(/, "$1*(").replace(/\)([0-9])/, ")*$1")
-		if(!this.validate(v)) return this.eNode.textContent = "E";
-		else this.eNode.textContent = "";
+		if(!this.validate(v)) return this.eNode.innerHTML = "E";
+		else this.eNode.innerHTML = "";
 		tb.setValue(eval("("+v+")"));
 	},
 	
@@ -99,8 +99,8 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 		if(v.split("(").length != v.split(")").length) return false;
 		//Check for invalid characters
 		for(var i=0; i < v.length; i++) {
-			var c = v[i];
-			if(!(parseInt(c)+"" != "NaN"
+			var c = v.charAt(i);
+			if(!(!isNaN(parseInt(c))
 			|| c == ")"
 			|| c == "("
 			|| c == "/"
@@ -114,7 +114,7 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 		var parts = v.split(".");
 		for(var i=0; i<parts.length;i++) {
 			if(parts[i] == "" && i!=0) return false;
-			if(parseInt(parts[i].charAt(0))+"" == "NaN" && i != 0) return false;
+			if(isNaN(parseInt(parts[i].charAt(0))) && i != 0) return false;
 		}
 		return true;
 	}
