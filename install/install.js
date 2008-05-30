@@ -50,11 +50,11 @@ install = new function() {
 	this.onPasswordChange = function() {
 		var form = dijit.byId("form").getValues();
 		if(form.admin_pass != form.admin_confpass) {
-			dojo.byId("admin_passbox").textContent = "Two passwords don't match";
+			api.textContent("admin_passbox", "Two passwords don't match")
 			dijit.byId("next").setDisabled(true);
 		}
 		else {
-			dojo.byId("admin_passbox").textContent = "";
+			api.textContent("admin_passbox", "");
 			dijit.byId("next").setDisabled(false);
 		}
 	}

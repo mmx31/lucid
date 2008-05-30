@@ -82,7 +82,7 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 	},
 	clear: function(t) {
 		this.answerShown = false;
-		this.eNode.textContent = "";
+		api.textContent(this.eNode, "");
 		t.setValue("");
 	},
 	answerShown: false,

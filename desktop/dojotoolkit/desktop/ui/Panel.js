@@ -197,7 +197,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				fontWeight: "bold",
 				marginTop: "10px"
 			})
-			header.textContent = a[key] || key;
+			api.textContent(header, a[key] || key);
 			div.appendChild(header);
 			div.appendChild(document.createElement("hr"));
 			for(var applet in desktop.ui.appletList[key]) {

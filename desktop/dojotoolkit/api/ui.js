@@ -85,7 +85,7 @@ api.ui = {
 		row2.appendChild(authButton.domNode);
 		row2.appendChild(closeButton.domNode);
 		var row4 = document.createElement("div");
-		row4.textContent = ac.attemptsRemaining+": ";
+		api.textContent(row4, ac.attemptsRemaining+": ");
 		row3.innerHTML = times;
 		row4.appendChild(row3);
 		var main = document.createElement("div"); main.appendChild(row1); main.appendChild(row2); main.appendChild(row4);

@@ -40,12 +40,12 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 		if(error) {
 			var messageNode = document.createElement("div");
 			dojo.style(messageNode, "textAlign", "center");
-			messageNode.textContent = actNls.authFail;
+			api.textContent(messageNode, actNls.authFail)
 			div.appendChild(messageNode);
 		}
 		dojo.forEach(["username", "password"], function(label) {
 			var row = document.createElement("div");
-			row.textContent = actNls[label]+": ";
+			api.textContent(row, actNls[label]+": ");
 			var textbox = this.loginUi[label] = new dijit.form.TextBox({
 				type: (label == "password" ? "password" : "text")
 			});
@@ -148,14 +148,14 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 	makeTextbox: function(div) {
 		var header = document.createElement("div");
 		dojo.style(header, "position", "relative");
-		header.textContent = "What are you doing?";
+		api.textContent(header, "What are you doing?");
 		var counter = document.createElement("div");
 		dojo.style(counter, {
 			position: "absolute",
 			top: "0px",
 			right: "0px"
 		});
-		counter.textContent = "140";
+		api.textContent(counter, "140");
 		header.appendChild(counter);
 		div.appendChild(header);
 		var area = document.createElement("div");
@@ -170,7 +170,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 			style: "width: 300px;",
 			onChange: function(value) {
 				var length = value.split("").length;
-				counter.textContent = 140 - length;
+				api.textContent(counter, 140-length);
 				button.setDisabled(length >= 140);
 			}
 		});

@@ -103,7 +103,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		desktop.user.get({callback: function(info) {
 			elems["name"].setValue(info.name);
 			elems["email"].setValue(info.email);
-			usernameSpan.textContent = info.username
+			api.textContent(usernameSpan, info.username);
 		}});
 		dojo.connect(win, "onClose", this, function() {
 			var args = {};
@@ -158,11 +158,11 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		dojo.style(row4, "textAlign", "center");
 		var onChange = dojo.hitch(this, function() {
 			if(this.newpasswd.getValue() == this.confpasswd.getValue()) {
-				row4.textContent = l.passwordsMatch;
+				api.textContent(row4, l.passwordsMatch);
 				this.chPasswdButton.setDisabled(false)
 			}
 			else {
-				row4.textContent = l.passwordsDontMatch;
+				api.textContent(row4, l.passwordsDontMatch);
 				this.chPasswdButton.setDisabled(true);
 			}
 		});
@@ -199,7 +199,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 					authButton.setDisabled(data);
 					newpasswd.setDisabled(!data);
 					confpasswd.setDisabled(!data);
-					row4.textContent = (data ? l.authSuccess : l.authFail);
+					api.textContent(row4, (data ? l.authSuccess : l.authFail));
 					this._authTimeout = setTimeout(resetForm, 5*60*1000);
 				}))
 				current.setValue("");
@@ -224,7 +224,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 			label: l.changePassword,
 			disabled: true,
 			onClick: dojo.hitch(this, function() {
-				row4.textContent = l.changingPassword;
+				api.textContent(row4, l.changingPassword)
 				current.setDisabled(true);
 				this.authButton.setDisabled(true);
 				newpasswd.setDisabled(true);
@@ -235,7 +235,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 					password: newpasswd.getValue(),
 					callback: function() {
 						resetForm();
-						row4.textContent = l.passwordChangeSuccessful;
+						api.textContent(row4, l.passwordChangeSuccessful);
 						clearTimeout(this._authTimeout);
 					}
 				})

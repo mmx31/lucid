@@ -430,12 +430,12 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 				var hashes = [];
 				var newHashes = false;
 	            dojo.forEach(items, function(item) {
-	                var title = item.getElementsByTagName("title")[0].textContent;
-	                var content = item.getElementsByTagName("description")[0].textContent;
-	                var url = item.getElementsByTagName("link")[0].textContent;
-	                var date = (item.getElementsByTagName("pubDate")[0] ||
-								item.getElementsByTagName("dc:date")[0] || {textContent: ""}).textContent;
-	                var guid = (item.getElementsByTagName("guid")[0] || {textContent: ""}).textContent;
+	                var title = api.textContent(item.getElementsByTagName("title")[0]);
+	                var content = api.textContent(item.getElementsByTagName("description")[0]);
+	                var url = api.textContent(item.getElementsByTagName("link")[0]);
+	                var date = api.textContent((item.getElementsByTagName("pubDate")[0] ||
+								item.getElementsByTagName("dc:date")[0] || {textContent: ""}));
+	                var guid = api.textContent((item.getElementsByTagName("guid")[0] || {textContent: ""}));
 					var dateObj = new Date(date);
 					if(isNaN(dateObj.getDay())) {
 						//must be an ISO string

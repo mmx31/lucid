@@ -244,13 +244,17 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 	},
 	drawScreen: function() {
 		var text = this.stdout;
+		var doScroll = this.domNode.scrollHeight == this.domNode.scrollTop;
 		if(this.appAttached === false) text += this.inputLine();
-		this.domNode.textContent = "";
+		api.textContent(this.domNode, "");
 		dojo.forEach(text.split("\n"), function(val, i) {
 			var row = document.createElement("div");
-			row.textContent += val;
+			api.textContent(row, val);
 			this.domNode.appendChild(row);
 		}, this)
+		if(doScroll) {
+			this.domNode.scrollHeight = this.domNode.scrollTop;
+		}
 	},
 	fixPath: function(path) {
 		if(path.charAt(0) == "~") path = "/"+path.substring(1);

@@ -751,7 +751,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			this.textBack,
 			this.textHidden
 		], function(node) {
-			node.textContent = this.label;
+			api.textContent(node, this.label);
 		}, this);
 	}
 })

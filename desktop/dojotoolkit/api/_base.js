@@ -109,3 +109,21 @@ api.log = function(/*String*/str) {
 	});
 	console.log(str);
 }
+
+api.textContent= function(/*DomNode|String*/node, /*String?*/text) {
+	//	summary:
+	//		sets the textContent of a domNode if text is provided
+	//		gets the textContent if a domNode if text is not provided
+	//		if dojo adds this in the future, grep though
+	//		the js code and replace it with dojo's method
+	//	node:
+	//		the node to set/get the text of
+	//	text:
+	//		the text to use
+	node = dojo.byId(node);
+	var attr = typeof node.innerText == "string" ? "innerText" : "textContent";
+	if(arguments.length == 1)
+		return node[attr];
+	else
+		node[attr] = text;
+}

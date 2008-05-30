@@ -34,7 +34,7 @@ desktop.app = {
 								+"background-image: url('"+dojo.moduleUrl("desktop.apps."+item.sysname, item.icon)+"');"
 								+"}";
 				});
-				style.textContent = contents;
+				api.textContent(style, contents);
 				document.getElementsByTagName("head")[0].appendChild(style);
 			}),
 			handleAs: "json"

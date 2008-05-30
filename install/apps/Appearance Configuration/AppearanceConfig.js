@@ -171,7 +171,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 			img.title = item.name;
 			p.appendChild(img);
 			var subtitle = document.createElement("div");
-			subtitle.textContent = item.name;
+			api.textContent(subtitle, item.name);
 			dojo.style(subtitle, "textAlign", "center");
 			p.appendChild(subtitle);
 			if(desktop.config.theme == item.sysname) dojo.addClass(p, "selectedItem");
