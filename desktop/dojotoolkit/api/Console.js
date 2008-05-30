@@ -253,7 +253,7 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 			this.domNode.appendChild(row);
 		}, this)
 		if(doScroll) {
-			this.domNode.scrollHeight = this.domNode.scrollTop;
+			this.domNode.scrollTop = this.domNode.scrollHeight;
 		}
 	},
 	fixPath: function(path) {
