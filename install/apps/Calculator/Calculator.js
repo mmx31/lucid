@@ -27,9 +27,10 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 			layoutAlign: "client"
 		});
 		win.addChild(client);
-		var c = document.createElement("table");
-		dojo.style(c, {
-			border: "0px",
+		var table = document.createElement("table");
+		var c = document.createElement("tbody");
+		dojo.style(table, {
+			borderColor: "transparent",
 			width: "100%",
 			height: "100%"
 		});
@@ -75,7 +76,8 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 			}, this);
 			c.appendChild(rowNode);
 		}, this);
-		client.setContent(c);
+		table.appendChild(c);
+		client.setContent(table);
 		win.show();
 	},
 	clear: function(t) {
@@ -84,12 +86,12 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 		t.setValue("");
 	},
 	answerShown: false,
-	onSubmit: function(t) {
+	onSubmit: function(tb) {
 		this.answerShown = true;
-		var v = t.getValue();
-		this.eNode.textContent = "";
+		var v = tb.getValue().replace(/([0-9])\(/, "$1*(").replace(/\)([0-9])/, ")*$1")
 		if(!this.validate(v)) return this.eNode.textContent = "E";
-		t.setValue(eval(t.getValue()));
+		else this.eNode.textContent = "";
+		tb.setValue(eval("("+v+")"));
 	},
 	
 	validate: function(v) {
