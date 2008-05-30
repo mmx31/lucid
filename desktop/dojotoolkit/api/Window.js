@@ -89,6 +89,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	//		This is to prevent a bug where the size is captured mid-animation and restores weird.
 	_minimizeAnim: false,
 	postCreate: function() {
+		dojo.setSelectable(this.titleNode, false);
 		this.domNode.title="";
 		this.makeDragger();
 		this.sizeHandle = new dojox.layout.ResizeHandle({

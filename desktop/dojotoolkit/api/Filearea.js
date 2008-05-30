@@ -414,6 +414,10 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		this.connect(this.iconNode, "ondblclick", "_onDblClick");
 		this.connect(this.labelNode, "ondblclick", "rename");
 		
+		dojo.query("*", this.labelNode).forEach(function(node) {
+			dojo.setSelectable(node, false);
+		})
+		
 		var con = {};
 		
 		this._subscriptions = [

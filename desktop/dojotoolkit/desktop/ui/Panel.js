@@ -253,9 +253,10 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		//		Event handler for when the panel is being dragged.
 		//		gets nearest edge, moves the panel there if we're not allready, and re-orients itself
 		//		also checks for any panels allready placed on that edge
+		dojo.stopEvent(e);
 		var viewport = dijit.getViewport();
 		var newPos;
-
+		
 		if(e.clientY < viewport.h/3 && e.clientX < viewport.w/3) {
 			if(e.clientX / (viewport.w/3) > e.clientY / (viewport.h/3)) newPos = "TL";
 			else newPos = "LT";
@@ -289,7 +290,6 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			desktop.ui._area.resize();
 			this._place();
 		}
-		dojo.stopEvent(e);
 	},
 	uninitialize: function() {
 		dojo.forEach(this.getChildren(), function(item) {
@@ -464,6 +464,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		}));
 	},
 	startup: function() {
+		dojo.setSelectable(this.domNode, false);
 		if(desktop.config.fx) {
 			//TODO: add to viewport when there are other panels around!
 			var viewport = dijit.getViewport();

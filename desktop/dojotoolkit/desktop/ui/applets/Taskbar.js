@@ -46,6 +46,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 	onNew: function(item) {
 		var store = desktop.ui._windowList;
 		var domNode=document.createElement("td");
+		dojo.setSelectable(domNode, false);
 		dojo.addClass(domNode, "taskBarItem");
 		if(this.getParent().getOrientation() == "horizontal") dojo.addClass(domNode, "taskBarItemHorizontal");
 		else dojo.addClass(domNode, "taskBarItemVertical");
