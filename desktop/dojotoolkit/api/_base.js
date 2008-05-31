@@ -121,7 +121,7 @@ api.textContent= function(/*DomNode|String*/node, /*String?*/text) {
 	//	text:
 	//		the text to use
 	node = dojo.byId(node);
-	var attr = typeof node.innerText == "string" ? "innerText" : "textContent";
+	var attr = typeof node.textContent == "string" ? "textContent" : "innerText";
 	if(arguments.length == 1)
 		return node[attr];
 	else
