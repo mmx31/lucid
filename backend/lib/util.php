@@ -56,9 +56,9 @@ function get_basepath() {
 	return implode("/", $curpath) . "/";
 }
 $sesPath = $GLOBALS['path']."/../tmp/sessions/";
-if(!is_dir($sesPath)) mkdir($sesPath);
-session_save_path($sesPath);
-if(!is_writable($sesPath)) internal_error("generic_err", "sessions path is not writable. (/tmp/session)");
+if(!is_dir($sesPath)) mkdir($sesPath, 777);
+if(is_writable($sesPath)) session_save_path($sesPath);
+
 
 $time = 60*60*24*365;
 session_name('desktop_session');
