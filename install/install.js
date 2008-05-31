@@ -7,6 +7,23 @@ dojo.require("dijit.form.Form");
 dojo.require("dijit.ProgressBar");
 install = new function() {
 	this.typeWasChecked = false;
+	this.textContent = function(/*DomNode|String*/node, /*String?*/text) {
+		//	summary:
+		//		sets the textContent of a domNode if text is provided
+		//		gets the textContent if a domNode if text is not provided
+		//		if dojo adds this in the future, grep though
+		//		the js code and replace it with dojo's method
+		//	node:
+		//		the node to set/get the text of
+		//	text:
+		//		the text to use
+		node = dojo.byId(node);
+		var attr = typeof node.textContent == "string" ? "textContent" : "innerText";
+		if(arguments.length == 1)
+			return node[attr];
+		else
+			node[attr] = text;
+	}
 	this.selected = function(page) {
 		dijit.byId("previous").setDisabled(page.isFirstChild);
 		if(page.isLastChild)
@@ -50,11 +67,11 @@ install = new function() {
 	this.onPasswordChange = function() {
 		var form = dijit.byId("form").getValues();
 		if(form.admin_pass != form.admin_confpass) {
-			api.textContent("admin_passbox", "Two passwords don't match")
+			install.textContent("admin_passbox", "Two passwords don't match")
 			dijit.byId("next").setDisabled(true);
 		}
 		else {
-			api.textContent("admin_passbox", "");
+			install.textContent("admin_passbox", "");
 			dijit.byId("next").setDisabled(false);
 		}
 	}
