@@ -33,7 +33,6 @@ class package {
 		$info['installedFiles']=$ret;
 		return $info;
 	}
-	
 	function remove($package) {
 		global $Package;
 		$packages = $Package->filter("name", $package);
@@ -79,6 +78,20 @@ class package {
         }
     }
 	function _install_application($info, $path) {
+		package::_insert_application_meta($info);
+		$backendDir = $GLOBALS['path']."../apps/".$app->sysname;
+		if(is_dir($path."/files")) package::_recursive_copy($path."/backends", $backendDir);
+		$sysDir = $GLOBALS['path']."../desktop/dojotoolkit/desktop/apps/".$app->sysname;
+		if(is_dir($path."/".$app->sysname)) package::_recursive_copy($path."/".$app->sysname, $sysDir);
+		$appFile = $GLOBALS['path']."../desktop/dojotoolkit/desktop/apps/".$app->sysname.".js";
+		copy($path."/".$app->sysname.".js", $appFile);
+		return array(
+			"/apps/".$app->sysname,
+			"/desktop/dojotoolkit/desktop/apps/".$app->sysname,
+			"/desktop/dojotoolkit/desktop/apps/".$app->sysname.".js"
+		);
+	}
+	function _insert_application_meta($info) {
 		global $App;
 		$app = new $App();
 		$app->sysname = $info['sysname'];
@@ -91,17 +104,6 @@ class package {
 		$app->filetypes = $info['filetypes'];
 		if($info['icon']) $app->icon = $info['icon'];
 		$app->save();
-		$backendDir = $GLOBALS['path']."../apps/".$app->sysname;
-		if(is_dir($path."/files")) package::_recursive_copy($path."/backends", $backendDir);
-		$sysDir = $GLOBALS['path']."../desktop/dojotoolkit/desktop/apps/".$app->sysname;
-		if(is_dir($path."/".$app->sysname)) package::_recursive_copy($path."/".$app->sysname, $sysDir);
-		$appFile = $GLOBALS['path']."../desktop/dojotoolkit/desktop/apps/".$app->sysname.".js";
-		copy($path."/".$app->sysname.".js", $appFile);
-		return array(
-			"/apps/".$app->sysname,
-			"/desktop/dojotoolkit/desktop/apps/".$app->sysname,
-			"/desktop/dojotoolkit/desktop/apps/".$app->sysname.".js"
-		);
 	}
 	function _install_theme($info, $path) {
 		$newpath = $GLOBALS['path']."/../desktop/themes/".strtolower($info['name']);

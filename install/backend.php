@@ -156,10 +156,10 @@
 				continue;
 			}
 			else {
-			if(is_dir("./apps/" . $file)){
-				$result = package::install("./apps/".$file . "/", false);
-				$out->append("installing ".$file."...", ($result ? "...done" : "...error" ));
-				}
+				$content = file_get_contents("./apps/".$file);
+				$info = Zend_Json::decode($content);
+				$result = package::_insert_application_meta($info);
+				$out->append("installing ".$info['name']."...", "...done");
 			}
 		}
 	}
@@ -175,17 +175,6 @@
 			"../desktop/dojotoolkit/desktop/resources/themes/",
 			"../desktop/dojotoolkit/desktop/apps/"
 		);
-		/*$dir = opendir("../desktop/dojotoolkit/desktop/resources/themes/");
-		while(($file = readdir($dir)) !== false){
-			if($file{0} == '.'){
-				continue;
-			}
-			else {
-				if(is_dir("../desktop/dojotoolkit/desktop/resources/themes/" . $file)){
-					array_push($dirs, "../desktop/dojotoolkit/desktop/resources/themes/".$file);
-				}
-			}
-		}*/
 		$out = new jsonOutput();
 		foreach($dirs as $dir)
 		{
