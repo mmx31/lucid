@@ -150,13 +150,14 @@
 		$out->append("Establishing connection to database...", "...done");
 		$out->append("Initalizing application installer...", "...done");
 		$dir = opendir("./apps/");
+		import("lib.package");
 		while(($file = readdir($dir)) !== false){
 			if($file{0} == '.'){
 				continue;
 			}
 			else {
 				$content = file_get_contents("./apps/".$file);
-				$info = Zend_Json::parse($content);
+				$info = Zend_Json::decode($content);
 				$result = package::_insert_application_meta($info);
 				$out->append("installing ".$info['name']."...", "...done");
 			}
