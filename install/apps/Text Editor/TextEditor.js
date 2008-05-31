@@ -54,22 +54,15 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	        iconClass: "icon-16-actions-process-stop"
 	    }));
 	    this.window.addChild(toolbar);
-	    var box = new dijit.layout.ContentPane({
-	        layoutAlign: "client",
-			style: "overflow: hidden;"
-	    },
-	    document.createElement("div"));
 	    this.other = new dijit.layout.ContentPane({
 	        layoutAlign: "bottom"
 	    },
 	    document.createElement("div"));
-		this.editor = document.createElement("textarea");
-		dojo.style(this.editor, "width", "100%");
-		dojo.style(this.editor, "height", "100%");
-		dojo.style(this.editor, "border", "0px");
-	    box.setContent(this.editor);
+		this.editor = new desktop.apps.TextEditor.EditorWidget({
+			layoutAlign: "client"
+		});
 	    this.other.setContent(msg.noFileOpen);
-	    this.window.addChild(box);
+	    this.window.addChild(this.editor);
 	    this.window.addChild(this.other);
 	    this.window.show();
 	    this.window.startup();
@@ -79,8 +72,8 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	processNew: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
-	    this.editor.disabled = false;
-	    this.editor.value = "";
+	    this.editor.setDisabled(false);
+	    this.editor.setValue("");
 	    this.editing = false;
 	    this.fileEditing = "";
 	    this.newAs = true;
@@ -89,7 +82,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	},
 	processClose: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
-	    this.editor.disabled = true;
+	    this.editor.setDisabled(true);
 	    this.newAs = false;
 	    this.editing = false;
 	    this.fileEditing = "";
@@ -112,12 +105,12 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    this.other.setContent(msg.openingFile.replace("%s", path));
 	    this.newAs = true;
-	    this.editor.disabled = true;
+	    this.editor.setDisabled(true);
 	    api.filesystem.readFileContents(path, dojo.hitch(this, function(content) {
-            this.editor.value = content;
+			this.editor.setValue(content);
             this.editing = true;
             this.newAs = true;
-            this.editor.disabled = false;
+            this.editor.setDisabled(false);
             this.fileEditing = path;
             this.other.setContent(msg.editingFile.replace("%s", path));
         }));
@@ -127,7 +120,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	processSave: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (this.editing) {
-	        api.filesystem.writeFileContents(this.fileEditing, this.editor.value);
+	        api.filesystem.writeFileContents(this.fileEditing, this.editor.getValue());
 	        this.other.setContent(msg.fileSaved);
 	
 	    }
@@ -158,3 +151,17 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	
 	}
 })
+
+dojo.declare("desktop.apps.TextEditor.EditorWidget", [dijit._Widget, dijit._Templated], {
+	//just a dummy textarea widget
+	templateString: "<textarea style='border: 0px;'></textarea>",
+	setDisabled: function(d) {
+		this.domNode.disabled=d;
+	},
+	getValue: function() {
+		return this.domNode.value;
+	},
+	setValue: function(str) {
+		this.domNode.value = str;
+	}
+});

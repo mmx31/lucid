@@ -340,11 +340,8 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 					height: "100%",
 					plugins: "BlinkingCaret GoToLineDialog Bookmarks MatchingBrackets",
 					colorsUrl: dojo.moduleUrl("desktop.apps.KatanaIDE.data", "javascript_dojo_color.json"),
-					autocompleteUrl: dojo.moduleUrl("desktop.apps.KatanaIDE.data", "javascript_dojo_ac.json")
-				});
-				div.appendChild(editor.domNode);
-				
-				var cpane = new dijit.layout.ContentPane({
+					autocompleteUrl: dojo.moduleUrl("desktop.apps.KatanaIDE.data", "javascript_dojo_ac.json"),
+					
 					closable: true,
 					title: filename.substring(filename.lastIndexOf("/")+1) || filename,
 					ide_info: {
@@ -353,10 +350,8 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 						editor: editor
 					}
 				});
-				
-				cpane.setContent(div);
-				this.tabArea.addChild(cpane);
-				this.tabArea.selectChild(cpane);
+				this.tabArea.addChild(editor);
+				this.tabArea.selectChild(editor);
 				editor.startup();
 				if(content != "")
 					editor.massiveWrite(content);
