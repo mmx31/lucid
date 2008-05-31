@@ -36,7 +36,22 @@ if (!function_exists('mime_content_type')) {
 	}
 	else {
 		function mime_content_type($file) {
-			return false;
+			//Guess the mimetype based on extension
+			if(is_dir($file)) return "text/directory";
+			import("api.fs_mimetypes");
+			global $fs_mimetypes;
+			$info = pathinfo($filename);
+			$ext = $info['extension'];
+			foreach($fs_mimetypes as $key=>$value) {
+				if($ext == $key) return $value;
+				$exts = str_split($key, " ");
+				if(count($exts) > 0) {
+					foreach($exts as $check) {
+						if($ext == $check) return $value;
+					}
+				}
+			}
+			return "text/plain";
 		}
 	}
 }
