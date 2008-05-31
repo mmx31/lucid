@@ -31,6 +31,10 @@ dependencies ={
 			dependencies: ["desktop.apps.Checkers"]
 		},
 		{
+			name: "../desktop/apps/EmailClient.js",
+			dependencies: ["desktop.apps.EmailClient"]
+		},
+		{
 			name: "../desktop/apps/FeedReader.js",
 			dependencies: ["desktop.apps.FeedReader"]
 		},
