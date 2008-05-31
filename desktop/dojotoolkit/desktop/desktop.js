@@ -14,7 +14,6 @@ dojo.require("desktop.user");
 		"api.Registry",
 		"api.Filearea",
 		"api.filesystem",
-		"api.Mail",
 		"api.Sound",
 		"api.ui",
 		"api.Window",
