@@ -5,7 +5,6 @@ dojo.require("api.Console");
 dojo.require("api.crosstalk");
 dojo.require("api.Filearea");
 dojo.require("api.filesystem");
-dojo.require("api.Mail");
 dojo.require("api.Registry");
 dojo.require("api.Sound");
 dojo.require("api.ui");
