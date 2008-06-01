@@ -1,3 +1,5 @@
+dojo.provide("desktop.apps.AdminPanel._base");
+
 dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 	kill: function() {
 		if(!this.win.closed) { this.win.close(); }
