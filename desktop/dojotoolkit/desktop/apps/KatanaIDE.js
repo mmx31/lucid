@@ -219,7 +219,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 									type: "warning",
 									message: nf.alreadyExists
 								})
-								var defaultContent = "dojo.provide(\"desktop.apps."
+								var defaultContent = "dojo"+".provide(\"desktop.apps."
 									+fileOrig.substring(0, fileOrig.length-3)
 									.replace(".", "")
 									.replace("/", ".")
@@ -520,7 +520,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			maturity: "Alpha",
 			category: "Accessories"
 		}, info);
-		var defaultContent = "dojo.provide(\"desktop.apps."+info.sysname+"\");\r\n\r\n"
+		var defaultContent = "dojo"+".provide(\"desktop.apps."+info.sysname+"\");\r\n\r\n"
 								+"dojo.declare(\"desktop.apps."+info.sysname+"\", desktop.apps._App, {\r\n"
 								+"	init: function(args) {\r\n"
 								+"		/*Startup code goes here*/\r\n"

@@ -1795,7 +1795,7 @@ dojo.declare(
             for(var i = 0; i < plugins.length; i++){
                 try{
                     if(plugins[i]){
-                        dojo.require("desktop.apps.KatanaIDE._codeTextArea.plugins." + plugins[i]);
+                        dojo["require"]("desktop.apps.KatanaIDE._codeTextArea.plugins." + plugins[i]);
                         desktop.apps.KatanaIDE._codeTextArea.plugins[plugins[i]].startup({source:this});
                     }
                 }catch(error){
