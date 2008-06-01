@@ -1,0 +1,47 @@
+.dijit .dijitToggleButton .dijitCheckBoxIcon {
+	background-image: url('../images/checkmarkNoBorder.gif');
+}
+
+.dijit .dijitCheckBox,
+.dijit .dijitCheckBoxIcon		/* inside a toggle button */	{
+	background-image: url('../images/checkmark.gif'); /* checkbox sprite image */
+	background-repeat: no-repeat;
+	width: 16px;
+	height: 16px;
+	margin: 0;
+	padding: 0;
+}
+
+.dijit .dijitCheckBox,
+.dijit .dijitToggleButton .dijitCheckBoxIcon {
+	/* unchecked */
+	background-position: -16px;
+}
+
+.dijit .dijitCheckBoxChecked,
+.dijit .dijitToggleButtonChecked .dijitCheckBoxIcon {
+	/* checked */
+	background-position: 0px;
+}
+
+.dijit .dijitCheckBoxDisabled {
+	/* disabled */
+	background-position: -48px;
+}
+
+.dijit .dijitCheckBoxCheckedDisabled {
+	/* disabled but checked */
+	background-position: -32px;
+}
+
+.dijit .dijitCheckBoxHover,
+.dijit .dijitCheckBoxFocused {
+	/* hovering over an unchecked enabled checkbox */
+	background-position: -80px;
+}
+
+.dijit .dijitCheckBoxCheckedHover,
+.dijit .dijitCheckBoxCheckedFocused {
+	/* hovering over a checked enabled checkbox */
+	background-position: -64px;
+}

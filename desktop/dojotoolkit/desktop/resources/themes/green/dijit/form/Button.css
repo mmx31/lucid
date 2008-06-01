@@ -1,0 +1,113 @@
+
+/*****
+		dijit.form.Button
+		dijit.form.DropDownButton
+		dijit.form.ComboButton
+		dijit.form.ComboBox (partial)
+ *****/
+
+.dijit .dijitButtonNode {
+	/* enabled state - inner */
+	/* border:1px outset #a0a0a0; */
+	border:1px solid #c0c0c0;
+	border-bottom:1px solid #9b9b9b;
+	border-right:1px solid #9b9b9b;
+	padding: 0.2em;
+	background:#fff url("../images/buttonEnabled.png") repeat-x bottom left;
+}
+.dj_ie .dijit .dijitButtonNode {
+	zoom: 1;
+}
+
+.dijit .dijitButtonText {
+	padding: 0 0.3em;
+}
+
+.dijit .dijitComboBox .dijitButtonNode {
+	border: 0px;
+}
+
+.dijit .dijitArrowButton {
+	color: #111;
+}
+
+.dijit .dijitComboButton .dijitDownArrowButton {
+	padding-right:4px;
+}
+
+.dj_ff2 .dijit .dijitComboButton .dijitButtonContentsFocused,
+.dj_ff2 .dijit .dijitComboButton .dijitDownArrowButtonFocused {
+	border: 1px black dotted !important;
+}
+
+.dijit .dijitButtonDisabled .dijitButtonNode,
+.dijit .dijitToggleButtonDisabled .dijitButtonNode,
+.dijit .dijitDropDownButtonDisabled .dijitButtonNode,
+.dijit .dijitComboButtonDisabled .dijitButtonNode,
+.dijit .dijitComboBoxDisabled,
+.dijit .dijitSpinnerDisabled,
+.dijit .dijitSpinnerDisabled .dijitButtonNode {
+	/* disabled state - inner */
+	border-color: #d5d5d5 #bdbdbd #bdbdbd #d5d5d5;
+	/*color:#b4b4b4;*/
+	background:#e4e4e4 url("../images/buttonDisabled.png") top repeat-x;
+	opacity: 0.60; /* Safari, Opera and Mozilla */
+}
+.dj_ie .dijit .dijitButtonDisabled .dijitButtonNode *,
+.dj_ie .dijit .dijitToggleButtonDisabled .dijitButtonNode *,
+.dj_ie .dijit .dijitDropDownButtonDisabled .dijitButtonNode *,
+.dj_ie .dijit .dijitComboButtonDisabled .dijitButtonNode *,
+.dj_ie .dijit .dijitSpinnerDisabled .dijitButtonNode * {
+	filter: gray() alpha(opacity=50); /* IE */
+}
+
+.dijit .dijitButtonHover .dijitButtonNode,
+.dijit .dijitToggleButtonHover .dijitButtonNode,
+.dijit .dijitDropDownButtonHover .dijitButtonNode,
+.dijit .dijitComboButtonHover .dijitButtonContents,
+.dijit .dijitComboButtonDownArrowHover .dijitDownArrowButton,
+.dijit .dijitComboBoxHover .dijitDownArrowButton,
+.dijit .dijitSpinnerUpArrowHover .dijitUpArrowButton,
+.dijit .dijitSpinnerDownArrowHover .dijitDownArrowButton {
+	/* hover state - inner */
+	/* TODO: change from Hover to Selected so that button is still highlighted while drop down is being used */
+	border-color:#a5beda;
+	border-bottom-color:#5c7590;
+	border-right-color:#5c7590;
+	color:#000;
+	background:#fcfdff url("../images/buttonHover.png") repeat-x bottom;
+}
+
+.dijit .dijitSpinnerUpArrowActive .dijitUpArrowButton,
+.dijit .dijitSpinnerDownArrowActive .dijitDownArrowButton,
+.dijit .dijitButtonActive .dijitButtonNode,
+.dijit .dijitToggleButtonActive .dijitButtonNode,
+.dijit .dijitDropDownButtonActive .dijitButtonNode,
+.dijit .dijitComboButtonActive .dijitButtonContents,
+.dijit .dijitDownArrowActive .dijitDownArrowButton,
+.dijit .dijitComboBoxActive .dijitDownArrowButton {
+	/* active state - inner (for when you are pressing a normal button, or
+	 * when a toggle button is in a depressed state
+	 */
+	border-color:#366dba;
+	background: #ededed url("../images/buttonActive.png") bottom repeat-x;
+}
+
+
+
+.dijit .dijitArrowButtonInner {
+	background:url("../images/arrowDown.png") no-repeat center center;
+}
+.dijit .dijitUpArrowButton .dijitArrowButtonInner { background-image:url("../images/arrowUp.png"); }
+.dj_ie6 .dijit .dijitArrowButtonInner {
+	background-image:url("../images/arrowDown.gif");
+}
+.dj_ie6 .dijit .dijitUpArrowButton .dijitArrowButtonInner {
+	background-image:url("../images/arrowUp.gif");
+}
+.dijit .dijitComboBox .dijitArrowButton .dijitArrowButtonInner {
+	background:url("../images/comboArrowDown.gif") no-repeat center center;
+}
+.dijit .dijitComboBoxHover .dijitArrowButtonInner {
+	/* TODO: url("../images/arrowDownHover.png") but in IE6 it flickers some? */
+}
