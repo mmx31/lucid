@@ -140,7 +140,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 					onClick: dojo.hitch(this, "permDialog",
 						grid,
 						dojo.hitch(this, function(row){
-							this._userStore.getValue(row, "username");
+							return this._userStore.getValue(row, "username");
 						}),
 						dojo.hitch(this, function(row){
 							return dojo.fromJson(this._userStore.getValue(row, "permissions"));
