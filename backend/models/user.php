@@ -189,7 +189,7 @@
 				global $User;
 				global $Group;
 				$groups = $this->groups;
-				if($groups && !empty($groups)) {			//Groups found
+				if(is_array($groups) && !empty($groups)) {			//Groups found
 					$attempt = array();
 					foreach($groups as $groupName) {
 						$group = $Group->filter("name", $groupName);
