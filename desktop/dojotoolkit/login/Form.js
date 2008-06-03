@@ -21,6 +21,8 @@ dojo.declare("login.Form", dijit.form.Form, {
 	label: "Desktop Login",
 	postCreate: function() {
 		this.inherited(arguments);
+		this.windowActNew.setChecked(dojo.cookie("desktopWindowPref") != "current");
+		this.windowActCurrent.setChecked(dojo.cookie("desktopWindowPref") == "current");
 		if(this.preloadDesktop) {
 			var ontype = dojo.connect(this.domNode, "onkeydown", this, function() {
 				dojo.disconnect(ontype);

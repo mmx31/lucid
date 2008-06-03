@@ -171,6 +171,7 @@
 					));
 					die();
 				}
+				import("lib.Json.Json");
 				$args = array();
 				foreach(array(
 					"name",
@@ -182,6 +183,7 @@
 				) as $key) {
 					if(!isset($_POST[$key])) continue;
 					$args[$key] = $_POST[$key];
+					if($key == "permissions" || $key == "groups") $args[$key] = Zend_Json::decode($args[$key]);
 				}
 				$user = new $User($args);
 				$user->crypt_password();
