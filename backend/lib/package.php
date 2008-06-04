@@ -101,7 +101,8 @@ class package {
 		$app->version = $info['version'];
 		$app->maturity = $info['maturity'];
 		$app->category = $info['category'];
-		$app->filetypes = $info['filetypes'];
+		$app->filetypes = $info['filetypes'] ? $info['filetypes'] : array();
+		$app->permissions = $info['permissions'] ? $info['permissions'] : array();
 		if($info['icon']) $app->icon = $info['icon'];
 		$app->save();
 	}

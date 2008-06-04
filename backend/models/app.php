@@ -18,6 +18,7 @@
 		var $category = array('type' => "text");
 		var $icon = array('type' => "text");
 		var $filetypes = array('type' => "array");
+		var $permissions = array('type' => "array");
 	}
 	global $App;
 	$App = new App();
