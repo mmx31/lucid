@@ -367,10 +367,14 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	    }
 	},
 	refresh: function() {
-		/*this.feedStore.fetch({onItem: dojo.hitch(this, function(item) {
-			this.updateCount(item);
-		})})*/
-		this.fetchFeed(this.currentFeed);
+		this.feedStore.fetch({
+			query: {
+				url: "*"
+			},
+			onItem: dojo.hitch(this, function(item) {
+				this.updateCount(item, true);
+			})
+		})
 	},
 	
 	markAllRead: function() {
@@ -407,15 +411,15 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 				},
 				onComplete: function(items) {
 					store.setValue(item, "label", store.getValue(item, "title")+(items.length > 0 ? " ("+items.length+")" : ""))
-					store.save();
+					//store.save();
 				}
 			})
 		})
-		if(fetchFeed) this.fetchFeed(item, true, onComplete);
+		if(fetchFeed) this.fetchFeed(item, true); //fetchFeed will call updateCount
 		else onComplete();
 		
 	},
-	fetchFeed: function(item, noGrid, callback)
+	fetchFeed: function(item, noGrid)
 	{
 		var FEED_URL = this.feedStore.getValue(item, "url");
 		var url = FEED_URL;
@@ -488,8 +492,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 						change = true;
 					}),
 					onComplete: dojo.hitch(this, function() {
-						if((change || newHashes) || (change && newHashes)) this.hashStore.save();
-						if(callback) callback();
+						if(change || newHashes) this.hashStore.save();
 						this.updateCount(FEED_ITEM, false);
 					})
 				})
