@@ -7,5 +7,6 @@
 	"version": "1.0",
 	"maturity": "Stable",
 	"category": "Development",
-	"filetypes": []
+	"filetypes": [],
+	"permissions": ["core.app.write"]
 }

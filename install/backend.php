@@ -47,7 +47,7 @@
 				'initial' => false
 			),
 			array(
-				'name' => 'api.ide',
+				'name' => 'core.app.write',
 				'description' => 'Can develop applications',
 				'initial' => false
 			)
@@ -84,7 +84,7 @@
 		$user->quota = 0; //no quota
 		$user->crypt_password();
 		$user->add_permission("core.administration");
-		$user->add_permission("api.ide");
+		$user->add_permission("core.app.write");
 		$user->save();
 		$out->append("Writing admin username, password, and e-mail to database...", "...done");
 	}

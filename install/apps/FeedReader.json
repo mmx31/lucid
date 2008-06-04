@@ -8,5 +8,6 @@
 	"maturity": "Stable",
 	"category": "Internet",
 	"icon": "icon-16-apps-internet-news-reader",
-	"filetypes": []
+	"filetypes": [],
+	"permissions": ["api.xsite"]
 }

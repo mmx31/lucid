@@ -33,7 +33,7 @@
     if($_GET['section'] == "install")
 	{
 		$cur = $User->get_current();
-		if($_GET['action'] == "package" && $cur->has_permission("api.ide"))
+		if($_GET['action'] == "package" && $cur->has_permission("core.app.write"))
 		{
 			import("lib.package");
 			$out = new textareaOutput();	
@@ -76,6 +76,16 @@
 			$list = array();
 			foreach($p as $d => $v)
 			{
+				//check permission metadata
+				//if the user does not have the right permissions, skip it
+				if(!empty($v->permissions)) {
+					$continue = false;
+					$user = $User->get_current();
+					foreach($v->permissions as $perm) {
+						if(!$user->has_permission($perm)) $continue = true;
+					}
+					if($continue) continue;
+				}
 				$item = array();
 				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "icon", "filetypes") as $key) {
 					$item[$key] = $v->$key;
@@ -111,7 +121,7 @@
 		{
 			import("models.user");
 			$user = $User->get_current();
-			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
+			if(!$user->has_permission("core.app.write")) internal_error("permission_denied");
 			if(!isset($_POST['filename'])) {
 				$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
 				$p = $App->filter("sysname", $_POST['sysname']);
@@ -133,7 +143,7 @@
 		if($_GET['action'] == "createFolder") {
 			import("models.user");
 			$user = $User->get_current();
-			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
+			if(!$user->has_permission("core.app.write")) internal_error("permission_denied");
 			$_POST['dirname'] = str_replace("..", "", $_POST['dirname']);
 			mkdir($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['dirname'], 0777);
 			$out = new intOutput("ok");
@@ -154,7 +164,7 @@
 			
 			import("models.user");
 			$user = $User->get_current();
-			if(!$user->has_permission("api.ide")) internal_error("permission_denied");
+			if(!$user->has_permission("core.app.write")) internal_error("permission_denied");
 			if($_POST['sysname']) {
 				//delete the whole app
 				$app = $App->filter("sysname", $_POST['sysname']);
