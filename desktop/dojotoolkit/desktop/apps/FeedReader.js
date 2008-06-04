@@ -205,7 +205,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		if(!this.feedStore.isItem(e)) return;
 	    this.currentFeed = e;
 		if(this.feedStore.getValue(e, "category") === true) return;
-	    this.fetchFeed(this.feedStore.getValue(e, "url"));
+	    this.fetchFeed(e);
 	},
 	
 	removeFeed: function(t) {
@@ -370,7 +370,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		/*this.feedStore.fetch({onItem: dojo.hitch(this, function(item) {
 			this.updateCount(item);
 		})})*/
-		this.fetchFeed(this.feedStore.getValue(this.currentFeed, "url"));
+		this.fetchFeed(this.currentFeed);
 	},
 	
 	markAllRead: function() {
@@ -392,35 +392,43 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			}),
 			onComplete: dojo.hitch(this, function() {
 				this.grid.refresh();
+				this.updateCount(this.currentFeed, false);
 			})
 		});
 	},
 	
-	updateCount: function(item) {
-		/*var store = this.feedStore
-		api.xhr({
-	        url: store.getValue(item, "url"),
-	        preventCache: true,
-			xsite: true,
-	        load: function(data) {
-				var items = data.getElementsByTagName("item").length;
-				store.setValue(item, "label", store.getValue(item, "title")+(items > 0 ? " ("+items+")" : ""))
-			},
-	        handleAs: "xml"
-	
-	    });	*/
+	updateCount: function(item, fetchFeed) {
+		var store = this.feedStore;
+		var onComplete = dojo.hitch(this, function() {
+			this.hashStore.fetch({
+				query: {
+					feed: store.getValue(item, "url"),
+					read: false
+				},
+				onComplete: function(items) {
+					store.setValue(item, "label", store.getValue(item, "title")+(items.length > 0 ? " ("+items.length+")" : ""))
+				}
+			})
+		})
+		if(fetchFeed) this.fetchFeed(item, true, onComplete);
+		else onComplete();
+		
 	},
-	fetchFeed: function(url)
+	fetchFeed: function(item, noGrid, callback)
 	{
-		var FEED_URL = url;
-		this.gridStore.close();
-		this.gridStore = new dojo.data.ItemFileWriteStore({
-			data: {
-				identifier: "Title",
-				items: []
-			}
-		});
-		this.grid.setModel(new dojox.grid.data.DojoData(null, null, {store: this.gridStore, query: {Title: "*"}}));
+		var FEED_URL = this.feedStore.getValue(item, "url");
+		var url = FEED_URL;
+		var FEED_ITEM = item;
+		if(!noGrid) {
+			this.gridStore.close();
+			this.gridStore = new dojo.data.ItemFileWriteStore({
+				data: {
+					identifier: "Title",
+					items: []
+				}
+			});
+			this.grid.setModel(new dojox.grid.data.DojoData(null, null, {store: this.gridStore, query: {Title: "*"}}));
+		}
 	    api.xhr({
 	        url: url,
 	        preventCache: true,
@@ -447,7 +455,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 					this.hashStore.fetch({
 						query: {hash: hash},
 						onComplete: dojo.hitch(this, function(items) {
-							this.gridStore.newItem({
+							if(!noGrid) this.gridStore.newItem({
 								Read: !(items.length == 0 || !this.hashStore.getValue(items[0], "read")),
 								Title: title,
 								Content: content,
@@ -480,6 +488,8 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 					}),
 					onComplete: dojo.hitch(this, function() {
 						if((change || newHashes) || (change && newHashes)) this.hashStore.save();
+						if(callback) callback();
+						this.updateCount(FEED_ITEM, false);
 					})
 				})
 	        }),
@@ -510,6 +520,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			query: {Title: title},
 			onComplete: dojo.hitch(this, function(items) {
 				this.gridStore.setValue(items[0], "Read", true);
+				this.updateCount(this.currentFeed, false);
 			})
 		});
 		
