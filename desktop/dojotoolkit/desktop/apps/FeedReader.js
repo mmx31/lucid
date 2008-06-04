@@ -407,6 +407,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 				},
 				onComplete: function(items) {
 					store.setValue(item, "label", store.getValue(item, "title")+(items.length > 0 ? " ("+items.length+")" : ""))
+					store.save();
 				}
 			})
 		})
