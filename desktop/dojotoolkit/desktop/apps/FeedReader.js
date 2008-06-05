@@ -22,11 +22,12 @@ api.addDojoCss("dojox/grid/_grid/Grid.css");
 		
 dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	currentFeed: false,
+	feedCounter: {},
 	init: function(args)
 	{
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
-	
+		this.feedCounter = {};
 	    this.win = new api.Window({
 	        title: app["Feed Reader"],
 			iconClass: this.iconClass,
@@ -130,6 +131,18 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	
 	    });
 	    this.toolbar.addChild(button);
+		
+		var load = this.loadNode = document.createElement("div");
+		dojo.addClass(load, "icon-loading-indicator");
+		dojo.style(load, {
+			display: "none",
+			position: "absolute",
+			top: "0px",
+			right: "0px",
+			margin: "7px"
+		});
+		this.toolbar.domNode.appendChild(load);
+		
 	    this.win.addChild(this.toolbar);
 	
 	    this.hiddenBar = new dijit.layout.ContentPane({
@@ -138,7 +151,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	
 	    },
 	    document.createElement("div"));
-	
+		
 	    var client = new dijit.layout.SplitContainer({
 	        orientation: "horizontal",
 	        layoutAlign: "client"
@@ -163,7 +176,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	    });
 			this.gridStore = new dojo.data.ItemFileWriteStore({
 				data: {
-					identifier: "Title",
+					identifier: "Guid",
 					items: []
 				}
 			});
@@ -222,6 +235,9 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 				})
 			});
 		}
+		var name = this.feedStore.getValue(this.currentFeed, "title");
+		this.feedCounter[name] = 0;
+		this.fixWinTitle();
 		this.feedStore.deleteItem(this.currentFeed);
 		this.feedStore.save();
 	},
@@ -371,6 +387,9 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			query: {
 				url: "*"
 			},
+			queryOptions: {
+				deep: true
+			},
 			onItem: dojo.hitch(this, function(item) {
 				this.updateCount(item, true);
 			})
@@ -409,15 +428,25 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 					feed: store.getValue(item, "url"),
 					read: false
 				},
-				onComplete: function(items) {
+				onComplete: dojo.hitch(this, function(items) {
 					store.setValue(item, "label", store.getValue(item, "title")+(items.length > 0 ? " ("+items.length+")" : ""))
+					this.feedCounter[store.getValue(item, "title")] = items.length;
+					this.fixWinTitle();
 					//store.save();
-				}
+				})
 			})
 		})
-		if(fetchFeed) this.fetchFeed(item, true); //fetchFeed will call updateCount
+		if(fetchFeed) this.fetchFeed(item, true); //fetchFeed will call updateCount when it's done
 		else onComplete();
 		
+	},
+	fixWinTitle: function() {
+		var sum = 0;
+		for(var key in this.feedCounter) {
+			sum += this.feedCounter[key];
+		}
+		var app = dojo.i18n.getLocalization("desktop", "apps");
+		this.win.setTitle(app["Feed Reader"]+(sum > 0 ? " ("+sum+")" : ""));
 	},
 	fetchFeed: function(item, noGrid)
 	{
@@ -434,6 +463,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			});
 			this.grid.setModel(new dojox.grid.data.DojoData(null, null, {store: this.gridStore, query: {Title: "*"}}));
 		}
+		dojo.style(this.loadNode, "display", "block");
 	    api.xhr({
 	        url: url,
 	        preventCache: true,
@@ -466,7 +496,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 								Content: content,
 								Date: date.toString(),
 								Url: url,
-								Guid: guid
+								Guid: guid||title
 							});
 							if(items.length == 0) {
 								this.hashStore.newItem({
@@ -494,6 +524,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 					onComplete: dojo.hitch(this, function() {
 						if(change || newHashes) this.hashStore.save();
 						this.updateCount(FEED_ITEM, false);
+						dojo.style(this.loadNode, "display", "none");
 					})
 				})
 	        }),
