@@ -55,7 +55,6 @@
 }
 /******************** Console ********************/
 .console {
-	border: 1px solid gray;
 	background-color: black;
 	color: white;
 }

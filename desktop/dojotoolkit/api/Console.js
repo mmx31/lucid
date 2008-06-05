@@ -244,7 +244,7 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 	},
 	drawScreen: function() {
 		var text = this.stdout;
-		var doScroll = this.domNode.scrollHeight == this.domNode.scrollTop;
+		var doScroll = this.domNode.scrollHeight - this.domNode.offsetHeight == this.domNode.scrollTop;
 		if(this.appAttached === false) text += this.inputLine();
 		api.textContent(this.domNode, "");
 		dojo.forEach(text.split("\n"), function(val, i) {

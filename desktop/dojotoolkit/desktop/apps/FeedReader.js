@@ -563,7 +563,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		
 		this.grid.refresh();
 		
-		var text = "<div style='background-color: #eee; padding: 3px;'><a href='"+url+"'>" + title + "</a></div><div style='padding: 5px;'>" + content + "</div>";
+		var text = "<div style='background-color: #eee; padding: 10px;'><a href='"+url+"'>" + title + "</a></div><div style='padding: 5px;'>" + content + "</div>";
 		
 		this.contentArea.setContent(text);
 		dojo.query("a", this.contentArea.domNode).forEach(function(node) {
