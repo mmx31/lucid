@@ -211,6 +211,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	    this.win.show();
 	    this.win.startup();
 		this.refresh();
+		this.updateTimer = setInterval(dojo.hitch(this, "refresh"), 1000*60*5)
 	},
 	
 	changeFeeds: function(e)
@@ -381,6 +382,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	    if (typeof(this.win) != "undefined") {
 	        this.win.close();
 	    }
+		if(this.updateTimer) clearInterval(this.updateTimer);
 	},
 	refresh: function() {
 		this.feedStore.fetch({
