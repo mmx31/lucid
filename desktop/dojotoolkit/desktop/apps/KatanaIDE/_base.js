@@ -551,7 +551,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		var app = store.getValue(item, "appname");
 		var tac = this.tabArea.getChildren();
 		for(var i in tac) {
-			if(typeof tac[i] != "object") continue;
+			if(typeof tac[i].ide_info != "object") continue;
 			if(tac[i].ide_info.fileName == filename && tac[i].ide_info.appName == app) {
 				return this.tabArea.selectChild(tac[i]);
 			}
