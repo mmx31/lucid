@@ -46,6 +46,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		
 		var menu = this.menu = new dijit.Menu({});
 		menu.addChild(new dijit.MenuItem({label: nf.createFolder, iconClass: "icon-16-actions-folder-new", onClick: dojo.hitch(this, this._makeFolder)}));
+		menu.addChild(new dijit.MenuItem({label: nf.createLauncher, onClick: dojo.hitch(this, this._makeLauncher)}));
 		menu.addChild(new dijit.MenuItem({label: nf.createFile, iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, this._makeFile)}));
 		menu.addChild(new dijit.MenuSeparator({}));
 		menu.addChild(new dijit.MenuItem({label: cm.refresh, iconClass: "icon-16-actions-view-refresh", onClick: dojo.hitch(this, this.refresh)}));
@@ -246,6 +247,96 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 			})
 		});
 	},
+	_makeLauncher: function() {
+		var nf = dojo.i18n.getLocalization("api", "filearea");
+		var cm = dojo.i18n.getLocalization("desktop", "common");
+		var appNls = dojo.i18n.getLocalization("desktop", "apps");
+		var win = new api.Window({
+			title: nf.createLauncher,
+			width: "300px",
+			height: "200px"
+		});
+		var cpane = new dijit.layout.ContentPane({
+			layoutAlign: "client"
+		});
+		var div = document.createElement("div");
+		
+		var row0 = document.createElement("div");
+		api.textContent(row0, nf.name+": ");
+		var nameBox = new dijit.form.TextBox({});
+		row0.appendChild(nameBox.domNode);
+		div.appendChild(row0);
+		
+		var row1 = document.createElement("div");
+		api.textContent(row1, nf.application+": ");
+		var appItems = [];
+		dojo.forEach(desktop.app.appList, function(item) {
+			appItems.push({
+				label: appNls[item.name] || item.name,
+				value: item.sysname
+			});
+		})
+		var appBox = new dijit.form.FilteringSelect({
+			autoComplete: true,
+			searchAttr: "label",
+			store: new dojo.data.ItemFileReadStore({
+				data: {
+					identifier: "value",
+					items: appItems
+				}
+			})
+		});
+		row1.appendChild(appBox.domNode);
+		div.appendChild(row1);
+		
+		var row2 = document.createElement("div");
+		api.textContent(row2, nf.arguments+": ");
+		var argBox = new dijit.form.TextBox({});
+		row2.appendChild(argBox.domNode);
+		div.appendChild(row2);
+		cpane.setContent(div);
+		win.addChild(cpane);
+		
+		//make bottom part
+		
+		var cpane = new dijit.layout.ContentPane({
+			layoutAlign: "bottom"
+		});
+		var div = document.createElement("div");
+		dojo.style(div, "cssFloat", "right");
+		var cancelButton = new dijit.form.Button({
+			label: cm.cancel,
+			onClick: dojo.hitch(win, "close")
+		});
+		div.appendChild(cancelButton.domNode);
+		var okButton = new dijit.form.Button({
+			label: cm.ok,
+			onClick: dojo.hitch(this, function() {
+				win.close();
+				var name = nameBox.getValue();
+				var app = appBox.getValue();
+				var args = {};
+				dojo.forEach(argBox.getValue().split("--"), function(text) {
+					var parsedArg = dojo.trim(text).split("=");
+					if(parsedArg[0])
+						args[parsedArg[0]] = parsedArg[1] || true;
+				});
+				api.filesystem.writeFileContents(
+					this.path+this._fixDuplicateFilename(name+".desktop", "text/plain"),
+					app+"\n"+dojo.toJson(args),
+					dojo.hitch(this, function() {
+						dojo.publish("filearea:"+this.path, [this.id]);
+						this.refresh();
+					})
+				);
+			})
+		});
+		div.appendChild(okButton.domNode);
+		cpane.setContent(div);
+		win.addChild(cpane);
+		
+		win.show();
+	},
 	_makeFile: function() {
 		//	summary:
 		//		Makes a file in the current dir
@@ -313,17 +404,15 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				var p = name.lastIndexOf(".");
 				var ext = name.substring(p+1, name.length);
 				var icon = desktop.config.filesystem.icons[ext.toLowerCase()];
-				if(desktop.config.filesystem.hideExt && item.type!="text/directory" && p != -1) {
-					var label = name.substring(0, p-1);
-				}
 				var wid = new api.Filearea._Icon({
-					label: label || name,
+					label: name,
 					name: name,
 					path: item.path,
 					type: item.type,
 					iconClass: (item.type=="text/directory" ? "icon-32-places-folder" : (icon || "icon-32-mimetypes-text-x-generic"))
 				});
 				this.addChild(wid);
+				wid.startup();
 			}, this);
 			//invoke a layout so that everything is positioned correctly
 			this.layout();
@@ -652,8 +741,9 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 	_formatLabel: function(name) {
 		var p = name.lastIndexOf(".");
 		var ext = name.substring(p+1, name.length);
-		if(desktop.config.filesystem.hideExt && this.type!="text/directory" && p != -1) {
-			var label = name.substring(0, p-1);
+		if((desktop.config.filesystem.hideExt && this.type != "text/directory" && p != -1)
+		|| ext == "desktop") {
+			var label = name.substring(0, p);
 		}
 		return label || name;
 	},
@@ -731,7 +821,8 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 		dojo.removeClass(this.iconNode, "fileIconSelected");
 	},
 	startup: function() {
-		return this.fixStyle();
+		this.label = this._formatLabel(this.label);
+		this.fixStyle();
 	},
 	fixStyle: function() {
 		if(!this.getParent().textShadow) {

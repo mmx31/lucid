@@ -1,6 +1,10 @@
 ({
 	"createFolder": "Crear Carpeta",
 	"createFile": "Crear Archivo",
+	"createLauncher": "Crear Lanzador",
+	"application": "Solicitud",
+	"arguments": "Alegaciones",
+	"name": "Nombre",
 	"createFolderText": "Introduzca el nuevo nombre de carpeta.",
 	"createFileText": "Introduzca el nuevo nombre del archivo.",
 	"asFile": "como archivo",
