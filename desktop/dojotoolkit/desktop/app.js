@@ -66,8 +66,8 @@ desktop.app = {
 			var l = file.lastIndexOf(".");
 			var ext = file.substring(l + 1, file.length);
 			if (ext == "desktop") {
-				api.filesystem.readFileContents(file, dojo.hitch(this, function(file){
-					var c = file.contents.split("\n");
+				api.filesystem.readFileContents(file, dojo.hitch(this, function(content){
+					var c = content.split("\n");
 					desktop.app.launch(c[0], dojo.fromJson(c[1]));
 				}));
 				return;

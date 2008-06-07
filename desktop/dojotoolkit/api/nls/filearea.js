@@ -1,6 +1,10 @@
 ({
 	"createFolder": "Create Folder",
 	"createFile": "Create File",
+	"createLauncher": "Create Launcher",
+	"application": "Application",
+	"arguments": "Arguments",
+	"name": "Name",
 	"createFolderText": "Enter the new folder's name.",
 	"createFileText": "Enter the new file's name.",
 	"asFile": "As File",
