@@ -32,7 +32,7 @@ a {
 	font-weight: bold;
 	margin-bottom: 10px;
 }
-#psychdesktop_login {
+.mainBox {
 	text-align: center;
 	background-color: white;
 	margin: 0px;
