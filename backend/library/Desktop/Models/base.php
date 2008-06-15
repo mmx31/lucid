@@ -74,7 +74,7 @@
 		}
 		function _connect() {
 			if(!$this->_link) {
-				$config = new Zend_Config_Xml(CONFIG_PATH);
+				$config = new Zend_Config(require CONFIG_PATH);
 				$this->_link = Zend_Db::factory($config->database);
 			}
 		}
@@ -243,7 +243,8 @@
 		function _get_tablename()
 		{
 			$tablename=strtolower(get_class($this));
-			$db_prefix = $GLOBALS['db']['prefix'];
+			$config = new Zend_Config(require CONFIG_PATH);
+			$db_prefix = $config->database->prefix;
 			return $db_prefix . $tablename;
 		}
 		function _makeModel($line)

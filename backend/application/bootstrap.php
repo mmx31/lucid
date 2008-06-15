@@ -1,6 +1,6 @@
 <?php 
 
-define("CONFIG_PATH", dirname(__FILE__)."/../../configuration.xml");
+define("CONFIG_PATH", dirname(dirname(__FILE__))."/configuration.php");
 
 error_reporting(E_ALL | E_STRICT);  
 ini_set('display_startup_errors', 1);  

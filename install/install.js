@@ -103,20 +103,8 @@ install = new function() {
 			{
 				dijit.byId("next").setDisabled(false);
 			}
-			else if(form.db_url != "")
-				dijit.byId("next").setDisabled(false);
 			else
 				dijit.byId("next").setDisabled(true);
-		}
-	}
-	this.fixurlStr = function(e)
-	{
-		if(typeof e != "object") var e = {target: {id: ""}};
-		if (e.target.id != "urlstr") {
-			var p = dijit.byId("form").getValues();
-			dijit.byId("urlstr").setValue(
-				p.db_type+"://"+(p.db_type == "sqlite" ? "/" : "")+(p.db_username ? p.db_username+(p.db_password ? ":"+p.db_password : "")+"@" : "") + p.db_host + (p.db_type == "sqlite" ? "?mode=666" : "") + (p.db_name ? "/" + p.db_name : "")
-			);
 		}
 	}
 	this.getPerms = function()
@@ -366,8 +354,12 @@ install = new function() {
 		dojo.xhrPost({
 				url: "./backend.php?action=installdatabase",
 				content: {
-					db_url: form.db_url,
+					db_type: form.db_type,
+					db_host: form.db_host,
+					db_name: form.db_name,
 					db_prefix: form.db_prefix,
+					db_username: form.db_username,
+					db_password: form.db_password,
 					conf_public: form.conf_public,
 					conf_throttle: form.conf_throttle
 				},

@@ -91,8 +91,12 @@
 	if($act == "installdatabase")
 	{
 		$out = new jsonOutput();
-		$db_url = addslashes($_POST['db_url']);
+		$db_type = addslashes($_POST['db_type']);
+		$db_host = addslashes($_POST['db_host']);
+		$db_name = addslashes($_POST['db_name']);
 		$db_prefix = addslashes($_POST['db_prefix']);
+		$db_username = addslashes($_POST['db_username']);
+		$db_password = addslashes($_POST['db_password']);
 		$conf_public = $_POST['conf_public'];
 		$conf_throttle = $_POST['conf_throttle'];
 		$out->append("Parsing form values...", "...done");
@@ -106,15 +110,23 @@
 		}    
 		$conf_secretword = bin2hex( md5($code, TRUE) );
 		$out->append("Generating encryption hash...", "...done");
-		$writebuffer  = "<" . "?php\n";
-		$writebuffer .= "\t$" . "GLOBALS['db'] = Array(\n";
-		$writebuffer .= "\t\t\"database\" => \"" . $db_url. "\",\n";
-		$writebuffer .= "\t\t\"prefix\" => \"". $db_prefix . "\"\n";
-		$writebuffer .= "\t);\n";
-		$writebuffer .= "\t$" . "GLOBALS['conf'] = Array(\n";
-		$writebuffer .= "\t\t\"salt\" => \"" . $conf_secretword . "\",\n";
-		$writebuffer .= "\t\t\"public\" => " . ($conf_public == "true" ? "true" : "false") . ",\n";
-		$writebuffer .= "\t\t\"crosstalkThrottle\" => " . ($conf_throttle == "true" ? "true" : "false") . "\n";
+		$writebuffer  = "<?php\n";
+		$writebuffer .= "\treturn array(\n";
+		$writebuffer .= "\t\tdatabase => array(\n";
+		$writebuffer .= "\t\t\t'adapter' => '".$db_type."',\n";
+		$writebuffer .= "\t\t\t'params' => array(\n";
+		$writebuffer .= "\t\t\t\t'host' => '".$db_host."',\n";
+		$writebuffer .= "\t\t\t\t'dbname' => '".$db_name."',\n";
+		$writebuffer .= "\t\t\t\t'username' => '".$db_username."',\n";
+		$writebuffer .= "\t\t\t\t'password' => '".$db_password."'\n";
+		$writebuffer .= "\t\t\t),\n";
+		$writebuffer .= "\t\t\t'prefix' => ''\n";
+		$writebuffer .= "\t\t),\n";
+		$writebuffer .= "\t\tconfiguration => array(\n";
+		$writebuffer .= "\t\t\t'salt' => '".$conf_secretword."',\n";
+		$writebuffer .= "\t\t\t'public' => ".($conf_public == "true" ? "true" : "false").",\n";
+		$writebuffer .= "\t\t\t'crosstalkThrottle' => ".($conf_throttle == "true" ? "true" : "false")."\n";
+		$writebuffer .= "\t\t)\n";
 		$writebuffer .= "\t);\n";
 		if (is_writable("../backend/configuration.php")) {
 	        $handle = fopen("../backend/configuration.php", 'w');
