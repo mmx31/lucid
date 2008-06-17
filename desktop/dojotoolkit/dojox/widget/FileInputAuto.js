@@ -98,7 +98,7 @@ dojo.declare("dojox.widget.FileInputAuto",
 		dojo.body().appendChild(_newForm);
 	
 		dojo.io.iframe.send({
-			url: this.url+"?name="+this.name,
+			url: this.url,
 			form: _newForm,
 			handleAs: "json",
 			handle: dojo.hitch(this,"_handleSend")
