@@ -21,6 +21,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 	},
 	kill: function() {
 		if(!this.wallWin.closed) this.wallWin.close();
+		desktop.config.save();
 	},
 	_wallpaper: function() {
 		//	summary:
