@@ -262,6 +262,15 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		path = path.split("://");
 		while(path[1].indexOf("//") != -1)
 			path[1] = path[1].replace("//", "/");
+		if(path[1].indexOf("..") != -1) {
+			var parts = ("/"+path[1]).split("/");
+			for(var i in parts) {
+				if(parts[i] != "..") continue;
+				if(!parts[i-1]) parts.splice(i, 1);
+				parts.splice(i-1, 2);
+			}
+			path[1] = parts.join("/");
+		}
 		path = path.join("://");
 		return path;
 	},
