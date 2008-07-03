@@ -50,53 +50,53 @@ class FileFs extends BaseFs {
 		
 	function _getSize($directory) //works for files and folders
 	{
-	$size = 0;
-	if(substr($directory,-1) == '/')
-	{
-		$directory = substr($directory,0,-1);
-	}
-	if(!file_exists($directory) || !is_dir($directory) || !is_readable($directory))
-	{
-		return filesize($directory);
-	}
-	if($handle = opendir($directory))
-	{
-		while(($file = readdir($handle)) !== false)
+		$size = 0;
+		if(substr($directory,-1) == '/')
 		{
-			$path = $directory.'/'.$file;
-			if($file != '.' && $file != '..')
+			$directory = substr($directory,0,-1);
+		}
+		if(!file_exists($directory) || !is_dir($directory) || !is_readable($directory))
+		{
+			return filesize($directory);
+		}
+		if($handle = opendir($directory))
+		{
+			while(($file = readdir($handle)) !== false)
 			{
-				if(is_file($path))
+				$path = $directory.'/'.$file;
+				if($file != '.' && $file != '..')
 				{
-					$size += filesize($path);
-				}elseif(is_dir($path))
-				{
-					$handlesize = $this->_getSize($path);
-					if($handlesize >= 0)
+					if(is_file($path))
 					{
-						$size += $handlesize;
-					}else{
-						return -1;
+						$size += filesize($path);
+					}elseif(is_dir($path))
+					{
+						$handlesize = $this->_getSize($path);
+						if($handlesize >= 0)
+						{
+							$size += $handlesize;
+						}else{
+							return -1;
+						}
 					}
 				}
 			}
+			closedir($handle);
 		}
-		closedir($handle);
-	}
-	if($format == TRUE)
-	{
-		if($size / 1048576 > 1)
+		if($format == TRUE)
 		{
-			return round($size / 1048576, 1).' MB';
-		}elseif($size / 1024 > 1)
-		{
-			return round($size / 1024, 1).' KB';
+			if($size / 1048576 > 1)
+			{
+				return round($size / 1048576, 1).' MB';
+			}elseif($size / 1024 > 1)
+			{
+				return round($size / 1024, 1).' KB';
+			}else{
+				return round($size, 1).' bytes';
+			}
 		}else{
-			return round($size, 1).' bytes';
+			return $size;
 		}
-	}else{
-		return $size;
-	}
 	} 
 	function _getFileInfo($file, $realPath=false) {
 		$r = array();
