@@ -8,7 +8,17 @@ class Desktop_VFS {
 		return $module;
 	}
 	public function copy($source, $destination) {
-		$module = self::getModule($source);
-		
+		$smodule = self::getModule($source);
+		$dmodule = self::getModule($destination);
+		$smodule = new $smodule;
+		$dmodule = new $dmodule;
+		$sFile = $smodule->fopen($source, "r");
+		$dFile = $dmodule->fopen($source, "w");
+		while(!$smodule->feof($sFile)) {
+			$c = $smodule->fread($sFile);
+			$dmodule->fwrite($c);
+		}
+		$smodule->fclose($sFile);
+		$dmodule->fclose($dFile);
 	}
 }

@@ -4,7 +4,9 @@ class Desktop_VFS_Modules_File extends Desktop_VFS_Modules_Base {
 	protected function getRealPath($path) {
 		//TODO: insert the username when that section is finished
 		$installPath = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
-		return $installPath."/files/".$user;
+		$user = "a";
+		$path = explode("://", 2);
+		return $installPath."/files/".$user."/".$path[1];
 	}
 	public function fopen($filename, $mode) {
 		return array(
