@@ -21,11 +21,27 @@ if (get_magic_quotes_gpc())
 		$_GET[$key] = stripslashes($value);
 	}
 }
- 
+//setup autoloading of classes
 set_include_path('library' . PATH_SEPARATOR . get_include_path());  
  
 require_once "Zend/Loader.php"; 
 Zend_Loader::registerAutoload();
+
+//initiate session management
+Zend_Session::start();
+$defaultNamespace = new Zend_Session_Namespace("desktop");
+
+if (!isset($defaultNamespace->initialized)) {
+    Zend_Session::regenerateId();
+    $defaultNamespace->initialized = true;
+}
+//set username for the session
+if(isset($defaultNamespace->username))
+	Desktop_User::set($defaultNamespace->username);
+//TODO: Make sure Zend_Session::writeClose() is called before loading any 3rd party app scripts to prevent session poisoning
+//TODO: Also, make sure it's impossible for an app to get the current session ID!
+
+//start the controllers
 
 $frontController = Zend_Controller_Front::getInstance(); 
 $frontController->throwExceptions(true); 
