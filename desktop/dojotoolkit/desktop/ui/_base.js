@@ -20,6 +20,7 @@ dojo.require("dojo.cookie");
 dojo.require("desktop.ui._appletMoveable");
 dojo.require("desktop.ui.Area");
 dojo.require("desktop.ui.Applet");
+dojo.require("desktop.ui.Credits");
 dojo.require("desktop.ui.Panel");
 dojo.require("desktop.ui.applets.Clock");
 dojo.require("desktop.ui.applets.Menu");
