@@ -1,5 +1,4 @@
 dojo.provide("desktop.connection");
-dojo.require("dojo.rpc.JsonService");
 
 desktop.connection = {
 	//	summary:

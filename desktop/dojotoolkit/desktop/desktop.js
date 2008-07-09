@@ -3,6 +3,8 @@ dojo.require("api._base");
 dojo.require("desktop.admin");
 dojo.require("desktop.app");
 dojo.require("desktop.config");
+dojo.require("desktop.connection");
+dojo.require("desktop.rpc");
 dojo.require("desktop.theme");
 dojo.require("desktop.ui");
 dojo.require("desktop.user");
