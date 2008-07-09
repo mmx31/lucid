@@ -2,6 +2,10 @@ dojo.provide("desktop.connection");
 dojo.require("dojo.rpc.JsonService");
 
 desktop.connection = {
+	//	summary:
+	//		The desktop's connection manager manages server connections made by the APIs, and apps. It makes sure that
+	//		an XHR using long-polling does not cause a short XHR to wait for that long-poll to finish. In other words,
+	//		if a short XHR is made while a long-poll is open, the long-poll is closed, allowing the short XHR to be handled.
 	_connections: [],
 	init: function() {
 		//TODO: create dojo.rpc.JsonService classes for each backend
@@ -17,6 +21,29 @@ desktop.connection = {
 		//		long -	used for connections that stay open until new data is on the server (also known as long-polling).
 		//				If "long" is used while interacting with the user (for example, a chat program), you should add an errback
 		//				just in case the connection has to be closed for a "short" request.
+		//	example:
+		//		making a short server ping
+		//		|	var df = dojo.xhrPost({
+		//		|		url: "/foo/bar.php",
+		//		|		load: function(data) { console.log(data) }
+		//		|	});
+		//		|	desktop.connection.notify(df, "short");
+		//		a request using long-polling
+		//		|	function longPoll() {
+		//		|		var df = dojo.xhrPost({
+		//		|			url: "/foo/longpoll.php",
+		//		|			load: function(data) {
+		//		|				console.info("New data from server: "+data);
+		//		|				longPoll();
+		//		|			},
+		//		|			error: function() {
+		//		|				console.error("Connection was closed for a short request. Reconnecting...");
+		//		|				longPoll();
+		//		|			}
+		//		|		});
+		//		|		desktop.connection.notify(df, "long");
+		//		|	}
+		//		|	longPoll();
 		if(type == "short") {
 			//check for any long polls, and cancel them
 			dojo.forEach(this._connections, function(pointer) {
