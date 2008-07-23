@@ -2,9 +2,20 @@
 	"__META__": {
 		"charset": "utf8"
 	},
-	"App": {
+	"Apps": {
 		"id": {"type": "int", "length": 11, "primaryKey": true},
 		"sysname": {"type": "varchar", "length": 128},
-		"name": {"type": "varchar", "length": 128}
+		"name": {"type": "varchar", "length": 128},
+		"author": {"type": "varchar", "length": 128},
+		"email": {"type": "varchar", "length": 128},
+		"website": {"type": "varchar", "length": 128},
+		"version": {"type": "varchar", "length": 128},
+		"category": {"type": "varchar", "length": 128},
+		"icon": {"type": "varchar", "length": 128},
+		"filetypes": {"type": "text"},
+		"permissions": {"type": "text"}
+	},
+	"Groups": {
+		"id": {"type": "int", "length": 11, "primaryKey": true}
 	}
 }

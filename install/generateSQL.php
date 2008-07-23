@@ -25,13 +25,14 @@
 										$properties["default"],
 										$properties["null"],
 										$properties["key"],
-										$properties["primarykey"]);
+										$properties["primaryKey"]);
 			}
 			$sql .= ")";
 			//TODO: set the charset/collate
 		}
 		private function makeField($name, $type, $length, $default=null, $null=false, $key=false, $pk=false) {
 			//TODO: change the type depending on the database backend used
+			//TODO: support AUTO_INCREMENT, on sqlite it's AUTOINCREMENT
 			$type = strtoupper($type);
 			return self::$_db->quoteIdentifier($name)." ".$type."(".$length.")"
 					. ($null ? " NULL" : " NOT NULL") . ($default ? " DEFAULT ".self::$_db->quote($default) : "")
