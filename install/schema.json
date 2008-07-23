@@ -1,0 +1,10 @@
+{
+	"__META__": {
+		"charset": "utf8"
+	},
+	"App": {
+		"id": {"type": "int", "length": 11, "primaryKey": true},
+		"sysname": {"type": "varchar", "length": 128},
+		"name": {"type": "varchar", "length": 128}
+	}
+}
