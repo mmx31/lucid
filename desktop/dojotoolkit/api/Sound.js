@@ -1,7 +1,16 @@
-dojo.require("dijit._Widget");
 dojo.provide("api.Sound");
+dojo.require("dojox.flash");
 
-dojo.declare("api.Sound", dijit._Widget, {
+if (dojox.flash.info.capable == true) {
+	dojox.flash.addLoadedListener(function() {
+		console.log("js:flash loaded");
+	});
+	dojox.flash.Embed.prototype.width = 1;
+	dojox.flash.Embed.prototype.height = 1;
+	dojox.flash.setSwf(dojo.moduleUrl("api.sound", "objManager.swf"), false);
+}
+
+dojo.declare("api.Sound", null, {
 	//	summary:
 	//		An API that allows an app to play audio content.
 	//		Abstracts between HTML5 audio tags, flash-based audio, and embed tags
@@ -97,7 +106,6 @@ dojo.declare("api.Sound", dijit._Widget, {
 	},
 	uninitialize: function() {
 		this.backend.uninitialize();
-		document.body.removeChild(this.domNode);
 	}
 });
 
@@ -106,9 +114,6 @@ dojo.declare("api.Sound._backend", null, {
 	//		The base sound backend class
 	//		Most of these properties are repeated in api.Sound, see that for more info
 	id: "",
-	//	domNode: domNode
-	//	A domNode that things like embed elements can be added to
-	domNode: null,
 	src: "",
 	loop: false,
 	autoStart: false,
@@ -259,7 +264,7 @@ dojo.declare("api.Sound.embed", api.Sound._backend, {
 		pause: false,
 		stop: true,
 		duration: false,
-		position: true,
+		position: true, //emulated
 		volume: false,
 		id3: false
 	},
@@ -282,5 +287,13 @@ dojo.declare("api.Sound.embed", api.Sound._backend, {
 	uninitialize: function() {
 		clearInterval(this.timer);
 		this.stop();
+		document.body.removeChild(this.domNode);
+	},
+	startup: function() {
+		this.domNode = document.createElement("div");
+		this.domNode.style.position="absolute";
+		this.domNode.style.left="-999px";
+		this.domNode.style.top="-999px";
+		document.body.appendChild(this.domNode);
 	}
 });

@@ -1,6 +1,5 @@
 dojo.provide("api._base");
 
-dojo.require("api.flash.flash");
 dojo.require("api.Console");
 dojo.require("api.crosstalk");
 dojo.require("api.Filearea");
