@@ -7,7 +7,7 @@ if (dojox.flash.info.capable == true) {
 	});
 	dojox.flash.Embed.prototype.width = 1;
 	dojox.flash.Embed.prototype.height = 1;
-	dojox.flash.setSwf(dojo.moduleUrl("api.sound", "objManager.swf"), false);
+	dojox.flash.setSwf(dojo.moduleUrl("api.sound", "objManager.swf")+"", false);
 }
 
 dojo.declare("api.Sound", null, {
@@ -35,11 +35,8 @@ dojo.declare("api.Sound", null, {
 		id3: true
 	},
 	backend: null,
-	postCreate: function() {
-		this.domNode.style.position="absolute";
-		this.domNode.style.left="-999px";
-		this.domNode.style.top="-999px";
-		document.body.appendChild(this.domNode);
+	constructor: function(params) {
+		dojo.mixin(this, params);
 		var backends = ["html", "flash", "embed"];
 		for(var k in backends) {
 			var i = backends[k];
