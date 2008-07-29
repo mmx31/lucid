@@ -35,7 +35,7 @@ dojo.declare("api.Sound", null, {
 		id3: true
 	},
 	backend: null,
-	constructor: function(params) {
+	constructor: function(/*Object*/params) {
 		dojo.mixin(this, params);
 		var backends = ["html", "flash", "embed"];
 		for(var k in backends) {
@@ -101,7 +101,7 @@ dojo.declare("api.Sound", null, {
 		//	summary:
 		//		Returns id3 information (if available)
 	},
-	uninitialize: function() {
+	destroy: function() {
 		this.backend.uninitialize();
 	}
 });
