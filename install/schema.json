@@ -1,9 +1,6 @@
 {
-	"__META__": {
-		"charset": "utf8"
-	},
 	"Apps": {
-		"id": {"type": "int", "length": 11, "primaryKey": true},
+		"id": {"type": "identifier"},
 		"sysname": {"type": "varchar", "length": 128},
 		"name": {"type": "varchar", "length": 128},
 		"author": {"type": "varchar", "length": 128},

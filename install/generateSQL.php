@@ -1,41 +1,42 @@
 <?php
     class sqlSchema {
 		var $_db;
-		public function __construct($schemaFile, $db) {
+		var $utilClass;
+		public function __construct($schemaFile, $driver, $db) {
 			//bootstrap
 			self::$_db = $db;
+			self::$utilClass = self::getZendClass($driver);
+			//read file
 			$fileContents = file_get_contents($schemaFile);
 			$schema = Zend_Json::decode($fileContents);
-			
-			//get the metadata, such as charset
-			$charset = $schema['__META__']['charset'];
-			unset($schema['__META__']);
 			
 			//make each table
 			foreach($schema as $table => $fields) {
 				self::makeTable($table, $fields, $charset);
 			}
 		}
-		private function makeTable($name, $fields, $charset) {
-			$sql = "CREATE TABLE ".self::$_db->quoteIdentifier($name)." (";
-			foreach($fields as $name => $properties) {
-				$sql .= self::makeField($name,
-										$properties["type"],
-										$properties["length"],
-										$properties["default"],
-										$properties["null"],
-										$properties["key"],
-										$properties["primaryKey"]);
-			}
-			$sql .= ")";
-			//TODO: set the charset/collate
+		private function getZendClass($driver) {
+			self::$_dbDriver = $driver;
+			$utilClass = "Zend_Db_TestUtil_{$driver}";
+			require_once "./sql/".str_replace("_", "/", $driver).".php";
+			$p= new $utilClass();
+			$p->setAdapter(self::$_db);
+			return $p;
 		}
-		private function makeField($name, $type, $length, $default=null, $null=false, $key=false, $pk=false) {
-			//TODO: change the type depending on the database backend used
-			//TODO: support AUTO_INCREMENT, on sqlite it's AUTOINCREMENT
-			$type = strtoupper($type);
-			return self::$_db->quoteIdentifier($name)." ".$type."(".$length.")"
-					. ($null ? " NULL" : " NOT NULL") . ($default ? " DEFAULT ".self::$_db->quote($default) : "")
-					. ($key && !$pk ? " UNIQUE KEY" : "") . ($pk && !$key ? " PRIMARY KEY" : "");
+		private function makeTable($name, $fields, $charset) {
+			$driver = self::$_dbDriver;
+			if($driver == "Db2"
+			|| $driver == "Pdo_Oci"
+			|| $driver == "Pdo_Pgsql") {
+				self::$utilClass->createSequence($name."_seq");
+			}
+			$outFields = array();
+			foreach($fields as $field => $value) {
+				$outFields[$field] = self::$utilClass->getSqlType(strtoupper($value["type"])).
+									 ($value["length"] ? "(".$value["length"].")" : "").
+									 ($value["null"] ? "" : "NOT NULL").
+									 ($value["references"] ? "REFERENCES ".self::$_db->quoteIdentifier($value["references"])." (\"id\")" : "");
+			}
+			self::$utilClass->createTable($name, $fields);
 		}
     }
