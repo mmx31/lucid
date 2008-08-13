@@ -7,6 +7,7 @@
 	"version": "1.0",
 	"maturity": "Stable",
 	"category": "Development",
+	"icon": "katana.png",
 	"filetypes": [],
 	"permissions": ["core.app.write"]
 }
