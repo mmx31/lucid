@@ -9,6 +9,7 @@
 
 require("../lib/includes.php");
 import("models.user");
+import("models.auth");
 import("lib.Json.Json");
 $user = $User->get_current();
 
@@ -23,7 +24,47 @@ if($user->has_permission("api.xsite"))
 	$p = new HTTP_Request($url, $reqArgs);
 	$p->setMethod(HTTP_REQUEST_METHOD_GET);
 	if(isset($params["authinfo"])) {
-		$p->addHeader('Authorization', 'Basic ' . $params["authinfo"]);
+		$auth = $params["authinfo"];
+		$server = array();
+		preg_match('(^(?:[^/]+://)?([^/:]+))', $url, $server);
+		if(array_key_exists($auth, "password")) {
+			//create/update the entry in the DB
+			$entries = $Auth->filter(array(
+				appid => $params["appid"],
+				server => $server[1],
+				username => $auth["username"],
+				userid => $user->id
+			));
+			if(!$entries)
+			{
+				//create
+				$entry = new $Auth(array(
+					appid => $params["appid"],
+					server => $server[1],
+					username => $auth["username"],
+					userid => $user->id,
+					password => $auth["password"],
+				));
+			}
+			else {
+				//update
+				$entry = $entries[0];
+				$entry->password = $auth["password"];
+			}
+			$entry->save();
+		}
+		else {
+			//fetch password from the db
+			$entries = $Auth->filter(array(
+				appid => $params["appid"],
+				server => $server[1],
+				username => $auth["username"],
+				userid => $user->id
+			));
+			$entry = $entries[0];
+			$auth["password"] = $entry->password;
+		}
+		$p->addHeader('Authorization', 'Basic ' . base64_encode($auth["username"].":".$auth["password"]));
 	}
 	//	required for some ajax apis
 	$p->addHeader("Referer", "http://".$_SERVER['SERVER_NAME']."/");

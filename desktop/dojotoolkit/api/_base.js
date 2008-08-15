@@ -9,7 +9,6 @@ dojo.require("api.Registry");
 dojo.require("api.Sound");
 dojo.require("api.ui");
 dojo.require("api.Window");
-dojo.require("dojox.encoding.base64");
 
 api.xhr = function(/*dojo.__ioArgs|String*/args) {
 	//	summary:
@@ -42,12 +41,7 @@ api.xhr = function(/*dojo.__ioArgs|String*/args) {
 			url: args.url
 		}
 		if(args.auth) {
-			var b = [];
-			var s = args.auth.username + ":" + args.auth.password;
-			for(var i = 0; i < s.length; ++i){
-				b.push(s.charCodeAt(i));
-			}
-			xsiteArgs.authinfo = dojox.encoding.base64.encode(b);
+			xsiteArgs.authinfo = dojo.clone(args.auth);
 		}
 		args.content["DESKTOP_XSITE_PARAMS"] = dojo.toJson(xsiteArgs);
 		delete args.auth;

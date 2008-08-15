@@ -3,7 +3,6 @@ dojo.require("dijit.form.Button");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.Dialog");
 dojo.require("dijit.form.Textarea");
-dojo.require("dojox.encoding.crypto.Blowfish");
 dojo.require("dojox.validate.web");
 dojo.requireLocalization("desktop.ui", "accountInfo");
 dojo.requireLocalization("desktop", "common");
@@ -21,8 +20,6 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 		this.inherited("postCreate", arguments);
 	},
 	startup: function() {
-		if(!this.settings.key)
-			this.settings.key = dojox.encoding.crypto.Blowfish.encrypt(Math.random(), Math.random());
 		if(!this.settings.username)
 			this.drawLoginForm();
 		else
@@ -73,8 +70,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 		}
 		else {
 			var authInfo = {
-				username: dojox.encoding.crypto.Blowfish.decrypt(this.settings.username, this.settings.key),
-				password: dojox.encoding.crypto.Blowfish.decrypt(this.settings.password, this.settings.key)
+				username: this.settings.username
 			}
 		}
 		this.timer = setTimeout(dojo.hitch(this, "getInfo"), 1000*60*5);
@@ -90,8 +86,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 	drawInfo: function(data) {
 		if(!this.settings.username) {
 			this.settings = dojo.mixin(this.settings, {
-				username: dojox.encoding.crypto.Blowfish.encrypt(this.loginUi.username.getValue(), this.settings.key),
-				password: dojox.encoding.crypto.Blowfish.encrypt(this.loginUi.password.getValue(), this.settings.key)
+				username: this.loginUi.username.getValue()
 			});
 			this.loginUi.username.setValue("");
 			this.loginUi.password.setValue("");
@@ -192,8 +187,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 				status: string
 			},
 			auth: {
-				username: dojox.encoding.crypto.Blowfish.decrypt(this.settings.username, this.settings.key),
-				password: dojox.encoding.crypto.Blowfish.decrypt(this.settings.password, this.settings.key)
+				username: this.settings.username,
 			},
 			load: dojo.hitch(this, function() {
 				this.textbox.setValue("");
