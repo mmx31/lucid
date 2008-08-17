@@ -11,6 +11,7 @@ require("../lib/includes.php");
 import("models.user");
 import("models.auth");
 import("lib.Json.Json");
+import("lib.Blowfish");
 $user = $User->get_current();
 
 if($user->has_permission("api.xsite"))
@@ -35,6 +36,10 @@ if($user->has_permission("api.xsite"))
 				username => $auth["username"],
 				userid => $user->id
 			));
+			//get encryption stuff going
+			$blowfish = Crypt_Blowfish::factory("ebc");
+			$blowfish->setKey($GLOBALS['conf']['salt']);
+			
 			if(!$entries)
 			{
 				//create
@@ -43,13 +48,13 @@ if($user->has_permission("api.xsite"))
 					server => $server[1],
 					username => $auth["username"],
 					userid => $user->id,
-					password => $auth["password"],
+					password => $blowfish->encrypt($auth["password"]),
 				));
 			}
 			else {
 				//update
 				$entry = $entries[0];
-				$entry->password = $auth["password"];
+				$entry->password = $blowfish->encrypt($auth["password"]);
 			}
 			$entry->save();
 		}
@@ -62,8 +67,12 @@ if($user->has_permission("api.xsite"))
 				userid => $user->id
 			));
 			$entry = $entries[0];
-			$auth["password"] = $entry->password;
+			$blowfish = Crypt_Blowfish::factory("ebc");
+			$blowfish->setKey($GLOBALS['conf']['salt']);
+			$auth["password"] = trim($blowfish->decrypt($entry->password));
 		}
+		// I wish API devs wouldn't be lazy, and support digest auth.
+		// That way we wouldn't have to use a two-way encryption algorythm
 		$p->addHeader('Authorization', 'Basic ' . base64_encode($auth["username"].":".$auth["password"]));
 	}
 	//	required for some ajax apis
