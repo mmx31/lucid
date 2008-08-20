@@ -88,6 +88,9 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	//		Set to true when the window is in the middle of a minimize animation.
 	//		This is to prevent a bug where the size is captured mid-animation and restores weird.
 	_minimizeAnim: false,
+	attributeMap: {
+		title: {node: "titleNode", type: "innerHTML" }
+	},
 	postCreate: function() {
 		dojo.setSelectable(this.titleNode, false);
 		this.domNode.title="";
@@ -175,7 +178,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			dojo.style(this.dragContainerNode, "display", "block");
 		}
 	},
-	setTitle: function(/*String*/title) {
+	_setTitleAttr: function(/*String*/title) {
 		//	summary:
 		//		Sets window title after window creation
 		//	title:
@@ -183,6 +186,11 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		this.titleNode.innerHTML = title;
 		desktop.ui._windowList.setValue(this._winListItem, "label", title);
 		this.title = title;
+	},
+	setTitle: function(/*String*/title) {
+		if(dojo.version.major >= 1 && dojo.version.minor >= 2)
+			dojo.deprecated("window.setTitle", "setTitle is deprecated. Please use dojo.attr(\"title\", \"value\");", "1.1");
+		return this._setTitleAttr(title);
 	},
 	_getPoints: function(/*Object*/box) {
 		//	summary:
