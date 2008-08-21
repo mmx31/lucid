@@ -42,7 +42,12 @@ function import($module) {
 	$module = explode(".", $module);
 	$path = implode(DIRECTORY_SEPARATOR, $module);
 	$file = $GLOBALS['path'] . $path . ".php";
-	return @include_once($file);
+	try {
+		return @include_once($file);
+	}
+	catch(Exception $e) {
+		return false;
+	}
 }
 //sessions and cookies
 function get_basepath() {

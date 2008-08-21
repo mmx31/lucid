@@ -28,7 +28,7 @@
 /**
  * Required PEAR package(s)
  */
-import("lib.PEAR");
+//import("lib.PEAR");
 
 /**
  * Engine choice constants
@@ -48,7 +48,6 @@ define('CRYPT_BLOWFISH_MCRYPT', 2);
  * @since 1.1.0
  */
 define('CRYPT_BLOWFISH_PHP',    3);
-
 
 /**
  * Example using the factory method in CBC mode

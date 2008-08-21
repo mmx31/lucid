@@ -52,7 +52,7 @@
  * @author      Lukas Smith <smith@pooteeweet.org>
  */
 
-require_once $GLOBALS['path'] . "lib" . DIRECTORY_SEPARATOR . 'PEAR.php';
+import("lib.PEAR");
 
 // {{{ Error constants
 
