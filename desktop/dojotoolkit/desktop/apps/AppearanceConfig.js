@@ -10,7 +10,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
-		var tabs = new dijit.layout.TabContainer({layoutAlign: "client"});
+		var tabs = new dijit.layout.TabContainer({region: "center"});
 		var themes = this._themes(); //so we can get any theme wallpaper first
 		tabs.addChild(this._wallpaper());
 		tabs.addChild(themes);
@@ -25,10 +25,10 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 	},
 	_wallpaper: function() {
 		//	summary:
-		//		Creates a layoutContainer with wallpaper configuration UI and returns it
+		//		Creates a BorderContainer with wallpaper configuration UI and returns it
 		var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
-		var wallpaper = new dijit.layout.LayoutContainer({title: l.wallpaper});
-		var c = new dijit.layout.ContentPane({layoutAlign: "client"});
+		var wallpaper = new dijit.layout.BorderContainer({title: l.wallpaper});
+		var c = new dijit.layout.ContentPane({region: "center"});
 		var cbody = document.createElement("div");
 		dojo.style(cbody, "width", "100%");
 		dojo.style(cbody, "height", "100%");
@@ -139,7 +139,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 				win.close();
 			}
 		});*/
-		var p = new dijit.layout.ContentPane({layoutAlign: "bottom"});
+		var p = new dijit.layout.ContentPane({region: "bottom"});
 		var body = document.createElement("div");
 		dojo.forEach([colorButton.domNode, styleLabel, styleButton.domNode, addButton.domNode, removeButton.domNode/*, closeButton.domNode*/], function(c) {
 			dojo.addClass(c, "dijitInline");
@@ -154,8 +154,8 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 		//	summary:
 		//		generates a theme configuration pane and returns it
 		var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
-		var p = new dijit.layout.LayoutContainer({title: l.theme});
-		var m = new dijit.layout.ContentPane({layoutAlign: "client"});
+		var p = new dijit.layout.BorderContainer({title: l.theme});
+		var m = new dijit.layout.ContentPane({region: "center"});
 		var area = document.createElement("div");
 		var makeThumb = function(item) {
 			var p = document.createElement("div");

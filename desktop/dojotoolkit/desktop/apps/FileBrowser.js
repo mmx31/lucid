@@ -24,9 +24,8 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
-			this.client = new dijit.layout.SplitContainer({layoutAlign: "client"});
-			this.fileArea = new api.Filearea({path: (args.path || "file://"), sizeShare: 70})
-			this.pane = new dijit.layout.ContentPane({sizeMin: 0, sizeShare: 30});
+			this.fileArea = new api.Filearea({path: (args.path || "file://"), region: "center"})
+			this.pane = new dijit.layout.ContentPane({region: "left", splitter: true, minSize: 120, style: "width: 120px;"});
 			var menu = new dijit.Menu({
 				style: "width: 100%;"
 			});
@@ -38,10 +37,10 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 				menu.addChild(item);
 			}, this);
 			this.pane.setContent(menu.domNode);
-			this.client.addChild(this.pane);
-			this.client.addChild(this.fileArea);
+			this.win.addChild(this.pane);
+			this.win.addChild(this.fileArea);
 			
-			this.pathbar = new dijit.Toolbar({layoutAlign: "top"});
+			this.pathbar = new dijit.Toolbar({region: "center"});
 			this.pathbox = new dijit.form.TextBox({
 				style: "width: 90%;",
 				value: args.path || "file://"
@@ -59,7 +58,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 			this.pathbar.addChild(this.goButton);
 			
 			
-		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
+		this.toolbar = new dijit.Toolbar({region: "top"});
 			var button = new dijit.form.Button({
 				onClick: dojo.hitch(this.fileArea, function() {
 					this.setPath("file://");
@@ -103,11 +102,17 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 			dojo.connect(this.fileArea, "_loadEnd", this, function() {
 				dojo.style(load, "display", "none");
 			});
-			
-		this.win.addChild(this.toolbar);
-		this.win.addChild(this.pathbar);
-		this.win.addChild(this.client);
+		
+		var bCont = new dijit.layout.BorderContainer({
+			region: "top",
+			style: "height: 60px;"	//This is really fucked up, since themes may use different heights for toolbars.
+									//If BorderContainer ever supports more then one widget in one slot, please fix this.
+		})
+		bCont.addChild(this.toolbar);
+		bCont.addChild(this.pathbar);
+		this.win.addChild(bCont);
 		this.win.show();
+		bCont.startup();
 		this.win.startup();
 		this.win.onDestroy = dojo.hitch(this, this.kill);
 		this.fileArea.refresh();
@@ -131,7 +136,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		});
 		this.windows.push(win);
 		var cpane = new dijit.layout.ContentPane({
-			layoutAlign: "client",
+			region: "center",
 			style: "padding: 10px;"
 		});
 		var div = document.createElement("div");
@@ -142,7 +147,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		
 		
 		var bpane = new dijit.layout.ContentPane({
-			layoutAlign: "bottom"
+			region: "bottom"
 		});
 		var div = document.createElement("div");
 		var button = new dijit.form.Button({

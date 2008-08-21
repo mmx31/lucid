@@ -35,7 +35,7 @@ body {
 }
 
 
-.wizard {
+#wizard {
 	border: 1px solid #9b9b9b;
 	background-color: white;
 	padding: 20px;

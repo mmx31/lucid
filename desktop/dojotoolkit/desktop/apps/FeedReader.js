@@ -103,7 +103,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			}
 		});
 	    this.toolbar = new dijit.Toolbar({
-	        layoutAlign: "top"
+	        region: "top"
 	    });
 	    var button = new dijit.form.Button({
 	        label: cm.refresh,
@@ -146,19 +146,16 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	    this.win.addChild(this.toolbar);
 	
 	    this.hiddenBar = new dijit.layout.ContentPane({
-	        layoutAlign: "bottom",
+	        region: "bottom",
 	        style: "display: none; height: 0px;"
 	
 	    },
 	    document.createElement("div"));
 		
-	    var client = new dijit.layout.SplitContainer({
-	        orientation: "horizontal",
-	        layoutAlign: "client"
-	    });
-		
 	    this.left = new dijit.Tree({
 			store: this.feedStore,
+			region: "left",
+			splitter: true,
 			query: {category: true},
 			getIconClass: function(item){
 				if(item != null && this.model.store.hasAttribute(item, "iconClass"))
@@ -167,12 +164,11 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	    });
 		dojo.connect(this.left, "onClick", this, "changeFeeds");
 	    this.left.startup();
-	    client.addChild(this.left);
+	    this.win.addChild(this.left);
 	
-	    this.right = new dijit.layout.SplitContainer({
-	        minsize: 50,
-	        sizeShare: 30,
-			orientation: "vertical"
+	    this.right = new dijit.layout.BorderContainer({
+	        minSize: 50,
+			region: "center"
 	    });
 			this.gridStore = new dojo.data.ItemFileWriteStore({
 				data: {
@@ -201,12 +197,19 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 				})
 			})
 			dojo.connect(grid, "onRowClick", this, "showItem");
-			this.right.addChild(grid);
-			var cpane = this.contentArea = new dijit.layout.ContentPane({});
+			var gridPane = new dijit.layout.ContentPane({region: "center"});
+			var div = document.createElement("div");
+			div.appendChild(grid.domNode);
+			gridPane.setContent(grid.domNode);
+			this.right.addChild(gridPane);
+			//this.right.addChild(grid);
+			this.right.startup(); //hack
+			var cpane = this.contentArea = new dijit.layout.ContentPane({region: "bottom", style: "height: 200px;", splitter: true});
+			cpane.setContent("noop");
 			this.right.addChild(cpane);
-	    client.addChild(this.right);
+			this.right.layout();
+	    this.win.addChild(this.right);
 	
-	    this.win.addChild(client);
 	    this.win.onClose = dojo.hitch(this, this.kill);
 	    this.win.show();
 	    this.win.startup();

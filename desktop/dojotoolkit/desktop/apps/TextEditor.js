@@ -26,7 +26,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	        onClose: dojo.hitch(this, "kill")
 	    });
 	    var toolbar = new dijit.Toolbar({
-	        layoutAlign: "top"
+	        region: "top"
 	    });
 	    toolbar.addChild(new dijit.form.Button({
 	        label: cm["new"],
@@ -55,11 +55,11 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    }));
 	    this.window.addChild(toolbar);
 	    this.other = new dijit.layout.ContentPane({
-	        layoutAlign: "bottom"
+	        region: "bottom"
 	    },
 	    document.createElement("div"));
 		this.editor = new desktop.apps.TextEditor.EditorWidget({
-			layoutAlign: "client"
+			region: "center"
 		});
 	    this.other.setContent(msg.noFileOpen);
 	    this.window.addChild(this.editor);

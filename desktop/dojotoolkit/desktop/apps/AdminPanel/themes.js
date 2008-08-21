@@ -85,7 +85,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			height: "200px"
 		});
 		this.windows.push(win);
-		var main = new dijit.layout.ContentPane({layoutAlign: "client"});
+		var main = new dijit.layout.ContentPane({region: "center"});
 		var div = document.createElement("div");
 		dojo.addClass(div, "tundra");
 		div.innerHTML = sys.installThemeInstructions;
@@ -105,7 +105,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 		div.appendChild(uploader.domNode);
 		main.setContent(div);
 		win.addChild(main);
-		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
+		var bottom = new dijit.layout.ContentPane({region: "bottom"});
 			var cont = document.createElement("div");
 			var close = new dijit.form.Button({
 				label: cmn.close,

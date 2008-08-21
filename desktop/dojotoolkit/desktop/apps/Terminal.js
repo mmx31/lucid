@@ -11,7 +11,7 @@ dojo.declare("desktop.apps.Terminal", desktop.apps._App, {
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
-		this.term = new api.Console({layoutAlign: "client", path: (args.path || "/")})
+		this.term = new api.Console({region: "center", path: (args.path || "/")})
 		var killMyself = dojo.hitch(this, "kill");
 		this.term.aliases.exit = function(params){
 			killMyself();

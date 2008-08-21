@@ -29,11 +29,11 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 	    });
 	    //var layout = new dijit.layout.LayoutContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
 	    this.main = new dijit.layout.ContentPane({
-	        layoutAlign: "client"
+	        region: "center"
 	    },
 	    document.createElement("div"));
 	    //layout.addChild(this.main);
-	    //this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
+	    //this.toolbar = new dijit.Toolbar({region: "top"});
 	    //layout.addChild(this.toolbar);
 	    this.win.addChild(this.main);
 	    this.win.show();

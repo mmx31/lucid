@@ -101,7 +101,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				this.propertiesWin = false;
 			})
 		});
-		var client = new dijit.layout.ContentPane({layoutAlign: "client", style: "padding: 5px;"});
+		var client = new dijit.layout.ContentPane({region: "center", style: "padding: 5px;"});
 		var div = document.createElement("div");
 		var rows = {
 			width: {
@@ -153,7 +153,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 		};
 		client.setContent(new dijit.form.Form({}, div).domNode);
 		win.addChild(client);
-		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom", style: "height: 40px;"});
+		var bottom = new dijit.layout.ContentPane({region: "bottom", style: "height: 40px;"});
 		var button = new dijit.form.Button({label: c.close});
 		bottom.setContent(button.domNode);
 		win.addChild(bottom);
@@ -179,7 +179,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				this.window = false;
 			})
 		});
-		var client = new dijit.layout.ContentPane({layoutAlign: "client", style: "border: 1px solid black;"});
+		var client = new dijit.layout.ContentPane({region: "center", style: "border: 1px solid black;"});
 		this.addDialogSelected = "";
 		this.addDialogIcons = [];
 		var div = document.createElement("div");
@@ -225,7 +225,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				this.addDialogSelected = c.name;
 			});
 		}, this);
-		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom", style: "height: 40px;"});
+		var bottom = new dijit.layout.ContentPane({region: "bottom", style: "height: 40px;"});
 		var button = new dijit.form.Button({label: l.addToPanel, style: "float: right;"});
 		bottom.setContent(button.domNode);
 		win.addChild(bottom);

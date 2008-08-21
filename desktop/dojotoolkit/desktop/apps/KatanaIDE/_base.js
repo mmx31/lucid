@@ -28,11 +28,8 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			}
 		});
 		
-		var client = new dijit.layout.SplitContainer({
-			layoutAlign: "client"
-		});
 		var right = this.tabArea = new dijit.layout.TabContainer({
-			sizeShare: 70
+			region: "center"
 		});
 		dojo.connect(right, "selectChild", this, function(wid) {
 			if(!wid.ide_info) return;
@@ -75,8 +72,8 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			var left = new dijit.Tree({
 				store: appStore,
 				query: {category: "*"},
-				sizeMin: 0,
-				sizeShare: 30,
+				region: "left",
+				splitter: true,
 				style: "overflow: auto;",
 				getIconClass: dojo.hitch(appStore, function(item, opened){
 					if(item && this.hasAttribute(item, "sysname")) return "icon-16-categories-applications-other";
@@ -86,12 +83,11 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			})
 			this.makeMenu(left);
 			dojo.connect(left, "onClick", this, "onItem");
-			client.addChild(left);
-			client.addChild(right);
+			this.win.addChild(left);
+			this.win.addChild(right);
 		}));
 		
-		this.win.addChild(client);
-		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
+		this.toolbar = new dijit.Toolbar({region: "top"});
 			this.toolbar.addChild(new dijit.form.Button({label: cm["new"], iconClass: "icon-16-actions-document-new", onClick: dojo.hitch(this, "newApp", 1)}));
 			this.toolbar.addChild(new dijit.form.Button({label: cm.save, iconClass: "icon-16-actions-document-save", onClick: dojo.hitch(this, "save")}));
 			this.toolbar.addChild(new dijit.form.DropDownButton({label: cm.metadata, iconClass: "icon-16-actions-document-properties", dropDown: this._makeMetaDialog()}));
@@ -445,7 +441,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		});
 		this.windows.push(win);
 		var cpane = new dijit.layout.ContentPane({
-			layoutAlign: "client",
+			region: "center",
 			style: "padding: 5px;"
 		});
 		var div = document.createElement("div");

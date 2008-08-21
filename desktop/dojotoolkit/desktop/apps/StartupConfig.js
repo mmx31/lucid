@@ -15,7 +15,7 @@ dojo.declare("desktop.apps.StartupConfig", desktop.apps._App, {
 			height: "300px"
 		});
 		var cpane = new dijit.layout.ContentPane({
-			layoutAlign: "client",
+			region: "center",
 			style: "overflow-y: auto; padding: 5px;"
 		});
 		var div = document.createElement("div");
@@ -43,6 +43,7 @@ dojo.declare("desktop.apps.StartupConfig", desktop.apps._App, {
 		cpane.setContent(div);
 		win.addChild(cpane);
 		win.show();
+		win.startup();
 	},
 	saveConfig: function() {
 		var config = [];

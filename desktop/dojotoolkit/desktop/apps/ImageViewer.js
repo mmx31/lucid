@@ -18,7 +18,7 @@ dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
-		var toolbar = new dijit.Toolbar({layoutAlign: "top"});
+		var toolbar = new dijit.Toolbar({region: "top"});
 		dojo.forEach([
 			{
 				label: cm.open,
@@ -34,7 +34,7 @@ dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
 			toolbar.addChild(new dijit.form.Button(a));
 		});
 		this.win.addChild(toolbar);
-		this.dragPane = new dojox.layout.DragPane({layoutAlign: "client", style: "overflow: scroll;"});
+		this.dragPane = new dojox.layout.DragPane({region: "center", style: "overflow: scroll;"});
 		this.win.addChild(this.dragPane);
 		this.win.show();
 		this.win.startup();

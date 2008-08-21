@@ -1,11 +1,11 @@
 dojo.provide("api.Window");
 dojo.require("dojox.layout.ResizeHandle");
 dojo.require("dojo.dnd.move");
-dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dojox.fx.easing");
 dojo.require("dijit._Templated");
+dojo.require("dijit.layout.BorderContainer");
 
-dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
+dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 	//	summary:
 	//		The window widget
 	//	example:
@@ -30,6 +30,9 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	//	iconClass: String?
 	//		the class to give the icon node
 	iconClass: "",
+	//	liveSplitters: Boolean
+	//		specifies whether splitters resize as you drag (true) or only upon mouseup (false)
+	liveSplitters: false,
 	onClose: function() {
 		//	summary:
 		//		What to do on destroying of the window
@@ -88,9 +91,6 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	//		Set to true when the window is in the middle of a minimize animation.
 	//		This is to prevent a bug where the size is captured mid-animation and restores weird.
 	_minimizeAnim: false,
-	attributeMap: {
-		title: {node: "titleNode", type: "innerHTML" }
-	},
 	postCreate: function() {
 		dojo.setSelectable(this.titleNode, false);
 		this.domNode.title="";
@@ -118,6 +118,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 		}
 		this.connect(window,'onresize',"_onResize");
 		this.bringToFront();
+		this.inherited(arguments);
 	},
 	show: function()
 	{
@@ -255,7 +256,6 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 			this.left = pos.x;
 			this.top = pos.y;
 			var win = this.domNode;
-			console.log("test");
 			this._width = dojo.style(win, "width");
 			this._height = dojo.style(win, "height");
 			var taskbar = dijit.byNode(dojo.query(".desktopTaskbarApplet")[0].parentNode);
@@ -560,8 +560,13 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	},
 	layout: function(){
 		//	summary:
-		//		Layout the widge
-		dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());
+		//		Layout the widgets
+		
+		//hack so we don't have to deal with BorderContainer's method using this.domNode
+		var oldNode = this.domNode;
+		this.domNode = this.containerNode;
+		this.inherited(arguments);
+		this.domNode = oldNode;
 	},
 	addChild: function(/*Widget*/ child, /*Integer?*/ insertIndex){
 		//	summary:
@@ -606,14 +611,7 @@ dojo.declare("api.Window", [dijit.layout._LayoutWidget, dijit._Templated], {
 	startup: function() {
 		//	summary:
 		//		starts the widget up
-		this.inherited("startup", arguments);
+		this.inherited(arguments);
 		this.resize();
 	}
-});
-
-dojo.extend(dijit._Widget, {
-	// layoutAlign: String
-	//		"none", "left", "right", "bottom", "top", and "client".
-	//		See the LayoutContainer description for details on this parameter.
-	layoutAlign: 'none'
 });

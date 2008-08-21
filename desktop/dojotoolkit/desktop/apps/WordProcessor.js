@@ -27,7 +27,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	        onClose: dojo.hitch(this, this.kill)
 	    });
 	    var toolbar = new dijit.Toolbar({
-	        layoutAlign: "top"
+	        region: "top"
 	    });
 	    toolbar.addChild(new dijit.form.Button({
 	        label: cm["new"],
@@ -56,17 +56,17 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    }));
 	    this.window.addChild(toolbar);
 	    var box = new dijit.layout.ContentPane({
-	        layoutAlign: "client"
+	        region: "center"
 	    },
 	    document.createElement("div"));
 	    this.other = new dijit.layout.ContentPane({
-	        layoutAlign: "bottom",
+	        region: "bottom",
 			style: "padding: 2px;"
 	    },
 	    document.createElement("div"));
 	    this.other.setContent(msg.noFileOpen);
 	    this.window.addChild(this.other);
-	    var editor = this.editor = new dijit.Editor({layoutAlign: "client"}, document.body.appendChild(document.createElement("div")));
+	    var editor = this.editor = new dijit.Editor({region: "center"}, document.body.appendChild(document.createElement("div")));
 		editor.startup();
 		this.window.addChild(editor);
 	    this.window.show();

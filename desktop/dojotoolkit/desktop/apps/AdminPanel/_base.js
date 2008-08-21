@@ -16,10 +16,15 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 		this.win = new api.Window({
 			title: app["Administration Panel"],
 			iconClass: this.iconClass,
-			onClose: dojo.hitch(this, "kill")
+			onClose: dojo.hitch(this, "kill"),
+			design: "sidebar"
 		});
-		var split = new dijit.layout.SplitContainer({sizerWidth: 7, orientation: "horizontal", layoutAlign: "client"});
-		var pane = new dijit.layout.ContentPane({sizeMin: 10, sizeShare: 20}, document.createElement("div"));
+		var pane = new dijit.layout.ContentPane({
+			minSize: 120,
+			style: "width: 120px;",
+			region: "left",
+			splitter: true
+		});
 			var menu = new dijit.Menu({});
 			menu.domNode.style.width="100%";
 				var item = new dijit.MenuItem({label: sys.home,
@@ -51,14 +56,11 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 			       onClick: dojo.hitch(this, this.themes)});
 				menu.addChild(item);
 			pane.setContent(menu.domNode);
-		split.addChild(pane);
-		var layout = new dijit.layout.LayoutContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
-		this.main = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
-		layout.addChild(this.main);
-		this.toolbar = new dijit.Toolbar({layoutAlign: "top"});
-		layout.addChild(this.toolbar);
-		split.addChild(layout);
-		this.win.addChild(split);
+		this.win.addChild(pane);
+		this.main = new dijit.layout.ContentPane({region: "center"}, document.createElement("div"));
+		this.win.addChild(this.main);
+		this.toolbar = new dijit.Toolbar({region: "top"});
+		this.win.addChild(this.toolbar);
 		this.win.show();
 		this.win.startup();
 		this.win.onClose = dojo.hitch(this, this.kill);
@@ -86,7 +88,7 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 			title: sys.permsFor.replace("%s", lbl(row))
 		});
 		this.windows.push(win);
-		var main = new dijit.layout.ContentPane({layoutAlign: "client"});
+		var main = new dijit.layout.ContentPane({region: "center"});
 		var tab = document.createElement("table");
 		dojo.style(tab, "width", "100%");
 		dojo.style(tab, "height", "100%");
@@ -135,7 +137,7 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 			}, this);
 			main.setContent(tab);
 			win.addChild(main);
-			var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
+			var bottom = new dijit.layout.ContentPane({region: "bottom"});
 			var cont = document.createElement("div");
 			var cancel = new dijit.form.Button({
 				label: "Cancel",
