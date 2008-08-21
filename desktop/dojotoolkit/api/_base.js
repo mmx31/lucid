@@ -42,6 +42,13 @@ api.xhr = function(/*dojo.__ioArgs|String*/args) {
 		}
 		if(args.auth) {
 			xsiteArgs.authinfo = dojo.clone(args.auth);
+			if(!args.appid) {
+				xsiteArgs.appid=0;
+			}
+			else {
+				xsiteArgs.appid=args.appid;
+				delete args.appid;
+			}
 		}
 		args.content["DESKTOP_XSITE_PARAMS"] = dojo.toJson(xsiteArgs);
 		delete args.auth;

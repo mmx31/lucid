@@ -1,7 +1,15 @@
 dojo.provide("desktop.version");
 dojo.provide("desktop.config");
 
-desktop.version = "SVN";
+desktop.version = {
+	major: 1,
+	minor: 0,
+	patch: 0,
+	flag: "dev",
+	toString: function() {
+		return this.major+"."+this.minor+"."+this.patch+this.flag;
+	}
+};
 
 desktop.config = {
 	//	summary:
