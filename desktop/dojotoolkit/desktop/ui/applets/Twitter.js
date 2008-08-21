@@ -32,6 +32,8 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 		for(var key in this.loginUi) {
 			this.loginUi[key].destroy();
 		}
+		if(this.settings.username)
+			delete this.settings.username;
 		var actNls = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
 		var div = document.createElement("div");
 		if(error) {

@@ -13,7 +13,7 @@
 		var $appid = array('type' => 'integer', 'length' => 11);
 		var $server = array('type' => 'text');
 		var $username = array('type' => 'text');
-		var $password = array('type' => 'text');
+		var $password = array('type' => 'blob');
 	}
 	global $Auth;
 	$Auth = new Auth();

@@ -13,7 +13,8 @@ import("models.auth");
 import("lib.Json.Json");
 import("lib.Blowfish");
 $user = $User->get_current();
-
+define('CRYPT_BLOWFISH_NOMCRYPT', true);
+error_reporting(1);
 if($user->has_permission("api.xsite"))
 {
 	$params = Zend_Json::decode($_POST['DESKTOP_XSITE_PARAMS']);
@@ -24,11 +25,11 @@ if($user->has_permission("api.xsite"))
 	);
 	$p = new HTTP_Request($url, $reqArgs);
 	$p->setMethod(HTTP_REQUEST_METHOD_GET);
-	if(isset($params["authinfo"])) {
+	if(array_key_exists("authinfo", $params)) {
 		$auth = $params["authinfo"];
 		$server = array();
 		preg_match('(^(?:[^/]+://)?([^/:]+))', $url, $server);
-		if(array_key_exists($auth, "password")) {
+		if(array_key_exists("password", $auth)) {
 			//create/update the entry in the DB
 			$entries = $Auth->filter(array(
 				appid => $params["appid"],
@@ -37,10 +38,10 @@ if($user->has_permission("api.xsite"))
 				userid => $user->id
 			));
 			//get encryption stuff going
-			$blowfish = Crypt_Blowfish::factory("ebc");
+			$blowfish = Crypt_Blowfish::factory("ecb");
 			$blowfish->setKey($GLOBALS['conf']['salt']);
 			
-			if(!$entries)
+			if(!$entries[0])
 			{
 				//create
 				$entry = new $Auth(array(
@@ -53,6 +54,7 @@ if($user->has_permission("api.xsite"))
 			}
 			else {
 				//update
+				var_dump($entries);
 				$entry = $entries[0];
 				$entry->password = $blowfish->encrypt($auth["password"]);
 			}
@@ -67,7 +69,7 @@ if($user->has_permission("api.xsite"))
 				userid => $user->id
 			));
 			$entry = $entries[0];
-			$blowfish = Crypt_Blowfish::factory("ebc");
+			$blowfish = Crypt_Blowfish::factory("ecb");
 			$blowfish->setKey($GLOBALS['conf']['salt']);
 			$auth["password"] = trim($blowfish->decrypt($entry->password));
 		}
