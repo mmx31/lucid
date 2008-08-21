@@ -37,7 +37,7 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 		});
 	
 		this.toolbar = new dijit.Toolbar({
-			layoutAlign: "top"
+			region: "top"
 		});
 		this.toolbar.addChild( new dijit.form.Button({
 			label: nls.start,
@@ -68,7 +68,7 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 		this.toolbar.addChild( dropdown );
 	
 		this.surfacePane = new dijit.layout.ContentPane({
-			layoutAlign: "client",
+			region: "center",
 			style: "overflow: hidden"
 		});
 	

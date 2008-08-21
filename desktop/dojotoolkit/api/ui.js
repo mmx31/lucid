@@ -55,9 +55,9 @@ api.ui = {
 			showMinimize: false,
 			showMaximize: false
 		});
-		var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding: 20px;"});
+		var top = new dijit.layout.ContentPane({region: "top", style: "padding: 20px;"});
 		top.setContent(ac.sudoExplanation);
-		var client = new dijit.layout.ContentPane({layoutAlign: "client", style: "padding: 40px;"});
+		var client = new dijit.layout.ContentPane({region: "center", style: "padding: 40px;"});
 		var row3 = document.createElement("span");
 		var row1 = document.createElement("div");
 		row1.innerHTML = ac.password+":&nbsp;";
@@ -90,7 +90,7 @@ api.ui = {
 		row4.appendChild(row3);
 		var main = document.createElement("div"); main.appendChild(row1); main.appendChild(row2); main.appendChild(row4);
 		client.setContent(main);
-		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom", style: "padding: 20px;"});
+		var bottom = new dijit.layout.ContentPane({region: "bottom", style: "padding: 20px;"});
 		bottom.setContent(ac.program+": "+object.program+"<br />"+ac.action+": "+object.permission+"<br />"+ac.vendor+": "+ac.unknown);
 		dojo.forEach([top, bottom, client], function(e) {
 			win.addChild(e);
@@ -120,7 +120,7 @@ api.ui = {
 		dialog.width = "400px";
 		dialog.height = "150px";
 		var onClose = dojo.connect(dialog, "onClose", null, function() {object.callback(false)});
-		var details = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
+		var details = new dijit.layout.ContentPane({region: "center"}, document.createElement("div"));
 		var text = new dijit.form.TextBox({value: object.initial || ""});
 		all = document.createElement("div");
 		var blah = new dijit.form.Button({label: cm.ok, onClick: dojo.hitch(this, function() {  dojo.disconnect(onClose); object.callback(text.getValue()); dialog.close(); })});
@@ -163,7 +163,7 @@ api.ui = {
 		dialog.width = "400px";
 		dialog.height = "150px";
 		var onClose = dojo.connect(dialog, "onClose", null, function() {object.callback(false)});
-		var details = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
+		var details = new dijit.layout.ContentPane({region: "center"}, document.createElement("div"));
 		all = document.createElement("div");
 		var blah = new dijit.form.Button({label: cm.yes, onClick: dojo.hitch(this, function() { dojo.disconnect(onClose); object.callback(true); dialog.close(); })});
 		var ablah = new dijit.form.Button({label: cm.no, onClick: dojo.hitch(this, function() { dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
@@ -207,7 +207,7 @@ api.ui = {
 			object.callback(path);
 			dialog.close();
 		})}); //Make the fileArea
-		var toolbar = new dijit.Toolbar({layoutAlign: "top"});
+		var toolbar = new dijit.Toolbar({region: "top"});
 		var layout = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
 		var button = new dijit.form.Button({
 			onClick: dojo.hitch(file, "setPath", "file://"),
@@ -228,9 +228,9 @@ api.ui = {
 		});
 		toolbar.addChild(button);
 		dialog.addChild(toolbar);
-		var client = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 70, layoutAlign: "client"});
+		var client = new dijit.layout.SplitContainer({sizeMin: 60, sizeShare: 70, region: "center"});
 		var pane = new dijit.layout.ContentPane({sizeMin: 125}, document.createElement("div"));
-		var details = new dijit.layout.ContentPane({layoutAlign: "bottom"}, document.createElement("div"));
+		var details = new dijit.layout.ContentPane({region: "bottom"}, document.createElement("div"));
 		var menu = new dijit.Menu({
 			style: "width: 100%;"
 		});

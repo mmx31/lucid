@@ -18,7 +18,7 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
-		var toolbar = new dijit.Toolbar({layoutAlign: "top"});
+		var toolbar = new dijit.Toolbar({region: "top"});
 		dojo.forEach([
 			{
 				label: nls.openFile,
@@ -95,7 +95,7 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 			position: "relative"
 		})
 		ticker.innerHTML = "&nbsp;0:00/00:00&nbsp;";
-		var client = new dijit.Toolbar({layoutAlign: "client"});
+		var client = new dijit.Toolbar({region: "center"});
 		for(var name in this.ui) {
 			var item = this.ui[name];
 			if(item.declaredClass == "dijit.form.Button") {

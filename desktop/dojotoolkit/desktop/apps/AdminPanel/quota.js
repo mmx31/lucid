@@ -158,11 +158,11 @@ dojo.extend(desktop.apps.AdminPanel, {
 			width: "400px",
 			height: "100px"
 		});
-		var cpane = new dijit.layout.ContentPane({layoutAlign: "client"});
+		var cpane = new dijit.layout.ContentPane({region: "center"});
 		cpane.setContent(ui.node);
 		win.addChild(cpane);
 		//bottom part
-		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
+		var bottom = new dijit.layout.ContentPane({region: "bottom"});
 		var cont = document.createElement("div");
 		var cancel = new dijit.form.Button({
 			label: "Cancel",

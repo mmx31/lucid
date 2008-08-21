@@ -188,7 +188,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 		this.windows.push(window);
 		var makeUI = function(list) {
 			var client = new dijit.layout.ContentPane({
-				layoutAlign: "client",
+				region: "center",
 				style: "overflow-x: auto"
 			})
 			var div = document.createElement("div");
@@ -223,7 +223,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			window.addChild(client);
 			
 			var top = new dijit.layout.ContentPane({
-				layoutAlign: "top"
+				region: "top"
 			});
 			var tdiv = document.createElement("div");
 			var s = new dijit.form.FilteringSelect({

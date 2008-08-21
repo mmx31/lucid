@@ -9,7 +9,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
-		var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding-bottom: 5px;"});
+		var top = new dijit.layout.ContentPane({region: "top", style: "padding-bottom: 5px;"});
 		var picture = new dijit.form.Button({iconClass: "icon-32-apps-system-users", label: "Picutre", showLabel: false})
 		var chpasswd = document.createElement("div");
 		dojo.style(chpasswd, "position", "absolute");
@@ -33,7 +33,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		top.setContent(topContent);
 		
 		var client = new dijit.layout.TabContainer({
-			layoutAlign: "client"
+			region: "center"
 		});
 		
 		var general = new dijit.layout.ContentPane({title: l.general});
@@ -86,7 +86,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		
 		client.addChild(general);
 		
-		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
+		var bottom = new dijit.layout.ContentPane({region: "bottom"});
 		var close = new dijit.form.Button({
 			label: cm.close,
 			onClick: dojo.hitch(win, "close")
@@ -150,10 +150,10 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 				clearTimeout(this._authTimeout);
 			})
 		});
-		var top = new dijit.layout.ContentPane({layoutAlign: "top", style: "padding: 20px;"});
+		var top = new dijit.layout.ContentPane({region: "top", style: "padding: 20px;"});
 		top.setContent(l.passwordDirections);
 		
-		var client = new dijit.layout.ContentPane({layoutAlign: "client"});
+		var client = new dijit.layout.ContentPane({region: "center"});
 		var row4 = document.createElement("div");
 		dojo.style(row4, "textAlign", "center");
 		var onChange = dojo.hitch(this, function() {
@@ -213,7 +213,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		dojo.forEach([row1, row2, row3, row4], function(e){ main.appendChild(e); });
 		client.setContent(main);
 		
-		var bottom = new dijit.layout.ContentPane({layoutAlign: "bottom"});
+		var bottom = new dijit.layout.ContentPane({region: "bottom"});
 		var div = document.createElement("div");
 		dojo.addClass(div, "floatRight");
 		div.appendChild((new dijit.form.Button({

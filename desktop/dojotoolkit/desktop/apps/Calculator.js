@@ -19,12 +19,12 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 			onClose: dojo.hitch(this, "kill")
 		});
 		var textbox = new dijit.form.TextBox({
-			layoutAlign: "top",
+			region: "top",
 			style: "text-align: right;"
 		});
 		win.addChild(textbox);
 		var client = new dijit.layout.ContentPane({
-			layoutAlign: "client"
+			region: "center"
 		});
 		win.addChild(client);
 		var table = document.createElement("table");
@@ -79,6 +79,7 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 		table.appendChild(c);
 		client.setContent(table);
 		win.show();
+		win.startup();
 	},
 	clear: function(t) {
 		this.answerShown = false;

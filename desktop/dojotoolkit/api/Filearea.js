@@ -257,7 +257,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 			height: "200px"
 		});
 		var cpane = new dijit.layout.ContentPane({
-			layoutAlign: "client"
+			region: "center"
 		});
 		var div = document.createElement("div");
 		
@@ -300,7 +300,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		//make bottom part
 		
 		var cpane = new dijit.layout.ContentPane({
-			layoutAlign: "bottom"
+			region: "bottom"
 		});
 		var div = document.createElement("div");
 		dojo.style(div, "cssFloat", "right");

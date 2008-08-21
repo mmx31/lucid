@@ -24,12 +24,12 @@ dojo.declare("desktop.apps.WebBrowser", desktop.apps._App, {
 		dojo.style(this.Iframe, "height", "100%");
 		dojo.style(this.Iframe, "border", "0px");
 		this.urlbox = new dijit.form.TextBox({style: "width: 80%;"});
-		var form = new dijit.Toolbar({layoutAlign: "top"});
+		var form = new dijit.Toolbar({region: "top"});
 		form.addChild(this.urlbox);
 		form.addChild(new dijit.form.Button({iconClass: "icon-22-actions-go-jump", label: cm.go, onClick: dojo.hitch(this, this.go), style: "width: 10%;"}));
 		form.startup();
 		this.win.addChild(form);
-		var client = new dijit.layout.ContentPane({layoutAlign: "client"}, document.createElement("div"));
+		var client = new dijit.layout.ContentPane({region: "center"}, document.createElement("div"));
 		client.setContent(this.Iframe);
 		this.win.addChild(client);
 		this.win.show();

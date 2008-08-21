@@ -1,4 +1,10 @@
 <?php
+/*
+	Copyright (c) 2004-2008, The Dojo Foundation & Lucid Contributors
+	All Rights Reserved.
+
+	Licensed under the Academic Free License version 2.1 or above.
+*/
 
 class Desktop_VFS_Modules_File extends Desktop_VFS_Modules_Base {
 	protected function getRealPath($path) {

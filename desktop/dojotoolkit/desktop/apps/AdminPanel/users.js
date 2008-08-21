@@ -82,7 +82,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 						this.windows.push(win);
 						
 						var client = new dijit.layout.ContentPane({
-							layoutAlign: "client"
+							region: "center"
 						});
 						var div = document.createElement("div");
 						var errBox = document.createElement("div");
@@ -114,7 +114,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 						win.addChild(client);
 						
 						var bottom = new dijit.layout.ContentPane({
-							layoutAlign: "bottom"
+							region: "bottom"
 						});
 						var div = document.createElement("div");
 						dojo.addClass(div, "floatRight");

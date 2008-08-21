@@ -13,6 +13,7 @@
 		"permissions": {"type": "text"}
 	},
 	"Groups": {
-		"id": {"type": "int", "length": 11, "primaryKey": true}
+		"id": {"type": "int", "length": 11, "primaryKey": true},
+		"description": {"type": "int", "length": 11, "primaryKey": true}
 	}
 }
