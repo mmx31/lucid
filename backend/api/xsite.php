@@ -14,7 +14,7 @@ import("lib.Json.Json");
 import("lib.Blowfish");
 $user = $User->get_current();
 define('CRYPT_BLOWFISH_NOMCRYPT', true);
-error_reporting(1);
+
 if($user->has_permission("api.xsite"))
 {
 	$params = Zend_Json::decode($_POST['DESKTOP_XSITE_PARAMS']);
@@ -54,7 +54,6 @@ if($user->has_permission("api.xsite"))
 			}
 			else {
 				//update
-				var_dump($entries);
 				$entry = $entries[0];
 				$entry->password = $blowfish->encrypt($auth["password"]);
 			}
