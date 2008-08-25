@@ -53,7 +53,9 @@ class intOutput {
 		"feature_not_available" => 9,
 		"object_not_found" => 10,
 		"already_installed" => 11,
-		"quota_exceeded" => 12
+		"quota_exceeded" => 12,
+		"remote_authentication_failed" => 13,
+		"remote_connection_failed" => 14,
 	);
 	function __construct($val=false) {
 		if($val !== false) $this->set($val);

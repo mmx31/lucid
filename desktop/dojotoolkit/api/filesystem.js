@@ -330,5 +330,59 @@ api.filesystem = {
 		if(onError) df.addErrback(onError);
 		
 		return df;
+	},
+	_onError: function(code, callback) {
+		var nf = dojo.i18n.getLocalization("api", "filearea");
+		if(code == 12) { //remote_authentication_failed
+			var win = new api.Window({
+				title: nf.enterPass,
+				width: "250px",
+				height: "120px"
+			});
+			var v = new api.filesystem._PassForm({
+				region: "center",
+				onCancel: function() {win.destroy();},
+				onSubmit: function() {
+					callback(this.getPassword(), this.getRemember());
+				}
+			});
+			win.addChild(v);
+			win.show();
+			win.startup();
+		}
+		else if(code == 13) { //remote_connection_failed
+			api.ui.notify(nf.connFailed);
+		}
 	}
 }
+
+dojo.declare("api.filesystem._PassForm", [dijit._Widget, dijit._Templated, dijit._Contained], {
+	templatePath: dojo.moduleUrl("api", "templates/Filearea_PassForm.html"),
+	widgetsInTemplate: true,
+	postCreate: function() {
+		var nf = dojo.i18n.getLocalization("api", "filearea");
+		this.titleNode.innerHTML = nf.enterPass;
+		this.forgetLabelNode.innerHTML = nf.forgetImmediate;
+		this.rememberForeverLabelNode.innerHTML = nf.rememberForever;
+		console.log(this.connectNode);
+		this.connectNode.setLabel(nf.connect);
+		this.cancelNode.setLabel(nf.cancel);
+		dojo.connect(this.cancelNode, "onClick", this, "onCancel");
+		dojo.connect(this.connectNode, "onClick", this, "onSubmit");
+	},
+	getPassword: function() {
+		return this.passwordNode.getValue();
+	},
+	getRemember: function() {
+		if(this.rememberForeverNode.checked)
+			return "forever";
+		else if(this.forgetNode.checked)
+			return "forget";
+	},
+	onSubmit: function() {
+		
+	},
+	onCancel: function() {
+		
+	}
+});

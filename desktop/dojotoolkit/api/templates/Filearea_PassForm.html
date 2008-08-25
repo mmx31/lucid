@@ -1,0 +1,20 @@
+<div style="position: relative;">
+	<div style="margin-left: auto; margin-right: auto; width: 200px;">
+		<div dojoAttachPoint="titleNode">Enter Password</div>
+		<div>
+			<input dojoAttachPoint="textNode" dojoType="dijit.form.TextBox" type="password" />
+		</div>
+		<div>
+			<input dojoAttachPoint="forgetNode" dojoType="dijit.form.RadioButton" name="${id}_remember" id="${id}_forget" />
+			<label for="${id}_forget" dojoAttachPoint="forgetLabelNode">Forget Immediately</label>
+		</div>
+		<div>
+			<input dojoAttachPoint="rememberForeverNode" dojoType="dijit.form.RadioButton" name="${id}_remember" id="${id}_remember_forever" />
+			<label for="${id}_remember_forever" dojoAttachPoint="rememberForeverLabelNode">Remember Forever</label>
+		</div>
+	</div>
+	<div style="position:absolute; bottom: 0px; right: 0px;">
+		<div dojoType="dijit.form.Button" dojoAttachPoint="cancelNode" label="Cancel"></div>
+		<div dojoType="dijit.form.Button" dojoAttachPoint="connectNode" label="Connect"></div>
+	</div>
+</div>

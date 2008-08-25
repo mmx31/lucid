@@ -15,7 +15,7 @@ class FtpFs extends BaseFs {
 		$this->_link = ftp_connect($this->hostname, $this->port);
 		if(!is_null($this->username)) $login = ftp_login($this->_link, $this->username, $this->password);
 		else $login = ftp_login($this->_link, "anonymous", "anonymous");
-		if((!$this->_link) || (!$login)) internal_error("generic_err", $this->_link ? "Authentication Error" : "Connection Error");
+		if((!$this->_link) || (!$login)) internal_error($this->_link ? "remote_authentication_failed" : "remote_connection_failed");
 		@ftp_pasv($this->_link,true);
 	}
 	function _getRealPath($path) {
