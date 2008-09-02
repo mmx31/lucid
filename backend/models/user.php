@@ -102,6 +102,7 @@
 		function delete_userdir()
 		{
 			$user = $this->username;
+			$user = str_replace("..", "", $user);
 			if(is_dir("../../files/".$user)) {
 				$this->_deltree("../../files/".$user);
 			}
