@@ -7,6 +7,10 @@
 */
 
 import("lib.json.Json");
+import("models.auth");
+import("lib.Blowfish");
+import("models.user");
+define('CRYPT_BLOWFISH_NOMCRYPT', true);
 
 class BaseFs {
 	var $path;
@@ -16,12 +20,16 @@ class BaseFs {
 	var $password;
 	var $_type = "filesystem"; //possible are 'filesystem' and 'server'. Server will parse the URL for server info.
 	function __construct($url) {
+		global $Auth;
+		global $User;
+		
 		if($this->_type == "filesystem") {
 			$p = explode("://", $url, 2);
 			$this->path = isset($p[1]) ? $p[1] : $url;
 			$this->path = str_replace("..", "", $this->path);
 		}
 		else if($this->_type == "server") {
+			$user = $User->get_current();
 			//parse the URL for server connection details
 			$url = explode("://", $url, 2);
 			$url = $url[1];
@@ -33,17 +41,63 @@ class BaseFs {
 				$userInfo = $args[0];
 				$userInfo = explode(":", $userInfo, 2);
 				$this->username = $userInfo[0];
-				if(isset($userInfo[1])) $this->password = $userInfo[1];
-				else if($_POST['login']) {
-					$info = Zend_Json::decode($_POST['login']);
-					$this->password = $info['password'];
-					//todo: do the remembering thing
-				}
 			}
 			else $serverInfo = $args[0];
 			$serverInfo = explode(":", $serverInfo, 2);
 			$this->hostname = $serverInfo[0];
 			if(isset($serverInfo[1])) $this->port = $serverInfo[1];
+			
+			//deffer password lookups until after we have everything else
+			
+			if($userInfo[1]) $this->password = $userInfo[1];
+			else {
+				$entries = $Auth->filter(array(
+					appid => 0, //$info["appid"],
+					server => get_class($this) . "://" . $this->hostname . ":" . $this->port,
+					username => $this->username,
+					userid => $user->id
+				));
+				if(isset($entries[0])) {
+					$blowfish = Crypt_Blowfish::factory("ecb");
+					$blowfish->setKey($GLOBALS['conf']['salt']);
+					$this->password = trim($blowfish->decrypt($entries[0]->password));
+				}
+			}
+			
+			if($_POST['login'] && $_POST['login'] != "undefined") {
+				$info = Zend_Json::decode($_POST['login']);
+				$this->password = $info['password'];
+				if($info["remember"] == "forever") {
+					//remember the password
+					$entries = $Auth->filter(array(
+						appid => 0, //$info["appid"],
+						server => get_class($this) . "://" . $this->hostname . ":" . $this->port,
+						username => $this->username,
+						userid => $user->id
+					));
+					//get encryption stuff going
+					$blowfish = Crypt_Blowfish::factory("ecb");
+					$blowfish->setKey($GLOBALS['conf']['salt']);
+					
+					if(!$entries[0])
+					{
+						//create
+						$entry = new $Auth(array(
+							appid => 0, //$info["appid"],
+							server => get_class($this) . "://" . $this->hostname . ":" . $this->port,
+							username => $this->username,
+							userid => $user->id,
+							password => $blowfish->encrypt($info["password"]),
+						));
+					}
+					else {
+						//update
+						$entry = $entries[0];
+						$entry->password = $blowfish->encrypt($info["password"]);
+					}
+					$entry->save();
+				}
+			}
 		}
 		$this->_startup();
 	}
