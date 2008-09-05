@@ -19,11 +19,12 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 	//	|	win.addChild(widget);
 	//	|	win.show();
 	//	|	win.startup();
-	//	|	setTimeout(dojo.hitch(win, "destroy"), 1000*5);
+	//	|	setTimeout(dojo.hitch(win, "close"), 1000*5);
 	templatePath: dojo.moduleUrl("api", "templates/Window.html"),
 	//	_winListItem: storeItem
 	//		The store item that represents this window on desktop.ui._windowList
 	_winListItem: null,
+	_started: false,
 	//	closed: Boolean
 	//		Is the window closed?
 	closed: false,
@@ -124,7 +125,7 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 	{
 		//	summary:
 		//		Shows the window
-		desktop.ui.containerNode.appendChild(this.domNode);
+		desktop.ui._area.addChild(this);
 		dojo.style(this.domNode, "width", this.width);
 		dojo.style(this.domNode, "height", this.height);
 		this.titleNode.innerHTML = this.title;
@@ -164,6 +165,9 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 			});
 			anim.play();
 		} else this.resize();
+		if(!this._started) {
+			this.startup();
+		}
 	},
 	_toggleBody: function(/*Boolean*/show) {
 		//	summary:
@@ -611,7 +615,9 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 	startup: function() {
 		//	summary:
 		//		starts the widget up
+		if(this._started) return;
 		this.inherited(arguments);
 		this.resize();
+		this._started = true;
 	}
 });

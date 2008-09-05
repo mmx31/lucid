@@ -6,6 +6,7 @@
 	Licensed under the Academic Free License version 2.1 or above.
 */
 
+import("lib.json.Json");
 
 class BaseFs {
 	var $path;
@@ -33,6 +34,11 @@ class BaseFs {
 				$userInfo = explode(":", $userInfo, 2);
 				$this->username = $userInfo[0];
 				if(isset($userInfo[1])) $this->password = $userInfo[1];
+				else if($_POST['login']) {
+					$info = Zend_Json::decode($_POST['login']);
+					$this->password = $info['password'];
+					//todo: do the remembering thing
+				}
 			}
 			else $serverInfo = $args[0];
 			$serverInfo = explode(":", $serverInfo, 2);

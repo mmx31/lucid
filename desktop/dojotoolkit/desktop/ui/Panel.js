@@ -296,7 +296,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			item.destroy();
 		});
 		setTimeout(dojo.hitch(desktop.ui._area, "resize"), 1000);
-		if(this.window) this.window.destroy();
+		if(this.window) this.window.close();
 	},
 	_place: function() {
 		//	summary:

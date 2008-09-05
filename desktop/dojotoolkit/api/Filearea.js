@@ -327,6 +327,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 					dojo.hitch(this, function() {
 						dojo.publish("filearea:"+this.path, [this.id]);
 						this.refresh();
+						win.close();
 					})
 				);
 			})

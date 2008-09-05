@@ -58,7 +58,6 @@ dojo.mixin(desktop.ui, {
 		this._drawn = true;
 		dojo.locale = desktop.config.locale;
 		this._area = new desktop.ui.Area({});
-		this.containerNode = desktop.ui._area.containerNode;
 		document.body.appendChild(desktop.ui._area.domNode);
 		this._area.updateWallpaper();
 		this.makePanels();
