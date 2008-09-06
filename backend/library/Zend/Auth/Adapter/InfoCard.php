@@ -17,8 +17,7 @@
  * @subpackage Zend_Auth_Adapter
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: InfoCard.php 8964 2008-03-21 17:53:14Z thomas $
- * @author     John Coggeshall <john@zend.com>
+ * @version    $Id: InfoCard.php 9094 2008-03-30 18:36:55Z thomas $
  */
 
 /**
@@ -45,7 +44,6 @@ require_once 'Zend/InfoCard.php';
  * @subpackage Zend_Auth_Adapter
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @author     John Coggeshall <john@zend.com>
  */
 class Zend_Auth_Adapter_InfoCard implements Zend_Auth_Adapter_Interface
 {

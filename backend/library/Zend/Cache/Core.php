@@ -47,7 +47,7 @@ class Zend_Cache_Core
      *
      * =====> (string) cache_id_prefix :
      * - prefix for cache ids (namespace)
-     * 
+     *
      * ====> (boolean) automatic_serialization :
      * - Enable / disable automatic serialization
      * - It can be used to save directly datas which aren't strings (but it's slower)
@@ -66,7 +66,7 @@ class Zend_Cache_Core
      *
      * ====> (boolean) logging :
      * - If set to true, logging is activated (but the system is slower)
-     * 
+     *
      * ====> (boolean) ignore_user_abort
      * - If set to true, the core will set the ignore_user_abort PHP flag inside the
      *   save() method to avoid cache corruptions in some cases (default false)
@@ -113,11 +113,8 @@ class Zend_Cache_Core
      * @throws Zend_Cache_Exception
      * @return void
      */
-    public function __construct($options = array())
+    public function __construct(array $options = array())
     {
-        if (!is_array($options)) {
-            Zend_Cache::throwException('Options parameter must be an array');
-        }
         while (list($name, $value) = each($options)) {
             $this->setOption($name, $value);
         }
@@ -131,11 +128,8 @@ class Zend_Cache_Core
      * @throws Zend_Cache_Exception
      * @return void
      */
-    public function setBackend($backendObject)
+    public function setBackend(Zend_Cache_Backend $backendObject)
     {
-        if (!is_object($backendObject)) {
-            Zend_Cache::throwException('Incorrect backend object !');
-        }
         $this->_backend= $backendObject;
         // some options (listed in $_directivesList) have to be given
         // to the backend too (even if they are not "backend specific")
@@ -144,6 +138,16 @@ class Zend_Cache_Core
             $directives[$directive] = $this->_options[$directive];
         }
         $this->_backend->setDirectives($directives);
+    }
+
+    /**
+     * Returns the backend
+     *
+     * @return object backend object
+     */
+    public function getBackend()
+    {
+        return $this->_backend;
     }
 
     /**
@@ -169,6 +173,29 @@ class Zend_Cache_Core
                 // This a specic option of this frontend
                 $this->_specificOptions[$name] = $value;
                 return;
+            }
+        }
+        Zend_Cache::throwException("Incorrect option name : $name");
+    }
+
+    /**
+     * Public frontend to get an option value
+     *
+     * @param  string $name  Name of the option
+     * @throws Zend_Cache_Exception
+     * @return mixed option value
+     */
+    public function getOption($name)
+    {
+        if (is_string($name)) {
+            $name = strtolower($name);
+            if (array_key_exists($name, $this->_options)) {
+                // This is a Core option
+                return $this->_options[$name];
+            }
+            if (array_key_exists($name, $this->_specificOptions)) {
+                // This a specic option of this frontend
+                return $this->_specificOptions[$name];
             }
         }
         Zend_Cache::throwException("Incorrect option name : $name");
@@ -255,7 +282,7 @@ class Zend_Cache_Core
      * Save some data in a cache
      *
      * @param  mixed $data           Data to put in cache (can be another type than string if automatic_serialization is on)
-     * @param  cache $id             Cache id (if not set, the last cache id will be used)
+     * @param  string $id             Cache id (if not set, the last cache id will be used)
      * @param  array $tags           Cache tags
      * @param  int $specificLifetime If != false, set a specific lifetime for this cache record (null => infinite lifetime)
      * @throws Zend_Cache_Exception
@@ -297,7 +324,7 @@ class Zend_Cache_Core
         }
         $result = $this->_backend->save($data, $id, $tags, $specificLifetime);
         if ($this->_options['ignore_user_abort']) {
-            ignore_user_abort($abort); 
+            ignore_user_abort($abort);
         }
         if (!$result) {
             // maybe the cache is corrupted, so we remove it !
@@ -462,7 +489,7 @@ class Zend_Cache_Core
      *
      * @param  string $id Cache id
      * @return string Cache id (with or without prefix)
-     */  
+     */
     private function _id($id)
     {
         if (!is_null($id) && isset($this->_options['cache_id_prefix'])) {

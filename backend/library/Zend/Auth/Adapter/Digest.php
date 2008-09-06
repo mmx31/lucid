@@ -14,10 +14,10 @@
  *
  * @category   Zend
  * @package    Zend_Auth
- * @subpackage Zend_Ath_Adapter
+ * @subpackage Zend_Auth_Adapter
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Digest.php 8964 2008-03-21 17:53:14Z thomas $
+ * @version    $Id: Digest.php 9668 2008-06-11 08:15:02Z doctorrock83 $
  */
 
 

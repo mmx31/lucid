@@ -17,7 +17,7 @@
  * @package    Zend_Validate
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Hostname.php 8986 2008-03-21 21:38:32Z matthew $
+ * @version    $Id: Hostname.php 9195 2008-04-10 17:35:30Z jokke $
  */
 
 
@@ -415,7 +415,7 @@ class Zend_Validate_Hostname extends Zend_Validate_Abstract
         }
 
         // If local network names are not allowed, add a message
-        if (!$allowLocal) {
+        if ($status && !$allowLocal) {
             $this->_error(self::LOCAL_NAME_NOT_ALLOWED);
         }
 

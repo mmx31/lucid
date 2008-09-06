@@ -43,11 +43,16 @@ class Zend_Cache_Frontend_Page extends Zend_Cache_Core
      *
      * ====> (boolean) debug_header :
      * - if true, a debug text is added before each cached pages
-     * 
+     *
      * ====> (boolean) content_type_memorization :
+     * - deprecated => use memorize_headers instead
      * - if the Content-Type header is sent after the cache was started, the
      *   corresponding value can be memorized and replayed when the cache is hit
      *   (if false (default), the frontend doesn't take care of Content-Type header)
+     *
+     * ====> (array) memorize_headers :
+     * - an array of strings corresponding to some HTTP headers name. Listed headers
+     *   will be stored with cache datas and "replayed" when the cache is hit
      *
      * ====> (array) default_options :
      * - an associative array of default options :
@@ -72,6 +77,7 @@ class Zend_Cache_Frontend_Page extends Zend_Cache_Core
         'http_conditional' => false,
         'debug_header' => false,
         'content_type_memorization' => false,
+        'memorize_headers' => array(),
         'default_options' => array(
             'cache_with_get_variables' => false,
             'cache_with_post_variables' => false,
@@ -96,6 +102,13 @@ class Zend_Cache_Frontend_Page extends Zend_Cache_Core
     protected $_activeOptions = array();
 
     /**
+     * If true, the page won't be cached
+     *
+     * @var boolean
+     */
+    private $_cancel = false;
+
+    /**
      * Constructor
      *
      * @param  array   $options                Associative array of options
@@ -103,7 +116,7 @@ class Zend_Cache_Frontend_Page extends Zend_Cache_Core
      * @throws Zend_Cache_Exception
      * @return void
      */
-    public function __construct($options = array())
+    public function __construct(array $options = array())
     {
         while (list($name, $value) = each($options)) {
             $name = strtolower($name);
@@ -113,6 +126,9 @@ class Zend_Cache_Frontend_Page extends Zend_Cache_Core
                 break;
             case 'default_options':
                 $this->_setDefaultOptions($value);
+                break;
+            case 'content_type_memorization':
+                $this->_setContentTypeMemorization($value);
                 break;
             default:
                 $this->setOption($name, $value);
@@ -144,6 +160,32 @@ class Zend_Cache_Frontend_Page extends Zend_Cache_Core
                 Zend_Cache::throwException("unknown option [$key] !");
             } else {
                 $this->_specificOptions['default_options'][$key] = $value;
+            }
+        }
+    }
+
+    /**
+     * Set the deprecated contentTypeMemorization option
+     *
+     * @param boolean $value value
+     * @return void
+     * @deprecated
+     */
+    protected function _setContentTypeMemorization($value)
+    {
+        $found = null;
+        foreach ($this->_specificOptions['memorize_headers'] as $key => $value) {
+            if (strtolower($value) == 'content-type') {
+                $found = $key;
+            }
+        }
+        if ($value) {
+            if (!$found) {
+                $this->_specificOptions['memorize_headers'][] = 'Content-Type';
+            }
+        } else {
+            if ($found) {
+                unset($this->_specificOptions['memorize_headers'][$found]);
             }
         }
     }
@@ -184,6 +226,7 @@ class Zend_Cache_Frontend_Page extends Zend_Cache_Core
      */
     public function start($id = false, $doNotDie = false)
     {
+        $this->_cancel = false;
         $lastMatchingRegexp = null;
         foreach ($this->_specificOptions['regexps'] as $regexp => $conf) {
             if (preg_match("`$regexp`", $_SERVER['REQUEST_URI'])) {
@@ -209,15 +252,15 @@ class Zend_Cache_Frontend_Page extends Zend_Cache_Core
         $array = $this->load($id);
         if ($array !== false) {
             $data = $array['data'];
-            $contentType = $array['contentType'];
+            $headers = $array['headers'];
             if ($this->_specificOptions['debug_header']) {
                 echo 'DEBUG HEADER : This is a cached page !';
             }
-            if ($this->_specificOptions['content_type_memorization']) {
-                if (!is_null($contentType)) {
-                    if (!headers_sent()) {
-                        header("Content-Type: $contentType");
-                    }
+            if (!headers_sent()) {
+                foreach ($headers as $key=>$headerCouple) {
+                    $name = $headerCouple[0];
+                    $value = $headerCouple[1];
+                    header("$name: $value");
                 }
             }
             echo $data;
@@ -232,6 +275,14 @@ class Zend_Cache_Frontend_Page extends Zend_Cache_Core
     }
 
     /**
+     * Cancel the current caching process
+     */
+    public function cancel()
+    {
+        $this->_cancel = true;
+    }
+
+    /**
      * callback for output buffering
      * (shouldn't really be called manually)
      *
@@ -240,21 +291,25 @@ class Zend_Cache_Frontend_Page extends Zend_Cache_Core
      */
     public function _flush($data)
     {
+        if ($this->_cancel) {
+            return $data;
+        }
         $contentType = null;
-        if ($this->_specificOptions['content_type_memorization']) {
-            if (headers_sent()) {
-                $headersList = headers_list();
-                foreach ($headersList as $header) {
-                    $tmp = split(':', $header);
-                    if (strtolower(trim($tmp[0])) == 'content-type') {
-                        $contentType = trim($tmp[1]);
-                    }
+        $storedHeaders = array();
+        $headersList = headers_list();
+        foreach($this->_specificOptions['memorize_headers'] as $key=>$headerName) {
+            foreach ($headersList as $headerSent) {
+                $tmp = split(':', $headerSent);
+                $headerSentName = trim(array_shift($tmp));
+                if (strolower($headerName) == strtolower($headerSentName)) {
+                    $headerSentValue = trim(implode(':', $tmp));
+                    $storedHeaders[] = array($headerSentName, $headerSentValue);
                 }
             }
-        }
+        }       
         $array = array(
             'data' => $data,
-            'contentType' => $contentType
+            'headers' => $storedHeaders
         );
         $this->save($array);
         return $data;

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Zend Framework
  *
@@ -588,7 +587,7 @@ abstract class Zend_Db_Table_Row_Abstract
      */
     public function toArray()
     {
-        return $this->_data;
+        return (array)$this->_data;
     }
 
     /**
@@ -600,7 +599,7 @@ abstract class Zend_Db_Table_Row_Abstract
     public function setFromArray(array $data)
     {
         foreach ($data as $columnName => $value) {
-            $this->$columnName = $value;
+            $this->__set($columnName, $value);
         }
 
         return $this;
@@ -672,12 +671,12 @@ abstract class Zend_Db_Table_Row_Abstract
 
         // retrieve recently updated row using primary keys
         $where = array();
-        foreach ($primaryKey as $columnName => $value) {
-            $column = $db->quoteIdentifier($columnName, true);
-            $type = $metadata[$columnName]['DATA_TYPE'];
-            $where[] = $db->quoteInto("$column = ?", $value, $type);
+        foreach ($primaryKey as $column => $value) {
+            $tableName = $db->quoteIdentifier($info[Zend_Db_Table_Abstract::NAME]);
+            $type = $metadata[$column]['DATA_TYPE'];
+            $columnName = $db->quoteIdentifier($column, true);
+            $where[] = $db->quoteInto("{$tableName}.{$columnName} = ?", $value, $type);
         }
-
         return $where;
     }
 
@@ -791,6 +790,7 @@ abstract class Zend_Db_Table_Row_Abstract
      *
      * @param string|Zend_Db_Table_Abstract  $dependentTable
      * @param string                         OPTIONAL $ruleKey
+     * @param Zend_Db_Table_Select           OPTIONAL $select
      * @return Zend_Db_Table_Rowset_Abstract Query result from $dependentTable
      * @throws Zend_Db_Table_Row_Exception If $dependentTable is not a table or is not loadable.
      */
@@ -1010,7 +1010,7 @@ abstract class Zend_Db_Table_Row_Abstract
      * @return Zend_Db_Table_Row_Abstract|Zend_Db_Table_Rowset_Abstract
      * @throws Zend_Db_Table_Row_Exception If an invalid method is called.
      */
-    protected function __call($method, array $args)
+    public function __call($method, array $args)
     {
         $matches = array();
         

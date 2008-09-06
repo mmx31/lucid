@@ -174,6 +174,8 @@ class Zend_Controller_Front
      *
      * Primarily used for testing; could be used to chain front controllers.
      *
+     * Also resets action helper broker, clearing all registered helpers.
+     *
      * @return void
      */
     public function resetInstance()
@@ -203,6 +205,7 @@ class Zend_Controller_Front
                     break;
             }
         }
+        Zend_Controller_Action_HelperBroker::resetHelpers();
     }
 
     /**
@@ -318,6 +321,33 @@ class Zend_Controller_Front
         }
 
         return $this;
+    }
+
+    /**
+     * Return the path to a module directory (but not the controllers directory within)
+     * 
+     * @param  string $module 
+     * @return string|null
+     */
+    public function getModuleDirectory($module = null)
+    {
+        if (null === $module) {
+            $request = $this->getRequest();
+            if (null !== $request) {
+                $module = $this->getRequest()->getModuleName();
+            }
+            if (empty($module)) {
+                $module = $this->getDispatcher()->getDefaultModule();
+            }
+        }
+
+        $controllerDir = $this->getControllerDirectory($module);
+
+        if ((null === $controllerDir) || !is_string($controllerDir)) {
+            return null;
+        }
+
+        return dirname($controllerDir);
     }
 
     /**
@@ -467,10 +497,12 @@ class Zend_Controller_Front
             Zend_Loader::loadClass($router);
             $router = new $router();
         }
+
         if (!$router instanceof Zend_Controller_Router_Interface) {
             throw new Zend_Controller_Exception('Invalid router class');
         }
 
+        $router->setFrontController($this);
         $this->_router = $router;
 
         return $this;
@@ -810,7 +842,7 @@ class Zend_Controller_Front
 
         if (!$this->getParam('noViewRenderer') && !Zend_Controller_Action_HelperBroker::hasHelper('viewRenderer')) {
             require_once 'Zend/Controller/Action/Helper/ViewRenderer.php';
-            Zend_Controller_Action_HelperBroker::addHelper(new Zend_Controller_Action_Helper_ViewRenderer());
+            Zend_Controller_Action_HelperBroker::getStack()->offsetSet(-80, new Zend_Controller_Action_Helper_ViewRenderer());
         }
 
         /**

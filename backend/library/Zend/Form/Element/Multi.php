@@ -30,7 +30,7 @@ require_once 'Zend/Form/Element/Xhtml.php';
  * @subpackage Element
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Multi.php 8971 2008-03-21 18:31:07Z matthew $
+ * @version    $Id: Multi.php 10647 2008-08-04 20:25:30Z matthew $
  */
 abstract class Zend_Form_Element_Multi extends Zend_Form_Element_Xhtml
 {
@@ -39,6 +39,12 @@ abstract class Zend_Form_Element_Multi extends Zend_Form_Element_Xhtml
      * @var array
      */
     public $options = array();
+
+    /**
+     * Flag: autoregister inArray validator?
+     * @var bool
+     */
+    protected $_registerInArrayValidator = true;
 
     /**
      * Separator to use between options; defaults to '<br />'.
@@ -205,6 +211,52 @@ abstract class Zend_Form_Element_Multi extends Zend_Form_Element_Xhtml
     }
 
     /**
+     * Set flag indicating whether or not to auto-register inArray validator
+     * 
+     * @param  bool $flag 
+     * @return Zend_Form_Element_Multi
+     */
+    public function setRegisterInArrayValidator($flag)
+    {
+        $this->_registerInArrayValidator = (bool) $flag;
+        return $this;
+    }
+
+    /**
+     * Get status of auto-register inArray validator flag
+     * 
+     * @return bool
+     */
+    public function registerInArrayValidator()
+    {
+        return $this->_registerInArrayValidator;
+    }
+
+    /**
+     * Is the value provided valid?
+     *
+     * Autoregisters InArray validator if necessary.
+     * 
+     * @param  string $value 
+     * @param  mixed $context 
+     * @return bool
+     */
+    public function isValid($value, $context = null)
+    {
+        if ($this->registerInArrayValidator()) {
+            if (!$this->getValidator('InArray')) {
+                $options = $this->getMultiOptions();
+                $this->addValidator(
+                    'InArray',
+                    true,
+                    array(array_keys($options))
+                );
+            }
+        }
+        return parent::isValid($value, $context);
+    }
+
+    /**
      * Translate an option
      * 
      * @param  string $option 
@@ -213,15 +265,38 @@ abstract class Zend_Form_Element_Multi extends Zend_Form_Element_Xhtml
      */
     protected function _translateOption($option, $value)
     {
-        if (!isset($this->_translated[$option]) 
-            && (null !== ($translator = $this->getTranslator()))
-            && $translator->isTranslated($value)) 
-        {
-            $this->options[$option] = $translator->translate($value);
+        if (!isset($this->_translated[$option])) {
+            $this->options[$option] = $this->_translateValue($value);
+            if ($this->options[$option] === $value) {
+                return false;
+            }
             $this->_translated[$option] = true;
             return true;
         } 
 
         return false;
+    }
+
+    /**
+     * Translate a multi option value
+     * 
+     * @param  string $value 
+     * @return string
+     */
+    protected function _translateValue($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as $key => $val) {
+                $value[$key] = $this->_translateValue($val);
+            }
+            return $value;
+        } else {
+            if (null !== ($translator = $this->getTranslator())) {
+                if ($translator->isTranslated($value)) {
+                    return $translator->translate($value);
+                }
+            }
+            return $value;
+        }
     }
 }

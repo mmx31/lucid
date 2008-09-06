@@ -56,7 +56,7 @@ class Zend_Cache_Backend_Sqlite extends Zend_Cache_Backend implements Zend_Cache
      */
     protected $_options = array(
         'cache_db_complete_path' => null,
-        'automatic_vacuum_factor' => 1
+        'automatic_vacuum_factor' => 10
     );
 
     /**
@@ -67,13 +67,20 @@ class Zend_Cache_Backend_Sqlite extends Zend_Cache_Backend implements Zend_Cache
     private $_db = null;
 
     /**
+     * Boolean to store if the structure has benn checked or not
+     *
+     * @var boolean $_structureChecked
+     */
+    private $_structureChecked = false;
+
+    /**
      * Constructor
      *
      * @param  array $options Associative array of options
      * @throws Zend_cache_Exception
      * @return void
      */
-    public function __construct($options = array())
+    public function __construct(array $options = array())
     {
         parent::__construct($options);
         if (is_null($this->_options['cache_db_complete_path'])) {
@@ -104,6 +111,7 @@ class Zend_Cache_Backend_Sqlite extends Zend_Cache_Backend implements Zend_Cache
      */
     public function load($id, $doNotTestCacheValidity = false)
     {
+        $this->_checkAndBuildStructure();
         $sql = "SELECT content FROM cache WHERE id='$id'";
         if (!$doNotTestCacheValidity) {
             $sql = $sql . " AND (expire=0 OR expire>" . time() . ')';
@@ -124,6 +132,7 @@ class Zend_Cache_Backend_Sqlite extends Zend_Cache_Backend implements Zend_Cache
      */
     public function test($id)
     {
+        $this->_checkAndBuildStructure();
         $sql = "SELECT lastModified FROM cache WHERE id='$id' AND (expire=0 OR expire>" . time() . ')';
         $result = $this->_query($sql);
         $row = @sqlite_fetch_array($result);
@@ -148,12 +157,7 @@ class Zend_Cache_Backend_Sqlite extends Zend_Cache_Backend implements Zend_Cache
      */
     public function save($data, $id, $tags = array(), $specificLifetime = false)
     {
-        if (!$this->_checkStructureVersion()) {
-            $this->_buildStructure();
-            if (!$this->_checkStructureVersion()) {
-                Zend_Cache::throwException("Impossible to build cache structure in " . $this->_options['cache_db_complete_path']);
-            }
-        }
+        $this->_checkAndBuildStructure();
         $lifetime = $this->getLifetime($specificLifetime);
         $data = @sqlite_escape_string($data);
         $mktime = time();
@@ -184,6 +188,7 @@ class Zend_Cache_Backend_Sqlite extends Zend_Cache_Backend implements Zend_Cache
      */
     public function remove($id)
     {
+        $this->_checkAndBuildStructure();
         $res = $this->_query("SELECT COUNT(*) AS nbr FROM cache WHERE id='$id'");
         $result1 = @sqlite_fetch_single($res);
         $result2 = $this->_query("DELETE FROM cache WHERE id='$id'");
@@ -209,6 +214,7 @@ class Zend_Cache_Backend_Sqlite extends Zend_Cache_Backend implements Zend_Cache
      */
     public function clean($mode = Zend_Cache::CLEANING_MODE_ALL, $tags = array())
     {
+        $this->_checkAndBuildStructure();
         $return = $this->_clean($mode, $tags);
         $this->_automaticVacuum();
         return $return;
@@ -228,11 +234,11 @@ class Zend_Cache_Backend_Sqlite extends Zend_Cache_Backend implements Zend_Cache
     }
 
     /**
-     * Return the connection resource 
-     * 
+     * Return the connection resource
+     *
      * If we are not connected, the connection is made
      *
-     * @throws Zend_Cache_Exception  
+     * @throws Zend_Cache_Exception
      * @return resource Connection resource
      */
     private function _getConnection()
@@ -245,15 +251,15 @@ class Zend_Cache_Backend_Sqlite extends Zend_Cache_Backend implements Zend_Cache
                 Zend_Cache::throwException("Impossible to open " . $this->_options['cache_db_complete_path'] . " cache DB file");
             }
             return $this->_db;
-        }       
+        }
     }
-    
+
     /**
      * Execute an SQL query silently
-     * 
+     *
      * @param string $query SQL query
      * @return mixed|false query results
-     */ 
+     */
     private function _query($query)
     {
         $db = $this->_getConnection();
@@ -263,7 +269,7 @@ class Zend_Cache_Backend_Sqlite extends Zend_Cache_Backend implements Zend_Cache
                 return false;
             } else {
                 return $res;
-            }           
+            }
         }
         return false;
     }
@@ -422,6 +428,25 @@ class Zend_Cache_Backend_Sqlite extends Zend_Cache_Backend implements Zend_Cache
             return $result;
         }
         return false;
+    }
+
+    /**
+     * Check if the database structure is ok (with the good version), if no : build it
+     *
+     * @return boolean True if ok
+     */
+    private function _checkAndBuildStructure()
+    {
+        if (!($this->_structureChecked)) {
+            if (!$this->_checkStructureVersion()) {
+                $this->_buildStructure();
+                if (!$this->_checkStructureVersion()) {
+                    Zend_Cache::throwException("Impossible to build cache structure in " . $this->_options['cache_db_complete_path']);
+                }
+            }
+            $this->_structureChecked = true;
+        }
+        return true;
     }
 
 }

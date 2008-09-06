@@ -17,7 +17,7 @@
  * @package    Zend_Filter
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Input.php 8928 2008-03-20 19:41:41Z thomas $
+ * @version    $Id: Input.php 8856 2008-03-16 11:28:48Z thomas $
  */
 
 /**

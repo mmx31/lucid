@@ -17,7 +17,7 @@
  * @subpackage Zend_Auth_Adapter
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Ldap.php 8964 2008-03-21 17:53:14Z thomas $
+ * @version    $Id: Ldap.php 10171 2008-07-18 04:57:08Z miallen $
  */
 
 /**
@@ -73,13 +73,36 @@ class Zend_Auth_Adapter_Ldap implements Zend_Auth_Adapter_Interface
      */
     public function __construct(array $options = array(), $username = null, $password = null)
     {
-        $this->_options = $options;
+        $this->setOptions($options);
         if ($username !== null) {
             $this->setUsername($username);
         }
         if ($password !== null) {
             $this->setPassword($password);
         }
+    }
+
+    /**
+     * Returns the array of arrays of Zend_Ldap options of this adapter.
+     *
+     * @return array|null
+     */
+    public function getOptions()
+    {
+        return $this->_options;
+    }
+
+    /**
+     * Sets the array of arrays of Zend_Ldap options to be used by
+     * this adapter.
+     *
+     * @param  array $options The array of arrays of Zend_Ldap options
+     * @return Zend_Auth_Adapter_Ldap Provides a fluent interface
+     */
+    public function setOptions($options)
+    {
+        $this->_options = is_array($options) ? $options : array();
+        return $this;
     }
 
     /**
