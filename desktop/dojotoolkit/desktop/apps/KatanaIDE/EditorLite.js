@@ -1,9 +1,17 @@
 dojo.provide("desktop.apps.KatanaIDE.EditorLite");
+dojo.require("dijit.form.SimpleTextarea")
 
-dojo.declare("desktop.apps.KatanaIDE.EditorLite", [dijit._Widget, dijit._Templated], {
-	templateString: "<textarea style='width: ${width}; height: ${height}; border: 0px;' dojoAttachEvent='onkeypress:_onKey' dojoAttachPoint='editorNode'></textarea>",
+dojo.declare("desktop.apps.KatanaIDE.EditorLite", dijit.form.SimpleTextarea, {
 	width: "100%",
 	height: "100%",
+	postCreate: function() {
+		this.inherited(arguments);
+		dojo.style(this.domNode, {
+			width: this.width,
+			height: this.height
+		});
+		this.connect("onkeypress", this, "_onKey");
+	},
 	_onKey: function(e) {
 		dojo.fixEvent(e);
 		if(e.keyCode != dojo.keys.TAB) return;
@@ -31,9 +39,9 @@ dojo.declare("desktop.apps.KatanaIDE.EditorLite", [dijit._Widget, dijit._Templat
 		//compatibility function
 	},
 	massiveWrite: function(content) {
-		this.editorNode.value = content;
+		this.setValue(content);
 	},
 	getContent: function() {
-		return this.editorNode.value;
+		return this.getValue();
 	}
 })

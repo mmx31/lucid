@@ -1,6 +1,7 @@
 dojo.provide("api._base");
 
 dojo.require("api.flash.flash");
+dojo.require("api.StatusBar");
 dojo.require("api.Console");
 dojo.require("api.crosstalk");
 dojo.require("api.Filearea");
@@ -127,3 +128,21 @@ api.textContent= function(/*DomNode|String*/node, /*String?*/text) {
 	else
 		node[attr] = text;
 }
+
+api._errorCodes = [
+	"ok",
+	"generic_err",
+	"not_authed",
+	"not_found",
+	"db_connect_err",
+	"db_select_err",
+	"db_query_err",
+	"permission_denied",
+	"mail_connect_err",
+	"feature_not_available",
+	"object_not_found",
+	"already_installed",
+	"quota_exceeded",
+	"remote_authentication_failed",
+	"remote_connection_failed"
+];

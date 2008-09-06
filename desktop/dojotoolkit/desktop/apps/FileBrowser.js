@@ -114,7 +114,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		this.win.show();
 		bCont.startup();
 		this.win.startup();
-		this.win.onDestroy = dojo.hitch(this, this.kill);
+		this.win.onClose = dojo.hitch(this, this.kill);
 		this.fileArea.refresh();
 	},
 	

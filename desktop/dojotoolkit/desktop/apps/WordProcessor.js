@@ -1,4 +1,5 @@
 dojo.provide("desktop.apps.WordProcessor");
+dojo.require("dijit.form.SimpleTextarea");
 
 dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	newAs: false,
@@ -59,13 +60,11 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	        region: "center"
 	    },
 	    document.createElement("div"));
-	    this.other = new dijit.layout.ContentPane({
-	        region: "bottom",
-			style: "padding: 2px;"
-	    },
-	    document.createElement("div"));
-	    this.other.setContent(msg.noFileOpen);
-	    this.window.addChild(this.other);
+	    this.statusbar = new api.StatusBar({
+	        region: "bottom"
+	    });
+	    this.statusbar.setLabel(msg.noFileOpen);
+	    this.window.addChild(this.statusbar);
 	    var editor = this.editor = new dijit.Editor({region: "center"}, document.body.appendChild(document.createElement("div")));
 		editor.startup();
 		this.window.addChild(editor);
@@ -94,7 +93,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    this.editing = false;
 	    this.fileEditing = "";
 	    this.newAs = true;
-	    this.other.setContent(msg.editingFile.replace("%s", cmn.untitled));
+	    this.statusbar.setLabel(msg.editingFile.replace("%s", cmn.untitled));
 	
 	},
 	processClose: function() {
@@ -104,7 +103,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    this.newAs = false;
 	    this.editing = false;
 	    this.fileEditing = "";
-	    this.other.setContent(msg.noFileOpen);
+	    this.statusbar.setLabel(msg.noFileOpen);
 	
 	},
 	processOpen: function() {
@@ -122,7 +121,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    if (path == false) {
 	        return false;
 	    }
-	    this.other.setContent(msg.openingFile.replace("%s", path));
+	    this.statusbar.setLabel(msg.openingFile.replace("%s", path));
 	    this.newAs = true;
 	    this.editor.setDisabled(true);
 	    api.filesystem.readFileContents(path, dojo.hitch(this, function(content) {
@@ -131,7 +130,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	            this.editing = true;
 	            this.newAs = true;
 	            this.fileEditing = path;
-	            this.other.setContent(msg.editingFile.replace("%s", path));
+	            this.statusbar.setLabel(msg.editingFile.replace("%s", path));
         }));
 	
 	},
@@ -140,7 +139,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (this.editing) {
         api.filesystem.writeFileContents(this.fileEditing, "<html>"+this.editor.getValue()+"</html>");
-        this.other.setContent(msg.fileSaved);
+        this.statusbar.setLabel(msg.fileSaved);
 	    }
 	    else {
 	        this.processSaveAs();

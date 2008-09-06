@@ -19,11 +19,12 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 	//	|	win.addChild(widget);
 	//	|	win.show();
 	//	|	win.startup();
-	//	|	setTimeout(dojo.hitch(win, "destroy"), 1000*5);
+	//	|	setTimeout(dojo.hitch(win, "close"), 1000*5);
 	templatePath: dojo.moduleUrl("api", "templates/Window.html"),
 	//	_winListItem: storeItem
 	//		The store item that represents this window on desktop.ui._windowList
 	_winListItem: null,
+	_started: false,
 	//	closed: Boolean
 	//		Is the window closed?
 	closed: false,
@@ -117,14 +118,14 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 			this.connect(this.domNode,'onresize',"_onResize");
 		}
 		this.connect(window,'onresize',"_onResize");
-		this.bringToFront();
+		dojo.style(this.domNode, "position", "absolute"); //override /all/ css values for this one
 		this.inherited(arguments);
 	},
 	show: function()
 	{
 		//	summary:
 		//		Shows the window
-		desktop.ui.containerNode.appendChild(this.domNode);
+		desktop.ui._area.addChild(this);
 		dojo.style(this.domNode, "width", this.width);
 		dojo.style(this.domNode, "height", this.height);
 		this.titleNode.innerHTML = this.title;
@@ -135,12 +136,14 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 		});
 		if(this.maximized == true) this.maximize();
 		dojo.style(this.domNode, "display", "block");
+		// offset the window size so that the container is the exact size specified
 		var calcWidth = this.domNode.offsetWidth;
 		var calcHeight = this.domNode.offsetHeight;
 		var bodyWidth = this.containerNode.offsetWidth;
 		var bodyHeight = this.containerNode.offsetHeight;
 		dojo.style(this.domNode, "width", ((calcWidth - bodyWidth)+calcWidth)+"px");
 		dojo.style(this.domNode, "height", ((calcHeight - bodyHeight)+calcHeight)+"px");
+		//calculate the middle of the desktop.ui.Area container
 		var viewport = dijit.getViewport();
 		var topCount = 0;
 		dojo.query(".desktopPanelTop", "desktop_ui_Area_0").forEach(function(panel) {
@@ -164,6 +167,10 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 			});
 			anim.play();
 		} else this.resize();
+		if(!this._started) {
+			this.startup();
+		}
+		this.bringToFront();
 	},
 	_toggleBody: function(/*Boolean*/show) {
 		//	summary:
@@ -439,35 +446,33 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 		//	returns:
 		//		true if it had to be raised
 		//		false if it was already on top
-		var ns = dojo.query("div.win", desktop.ui.containerNode);
 		var maxZindex = 10;
 		var alwaysOnTopNum = 0;		// Number of wins with 'alwaysOnTop' property set to true
 		var topWins = new Array();	// Array of reffernces to win widgets with 'alwaysOnTop' property set to true
 		var winWidget;			// Reffernce to window widget by dom node
-		for(var i=0;i<ns.length;i++)
-		{
-			if(dojo.style(ns[i], "display") == "none") continue;
-			if(dojo.style(ns[i], "zIndex") > maxZindex)
-			{
-				maxZindex = dojo.style(ns[i], "zIndex");
+		this.getParent().getChildren().forEach(function(wid) {
+			var node = wid.domNode;
+			var zindex = dojo.style(node, "zIndex")
+			if(zindex > maxZindex && zindex != "auto") {
+				maxZindex = zindex;
 			}
-			winWidget = dijit.byNode(ns[i]);
-			if ( winWidget.alwaysOnTop == true ) {
+			if ( wid.alwaysOnTop == true ) {
 				alwaysOnTopNum++;
 				topWins.push( winWidget );
 			}
-		}
+		})
 		var zindex = dojo.style(this.domNode, "zIndex");
+		console.log(maxZindex, zindex);
 		if(maxZindex != zindex)
 		{
 			maxZindex++;
 			dojo.style(this.domNode, "zIndex", maxZindex);
 			// Check for win widgets with 'alwaysOnTop' property set to true
 			if ( topWins.length > 0 ) {
-				for ( i=0; i < topWins.length; i++ ) {
+				dojo.forEach(topWins, function(win) {
 					maxZindex++;
 					dojo.style(topWins[i].domNode, "zIndex", maxZindex);
-				}
+				});
 			}
 			return true;
 		}
@@ -611,7 +616,9 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 	startup: function() {
 		//	summary:
 		//		starts the widget up
+		if(this._started) return;
 		this.inherited(arguments);
 		this.resize();
+		this._started = true;
 	}
 });
