@@ -18,31 +18,36 @@ dojo.declare(
 	//
 	// example:
 	// |	<textarea dojoType="dijit.form.TextArea">...</textarea>
-	//
 
 	attributeMap: dojo.mixin(dojo.clone(dijit.form._FormValueWidget.prototype.attributeMap),
 		{style:"styleNode", 'class':"styleNode"}),
 
 	templateString: (dojo.isIE || dojo.isSafari || dojo.isFF) ?
-				((dojo.isIE || dojo.isSafari || dojo.isFF >= 3) ? '<fieldset id="${id}" class="dijitInline dijitInputField dijitTextArea" dojoAttachPoint="styleNode" waiRole="presentation"><div dojoAttachPoint="editNode,focusNode,eventNode" dojoAttachEvent="onpaste:_changing,oncut:_changing" waiRole="textarea" style="text-decoration:none;display:block;overflow:auto;" contentEditable="true"></div>'
+				((dojo.isIE || dojo.isSafari || dojo.isFF >= 3) ? '<fieldset id="${id}" class="dijitInline" dojoAttachPoint="styleNode" waiRole="presentation"><div dojoAttachPoint="editNode,focusNode,eventNode" dojoAttachEvent="onpaste:_changing,oncut:_changing" waiRole="textbox" waiState="multiline-true" style="text-decoration:none;display:block;overflow:auto;" contentEditable="true"></div>'
 					: '<span id="${id}" class="dijitReset">'+
 					'<iframe src="javascript:<html><head><title>${_iframeEditTitle}</title></head><body><script>var _postCreate=window.frameElement?window.frameElement.postCreate:null;if(_postCreate)_postCreate();</script></body></html>"'+
-							' dojoAttachPoint="iframe,styleNode" dojoAttachEvent="onblur:_onIframeBlur" class="dijitInline dijitInputField dijitTextArea"></iframe>')
-				+ '<textarea name="${name}" value="${value}" dojoAttachPoint="formValueNode" style="display:none;"></textarea>'
+							' dojoAttachPoint="iframe,styleNode,stateNode" dojoAttachEvent="onblur:_onIframeBlur" class="dijitInline dijitInputField"></iframe>')
+				+ '<textarea name="${name}" value="${value}" dojoAttachPoint="formValueNode" style="display:none;" autocomplete="off"></textarea>'
 				+ ((dojo.isIE || dojo.isSafari || dojo.isFF >= 3) ? '</fieldset>':'</span>')
-			: '<textarea id="${id}" name="${name}" value="${value}" dojoAttachPoint="formValueNode,editNode,focusNode,styleNode" class="dijitInputField dijitTextArea">'+dojo.isFF+'</textarea>',
+			: '<textarea id="${id}" name="${name}" value="${value}" dojoAttachPoint="formValueNode,editNode,focusNode,styleNode">'+dojo.isFF+'</textarea>',
 
-	setAttribute: function(/*String*/ attr, /*anything*/ value){
+	baseClass: "dijitTextArea",
+
+	_setDisabledAttr: function(/*Boolean*/ value){
 		this.inherited(arguments);
-		switch(attr){
-			case "disabled":
-				this.formValueNode.disabled = this.disabled;
-			case "readOnly":
-				if(dojo.isIE || dojo.isSafari || dojo.isFF >= 3){
-					this.editNode.contentEditable = (!this.disabled && !this.readOnly);
-				}else if(dojo.isFF){
-					this.iframe.contentDocument.designMode = (this.disabled || this.readOnly)? "off" : "on";
-				}
+		this.formValueNode.disabled = this.disabled;
+		this._adjustWritable();
+	},
+	_setReadOnlyAttr: function(/*Boolean*/ value){
+		this.readOnly = value;
+		this._adjustWritable();
+	},
+	_adjustWritable: function(){
+		// summary: set whether user can write into textbox, based on this.disabled and this.readOnly
+		if(dojo.isIE || dojo.isSafari || dojo.isFF >= 3){
+			this.editNode.contentEditable = (!this.disabled && !this.readOnly);
+		}else if(dojo.isFF){
+			this.iframe.contentDocument.designMode = (this.disabled || this.readOnly)? "off" : "on";
 		}
 	},
 
@@ -54,7 +59,9 @@ dojo.declare(
 		dijit.focus(this.iframe || this.focusNode);
 	},
 
-	setValue: function(/*String*/ value, /*Boolean, optional*/ priorityChange){
+	_setValueAttr: function(/*String*/ value, /*Boolean, optional*/ priorityChange){
+		// summary:
+		//		Hook so attr('value', ...) works.
 		var editNode = this.editNode;
 		if(typeof value == "string"){
 			editNode.innerHTML = ""; // wipe out old nodes
@@ -103,10 +110,12 @@ dojo.declare(
 			}
 			editNode.removeChild(sizeNode);
 		}
-		dijit.form.Textarea.superclass.setValue.call(this, this.getValue(), priorityChange);
+		dijit.form.Textarea.superclass._setValueAttr.call(this, this.attr('value'), priorityChange);
 	},
 
-	getValue: function(){
+	_getValueAttr: function(){
+		// summary:
+		//		Hook so attr('value') works.
 		return this.value.replace(/\r/g,"");
 	},
 
@@ -123,7 +132,7 @@ dojo.declare(
 		if(!this.value){ this.value = ""; }
 		this.value = this.value.replace(/\r\n/g,"\n").replace(/&gt;/g,">").replace(/&lt;/g,"<").replace(/&amp;/g,"&");
 		if(dojo.isFF == 2){
-			// In the case of Firefox an iframe is used and when the text gets focus,
+			// In the case of Firefox < 3 an iframe is used and when the text gets focus,
 			// focus is fired from the document object.  There isn't a way to put a
 			// waiRole on the document object and as a result screen readers don't
 			// announce the role.  As a result screen reader users are lost.
@@ -178,14 +187,15 @@ dojo.declare(
 			// this.connect won't destroy this handler cleanly since its on the iframe's window object
 			// resize is a method of window, not document
 			w.addEventListener("resize", dojo.hitch(this, this._changed), false); // resize is only on the window object
+			dijit.registerWin(w);
 		}else{
 			this.focusNode = this.domNode;
 		}
 		if(this.eventNode){
 			this.connect(this.eventNode, "keypress", this._onKeyPress);
 			this.connect(this.eventNode, "mousemove", this._changed);
-			this.connect(this.eventNode, "focus", this._focused);
-			this.connect(this.eventNode, "blur", this._blurred);
+			this.connect(this.eventNode, "focus", this._focusedEventNode);
+			this.connect(this.eventNode, "blur", this._blurredEventNode);
 		}
 		if(this.editNode){
 			this.connect(this.editNode, "change", this._changed); // needed for mouse paste events per #3479
@@ -194,13 +204,17 @@ dojo.declare(
 	},
 
 	// event handlers, you can over-ride these in your own subclasses
-	_focused: function(e){
-		dojo.addClass(this.iframe||this.domNode, "dijitInputFieldFocused");
+	_focusedEventNode: function(e){
+		// note: this is needed when we have an iframe
+		this._focused = true;
+		this._setStateClass();
 		this._changed(e);
 	},
 
-	_blurred: function(e){
-		dojo.removeClass(this.iframe||this.domNode, "dijitInputFieldFocused");
+	_blurredEventNode: function(e){
+		// note: this is needed when we have an iframe
+		this._focused = false;
+		this._setStateClass();
 		this._changed(e, true);
 	},
 
@@ -210,7 +224,7 @@ dojo.declare(
 	},
 
 	_onKeyPress: function(e){
-		if(e.keyCode == dojo.keys.TAB && !e.shiftKey && !e.ctrlKey && !e.altKey && this.iframe){
+		if(e.charOrCode == dojo.keys.TAB && !e.shiftKey && !e.ctrlKey && !e.altKey && this.iframe){
 			// Pressing the tab key in the iframe (with designMode on) will cause the
 			// entry of a tab character so we have to trap that here.  Since we don't
 			// know the next focusable object we put focus on the iframe and then the
@@ -227,7 +241,7 @@ dojo.declare(
 			// on the iframe's contentWindow.
 			this.iframe.focus();  // this.focus(); won't work
 			dojo.stopEvent(e);
-		}else if(e.keyCode == dojo.keys.ENTER){
+		}else if(e.charOrCode == dojo.keys.ENTER){
 			e.stopPropagation();
 		}else if(this.inherited("_onKeyPress", arguments) && this.iframe){
 			// #3752:
@@ -252,6 +266,6 @@ dojo.declare(
 		if(this.iframe && this.iframe.contentDocument.designMode != "on" && !this.disabled && !this.readOnly){
 			this.iframe.contentDocument.designMode="on"; // in case this failed on init due to being hidden
 		}
-		this.setValue(null, priorityChange || false);
+		this._setValueAttr(null, priorityChange || false);
 	}
 });

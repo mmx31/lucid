@@ -53,20 +53,11 @@ dojo.requireLocalization("dojo.cldr", "gregorian");
 //					}
 					break;
 				case 'M':
-				case 'L':
 					var m = dateObject.getMonth();
-					var widthM;
-					switch(l){
-						case 1: case 2:
-							s = m+1; pad = true;
-							break;
-						case 3: case 4: case 5:
-							widthM = widthList[l-3];
-							break;
-					}
-					if(widthM){
-						var typeM = (c == "L") ? "standalone" : "format";
-						var propM = ["months", typeM, widthM].join("-");
+					if(l<3){
+						s = m+1; pad = true;
+					}else{
+						var propM = ["months", "format", widthList[l-3]].join("-");
 						s = bundle[propM][m];
 					}
 					break;
@@ -81,28 +72,11 @@ dojo.requireLocalization("dojo.cldr", "gregorian");
 					s = dojo.date.locale._getDayOfYear(dateObject); pad = true;
 					break;
 				case 'E':
-				case 'e':
-				case 'c': // REVIEW: don't see this in the spec?
 					var d = dateObject.getDay();
-					var widthD;
-					switch(l){
-						case 1: case 2:
-							if(c == 'e'){
-								var first = dojo.cldr.supplemental.getFirstDayOfWeek(options.locale);
-								d = (d-first+7)%7;
-							}
-							if(c != 'c'){
-								s = d+1; pad = true;
-								break;
-							}
-							// else fallthrough...
-						case 3: case 4: case 5:
-							widthD = widthList[l-3];
-							break;
-					}
-					if(widthD){
-						var typeD = (c == "c") ? "standalone" : "format";
-						var propD = ["days", typeD, widthD].join("-");
+					if(l<3){
+						s = d+1; pad = true;
+					}else{
+						var propD = ["days", "format", widthList[l-3]].join("-");
 						s = bundle[propD][d];
 					}
 					break;
@@ -161,7 +135,7 @@ dojo.requireLocalization("dojo.cldr", "gregorian");
 					}
 					s = tz.join("");
 					break;
-//				case 'Y': case 'u': case 'W': case 'F': case 'g': case 'A':
+//				case 'Y': case 'u': case 'W': case 'F': case 'g': case 'A': case 'e':
 //					console.debug(match+" modifier unimplemented");
 				default:
 					throw new Error("dojo.date.locale.format: invalid pattern char: "+pattern);
@@ -301,7 +275,7 @@ dojo.date.locale.parse = function(/*String*/value, /*dojo.date.locale.__FormatOp
 
 	var info = dojo.date.locale._parseInfo(options);
 	var tokens = info.tokens, bundle = info.bundle;
-	var re = new RegExp("^" + info.regexp + "$");
+	var re = new RegExp("^" + info.regexp + "$", info.strict ? "" : "i");
 	var match = re.exec(value);
 	if(!match){ return null; } // null
 
@@ -472,7 +446,7 @@ function _processPattern(pattern, applyPattern, applyLiteral, applyAll){
 	//split on single quotes (which escape literals in date format strings) 
 	//but preserve escaped single quotes (e.g., o''clock)
 	var chunks = pattern.match(/(''|[^'])+/g); 
-	var literal = false;
+	var literal = pattern.charAt(0) == "'";
 
 	dojo.forEach(chunks, function(chunk, i){
 		if(!chunk){
@@ -505,13 +479,13 @@ function _buildDateTimeRE(tokens, bundle, options, pattern){
 				s = '\\d{2,4}';
 				break;
 			case 'M':
-				s = (l>2) ? '\\S+' : p2+'[1-9]|1[0-2]';
+				s = (l>2) ? '\\S+?' : p2+'[1-9]|1[0-2]';
 				break;
 			case 'D':
 				s = p2+'[1-9]|'+p3+'[1-9][0-9]|[12][0-9][0-9]|3[0-5][0-9]|36[0-6]';
 				break;
 			case 'd':
-				s = p2+'[1-9]|[12]\\d|3[01]';
+				s = '[12]\\d|'+p2+'[1-9]|3[01]';
 				break;
 			case 'w':
 				s = p2+'[1-9]|[1-4][0-9]|5[0-3]';
@@ -547,7 +521,9 @@ function _buildDateTimeRE(tokens, bundle, options, pattern){
 					s = am + '|' + pm;
 					if(am != am.toLowerCase()){ s += '|' + am.toLowerCase(); }
 					if(pm != pm.toLowerCase()){ s += '|' + pm.toLowerCase(); }
+					if(s.indexOf('.') != -1){ s += '|' + s.replace(/\./g, ""); }
 				}
+				s = s.replace(/\./g, "\\.");
 				break;
 			default:
 			// case 'v':
@@ -610,7 +586,10 @@ dojo.date.locale.getNames = function(/*String*/item, /*String*/type, /*String?*/
 	var lookup = dojo.date.locale._getGregorianBundle(locale);
 	var props = [item, use, type];
 	if(use == 'standAlone'){
-		label = lookup[props.join('-')];
+		var key = props.join('-');
+		label = lookup[key];
+		// Fall back to 'format' flavor of name
+		if(label[0] == 1){ label = undefined; } // kludge, in the absense of real aliasing support in dojo.cldr
 	}
 	props[1] = 'format';
 
@@ -635,7 +614,7 @@ dojo.date.locale.isWeekend = function(/*Date?*/dateObject, /*String?*/locale){
 
 dojo.date.locale._getDayOfYear = function(/*Date*/dateObject){
 	// summary: gets the day of the year as represented by dateObject
-	return dojo.date.difference(new Date(dateObject.getFullYear(), 0, 1), dateObject) + 1; // Number
+	return dojo.date.difference(new Date(dateObject.getFullYear(), 0, 1, dateObject.getHours()), dateObject) + 1; // Number
 };
 
 dojo.date.locale._getWeekOfYear = function(/*Date*/dateObject, /*Number*/firstDayOfWeek){

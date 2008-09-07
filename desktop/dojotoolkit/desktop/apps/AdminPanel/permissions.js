@@ -43,6 +43,8 @@ dojo.extend(desktop.apps.AdminPanel, {
 				structure: layout,
 				model: new dojox.grid.data.DojoData(null, null, {store: this._permStore, query: {id: "*"}})
 			});
+			if(this._con) dojo.disconnect(this._con);
+			this._con = dojo.connect(this.main, "resize", grid, "resize");
 			this.main.setContent(this._permGrid.domNode);
 			this._permGrid.render();
 			this.win.startup();

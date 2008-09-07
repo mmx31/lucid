@@ -43,6 +43,7 @@ dojo.declare("dijit._editor.plugins.FontChoice",
 		_uniqueId: 0,
 
 		buttonClass: dijit.form.FilteringSelect,
+		useDefaultCommand: false,
 
 		_initButton: function(){
 			//TODO: would be nice to be able to handle comma-separated font lists and search within them
@@ -54,6 +55,7 @@ dojo.declare("dijit._editor.plugins.FontChoice",
 				fontSize: [1,2,3,4,5,6,7], // sizes according to the old HTML FONT SIZE
 				formatBlock: ["p", "h1", "h2", "h3", "pre"]
 			}[cmd];
+			this._availableValues = names; //store all possible values
 			var strings = dojo.i18n.getLocalization("dijit._editor", "FontChoice");
 			var items = dojo.map(names, function(value){
 				var name = strings[value] || value;
@@ -71,24 +73,18 @@ dojo.declare("dijit._editor.plugins.FontChoice",
 				}
 				return { label: label, name: name, value: value };
 			});
-			items.push({label: "", name:"", value:""}); // FilteringSelect doesn't like unmatched blank strings
+			//items.push({label: "", name:"", value:""}); // FilteringSelect doesn't like unmatched blank strings
 
-			dijit._editor.plugins.FontChoice.superclass._initButton.apply(this,
-				[{ labelType: "html", labelAttr: "label", searchAttr: "name", store: new dojo.data.ItemFileReadStore(
+			this.inherited(arguments,[{required:false, labelType: "html", labelAttr: "label", searchAttr: "name", store: new dojo.data.ItemFileReadStore(
 					{ data: { identifier: "value", items: items } })}]);
 
-			this.button.setValue("");
+			this.button.attr("value", "");
 
 			this.connect(this.button, "onChange", function(choice){
 				if(this.updating){ return; }
-				// FIXME: IE is really messed up here!!
-				if(dojo.isIE && "_savedSelection" in this){
-					var b = this._savedSelection;
-					delete this._savedSelection;
+				if(dojo.isIE || !this._focusHandle){
 					this.editor.focus();
-					this.editor._moveToBookmark(b);
 				}else{
-//					this.editor.focus();
 					dijit.focus(this._focusHandle);
 				}
 				if(this.command == "fontName" && choice.indexOf(" ") != -1){ choice = "'" + choice + "'"; }
@@ -102,11 +98,17 @@ dojo.declare("dijit._editor.plugins.FontChoice",
 			var _c = this.command;
 			if(!_e || !_e.isLoaded || !_c.length){ return; }
 			if(this.button){
-				var value = _e.queryCommandValue(this.editor._normalizeCommand(_c)) || "";
+				var value;
+				try{
+					value = _e.queryCommandValue(_c) || "";
+				}catch(e){
+					//Firefox may throw error above if the editor is just loaded, ignore it
+					value = "";
+				}
 				// strip off single quotes, if any
 				var quoted = dojo.isString(value) && value.match(/'([^']*)'/);
 				if(quoted){ value = quoted[1]; }
-//console.log("selected " + value);
+
 				if(this.generic && _c == "fontName"){
 					var map = {
 						"Arial": "sans-serif",
@@ -121,22 +123,23 @@ dojo.declare("dijit._editor.plugins.FontChoice",
 						"Papyrus": "fantasy"
 // 						,"????": "fantasy" TODO: IE doesn't map fantasy font-family?
 					};
-//console.log("mapped to " + map[value]);
+
 					value = map[value] || value;
 				}else if(_c == "fontSize" && value.indexOf && value.indexOf("px") != -1){
 					var pixels = parseInt(value);
 					value = {10:1, 13:2, 16:3, 18:4, 24:5, 32:6, 48:7}[pixels] || value;
 				}
+
 				this.updating = true;
-				this.button.setValue(value);
+				//if the value is not a permitted value, just set empty string to prevent
+				//showing the warning icon
+				this.button.attr('value', dojo.indexOf(this._availableValues,value)<0?"":value);
 				delete this.updating;
 			}
 
-			// FIXME: IE is *really* b0rken
-			if(dojo.isIE){
-				this._savedSelection = this.editor._getBookmark();
+			if(this.editor.iframe){
+				this._focusHandle = dijit.getFocus(this.editor.iframe);
 			}
-			this._focusHandle = dijit.getFocus(this.editor.iframe);
 		},
 
 		setToolbar: function(){

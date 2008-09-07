@@ -25,11 +25,16 @@ dojo.mixin(dijit,
 
 	isCollapsed: function(){
 		// summary: tests whether the current selection is empty
-		var _window = dojo.global;
 		var _document = dojo.doc;
 		if(_document.selection){ // IE
-			return !_document.selection.createRange().text; // Boolean
+			var s=_document.selection;
+			if(s.type=='Text'){
+				return !s.createRange().htmlText.length; // Boolean
+			}else{ //Control range
+				return !s.createRange().length; // Boolean
+			}
 		}else{
+			var _window = dojo.global;
 			var selection = _window.getSelection();
 			if(dojo.isString(selection)){ // Safari
 				return !selection; // Boolean
@@ -79,7 +84,11 @@ dojo.mixin(dijit,
 			var range;
 			if(dojo.isArray(bookmark)){
 				range = _document.body.createControlRange();
-				dojo.forEach(bookmark, "range.addElement(item)"); //range.addElement does not have call/apply method, so can not call it directly
+				//range.addElement does not have call/apply method, so can not call it directly
+				//range is not available in "range.addElement(item)", so can't use that either
+				dojo.forEach(bookmark, function(n){
+					range.addElement(n);
+				});
 			}else{
 				range = _document.selection.createRange();
 				range.moveToBookmark(bookmark);

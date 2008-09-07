@@ -74,7 +74,7 @@ dojo.require("dojo._base.array");
 			//		Optional parameter to describe what position relative to
 			//		the NodeList's zero index to end the slice at. Like begin,
 			//		can be positive or negative.
-			var a = dojo._toArray(arguments);
+			var a = d._toArray(arguments);
 			return tnl(a.slice.apply(this, a));
 		},
 
@@ -102,7 +102,7 @@ dojo.require("dojo._base.array");
 			//		spliced into the NodeList
 			// returns:
 			//		dojo.NodeList
-			var a = dojo._toArray(arguments);
+			var a = d._toArray(arguments);
 			return tnl(a.splice.apply(this, a));
 		},
 
@@ -120,7 +120,7 @@ dojo.require("dojo._base.array");
 			//		spliced into the NodeList
 			// returns:
 			//		dojo.NodeList
-			var a = dojo._toArray(arguments, 0, [this]);
+			var a = d._toArray(arguments, 0, [this]);
 			return tnl(a.concat.apply([], a));
 		},
 		
@@ -214,9 +214,11 @@ dojo.require("dojo._base.array");
 			//		the attribute to get/set
 			//	value: String?
 			//		optional. The value to set the property to
-			//	return:
+			//	returns:
 			//		if no value is passed, the result is an array of attribute values
 			//		If a value is passed, the return is this NodeList
+			return; // dojo.NodeList
+			return; // Array
 		},
 
 		style: function(property, value){
@@ -227,9 +229,11 @@ dojo.require("dojo._base.array");
 			//		("lineHieght" instead of "line-height") 
 			//	value: String?
 			//		optional. The value to set the property to
-			//	return:
+			//	returns:
 			//		if no value is passed, the result is an array of strings.
 			//		If a value is passed, the return is this NodeList
+			return; // dojo.NodeList
+			return; // Array
 		},
 
 		addClass: function(className){
@@ -237,8 +241,7 @@ dojo.require("dojo._base.array");
 			//		adds the specified class to every node in the list
 			//	className: String
 			//		the CSS class to add
-			//	return:
-			//		dojo.NodeList, this list
+			return; // dojo.NodeList
 		},
 
 		removeClass: function(className){
@@ -246,8 +249,9 @@ dojo.require("dojo._base.array");
 			//		removes the specified class from every node in the list
 			//	className: String
 			//		the CSS class to add
-			//	return:
+			//	returns:
 			//		dojo.NodeList, this list
+			return; // dojo.NodeList
 		},
 
 		toggleClass: function(className, condition){
@@ -258,8 +262,7 @@ dojo.require("dojo._base.array");
 			//		If passed, true means to add the class, false means to remove.
 			//	className: String
 			//		the CSS class to add
-			//	return: dojo.NodeList
-			//		this list
+			return; // dojo.NodeList
 		},
 
 		connect: function(methodName, objOrFunc, funcName){
@@ -313,7 +316,7 @@ dojo.require("dojo._base.array");
 			//			* "after"
 			// 		or an offset in the childNodes property
 			var item = d.query(queryOrNode)[0];
-			return this.forEach(function(i){ d.place(i, item, (position||"last")); }); // dojo.NodeList
+			return this.forEach(function(i){ d.place(i, item, position); }); // dojo.NodeList
 		},
 
 		orphan: function(/*String?*/ simpleFilter){
@@ -323,15 +326,10 @@ dojo.require("dojo._base.array");
 			//		NodeList.
 			//	simpleFilter:
 			//		single-expression CSS filter
-			//	return:
-			//		`dojo.NodeList` the orpahned elements 
-			var orphans = simpleFilter ? d._filterQueryResult(this, simpleFilter) : this;
-			orphans.forEach(function(item){
-				if(item.parentNode){
-					item.parentNode.removeChild(item);
-				}
-			});
-			return orphans; // dojo.NodeList
+			//	returns:
+			//		`dojo.NodeList` containing the orpahned elements 
+			return (simpleFilter ? d._filterQueryResult(this, simpleFilter) : this). // dojo.NodeList
+				forEach("if(item.parentNode){ item.parentNode.removeChild(item); }"); 
 		},
 
 		adopt: function(/*String||Array||DomNode*/ queryOrListOrNode, /*String?*/ position){
@@ -351,7 +349,9 @@ dojo.require("dojo._base.array");
 			//			* "after"
 			// 		or an offset in the childNodes property
 			var item = this[0];
-			return d.query(queryOrListOrNode).forEach(function(ai){ d.place(ai, item, position || "last"); }); // dojo.NodeList
+			return d.query(queryOrListOrNode).forEach(function(ai){ // dojo.NodeList
+				d.place(ai, item, position || "last"); 
+			});
 		},
 
 		// FIXME: do we need this?
@@ -367,11 +367,8 @@ dojo.require("dojo._base.array");
 			// FIXME: use map?
 			var ret = d.NodeList();
 			this.forEach(function(item){
-				d.query(queryStr, item).forEach(function(subItem){
-					if(subItem !== undefined){
-						ret.push(subItem);
-					}
-				});
+				// FIXME: why would we ever get undefined here?
+				ret = ret.concat(d.query(queryStr, item).filter(function(subItem){ return (subItem !== undefined); }));
 			});
 			return ret; // dojo.NodeList
 		},
@@ -486,6 +483,19 @@ dojo.require("dojo._base.array");
 			return this.forEach(function(i){
 				new c(properties||{},i);
 			}) // dojo.NodeList
+		},
+
+		at: function(/*===== index =====*/){
+			//	summary:
+			//		Returns a new NodeList comprised of items in this NodeList
+			//		at the given index or indices.
+			//	index: Integer...
+			//		One or more 0-based indices of items in the current NodeList.
+			//	returns:
+			//		dojo.NodeList
+			var nl = new dojo.NodeList();
+			dojo.forEach(arguments, function(i) { if(this[i]) { nl.push(this[i]); } }, this);
+			return nl; // dojo.NodeList
 		}
 
 	});
@@ -494,10 +504,10 @@ dojo.require("dojo._base.array");
 	d.forEach([
 		"blur", "focus", "click", "keydown", "keypress", "keyup", "mousedown",
 		"mouseenter", "mouseleave", "mousemove", "mouseout", "mouseover",
-		"mouseup"
+		"mouseup", "submit", "load", "error"
 		], function(evt){
 			var _oe = "on"+evt;
-			dojo.NodeList.prototype[_oe] = function(a, b){
+			d.NodeList.prototype[_oe] = function(a, b){
 				return this.connect(_oe, a, b);
 			}
 				// FIXME: should these events trigger publishes?

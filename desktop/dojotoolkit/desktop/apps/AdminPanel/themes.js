@@ -42,6 +42,8 @@ dojo.extend(desktop.apps.AdminPanel, {
 				structure: layout,
 				model: new dojox.grid.data.DojoData(null, null, {store: this._themeStore, query: {sysname: "*"}})
 			});
+			if(this._con) dojo.disconnect(this._con);
+			this._con = dojo.connect(this.main, "resize", grid, "resize");
 			dojo.connect(this._themeStore, "onDelete", this, function(a) {
 				desktop.theme.remove(a.sysname[0]); //that feels really hackish
 			})

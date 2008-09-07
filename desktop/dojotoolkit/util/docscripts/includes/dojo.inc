@@ -3,6 +3,8 @@
 require_once('lib/parser/Dojo.php');
 require_once('lib/parser/DojoPackage.php');
 
+DojoFunctionBody::$suffix = ':';
+
 function _dojo_get_namespaces(){
   static $namespaces;
   if (!isset($namespaces)) {
@@ -40,9 +42,14 @@ function dojo_get_files() {
         $dojo = new Dojo($namespace, $location);
         $list = $dojo->getFileList();
         foreach ($list as $i => $item) {
+            // Skip internationalization/tests/demos files
+            if (preg_match('%(^|/|\\\\)(nls|tests|demos)(\\\\|/)%', $item)) {
+              unset($list[$i]);
+              continue;
+            }
             $list[$i] = array($namespace, $item);
         }
-        $files = array_merge($files, $list);
+        $files = array_merge($files, array_values($list));
     }
 
     return $files;
@@ -156,11 +163,11 @@ function dojo_get_contents($namespace, $file_name) {
   unset($env);
   unset($req);
 
-  $declare_calls = array_merge($package->getFunctionCalls('dojo.declare'), $package->getFunctionCalls('dojo.widget.defineWidget'));
+  $declare_calls = array_merge($package->getFunctionCalls('dojo.declare'), $package->getFunctionCalls('d.declare'), $package->getFunctionCalls('dojo.widget.defineWidget'));
   // This closely matches dojo.widget.defineWidget as declared in src/widget/Widget.js
   foreach ($declare_calls as $call) {
     $init = null;
-    if ($call->getName() == 'dojo.declare') {
+    if ($call->getName() == 'dojo.declare' || $call->getName() == 'd.declare') {
       $args = array($call->getParameter(0), null, $call->getParameter(1), $call->getParameter(2), $call->getParameter(3));
       $name = $args[0]->getString();
       if ($args[3]->isA(DojoFunctionDeclare)) {
@@ -326,8 +333,8 @@ function dojo_get_contents($namespace, $file_name) {
   unset($declaration_instance);
 
   foreach ($executions as $execution) {
-    $execution->rollOut($output);
     $execution->removeSwallowedMixins($swallowed_mixins);
+    $execution->rollOut($output);
 
     unset($execution);
   }
@@ -340,7 +347,7 @@ function dojo_get_contents($namespace, $file_name) {
   foreach ($mixin_calls as $call) {
     $is_prototype = false;
     if ($call->getParameter(0)->isA(DojoVariable) || $call->getParameter(0)->isA(DojoFunctionDeclare)) {
-      if ($call->getParameter(0)->isA(dojoVariable)) {
+      if ($call->getParameter(0)->isA(DojoVariable)) {
         $object = $call->getParameter(0)->getVariable();
         if (strpos($object, '(') !== false) {
           continue;
@@ -455,6 +462,16 @@ function dojo_get_contents($namespace, $file_name) {
       array_pop($parts);
   }
   unset($parts);
+
+  list($project,) = explode('.', $output['#provides'], 2);
+  if ($output['#requires']) {
+    foreach ($output['#requires'] as &$require) {
+      list($require_project,) = explode('.', $require[1]);
+      if ($require_project != $project) {
+        $require[2] = $require_project;
+      }
+    }
+  }
 
   foreach ($output as $object_name => $object) {
     if ($object_name{0} == '#') {

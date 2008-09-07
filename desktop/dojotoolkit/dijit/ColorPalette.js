@@ -74,8 +74,8 @@ dojo.declare("dijit.ColorPalette",
 	// _imagePaths: Map
 	//		This is stores the path to the palette images
 	_imagePaths: {
-		"7x10": dojo.moduleUrl("dijit", "templates/colors7x10.png"),
-		"3x4": dojo.moduleUrl("dijit", "templates/colors3x4.png")
+		"7x10": dojo.moduleUrl("dijit.themes", "a11y/colors7x10.png"),
+		"3x4": dojo.moduleUrl("dijit.themes", "a11y/colors3x4.png")
 	},
 
 	// _paletteCoords: Map
@@ -110,7 +110,7 @@ dojo.declare("dijit.ColorPalette",
 		this.domNode.style.position = "relative";
 		this._cellNodes = [];	
 		this.colorNames = dojo.i18n.getLocalization("dojo", "colors", this.lang);
-		var url = dojo.moduleUrl("dojo", "resources/blank.gif"),
+		var url = this._blankGif,
             colorObject = new dojo.Color(),
 		    coords = this._paletteCoords;
 		for(var row=0; row < choices.length; row++){
@@ -161,7 +161,7 @@ dojo.declare("dijit.ColorPalette",
 		};
 		for(var key in keyIncrementMap){
 			this._connects.push(dijit.typematic.addKeyListener(this.domNode,
-				{keyCode:dojo.keys[key], ctrlKey:false, altKey:false, shiftKey:false},
+				{charOrCode:dojo.keys[key], ctrlKey:false, altKey:false, shiftKey:false},
 				this,
 				function(){
 					var increment = keyIncrementMap[key];
@@ -232,6 +232,7 @@ dojo.declare("dijit.ColorPalette",
 		// evt:
 		//		The mouse event.
 		var target = evt.currentTarget;
+		this._setCurrent(target);	// redundant, but needed per safari bug where onCellFocus never called
 		window.setTimeout(function(){dijit.focus(target)}, 0);
 	},
 
@@ -242,9 +243,18 @@ dojo.declare("dijit.ColorPalette",
 		//		the new color.
 		// evt:
 		//		The focus event.
+		this._setCurrent(evt.currentTarget);
+	},
+
+	_setCurrent: function(/*Node*/ node){
+		// summary:
+		//		Called when color is hovered or focused.
+		// description:
+		//		Removes highlight of the old color, and highlights
+		//		the new color.
 		this._removeCellHighlight(this._currentFocus);
-		this._currentFocus = evt.currentTarget.index;
-		dojo.addClass(evt.currentTarget, "dijitPaletteCellHighlight");
+		this._currentFocus = node.index;
+		dojo.addClass(node, "dijitPaletteCellHighlight");		
 	},
 
 	_onCellBlur: function(/*Event*/ evt){

@@ -5,6 +5,7 @@ dojo.require("dijit.layout._LayoutWidget");
 
 dojo.require("dojo.parser");
 dojo.require("dojo.string");
+dojo.require("dojo.html");
 dojo.requireLocalization("dijit", "loading");
 
 dojo.declare(
@@ -23,19 +24,27 @@ dojo.declare(
 	//		But note that those classes can contain any widget as a child.
 	// example:
 	//		Some quick samples:
-	//		To change the innerHTML use .setContent('<b>new content</b>')
+	//		To change the innerHTML use .attr('content', '<b>new content</b>')
 	//
-	//		Or you can send it a NodeList, .setContent(dojo.query('div [class=selected]', userSelection))
+	//		Or you can send it a NodeList, .attr('content', dojo.query('div [class=selected]', userSelection))
 	//		please note that the nodes in NodeList will copied, not moved
 	//
-	//		To do a ajax update use .setHref('url')
-	//
+	//		To do a ajax update use .attr('href', url)
+
 	// href: String
 	//		The href of the content that displays now.
 	//		Set this at construction if you want to load data externally when the
-	//		pane is shown.  (Set preload=true to load it immediately.)
-	//		Changing href after creation doesn't have any effect; see setHref();
+	//		pane is shown.	(Set preload=true to load it immediately.)
+	//		Changing href after creation doesn't have any effect; use attr('href', ...);
 	href: "",
+
+/*=====
+	// content: String
+	//		The innerHTML of the ContentPane.
+	//		Note that the initialization parameter / argument to attr("content", ...)
+	//		can be a String, DomNode, Nodelist, or widget.
+	content: "",
+=====*/
 
 	// extractContent: Boolean
 	//	Extract visible content from inside of <body> .... </body>
@@ -69,44 +78,39 @@ dojo.declare(
 	//	Tells loading status see onLoad|onUnload for event hooks
 	isLoaded: false,
 
-	// class: String
-	//	Class name to apply to ContentPane dom nodes
-	// TODO: this should be called "baseClass" like in the other widgets
-	"class": "dijitContentPane",
+	baseClass: "dijitContentPane",
 
-	// doLayout: String/Boolean
-	//	false - don't adjust size of children
-	//	true - looks for the first sizable child widget (ie, having resize() method) and sets it's size to
-	//			however big the ContentPane is (TODO: implement)
-	//	auto - if there is a single sizable child widget (ie, having resize() method), set it's size to
-	//			however big the ContentPane is
-	doLayout: "auto",
+	// doLayout: Boolean
+	//		- false - don't adjust size of children
+	//		- true - if there is a single visible child widget, set it's size to
+	//				however big the ContentPane is
+	doLayout: true,
+
+	postMixInProperties: function(){
+		this.inherited(arguments);
+		var messages = dojo.i18n.getLocalization("dijit", "loading", this.lang);
+		this.loadingMessage = dojo.string.substitute(this.loadingMessage, messages);
+		this.errorMessage = dojo.string.substitute(this.errorMessage, messages);
+	},
+
+	buildRendering: function(){
+		this.inherited(arguments);
+		if(!this.containerNode){
+			// make getDescendants() work
+			this.containerNode = this.domNode;
+		}
+	},
 
 	postCreate: function(){
 		// remove the title attribute so it doesn't show up when i hover
 		// over a node
 		this.domNode.title = "";
 
-		if(!this.containerNode){
-			// make getDescendants() work
-			this.containerNode = this.domNode;
-		}
-
-		if(this.preload){
-			this._loadCheck();
-		}
-
-		var messages = dojo.i18n.getLocalization("dijit", "loading", this.lang);
-		this.loadingMessage = dojo.string.substitute(this.loadingMessage, messages);
-		this.errorMessage = dojo.string.substitute(this.errorMessage, messages);
-		var curRole = dijit.getWaiRole(this.domNode);
-		if (!curRole){
+		if (!dijit.hasWaiRole(this.domNode)){
 			dijit.setWaiRole(this.domNode, "group");
 		}
 
-		// for programatically created ContentPane (with <span> tag), need to muck w/CSS
-		// or it's as though overflow:visible is set
-		dojo.addClass(this.domNode, this["class"]);
+		dojo.addClass(this.domNode, this.baseClass);
 	},
 
 	startup: function(){
@@ -123,17 +127,26 @@ dojo.declare(
 
 	_checkIfSingleChild: function(){
 		// summary:
-		// 	Test if we have exactly one widget as a child, and if so assume that we are a container for that widget,
-		//	and should propogate startup() and resize() calls to it.
+		//		Test if we have exactly one visible widget as a child,
+		//		and if so assume that we are a container for that widget,
+		//		and should propogate startup() and resize() calls to it.
+		//		Skips over things like data stores since they aren't visible.
 
-		// TODO: if there are two child widgets (a data store and a TabContainer, for example),
-		//	should still find the TabContainer
-		var childNodes = dojo.query(">", this.containerNode || this.domNode),
-			childWidgets = childNodes.filter("[widgetId]");
+		var childNodes = dojo.query(">", this.containerNode),
+			childWidgetNodes = childNodes.filter("[dojoType]"),
+			candidateWidgets = dojo.filter(childWidgetNodes.map(dijit.byNode), function(widget){
+				return widget && widget.domNode && widget.resize;
+			});
 
-		if(childNodes.length == 1 && childWidgets.length == 1){
+		if(
+			// all child nodes are widgets
+			childNodes.length == childWidgetNodes.length &&
+
+			// all but one are invisible (like dojo.data)
+			candidateWidgets.length == 1
+		){
 			this.isContainer = true;
-			this._singleChild = dijit.byNode(childWidgets[0]);
+			this._singleChild = candidateWidgets[0];
 		}else{
 			delete this.isContainer;
 			delete this._singleChild;
@@ -149,19 +162,34 @@ dojo.declare(
 	},
 
 	setHref: function(/*String|Uri*/ href){
+		dojo.deprecated("dijit.layout.ContentPane.setHref() is deprecated.	Use attr('href', ...) instead.", "", "2.0");
+		return this.attr("href", href);
+	},
+	_setHrefAttr: function(/*String|Uri*/ href){
 		// summary:
+		//		Hook so attr("href", ...) works.
+		// description:
 		//		Reset the (external defined) content of this pane and replace with new url
-		//		Note: It delays the download until widget is shown if preload is false
+		//		Note: It delays the download until widget is shown if preload is false.
 		//	href:
 		//		url to the page you want to get, must be within the same domain as your mainpage
 		this.href = href;
 
-		// we return result of _prepareLoad here to avoid code dup. in dojox.layout.ContentPane
-		return this._prepareLoad();
+		// _setHrefAttr() is called during creation and by the user, after creation.
+		// only in the second case do we actually load the URL; otherwise it's done in startup()
+		if(this._created){
+			// we return result of _prepareLoad here to avoid code dup. in dojox.layout.ContentPane
+			return this._prepareLoad();
+		}
 	},
 
 	setContent: function(/*String|DomNode|Nodelist*/data){
+		dojo.deprecated("dijit.layout.ContentPane.setContent() is deprecated.  Use attr('content', ...) instead.", "", "2.0");
+		this.attr("content", data);
+	},
+	_setContentAttr: function(/*String|DomNode|Nodelist*/data){
 		// summary:
+		//		Hook to make attr("content", ...) work.
 		//		Replaces old content with data content, include style classes from old content
 		//	data:
 		//		the new Content may be String, DomNode or NodeList
@@ -180,19 +208,20 @@ dojo.declare(
 
 		this._isDownloaded = false; // must be set after _setContent(..), pathadjust in dojox.layout.ContentPane
 
-		if(this.parseOnLoad){
-			this._createSubWidgets();
-		}
-
 		if(this.doLayout != "false" && this.doLayout !== false){
 			this._checkIfSingleChild();
 			if(this._singleChild && this._singleChild.resize){
 				this._singleChild.startup();
-				this._singleChild.resize(this._contentBox || dojo.contentBox(this.containerNode || this.domNode));
+				var cb = this._contentBox || dojo.contentBox(this.containerNode);
+				this._singleChild.resize({w: cb.w, h: cb.h});
 			}
 		}
 
 		this._onLoadHandler();
+	},
+	_getContentAttr: function(){
+		// summary: hook to make attr("content") work
+		return this.containerNode.innerHTML;
 	},
 
 	cancel: function(){
@@ -212,7 +241,7 @@ dojo.declare(
 		// make sure we call onUnload
 		this._onUnloadHandler();
 		this._beingDestroyed = true;
-		this.inherited("destroy",arguments);
+		this.inherited(arguments);
 	},
 
 	resize: function(size){
@@ -222,14 +251,16 @@ dojo.declare(
 		// If either height or width wasn't specified by the user, then query node for it.
 		// But note that setting the margin box and then immediately querying dimensions may return
 		// inaccurate results, so try not to depend on it.
-		var node = this.containerNode || this.domNode,
+		var node = this.containerNode,
 			mb = dojo.mixin(dojo.marginBox(node), size||{});
 
-		this._contentBox = dijit.layout.marginBox2contentBox(node, mb);
+		var cb = this._contentBox = dijit.layout.marginBox2contentBox(node, mb);
 
 		// If we have a single widget child then size it to fit snugly within my borders
 		if(this._singleChild && this._singleChild.resize){
-			this._singleChild.resize(this._contentBox);
+			// note: if widget has padding this._contentBox will have l and t set,
+			// but don't pass them to resize() or it will doubly-offset the child
+			this._singleChild.resize({w: cb.w, h: cb.h});
 		}
 	},
 
@@ -266,9 +297,10 @@ dojo.declare(
 
 		var displayState = this._isShown();
 
-		if(this.href &&	
-			(forceLoad ||
-				(this.preload && !this._xhrDfd) ||
+		if(this.href && 
+			(
+				forceLoad ||
+				(this.preload && !this.isLoaded && !this._xhrDfd) ||
 				(this.refreshOnShow && displayState && !this._xhrDfd) ||
 				(!this.isLoaded && displayState && !this._xhrDfd)
 			)
@@ -301,7 +333,7 @@ dojo.declare(
 			try{
 				self.onDownloadEnd.call(self);
 				self._isDownloaded = true;
-				self.setContent.call(self, html); // onload event is called from here
+				self.attr.call(self, 'content', html); // onload event is called from here
 			}catch(err){
 				self._onError.call(self, 'Content', err); // onContentError
 			}
@@ -331,6 +363,11 @@ dojo.declare(
 	_onUnloadHandler: function(){
 		this.isLoaded = false;
 		this.cancel();
+		
+		if(this._contentSetter) {
+			// calling empty destroys all child widgets as well as emptying the containerNode
+			this._contentSetter.empty(); 
+		}
 		try{
 			this.onUnload.call(this);
 		}catch(e){
@@ -339,42 +376,48 @@ dojo.declare(
 	},
 
 	_setContent: function(cont){
-		this.destroyDescendants();
+		// summary: 
+		//	insert the content into the container node, 
 
-		try{
-			var node = this.containerNode || this.domNode;
-			while(node.firstChild){
-				dojo._destroyElement(node.firstChild);
-			}
-			if(typeof cont == "string"){
-				// dijit.ContentPane does only minimal fixes,
-				// No pathAdjustments, script retrieval, style clean etc
-				// some of these should be available in the dojox.layout.ContentPane
-				if(this.extractContent){
-					match = cont.match(/<body[^>]*>\s*([\s\S]+)\s*<\/body>/im);
-					if(match){ cont = match[1]; }
-				}
-				node.innerHTML = cont;
-			}else{
-				// domNode or NodeList
-				if(cont.nodeType){ // domNode (htmlNode 1 or textNode 3)
-					node.appendChild(cont);
-				}else{// nodelist or array such as dojo.Nodelist
-					dojo.forEach(cont, function(n){
-						node.appendChild(n.cloneNode(true));
-					});
-				}
-			}
-		}catch(e){
-			// check if a domfault occurs when we are appending this.errorMessage
-			// like for instance if domNode is a UL and we try append a DIV
-			var errMess = this.onContentError(e);
-			try{
-				node.innerHTML = errMess;
-			}catch(e){
-				console.error('Fatal '+this.id+' could not change content due to '+e.message, e);
-			}
-		}
+		// first get rid of child widgets
+		this.destroyDescendants();
+		
+		// dojo.html.set will take care of the rest of the details
+		// we provide an overide for the error handling to ensure the widget gets the errors 
+		// configure the setter instance with only the relevant widget instance properties
+		// NOTE: unless we hook into attr, or provide property setters for each property, 
+		// we need to re-configure the ContentSetter with each use
+		var setter = this._contentSetter; 
+		if(! (setter && setter instanceof dojo.html._ContentSetter)) {
+			setter = this._contentSetter = new dojo.html._ContentSetter({
+				node: this.containerNode,
+				_onError: dojo.hitch(this, this._onError),
+				onContentError: dojo.hitch(this, function(e){
+					// fires if a domfault occurs when we are appending this.errorMessage
+					// like for instance if domNode is a UL and we try append a DIV
+					var errMess = this.onContentError(e);
+					try{
+						this.containerNode.innerHTML = errMess;
+					}catch(e){
+						console.error('Fatal '+this.id+' could not change content due to '+e.message, e);
+					}
+				})/*,
+				_onError */
+			});
+		};
+
+		var setterParams = dojo.mixin({
+			cleanContent: this.cleanContent, 
+			extractContent: this.extractContent, 
+			parseContent: this.parseOnLoad 
+		}, this._contentSetterParams || {});
+		
+		dojo.mixin(setter, setterParams); 
+		
+		setter.set( (dojo.isObject(cont) && cont.domNode) ? cont.domNode : cont );
+
+		// setter params must be pulled afresh from the ContentPane each time
+		delete this._contentSetterParams
 	},
 
 	_onError: function(type, err, consoleText){
@@ -390,14 +433,14 @@ dojo.declare(
 
 	_createSubWidgets: function(){
 		// summary: scan my contents and create subwidgets
-		var rootNode = this.containerNode || this.domNode;
 		try{
-			dojo.parser.parse(rootNode, true);
+			dojo.parser.parse(this.containerNode, true);
 		}catch(e){
 			this._onError('Content', e, "Couldn't create widgets in "+this.id
 				+(this.href ? " from "+this.href : ""));
 		}
 	},
+
 
 	// EVENT's, should be overide-able
 	onLoad: function(e){

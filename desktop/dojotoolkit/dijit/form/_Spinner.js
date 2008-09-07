@@ -43,10 +43,10 @@ dojo.declare(
 			this._setStateClass();
 		},
 
-		_arrowPressed: function(/*Node*/ nodePressed, /*Number*/ direction){
+		_arrowPressed: function(/*Node*/ nodePressed, /*Number*/ direction, /*Number*/ increment){
 			if(this.disabled || this.readOnly){ return; }
 			this._arrowState(nodePressed, true);
-			this.setValue(this.adjust(this.getValue(), direction*this.smallDelta), false);
+			this._setValueAttr(this.adjust(this.attr('value'), direction*increment), false);
 			dijit.selectInputText(this.textbox, this.textbox.value.length);
 		},
 
@@ -57,53 +57,59 @@ dojo.declare(
 		},
 
 		_typematicCallback: function(/*Number*/ count, /*DOMNode*/ node, /*Event*/ evt){
-			if(node == this.textbox){ node = (evt.keyCode == dojo.keys.UP_ARROW) ? this.upArrowNode : this.downArrowNode; }
+			var inc=this.smallDelta;
+			if(node == this.textbox){
+				k=dojo.keys;
+				var key = evt.charOrCode; 
+				inc = (key == k.PAGE_UP || key == k.PAGE_DOWN) ? this.largeDelta : this.smallDelta;
+				node = (key == k.UP_ARROW ||key == k.PAGE_UP) ? this.upArrowNode : this.downArrowNode;
+			}
 			if(count == -1){ this._arrowReleased(node); }
-			else{ this._arrowPressed(node, (node == this.upArrowNode) ? 1 : -1); }
+			else{ this._arrowPressed(node, (node == this.upArrowNode) ? 1 : -1, inc); }
 		},
 
 		_wheelTimer: null,
 		_mouseWheeled: function(/*Event*/ evt){
-			dojo.stopEvent(evt);
-			var scrollAmount = 0;
-			if(typeof evt.wheelDelta == 'number'){ // IE
-				scrollAmount = evt.wheelDelta;
-			}else if(typeof evt.detail == 'number'){ // Mozilla+Firefox
-				scrollAmount = -evt.detail;
+			// summary: Mouse wheel listener where supported
+			dojo.stopEvent(evt);	
+			// FIXME: Safari bubbles
+
+			// be nice to DOH and scroll as much as the event says to
+			var scrollAmount = evt.detail ? (evt.detail * -1) : (evt.wheelDelta / 120);
+			if(scrollAmount !== 0){
+				var node = this[(scrollAmount > 0 ? "upArrowNode" : "downArrowNode" )];
+				
+				this._arrowPressed(node, scrollAmount, this.smallDelta);
+
+				if(!this._wheelTimer){
+					clearTimeout(this._wheelTimer);
+				}
+				this._wheelTimer = setTimeout(dojo.hitch(this,"_arrowReleased",node), 50);
 			}
-			var node, dir;
-			if(scrollAmount > 0){
-				node = this.upArrowNode;
-				dir = +1;
-			}else if(scrollAmount < 0){
-				node = this.downArrowNode;
-				dir = -1;
-			}else{ return; }
-			this._arrowPressed(node, dir);
-			if(this._wheelTimer != null){
-				clearTimeout(this._wheelTimer);
-			}
-			var _this = this;
-			this._wheelTimer = setTimeout(function(){_this._arrowReleased(node);}, 50);
+			
 		},
 
 		postCreate: function(){
 			this.inherited('postCreate', arguments);
 
 			// extra listeners
-			this.connect(this.textbox, dojo.isIE ? "onmousewheel" : 'DOMMouseScroll', "_mouseWheeled");
-			this._connects.push(dijit.typematic.addListener(this.upArrowNode, this.textbox, {keyCode:dojo.keys.UP_ARROW,ctrlKey:false,altKey:false,shiftKey:false}, this, "_typematicCallback", this.timeoutChangeRate, this.defaultTimeout));
-			this._connects.push(dijit.typematic.addListener(this.downArrowNode, this.textbox, {keyCode:dojo.keys.DOWN_ARROW,ctrlKey:false,altKey:false,shiftKey:false}, this, "_typematicCallback", this.timeoutChangeRate, this.defaultTimeout));
+			this.connect(this.domNode, !dojo.isMozilla ? "onmousewheel" : 'DOMMouseScroll', "_mouseWheeled");
+			this._connects.push(dijit.typematic.addListener(this.upArrowNode, this.textbox, {charOrCode:dojo.keys.UP_ARROW,ctrlKey:false,altKey:false,shiftKey:false}, this, "_typematicCallback", this.timeoutChangeRate, this.defaultTimeout));
+			this._connects.push(dijit.typematic.addListener(this.downArrowNode, this.textbox, {charOrCode:dojo.keys.DOWN_ARROW,ctrlKey:false,altKey:false,shiftKey:false}, this, "_typematicCallback", this.timeoutChangeRate, this.defaultTimeout));
+			this._connects.push(dijit.typematic.addListener(this.upArrowNode, this.textbox, {charOrCode:dojo.keys.PAGE_UP,ctrlKey:false,altKey:false,shiftKey:false}, this, "_typematicCallback", this.timeoutChangeRate, this.defaultTimeout));
+			this._connects.push(dijit.typematic.addListener(this.downArrowNode, this.textbox, {charOrCode:dojo.keys.PAGE_DOWN,ctrlKey:false,altKey:false,shiftKey:false}, this, "_typematicCallback", this.timeoutChangeRate, this.defaultTimeout));
 			if(dojo.isIE){
-				// When spinner is moved from hidden to visible, call _setStateClass to remind IE to render it. (#6123)
 				var _this = this;
-				this.connect(this.domNode, "onresize", 
+				this.connect(this.domNode, "onresize",
 					function(){ setTimeout(dojo.hitch(_this,
 						function(){
-							// cause the IE expressions to rerun
-							this.upArrowNode.style.behavior = '';
-							this.downArrowNode.style.behavior = '';
-							// cause IE to rerender
+				        		var sz = this.upArrowNode.parentNode.offsetHeight;
+							if(sz){
+								this.upArrowNode.style.height = sz >> 1;
+								this.downArrowNode.style.height = sz - (sz >> 1);
+								this.focusNode.parentNode.style.height = sz;
+							}
+							// cause IE to rerender when spinner is moved from hidden to visible
 							this._setStateClass();
 						}), 0);
 					}

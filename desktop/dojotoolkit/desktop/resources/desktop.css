@@ -17,9 +17,11 @@ html, body {
 .desktopApplet .dijit button {
 	border: 0px none;
 }
+.dijit .desktopPanel .desktopApplet .dijitButtonNode button,
 .dijit .desktopPanel .desktopApplet .dijitButtonNode,
 .dijit .desktopPanel .desktopApplet .dijitToolbar {
 	background: transparent none repeat scroll 0%;
+	border: 0px none;
 	padding: 0px;
 	padding-bottom: 1px;
 }

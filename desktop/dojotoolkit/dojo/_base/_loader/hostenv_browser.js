@@ -30,28 +30,28 @@ dojo = {
 	// isBrowser: Boolean
 	//		True if the client is a web-browser
 	isBrowser: true,
-	//	isFF: Number
-	//		Greater than zero if client is FireFox. 0 otherwise. Corresponds to
+	//	isFF: Number | undefined
+	//		Version as a Number if client is FireFox. undefined otherwise. Corresponds to
 	//		major detected FireFox version (1.5, 2, 3, etc.)
 	isFF: 2,
-	//	isIE: Number
-	//		Greater than zero if client is MSIE(PC). 0 otherwise. Corresponds to
+	//	isIE: Number | undefined
+	//		Version as a Number if client is MSIE(PC). undefined otherwise. Corresponds to
 	//		major detected IE version (6, 7, 8, etc.)
 	isIE: 6,
-	//	isKhtml: Number
-	//		Greater than zero if client is a KTHML-derived browser (Konqueror,
-	//		Safari, etc.). 0 otherwise. Corresponds to major detected version.
+	//	isKhtml: Number | undefined
+	//		Version as a Number if client is a KTHML-derived browser (Konqueror,
+	//		Safari, etc.). undefined otherwise. Corresponds to major detected version.
 	isKhtml: 0,
-	//	isMozilla: Number
-	//		Greater than zero if client is a Mozilla-based browser (Firefox,
-	//		SeaMonkey). 0 otherwise. Corresponds to major detected version.
+	//	isMozilla: Number | undefined
+	//		Version as a Number if client is a Mozilla-based browser (Firefox,
+	//		SeaMonkey). undefined otherwise. Corresponds to major detected version.
 	isMozilla: 0,
-	//	isOpera: Number
-	//		Greater than zero if client is Opera. 0 otherwise. Corresponds to
+	//	isOpera: Number | undefined
+	//		Version as a Number if client is Opera. undefined otherwise. Corresponds to
 	//		major detected version.
 	isOpera: 0,
-	//	isSafari: Number
-	//		Greater than zero if client is Safari or iPhone. 0 otherwise.
+	//	isSafari: Number | undefined
+	//		Version as a Number if client is Safari or iPhone. undefined otherwise.
 	isSafari: 0
 }
 =====*/
@@ -100,26 +100,26 @@ if(typeof window != 'undefined'){
 		var dav = n.appVersion;
 		var tv = parseFloat(dav);
 
-		d.isOpera = (dua.indexOf("Opera") >= 0) ? tv : 0;
+		if(dua.indexOf("Opera") >= 0){ d.isOpera = tv; }
 		// safari detection derived from:
 		//		http://developer.apple.com/internet/safari/faq.html#anchor2
 		//		http://developer.apple.com/internet/safari/uamatrix.html
-		var idx = Math.max(dav.indexOf("WebKit"), dav.indexOf("Safari"), 0);
-		if(idx){
+		var index = Math.max(dav.indexOf("WebKit"), dav.indexOf("Safari"), 0);
+		if(index){
 			// try to grab the explicit Safari version first. If we don't get
 			// one, look for 419.3+ as the indication that we're on something
 			// "Safari 3-ish". Lastly, default to "Safari 2" handling.
-			d.isSafari = parseFloat(dav.split("Version/")[1]) || ( ( parseFloat(dav.substr(idx+7)) >= 419.3 ) ? 3 : 2 ) || 2;
+			d.isSafari = parseFloat(dav.split("Version/")[1]) ||
+				(parseFloat(dav.substr(index + 7)) > 419.3) ? 3 : 2;
 		}
-		d.isAIR = (dua.indexOf("AdobeAIR") >= 0) ? 1 : 0;
-		d.isKhtml = (dav.indexOf("Konqueror") >= 0 || d.isSafari) ? tv : 0;
-		d.isMozilla = d.isMoz = (dua.indexOf("Gecko") >= 0 && !d.isKhtml) ? tv : 0;
-		d.isFF = d.isIE = 0;
+		if(dua.indexOf("AdobeAIR") >= 0){ d.isAIR = 1; }
+		if(dav.indexOf("Konqueror") >= 0 || d.isSafari){ d.isKhtml =  tv; }
+		if(dua.indexOf("Gecko") >= 0 && !d.isKhtml){ d.isMozilla = d.isMoz = tv; }
 		if(d.isMoz){
-			d.isFF = parseFloat(dua.split("Firefox/")[1]) || 0;
+			d.isFF = parseFloat(dua.split("Firefox/")[1]) || undefined;
 		}
 		if(document.all && !d.isOpera){
-			d.isIE = parseFloat(dav.split("MSIE ")[1]) || 0;
+			d.isIE = parseFloat(dav.split("MSIE ")[1]) || undefined;
 		}
 
 		//Workaround to get local file loads of dojo to work on IE 7
@@ -215,6 +215,8 @@ if(typeof window != 'undefined'){
 			*/
 
 			if(d.config.cacheBust){
+				//Make sure we have a string before string methods are used on uri
+				uri += "";
 				uri += (uri.indexOf("?") == -1 ? "?" : "&") + String(d.config.cacheBust).replace(/\W+/g,"");
 			}
 
@@ -234,6 +236,34 @@ if(typeof window != 'undefined'){
 				throw e;
 			}
 			return http.responseText; // String
+		}
+		
+		d._windowUnloaders = [];
+		
+		d.windowUnloaded = function(){
+			// summary:
+			//		signal fired by impending window destruction. You may use
+			//		dojo.addOnWIndowUnload() or dojo.connect() to this method to perform
+			//		page/application cleanup methods. See dojo.addOnWindowUnload for more info.
+			var mll = this._windowUnloaders;
+			while(mll.length){
+				(mll.pop())();
+			}
+		}
+
+		d.addOnWindowUnload = function(/*Object?*/obj, /*String|Function?*/functionName){
+			// summary:
+			//		registers a function to be triggered when window.onunload fires.
+			//		Be careful trying to modify the DOM or access JavaScript properties
+			//		during this phase of page unloading: they may not always be available.
+			//		Consider dojo.addOnUnload() if you need to modify the DOM or do heavy
+			//		JavaScript work.
+			// example:
+			//	|	dojo.addOnWindowUnload(functionPointer)
+			//	|	dojo.addOnWindowUnload(object, "functionName")
+			//	|	dojo.addOnWindowUnload(object, function(){ /* ... */});
+	
+			d._onto(d._windowUnloaders, obj, functionName);
 		}
 	})();
 
@@ -318,27 +348,15 @@ if(typeof window != 'undefined'){
 				);
 			}
 
-			// IE WebControl hosted in an application can fire "beforeunload" and "unload"
-			// events when control visibility changes, causing Dojo to unload too soon. The
-			// following code fixes the problem
-			// Reference: http://support.microsoft.com/default.aspx?scid=kb;en-us;199155
-			var _unloading = true;
-			_handleNodeEvent("onbeforeunload", function(){
-				_w.setTimeout(function(){ _unloading = false; }, 0);
-			});
-			_handleNodeEvent("onunload", function(){
-				if(_unloading){ dojo.unloaded(); }
-			});
-
 			try{
 				document.namespaces.add("v","urn:schemas-microsoft-com:vml");
 				document.createStyleSheet().addRule("v\\:*", "behavior:url(#default#VML)");
 			}catch(e){}
-		}else{
-			// FIXME: dojo.unloaded requires dojo scope, so using anon function wrapper.
-			_handleNodeEvent("onbeforeunload", function() { dojo.unloaded(); });
 		}
 
+		// FIXME: dojo.unloaded requires dojo scope, so using anon function wrapper.
+		_handleNodeEvent("onbeforeunload", function() { dojo.unloaded(); });
+		_handleNodeEvent("onunload", function() { dojo.windowUnloaded(); });
 	})();
 
 	/*

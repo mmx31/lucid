@@ -43,8 +43,15 @@ dojo.declare(
 		dayWidth: "narrow",
 
 		setValue: function(/*Date*/ value){
-			// summary: set the current date and update the UI.  If the date is disabled, the selection will
-			//	not change, but the display will change to the corresponding month.
+			dojo.deprecated("dijit.Calendar:setValue() is deprecated.  Use attr('value', ...) instead.", "", "2.0");
+			this.attr('value', value);
+		},
+		_setValueAttr: function(/*Date*/ value){
+			// summary:
+			//		Hook to make attr("value", ...) work.
+			// description:
+			// 		Set the current date and update the UI.  If the date is disabled, the selection will
+			//		not change, but the display will change to the corresponding month.
 			if(!this.value || dojo.date.compare(value, this.value)){
 				value = new Date(value);
 				this.displayMonth = new Date(value);
@@ -114,7 +121,7 @@ dojo.declare(
 
 				var clazz2 = this.getClassForDate(date, this.lang);
 				if(clazz2){
-					clazz += clazz2 + " " + clazz;
+					clazz = clazz2 + " " + clazz;
 				}
 
 				template.className =  clazz + "Month dijitCalendarDateTemplate";
@@ -139,9 +146,11 @@ dojo.declare(
 			// Set up repeating mouse behavior
 			var _this = this;
 			var typematic = function(nodeProp, dateProp, adj){
-				dijit.typematic.addMouseListener(_this[nodeProp], _this, function(count){
-					if(count >= 0){ _this._adjustDisplay(dateProp, adj); }
-				}, 0.8, 500);
+				_this._connects.push(
+					dijit.typematic.addMouseListener(_this[nodeProp], _this, function(count){
+						if(count >= 0){ _this._adjustDisplay(dateProp, adj); }
+					}, 0.8, 500)
+				);
 			};
 			typematic("incrementMonth", "month", 1);
 			typematic("decrementMonth", "month", -1);
@@ -150,7 +159,7 @@ dojo.declare(
 		},
 
 		goToToday: function(){
-			this.setValue(new Date());
+			this.attr('value', new Date());
 		},
 
 		postCreate: function(){
@@ -186,7 +195,7 @@ dojo.declare(
 			}, this);
 
 			this.value = null;
-			this.setValue(new Date());
+			this.attr('value', new Date());
 		},
 
 		_adjustDisplay: function(/*String*/part, /*int*/amount){
@@ -201,9 +210,31 @@ dojo.declare(
 				node = node.parentNode;
 			}
 			if(!dojo.hasClass(node, "dijitCalendarDisabledDate")){
-				this.setValue(node.dijitDateValue);
+				this.attr('value', node.dijitDateValue);
 				this.onValueSelected(this.value);
 			}
+		},
+
+		_onDayMouseOver: function(/*Event*/evt){
+			var node = evt.target;
+			if(node && (node.dijitDateValue || node == this.previousYearLabelNode || node == this.nextYearLabelNode) ){
+				dojo.addClass(node, "dijitCalendarHoveredDate");
+				this._currentNode = node;
+			}
+		},
+
+		_onDayMouseOut: function(/*Event*/evt){
+			if(!this._currentNode){ return; }
+			for(var node = evt.relatedTarget; node;){
+				if(node == this._currentNode){ return; }
+				try{
+					node = node.parentNode;
+				}catch(x){
+					node = null;
+				}
+			}
+			dojo.removeClass(this._currentNode, "dijitCalendarHoveredDate");
+			this._currentNode = null;
 		},
 
 		onValueSelected: function(/*Date*/date){

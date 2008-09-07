@@ -79,6 +79,7 @@ dijit.popup = new function(){
 		wrapper.id = id;
 		wrapper.className="dijitPopup";
 		wrapper.style.zIndex = beginZIndex + stack.length;
+		wrapper.style.left = wrapper.style.top = "0px";		// prevent transient scrollbar causing misalign (#5776)
 		wrapper.style.visibility = "hidden";
 		if(args.parent){
 			wrapper.dijitPopupParent=args.parent.id;
@@ -115,10 +116,10 @@ dijit.popup = new function(){
 		// provide default escape and tab key handling
 		// (this will work for any widget, not just menu)
 		handlers.push(dojo.connect(wrapper, "onkeypress", this, function(evt){
-			if(evt.keyCode == dojo.keys.ESCAPE && args.onCancel){
+			if(evt.charOrCode == dojo.keys.ESCAPE && args.onCancel){
 				dojo.stopEvent(evt);
 				args.onCancel();
-			}else if(evt.keyCode == dojo.keys.TAB){
+			}else if(evt.charOrCode == dojo.keys.TAB){
 				dojo.stopEvent(evt);
 				var topPopup = getTopPopup();
 				if(topPopup && topPopup.onCancel){
@@ -199,7 +200,8 @@ dijit._frames = new function(){
 			iframe.style.display="";
 		}else{
 			if(dojo.isIE){
-				var html="<iframe src='javascript:\"\"'"
+				var burl = dojo.config["dojoBlankHtmlUrl"] || (dojo.moduleUrl("dojo", "resources/blank.html")+"") || "javascript:\"\"";
+				var html="<iframe src='" + burl + "'"
 					+ " style='position: absolute; left: 0px; top: 0px;"
 					+ "z-index: -1; filter:Alpha(Opacity=\"0\");'>";
 				iframe = dojo.doc.createElement(html);
@@ -225,7 +227,7 @@ dijit._frames = new function(){
 }();
 
 // fill the queue
-if(dojo.isIE && dojo.isIE < 7){
+if(dojo.isIE < 7){
 	dojo.addOnLoad(function(){
 		var f = dijit._frames;
 		dojo.forEach([f.pop()], f.push);

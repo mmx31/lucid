@@ -12,10 +12,16 @@ dojo.declare("dijit.form.MultiSelect",dijit.form._FormWidget,{
 	//		set the size via style="..." or CSS class names instead.
 	size: 7,
 	
-	templateString: "<select multiple='true' dojoAttachPoint='containerNode,focusNode' dojoAttachEvent='onchange: _onChange'></select>",
+	templateString: "<select multiple='true' name='${name}' dojoAttachPoint='containerNode,focusNode' dojoAttachEvent='onchange: _onChange'></select>",
 
 	attributeMap: dojo.mixin(dojo.clone(dijit.form._FormWidget.prototype.attributeMap),
 		{size:"focusNode"}),
+
+	reset: function(){
+		// TODO: once we inherit from FormValueWidget this won't be needed
+		this._hasBeenBlurred = false;
+		this._setValueAttr(this._resetValue, true);
+	},
 
 	addSelected: function(/* dijit.form.MultiSelect */select){
 		// summary: Move the selected nodes af an passed Select widget
@@ -27,6 +33,22 @@ dojo.declare("dijit.form.MultiSelect",dijit.form._FormWidget,{
 		
 		select.getSelected().forEach(function(n){
 			this.containerNode.appendChild(n);
+			if(dojo.isIE){ // tweak the node to force IE to refresh (aka _layoutHack on FF2)
+				var s = dojo.getComputedStyle(n);
+				if(s){
+					var filter = s.filter;
+					n.style.filter = "alpha(opacity=99)";
+					n.style.filter = filter;
+				}
+			}
+			// scroll to bottom to see item
+			// cannot use scrollIntoView since <option> tags don't support all attributes
+			// does not work on IE due to a bug where <select> always shows scrollTop = 0
+			this.domNode.scrollTop = this.domNode.offsetHeight; // overshoot will be ignored
+			// scrolling the source select is trickier esp. on safari who forgets to change the scrollbar size
+			var oldscroll = select.domNode.scrollTop;
+			select.domNode.scrollTop = 0;
+			select.domNode.scrollTop = oldscroll;
 		},this);
 	},
 					
@@ -37,17 +59,23 @@ dojo.declare("dijit.form.MultiSelect",dijit.form._FormWidget,{
 		});
 	},
 	
-	_getValueDeprecated: false, // remove when _FormWidget:_getValueDeprecated is removed in 2.0
-	getValue: function(){
-		// summary: Returns an array of the selected options' values
+	_getValueAttr: function(){
+		// summary:
+		//		Hook so attr('value') works.
+		// description:
+		//		Returns an array of the selected options' values.
 		return this.getSelected().map(function(n){
 			return n.value;
 		});
 	},
 	
 	_multiValue: true, // for Form
-	setValue: function(/* Array */values){
-		// summary: Set the value(s) of this Select based on passed values
+
+	_setValueAttr: function(/* Array */values){
+		// summary:
+		//		Hook so attr('value', values) works.
+		// description:
+		//		Set the value(s) of this Select based on passed values
 		dojo.query("option",this.containerNode).forEach(function(n){
 			n.selected = (dojo.indexOf(values,n.value) != -1);
 		});
@@ -60,11 +88,11 @@ dojo.declare("dijit.form.MultiSelect",dijit.form._FormWidget,{
 		dojo.query("option",this.containerNode).forEach(function(n){
 			n.selected = !n.selected;
 		});
-		this._handleOnChange(this.getValue(), onChange==true);
+		this._handleOnChange(this.attr('value'), onChange==true);
 	},
 
 	_onChange: function(/*Event*/ e){
-		this._handleOnChange(this.getValue(), true);
+		this._handleOnChange(this.attr('value'), true);
 	},
 	
 	// for layout widgets:

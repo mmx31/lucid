@@ -27,24 +27,14 @@ dojo.declare(
 		//	- List can be specified either as a static list or via a javascript
 		//	  function (that can get the list from a server)
 		//
-		// searchAttr: String
-		//		Searches pattern match against this field
-		//
-		// labelAttr: String
-		//		Optional.  The text that actually appears in the drop down.
-		//		If not specified, the searchAttr text is used instead.
-		labelAttr: "",
-
-		// labelType: String
-		//		"html" or "text"
-		labelType: "text",
-
 		_isvalid:true,
+
+		required:true,
 
 		_lastDisplayedValue: "",
 
 		isValid:function(){
-			return this._isvalid;
+			return this._isvalid || (!this.required && this.attr('displayedValue') == ""); // #5974
 		},
 
 		_callbackSetLabel: function(	/*Array*/ result, 
@@ -57,8 +47,8 @@ dojo.declare(
 			// setValue does a synchronous lookup,
 			// so it calls _callbackSetLabel directly,
 			// and so does not pass dataObject
-			// dataObject==null means do not test the lastQuery, just continue
-			if(dataObject && dataObject.query[this.searchAttr] != this._lastQuery){
+			// still need to test against _lastQuery in case it came too late
+			if((dataObject && dataObject.query[this.searchAttr] != this._lastQuery)||(!dataObject && result.length && this.store.getIdentity(result[0])!= this._lastQuery)){
 				return;
 			}
 			if(!result.length){
@@ -66,9 +56,10 @@ dojo.declare(
 				//this._setValue("", "");
 				//#3285: change CSS to indicate error
 				if(!this._focused){ this.valueNode.value=""; }
-				dijit.form.TextBox.superclass.setValue.call(this, undefined, !this._focused);
+				dijit.form.TextBox.superclass._setValueAttr.call(this, "", !this._focused);
 				this._isvalid=false;
 				this.validate(this._focused);
+				this.item=null;
 			}else{
 				this._setValueFromItem(result[0], priorityChange);
 			}
@@ -84,8 +75,13 @@ dojo.declare(
 			dijit.form.ComboBoxMixin.prototype._openResultList.apply(this, arguments);
 		},
 
-		getValue:function(){
+		_getValueAttr: function(){
+			// summary:
+			//		Hook for attr('value') to work.
+
 			// don't get the textbox value but rather the previously set hidden value
+			// TODO: seems suspicious that we need this; how is FilteringSelect different
+			// than another MappedTextBox widget?
 			return this.valueNode.value;
 		},
 
@@ -94,18 +90,26 @@ dojo.declare(
 			return "value";
 		},
 
-		_setValue:function(	/*String*/ value, 
-					/*String*/ displayedValue, 
+		_setValue: function(	/*String*/ value, 
+					/*String*/ displayedValue,
 					/*Boolean?*/ priorityChange){
 			this.valueNode.value = value;
-			dijit.form.FilteringSelect.superclass.setValue.call(this, value, priorityChange, displayedValue);
+			dijit.form.FilteringSelect.superclass._setValueAttr.call(this, value, priorityChange, displayedValue);
 			this._lastDisplayedValue = displayedValue;
 		},
 
-		setValue: function(/*String*/ value, /*Boolean?*/ priorityChange){
-			// summary
-			//	Sets the value of the select.
-			//	Also sets the label to the corresponding value by reverse lookup.
+		_setValueAttr: function(/*String*/ value, /*Boolean?*/ priorityChange){
+			// summary:
+			//		Hook so attr('value', value) works.
+			// description:
+			//		Sets the value of the select.
+			//		Also sets the label to the corresponding value by reverse lookup.
+			this._lastQuery=value;
+
+			if(!value){
+				this.attr('displayedValue', '');	// TODO: do we need to pass priorityChange like in 1.1?  - BILL
+				return;
+			}
 
 			//#3347: fetchItemByIdentity if no keyAttr specified
 			var self=this;
@@ -141,8 +145,9 @@ dojo.declare(
 			//		selected item.
 			//	description:
 			//		Users shouldn't call this function; they should be calling
-			//		setDisplayedValue() instead
+			//		attr('displayedValue', value) instead
 			this._isvalid=true;
+			this.item = item; // Fix #6381
 			this._setValue(	this.store.getIdentity(item), 
 							this.labelFunc(item, this.store), 
 							priorityChange);
@@ -160,18 +165,34 @@ dojo.declare(
 			//	description:
 			//		FilteringSelect overrides this to set both the visible and
 			//		hidden value from the information stored in the menu
-			this.item = tgt.item;
 			this._setValueFromItem(tgt.item, true);
 		},
 
-		setDisplayedValue:function(/*String*/ label, /*Boolean?*/ priorityChange){
+		_setDisplayedValueAttr: function(/*String*/ label, /*Boolean?*/ priorityChange){
 			// summary:
+			//		Hook so attr('displayedValue', label) works.
+			// description:
 			//		Set textbox to display label. Also performs reverse lookup
-			//		to set the hidden value. Used in InlineEditBox
+			//		to set the hidden value.
+
+			// When this is called during initialization it'll ping the datastore
+			// for reverse lookup, and when that completes (after an XHR request)
+			// will call setValueAttr()... but that shouldn't trigger an onChange()
+			//  event, even when it happens after creation has finished
+			if(!this._created){
+				priorityChange = false;
+			}
+
+			// 	If user clears input box then value is also cleared; don't query the data store
+			if(!label){
+				this._callbackSetLabel([]);
+				return;
+			}
 
 			if(this.store){
 				var query = dojo.clone(this.query); // #6196: populate query with user-specifics
-				this._lastQuery = query[this.searchAttr] = label;
+				// escape meta characters of dojo.data.util.filter.patternToRegExp().
+				this._lastQuery = query[this.searchAttr] = label.replace(/([\\\*\?])/g, "\\$1");
 				// if the label is not valid, the callback will never set it,
 				// so the last valid value will get the warning textbox set the
 				// textbox value now so that the impending warning will make
@@ -179,7 +200,7 @@ dojo.declare(
 				this.textbox.value = label;
 				this._lastDisplayedValue = label;
 				var _this = this;
-				this.store.fetch({
+				var fetch = {
 					query: query, 
 					queryOptions: {
 						ignoreCase: this.ignoreCase, 
@@ -190,23 +211,11 @@ dojo.declare(
 					},
 					onError: function(errText){
 						console.error('dijit.form.FilteringSelect: ' + errText);
-						dojo.hitch(_this, "_setValue")(undefined, label, false);
+						dojo.hitch(_this, "_setValue")("", label, false);
 					}
-				});
-			}
-		},
-
-		_getMenuLabelFromItem:function(/*Item*/ item){
-			// internal function to help ComboBoxMenu figure out what to display
-			if(this.labelAttr){
-				return {
-					html: this.labelType=="html", 
-					label: this.store.getValue(item, this.labelAttr)
 				};
-			}else{
-				// because this function is called by ComboBoxMenu,
-				// this.inherited tries to find the superclass of ComboBoxMenu
-				return dijit.form.ComboBoxMixin.prototype._getMenuLabelFromItem.apply(this, arguments);
+				dojo.mixin(fetch, this.fetchProperties);
+				this.store.fetch(fetch);
 			}
 		},
 
@@ -221,17 +230,17 @@ dojo.declare(
 			dijit.form.MappedTextBox.prototype.postCreate.apply(this, arguments);
 		},
 		
-		setAttribute: function(/*String*/ attr, /*anything*/ value){
-			dijit.form.MappedTextBox.prototype.setAttribute.apply(this, arguments);
-			dijit.form.ComboBoxMixin.prototype._setAttribute.apply(this, arguments);
+		_setDisabledAttr: function(/*String*/ attr, /*anything*/ value){
+			dijit.form.MappedTextBox.prototype._setDisabledAttr.apply(this, arguments);
+			dijit.form.ComboBoxMixin.prototype._setDisabledAttr.apply(this, arguments);
 		},
 
 		undo: function(){
-			this.setDisplayedValue(this._lastDisplayedValue);
+			this.attr('displayedValue', this._lastDisplayedValue);
 		},
 
 		_valueChanged: function(){
-			return this.getDisplayedValue()!=this._lastDisplayedValue;
+			return this.attr('displayedValue')!=this._lastDisplayedValue;
 		}
 	}
 );

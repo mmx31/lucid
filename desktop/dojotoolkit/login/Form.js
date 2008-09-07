@@ -24,12 +24,15 @@ dojo.declare("login.Form", dijit.form.Form, {
 		if(this.preloadDesktop) {
 			var ontype = dojo.connect(this.domNode, "onkeydown", this, function() {
 				dojo.disconnect(ontype);
+				// pre-fetch the desktop.js file
+				// in built versions, this should have everything we need
 				dojo.xhrGet({
-					url: dojo.baseUrl+"../desktop/desktop.js"
+					url: dojo.moduleUrl("desktop", "desktop.js")
 				});
 			})
 		}
 		this.checkForLogin();
+		this.setRadioButton();
 	},
 	checkForLogin: function(winClosed) {
 		dojo.xhrGet({
@@ -73,6 +76,12 @@ dojo.declare("login.Form", dijit.form.Form, {
 				}
 			})
 		})
+	},
+	setRadioButton: function() {
+		if(!dojo.cookie("desktopWindowPref") || dojo.cookie("desktopWindowPref") == "current")
+			this.currentRadioNode.attr("checked", true);
+		else
+			this.newRadioNode.attr("checked", true);
 	},
 	onLinkClick: function() {
 		if(dojo.cookie("desktopWindowPref") == "current") {

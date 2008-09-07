@@ -31,6 +31,7 @@ dojo.require("dojox.lang.functional.reversed");
 				}
 			}
 			// draw runs in backwards
+			this.dirty = this.isDirty();
 			if(this.dirty){
 				dojo.forEach(this.series, purgeGroup);
 				this.cleanGroup();
@@ -38,7 +39,11 @@ dojo.require("dojox.lang.functional.reversed");
 				df.forEachRev(this.series, function(item){ item.cleanGroup(s); });
 			}
 			var t = this.chart.theme, color, stroke, fill, f,
-				gap = this.opt.gap < this._hScaler.scale / 3 ? this.opt.gap : 0;
+				ht = this._hScaler.scaler.getTransformerFromModel(this._hScaler),
+				vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler);
+				gap = this.opt.gap < this._hScaler.bounds.scale / 3 ? this.opt.gap : 0,
+				width  = this._hScaler.bounds.scale - 2 * gap,
+				events = this.events();
 			for(var i = this.series.length - 1; i >= 0; --i){
 				var run = this.series[i];
 				if(!this.dirty && !run.dirty){ continue; }
@@ -52,16 +57,29 @@ dojo.require("dojox.lang.functional.reversed");
 				fill = run.fill ? run.fill : dc.augmentFill(t.series.fill, color);
 				for(var j = 0; j < acc.length; ++j){
 					var v = acc[j],
-						width  = this._hScaler.scale - 2 * gap,
-						height = this._vScaler.scale * (v - this._vScaler.bounds.lower);
+						height = vt(v);
 					if(width >= 1 && height >= 1){
 						var shape = s.createRect({
-							x: offsets.l + this._hScaler.scale * (j + 0.5 - this._hScaler.bounds.lower) + gap,
-							y: dim.height - offsets.b - this._vScaler.scale * (v - this._vScaler.bounds.lower),
+							x: offsets.l + ht(j + 0.5) + gap,
+							y: dim.height - offsets.b - vt(v),
 							width: width, height: height
 						}).setFill(fill).setStroke(stroke);
 						run.dyn.fill   = shape.getFill();
 						run.dyn.stroke = shape.getStroke();
+						if(events){
+							var o = {
+								element: "column",
+								index:   j,
+								run:     run,
+								plot:    this,
+								hAxis:   this.hAxis || null,
+								vAxis:   this.vAxis || null,
+								shape:   shape,
+								x:       j + 0.5,
+								y:       v
+							};
+							this._connectEvents(shape, o);
+						}
 					}
 				}
 				run.dirty = false;

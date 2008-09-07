@@ -2,10 +2,11 @@
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-		<title>Test dojox.Grid Programmatic Instantiation</title>
+		<title>Test dojox.grid.Grid Programmatic Instantiation</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
 		<style type="text/css">
-			@import "../_grid/tundraGrid.css";
+			@import "../resources/Grid.css";
+			@import "../resources/tundraGrid.css";
 			@import "../../../dojo/resources/dojo.css";
 			@import "../../../dijit/themes/tundra/tundra.css";
 			@import "../../../dijit/tests/css/dijitTests.css";
@@ -24,49 +25,48 @@
 		<script type="text/javascript">
 			dojo.require("dijit.layout.TabContainer");
 			dojo.require("dijit.layout.ContentPane");
-			dojo.require("dojox.grid.Grid");
+			dojo.require("dojox.grid.DataGrid");
+			dojo.require("dojo.data.ItemFileWriteStore");
 			dojo.require("dojo.parser");
 		</script>
 		<script type="text/javascript" src="support/test_data.js"></script>
 		<script type="text/javascript">
 			dojo.addOnLoad(function(){
-				// a grid view is a group of columns
-				var view1 = {
-					cells: [
-						[
-							{name: 'Column 0'}, 
-							{name: 'Column 1'}, 
-							{name: 'Column 2'}, 
-							{name: 'Column 3', width: "150px"}, 
-							{name: 'Column 4'}
-						],
-						[
-							{name: 'Column 5'}, 
-							{name: 'Column 6'}, 
-							{name: 'Column 7'}, 
-							{name: 'Column 8', field: 3, colSpan: 2}
-						]
-					]
-				};
-				// a grid layout is an array of views.
-				var layout = [ view1 ];
 
-				var grid = new dojox.Grid({
+				var tc = new dijit.layout.TabContainer({
+					style:"height: 300px; width: 100%;"
+				}, "mainTabContainer");
+				var cp = new dijit.layout.ContentPane({ title:"Tab 2" }, "cp");
+				tc.addChild(cp);
+				tc.startup();
+				
+				var layout = [[
+					{name: 'Column 1', field: 'col1'},
+					{name: 'Column 2', field: 'col2'},
+					{name: 'Column 3', field: 'col3'},
+					{name: 'Column 4', field: 'col4', width: "150px"},
+					{name: 'Column 5', field: 'col5'}
+				],[
+					{name: 'Column 6', field: 'col6'},
+					{name: 'Column 7', field: 'col7'},
+					{name: 'Column 8'},
+					{name: 'Column 9', field: 'col3', colSpan: 2}
+				]];
+
+				var grid = new dojox.grid.DataGrid({
 					title: "tab 1",
 					id: "grid",
-					model: model,
+					store: test_store,
 					structure: layout
 				});
-				dijit.byId("mainTabContainer").addChild(grid, 0);
-				grid.render();
+				tc.addChild(grid, 0);
 			});
 		</script>
 	</head>
 	<body class="tundra">
-		<div class="heading">dojox.Grid Programmatic Instantiation Test</div>
-		<div id="mainTabContainer" dojoType="dijit.layout.TabContainer"
-			style="height: 300px; width: 100%;">
-			<div dojoType="dijit.layout.ContentPane" title="Tab 2">
+		<div class="heading">dojox.grid.Grid Programmatic Instantiation Test</div>
+		<div id="mainTabContainer">
+			<div id="cp">
 				... stuff ...
 			</div>
 		</div>

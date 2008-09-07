@@ -7,38 +7,51 @@ dojo.declare("dijit.form.Button",
 	dijit.form._FormWidget,
 	{
 	// summary:
-	//	Basically the same thing as a normal HTML button, but with special styling.
-	//
+	//		Basically the same thing as a normal HTML button, but with special styling.
+	// description:
+	//		Buttons can display a label, an icon, or both.
+	//		A label should always be specified (through innerHTML) or the label
+	//		attribute.  It can be hidden via showLabel=false.
 	// example:
 	// |	<button dojoType="dijit.form.Button" onClick="...">Hello world</button>
 	// 
 	// example:
 	// |	var button1 = new dijit.form.Button({label: "hello world", onClick: foo});
 	// |	dojo.body().appendChild(button1.domNode);
-	//
-	// label: String
-	//	text to display in button
+
+	// label: HTML String
+	//		Text to display in button.
+	//		If the label is hidden (showLabel=false) then and no title has
+	//		been specified, then label is also set as title attribute of icon.
 	label: "",
 
 	// showLabel: Boolean
-	//	whether or not to display the text label in button
+	//		Set this to true to hide the label text and display only the icon.
+	//		(If showLabel=false then iconClass must be specified.)
+	//		Especially useful for toolbars.  
+	//		If showLabel=true, the label will become the title (a.k.a. tooltip/hint) of the icon.
+	//
+	//		The exception case is for computers in high-contrast mode, where the label
+	//		will still be displayed, since the icon doesn't appear.
 	showLabel: true,
 
 	// iconClass: String
-	//	class to apply to div in button to make it display an icon
+	//		Class to apply to div in button to make it display an icon
 	iconClass: "",
 
 	type: "button",
 	baseClass: "dijitButton",
 	templatePath: dojo.moduleUrl("dijit.form", "templates/Button.html"),
 
-	_onChangeMonitor: '',
-	// TODO: set button's title to this.containerNode.innerText
+	attributeMap: dojo.mixin(dojo.clone(dijit.form._FormWidget.prototype.attributeMap), {
+		label: {node: "containerNode", type: "innerHTML" },
+		iconClass: {node: "iconNode", type: "class" }
+	}),
+		
 
 	_onClick: function(/*Event*/ e){
 		// summary: internal function to handle click actions
 		if(this.disabled || this.readOnly){
-			dojo.stopEvent(e); // needed for checkbox
 			return false;
 		}
 		this._clicked(); // widget click actions
@@ -46,9 +59,13 @@ dojo.declare("dijit.form.Button",
 	},
 
 	_onButtonClick: function(/*Event*/ e){
-		// summary: callback when the user mouse clicks the button portion
-		if(this._onClick(e) === false){ // returning nothing is same as true
+		// summary: callback when the user activates the button portion
+		// if is activated via a keystroke, stop the event 
+		if(e.type!='click'){
 			dojo.stopEvent(e);
+		}
+		if(this._onClick(e) === false){ // returning nothing is same as true
+			e.preventDefault(); // needed for checkbox
 		}else if(this.type=="submit" && !this.focusNode.form){ // see if a nonform widget needs to be signalled
 			for(var node=this.domNode; node.parentNode/*#5935*/; node=node.parentNode){
 				var widget=dijit.byNode(node);
@@ -60,15 +77,17 @@ dojo.declare("dijit.form.Button",
 		}
 	},
 
-	postCreate: function(){
+	_fillContent: function(/*DomNode*/ source){
 		// summary:
-		//	get label and set as title on button icon if necessary
+		//		If button label is specified as srcNodeRef.innerHTML rather than
+		//		this.params.label, handle it here.
+		if(source && !("label" in this.params)){
+			this.attr('label', source.innerHTML);
+		}
+	},
+
+	postCreate: function(){
 		if (this.showLabel == false){
-			var labelText = "";
-			this.label = this.containerNode.innerHTML;
-			labelText = dojo.trim(this.containerNode.innerText || this.containerNode.textContent || '');
-			// set title attrib on iconNode
-			this.titleNode.title=labelText;
 			dojo.addClass(this.containerNode,"dijitDisplayNone");
 		}
 		dojo.setSelectable(this.focusNode, false);
@@ -86,11 +105,18 @@ dojo.declare("dijit.form.Button",
 	},
 
 	setLabel: function(/*String*/ content){
-		// summary: reset the label (text) of the button; takes an HTML string
+		dojo.deprecated("dijit.form.Button.setLabel() is deprecated.  Use attr('label', ...) instead.", "", "2.0");
+		this.attr("label", content);
+	},
+	_setLabelAttr: function(/*String*/ content){
+		// summary:
+		//		Hook for attr('label', ...) to work.
+		// description:
+		//		Set the label (text) of the button; takes an HTML string.
 		this.containerNode.innerHTML = this.label = content;
 		this._layoutHack();
-		if (this.showLabel == false){
-			this.titleNode.title=dojo.trim(this.containerNode.innerText || this.containerNode.textContent || '');
+		if (this.showLabel == false && !this.params.title){
+			this.titleNode.title = dojo.trim(this.containerNode.innerText || this.containerNode.textContent || '');
 		}
 	}		
 });
@@ -183,7 +209,7 @@ dojo.declare("dijit.form.DropDownButton", [dijit.form.Button, dijit._Container],
 	_onKey: function(/*Event*/ e){
 		// summary: callback when the user presses a key on menu popup node
 		if(this.disabled || this.readOnly){ return; }
-		if(e.keyCode == dojo.keys.DOWN_ARROW){
+		if(e.charOrCode == dojo.keys.DOWN_ARROW){
 			if(!this.dropDown || this.dropDown.domNode.style.visibility=="hidden"){
 				dojo.stopEvent(e);
 				this._toggleDropDown();
@@ -244,7 +270,7 @@ dojo.declare("dijit.form.DropDownButton", [dijit.form.Button, dijit._Container],
 			onClose: function(){
 				dropDown.domNode.style.width = oldWidth;
 				self.popupStateNode.removeAttribute("popupActive");
-				this._opened = false;
+				self._opened = false;
 			}
 		});
 		if(this.domNode.offsetWidth > dropDown.domNode.offsetWidth){
@@ -292,8 +318,11 @@ dojo.declare("dijit.form.ComboButton", dijit.form.DropDownButton, {
 
 	templatePath: dojo.moduleUrl("dijit.form", "templates/ComboButton.html"),
 
-	attributeMap: dojo.mixin(dojo.clone(dijit.form._FormWidget.prototype.attributeMap),
-		{id:"", name:""}),
+	attributeMap: dojo.mixin(dojo.clone(dijit.form.Button.prototype.attributeMap), {
+		id:"",
+		name:"",
+		tabIndex: ["focusNode", "titleNode"]
+	}),
 
 	// optionsTitle: String
 	//  text that describes the options menu (accessibility)
@@ -387,35 +416,32 @@ dojo.declare("dijit.form.ToggleButton", dijit.form.Button, {
 	//		or the radio button is selected, etc.
 	checked: false,
 
-	_onChangeMonitor: 'checked',
-
 	attributeMap: dojo.mixin(dojo.clone(dijit.form.Button.prototype.attributeMap),
 		{checked:"focusNode"}),
 
 	_clicked: function(/*Event*/ evt){
-		this.setAttribute('checked', !this.checked);
+		this.attr('checked', !this.checked);
 	},
 
-	setAttribute: function(/*String*/ attr, /*anything*/ value){
-		this.inherited(arguments);
-		switch(attr){
-			case "checked":
-				dijit.setWaiState(this.focusNode || this.domNode, "pressed", this.checked);
-				this._setStateClass();		
-				this._handleOnChange(this.checked, true);
-		}
+	_setCheckedAttr: function(/*Boolean*/ value){
+		this.checked = value;
+		dojo.attr(this.focusNode || this.domNode, "checked", value);
+		dijit.setWaiState(this.focusNode || this.domNode, "pressed", value);
+		this._setStateClass();		
+		this._handleOnChange(value, true);
 	},
-
 
 	setChecked: function(/*Boolean*/ checked){
 		// summary:
 		//	Programatically deselect the button
-		dojo.deprecated("setChecked("+checked+") is deprecated. Use setAttribute('checked',"+checked+") instead.", "", "2.0");
-		this.setAttribute('checked', checked);
+		dojo.deprecated("setChecked("+checked+") is deprecated. Use attr('checked',"+checked+") instead.", "", "2.0");
+		this.attr('checked', checked);
 	},
 	
-	postCreate: function(){
-		this.inherited(arguments);
-		this.setAttribute('checked', this.checked); //to initially set wai pressed state 
+	reset: function(){
+		this._hasBeenBlurred = false;
+
+		// set checked state to original setting
+		this.attr('checked', this.params.checked || false);
 	}
 });

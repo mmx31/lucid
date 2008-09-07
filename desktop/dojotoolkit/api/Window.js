@@ -55,6 +55,7 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 		//	summary:
 		//		What to do upon maximize of window
 	},
+	gutters: false,
 	//	showMaximize: Boolean
 	//		Whether or not to show the maximize button
 	showMaximize: true,
@@ -192,7 +193,8 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 		//	title:
 		//		The new title
 		this.titleNode.innerHTML = title;
-		desktop.ui._windowList.setValue(this._winListItem, "label", title);
+		if(this._winListItem)
+			desktop.ui._windowList.setValue(this._winListItem, "label", title);
 		this.title = title;
 	},
 	setTitle: function(/*String*/title) {
@@ -462,7 +464,6 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 			}
 		})
 		var zindex = dojo.style(this.domNode, "zIndex");
-		console.log(maxZindex, zindex);
 		if(maxZindex != zindex)
 		{
 			maxZindex++;
@@ -508,61 +509,6 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 			else onEnd();
 		}
 	},
-	resize: function(/*Object?*/args){
-		//	summary:
-		//		Explicitly set the window's size (in pixels)
-		//	args:
-		//		{w: int, h: int, l: int, t: int}
-		var node = this.domNode;
-		
-		//first take care of our size if we're maximized
-		if(this.maximized && typeof args == "undefined") {
-			var max = desktop.ui._area.getBox();
-			var viewport = dijit.getViewport();
-			dojo.style(node, "top", max.T+"px");
-			dojo.style(node, "left", max.L+"px");
-			dojo.style(node, "width", (viewport.w - max.R - max.L)+"px");
-			dojo.style(node, "height", (viewport.h - max.B  - max.T)+"px");
-		}
-		else if(this.maximized && typeof args != "undefined") {
-			var fx = desktop.config.fx;
-			desktop.config.fx = 0;
-			this.unmaximize();
-			desktop.config.fx = fx;
-		}
-		
-		// set margin box size, unless it wasn't specified, in which case use current size
-		if(args){
-			// Offset based on window border size
-			if(args.w) {
-				var calc = node.offsetWidth;
-				var c = this.containerNode.offsetWidth;
-				args.w = ((calc-c)+args.w);
-			}
-			if(args.h) {
-				var calc = node.offsetHeight;
-				var c = this.containerNode.offsetHeight;
-				args.h = ((calc-c)+args.h);
-			}
-			dojo.marginBox(node, args);
-
-			// set offset of the node
-			if(args.t){ node.style.top = args.t + "px"; }
-			if(args.l){ node.style.left = args.l + "px"; }
-			
-		}
-		
-		// If either height or width wasn't specified by the user, then query node for it.
-		// But note that setting the margin box and then immediately querying dimensions may return
-		// inaccurate results, so try not to depend on it.
-		var mb = dojo.mixin(dojo.marginBox(this.containerNode), args||{});
-
-		// Save the size of my content box.
-		this._contentBox = dijit.layout.marginBox2contentBox(this.containerNode, mb);
-		
-		// Callback for widget to adjust size of it's children
-		this.layout();
-	},
 	layout: function(){
 		//	summary:
 		//		Layout the widgets
@@ -573,27 +519,13 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 		this.inherited(arguments);
 		this.domNode = oldNode;
 	},
-	addChild: function(/*Widget*/ child, /*Integer?*/ insertIndex){
-		//	summary:
-		//		Add a child to the window
-		//	child:
-		//		the child to add
-		//	insertIndex:
-		//		at what index to insert the widget
-		dijit._Container.prototype.addChild.apply(this, arguments);
-		if(this._started){
-			dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());
-		}
-	},
-	removeChild: function(/*Widget*/ widget){
-		//	summary:
-		//		Remove a child from the widget
-		//	widget:
-		//		the widget to remove
-		dijit._Container.prototype.removeChild.apply(this, arguments);
-		if(this._started){
-			dijit.layout.layoutChildren(this.containerNode, this._contentBox, this.getChildren());
-		}
+	resize: function() {
+		//hack so we don't have to deal with BorderContainer's method using this.domNode
+		var oldNode = this.domNode;
+		this.domNode = this.containerNode;
+		this.inherited(arguments);
+		this.domNode = oldNode;
+		this.getChildren().forEach(function(wid) { if(wid.resize) wid.resize(); });
 	},
 	_onResize: function(e) {
 		//	summary:

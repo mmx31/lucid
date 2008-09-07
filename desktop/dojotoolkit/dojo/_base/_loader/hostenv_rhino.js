@@ -108,27 +108,27 @@ dojo.exit = function(exitcode){
 
 // do it by using java java.lang.Exception
 dojo._rhinoCurrentScriptViaJava = function(depth){
-    var optLevel = Packages.org.mozilla.javascript.Context.getCurrentContext().getOptimizationLevel();  
-    var caw = new java.io.CharArrayWriter();
-    var pw = new java.io.PrintWriter(caw);
-    var exc = new java.lang.Exception();
-    var s = caw.toString();
-    // we have to exclude the ones with or without line numbers because they put double entries in:
-    //   at org.mozilla.javascript.gen.c3._c4(/Users/mda/Sites/burstproject/burst/Runtime.js:56)
-    //   at org.mozilla.javascript.gen.c3.call(/Users/mda/Sites/burstproject/burst/Runtime.js)
-    var matches = s.match(/[^\(]*\.js\)/gi);
-    if(!matches){
+	var optLevel = Packages.org.mozilla.javascript.Context.getCurrentContext().getOptimizationLevel();  
+	var caw = new java.io.CharArrayWriter();
+	var pw = new java.io.PrintWriter(caw);
+	var exc = new java.lang.Exception();
+	var s = caw.toString();
+	// we have to exclude the ones with or without line numbers because they put double entries in:
+	//   at org.mozilla.javascript.gen.c3._c4(/Users/mda/Sites/burstproject/burst/Runtime.js:56)
+	//   at org.mozilla.javascript.gen.c3.call(/Users/mda/Sites/burstproject/burst/Runtime.js)
+	var matches = s.match(/[^\(]*\.js\)/gi);
+	if(!matches){
 		throw Error("cannot parse printStackTrace output: " + s);
 	}
 
-    // matches[0] is entire string, matches[1] is this function, matches[2] is caller, ...
-    var fname = ((typeof depth != 'undefined')&&(depth)) ? matches[depth + 1] : matches[matches.length - 1];
-    var fname = matches[3];
+	// matches[0] is entire string, matches[1] is this function, matches[2] is caller, ...
+	var fname = ((typeof depth != 'undefined')&&(depth)) ? matches[depth + 1] : matches[matches.length - 1];
+	fname = matches[3];
 	if(!fname){ fname = matches[1]; }
-    // print("got fname '" + fname + "' from stack string '" + s + "'");
-    if (!fname){ throw Error("could not find js file in printStackTrace output: " + s); }
-    //print("Rhino getCurrentScriptURI returning '" + fname + "' from: " + s); 
-    return fname;
+	// print("got fname '" + fname + "' from stack string '" + s + "'");
+	if (!fname){ throw Error("could not find js file in printStackTrace output: " + s); }
+	//print("Rhino getCurrentScriptURI returning '" + fname + "' from: " + s); 
+	return fname;
 }
 
 // reading a file from disk in Java is a humiliating experience by any measure.
@@ -195,37 +195,45 @@ dojo.body = function(){
 	return document.body;	
 }
 
-dojo._timeouts = [];
+// Supply setTimeout/clearTimeout implementations if they aren't already there
+// Note: this assumes that we define both if one is not provided... there might
+// be a better way to do this if there is a use case where one is defined but
+// not the other
+try{
+	setTimeout;
+	clearTimeout;
+}catch(e){
+	dojo._timeouts = [];
+	function clearTimeout(idx){
+		if(!dojo._timeouts[idx]){ return; }
+		dojo._timeouts[idx].stop();
+	}
 
-function clearTimeout(idx){
-	if(!dojo._timeouts[idx]){ return; }
-	dojo._timeouts[idx].stop();
-}
+	function setTimeout(func, delay){
+		// summary: provides timed callbacks using Java threads
 
-function setTimeout(func, delay){
-	// summary: provides timed callbacks using Java threads
-
-	var def={
-		sleepTime:delay,
-		hasSlept:false,
+		var def={
+			sleepTime:delay,
+			hasSlept:false,
 		
-		run:function(){
-			if(!this.hasSlept){
-				this.hasSlept=true;
-				java.lang.Thread.currentThread().sleep(this.sleepTime);
+			run:function(){
+				if(!this.hasSlept){
+					this.hasSlept=true;
+					java.lang.Thread.currentThread().sleep(this.sleepTime);
+				}
+				try{
+					func();
+				}catch(e){
+					console.debug("Error running setTimeout thread:" + e);
+				}
 			}
-			try{
-				func();
-			}catch(e){
-				console.debug("Error running setTimeout thread:" + e);
-			}
-		}
-	};
+		};
 	
-	var runnable = new java.lang.Runnable(def);
-	var thread = new java.lang.Thread(runnable);
-	thread.start();
-	return dojo._timeouts.push(thread)-1;
+		var runnable = new java.lang.Runnable(def);
+		var thread = new java.lang.Thread(runnable);
+		thread.start();
+		return dojo._timeouts.push(thread)-1;
+	}
 }
 
 //Register any module paths set up in djConfig. Need to do this

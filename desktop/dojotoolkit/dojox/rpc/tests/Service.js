@@ -3,14 +3,14 @@ dojo.require("dojo.io.script");
 dojo.require("dojox.rpc.Service");
 dojo.require("dojox.rpc.JsonRPC");
 dojo.require("dojox.rpc.Rest");
+dojo.require("dojox.rpc.Client");
 //this is a copy of our smd in js form, so we can just share it easily
 //dojo.require("dojox.rpc.tests.resources.testSmd");
-
 
 dojox.rpc.tests.service = new dojox.rpc.Service(dojo.moduleUrl("dojox.rpc.tests.resources", "test.smd"));
 
 doh.register("dojox.rpc.tests.echo", 
-	[ 
+	[
 		{
 			name: "#1 POST,URL,Named Parameters",
 			timeout: 4000,
@@ -260,7 +260,7 @@ doh.register("dojox.rpc.tests.echo",
 		},
 
 		{
-			name: "#4 GET,URL,Ordered Parameters",
+			name: "#4.1 GET,URL,Ordered Parameters",
 			timeout: 4000,
 			setUp: function(){
 				//this.svc = new dojox.rpc.Service(dojox.rpc.tests.resources.testSmd);
@@ -277,6 +277,35 @@ doh.register("dojox.rpc.tests.echo",
 
 				//test when given named params
 				var td = this.svc.getEcho(this.name);
+				td.addCallback(this, function(result){
+					if (result==this.name){
+						d.callback(true);
+					}else{
+						d.errback(new Error("Unexpected Return Value: ", result));
+					}
+				});
+
+				return d;
+			}
+		},
+		{
+			name: "#4.2 Namespaced GET,URL,Ordered Parameters",
+			timeout: 4000,
+			setUp: function(){
+				//this.svc = new dojox.rpc.Service(dojox.rpc.tests.resources.testSmd);
+				this.svc = dojox.rpc.tests.service;
+			},
+			runTest: function(){
+				var d = new doh.Deferred();
+
+				if (window.location.protocol=="file:") {
+					var err= new Error("This Test requires a webserver and will fail intentionally if loaded from file://");
+					d.errback(err);
+					return d;
+				}
+
+				//test when given named params
+				var td = this.svc.namespace.getEcho(this.name);
 				td.addCallback(this, function(result){
 					if (result==this.name){
 						d.callback(true);
@@ -307,8 +336,7 @@ doh.register("dojox.rpc.tests.echo",
 
 				//test when given named params
 				var td = this.svc.postJsonEcho({message: this.name});
-				td.addCallback(this, function(res){
-					var result = dojo.fromJson(res);
+				td.addCallback(this, function(result){
 					if (result && result.message && result.message==this.name){
 						d.callback(true);
 					}else{
@@ -338,9 +366,8 @@ doh.register("dojox.rpc.tests.echo",
 
 				//test when given named params
 				var td = this.svc.postJsonEcho(this.name);
-				td.addCallback(this, function(res){
-					var result = dojo.fromJson(res);
-					if (result && result.message && result.message==this.name){
+				td.addCallback(this, function(result){
+					if (result && result[0] && result[0]==this.name){
 						d.callback(true);
 					}else{
 						d.errback(new Error("Unexpected Return Value: ", result));
@@ -467,7 +494,7 @@ doh.register("dojox.rpc.tests.echo",
 			}
 		},
 		{
-			name: "#11 POST,JSON-RPC 1.2, Ordered Parameters",
+			name: "#11 POST,JSON-RPC 2.0, Ordered Parameters",
 			timeout: 4000,
 			setUp: function(){
 				//this.svc = new dojox.rpc.Service(dojox.rpc.tests.resources.testSmd);
@@ -496,7 +523,7 @@ doh.register("dojox.rpc.tests.echo",
 			}
 		},
 		{
-			name: "#12 POST,JSON-RPC 1.2, Named Parameters",
+			name: "#12 POST,JSON-RPC 2.0, Named Parameters",
 			timeout: 4000,
 			setUp: function(){
 				//this.svc = new dojox.rpc.Service(dojox.rpc.tests.resources.testSmd);
@@ -526,7 +553,7 @@ doh.register("dojox.rpc.tests.echo",
 		}
 	/*
 		,{
-			name: "#13 GET,JSON-RPC 1.2, Ordered Parameters",
+			name: "#13 GET,JSON-RPC 2.0, Ordered Parameters",
 			timeout: 4000,
 			setUp: function(){
 				//this.svc = new dojox.rpc.Service(dojox.rpc.tests.resources.testSmd);
@@ -555,7 +582,7 @@ doh.register("dojox.rpc.tests.echo",
 			}
 		},
 		{
-			name: "#14 GET,JSON-RPC 1.2, Named Parameters",
+			name: "#14 GET,JSON-RPC 2.0, Named Parameters",
 			timeout: 4000,
 			setUp: function(){
 				//this.svc = new dojox.rpc.Service(dojox.rpc.tests.resources.testSmd);
@@ -584,7 +611,7 @@ doh.register("dojox.rpc.tests.echo",
 			}
 		},
 		,{
-			name: "#15 JSONP,JSON-RPC 1.2, Ordered Parameters",
+			name: "#15 JSONP,JSON-RPC 2.0, Ordered Parameters",
 			timeout: 4000,
 			setUp: function(){
 				//this.svc = new dojox.rpc.Service(dojox.rpc.tests.resources.testSmd);
@@ -644,7 +671,7 @@ doh.register("dojox.rpc.tests.jsonRpcForcedError", [
 			}
 		},
 		{
-			name: "POST,JSON-RPC 1.2, Ordered Parameters",
+			name: "POST,JSON-RPC 2.0, Ordered Parameters",
 			timeout: 4000,
 			setUp: function(){
 				//this.svc = new dojox.rpc.Service(dojox.rpc.tests.resources.testSmd);
@@ -670,7 +697,7 @@ doh.register("dojox.rpc.tests.jsonRpcForcedError", [
 			}
 		},
 		{
-			name: "POST,JSON-RPC 1.2, Named Parameters",
+			name: "POST,JSON-RPC 2.0, Named Parameters",
 			timeout: 4000,
 			setUp: function(){
 				//this.svc = new dojox.rpc.Service(dojox.rpc.tests.resources.testSmd);

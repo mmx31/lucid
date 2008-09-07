@@ -1,12 +1,20 @@
 dojo.provide("dijit.form.ComboBox");
 
 dojo.require("dijit.form.ValidationTextBox");
+dojo.require("dojo.data.util.simpleFetch");
+dojo.require("dojo.data.util.filter");
+
 dojo.requireLocalization("dijit.form", "ComboBox");
 
 dojo.declare(
 	"dijit.form.ComboBoxMixin",
 	null,
 	{
+		// summary:
+		//		Implements the base functionality for ComboBox/FilteringSelect
+		// description:
+		//		All widgets that mix in dijit.form.ComboBoxMixin must extend dijit.form._FormValueWidget
+
 		// item: Object
 		//		This is the item returned by the dojo.data.store implementation that
 		//		provides the data for this cobobox, it's the currently selected item.
@@ -21,6 +29,12 @@ dojo.declare(
 		//		Reference to data provider object used by this ComboBox
 		store: null,
 
+		// fetchProperties: Object
+		//		Mixin to the dojo.data store's fetch.
+		//		For example, to set the sort order of the ComboBox menu, pass:
+		//		{sort:{attribute:"name",descending:true}}
+		fetchProperties:{},
+
 		// query: Object
 		//		A query that can be passed to 'store' to initially filter the items,
 		//		before doing further filtering based on `searchAttr` and the key.
@@ -33,6 +47,14 @@ dojo.declare(
 		//		the `<input>` field
 		autoComplete: true,
 
+		// highlightMatch: String
+		// 		One of: "first", "all" or "none".
+		//		If the ComboBox opens with the serach results and the searched
+		//		string can be found it will be highlighted.
+		//		This value is not considered when labelType!="text" to not
+		//		screw up any mark up the label might contain.
+		highlightMatch: "first",
+		
 		// searchDelay: Integer
 		//		Delay in milliseconds between when user types something and we start
 		//		searching based on that value
@@ -41,6 +63,15 @@ dojo.declare(
 		// searchAttr: String
 		//		Searches pattern match against this field
 		searchAttr: "name",
+
+		// labelAttr: String
+		//		Optional.  The text that actually appears in the drop down.
+		//		If not specified, the searchAttr text is used instead.
+		labelAttr: "",
+
+		// labelType: String
+		//		"html" or "text"
+		labelType: "text",
 
 		// queryExpr: String
 		//		dojo.data query expression pattern.
@@ -95,18 +126,21 @@ dojo.declare(
 			dijit.selectInputText(element, location, location);
 		},
 
-		_setAttribute: function(/*String*/ attr, /*anything*/ value){
-			// summary: additional code to set disablbed state of combobox node
-			if (attr == "disabled"){
+		_setDisabledAttr: function(/*Boolean*/ value){
+			// summary:
+			//		Call this from superclass as part of _setDisabledAttr() method.
+			//		Superclass _must_ define _setDisabledAttr().
+			// description:
+			//		Additional code to set disabled state of combobox node
 				dijit.setWaiState(this.comboNode, "disabled", value);
-			}
 		},	
 		
 		_onKeyPress: function(/*Event*/ evt){
 			// summary: handles keyboard events
 
-			//except for pasting case - ctrl + v(118)
-			if(evt.altKey || (evt.ctrlKey && evt.charCode != 118)){
+			//except for cutting/pasting case - ctrl + x/v
+			var key = evt.charOrCode;
+			if(evt.altKey || (evt.ctrlKey && (key != 'v' && key != 'x')) || evt.keyCode == dojo.keys.SHIFT){
 				return;
 			}
 			var doSearch = false;
@@ -115,7 +149,7 @@ dojo.declare(
 			if(this._isShowingNow){
 				pw.handleKey(evt);
 			}
-			switch(evt.keyCode){
+			switch(evt.charOrCode){
 				case dk.PAGE_DOWN:
 				case dk.DOWN_ARROW:
 					if(!this._isShowingNow||this._prev_key_esc){
@@ -158,7 +192,8 @@ dojo.declare(
 							break;
 						}
 					}else{
-						this.setDisplayedValue(this.getDisplayedValue());
+						// Update 'value' (ex: KY) according to currently displayed text
+						this.attr('displayedValue', this.attr('displayedValue'));
 					}
 					// default case:
 					// prevent submit, but allow event to bubble
@@ -166,7 +201,7 @@ dojo.declare(
 					// fall through
 
 				case dk.TAB:
-					var newvalue = this.getDisplayedValue();
+					var newvalue = this.attr('displayedValue');
 					// #4617: 
 					//		if the user had More Choices selected fall into the
 					//		_onBlur handler
@@ -180,13 +215,13 @@ dojo.declare(
 						this._prev_key_backspace = false;
 						this._prev_key_esc = false;
 						if(pw.getHighlightedOption()){
-							pw.setValue({ target: pw.getHighlightedOption() }, true);
+							pw.attr('value', { target: pw.getHighlightedOption() });
 						}
 						this._hideResultList();
 					}
 					break;
 
-				case dk.SPACE:
+				case ' ':
 					this._prev_key_backspace = false;
 					this._prev_key_esc = false;
 					if(this._isShowingNow && pw.getHighlightedOption()){
@@ -204,8 +239,9 @@ dojo.declare(
 					if(this._isShowingNow){
 						dojo.stopEvent(evt);
 						this._hideResultList();
+					}else{
+						this.inherited(arguments);
 					}
-					this.inherited(arguments);
 					break;
 
 				case dk.DELETE:
@@ -224,9 +260,7 @@ dojo.declare(
 				default: // non char keys (F1-F12 etc..)  shouldn't open list
 					this._prev_key_backspace = false;
 					this._prev_key_esc = false;
-					if(dojo.isIE || evt.charCode != 0){
-						doSearch = true;
-					}
+					doSearch = evt.keyChar !== '';
 			}
 			if(this.searchTimer){
 				clearTimeout(this.searchTimer);
@@ -297,6 +331,7 @@ dojo.declare(
 				// if they are just previewing the options available.
 				this._autoCompleteText(zerothvalue);
 			}
+			dataObject._maxOptions = this._maxOptions;
 			this._popupWidget.createOptions(
 				results, 
 				dataObject, 
@@ -337,13 +372,12 @@ dojo.declare(
 			//	and
 			//		http://trac.dojotoolkit.org/ticket/4108
 
-			with(this._popupWidget.domNode.style){
-				// natural size of the list has changed, so erase old
-				// width/height settings, which were hardcoded in a previous
-				// call to this function (via dojo.marginBox() call) 
-				width = "";
-				height = "";
-			}
+
+			// natural size of the list has changed, so erase old
+			// width/height settings, which were hardcoded in a previous
+			// call to this function (via dojo.marginBox() call)
+			dojo.style(this._popupWidget.domNode, {width: "", height: ""});
+
 			var best = this.open();
 			// #3212:
 			//		only set auto scroll bars if necessary prevents issues with
@@ -382,16 +416,17 @@ dojo.declare(
 			// #4617: 
 			//		if value is now more choices or previous choices, revert
 			//		the value
-			var newvalue=this.getDisplayedValue();
+			var newvalue=this.attr('displayedValue');
 			var pw = this._popupWidget;
 			if(pw && (
 				newvalue == pw._messages["previousMessage"] ||
 				newvalue == pw._messages["nextMessage"]
 				)
 			){
-				this.setValue(this._lastValueReported, true);
+				this._setValueAttr(this._lastValueReported, true);
 			}else{
-				this.setDisplayedValue(newvalue);
+				// Update 'value' (ex: KY) according to currently displayed text
+				this.attr('displayedValue', newvalue);
 			}
 		},
 
@@ -435,7 +470,7 @@ dojo.declare(
 				// what if nothing is highlighted yet?
 			if(!evt.target){
 				// handle autocompletion where the the user has hit ENTER or TAB
-				this.setDisplayedValue(this.getDisplayedValue());
+				this.attr('displayedValue', this.attr('displayedValue'));
 				return;
 			// otherwise the user has accepted the autocompleted value
 			}else{
@@ -450,7 +485,7 @@ dojo.declare(
 
 		_doSelect: function(tgt){
 			this.item = tgt.item;
-			this.setValue(this.store.getValue(tgt.item, this.searchAttr), true);
+			this.attr('value', this.store.getValue(tgt.item, this.searchAttr));
 		},
 
 		_onArrowMouseDown: function(evt){
@@ -491,17 +526,19 @@ dojo.declare(
 			// value from FilteringSelect's keyField
 			this.item = null; // #4872
 			var query = dojo.clone(this.query); // #5970
+			this._lastInput = key; // Store exactly what was entered by the user.
 			this._lastQuery = query[this.searchAttr] = this._getQueryString(key);
 			// #5970: set _lastQuery, *then* start the timeout
 			// otherwise, if the user types and the last query returns before the timeout,
 			// _lastQuery won't be set and their input gets rewritten
 			this.searchTimer=setTimeout(dojo.hitch(this, function(query, _this){
-				var dataObject = this.store.fetch({
+				var fetch = {
 					queryOptions: {
 						ignoreCase: this.ignoreCase, 
 						deep: true
 					},
 					query: query,
+					onBegin: dojo.hitch(this, "_setMaxOptions"),
 					onComplete: dojo.hitch(this, "_openResultList"), 
 					onError: function(errText){
 						console.error('dijit.form.ComboBox: ' + errText);
@@ -509,7 +546,9 @@ dojo.declare(
 					},
 					start:0,
 					count:this.pageSize
-				});
+				};
+				dojo.mixin(fetch, _this.fetchProperties);
+				var dataObject = _this.store.fetch(fetch);
 
 				var nextSearch = function(dataObject, direction){
 					dataObject.start += dataObject.count*direction;
@@ -518,9 +557,13 @@ dojo.declare(
 					//		reader knows which menu option to shout
 					dataObject.direction = direction;
 					this.store.fetch(dataObject);
-				}
+				};
 				this._nextSearch = this._popupWidget.onPage = dojo.hitch(this, nextSearch, dataObject);
 			}, query, this), this.searchDelay);
+		},
+
+		_setMaxOptions: function(size, request){
+			 this._maxOptions = size;
 		},
 
 		_getValueField:function(){
@@ -551,13 +594,14 @@ dojo.declare(
 			//		Asian languages, it will generate this event instead of
 			//		onKeyDown event Note: this event is only triggered in FF
 			//		(not in IE)
-			this.onkeypress({charCode:-1});
+			this._onKeyPress({charCode:-1});
 		},
 
 		//////////// INITIALIZATION METHODS ///////////////////////////////////////
 
 		constructor: function(){
 			this.query={};
+			this.fetchProperties={};
 		},
 
 		postMixInProperties: function(){
@@ -597,7 +641,6 @@ dojo.declare(
 				label[0].id = (this.id+"_label");
 				var cn=this.comboNode;
 				dijit.setWaiState(cn, "labelledby", label[0].id);
-				dijit.setWaiState(cn, "disabled", this.disabled);
 				
 			}
 		},
@@ -605,15 +648,45 @@ dojo.declare(
 		uninitialize:function(){
 			if(this._popupWidget){
 				this._hideResultList();
-				this._popupWidget.destroy()
+				this._popupWidget.destroy();
 			}
 		},
 
 		_getMenuLabelFromItem:function(/*Item*/ item){
-			return {
-				html: false, 
-				label: this.store.getValue(item, this.searchAttr)
-			};
+			var label = this.store.getValue(item, this.labelAttr || this.searchAttr);
+			var labelType = this.labelType;
+			// If labelType is not "text" we don't want to screw any markup ot whatever.
+			if (this.highlightMatch!="none" && this.labelType=="text" && this._lastInput){
+				label = this.doHighlight(label, this._escapeHtml(this._lastInput));
+				labelType = "html";
+			}
+			return {html: labelType=="html", label: label};
+		},
+		
+		doHighlight:function(/*String*/label, /*String*/find){
+			// summary:
+			//		Highlights the string entered by the user in the menu, by default this
+			//		highlights the first occurence found. Override this method
+			//		to implement your custom highlighing.
+			// Add greedy when this.highlightMatch=="all"
+			var modifiers = "i"+(this.highlightMatch=="all"?"g":"");
+			var escapedLabel = this._escapeHtml(label);
+			var ret = escapedLabel.replace(new RegExp("^("+ find +")", modifiers),
+					'<span class="dijitComboBoxHighlightMatch">$1</span>');
+			if (escapedLabel==ret){ // Nothing replaced, try to replace at word boundaries.
+				ret = escapedLabel.replace(new RegExp(" ("+ find +")", modifiers),
+					' <span class="dijitComboBoxHighlightMatch">$1</span>');
+			}
+			return ret;// returns String, (almost) valid HTML (entities encoded)
+		},
+		
+		_escapeHtml:function(/*string*/str){
+			// TODO Should become dojo.html.entities(), when exists use instead
+			// summary:
+			//		Adds escape sequences for special characters in XML: &<>"'
+			str = String(str).replace(/&/gm, "&amp;").replace(/</gm, "&lt;")
+				.replace(/>/gm, "&gt;").replace(/"/gm, "&quot;");
+			return str; // string
 		},
 
 		open:function(){
@@ -638,12 +711,11 @@ dojo.declare(
 dojo.declare(
 	"dijit.form._ComboBoxMenu",
 	[dijit._Widget, dijit._Templated],
-
 	{
 		//	summary:
 		//		Focus-less div based menu for internal use in ComboBox
 
-		templateString: "<ul class='dijitMenu' dojoAttachEvent='onmousedown:_onMouseDown,onmouseup:_onMouseUp,onmouseover:_onMouseOver,onmouseout:_onMouseOut' tabIndex='-1' style='overflow:\"auto\";'>"
+		templateString: "<ul class='dijitReset dijitMenu' dojoAttachEvent='onmousedown:_onMouseDown,onmouseup:_onMouseUp,onmouseover:_onMouseOver,onmouseout:_onMouseOut' tabIndex='-1' style='overflow:\"auto\";'>"
 				+"<li class='dijitMenuItem dijitMenuPreviousButton' dojoAttachPoint='previousButton'></li>"
 				+"<li class='dijitMenuItem dijitMenuNextButton' dojoAttachPoint='nextButton'></li>"
 			+"</ul>",
@@ -654,7 +726,7 @@ dojo.declare(
 			this.inherited("postMixInProperties", arguments);
 		},
 
-		setValue: function(/*Object*/ value){
+		_setValueAttr: function(/*Object*/ value){
 			this.value = value;
 			this.onChange(value);
 		},
@@ -667,7 +739,7 @@ dojo.declare(
 			// fill in template with i18n messages
 			this.previousButton.innerHTML = this._messages["previousMessage"];
 			this.nextButton.innerHTML = this._messages["nextMessage"];
-			this.inherited("postCreate", arguments);
+			this.inherited(arguments);
 		},
 
 		onClose:function(){
@@ -698,6 +770,7 @@ dojo.declare(
 		},
 
 		createOptions: function(results, dataObject, labelFunc){
+			// TODOC: needs summary. What does this do and what are the params supposed to mean? 
 			//this._dataObject=dataObject;
 			//this._dataObject.onComplete=dojo.hitch(comboBox, comboBox._openResultList);
 			// display "Previous . . ." button
@@ -709,13 +782,32 @@ dojo.declare(
 			//		iterate over cache nondestructively
 			dojo.forEach(results, function(item, i){
 				var menuitem = this._createOption(item, labelFunc);
-				menuitem.className = "dijitMenuItem";
+				menuitem.className = "dijitReset dijitMenuItem";
 				dojo.attr(menuitem, "id", this.id + i);
 				this.domNode.insertBefore(menuitem, this.nextButton);
 			}, this);
 			// display "Next . . ." button
-			this.nextButton.style.display = (dataObject.count == results.length) ? "" : "none";
-			dojo.attr(this.nextButton,"id", this.id + "_next")
+			var displayMore = false;
+			//Try to determine if we should show 'more'...
+			if(dataObject._maxOptions && dataObject._maxOptions != -1){
+				if((dataObject.start + dataObject.count) < dataObject._maxOptions){
+					displayMore = true;
+				}else if((dataObject.start + dataObject.count) > (dataObject._maxOptions - 1)){
+					//Weird return from a datastore, where a start + count > maxOptions
+					//implies maxOptions isn't really valid and we have to go into faking it.
+					//And more or less assume more if count == results.length
+					if(dataObject.count == results.length){
+						displayMore = true;
+					}
+				}
+			}else if(dataObject.count == results.length){
+				//Don't know the size, so we do the best we can based off count alone.
+				//So, if we have an exact match to count, assume more.
+				displayMore = true;
+			}
+
+			this.nextButton.style.display = displayMore ? "" : "none";
+			dojo.attr(this.nextButton,"id", this.id + "_next");
 		},
 
 		clearResultList: function(){
@@ -752,7 +844,7 @@ dojo.declare(
 					// recurse to the top
 					tgt = tgt.parentNode;
 				}
-				this.setValue({ target: tgt }, true);
+				this._setValueAttr({ target: tgt }, true);
 			}
 		},
 
@@ -888,7 +980,7 @@ dojo.declare(
 		},
 
 		handleKey: function(evt){
-			switch(evt.keyCode){
+			switch(evt.charOrCode){
 				case dojo.keys.DOWN_ARROW:
 					this._highlightNextOption();
 					break;
@@ -920,10 +1012,6 @@ dojo.declare(
 		// 
 		//		Some of the options to the ComboBox are actually arguments to the data
 		//		provider.
-		// 
-		//		You can assume that all the form widgets (and thus anything that mixes
-		//		in dijit.formComboBoxMixin) will inherit from dijit.form._FormWidget and thus the `this`
-		//		reference will also "be a" _FormWidget.
 
 		postMixInProperties: function(){
 			// this.inherited(arguments); // ??
@@ -935,9 +1023,9 @@ dojo.declare(
 			dijit.form.ComboBoxMixin.prototype._postCreate.apply(this, arguments);
 			dijit.form.ValidationTextBox.prototype.postCreate.apply(this, arguments);
 		},
-		setAttribute: function(/*String*/ attr, /*anything*/ value){
-			dijit.form.ValidationTextBox.prototype.setAttribute.apply(this, arguments);
-			dijit.form.ComboBoxMixin.prototype._setAttribute.apply(this, arguments);
+		_setDisabledAttr: function(/*Boolean*/ value){
+			dijit.form.ValidationTextBox.prototype._setDisabledAttr.apply(this, arguments);
+			dijit.form.ComboBoxMixin.prototype._setDisabledAttr.apply(this, arguments);
 		}
 		
 	}
@@ -961,13 +1049,14 @@ dojo.declare("dijit.form._ComboBoxDataStore", null, {
 
 	constructor: function( /*DomNode*/ root){
 		this.root = root;
-/*
-		//	TODO: this was added in #3858 but unclear why/if it's needed;  doesn't seem to be.
-		//	If it is needed then can we just hide the select itself instead?
+
 		dojo.query("> option", root).forEach(function(node){
-			node.style.display="none";
+			//	TODO: this was added in #3858 but unclear why/if it's needed;  doesn't seem to be.
+			//	If it is needed then can we just hide the select itself instead?
+			//node.style.display="none";
+			node.innerHTML = dojo.trim(node.innerHTML);
 		});
-*/
+
 	},
 
 	getValue: function(	/* item */ item, 
@@ -980,39 +1069,26 @@ dojo.declare("dijit.form._ComboBoxDataStore", null, {
 		return true;
 	},
 
-	fetch: function(/* Object */ args){
-		//	summary:
-		//		Given a query and set of defined options, such as a start and count of items to return,
-		//		this method executes the query and makes the results available as data items.
-		//		Refer to dojo.data.api.Read.fetch() more details.
-		//
-		//	description:
-		//		Given a query like
-		//
-		//	|	{
-		// 	|		query: {name: "Cal*"},
-		//	|		start: 30,
-		//	|		count: 20,
-		//	|		ignoreCase: true,
-		//	|		onComplete: function(/* item[] */ items, /* Object */ args){...}
-		// 	|	}
-		//
-		//		will call `onComplete()` with the results of the query (and the argument to this method)
-
-		// convert query to regex (ex: convert "first\last*" to /^first\\last.*$/i) and get matching vals
-		var query = "^" + args.query.name
-				.replace(/([\\\|\(\)\[\{\^\$\+\?\.\<\>])/g, "\\$1")
-				.replace("*", ".*") + "$",
-			matcher = new RegExp(query, args.queryOptions.ignoreCase ? "i" : ""),
+	getFeatures: function(){
+		return {"dojo.data.api.Read": true, "dojo.data.api.Identity": true};
+	},
+	
+	_fetchItems: function(	/* Object */ args,
+							/* Function */ findCallback, 
+							/* Function */ errorCallback){
+		//	summary: 
+		//		See dojo.data.util.simpleFetch.fetch()
+		if(!args.query){ args.query = {}; }
+		if(!args.query.name){ args.query.name = ""; }
+		if(!args.queryOptions){ args.queryOptions = {}; }
+		var matcher = dojo.data.util.filter.patternToRegExp(args.query.name, args.queryOptions.ignoreCase),
 			items = dojo.query("> option", this.root).filter(function(option){
 				return (option.innerText || option.textContent || '').match(matcher);
 			} );
-
-		var start = args.start || 0,
-			end = ("count" in args && args.count != Infinity) ? (start + args.count) : items.length ;
-		args.onComplete(items.slice(start, end), args);
-		return args; // Object
-		// TODO: I don't need to return the length?
+		if(args.sort){
+			items.sort(dojo.data.util.sorter.createSortFunction(args.sort, this));
+		}
+		findCallback(items, args);
 	},
 
 	close: function(/*dojo.data.api.Request || args || null */ request){
@@ -1054,3 +1130,5 @@ dojo.declare("dijit.form._ComboBoxDataStore", null, {
 			root)[0];	// dojo.data.Item
 	}
 });
+//Mix in the simple fetch implementation to this class. 
+dojo.extend(dijit.form._ComboBoxDataStore,dojo.data.util.simpleFetch);

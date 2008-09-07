@@ -14,7 +14,7 @@ dojo.require("dojo.parser");
 
 dojo.declare("dojo.dnd.Container", null, {
 	// summary: a Container object, which knows when mouse hovers over it, 
-	//	and know over which element it hovers
+	//	and over which element it hovers
 	
 	// object attributes (for markup)
 	skipForm: false,
@@ -26,14 +26,16 @@ dojo.declare("dojo.dnd.Container", null, {
 		//	creator: Function: a creator function, which takes a data item, and returns an object like that:
 		//		{node: newNode, data: usedData, type: arrayOfStrings}
 		//	skipForm: Boolean: don't start the drag operation, if clicked on form elements
+		//	dropParent: Node: node or node's id to use as the parent node for dropped items
+		//		(must be underneath the 'node' parameter in the DOM)
 		//	_skipStartup: Boolean: skip startup(), which collects children, for deferred initialization
 		//		(this is used in the markup mode)
 		this.node = dojo.byId(node);
 		if(!params){ params = {}; }
 		this.creator = params.creator || null;
 		this.skipForm = params.skipForm;
-		this.defaultCreator = dojo.dnd._defaultCreator(this.node);
-
+		this.parent = params.dropParent && dojo.byId(params.dropParent);
+		
 		// class-specific variables
 		this.map = {};
 		this.current = null;
@@ -78,10 +80,11 @@ dojo.declare("dojo.dnd.Container", null, {
 		//	are present in the empty object (IE and/or 3rd-party libraries).
 		o = o || dojo.global;
 		var m = this.map, e = dojo.dnd._empty;
-		for(var i in this.map){
+		for(var i in m){
 			if(i in e){ continue; }
-			f.call(o, m[i], i, m);
+			f.call(o, m[i], i, this);
 		}
+		return o;	// Object
 	},
 	clearItems: function(){
 		// summary: removes all data items from the map
@@ -92,6 +95,29 @@ dojo.declare("dojo.dnd.Container", null, {
 	getAllNodes: function(){
 		// summary: returns a list (an array) of all valid child nodes
 		return dojo.query("> .dojoDndItem", this.parent);	// NodeList
+	},
+	sync: function(){
+		// summary: synch up the node list with the data map
+		var map = {};
+		this.getAllNodes().forEach(function(node){
+			if(node.id){
+				var item = this.getItem(node.id);
+				if(item){
+					map[node.id] = item;
+					return;
+				}
+			}else{
+				node.id = dojo.dnd.getUniqueId();
+			}
+			var type = node.getAttribute("dndType"),
+				data = node.getAttribute("dndData");
+			map[node.id] = {
+				data: data || node.innerHTML,
+				type: type ? type.split(/\s*,\s*/) : ["text"]
+			};
+		}, this);
+		this.map = map;
+		return this;	// self
 	},
 	insertNodes: function(data, before, anchor){
 		// summary: inserts an array of new nodes before/after an anchor node
@@ -128,7 +154,7 @@ dojo.declare("dojo.dnd.Container", null, {
 		// summary: prepares the object to be garbage-collected
 		dojo.forEach(this.events, dojo.disconnect);
 		this.clearItems();
-		this.node = this.parent = this.current;
+		this.node = this.parent = this.current = null;
 	},
 
 	// markup methods
@@ -140,22 +166,18 @@ dojo.declare("dojo.dnd.Container", null, {
 		// summary: collects valid child items and populate the map
 		
 		// set up the real parent node
-		this.parent = this.node;
-		if(this.parent.tagName.toLowerCase() == "table"){
-			var c = this.parent.getElementsByTagName("tbody");
-			if(c && c.length){ this.parent = c[0]; }
+		if(!this.parent){
+			// use the standard algorithm, if not assigned
+			this.parent = this.node;
+			if(this.parent.tagName.toLowerCase() == "table"){
+				var c = this.parent.getElementsByTagName("tbody");
+				if(c && c.length){ this.parent = c[0]; }
+			}
 		}
+		this.defaultCreator = dojo.dnd._defaultCreator(this.parent);
 
 		// process specially marked children
-		this.getAllNodes().forEach(function(node){
-			if(!node.id){ node.id = dojo.dnd.getUniqueId(); }
-			var type = node.getAttribute("dndType"),
-				data = node.getAttribute("dndData");
-			this.setItem(node.id, {
-				data: data ? data : node.innerHTML,
-				type: type ? type.split(/\s*,\s*/) : ["text"]
-			});
-		}, this);
+		this.sync();
 	},
 
 	// mouse events
@@ -250,7 +272,7 @@ dojo.declare("dojo.dnd.Container", null, {
 	},
 	_normalizedCreator: function(item, hint){
 		// summary: adds all necessary data to the output of the user-supplied creator function
-		var t = (this.creator ? this.creator : this.defaultCreator)(item, hint);
+		var t = (this.creator || this.defaultCreator).call(this, item, hint);
 		if(!dojo.isArray(t.type)){ t.type = ["text"]; }
 		if(!t.node.id){ t.node.id = dojo.dnd.getUniqueId(); }
 		dojo.addClass(t.node, "dojoDndItem");
@@ -292,15 +314,25 @@ dojo.dnd._createSpan = function(text){
 dojo.dnd._defaultCreatorNodes = {ul: "li", ol: "li", div: "div", p: "div"};
 
 dojo.dnd._defaultCreator = function(node){
-	// summary: takes a container node, and returns an appropriate creator function
+	// summary: takes a parent node, and returns an appropriate creator function
 	// node: Node: a container node
 	var tag = node.tagName.toLowerCase();
-	var c = tag == "table" ? dojo.dnd._createTrTd : dojo.dnd._createNode(dojo.dnd._defaultCreatorNodes[tag]);
+	var c = tag == "tbody" || tag == "thead" ? dojo.dnd._createTrTd :
+			dojo.dnd._createNode(dojo.dnd._defaultCreatorNodes[tag]);
 	return function(item, hint){	// Function
-		var isObj = dojo.isObject(item) && item;
-		var data = (isObj && item.data) ? item.data : item;
-		var type = (isObj && item.type) ? item.type : ["text"];
-		var t = String(data), n = (hint == "avatar" ? dojo.dnd._createSpan : c)(t);
+		var isObj = item && dojo.isObject(item), data, type, n;
+		if(isObj && item.tagName && item.nodeType && item.getAttribute){
+			// process a DOM node
+			data = item.getAttribute("dndData") || item.innerHTML;
+			type = item.getAttribute("dndType");
+			type = type ? type.split(/\s*,\s*/) : ["text"];
+			n = item;	// this node is going to be moved rather than copied
+		}else{
+			// process a DnD item object or a string
+			data = (isObj && item.data) ? item.data : item;
+			type = (isObj && item.type) ? item.type : ["text"];
+			n = (hint == "avatar" ? dojo.dnd._createSpan : c)(String(data));
+		}
 		n.id = dojo.dnd.getUniqueId();
 		return {node: n, data: data, type: type};
 	};

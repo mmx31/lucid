@@ -42,15 +42,17 @@ dojo.declare("dijit.layout.SplitContainer",
 	//		Save splitter positions in a cookie
 	persist: true,
 
+	baseClass: "dijitSplitContainer",
+
 	postMixInProperties: function(){
 		this.inherited("postMixInProperties",arguments);
 		this.isHorizontal = (this.orientation == 'horizontal');
 	},
 
 	postCreate: function(){
-		this.inherited("postCreate",arguments);
+		this.inherited(arguments);
 		this.sizers = [];
-		dojo.addClass(this.domNode, "dijitSplitContainer");
+
 		// overflow has to be explicitly hidden for splitContainers using gekko (trac #1435)
 		// to keep other combined css classes from inadvertantly making the overflow visible
 		if(dojo.isMozilla){
@@ -90,7 +92,7 @@ dojo.declare("dijit.layout.SplitContainer",
 
 		dojo.forEach(this.getChildren(), function(child, i, children){
 			// attach the children and create the draggers
-			this._injectChild(child);
+			this._setupChild(child);
 
 			if(i < children.length-1){
 				this._addSizer();
@@ -104,7 +106,8 @@ dojo.declare("dijit.layout.SplitContainer",
 		this.inherited(arguments); 
 	},
 
-	_injectChild: function(child){
+	_setupChild: function(/*Widget*/ child){
+		this.inherited(arguments);
 		child.domNode.style.position = "absolute";
 		dojo.addClass(child.domNode, "dijitSplitPane");
 	},
@@ -157,11 +160,10 @@ dojo.declare("dijit.layout.SplitContainer",
 		// child: a widget to add
 		// insertIndex: postion in the "stack" to add the child widget
 		
-		this.inherited("addChild",arguments); 
+		this.inherited(arguments); 
 
 		if(this._started){
 			// Do the stuff that startup() does for each widget
-			this._injectChild(child);
 			var children = this.getChildren();
 			if(children.length > 1){
 				this._addSizer();
@@ -372,11 +374,11 @@ dojo.declare("dijit.layout.SplitContainer",
 		// TODO: REVISIT - we want MARGIN_BOX and core hasn't exposed that yet (but can't we use it anyway if we pay attention? we do elsewhere.)
 		this.originPos = dojo.coords(children[0].domNode, true);
 		if(this.isHorizontal){
-			var client = (e.layerX ? e.layerX : e.offsetX);
+			var client = e.layerX || e.offsetX || 0;
 			var screen = e.pageX;
 			this.originPos = this.originPos.x;
 		}else{
-			var client = (e.layerY ? e.layerY : e.offsetY);
+			var client = e.layerY || e.offsetY || 0;
 			var screen = e.pageY;
 			this.originPos = this.originPos.y;
 		}
@@ -525,8 +527,11 @@ dojo.declare("dijit.layout.SplitContainer",
 	},
 
 	_saveState: function(){
+		if(!this.persist){
+			return;
+		}
 		dojo.forEach(this.getChildren(), function(child, i){
-			dojo.cookie(this._getCookieName(i), child.sizeShare);
+			dojo.cookie(this._getCookieName(i), child.sizeShare, {expires:365});
 		}, this);
 	}
 });

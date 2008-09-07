@@ -16,7 +16,11 @@ dojo.require("dojo._base.connect");
 				//oname = name;
 				name = (name == "mouseenter") ? "mouseover" : "mouseout";
 				fp = function(e){
-					// thanks ben!
+					// check tagName to fix a FF2 bug with invalid nodes (hidden child DIV of INPUT)
+					// which causes isDecendant to return false which causes
+					// spurious, and more importantly, incorrect mouse events to fire.
+					// TODO: remove tagName check when Firefox 2 is no longer supported
+					try{ e.relatedTarget.tagName; } catch(e2){ return; }
 					if(!dojo.isDescendant(e.relatedTarget, node)){
 						// e.type = oname; // FIXME: doesn't take? SJM: event.type is generally immutable.
 						return ofp.call(this, e); 
@@ -66,6 +70,7 @@ dojo.require("dojo._base.connect");
 		},
 		_setKeyChar: function(evt){
 			evt.keyChar = evt.charCode ? String.fromCharCode(evt.charCode) : '';
+			evt.charOrCode = evt.keyChar || evt.keyCode;
 		}
 	});
 
@@ -198,6 +203,7 @@ dojo.require("dojo._base.connect");
 
 		// by default, use the standard listener
 		var iel = dojo._listener;
+		var listenersName = dojo._ieListenersName = "_" + dojo._scopeName + "_listeners";
 		// dispatcher tracking property
 		if(!dojo.config._allow_leaks){
 			// custom listener that handles leak protection for DOM events
@@ -209,20 +215,20 @@ dojo.require("dojo._base.connect");
 				add: function(/*Object*/ source, /*String*/ method, /*Function*/ listener){
 					source = source || dojo.global;
 					var f = source[method];
-					if(!f||!f._listeners){
+					if(!f||!f[listenersName]){
 						var d = dojo._getIeDispatcher();
 						// original target function is special
 						d.target = f && (ieh.push(f) - 1);
 						// dispatcher holds a list of indices into handlers table
-						d._listeners = [];
+						d[listenersName] = [];
 						// redirect source to dispatcher
 						f = source[method] = d;
 					}
-					return f._listeners.push(ieh.push(listener) - 1) ; /*Handle*/
+					return f[listenersName].push(ieh.push(listener) - 1) ; /*Handle*/
 				},
 				// remove a listener from an object
 				remove: function(/*Object*/ source, /*String*/ method, /*Handle*/ handle){
-					var f = (source||dojo.global)[method], l = f && f._listeners;
+					var f = (source||dojo.global)[method], l = f && f[listenersName];
 					if(f && l && handle--){
 						delete ieh[l[handle]];
 						delete l[handle];
@@ -242,7 +248,7 @@ dojo.require("dojo._base.connect");
 					// keypress events that otherwise won't fire
 					// on IE
 					var kd = node.onkeydown;
-					if(!kd || !kd._listeners || !kd._stealthKeydownHandle){
+					if(!kd || !kd[listenersName] || !kd._stealthKeydownHandle){
 						var h = del.add(node, "onkeydown", del._stealthKeyDown);
 						kd = node.onkeydown;
 						kd._stealthKeydownHandle = h;
@@ -350,7 +356,7 @@ dojo.require("dojo._base.connect");
 				// other browsers do, we simulate it here.
 				var kp = evt.currentTarget.onkeypress;
 				// only works if kp exists and is a dispatcher
-				if(!kp || !kp._listeners){ return; }
+				if(!kp || !kp[listenersName]){ return; }
 				// munge key/charCode
 				var k=evt.keyCode;
 				// These are Windows Virtual Key Codes
@@ -502,19 +508,21 @@ if(dojo.isIE){
 	// closing over 'iel' or 'ieh' b0rks leak prevention
 	// ls[i] is an index into the master handler array
 	dojo._ieDispatcher = function(args, sender){
-		var ap=Array.prototype, h=dojo._ie_listener.handlers, c=args.callee, ls=c._listeners, t=h[c.target];
+		var ap=Array.prototype, h=dojo._ie_listener.handlers, c=args.callee, ls=c[dojo._ieListenersName], t=h[c.target];
 		// return value comes from original target function
 		var r = t && t.apply(sender, args);
+		// make local copy of listener array so it's immutable during processing
+		var lls = [].concat(ls);
 		// invoke listeners after target function
-		for(var i in ls){
+		for(var i in lls){
 			if(!(i in ap)){
-				h[ls[i]].apply(sender, args);
+				h[lls[i]].apply(sender, args);
 			}
 		}
 		return r;
 	}
 	dojo._getIeDispatcher = function(){
-		// ensure the returned function closes over nothing
+		// ensure the returned function closes over nothing ("new Function" apparently doesn't close)
 		return new Function(dojo._scopeName + "._ieDispatcher(arguments, this)"); // function
 	}
 	// keep this out of the closure to reduce RAM allocation

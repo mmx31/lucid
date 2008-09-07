@@ -31,7 +31,7 @@ dojo._xdCreateResource = function(/*String*/contents, /*String*/resourceName, /*
 
 	//Find dependencies.
 	var deps = [];
-    var depRegExp = /dojo.(require|requireIf|provide|requireAfterIf|platformRequire|requireLocalization)\(([\w\W]*?)\)/mg;
+    var depRegExp = /dojo.(require|requireIf|provide|requireAfterIf|platformRequire|requireLocalization)\s*\(([\w\W]*?)\)/mg;
     var match;
 	while((match = depRegExp.exec(depContents)) != null){
 		if(match[1] == "requireLocalization"){
@@ -45,12 +45,26 @@ dojo._xdCreateResource = function(/*String*/contents, /*String*/resourceName, /*
 
 	//Create resource object and the call to _xdResourceLoaded.
 	var output = [];
-	output.push(dojo._scopeName + "._xdResourceLoaded({\n");
+	output.push(dojo._scopeName + "._xdResourceLoaded(function(" + dojo._scopePrefixArgs + "){\n");
+
+	//See if there are any dojo.loadInit calls
+	var loadInitCalls = dojo._xdExtractLoadInits(contents);
+	if(loadInitCalls){
+		//Adjust fileContents since extractLoadInits removed something.
+		contents = loadInitCalls[0];
+		
+		//Add any loadInit calls to the top of the xd file.
+		for(var i = 1; i < loadInitCalls.length; i++){
+			output.push(loadInitCalls[i] + ";\n");
+		}
+	}
+
+	output.push("return {");
 
 	//Add dependencies
 	if(deps.length > 0){
 		output.push("depends: [");
-		for(var i = 0; i < deps.length; i++){
+		for(i = 0; i < deps.length; i++){
 			if(i > 0){
 				output.push(",\n");
 			}
@@ -73,9 +87,60 @@ dojo._xdCreateResource = function(/*String*/contents, /*String*/resourceName, /*
 	}
 	//Add isLocal property so we know if we have to do something different
 	//in debugAtAllCosts situations.
-	output.push("\n}, resourceName: '" + resourceName + "', resourcePath: '" + resourcePath + "'});");
+	output.push("\n}, resourceName: '" + resourceName + "', resourcePath: '" + resourcePath + "'};});");
 	
 	return output.join(""); //String
+}
+
+dojo._xdExtractLoadInits = function(/*String*/fileContents){
+	//Extracts
+	var regexp = /dojo.loadInit\s*\(/g;
+	regexp.lastIndex = 0;
+
+	var parenRe = /[\(\)]/g;
+	parenRe.lastIndex = 0;
+
+	var results = [];
+	var matches;
+	while((matches = regexp.exec(fileContents))){
+		//Find end of the call by finding the matching end paren
+		parenRe.lastIndex = regexp.lastIndex;
+		var matchCount = 1;
+		var parenMatch;
+		while((parenMatch = parenRe.exec(fileContents))){
+			if(parenMatch[0] == ")"){
+				matchCount -= 1;
+			}else{
+				matchCount += 1;
+			}
+			if(matchCount == 0){
+				break;
+			}
+		}
+		
+		if(matchCount != 0){
+			throw "unmatched paren around character " + parenRe.lastIndex + " in: " + fileContents;
+		}
+
+		//Put the master matching string in the results.
+		var startIndex = regexp.lastIndex - matches[0].length;
+		results.push(fileContents.substring(startIndex, parenRe.lastIndex));
+
+		//Remove the matching section.
+		var remLength = parenRe.lastIndex - startIndex;
+		fileContents = fileContents.substring(0, startIndex) + fileContents.substring(parenRe.lastIndex, fileContents.length);
+
+		//Move the master regexp past the last matching paren point.
+		regexp.lastIndex = parenRe.lastIndex - remLength;
+
+		regexp.lastIndex = parenRe.lastIndex;
+	}
+
+	if(results.length > 0){
+		results.unshift(fileContents);
+	}
+
+	return (results.length ? results : null);
 }
 
 dojo._xdIsXDomainPath = function(/*string*/relpath) {
@@ -116,7 +181,7 @@ dojo._loadPath = function(/*String*/relpath, /*String?*/module, /*Function?*/cb)
 	try{
 		return ((!module || this._isXDomain) ? this._loadUri(uri, cb, currentIsXDomain, module) : this._loadUriAndCheck(uri, module, cb)); //Boolean
 	}catch(e){
-		console.debug(e);
+		console.error(e);
 		return false; //Boolean
 	}
 }
@@ -227,6 +292,11 @@ dojo._loadUri = function(/*String*/uri, /*Function?*/cb, /*boolean*/currentIsXDo
 dojo._xdResourceLoaded = function(/*Object*/res){
 	//summary: Internal xd loader function. Called by an xd module resource when
 	//it has been loaded via a script tag.
+	
+	//Evaluate the function with scopeArgs for multiversion support.
+	res = res.apply(dojo.global, dojo._scopeArgs);
+
+	//Work through dependencies.
 	var deps = res.depends;
 	var requireList = null;
 	var requireAfterList = null;
@@ -285,7 +355,7 @@ dojo._xdResourceLoaded = function(/*Object*/res){
 				}) - 1;
 	
 			//Add provide/requires to dependency map.
-			for(var i = 0; i < provideList.length; i++){
+			for(i = 0; i < provideList.length; i++){
 				this._xdDepMap[provideList[i]] = { requires: requireList, requiresAfter: requireAfterList, contentIndex: contentIndex };
 			}
 		}
@@ -293,7 +363,7 @@ dojo._xdResourceLoaded = function(/*Object*/res){
 		//Now update the inflight status for any provided resources in this loaded resource.
 		//Do this at the very end (in a *separate* for loop) to avoid shutting down the 
 		//inflight timer check too soon.
-		for(var i = 0; i < provideList.length; i++){
+		for(i = 0; i < provideList.length; i++){
 			this._xdInFlight[provideList[i]] = false;
 		}
 	}
@@ -432,7 +502,7 @@ dojo._xdUnpackDependency = function(/*Array*/dep){
 		case "platformRequire":
 			var modMap = dep[1];
 			var common = modMap["common"]||[];
-			var newDeps = (modMap[dojo.hostenv.name_]) ? common.concat(modMap[dojo.hostenv.name_]||[]) : common.concat(modMap["default"]||[]);	
+			newDeps = (modMap[dojo.hostenv.name_]) ? common.concat(modMap[dojo.hostenv.name_]||[]) : common.concat(modMap["default"]||[]);	
 			//Flatten the array of arrays into a one-level deep array.
 			//Each result could be an array of 3 elements  (the 3 arguments to dojo.require).
 			//We only need the first one.
@@ -490,13 +560,13 @@ dojo._xdEvalReqs = function(/*Array*/reqChain){
 	while(reqChain.length > 0){
 		var req = reqChain[reqChain.length - 1];
 		var res = this._xdDepMap[req];
+		var i, reqs, nextReq;
 		if(res){
 			//Trace down any requires for this resource.
 			//START dojo._xdTraceReqs() inlining for small Safari 2.0 call stack
-			var reqs = res.requires;
+			reqs = res.requires;
 			if(reqs && reqs.length > 0){
-				var nextReq;
-				for(var i = 0; i < reqs.length; i++){
+				for(i = 0; i < reqs.length; i++){
 					nextReq = reqs[i].name;
 					if(nextReq && !reqChain[nextReq]){
 						//New req depedency. Follow it down.
@@ -521,10 +591,9 @@ dojo._xdEvalReqs = function(/*Array*/reqChain){
 
 			//Trace down any requireAfters for this resource.
 			//START dojo._xdTraceReqs() inlining for small Safari 2.0 call stack
-			var reqs = res.requiresAfter;
+			reqs = res.requiresAfter;
 			if(reqs && reqs.length > 0){
-				var nextReq;
-				for(var i = 0; i < reqs.length; i++){
+				for(i = 0; i < reqs.length; i++){
 					nextReq = reqs[i].name;
 					if(nextReq && !reqChain[nextReq]){
 						//New req depedency. Follow it down.
@@ -598,7 +667,7 @@ dojo._xdWatchInFlight = function(){
 	//This normally shouldn't happen with proper dojo.provide and dojo.require
 	//usage, but providing it just in case. Note that these may not be executed
 	//in the original order that the developer intended.
-	for(var i = 0; i < this._xdContents.length; i++){
+	for(i = 0; i < this._xdContents.length; i++){
 		var current = this._xdContents[i];
 		if(current.content && !current.isDefined){
 			//Pass in scope args to allow multiple versions of modules in a page.	

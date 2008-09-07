@@ -18,7 +18,7 @@ dojo.isArray = function(/*anything*/ it){
 dojo.isFunction = function(it){
 	// summary: Return true if it is a Function
 	// it: anything
-	//	return: Boolean
+	return; // Boolean
 }
 =====*/
 
@@ -52,15 +52,15 @@ dojo.isArrayLike = function(/*anything*/ it){
 	//		and DOM collections will return true when passed to
 	//		dojo.isArrayLike(), but will return false when passed to
 	//		dojo.isArray().
-	//	return:
+	//	returns:
 	//		If it walks like a duck and quicks like a duck, return `true`
 	var d = dojo;
-	return it && it !== undefined &&
+	return it && it !== undefined && // Boolean
 		// keep out built-in constructors (Number, String, ...) which have length
 		// properties
 		!d.isString(it) && !d.isFunction(it) &&
 		!(it.tagName && it.tagName.toLowerCase() == 'form') &&
-		(d.isArray(it) || isFinite(it.length)); // Boolean
+		(d.isArray(it) || isFinite(it.length));
 }
 
 dojo.isAlien = function(/*anything*/ it){
@@ -162,18 +162,56 @@ dojo.delegate = function(obj, props){
 }
 =====*/
 
-
-dojo.delegate = dojo._delegate = function(obj, props){
-
-	// boodman/crockford delegation
+dojo.delegate = dojo._delegate = (function(){
+	// boodman/crockford delegation w/ cornford optimization
 	function TMP(){};
-	TMP.prototype = obj;
-	var tmp = new TMP();
-	if(props){
-		dojo.mixin(tmp, props);
+	return function(obj, props){
+		TMP.prototype = obj;
+		var tmp = new TMP();
+		if(props){
+			dojo._mixin(tmp, props);
+		}
+		return tmp; // Object
 	}
-	return tmp; // Object
+})();
+
+/*=====
+dojo._toArray = function(obj, offset, startWith){
+	//	summary:
+	//		Converts an array-like object (i.e. arguments, DOMCollection) to an
+	//		array. Returns a new Array with the elements of obj.
+	//	obj: Object
+	//		the object to "arrayify". We expect the object to have, at a
+	//		minimum, a length property which corresponds to integer-indexed
+	//		properties.
+	//	offset: Number?
+	//		the location in obj to start iterating from. Defaults to 0.
+	//		Optional.
+	//	startWith: Array?
+	//		An array to pack with the properties of obj. If provided,
+	//		properties in obj are appended at the end of startWith and
+	//		startWith is the returned array.
 }
+=====*/
+
+(function(){
+	var efficient = function(obj, offset, startWith){
+		return (startWith||[]).concat(Array.prototype.slice.call(obj, offset||0));
+	};
+
+	var slow = function(obj, offset, startWith){
+		var arr = startWith||[]; 
+		for(var x = offset || 0; x < obj.length; x++){ 
+			arr.push(obj[x]); 
+		} 
+		return arr;
+	};
+
+	dojo._toArray = (!dojo.isIE) ? efficient : function(obj){
+		return ((obj.item) ? slow : efficient).apply(this, arguments);
+	};
+
+})();
 
 dojo.partial = function(/*Function|String*/method /*, ...*/){
 	//	summary:
@@ -184,28 +222,6 @@ dojo.partial = function(/*Function|String*/method /*, ...*/){
 	//		|	dojo.hitch(null, funcName, ...);
 	var arr = [ null ];
 	return dojo.hitch.apply(dojo, arr.concat(dojo._toArray(arguments))); // Function
-}
-
-dojo._toArray = function(/*Object*/obj, /*Number?*/offset, /*Array?*/ startWith){
-	//	summary:
-	//		Converts an array-like object (i.e. arguments, DOMCollection) to an
-	//		array. Returns a new Array with the elements of obj.
-	//	obj:
-	//		the object to "arrayify". We expect the object to have, at a
-	//		minimum, a length property which corresponds to integer-indexed
-	//		properties.
-	//	offset:
-	//		the location in obj to start iterating from. Defaults to 0.
-	//		Optional.
-	//	startWith:
-	//		An array to pack with the properties of obj. If provided,
-	//		properties in obj are appended at the end of startWith and
-	//		startWith is the returned array.
-	var arr = startWith||[];
-	for(var x = offset || 0; x < obj.length; x++){
-		arr.push(obj[x]);
-	}
-	return arr; // Array
 }
 
 dojo.clone = function(/*anything*/ o){

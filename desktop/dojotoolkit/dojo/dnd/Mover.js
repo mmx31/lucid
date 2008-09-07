@@ -37,16 +37,19 @@ dojo.declare("dojo.dnd.Mover", null, {
 		dojo.dnd.autoScroll(e);
 		var m = this.marginBox;
 		this.host.onMove(this, {l: m.l + e.pageX, t: m.t + e.pageY});
+		dojo.stopEvent(e);
 	},
 	onMouseUp: function(e){
-		if(this.mouseButton == e.button){
+		if(dojo.isSafari && dojo.dnd._isMac && this.mouseButton == 2 ? 
+				e.button == 0 : this.mouseButton == e.button){
 			this.destroy();
 		}
+		dojo.stopEvent(e);
 	},
 	// utilities
 	onFirstMove: function(){
 		// summary: makes the node absolute; it is meant to be called only once
-		var s = this.node.style, l, t;
+		var s = this.node.style, l, t, h = this.host;
 		switch(s.position){
 			case "relative":
 			case "absolute":
@@ -57,13 +60,27 @@ dojo.declare("dojo.dnd.Mover", null, {
 			default:
 				s.position = "absolute";	// enforcing the absolute mode
 				var m = dojo.marginBox(this.node);
-				l = m.l;
-				t = m.t;
+				// event.pageX/pageY (which we used to generate the initial
+				// margin box) includes padding and margin set on the body.
+				// However, setting the node's position to absolute and then
+				// doing dojo.marginBox on it *doesn't* take that additional
+				// space into account - so we need to subtract the combined
+				// padding and margin.  We use getComputedStyle and
+				// _getMarginBox/_getContentBox to avoid the extra lookup of
+				// the computed style. 
+				var b = dojo.doc.body;
+				var bs = dojo.getComputedStyle(b);
+				var bm = dojo._getMarginBox(b, bs);
+				var bc = dojo._getContentBox(b, bs);
+				l = m.l - (bc.l - bm.l);
+				t = m.t - (bc.t - bm.t);
 				break;
 		}
 		this.marginBox.l = l - this.marginBox.l;
 		this.marginBox.t = t - this.marginBox.t;
-		this.host.onFirstMove(this);
+		if(h && h.onFirstMove){
+			h.onFirstMove(this);
+		}
 		dojo.disconnect(this.events.pop());
 	},
 	destroy: function(){
@@ -75,6 +92,6 @@ dojo.declare("dojo.dnd.Mover", null, {
 			h.onMoveStop(this);
 		}
 		// destroy objects
-		this.events = this.node = null;
+		this.events = this.node = this.host = null;
 	}
 });

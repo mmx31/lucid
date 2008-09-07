@@ -25,7 +25,7 @@ dojo.require("dojo._base.NodeList");
 				  statement dispatchers are cached (to prevent re-definition)
 				  as are entire dispatch chains (to make re-execution of the
 				  same query fast)
-				- in the xpath path, tokenization yeilds a concatenation of
+				- in the xpath path, tokenization yields a concatenation of
 				  parameterized xpath selectors. As with the DOM version, both
 				  simple selector blocks and overall evaluators are cached to
 				  prevent re-defintion
@@ -81,7 +81,7 @@ dojo.require("dojo._base.NodeList");
 
 		var endTag = function(){
 			if(inTag >= 0){
-				var tv = (inTag == x) ? null : ts(inTag, x).toLowerCase();
+				var tv = (inTag == x) ? null : ts(inTag, x); // .toLowerCase();
 				currentPart[ (">~+".indexOf(tv) < 0) ? "tag" : "oper" ] = tv;
 				inTag = -1;
 			}
@@ -190,7 +190,10 @@ dojo.require("dojo._base.NodeList");
 						currentPart.attrs.length || 
 						currentPart.classes.length	);
 				currentPart.query = ts(pStart, x);
-				currentPart.tag = (currentPart["oper"]) ? null : (currentPart.tag || "*");
+				currentPart.otag = currentPart.tag = (currentPart["oper"]) ? null : (currentPart.tag || "*");
+				if(currentPart.tag){ // FIXME: not valid in case-sensitive documents
+					currentPart.tag = currentPart.tag.toUpperCase();
+				}
 				qparts.push(currentPart);
 				currentPart = null;
 			}
@@ -321,10 +324,15 @@ dojo.require("dojo._base.NodeList");
 
 		var tf = function(parent){
 			// XPath query strings are memoized.
+
 			var ret = [];
 			var xpathResult;
+			var tdoc = doc;
+			if(parent){
+				tdoc = (parent.nodeType == 9) ? parent : parent.ownerDocument;
+			}
 			try{
-				xpathResult = doc.evaluate(xpath, parent, null, 
+				xpathResult = tdoc.evaluate(xpath, parent, null, 
 												// XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
 												XPathResult.ANY_TYPE, null);
 			}catch(e){
@@ -372,8 +380,8 @@ dojo.require("dojo._base.NodeList");
 
 	var _childElements = function(root){
 		var ret = [];
-		var te, x=0, tret = root[childNodesName];
-		while(te=tret[x++]){
+		var te, x = 0, tret = root[childNodesName];
+		while((te = tret[x++])){
 			if(te.nodeType == 1){ ret.push(te); }
 		}
 		return ret;
@@ -391,6 +399,12 @@ dojo.require("dojo._base.NodeList");
 		return ret;
 	}
 
+	// FIXME:
+	//		we need to re-write the way "~" and "+" selectors are handled since
+	//		the left-hand selector simply modifies the right (which is the
+	//		actual search selector). We need to locate on search selector
+	//		instead of modifier to speed up these searches.
+
 	var _filterDown = function(element, queryParts, matchArr, idx){
 		// NOTE:
 		//		in the fast path! this function is called recursively and for
@@ -401,6 +415,7 @@ dojo.require("dojo._base.NodeList");
 
 		// see if we can constrain our next level to direct children
 		if(tqp.oper){
+			// find some eligable children to search
 			var ecn = (tqp.oper == ">") ? 
 				_childElements(element) :
 				_nextSiblings(element, (tqp.oper == "+"));
@@ -453,7 +468,7 @@ dojo.require("dojo._base.NodeList");
 		// for every root, get the elements that match the descendant selector
 		// for(var x=elements.length-1, te; x>=0, te=elements[x]; x--){
 		var x = elements.length - 1, te;
-		while(te = elements[x--]){
+		while((te = elements[x--])){
 			_filterDown(te, queryParts, ret, 0);
 		}
 		return ret;
@@ -480,7 +495,8 @@ dojo.require("dojo._base.NodeList");
 					function(elem){
 						return (
 							(elem.nodeType == 1) &&
-							(q.tag == elem.tagName.toLowerCase())
+							(q[ caseSensitive ? "otag" : "tag" ] == elem.tagName)
+							// (q.tag == elem.tagName.toLowerCase())
 						);
 						// return isTn;
 					}
@@ -574,6 +590,9 @@ dojo.require("dojo._base.NodeList");
 		if(attr == "for"){
 			return elem.htmlFor || blank;
 		}
+		if(attr == "style"){
+			return elem.style.cssText || blank;
+		}
 		return elem.getAttribute(attr, 2) || blank;
 	}
 
@@ -639,6 +658,11 @@ dojo.require("dojo._base.NodeList");
 	};
 
 	var pseudos = {
+		"checked": function(name, condition){
+			return function(elem){
+				return !!d.attr(elem, "checked");
+			}
+		},
 		"first-child": function(name, condition){
 			return function(elem){
 				if(elem.nodeType != 1){ return false; }
@@ -683,6 +707,9 @@ dojo.require("dojo._base.NodeList");
 				// based version might be more accurate, but since
 				// jQuery and DomQuery also potentially get this wrong,
 				// I'm leaving it for now.
+				if(condition.charAt(0)=='"' || condition.charAt(0)=="'"){//remove quote
+					condition=condition.substr(1,condition.length-2);
+				}
 				return (elem.innerHTML.indexOf(condition) >= 0);
 			}
 		},
@@ -695,34 +722,44 @@ dojo.require("dojo._base.NodeList");
 		"nth-child": function(name, condition){
 			var pi = parseInt;
 			if(condition == "odd"){
-				return function(elem){
-					return (
-						((getNodeIndex(elem)) % 2) == 1
-					);
+				condition = "2n+1";
+			}else if(condition == "even"){
+				condition = "2n";
+			}
+			if(condition.indexOf("n") != -1){
+				var tparts = condition.split("n", 2);
+				var pred = tparts[0] ? (tparts[0]=='-'?-1:pi(tparts[0])) : 1;
+				var idx = tparts[1] ? pi(tparts[1]) : 0;
+				var lb = 0, ub = -1;
+				if(pred>0){
+					if(idx<0){
+						idx = (idx % pred) && (pred + (idx % pred));
+					}else if(idx>0){
+						if(idx >= pred){
+							lb = idx - idx % pred;
+						}
+						idx = idx % pred;
+					}
+				}else if(pred<0){
+					pred *= -1;
+					if(idx>0){
+						ub = idx;
+						idx = idx % pred;
+					} //idx has to be greater than 0 when pred is negative; shall we throw an error here?
 				}
-			}else if((condition == "2n")||
-				(condition == "even")){
-				return function(elem){
-					return ((getNodeIndex(elem) % 2) == 0);
+				if(pred>0){
+					return function(elem){
+						var i=getNodeIndex(elem);
+						return (i>=lb) && (ub<0 || i<=ub) && ((i % pred) == idx);
+					}
+				}else{
+					condition=idx;
 				}
-			}else if(condition.indexOf("0n+") == 0){
-				var ncount = pi(condition.substr(3));
-				return function(elem){
-					return (elem.parentNode[childNodesName][ncount-1] === elem);
-				}
-			}else if(	(condition.indexOf("n+") > 0) &&
-						(condition.length > 3) ){
-				var tparts = condition.split("n+", 2);
-				var pred = pi(tparts[0]);
-				var idx = pi(tparts[1]);
-				return function(elem){
-					return ((getNodeIndex(elem) % pred) == idx);
-				}
-			}else if(condition.indexOf("n") == -1){
-				var ncount = pi(condition);
-				return function(elem){
-					return (getNodeIndex(elem) == ncount);
-				}
+			}
+			//if(condition.indexOf("n") == -1){
+			var ncount = pi(condition);
+			return function(elem){
+				return (getNodeIndex(elem) == ncount);
 			}
 		}
 	};
@@ -749,7 +786,7 @@ dojo.require("dojo._base.NodeList");
 		if(query.id){ // do we have an ID component?
 			if(query.tag != "*"){
 				ff = agree(ff, function(elem){
-					return (elem.tagName.toLowerCase() == query.tag);
+					return (elem.tagName == query[ caseSensitive ? "otag" : "tag" ]);
 				});
 			}
 		}
@@ -809,7 +846,7 @@ dojo.require("dojo._base.NodeList");
 		if(query.tag && query.id && !query.hasLoops){
 			// we got a filtered ID search (e.g., "h4#thinger")
 			retFunc = function(root){
-				var te = d.byId(query.id);
+				var te = d.byId(query.id, (root.ownerDocument||root)); //root itself may be a document
 				if(filterFunc(te)){
 					return [ te ];
 				}
@@ -821,8 +858,8 @@ dojo.require("dojo._base.NodeList");
 				// it's just a plain-ol elements-by-tag-name query from the root
 				retFunc = function(root){
 					var ret = [];
-					var te, x=0, tret = root.getElementsByTagName(query.tag);
-					while(te=tret[x++]){
+					var te, x=0, tret = root.getElementsByTagName(query[ caseSensitive ? "otag" : "tag"]);
+					while((te = tret[x++])){
 						ret.push(te);
 					}
 					return ret;
@@ -830,8 +867,8 @@ dojo.require("dojo._base.NodeList");
 			}else{
 				retFunc = function(root){
 					var ret = [];
-					var te, x=0, tret = root.getElementsByTagName(query.tag);
-					while(te=tret[x++]){
+					var te, x = 0, tret = root.getElementsByTagName(query[ caseSensitive ? "otag" : "tag"]);
+					while((te = tret[x++])){
 						if(filterFunc(te)){
 							ret.push(te);
 						}
@@ -871,7 +908,7 @@ dojo.require("dojo._base.NodeList");
 		// if(query[query.length-1] == ">"){ query += " *"; }
 		if(qparts.length == 1){
 			var tt = getElementsFunc(qparts[0]);
-			tt.nozip = true;
+			tt.nozip = true; // FIXME: is this right? Shouldn't this be wrapped in a closure to mark the return?
 			return tt;
 		}
 
@@ -894,20 +931,21 @@ dojo.require("dojo._base.NodeList");
 	// This allows us to dispatch queries to the fastest subsystem we can get.
 	var _getQueryFunc = (
 		// NOTE: 
-		//		XPath on the Webkit nighlies is slower than it's DOM iteration
-		//		for most test cases
+		//		XPath on the Webkit is slower than it's DOM iteration for most
+		//		test cases
 		// FIXME: 
 		//		we should try to capture some runtime speed data for each query
 		//		function to determine on the fly if we should stick w/ the
 		//		potentially optimized variant or if we should try something
 		//		new.
 		(document["evaluate"] && !d.isSafari) ? 
-		function(query){
+		function(query, root){
 			// has xpath support that's faster than DOM
 			var qparts = query.split(" ");
 			// can we handle it?
-			if(	(document["evaluate"])&&
-				(query.indexOf(":") == -1)&&
+			if(	(!caseSensitive) && // not strictly necessaray, but simplifies lots of stuff
+				(document["evaluate"]) &&
+				(query.indexOf(":") == -1) &&
 				(query.indexOf("+") == -1) // skip direct sibling matches. See line ~344
 			){
 				// dojo.debug(query);
@@ -973,7 +1011,7 @@ dojo.require("dojo._base.NodeList");
 				var pindex = 0; // avoid array alloc for every invocation
 				var ret = [];
 				var tp;
-				while(tp = parts[pindex++]){
+				while((tp = parts[pindex++])){
 					ret = ret.concat(_getQueryFunc(tp, tp.indexOf(" "))(root));
 				}
 				return ret;
@@ -998,13 +1036,28 @@ dojo.require("dojo._base.NodeList");
 			ret.push(arr[0]);
 		}
 		if(arr.length < 2){ return ret; }
+
 		_zipIdx++;
-		arr[0]["_zipIdx"] = _zipIdx;
-		for(var x=1, te; te = arr[x]; x++){
-			if(arr[x]["_zipIdx"] != _zipIdx){ 
-				ret.push(te);
+		
+		// we have to fork here for IE and XML docs because we can't set
+		// expandos on their nodes (apparently). *sigh*
+		if(d.isIE && caseSensitive){
+			var szidx = _zipIdx+"";
+			arr[0].setAttribute("_zipIdx", szidx);
+			for(var x = 1, te; te = arr[x]; x++){
+				if(arr[x].getAttribute("_zipIdx") != szidx){ 
+					ret.push(te);
+				}
+				te.setAttribute("_zipIdx", szidx);
 			}
-			te["_zipIdx"] = _zipIdx;
+		}else{
+			arr[0]["_zipIdx"] = _zipIdx;
+			for(var x = 1, te; te = arr[x]; x++){
+				if(arr[x]["_zipIdx"] != _zipIdx){ 
+					ret.push(te);
+				}
+				te["_zipIdx"] = _zipIdx;
+			}
 		}
 		// FIXME: should we consider stripping these properties?
 		return ret;
@@ -1046,6 +1099,7 @@ dojo.require("dojo._base.NodeList");
 		//			* `:first-child`, `:last-child` positional selectors
 		//			* `:empty` content emtpy selector
 		//			* `:empty` content emtpy selector
+		//			* `:checked` pseudo selector
 		//			* `:nth-child(n)`, `:nth-child(2n+1)` style positional calculations
 		//			* `:nth-child(even)`, `:nth-child(odd)` positional selectors
 		//			* `:not(...)` negation pseudo selectors
@@ -1070,7 +1124,7 @@ dojo.require("dojo._base.NodeList");
 		//			|	* `:root`, `:lang()`, `:target`, `:focus`
 		//			* all visual and state selectors:
 		//			|	* `:root`, `:active`, `:hover`, `:visisted`, `:link`,
-		//				  `:enabled`, `:disabled`, `:checked`
+		//				  `:enabled`, `:disabled`
 		//			* `:*-of-type` pseudo selectors
 		//		
 		//		dojo.query and XML Documents:
@@ -1164,7 +1218,10 @@ dojo.require("dojo._base.NodeList");
 			root = d.byId(root);
 		}
 
-		return _zip(getQueryFunc(query)(root||d.doc)); // dojo.NodeList
+		root = root||d.doc;
+		var od = root.ownerDocument||root.documentElement;
+		caseSensitive = (root.contentType && root.contentType=="application/xml") || (!!od) && (d.isIE ? od.xml : (root.xmlVersion||od.xmlVersion));
+		return _zip(getQueryFunc(query)(root)); // dojo.NodeList
 	}
 
 	/*
@@ -1179,7 +1236,7 @@ dojo.require("dojo._base.NodeList");
 	d._filterQueryResult = function(nodeList, simpleFilter){
 		var tnl = new d.NodeList();
 		var ff = (simpleFilter) ? getFilterFunc(getQueryParts(simpleFilter)[0]) : function(){ return true; };
-		for(var x=0, te; te = nodeList[x]; x++){
+		for(var x = 0, te; te = nodeList[x]; x++){
 			if(ff(te)){ tnl.push(te); }
 		}
 		return tnl;

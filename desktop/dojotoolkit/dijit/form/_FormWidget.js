@@ -4,18 +4,18 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 
 dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
-{
-	/*
-	Summary:
-		_FormWidget's correspond to native HTML elements such as <checkbox> or <button>.
-		Each _FormWidget represents a single HTML element.
-
-		All these widgets should have these attributes just like native HTML input elements.
-		You can set them during widget construction.
-
-		They also share some common methods.
-	*/
-
+	{
+	//
+	// summary:
+	//	_FormWidget's correspond to native HTML elements such as <checkbox> or <button>.
+	//
+	// description:
+	//		Each _FormWidget represents a single HTML element.
+	//		All these widgets should have these attributes just like native HTML input elements.
+	//		You can set them during widget construction.
+	//
+	//	They also share some common methods.
+	//
 	// baseClass: String
 	//		Root CSS class of the widget (ex: dijitTextBox), used to add CSS classes of widget
 	//		(ex: "dijitTextBox dijitTextBoxInvalid dijitTextBoxFocused dijitTextBoxInvalidFocused")
@@ -64,33 +64,36 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 	attributeMap: dojo.mixin(dojo.clone(dijit._Widget.prototype.attributeMap),
 		{value:"focusNode", disabled:"focusNode", readOnly:"focusNode", id:"focusNode", tabIndex:"focusNode", alt:"focusNode"}),
 
-	setAttribute: function(/*String*/ attr, /*anything*/ value){
-		this.inherited(arguments);
-		switch(attr){
-			case "disabled":
-				var tabIndexNode = this[this.attributeMap['tabIndex']||'domNode'];
+	_setDisabledAttr: function(/*Boolean*/ value){
+		this.disabled = value;
+		dojo.attr(this.focusNode, 'disabled', value);
+		dijit.setWaiState(this.focusNode, "disabled", value);
+
 				if(value){
 					//reset those, because after the domNode is disabled, we can no longer receive
 					//mouse related events, see #4200
 					this._hovering = false;
 					this._active = false;
 					// remove the tabIndex, especially for FF
-					tabIndexNode.removeAttribute('tabIndex');
+					this.focusNode.removeAttribute('tabIndex');
 				}else{
-					tabIndexNode.setAttribute('tabIndex', this.tabIndex);
+					this.focusNode.setAttribute('tabIndex', this.tabIndex);
 				}
-				dijit.setWaiState(this[this.attributeMap['disabled']||'domNode'], "disabled", value);
 				this._setStateClass();
-		}
 	},
 
 	setDisabled: function(/*Boolean*/ disabled){
 		// summary:
 		//		Set disabled state of widget (Deprecated).
-		dojo.deprecated("setDisabled("+disabled+") is deprecated. Use setAttribute('disabled',"+disabled+") instead.", "", "2.0");
-		this.setAttribute('disabled', disabled);
+		dojo.deprecated("setDisabled("+disabled+") is deprecated. Use attr('disabled',"+disabled+") instead.", "", "2.0");
+		this.attr('disabled', disabled);
 	},
 
+
+	_onFocus: function(e){
+		dijit.scrollIntoView(this.domNode);
+		this.inherited(arguments);
+	},
 
 	_onMouse : function(/*Event*/ event){
 		// summary:
@@ -125,12 +128,16 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 					// set a global event to handle mouseup, so it fires properly
 					//	even if the cursor leaves the button
 					var mouseUpConnector = this.connect(dojo.body(), "onmouseup", function(){
+						//if user clicks on the button, even if the mouse is released outside of it,
+						//this button should get focus (which mimics native browser buttons)
+						if(this._mouseDown && this.isFocusable()){
+							this.focus();
+						}
 						this._active = false;
 						this._mouseDown = false;
 						this._setStateClass();
 						this.disconnect(mouseUpConnector);
 					});
-					if(this.isFocusable()){ this.focus(); }
 					break;
 			}
 			this._setStateClass();
@@ -142,7 +149,7 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 	},
 
 	focus: function(){
-		setTimeout(dojo.hitch(this, dijit.focus, this.focusNode), 0); // cannot call focus() from an event handler directly
+		dijit.focus(this.focusNode);
 	},
 
 	_setStateClass: function(){
@@ -179,7 +186,7 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 		}
 
 		// Compute new set of classes
-		var classes = [ this.baseClass ];
+		var classes = this.baseClass.split(" ");
 
 		function multiply(modifier){
 			classes=classes.concat(dojo.map(classes, function(c){ return c+modifier; }), "dijit"+modifier);
@@ -213,32 +220,34 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 		(this.stateNode || this.domNode).className = this.staticClass + " " + classes.join(" ");
 	},
 
+	compare: function(/*anything*/val1, /*anything*/val2){
+		// summary: compare 2 values
+		if((typeof val1 == "number") && (typeof val2 == "number")){
+			return (isNaN(val1) && isNaN(val2))? 0 : (val1-val2);
+		}else if(val1 > val2){ return 1; }
+		else if(val1 < val2){ return -1; }
+		else { return 0; }
+	},
+
 	onChange: function(newValue){
 		// summary: callback when value is changed
 	},
 
-	_onChangeMonitor: 'value',
 	_onChangeActive: false,
 
 	_handleOnChange: function(/*anything*/ newValue, /*Boolean, optional*/ priorityChange){
 		// summary: set the value of the widget.
 		this._lastValue = newValue;
 		if(this._lastValueReported == undefined && (priorityChange === null || !this._onChangeActive)){
+			// this block executes not for a change, but during initialization,
+			// and is used to store away the original value (or for ToggleButton, the original checked state)
 			this._resetValue = this._lastValueReported = newValue;
 		}
 		if((this.intermediateChanges || priorityChange || priorityChange === undefined) && 
-			((newValue && newValue.toString)?newValue.toString():newValue) !== ((this._lastValueReported && this._lastValueReported.toString)?this._lastValueReported.toString():this._lastValueReported)){
+			((typeof newValue != typeof this._lastValueReported) ||
+				this.compare(newValue, this._lastValueReported) != 0)){
 			this._lastValueReported = newValue;
 			if(this._onChangeActive){ this.onChange(newValue); }
-		}
-	},
-
-	reset: function(){
-		this._hasBeenBlurred = false;
-		if(this.setValue && !this._getValueDeprecated){
-			this.setValue(this._resetValue, true);
-		}else if(this._onChangeMonitor){
-			this.setAttribute(this._onChangeMonitor, (this._resetValue !== undefined && this._resetValue !== null)? this._resetValue : '');
 		}
 	},
 
@@ -256,19 +265,18 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 	},
 
 	setValue: function(/*String*/ value){
-		dojo.deprecated("dijit.form._FormWidget:setValue("+value+") is deprecated.  Use setAttribute('value',"+value+") instead.", "", "2.0");
-		this.setAttribute('value', value);
+		dojo.deprecated("dijit.form._FormWidget:setValue("+value+") is deprecated.  Use attr('value',"+value+") instead.", "", "2.0");
+		this.attr('value', value);
 	},
 
-	_getValueDeprecated: true, // Form uses this, remove when getValue is removed
 	getValue: function(){
-		dojo.deprecated("dijit.form._FormWidget:getValue() is deprecated.  Use widget.value instead.", "", "2.0");
-		return this.value;
+		dojo.deprecated(this.declaredClass+"::getValue() is deprecated. Use attr('value') instead.", "", "2.0");
+		return this.attr('value');
 	},
 
 	_layoutHack: function(){
 		// summary: work around table sizing bugs on FF2 by forcing redraw
-		if(dojo.isFF == 2){
+		if(dojo.isFF == 2 && !this._layoutHackHandle){
 			var node=this.domNode;
 			var old = node.style.opacity;
 			node.style.opacity = "0.999";
@@ -290,32 +298,53 @@ dojo.declare("dijit.form._FormValueWidget", dijit.form._FormWidget,
 		works as expected.
 	*/
 
+	// TODO: unclear what that {value: ""} is for; FormWidget.attributeMap copies value to focusNode,
+	// so maybe {value: ""} is so the value *doesn't* get copied to focusNode?
+	// Seems like we really want value removed from attributeMap altogether
+	// (although there's no easy way to do that now)
 	attributeMap: dojo.mixin(dojo.clone(dijit.form._FormWidget.prototype.attributeMap),
 		{value:""}),
 
 	postCreate: function(){
-		this.setValue(this.value, null);
+		if(dojo.isIE || dojo.isSafari){ // IE won't stop the event with keypress and Safari won't send an ESCAPE to keypress at all
+			this.connect(this.focusNode || this.domNode, "onkeydown", this._onKeyDown);
+		}
+		// Update our reset value if it hasn't yet been set (because this.attr
+		// is only called when there *is* a value
+		if(this._resetValue === undefined){
+			this._resetValue = this.value;
+		}
 	},
 
-	setValue: function(/*anything*/ newValue, /*Boolean, optional*/ priorityChange){
-		// summary: set the value of the widget.
+	_setValueAttr: function(/*anything*/ newValue, /*Boolean, optional*/ priorityChange){
+		// summary:
+		//		Hook so attr('value', value) works.
+		// description:
+		//		Sets the value of the widget.
+		//		If the value has changed, then fire onChange event, unless priorityChange
+		//		is specified as null (or false?)
 		this.value = newValue;
 		this._handleOnChange(newValue, priorityChange);
 	},
 
-	_getValueDeprecated: false, // remove when _FormWidget:getValue is removed
-	getValue: function(){
-		// summary: get the value of the widget.
+	_getValueAttr: function(/*String*/ value){
+		// summary:
+		//		Hook so attr('value') works.
 		return this._lastValue;
 	},
 
 	undo: function(){
 		// summary: restore the value to the last value passed to onChange
-		this.setValue(this._lastValueReported, false);
+		this._setValueAttr(this._lastValueReported, false);
+	},
+
+	reset: function(){
+		this._hasBeenBlurred = false;
+		this._setValueAttr(this._resetValue, true);
 	},
 
 	_valueChanged: function(){
-		var v = this.getValue();
+		var v = this.attr('value');
 		var lv = this._lastValueReported;
 		// Equality comparison of objects such as dates are done by reference so
 		// two distinct objects are != even if they have the same data. So use
@@ -323,13 +352,34 @@ dojo.declare("dijit.form._FormValueWidget", dijit.form._FormWidget,
 		return ((v !== null && (v !== undefined) && v.toString)?v.toString():'') !== ((lv !== null && (lv !== undefined) && lv.toString)?lv.toString():'');
 	},
 
-	_onKeyPress: function(e){
-		if(e.keyCode == dojo.keys.ESCAPE && !e.shiftKey && !e.ctrlKey && !e.altKey){
-			if(this._valueChanged()){
-				this.undo();
-				dojo.stopEvent(e);
-				return false;
+	_onKeyDown: function(e){
+		if(e.keyCode == dojo.keys.ESCAPE && !e.ctrlKey && !e.altKey){
+			var te;
+			if(dojo.isIE){ 
+				e.preventDefault(); // default behavior needs to be stopped here since keypress is too late
+				te = document.createEventObject();
+				te.keyCode = dojo.keys.ESCAPE;
+				te.shiftKey = e.shiftKey;
+				e.srcElement.fireEvent('onkeypress', te);
+			}else if(dojo.isSafari){ // ESCAPE needs help making it into keypress
+				te = document.createEvent('Events');
+				te.initEvent('keypress', true, true);
+				te.keyCode = dojo.keys.ESCAPE;
+				te.shiftKey = e.shiftKey;
+				e.target.dispatchEvent(te);
 			}
+		}
+	},
+
+	_onKeyPress: function(e){
+		if(e.charOrCode == dojo.keys.ESCAPE && !e.ctrlKey && !e.altKey && this._valueChanged()){
+			this.undo();
+			dojo.stopEvent(e);
+			return false;
+		}else if(this.intermediateChanges){
+			var _this = this;
+			// the setTimeout allows the key to post to the widget input box
+			setTimeout(function(){ _this._handleOnChange(_this.attr('value'), false); }, 0);
 		}
 		return true;
 	}

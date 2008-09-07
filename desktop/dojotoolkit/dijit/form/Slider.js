@@ -34,7 +34,7 @@ dojo.declare(
 	discreteValues: Infinity,
 
 	// pageIncrement: integer
-	//	The amount of change with shift+arrow
+	//	The amount of change via pageup/down
 	pageIncrement: 2,
 
 	// clickSelect: boolean
@@ -43,7 +43,7 @@ dojo.declare(
 
 	// slideDuration: Number
 	//	The time in ms to take to animate the slider handle from 0% to 100%
-	slideDuration: 1000,
+	slideDuration: dijit.defaultDuration,
 
 	widgetsInTemplate: true,
 
@@ -61,12 +61,12 @@ dojo.declare(
 
 	_onKeyPress: function(/*Event*/ e){
 		if(this.disabled || this.readOnly || e.altKey || e.ctrlKey){ return; }
-		switch(e.keyCode){
+		switch(e.charOrCode){
 			case dojo.keys.HOME:
-				this.setValue(this.minimum, true);
+				this._setValueAttr(this.minimum, true);
 				break;
 			case dojo.keys.END:
-				this.setValue(this.maximum, true);
+				this._setValueAttr(this.maximum, true);
 				break;
 			// this._descending === false: if ascending vertical (min on top)
 			// (this._descending || this.isLeftToRight()): if left-to-right horizontal or descending vertical
@@ -118,16 +118,21 @@ dojo.declare(
 		count--;
 		var pixelsPerValue = maxPixels / count;
 		var wholeIncrements = Math.round(pixelValue / pixelsPerValue);
-		this.setValue((this.maximum-this.minimum)*wholeIncrements/count + this.minimum, priorityChange);
+		this._setValueAttr((this.maximum-this.minimum)*wholeIncrements/count + this.minimum, priorityChange);
 	},
 
-	setValue: function(/*Number*/ value, /*Boolean, optional*/ priorityChange){
+	_setValueAttr: function(/*Number*/ value, /*Boolean, optional*/ priorityChange){
+		// summary:
+		//		Hook so attr('value', value) works.
 		this.valueNode.value = this.value = value;
 		dijit.setWaiState(this.focusNode, "valuenow", value);
 		this.inherited(arguments);
 		var percent = (value - this.minimum) / (this.maximum - this.minimum);
 		var progressBar = (this._descending === false) ? this.remainingBar : this.progressBar;
 		var remainingBar = (this._descending === false) ? this.progressBar : this.remainingBar;
+		if(this._inProgressAnim && this._inProgressAnim.status != "stopped"){
+			this._inProgressAnim.stop(true);
+		}
 		if(priorityChange && this.slideDuration > 0 && progressBar.style[this._progressPixelSize]){
 			// animate the slider
 			var _this = this;
@@ -137,10 +142,12 @@ dojo.declare(
 			if(duration == 0){ return; }
 			if(duration < 0){ duration = 0 - duration; }
 			props[this._progressPixelSize] = { start: start, end: percent*100, units:"%" };
-			dojo.animateProperty({ node: progressBar, duration: duration, 
+			this._inProgressAnim = dojo.animateProperty({ node: progressBar, duration: duration, 
 				onAnimate: function(v){ remainingBar.style[_this._progressPixelSize] = (100-parseFloat(v[_this._progressPixelSize])) + "%"; },
-			        properties: props
-			}).play();
+				onEnd: function(){ delete _this._inProgressAnim; },
+				properties: props
+			})
+			this._inProgressAnim.play();
 		}
 		else{
 			progressBar.style[this._progressPixelSize] = (percent*100) + "%";
@@ -159,42 +166,37 @@ dojo.declare(
 		if(value < 0){ value = 0; }
 		if(value > count){ value = count; }
 		value = value * (this.maximum - this.minimum) / count + this.minimum;
-		this.setValue(value, true);
+		this._setValueAttr(value, true);
 	},
 
 	_onClkIncBumper: function(){
-		this.setValue(this._descending === false ? this.minimum : this.maximum, true);
+		this._setValueAttr(this._descending === false ? this.minimum : this.maximum, true);
 	},
 
 	_onClkDecBumper: function(){
-		this.setValue(this._descending === false ? this.maximum : this.minimum, true);
+		this._setValueAttr(this._descending === false ? this.maximum : this.minimum, true);
 	},
 
 	decrement: function(e){
 		// summary
 		//	decrement slider by 1 unit
-		this._bumpValue(e.keyCode == dojo.keys.PAGE_DOWN?-this.pageIncrement:-1);
+		this._bumpValue(e.charOrCode == dojo.keys.PAGE_DOWN ? -this.pageIncrement : -1);
 	},
 
 	increment: function(e){
 		// summary
 		//	increment slider by 1 unit
-		this._bumpValue(e.keyCode == dojo.keys.PAGE_UP?this.pageIncrement:1);
+		this._bumpValue(e.charOrCode == dojo.keys.PAGE_UP ? this.pageIncrement : 1);
 	},
 
 	_mouseWheeled: function(/*Event*/ evt){
+		// summary: Event handler for mousewheel where supported
 		dojo.stopEvent(evt);
-		var scrollAmount = 0;
-		if(typeof evt.wheelDelta == 'number'){ // IE
-			scrollAmount = evt.wheelDelta;
-		}else if(typeof evt.detail == 'number'){ // Mozilla+Firefox
-			scrollAmount = -evt.detail;
-		}
-		if(scrollAmount > 0){
-			this.increment(evt);
-		}else if(scrollAmount < 0){
-			this.decrement(evt);
-		}
+		// FIXME: this adds mouse wheel support for safari, though stopEvent doesn't prevent
+		// it from bleeding to window?!
+		var janky = !dojo.isMozilla;
+		var scroll = evt[(janky ? "wheelDelta" : "detail")] * (janky ? 1 : -1);
+		this[(scroll < 0 ? "decrement" : "increment")](evt);
 	},
 
 	startup: function(){
@@ -205,12 +207,21 @@ dojo.declare(
 		}, this);
 	},
 
+	_typematicCallback: function(/*Number*/ count, /*Object*/ button, /*Event*/ e){
+		if(count == -1){ return; }
+		this[(button == (this._descending? this.incrementButton : this.decrementButton))? "decrement" : "increment"](e);
+	},
+
 	postCreate: function(){
 		if(this.showButtons){
 			this.incrementButton.style.display="";
 			this.decrementButton.style.display="";
+			this._connects.push(dijit.typematic.addMouseListener(
+				this.decrementButton, this, "_typematicCallback", 25, 500));
+			this._connects.push(dijit.typematic.addMouseListener(
+				this.incrementButton, this, "_typematicCallback", 25, 500));
 		}
-		this.connect(this.domNode, dojo.isIE ? "onmousewheel" : 'DOMMouseScroll', "_mouseWheeled");
+		this.connect(this.domNode, !dojo.isMozilla ? "onmousewheel" : "DOMMouseScroll", "_mouseWheeled");
 
 		// define a custom constructor for a SliderMover that points back to me
 		var _self = this;
@@ -221,6 +232,12 @@ dojo.declare(
 		dojo.extend(mover, dijit.form._SliderMover.prototype);
 
 		this._movable = new dojo.dnd.Moveable(this.sliderHandle, {mover: mover});
+		//find any associated label element and add to slider focusnode.
+		var label=dojo.query('label[for="'+this.id+'"]');
+		if(label.length){
+			label[0].id = (this.id+"_label");
+			dijit.setWaiState(this.focusNode, "labelledby", label[0].id);
+		}
 		dijit.setWaiState(this.focusNode, "valuemin", this.minimum);
 		dijit.setWaiState(this.focusNode, "valuemax", this.maximum);
 
@@ -229,6 +246,9 @@ dojo.declare(
 
 	destroy: function(){
 		this._movable.destroy();
+		if(this._inProgressAnim && this._inProgressAnim.status != "stopped"){
+			this._inProgressAnim.stop(true);
+		}
 		this.inherited(arguments);	
 	}
 });
@@ -268,22 +288,6 @@ dojo.declare(
 		return this._descending;
 	},
 
-	_topButtonClicked: function(e){
-		if(this._descending){
-			this.increment(e);
-		}else{
-			this.decrement(e);
-		}
-	},
-
-	_bottomButtonClicked: function(e){
-		if(this._descending){
-			this.decrement(e);
-		}else{
-			this.increment(e);
-		}
-	},
-
 	_rtlRectify: function(decorationNode/*NodeList*/){
 		// summary:
 		//      Rectify children nodes for left/right decoration in rtl case.
@@ -319,7 +323,8 @@ dojo.declare("dijit.form._SliderMover",
 	destroy: function(e){
 		dojo.dnd.Mover.prototype.destroy.apply(this, arguments);
 		var widget = this.widget;
-		widget.setValue(widget.value, true);
+		widget._abspos = null;
+		widget._setValueAttr(widget.value, true);
 	}
 });
 
@@ -391,7 +396,7 @@ dojo.declare("dijit.form.HorizontalRuleLabels", dijit.form.HorizontalRule,
 {
 	//	Summary:
 	//		Create labels for the Horizontal slider
-	templateString: '<div class="dijitRuleContainer dijitRuleContainerH"></div>',
+	templateString: '<div class="dijitRuleContainer dijitRuleContainerH dijitRuleLabelsContainer dijitRuleLabelsContainerH"></div>',
 
 	// labelStyle: String
 	//		CSS style to apply to individual text labels
@@ -464,7 +469,7 @@ dojo.declare("dijit.form.VerticalRuleLabels", dijit.form.HorizontalRuleLabels,
 {
 	//	Summary:
 	//		Create labels for the Vertical slider
-	templateString: '<div class="dijitRuleContainer dijitRuleContainerV"></div>',
+	templateString: '<div class="dijitRuleContainer dijitRuleContainerV dijitRuleLabelsContainer dijitRuleLabelsContainerV"></div>',
 
 	_positionPrefix: '<div class="dijitRuleLabelContainer dijitRuleLabelContainerV" style="top:',
 	_labelPrefix: '"><span class="dijitRuleLabel dijitRuleLabelV">',

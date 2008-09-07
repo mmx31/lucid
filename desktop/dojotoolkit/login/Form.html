@@ -11,9 +11,9 @@
 			<input type='password' dojoType="dijit.form.TextBox" class='desktopInput' name='password' />
 		</div>
 		<div>
-			<input type='radio' name='windowAct' dojoType="dijit.form.RadioButton" id='${id}_windowActNew' value='new' />
+			<input type='radio' dojoAttachPoint="newRadioNode" name='windowAct' dojoType="dijit.form.RadioButton" id='${id}_windowActNew' value='new' />
 			<label for='${id}_windowActNew'> New window</label>&nbsp;&nbsp;&nbsp;
-			<input type='radio' name='windowAct' dojoType="dijit.form.RadioButton" id='${id}_windowActCurrent' value='current' />
+			<input type='radio' dojoAttachPoint="currentRadioNode" name='windowAct' dojoType="dijit.form.RadioButton" id='${id}_windowActCurrent' value='current' />
 			<label for='${id}_windowActCurrent'> Current window</label>
 		</div>
 		<input type='submit' name='submit' dojoType="dijit.form.Button" dojoAttachPoint="submitNode" value='Login' label="Login" />

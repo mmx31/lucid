@@ -48,6 +48,19 @@ dojo.declare("dijit._Contained",
 			//		otherwise returns the next element sibling to the "right".
 
 			return this._getSibling("next"); // Mixed
+		},
+		
+		getIndexInParent: function(){
+			// summary:
+			//		Returns the index of this widget within its container parent.
+			//		It returns -1 if the parent does not exist, or if the parent
+			//		is not a dijit._Container
+			
+			var p = this.getParent();
+			if(!p || !p.getIndexOfChild){
+				return -1; // int
+			}
+			return p.getIndexOfChild(this); // int
 		}
 	}
 );
@@ -56,27 +69,43 @@ dojo.declare("dijit._Container",
 	null,
 	{
 		// summary:
-		//		Mixin for widgets that contain a list of children.
+		//		Mixin for widgets that contain a set of widget children.
 		// description:
-		//		Use this mixin when the widget needs to know about and
-		//		keep track of it's widget children. Widgets like SplitContainer
-		//		and TabContainer.  
+		//		Use this mixin for widgets that needs to know about and
+		//		keep track of their widget children. Suitable for widgets like BorderContainer
+		//		and TabContainer which contain (only) a set of child widgets.
+		//
+		//		It's not suitable for widgets like ContentPane
+		//		which contains mixed HTML (plain DOM nodes in addition to widgets),
+		//		and where contained widgets are not necessarily directly below
+		//		this.containerNode.   In that case calls like addChild(node, position)
+		//		wouldn't make sense.
 
+		// isContainer: Boolean
+		//		Just a flag indicating that this widget descends from dijit._Container
 		isContainer: true,
+
+		buildRendering: function(){
+			this.inherited(arguments);
+			if(!this.containerNode){
+				// all widgets with descendants must set containerNode
+   				this.containerNode = this.domNode;
+			}
+		},
 
 		addChild: function(/*Widget*/ widget, /*int?*/ insertIndex){
 			// summary:
-			//		Process the given child widget, inserting it's dom node as
-			//		a child of our dom node
+			//		Makes the given widget a child of this widget.
+			// description:
+			//		Inserts specified child widget's dom node as a child of this widget's
+			//		container node, and possibly does otherprocessing (such as layout).
 
-			if(insertIndex === undefined){
-				insertIndex = "last";
-			}
-			var refNode = this.containerNode || this.domNode;
+			var refNode = this.containerNode;
 			if(insertIndex && typeof insertIndex == "number"){
-				var children = dojo.query("> [widgetid]", refNode);
+				var children = dojo.query("> [widgetId]", refNode);
 				if(children && children.length >= insertIndex){
-					refNode = children[insertIndex-1]; insertIndex = "after";
+					refNode = children[insertIndex-1];
+					insertIndex = "after";
 				}
 			}
 			dojo.place(widget.domNode, refNode, insertIndex);
@@ -90,10 +119,17 @@ dojo.declare("dijit._Container",
 			}
 		},
 
-		removeChild: function(/*Widget*/ widget){
+		removeChild: function(/*Widget or int*/ widget){
 			// summary:
 			//		Removes the passed widget instance from this widget but does
-			//		not destroy it
+			//		not destroy it.  You can also pass in an integer indicating
+			//		the index within the container to remove
+			if(typeof widget == "number" && widget > 0){
+				widget = this.getChildren()[widget];
+			}
+			// If we cannot find the widget, just return
+			if(!widget || !widget.domNode){ return; }
+			
 			var node = widget.domNode;
 			node.parentNode.removeChild(node);	// detach but don't destroy
 		},
@@ -115,17 +151,22 @@ dojo.declare("dijit._Container",
 
 		getChildren: function(){
 			// summary:
-			//		Returns array of children widgets
-			return dojo.query("> [widgetId]", this.containerNode || this.domNode).map(dijit.byNode); // Array
+			//		Returns array of children widgets.
+			// description:
+			//		Returns the widgets that are directly under this.containerNode.
+			return dojo.query("> [widgetId]", this.containerNode).map(dijit.byNode); // Widget[]
 		},
 
 		hasChildren: function(){
 			// summary:
-			//		Returns true if widget has children
-			var cn = this.containerNode || this.domNode;
-			return !!this._firstElement(cn); // Boolean
+			//		Returns true if widget has children, i.e. if this.containerNode contains something.
+			return !!this._firstElement(this.containerNode); // Boolean
 		},
 
+		destroyDescendants: function(/*Boolean*/ preserveDom){
+			dojo.forEach(this.getChildren(), function(child){ child.destroyRecursive(preserveDom); });
+		},
+	
 		_getSiblingOfChild: function(/*Widget*/ child, /*int*/ dir){
 			// summary:
 			//		Get the next or previous widget sibling of child
@@ -138,6 +179,18 @@ dojo.declare("dijit._Container",
 				node = node[which];
 			}while(node && (node.nodeType != 1 || !dijit.byNode(node)));
 			return node ? dijit.byNode(node) : null;
+		},
+		
+		getIndexOfChild: function(/*Widget*/ child){
+			// summary:
+			//		Gets the index of the child in this container or -1 if not found
+			var children = this.getChildren();
+			for(var i=0, c; c=children[i]; i++){
+				if(c == child){ 
+					return i; // int
+				}
+			}
+			return -1; // int
 		}
 	}
 );
@@ -282,7 +335,7 @@ dojo.declare("dijit._KeyNavContainer",
 
 		_onContainerKeypress: function(evt){
 			if(evt.ctrlKey || evt.altKey){ return; }
-			var func = this._keyNavCodes[evt.keyCode];
+			var func = this._keyNavCodes[evt.charOrCode];
 			if(func){
 				func();
 				dojo.stopEvent(evt);

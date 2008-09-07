@@ -3,7 +3,7 @@ dojo.provide("dojox.lang.utils");
 (function(){
 	var empty = {}, du = dojox.lang.utils;
 	
-	dojo.mixin(dojox.lang.utils, {
+	dojo.mixin(du, {
 		coerceType: function(target, source){
 			switch(typeof target){
 				case "number":	return Number(eval("(" + source + ")"));
@@ -23,7 +23,7 @@ dojo.provide("dojox.lang.utils");
 				if(x in source && !(x in empty)){
 					var t = target[x];
 					if(t && typeof t == "object"){
-						du.updateObject(t, source[x]);
+						du.updateWithObject(t, source[x], conv);
 					}else{
 						target[x] = conv ? du.coerceType(t, source[x]) : dojo.clone(source[x]);
 					}

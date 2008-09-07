@@ -1,15 +1,32 @@
 -------------------------------------------------------------------------------
-dojox.image
+dojox.image - Image Related Widgets and Components
 -------------------------------------------------------------------------------
 Version 1.0
 Release date: 10/31/07
 -------------------------------------------------------------------------------
 Project state:
-prototype | experimental
+
+[Badge] experimental
+[FlickrBadge] experimental
+[Gallery] experimental
+[Lightbox] beta
+[Magnifier] experimental
+[MagnifierLite] experimental
+[SlideShow] experimental
+[ThumbnailPicker] experimental
+
 -------------------------------------------------------------------------------
 Credits
-	Peter Higgins (dante)
-	Shane O'Sullivan (shaneosullivan1@gmail.com)
+
+[Badge] Peter Higgins (dante)
+[FlickrBadge] Bryan Forbes (BryanForbes)
+[Gallery] Shane O'Sullivan (sos)
+[Lightbox] Peter Higgins (dante)
+[Magnifier] Peter Higgins (dante)
+[MagnifierLite] Peter Higgins (dante)
+[SlideShow] Shane O'Sullivan (sos)
+[ThumbnailPicker] Shane O'Sullivan (sos)
+
 -------------------------------------------------------------------------------
 Project description 
 
@@ -30,7 +47,9 @@ Dependencies:
 
 	Gallery: core, dojox.image.SlideShow, dojox.image.ThumbNailPicker
 
-	Magnifier: dojo core, dijit._Widget, dojox.gfx
+	Magnifier: (prototype) dojo core, dijit._Widget, dojox.gfx
+	
+	Badge: (prototype) dojo core, dijit._Widget + _Templated 
 
 -------------------------------------------------------------------------------
 Documentation
@@ -63,4 +82,7 @@ Additional Notes
 
 	Magnifier: Unobtrusive way to attach a hovering window window
 	when moving the mouse over an image. The window shows a a zoomed
-	version of the original source. (experimental)
+	version of the original source. (prototype)
+
+	Badge: (prototype) A Javascript version of a FlickrBadge thingr, 
+	which loops through and sizes children in a loop.

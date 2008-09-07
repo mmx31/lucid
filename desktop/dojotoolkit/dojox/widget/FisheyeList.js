@@ -623,8 +623,6 @@ dojo.declare("dojox.widget.FisheyeListItem", [dijit._Widget, dijit._Templated, d
 	//	will be set to the id of the orginal div element
 	id: "",
 
-	_blankImgPath: dojo.moduleUrl("dojo", "resources/blank.gif"),
-
 	templateString:
 		'<div class="dojoxFisheyeListItem">' +
 		'  <img class="dojoxFisheyeListItemImage" dojoAttachPoint="imgNode" dojoAttachEvent="onmouseover:onMouseOver,onmouseout:onMouseOut,onclick:onClick">' +
@@ -653,14 +651,14 @@ dojo.declare("dojox.widget.FisheyeListItem", [dijit._Widget, dijit._Templated, d
 	postCreate: function() {
 
 		// set image
-		if((this.iconSrc.toLowerCase().substring(this.iconSrc.length-4)==".png")&&(dojo.isIE)&&(dojo.isIE<7)){
+		if((this.iconSrc.toLowerCase().substring(this.iconSrc.length-4)==".png") && dojo.isIE < 7){
 			/* we set the id of the new fisheyeListItem to the id of the div defined in the HTML */
 			if(this._hasParent(this.imgNode) && this.id != ""){
 				var parent = this.imgNode.parentNode;
 				parent.setAttribute("id", this.id);
 			}
 			this.imgNode.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+this.iconSrc+"', sizingMethod='scale')";
-			this.imgNode.src = this._blankImgPath.toString();
+			this.imgNode.src = this._blankGif.toString();
 		}else{
 			if(this._hasParent(this.imgNode) && this.id != ""){
 				var parent = this.imgNode.parentNode;

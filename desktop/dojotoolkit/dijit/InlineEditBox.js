@@ -24,10 +24,11 @@ dojo.declare("dijit.InlineEditBox",
 	//		inline values a TextBox), but you can specify an editor such as
 	//		dijit.Editor (for editing HTML) or a Slider (for adjusting a number).
 	//		An edit widget must support the following API to be used:
-	//		String getDisplayedValue() OR String getValue()
-	//		void setDisplayedValue(String) OR void setValue(String)
-	//		void focus()
-	//
+	//			- displayedValue or value as initialization parameter,
+	//			and available through attr('displayedValue') / attr('value')
+	//			- void focus()
+	//			- DOM-node focusNode = node containing editable text
+
 	// editing: Boolean
 	//		Is the node currently in edit mode?
 	editing: false,
@@ -61,6 +62,10 @@ dojo.declare("dijit.InlineEditBox",
 	onChange: function(value){
 		// summary: User should set this handler to be notified of changes to value
 	},
+	
+	onCancel: function(){
+		// summary: User should set this handler to be notified when no change occured
+	},
 
 	// width: String
 	//		Width of editor.  By default it's width=100% (ie, block mode)
@@ -74,8 +79,12 @@ dojo.declare("dijit.InlineEditBox",
 	//		The text that gets displayed when there is no value (so that the user has a place to click to edit)
 	noValueIndicator: "<span style='font-family: wingdings; text-decoration: underline;'>&nbsp;&nbsp;&nbsp;&nbsp;&#x270d;&nbsp;&nbsp;&nbsp;&nbsp;</span>",
 
+	constructor: function(){
+		this.editorParams = {};
+	},
+
 	postMixInProperties: function(){
-		this.inherited('postMixInProperties', arguments);
+		this.inherited(arguments);
 
 		// save pointer to original source node, since Widget nulls-out srcNodeRef
 		this.displayNode = this.srcNodeRef;
@@ -96,15 +105,19 @@ dojo.declare("dijit.InlineEditBox",
 			this.displayNode.setAttribute("tabIndex", 0);
 		}
 
-		this.setValue(this.value || this.displayNode.innerHTML);
+		this.attr('value', this.value || this.displayNode.innerHTML);
 	},
 
 	setDisabled: function(/*Boolean*/ disabled){
-		// summary:
+		dojo.deprecated("dijit.InlineEditBox.setDisabled() is deprecated.  Use attr('disabled', bool) instead.", "", "2.0");
+		this.attr('disabled', disabled);
+	},
+	_setDisabledAttr: function(/*Boolean*/ disabled){
+		// summary: 
+		//		Hook to make attr("disabled", ...) work.
 		//		Set disabled state of widget.
-
 		this.disabled = disabled;
-		dijit.setWaiState(this.focusNode || this.domNode, "disabled", disabled);
+		dijit.setWaiState(this.domNode, "disabled", disabled);
 	},
 
 	_onMouseOver: function(){
@@ -121,18 +134,20 @@ dojo.declare("dijit.InlineEditBox",
 		this._onMouseOut();
 
 		// Since FF gets upset if you move a node while in an event handler for that node...
-		setTimeout(dojo.hitch(this, "_edit"), 0);
+		setTimeout(dojo.hitch(this, "edit"), 0);
 	},
 
-	_edit: function(){
-		// summary: display the editor widget in place of the original (read only) markup
+	edit: function(){
+		// summary:
+		//		Display the editor widget in place of the original (read only) markup.
 
+		if(this.disabled || this.editing){ return; }
 		this.editing = true;
 
 		var editValue = 
 				(this.renderAsHtml ?
 				this.value :
-				this.value.replace(/\s*\r?\n\s*/g,"").replace(/<br\/?>/gi, "\n").replace(/&gt;/g,">").replace(/&lt;/g,"<").replace(/&amp;/g,"&"));
+				this.value.replace(/\s*\r?\n\s*/g,"").replace(/<br\/?>/gi,"\n").replace(/&gt;/g,">").replace(/&lt;/g,"<").replace(/&amp;/g,"&").replace(/&quot;/g,"\""));
 
 		// Placeholder for edit widget
 		// Put place holder (and eventually editWidget) before the display node so that it's positioned correctly
@@ -202,14 +217,13 @@ dojo.declare("dijit.InlineEditBox",
 		//		Save the contents of the editor and revert to display mode.
 		// focus: Boolean
 		//		Focus on the display mode text
+		if(this.disabled || !this.editing){ return; }
 		this.editing = false;
 
 		var value = this.editWidget.getValue() + "";
-		if(!this.renderAsHtml){
-			value = value.replace(/&/gm, "&amp;").replace(/</gm, "&lt;").replace(/>/gm, "&gt;").replace(/"/gm, "&quot;")
-				.replace(/\n/g, "<br>");
-		}
-		this.setValue(value);
+		this.attr('value', this.renderAsHtml? value
+			: value.replace(/&/gm, "&amp;").replace(/</gm, "&lt;").replace(/>/gm, "&gt;").replace(/"/gm, "&quot;").replace(/\n/g, "<br>")
+		);
 
 		// tell the world that we have changed
 		this.onChange(value);
@@ -218,19 +232,30 @@ dojo.declare("dijit.InlineEditBox",
 	},
 
 	setValue: function(/*String*/ val){
-		// summary: inserts specified HTML value into this node, or an "input needed" character if node is blank
+		dojo.deprecated("dijit.InlineEditBox.setValue() is deprecated.  Use attr('value', ...) instead.", "", "2.0");
+		return this.attr("value", val);
+	},
+	_setValueAttr: function(/*String*/ val){
+		// summary:
+		// 		Hook to make attr("value", ...) work.
+		//		Inserts specified HTML value into this node, or an "input needed" character if node is blank.
 		this.value = val;
 		this.displayNode.innerHTML = dojo.trim(val) || this.noValueIndicator;
 	},
 
 	getValue: function(){
-		return this.value;
+		dojo.deprecated("dijit.InlineEditBox.getValue() is deprecated.  Use attr('value') instead.", "", "2.0");
+		return this.attr("value");
 	},
 
 	cancel: function(/*Boolean*/ focus){
 		// summary:
 		//		Revert to display mode, discarding any changes made in the editor
 		this.editing = false;
+		
+		// tell the world that we have no changes
+		this.onCancel();
+		
 		this._showText(focus);
 	}
 });
@@ -256,7 +281,7 @@ dojo.declare(
 	widgetsInTemplate: true,
 
 	postMixInProperties: function(){
-		this.inherited('postMixInProperties', arguments);
+		this.inherited(arguments);
 		this.messages = dojo.i18n.getLocalization("dijit", "common", this.lang);
 		dojo.forEach(["buttonSave", "buttonCancel"], function(prop){
 			if(!this[prop]){ this[prop] = this.messages[prop]; }
@@ -266,6 +291,7 @@ dojo.declare(
 	postCreate: function(){
 		// Create edit widget in place in the template
 		var cls = dojo.getObject(this.editor);
+		this.editorParams[ "displayedValue" in cls.prototype ? "displayedValue" : "value"]= this.value;
 		var ew = this.editWidget = new cls(this.editorParams, this.editorPlaceholder);
 
 		// Copy the style from the source
@@ -291,10 +317,7 @@ dojo.declare(
 		// Monitor keypress on the edit widget.   Note that edit widgets do a stopEvent() on ESC key (to
 		// prevent Dialog from closing when the user just wants to revert the value in the edit widget),
 		// so this is the only way we can see the key press event.
-		this.connect(ew.focusNode || ew.domNode, "onkeypress", "_onKeyPress");
-
-		// priorityChange=false will prevent bogus onChange event
-		(this.editWidget.setDisplayedValue||this.editWidget.setValue).call(this.editWidget, this.value, false);
+		this.connect(ew, "onKeyPress", "_onKeyPress");
 
 		this._initialText = this.getValue();
 
@@ -310,7 +333,7 @@ dojo.declare(
 
 	getValue: function(){
 		var ew = this.editWidget;
-		return ew.getDisplayedValue ? ew.getDisplayedValue() : ew.getValue();
+		return ew.attr("displayedValue" in ew ? "displayedValue" : "value");
 	},
 
 	_onKeyPress: function(e){
@@ -325,15 +348,15 @@ dojo.declare(
 		if(this.autoSave){
 			if(e.altKey || e.ctrlKey){ return; }
 			// If Enter/Esc pressed, treat as save/cancel.
-			if(e.keyCode == dojo.keys.ESCAPE){
+			if(e.charOrCode == dojo.keys.ESCAPE){
 				dojo.stopEvent(e);
 				this._exitInProgress = true;
 				this.cancel(true);
-			}else if(e.keyCode == dojo.keys.ENTER){
+			}else if(e.charOrCode == dojo.keys.ENTER){
 				dojo.stopEvent(e);
 				this._exitInProgress = true;
 				this.save(true);
-			}else if(e.keyCode == dojo.keys.TAB){
+			}else if(e.charOrCode == dojo.keys.TAB){
 				this._exitInProgress = true;
 				// allow the TAB to change focus before we mess with the DOM: #6227
 				// Expounding by request:
@@ -355,7 +378,7 @@ dojo.declare(
 			// The delay gives the browser a chance to update the Textarea.
 			setTimeout(
 				function(){
-					_this.saveButton.setAttribute("disabled", _this.getValue() == _this._initialText);
+					_this.saveButton.attr("disabled", _this.getValue() == _this._initialText);
 				}, 100);
 		}
 	},
@@ -379,12 +402,6 @@ dojo.declare(
 		}
 	},
 
-	enableSave: function(){
-		// summary: User replacable function returning a Boolean to indicate
-		// 	if the Save button should be enabled or not - usually due to invalid conditions
-		return this.editWidget.isValid ? this.editWidget.isValid() : true; // Boolean
-	},
-
 	_onChange: function(){
 		// summary:
 		//	Called when the underlying widget fires an onChange event,
@@ -401,7 +418,7 @@ dojo.declare(
 			// in case the keypress event didn't get through (old problem with Textarea that has been fixed
 			// in theory) or if the keypress event comes too quickly and the value inside the Textarea hasn't
 			// been updated yet)
-			this.saveButton.setAttribute("disabled", (this.getValue() == this._initialText) || !this.enableSave());
+			this.saveButton.attr("disabled", (this.getValue() == this._initialText) || !this.enableSave());
 		}
 	},
 	

@@ -1,5 +1,18 @@
 <?php
 
+function jsdoc_update_1() {
+  $items = array();
+  $items[] = update_sql('ALTER TABLE {jsdoc_resource_hierarchy} ADD project integer');
+  $items[] = update_sql('ALTER TABLE {jsdoc_objects} ADD INDEX (new)');
+  $items[] = update_sql('ALTER TABLE {jsdoc_parameters} ADD INDEX (vid)');
+  $items[] = update_sql('ALTER TABLE {jsdoc_examples} ADD INDEX (vid)');
+  $items[] = update_sql('ALTER TABLE {jsdoc_resources} ADD INDEX (version)');
+  $items[] = update_sql('ALTER TABLE {jsdoc_variables} ADD INDEX (version)');
+  $items[] = update_sql('ALTER TABLE {jsdoc_variable_hierarchy} ADD INDEX (version)');
+  $items[] = update_sql('ALTER TABLE {jsdoc_resource_hierarchy} ADD INDEX (version)');
+  return $items;
+}
+
 function jsdoc_install() {
   foreach (taxonomy_get_vocabularies('jsdoc') as $vocabulary) {
     if ($vocabulary->name == 'Environments') {
@@ -84,10 +97,12 @@ function jsdoc_install() {
       db_query("CREATE TABLE {jsdoc_resources} (
         vid integer NOT NULL PRIMARY KEY REFERENCES {node_revisions} (vid),
         nid integer NOT NULL REFERENCES {node} (nid), -- node-type: jsdoc_resource
+        project integer NULL REFERENCES {node} (nid), -- note-type: jsdoc_project
         version integer NOT NULL REFERENCES {node} (nid), -- node-type: jsdoc_version
         used boolean NOT NULL DEFAULT 1,
         new boolean NOT NULL DEFAULT 1,
-        INDEX (used)
+        INDEX (used),
+        INDEX (version)
       ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
 
       // jsdoc_variables is used for disambiguation
@@ -100,7 +115,8 @@ function jsdoc_install() {
         private bool NOT NULL DEFAULT 0,
         private_parent bool NOT NULL DEFAULT 0,
         version integer NOT NULL REFERENCES {node} (nid), -- node-type: jsdoc_version
-        PRIMARY KEY (vid, version)
+        PRIMARY KEY (vid, version),
+        INDEX (version)
       ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
 
       // jsdoc_objects is used for specific objects
@@ -129,21 +145,23 @@ function jsdoc_install() {
         INDEX (resource_vid),
         INDEX (provide_vid),
         INDEX (version),
-        INDEX (used)
+        INDEX (used),
+        INDEX (new)
       ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
 
       // jsdoc_variable_hierarchy is for showing how variables are associated with each other
       // There should be one of these for each type of join, for each variable pair, for each version
       db_query("CREATE TABLE {jsdoc_variable_hierarchy} (
         vid integer NOT NULL REFERENCES {node_revisions} (vid),
-        nid integer NOT NULL REFERENCES {node} (nid), -- node-type: jsdoc_variable
+        nid integer NOT NULL REFERENCES {node} (nid), -- node-type: jsdoc_object
         parent_vid integer NOT NULL REFERENCES {node_revisions} (vid),
         parent_nid integer NOT NULL REFERENCES {node} (vid), -- node-type: jsdoc_variable
         type enum('normal', 'cascading', 'prototype', 'instance', 'alias', 'chain', 'mixin'), -- The type of join
         subtype enum('call', 'prototype', '') DEFAULT '', -- The subtype of the join
         version integer NOT NULL REFERENCES {node} (nid), -- node-type: jsdoc_version
         PRIMARY KEY (vid, parent_vid, type, subtype, version),
-        INDEX (parent_vid)
+        INDEX (parent_vid),
+        INDEX (version)
       ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
 
       // jsdoc_resource_hierarchy is for showing which resources require which resources
@@ -153,11 +171,13 @@ function jsdoc_install() {
         nid integer NOT NULL REFERENCES {node} (nid), -- node-type: jsdoc_resource
         parent_vid integer NOT NULL REFERENCES {node_revisions} (vid),
         parent_nid integer NOT NULL REFERENCES {node} (vid), -- node-type: jsdoc_resource
+        project integer REFERENCES {node} (nid), -- node-type: jsdoc_project
         tid integer REFERENCES {term_data} (tid), -- We use this for saying how a resource joins to a resource
         version integer NOT NULL REFERENCES {node} (nid), -- node-type: jsdoc_version
         PRIMARY KEY (vid, parent_vid, tid, version),
         INDEX (parent_vid),
-        INDEX (tid)
+        INDEX (tid),
+        INDEX (version)
       ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
 
       // jsdoc_parameters is for showing which parameters are part of which object (assume the object is a function)
@@ -171,7 +191,8 @@ function jsdoc_install() {
         summary longtext NOT NULL,
         optional bool NOT NULL,
         repeating bool NOT NULL,
-        PRIMARY KEY (vid, name)
+        PRIMARY KEY (vid, name),
+        INDEX (vid)
       ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
 
       // jsdoc_examples is for associating examples with objects
@@ -181,7 +202,8 @@ function jsdoc_install() {
         weight integer NOT NULL,
         example longtext NOT NULL,
         markedup longtext NOT NULL,
-      PRIMARY KEY (vid, weight)
+        PRIMARY KEY (vid, weight),
+        INDEX (vid)
       ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
     break;
   case 'pgsql':

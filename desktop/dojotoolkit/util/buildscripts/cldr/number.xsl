@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:saxon="http://saxon.sf.net/" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" extension-element-prefixes="saxon" version="2.0">
 <xsl:import href="util.xsl"/>
-<xsl:output method="text" indent="yes"/>
+<xsl:output method="text" indent="yes" saxon:byte-order-mark="yes"/>
 <!-- list the data elements whose spaces should be preserved
        it seems listing only the parent node doesn't work -->
 <xsl:preserve-space elements="decimal group list pattern currencyMatch surroundingMatch insertBetween"/>
@@ -74,7 +74,7 @@
         <xsl:otherwise>
             <xsl:for-each select="*[not(@draft)] | *[@draft!='provisional' and @draft!='unconfirmed']">
                 <xsl:call-template name="insert_comma"/>
-        '<xsl:value-of select="name()"></xsl:value-of>
+	'<xsl:value-of select="name()"></xsl:value-of>
                 <xsl:text>':"</xsl:text>
                 <xsl:value-of select="replace(.,'&quot;', '\\&quot;')"></xsl:value-of>
                 <xsl:text>"</xsl:text>
@@ -98,6 +98,7 @@
                     <xsl:with-param name="templateToCall">formats</xsl:with-param>
                     <xsl:with-param name="source" select="@source"></xsl:with-param>
                     <xsl:with-param name="xpath" select="@path"></xsl:with-param>
+					<xsl:with-param name="width" select="$width"></xsl:with-param>
                 </xsl:call-template>
             </xsl:for-each>       
         </xsl:when>
@@ -115,7 +116,7 @@
                         </xsl:if><xsl:for-each select=".//pattern[not(@draft)] | 
                           .//pattern[@draft!='provisional' and @draft!='unconfirmed']">
 			                <xsl:call-template name="insert_comma"/>
-        '<xsl:value-of select="name(..)"></xsl:value-of>                            
+	'<xsl:value-of select="name(..)"></xsl:value-of>                            
                             <xsl:if test="string-length($width)>0">
                                 <xsl:text>-</xsl:text>
                                 <xsl:value-of select="$width"></xsl:value-of>
@@ -159,7 +160,7 @@
                 <xsl:otherwise>
                    <xsl:if test=".[(not(@draft) or @draft!='provisional' and @draft!='unconfirmed')]">
 	                <xsl:call-template name="insert_comma"/>
-        '<xsl:value-of select="name(../..)"></xsl:value-of>
+	'<xsl:value-of select="name(../..)"></xsl:value-of>
                     <xsl:text>-</xsl:text>
                     <xsl:value-of select="name(..)"></xsl:value-of>
                     <xsl:text>-</xsl:text>
@@ -188,6 +189,8 @@
      <xsl:param name="templateName"></xsl:param>
      <xsl:param name="name"></xsl:param> 
      <xsl:param name="width"></xsl:param>
+	 <xsl:param name="ctx"></xsl:param>
+	 <xsl:param name="fromLocaleAlias"></xsl:param>
      <xsl:if test="$templateName='top'">
          <xsl:call-template name="top"></xsl:call-template>
      </xsl:if>

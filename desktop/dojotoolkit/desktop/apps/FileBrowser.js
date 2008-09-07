@@ -105,7 +105,8 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		
 		var bCont = new dijit.layout.BorderContainer({
 			region: "top",
-			style: "height: 60px;"	//This is really fucked up, since themes may use different heights for toolbars.
+			gutters: false,
+			style: "height: 42px;"	//This is really fucked up, since themes may use different heights for toolbars.
 									//If BorderContainer ever supports more then one widget in one slot, please fix this.
 		})
 		bCont.addChild(this.toolbar);

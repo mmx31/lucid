@@ -16,7 +16,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		tbody.appendChild(tr);
 		tbl.appendChild(tbody);
 		this.containerNode.appendChild(tbl);
-		this.inherited("postCreate", arguments);
+		this.inherited(arguments);
 	},
 	startup: function() {
 		var store = desktop.ui._windowList;

@@ -30,7 +30,7 @@ dojox.xml.DomParser=new (function(){
 
 	//	compile the regular expressions once.
 	var reTags=/<([^>\/\s+]*)([^>]*)>([^<]*)/g;
-	var reAttr=/([^=]*)="([^"]*)"/g;
+	var reAttr=/([^=]*)=(("([^"]*)")|('([^']*)'))/g;	//	patch from tdedischew AT gmail, with additional grouping
 	var reEntity=/<!ENTITY\s+([^"]*)\s+"([^"]*)">/g;
 	var reCData=/<!\[CDATA\[([\u0001-\uFFFF]*?)\]\]>/g;
 	var reComments=/<!--([\u0001-\uFFFF]*?)-->/g;
@@ -62,7 +62,7 @@ dojox.xml.DomParser=new (function(){
 				if(all[id]){ delete all[id]; }
 			};
 
-			this.byId=this.getElementById=function(id){ return keys[id]; };
+			this.byId=this.getElementById=function(id){ return all[id]; };
 			this.byName=this.getElementsByTagName=byName;
 			this.byNameNS=this.getElementsByTagNameNS=byNameNS;
 			this.childrenByName=childrenByName;
@@ -115,10 +115,10 @@ dojox.xml.DomParser=new (function(){
 
 	function _createTextNode(v){
 		return { 
-							nodeType:nodeTypes.TEXT,
-							nodeName:"#text",
-							nodeValue:v.replace(normalize," ").replace(egt,">").replace(elt,"<").replace(eapos,"'").replace(equot,'"').replace(eamp,"&")
-						};
+			nodeType:nodeTypes.TEXT,
+			nodeName:"#text",
+			nodeValue:v.replace(normalize," ").replace(egt,">").replace(elt,"<").replace(eapos,"'").replace(equot,'"').replace(eamp,"&")
+		};
 	}
 
 	//	attribute functions
@@ -229,17 +229,18 @@ dojox.xml.DomParser=new (function(){
 		var res, obj=root;
 		while((res=reTags.exec(str))!=null){
 			//	closing tags.
-			if(res[2].charAt(0)=="/"){
+			if(res[2].charAt(0)=="/" && res[2].replace(trim, "").length>1){
 				if(obj.parentNode){
 					obj=obj.parentNode;
 				}
-				var text=res[3];
-				if(text.length>0)
-					obj.appendChild(_createTextNode(text));
-			}else
+				var text=(res[3]||"").replace(trim, "");
+				if(text.length>0) {
+					obj.childNodes.push(_createTextNode(text));
+				}
+			}
 
 			//	open tags.
-			if(res[1].length>0){
+			else if(res[1].length>0){
 				//	figure out the type of node.
 				if(res[1].charAt(0)=="?"){
 					//	processing instruction
@@ -308,7 +309,7 @@ dojox.xml.DomParser=new (function(){
 					while((attr=reAttr.exec(res[2]))!=null){
 						if(attr.length>0){
 							var name=attr[1].replace(trim,"");
-							var val=attr[2].replace(normalize," ")
+							var val=(attr[4]||attr[6]||"").replace(normalize," ")
 								.replace(egt,">")
 								.replace(elt,"<")
 								.replace(eapos,"'")
