@@ -13,7 +13,6 @@
 	/* Use this style to null out padding, margin, border in your template elements
 		so that page specific styles don't break them.
 		- Use in all TABLE, TR and TD tags.	
-		- If there is more than one class on the tag, place this first so other classes override.
 	*/
 	margin:0;
 	border:0;
@@ -35,24 +34,12 @@
 	border:0;
 	padding:0;
 	vertical-align:middle;
+	#vertical-align: auto;	/* makes TextBox,Button line up w/native counterparts on IE6 */
 }
 
 .dj_ie INPUT.dijitTextBox,
 .dj_ie .dijitInputField INPUT {
 	font-size: 100%;
-	font-family: inherit; /* trigger pseudo font-family inheritance */
-	behavior: expression( /* if the font-family = inherit, then get the parent's font-family */
-		function(self){
-			var cs, e; 
-			try{
-				if(self.currentStyle.fontFamily=='inherit'){
-					cs = self.parentNode.currentStyle || document.documentElement.currentStyle;
-					self.style.fontFamily = cs.fontFamily;
-				}
-				self.style.behavior = null; /* #5562: prevent re-eval of css expression */
-			}catch(e){} /* #6024: random exceptions thrown during init */
-		}(this)
-	);
 }
 
 .dj_ie .dijitInputField INPUT { /* try to get rid of IE implicit margin around INPUT */
@@ -96,11 +83,7 @@
 .dijit_ally .dijitPopup div,
 .dijit_a11y .dijitPopup table,
 .dijit_a11y .dijitTooltipContainer {
-	opacity: 1 !important;
 	background-color: white !important;
-}
-.dj_ie .dijit_a11y .dijitPopup * {
-	filter: none;
 }
 
 .dijitInputField {
@@ -143,8 +126,9 @@
 }
 
 .dijitClickableRegion {
-	/* a region we expect the user to click on */
-	cursor: pointer;
+	/* An InlineEditBox in view mode (click this to edit the text) */
+	background-color: #e2ebf2;
+	cursor: text;
 }
 
 
@@ -208,6 +192,11 @@
 	color:#999 !important;
 }
 
+.dj_ff2 .dijit_a11y .dijitComboButton .dijitButtonContentsFocused,
+.dj_ff2 .dijit_a11y .dijitComboButton .dijitDownArrowButtonFocused {
+	border: 1px dotted black !important;
+}
+
 /* button inner contents - labels, icons etc. */
 .dijitButtonNode * {
 	vertical-align: middle;
@@ -260,21 +249,63 @@
 	margin: 0.2em;
 }
 
+.dijitToolbar .dijitButton,
+.dijitToolbar .dijitDropDownButton,
+.dijitToolbar .dijitComboButton {
+	margin: 0;
+}
+
+.dj_ie .dijitToolbar button,
+.dj_safari .dijitToolbar button {
+	/* FF adds implicit padding to buttons so make other browsers follow suit,
+	 * to avoid a bunch of browse specific rules in theme files
+	 */
+	padding: 1px 2px;
+}
+
+.dj_ie .dijitComboButton {
+	/* hack to get inline-table to vertically align w/other buttons */
+	margin-bottom: -3px;
+}
+
 .dj_safari .dijitToolbar .dijitDropDownButton {
 	padding-left: 0.3em;
+}
+.dj_gecko .dijitToolbar .dijitButtonNode::-moz-focus-inner {
+	padding:0;
 }
 
 .dijitButtonNode {
 	/* Node that is acting as a button -- may or may not be a BUTTON element */
 	border:1px solid gray;
 	margin:0;
-	padding:.2em .2em .1em;
 	line-height:normal;
 	cursor:pointer;
-	vertical-align:middle;	
+	vertical-align: middle;
+	#vertical-align: auto;
 	text-align:center;
 	white-space: nowrap;
 }
+
+/*
+.dijitButtonNode button { 
+	cursor: pointer;
+} 
+*/
+
+.dj_ie .dijitButtonNode {
+	/* ensure hasLayout */
+	zoom: 1;
+}
+
+.dj_ie .dijitButtonNode button { 
+	/*  
+		disgusting hack to get rid of spurious padding around button elements 
+		on IE. MSIE is truly the web's boat anchor. 
+	*/ 
+	overflow: visible;
+	cursor: pointer;
+} 
 
 .dijitArrowButton {
 	/* Node that is acting as a arrow button -- drop down (spinner has its own treatment).  Also gets dijitButtonNode */
@@ -307,18 +338,17 @@ DIV.dijitArrowButton {
 	bottom: none;
 }
 
-.dijitComboButton TABLE {
-	/* each cell in a combo-table should have its own separate border */
-	border-collapse: separate;
+TABLE.dijitComboButton {
+	/* In ComboButton, borders are on each cell rather than on <table> itself */
+	border-collapse: collapse;
 	border:0;
 	padding:0;
 	margin:0;
 }
-
-.dijitComboButton .dijitButtonContents {
-	border-right-width:0 !important;
+.dijitToolbar .dijitComboButton {
+	/* because Toolbar only draws a border around the hovered thing */
+	border-collapse: separate;
 }
-
 
 .dj_ie BUTTON.dijitButtonNode {
 	overflow: visible; /* eliminates arbitrary left and right padding on buttons */
@@ -334,7 +364,7 @@ table .dijitComboButton .dijitButtonNode {
 .dijitButtonNode IMG {
 	/* make text and images line up cleanly */
 	vertical-align:middle;
-	margin-bottom:.2em;
+	/*margin-bottom:.2em;*/
 }
 
 /******
@@ -348,6 +378,12 @@ table .dijitComboButton .dijitButtonNode {
 	border: solid black 1px;
 	#overflow: hidden; /* #6027, #6067 */
 	width: 15em;	/* need to set default size on outer node since inner nodes say <input style="width:100%"> and <td width=100%>.  user can override */
+	vertical-align: middle;
+	#vertical-align: auto;	
+}
+
+.dijitTimeTextBox {
+	width: 8em;
 }
 
 /* rules for safari to deal with fuzzy blue focus border */
@@ -358,21 +394,25 @@ table .dijitComboButton .dijitButtonNode {
 }
 .dijitTextBoxFocused,
 .dijitComboBoxFocused,
-.dijitSpinnerFocused {
+.dijitSpinnerFocused,
+.dijitTextAreaFocused {
 	/* should we display focus like we do on other browsers, or use the safari standard focus indicator?? */
 	outline: auto 5px -webkit-focus-ring-color;
+}
+.dijitTextAreaFocused div {
+	/* prevent dotted border on FF3 */
+	outline: none !important;
 }
 
 .dijitTextBox INPUT,
 .dijitComboBox INPUT,
 .dijitSpinner INPUT {
-	padding:0;
 	border-left: solid black 1px;	/* TODO: for RTL mode should be border-right */
 	display:inline;
 	position:static !important;
 	border:0 !important;	
 	margin:0 !important;
-	vertical-align:0em !important;
+	vertical-align:top !important;
 	visibility:visible !important;
 	background-color:transparent !important;
 	background-image:none !important;
@@ -475,10 +515,12 @@ table .dijitComboButton .dijitButtonNode {
 	z-index:-1;
 	top:0;
 	width:100%;
-	height:100%;
+}
+.dj_ie6 .dijitProgressBarFull {
+	height:1.6em;
 }
 
-.dijitProgressBarTile{
+.dijitProgressBarTile {
 	/* inner container for finished portion */
 	position:absolute;
 	overflow:hidden;
@@ -501,31 +543,26 @@ table .dijitComboButton .dijitButtonNode {
 	background-color:transparent !important;
 }
 
-.dj_iequirks .dijitProgressBarTile{
-	width:100%;
-	height:100%;
-}
-
-.dj_ie6 .dijitProgressBarTile{
+.dj_ie6 .dijitProgressBarTile {
 	/* width:auto works in IE6 with position:static but not position:absolute */
 	position:static;
-	/* height:auto does not work in IE6 */
-	height:100%;
+	/* height:auto or 100% does not work in IE6 */
+	height:1.6em;
 }
 
-.dijitProgressBarIndeterminate .dijitProgressBarLabel{
+.dijitProgressBarIndeterminate .dijitProgressBarLabel {
 	visibility:hidden;
 }
 
-.dijitProgressBarIndeterminate .dijitProgressBarTile{
+.dijitProgressBarIndeterminate .dijitProgressBarTile {
 	/* animated gif for 'indeterminate' mode */
 }
 
-.dijitProgressBarIndeterminateHighContrastImage{
+.dijitProgressBarIndeterminateHighContrastImage {
 	display:none;
 }
 
-.dijit_a11y .dijitProgressBarIndeterminate .dijitProgressBarIndeterminateHighContrastImage{
+.dijit_a11y .dijitProgressBarIndeterminate .dijitProgressBarIndeterminateHighContrastImage {
 	display:block;
 	position:absolute;
 	top:0;
@@ -536,26 +573,13 @@ table .dijitComboButton .dijitButtonNode {
 	height:auto;
 }
 
-.dijitProgressBarLabel{
+.dijitProgressBarLabel {
 	display:block;
 	position:static;
 	width:100%;
 	text-align:center;
 	background-color:transparent !important;
 }
-
-/* progress bar in vertical mode - TODO: remove? no longer supported? */
-.dijitProgressBarV .dijitProgressBarFull{
-	bottom:0;		/* start at the bottom */
-}
-
-.dj_ie6 .dijitProgressBarV .dijitProgressBarTile{
-	position:absolute;
-	/* can't use position:static here -- need absolute positioning to place
-	   the bar at the bottom of a vertical progressbar */
-	width:100%;
-}
-
 
 /****
 		dijit.Tooltip
@@ -586,6 +610,9 @@ table .dijitComboButton .dijitButtonNode {
 	position: absolute;
 }
 
+.dijitTooltipData {
+	display:none;
+}
 /* MOW: using actual images at this time
 /* draw an arrow with CSS only * /
 .dijitTooltipConnector {
@@ -635,15 +662,33 @@ body .dijitAlignRight {
 
 body .dijitAlignClient { position: absolute; }
 
-.dijitBorderContainer {
+/*
+ * BorderContaienr
+ *
+ * .dijitBorderContainer is a stylized layout where panes have border and margin.
+ * .dijitBorderContainerNoGutter is a raw layout.
+ */
+.dijitBorderContainer, .dijitBorderContainerNoGutter {
 	position:relative;
 	overflow: hidden;
+}
+
+.dijitBorderContainerPane,
+.dijitBorderContainerNoGutterPane {
+	position: absolute !important;	/* !important to override position:relative in dijitTabContainer etc. */
+	z-index: 2;		/* above the splitters so that off-by-one browser errors don't cover up border of pane */
 }
 
 .dijitBorderContainer > .dijitTextArea {
 	/* On Safari, for SimpleTextArea inside a BorderContainer,
 		don't want to display the grip to resize */
 	resize: none;
+}
+
+.dijitGutter {
+	/* gutter is just a place holder for empty space between panes in BorderContainer */
+	position: absolute;
+	font-size: 1px;		/* needed by IE6 even though div is empty, otherwise goes to 15px */
 }
 
 /* SplitContainer
@@ -655,13 +700,17 @@ body .dijitAlignClient { position: absolute; }
 .dijitSplitter {
 	position: absolute;
 	overflow: hidden;
-	z-index: 9999;
+	z-index: 1;		/* behind the panes */
 	background-color: #fff;
 	border-color: gray;
 	border-style: solid;
 	border-width: 0;
-	z-index: 10 !important;
 }
+
+.dijitSplitterActive {
+	z-index: 11 !important;
+}
+
 .dijitSplitterCover{
 	position:absolute;
 	z-index:1;
@@ -670,6 +719,13 @@ body .dijitAlignClient { position: absolute; }
 	width:100%;
 	height:100%;
 }
+
+/* #6945: stop mouse events */
+.dj_ie .dijitSplitterCover{
+	background: white;
+	filter: alpha(opacity=0)
+}
+
 .dijitSplitterH {
 	height: 7px;
 	border-top:1px;
@@ -826,6 +882,10 @@ img.dijitColorPaletteUnder {
 	overflow: auto;
 }
 
+/* #7104 - workaround IE jankyness with overflows */
+.dj_ie .dijitAccordionBody {
+	position:relative;
+}
 
 .dijitAccordionContainer {
 	border:1px solid #b7b7b7;
@@ -836,23 +896,17 @@ img.dijitColorPaletteUnder {
 	cursor: pointer;
 }
 
-.dijitAccordionTitle .dijitAccordionArrow {
-	float: right;
-}
-
 /* images off, high-contrast mode styles */
 .dijitAccordionPane .dijitAccordionTitle .arrowTextUp,
 .dijitAccordionPane .dijitAccordionTitle .arrowTextDown {
 	display: none;
-	float: right;
 	font-size: 0.65em;
 	font-weight: normal !important;
 }
 
-.dijit_a11y .dijitAccordionPane .dijitAccordionTitle .arrowTextUp {
+.dijit_a11y .dijitAccordionTitle .arrowTextUp {
 	display: inline;
 }
-
 .dijit_a11y .dijitAccordionTitle-selected .arrowTextDown {
 	display: inline;
 }
@@ -926,6 +980,7 @@ img.dijitColorPaletteUnder {
 }
 
 .dijitMenuItem{
+	text-align: left;
 	white-space: nowrap;
 	padding:.1em .2em;
 }
@@ -967,8 +1022,11 @@ img.dijitColorPaletteUnder {
 	border: 1px #fff dotted !important;
 }
 
-.dijit_a11y .dijitMenuExpandInner {
-	display:block !important;
+.dijitMenuExpandA11y {
+	display: none;
+}
+.dijit_a11y .dijitMenuExpandA11y {
+	display: inline;
 }
 
 /* separator can be two pixels -- set border of either one to 0 to have only one */
@@ -986,54 +1044,95 @@ img.dijitColorPaletteUnder {
 	font-size: 1px;
 }
 
+/* the checked menu item */
+.dijitCheckedMenuItemIconChar {
+	vertical-align: middle;
+	visibility:hidden;
+}
+.dijitCheckedMenuItemIconChecked .dijitCheckedMenuItemIconChar {
+	visibility:visible !important;
+}
+.dijit_a11y .dijitCheckedMenuItemIconChar {
+	display:block !important;
+}
 
 
 /* Tab */
 
-
-.dijitTabLabels-top {
-/* position the tab labels row down by 1 px, and on top of the dijitTabPaneWrapper
-	so the buttons can overlay the tab pane properly		*/
-	top:1px !important;
-	z-index:10;	
+.dijitTabContainerBottom-tabs,
+.dijitTabContainerTop-tabs,
+.dijitTabContainerLeft-tabs,
+.dijitTabContainerRight-tabs {
+	z-index:10;
+	overflow: visible !important;  /* so tabs can cover up border adjacent to container */
 }
 
-.dijitTabLabels-bottom {
-/* position the tab labels row up by 1 px so they overlap	*/
-	margin-top:-1px !important;
-	z-index:10;	
-}
-
-.dijitTabLabels-left-h {
-/* position the tab labels left by 1 px so they overlap		*/
-	margin-right:-1px !important;
-	z-index:10;	
-}
-
-.dijitTabLabels-right-h {
-/* position the tab labels right by 1 px, on top of the dijitTabPaneWrapper
-	so the buttons can overlay the tab pane properly		*/
-	margin-left:-1px !important;
-	z-index:10;	
-}
-
-.dijitTabPaneWrapper {
+.dijitTabContainerBottom-container,
+.dijitTabContainerTop-container,
+.dijitTabContainerLeft-container,
+.dijitTabContainerRight-container {
 	z-index:0;
 	overflow: hidden;
-	clear: both;	/* needed for doLayout=false mode */
+	border: 1px solid black;
 }
+
+.dijitTabContainerTop-tabs {
+	border-bottom: 1px solid black;
+}
+.dijitTabContainerTop-container {
+	border-top: 0px;
+}
+
+.dijitTabContainerLeft-tabs {
+	border-right: 1px solid black;
+}
+.dijitTabContainerLeft-container {
+	border-left: 0px;
+}
+
+.dijitTabContainerBottom-tabs {
+	border-top: 1px solid black;
+}
+.dijitTabContainerBottom-container {
+	border-bottom: 0px;
+}
+
+.dijitTabContainerRight-tabs {
+	border-left: 1px solid black
+}
+.dijitTabContainerRight-container {
+	border-right: 0px;
+}
+
 
 .dijitTab {
 	position:relative;
-	float:left;
 	cursor:pointer;
 	white-space:nowrap;
 	z-index:3;
 }
 
-.dijitTabContainer .dijitAlignLeft .dijitTab,
-.dijitTabContainer .dijitAlignRight .dijitTab {
-	float:none;
+.dijitTabContainerTop-tabs .dijitTab {
+	top: 1px;	/* to overlap border on .dijitTabContainerTop-tabs */
+}
+.dijitTabContainerBottom-tabs .dijitTab {
+	top: -1px;	/* to overlap border on .dijitTabContainerBottom-tabs */
+}
+.dijitTabContainerLeft-tabs .dijitTab {
+	left: 1px;	/* to overlap border on .dijitTabContainerLeft-tabs */
+}
+.dijitTabContainerRight-tabs .dijitTab {
+	left: -1px;	/* to overlap border on .dijitTabContainerRight-tabs */
+}
+
+
+.dijitTabContainerTop-tabs .dijitTab,
+.dijitTabContainerBottom-tabs .dijitTab {
+	/* Inline-block */
+	display:-moz-inline-box;		/* FF2 */
+	display:inline-block;			/* webkit and FF3 */
+	#zoom: 1; /* set hasLayout:true to mimic inline-block */
+	#display:inline; /* don't use .dj_ie since that increases the priority */
 }
 
 .dijitTabInnerDiv {
@@ -1100,18 +1199,17 @@ img.dijitColorPaletteUnder {
 
 /* Tree */
 
-.dijitTreeExpando, .dijitTreeExpand {
-	float:left;
-	display:inline;
+.dijitTreeRow, .dijitTreeContent {
+	white-space: nowrap;
 }
 
-.dijitTreeExpando {
-	clear:both;
+.dijitTreeRow img {
+	/* make the expando and folder icons line up with the label */
+	vertical-align: middle;
 }
 
 .dijitTreeContent {
     cursor: default;
-    /* can't make inline - multiline bugs */
 }
 
 .dijitExpandoText {
@@ -1119,7 +1217,6 @@ img.dijitColorPaletteUnder {
 }
 
 .dijit_a11y .dijitExpandoText {
-	float: left;
 	display: inline;
 	padding-left: 10px;
 	padding-right: 10px;
@@ -1129,12 +1226,20 @@ img.dijitColorPaletteUnder {
 	cursor: pointer;
 }
 
+.dijitTreeLabel {
+	margin: 0px 4px;
+}
+
 /* Dialog */
 
 .dijitDialog {
 	position: absolute;
 	z-index: 999;
 	padding: 1px;
+}
+
+.dijitDialogFixed div.dijitDialogTitleBar {
+	cursor:default; 
 }
 
 .dijitDialogUnderlayWrapper {
@@ -1214,6 +1319,17 @@ img.dijitColorPaletteUnder {
 	border-color:black;
 }
 
+.dijitSliderBarContainerV {
+	position:relative;
+	height:100%;
+	z-index:1;
+}
+
+.dijitSliderBarContainerH {
+	position:relative;
+	z-index:1;
+}
+
 .dijitSliderBarH {
 	height:4px;
 	border-width:1px 0;
@@ -1226,7 +1342,7 @@ img.dijitColorPaletteUnder {
 
 .dijitSliderProgressBar {
 	background-color:red;
-	#z-index:0;
+	z-index:1;
 }
 
 .dijitSliderProgressBarV {
@@ -1246,7 +1362,7 @@ img.dijitColorPaletteUnder {
 .dijitSliderRemainingBar {
 	overflow:hidden;
 	background-color:transparent;
-	#z-index:-1;
+	z-index:1;
 }
 
 .dijitSliderRemainingBarV {
@@ -1261,7 +1377,7 @@ img.dijitColorPaletteUnder {
 /* the slider bumper is the space consumed by the slider handle when it hangs over an edge */
 .dijitSliderBumper {
 	overflow:hidden;
-	#z-index:-1
+	z-index:1;
 }
 
 .dijitSliderBumperV {
@@ -1309,10 +1425,6 @@ img.dijitColorPaletteUnder {
 .dijitSlider .dijitButtonNode {
 	padding:0;
 	display:block;
-}
-
-.dj_ie .dijitRuleContainer {
-	z-index: -1; /* #4809 */
 }
 
 .dijitRuleContainer {
@@ -1417,45 +1529,35 @@ img.dijitColorPaletteUnder {
 	border:0;
 	padding:2px 8px 2px 8px;
 }
-.dijitTimePickerTick {
-	/* opacity:0.1 !important; */
-	color:#dedede;	
-	border-bottom:1px solid #dedede;
-	border-top:1px solid #dedede;
-	position:relative;
-}
-.dijitTimePickerTick .dijitTimePickerItemInner {
-	font-size:0.25em;
-}
+
+.dijitTimePickerTick,
 .dijitTimePickerMarker {
-	background-color:#ededed;
-	border-top:1px solid #999;
-	border-bottom:1px solid #999;
+	border-bottom:1px solid gray;
 }
 
-.dijitTimePickerItemHover {
-	opacity:1 !important;
-	background-color:#808080;
-	color:#fff;
-	border-top:1px solid #333;
-	border-bottom:1px solid #333;
-	cursor:pointer;
-}
-.dijitTimePickerMarker.dijitTimePickerItemHover {
-	font-size:1.3em;
+.dijitTimePicker .dijitDownArrowButton {
+	border-top: none !important;
 }
 
-.dijitTimePickerItemHover .dijitTimePickerItemInner {
-	display:block;
-	overflow:visible;
-	background-color:#808080;
-	font-size:1em;
+.dijitTimePickerTick {
+	color:#CCC;
+}
+
+.dijitTimePickerMarker {
+	color:black;
+	background-color:#CCC;
 }
 
 .dijitTimePickerItemSelected {
 	font-weight:bold;
 	color:#333;
-	background-color:#b7cdee !important;
+	background-color:#b7cdee;
+}
+
+.dijitTimePickerItemHover {
+	background-color:gray;
+	color:white;
+	cursor:pointer;
 }
 
 .dijit_a11y .dijitTimePickerItem {
@@ -1498,20 +1600,6 @@ img.dijitColorPaletteUnder {
 	height: 50%;
 	width: 16px;
 	overflow: hidden;
-}
-.dj_ie .dijitSpinner .dijitInputLayoutContainer .dijitArrowButton {
-	behavior: expression(
-		function(self){
-			var e; 
-			try{
-				var h = self.parentNode.offsetHeight/2;
-				if(h > 1){
-					self.style.height = h;
-					self.style.behavior = null; /* prevent re-eval of css expression */
-				}
-			}catch(e){} /* random exceptions thrown during init */
-		}(this)
-	);
 }
 .dijitSpinner .dijitInputLayoutContainer .dijitArrowButtonInner {
 	overflow: hidden;

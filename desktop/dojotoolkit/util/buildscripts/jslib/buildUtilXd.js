@@ -76,7 +76,6 @@ buildUtilXd.xdgen = function(
 	}
 }
 
-//START makeXdContents function
 //Function that generates the XD version of the module file's contents
 buildUtilXd.makeXdContents = function(fileContents, prefixes, kwArgs){
 	var dependencies = [];
@@ -116,8 +115,25 @@ buildUtilXd.makeXdContents = function(fileContents, prefixes, kwArgs){
 
 	//Build the xd file contents.
 	var xdContentsBuffer = [];
-	xdContentsBuffer.push((kwArgs.xdDojoScopeName || "dojo") + "._xdResourceLoaded({\n");
-	
+	var scopeArgs = kwArgs.xdScopeArgs || "dojo, dijit, dojox";
+
+	//Start the module function wrapper.
+	xdContentsBuffer.push((kwArgs.xdDojoScopeName || "dojo") + "._xdResourceLoaded(function(" + scopeArgs + "){\n");
+
+	//See if there are any dojo.loadInit calls
+	var loadInitCalls = buildUtilXd.extractLoadInits(fileContents);
+	if(loadInitCalls){
+		//Adjust fileContents since extractLoadInits removed something.
+		fileContents = loadInitCalls[0];
+
+		//Add any loadInit calls to an array passed _xdResourceLoaded
+		for(i = 1; i < loadInitCalls.length; i++){
+			xdContentsBuffer.push(loadInitCalls[i] + ";\n");
+		}
+	}
+
+	xdContentsBuffer.push("return {");
+
 	//Add in dependencies section.
 	if(dependencies.length > 0){
 		xdContentsBuffer.push("depends: [");
@@ -132,19 +148,16 @@ buildUtilXd.makeXdContents = function(fileContents, prefixes, kwArgs){
 	
 	//Add the contents of the file inside a function.
 	//Pass in module names to allow for multiple versions of modules in a page.
-	var scopeArgs = kwArgs.xdScopeArgs || "dojo, dijit, dojox";
 	xdContentsBuffer.push("\ndefineResource: function(" + scopeArgs + "){");
 	//Remove requireLocalization calls, since that will mess things up.
 	//String() part is needed since fileContents is a Java object.
 	xdContentsBuffer.push(String(fileContents).replace(/dojo\.(requireLocalization|i18n\._preloadLocalizations)\([^\)]*\)/g, ""));
-	xdContentsBuffer.push("\n}});");
+	xdContentsBuffer.push("\n}};});");
 
 	return xdContentsBuffer.join("");
 }
-//END makeXdContents function
 
 
-//START makeXdBundleContents function
 buildUtilXd.makeXdBundleContents = function(prefix, prefixPath, srcFileName, fileContents, prefixes, kwArgs){
 	//logger.info("Flattening bundle: " + srcFileName);
 
@@ -172,4 +185,8 @@ buildUtilXd.makeXdBundleContents = function(prefix, prefixPath, srcFileName, fil
 	//Now make a proper xd.js file out of the content.
 	return buildUtilXd.makeXdContents(fileContents, prefixes, kwArgs);
 }
-//END makeXdBundleContents function
+
+buildUtilXd.loadInitRegExp = /dojo\.loadInit\s*\(/g;
+buildUtilXd.extractLoadInits = function(/*String*/fileContents){
+	return buildUtil.extractMatchedParens(buildUtilXd.loadInitRegExp, fileContents);
+}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:saxon="http://saxon.sf.net/" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" extension-element-prefixes="saxon" version="2.0">
 <xsl:import href="util.xsl"/>
-<xsl:output method="text" indent="yes"/>
+<xsl:output method="text" indent="yes" saxon:byte-order-mark="yes"/>
 <!-- list the data elements whose spaces should be preserved
        it seems listing only the parent node doesn't work -->
 <xsl:preserve-space elements="displayName symbol"/>
@@ -84,8 +84,8 @@
             </xsl:for-each>
         </xsl:when>
         <xsl:otherwise>
-        <xsl:if test="count(./* [(not(@draft) or @draft!='provisional' and @draft!='unconfirmed')]) > 0">
-            <xsl:for-each select="*[not(@draft)] | *[@draft!='provisional' and @draft!='unconfirmed']">
+        <!-- CLDR 1.6+: skip entries in the form of displayName count="" until we implement plurals -->
+            <xsl:for-each select="*[not(@count) and (not(@draft) or (@draft!='provisional' and @draft!='unconfirmed'))]">
 				<xsl:call-template name="insert_comma"/>
                 <xsl:text>
 	</xsl:text>
@@ -96,8 +96,7 @@
                 <xsl:call-template name="normalize_unicode"/>
                 <xsl:text>"</xsl:text>
             </xsl:for-each>
-            </xsl:if>
-         </xsl:otherwise>   
+         </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
@@ -107,6 +106,8 @@
         <xsl:param name="templateName"></xsl:param>
         <xsl:param name="name"></xsl:param> 
         <xsl:param name="width"></xsl:param>
+		<xsl:param name="ctx"></xsl:param>
+		<xsl:param name="fromLocaleAlias"></xsl:param>
         <xsl:if test="$templateName='top'">
             <xsl:call-template name="top"></xsl:call-template>
         </xsl:if>

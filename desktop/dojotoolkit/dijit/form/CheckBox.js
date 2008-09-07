@@ -29,40 +29,82 @@ dojo.declare(
 		//	Value of "type" attribute for <input>
 		type: "checkbox",
 
-		// value: Value
-		//	equivalent to value field on normal checkbox (if checked, the value is passed as
-		//	the value when form is submitted)
+		// value: String
+		//		As an initialization parameter, equivalent to value field on normal checkbox
+		//		(if checked, the value is passed as the value when form is submitted).
+		//
+		//		However, attr('value') will return either the string or false depending on
+		//		whether or not the checkbox is checked.
+		//
+		//		attr('value', string) will check the checkbox and change the value to the
+		//		specified string
+		//
+		//		attr('value', boolean) will change the checked state.
 		value: "on",
 
-		setValue: function(/*String or Boolean*/ newValue){
+		_setValueAttr: function(/*String or Boolean*/ newValue){
 			// summary:
-			//		When passed a boolean, controls whether or not the CheckBox is checked.
+			//		Handler for value= attribute to constructor, and also calls to
+			//		attr('value', val).
+			// description:
+			//		During initialization, just saves as attribute to the <input type=checkbox>.
+			//		
+			//		After initialization,
+			//		when passed a boolean, controls whether or not the CheckBox is checked.
 			//		If passed a string, changes the value attribute of the CheckBox (the one
 			//		specified as "value" when the CheckBox was constructed (ex: <input
 			//		dojoType="dijit.CheckBox" value="chicken">)
 			if(typeof newValue == "string"){
-				this.setAttribute('value', newValue);
+				this.value = newValue;
+				dojo.attr(this.focusNode, 'value', newValue);
 				newValue = true;
 			}
-			this.setAttribute('checked', newValue);
+			if(this._created){
+				this.attr('checked', newValue);
+			}
 		},
 
-		_getValueDeprecated: false, // remove when _FormWidget:_getValueDeprecated is removed
-		getValue: function(){
+		_getValueAttr: function(){
 			// summary:
+			//		Hook so attr('value') works.
+			// description:
 			//		If the CheckBox is checked, returns the value attribute.
 			//		Otherwise returns false.
 			return (this.checked ? this.value : false);
 		},
 
-		reset: function(){
+		postMixInProperties: function(){
+			if(this.value == ""){
+				this.value = "on";
+			}
 			this.inherited(arguments);
-			this.setAttribute('value', this._resetValueAttr);
+		},
+		
+		 _fillContent: function(/*DomNode*/ source){
+			// Override Button::_fillContent() since it doesn't make sense for CheckBox,
+			// since CheckBox doesn't even have a container
 		},
 
-		postCreate: function(){
-			this.inherited(arguments);
-			this._resetValueAttr = this.value;
+		reset: function(){
+			this._hasBeenBlurred = false;
+
+			this.attr('checked', this.params.checked || false);
+
+			// Handle unlikely event that the <input type=checkbox> value attribute has changed
+			this.value = this.params.value || "on";
+			dojo.attr(this.focusNode, 'value', this.value);
+		},
+		
+		_onFocus: function(){
+			if(this.id){
+				dojo.query("label[for='"+this.id+"']").addClass("dijitFocusedLabel");
+			}
+		},
+
+		_onBlur: function(){
+			if(this.id){
+				dojo.query("label[for='"+this.id+"']").removeClass("dijitFocusedLabel");
+			}
 		}
 	}
 );
@@ -73,56 +115,33 @@ dojo.declare(
 	{
 		// summary:
 		// 		Same as an HTML radio, but with fancy styling.
-		//
-		// description:
-		// Implementation details
-		//
-		// Specialization:
-		// We keep track of dijit radio groups so that we can update the state
-		// of all the siblings (the "context") in a group based on input
-		// events. We don't rely on browser radio grouping.
 
 		type: "radio",
 		baseClass: "dijitRadio",
 
-		// This shared object keeps track of all widgets, grouped by name
-		_groups: {},
-
-		postCreate: function(){
-			// add this widget to _groups
-			(this._groups[this.name] = this._groups[this.name] || []).push(this);
-
-			this.inherited(arguments);
-		},
-
-		uninitialize: function(){
-			// remove this widget from _groups
-			dojo.forEach(this._groups[this.name], function(widget, i, arr){
-				if(widget === this){
-					arr.splice(i, 1);
-					return;
-				}
-			}, this);
-		},
-
-		setAttribute: function(/*String*/ attr, /*anything*/ value){
+		_setCheckedAttr: function(/*Boolean*/ value){
 			// If I am being checked then have to deselect currently checked radio button
 			this.inherited(arguments);
-			switch(attr){
-				case "checked":
-					if(this.checked){
-						dojo.forEach(this._groups[this.name], function(widget){
-							if(widget != this && widget.checked){
-								widget.setAttribute('checked', false);
+			if(!this._created){ return; }
+			if(value){
+				var _this = this;
+				// search for radio buttons with the same name that need to be unchecked
+				dojo.query('INPUT[type=radio][name='+this.name+']', this.focusNode.form||dojo.doc).forEach(
+					function(inputNode){
+						if(inputNode != _this.focusNode && inputNode.form == _this.focusNode.form){
+							var widget = dijit.getEnclosingWidget(inputNode);
+							if(widget && widget.checked){
+								widget.attr('checked', false);
 							}
-						}, this);
+						}
 					}
+				);
 			}
 		},
 
 		_clicked: function(/*Event*/ e){
 			if(!this.checked){
-				this.setAttribute('checked', true);
+				this.attr('checked', true);
 			}
 		}
 	}

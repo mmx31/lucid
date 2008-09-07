@@ -2,6 +2,8 @@ dojo.provide("dijit.Editor");
 dojo.require("dijit._editor.RichText");
 dojo.require("dijit.Toolbar");
 dojo.require("dijit._editor._Plugin");
+dojo.require("dijit._editor.plugins.EnterKeyHandling");
+dojo.require("dijit._editor.range");
 dojo.require("dijit._Container");
 dojo.require("dojo.i18n");
 dojo.requireLocalization("dijit._editor", "commands");
@@ -10,7 +12,17 @@ dojo.declare(
 	"dijit.Editor",
 	dijit._editor.RichText,
 	{
-	// summary: A rich-text Editing widget
+		// summary:
+		//	A rich text Editing widget
+		//
+		// description:
+		//	This widget provides basic WYSIWYG editing features, based on the browser's
+		//	underlying rich text editing capability, accompanied by a toolbar (dijit.Toolbar).
+		//  A plugin model is available to extend the editor's capabilities as well as the
+		//	the options available in the toolbar.  Content generation may vary across
+		//	browsers, and clipboard operations may have different results, to name
+		//	a few limitations.  Note: this widget should not be used with the HTML
+		//	&lt;TEXTAREA&gt; tag -- see dijit._editor.RichText for details.
 
 		// plugins: Array
 		//		a list of plugin names (as strings) or instances (as objects)
@@ -24,11 +36,26 @@ dojo.declare(
 		constructor: function(){
 			if(!dojo.isArray(this.plugins)){
 				this.plugins=["undo","redo","|","cut","copy","paste","|","bold","italic","underline","strikethrough","|",
-				"insertOrderedList","insertUnorderedList","indent","outdent","|","justifyLeft","justifyRight","justifyCenter","justifyFull"/*"createLink"*/];
+				"insertOrderedList","insertUnorderedList","indent","outdent","|","justifyLeft","justifyRight","justifyCenter","justifyFull",
+				"dijit._editor.plugins.EnterKeyHandling" /*, "createLink"*/];
 			}
 
 			this._plugins=[];
 			this._editInterval = this.editActionInterval * 1000;
+
+			//IE will always lose focus when other element gets focus, while for FF and safari,
+			//when no iframe is used, focus will be lost whenever another element gets focus.
+			//For IE, we can connect to onBeforeDeactivate, which will be called right before
+			//the focus is lost, so we can obtain the selected range. For other browsers,
+			//no equivelent of onBeforeDeactivate, so we need to do two things to make sure 
+			//selection is properly saved before focus is lost: 1) when user clicks another 
+			//element in the page, in which case we listen to mousedown on the entire page and
+			//see whether user clicks out of a focus editor, if so, save selection (focus will
+			//only lost after onmousedown event is fired, so we can obtain correct caret pos.)
+			//2) when user tabs away from the editor, which is handled in onKeyDown below.
+			if(dojo.isIE){
+	            this.events.push("onBeforeDeactivate");
+							}
 		},
 
 		postCreate: function(){
@@ -59,6 +86,8 @@ dojo.declare(
 			dojo.forEach(this.plugins, this.addPlugin, this);
 			this.onNormalizedDisplayChanged(); //update toolbar button status
 //			}catch(e){ console.debug(e); }
+
+			this.toolbar.startup();
 		},
 		destroy: function(){
 			dojo.forEach(this._plugins, function(p){
@@ -78,10 +107,13 @@ dojo.declare(
 			//		plugins array. If index is passed, it's placed in the plugins
 			//		array at that index. No big magic, but a nice helper for
 			//		passing in plugin names via markup.
-			//	plugin: String, args object or plugin instance. Required.
-			//	args: This object will be passed to the plugin constructor.
-			//	index:	
-			//		Integer, optional. Used when creating an instance from
+			//
+			//	plugin: String, args object or plugin instance
+			//
+			//	args: This object will be passed to the plugin constructor
+			//
+			//	index: Integer
+			//		Used when creating an instance from
 			//		something already in this.plugins. Ensures that the new
 			//		instance is assigned to this.plugins at that index.
 			var args=dojo.isString(plugin)?{name:plugin}:plugin;
@@ -110,13 +142,35 @@ dojo.declare(
 				plugin.setToolbar(this.toolbar);
 			}
 		},
+		//the following 3 functions are required to make the editor play nice under a layout widget, see #4070
+		startup: function(){
+			//console.log('startup',arguments);
+		},
+		resize: function(){
+			dijit.layout._LayoutWidget.prototype.resize.apply(this,arguments);
+		},
+		layout: function(){
+			this.editingArea.style.height=(this._contentBox.h - dojo.marginBox(this.toolbar.domNode).h)+"px";
+			if(this.iframe){
+				this.iframe.style.height="100%";
+			}
+		},
+		onBeforeDeactivate: function(e){
+			if(this.customUndo){
+				this.endEditing(true);
+			}
+			//in IE, the selection will be lost when other elements get focus,
+			//let's save focus before the editor is deactivated
+			this._saveSelection();
+	        //console.log('onBeforeDeactivate',this);
+	    },
 		/* beginning of custom undo/redo support */
 
 		// customUndo: Boolean
 		//		Whether we shall use custom undo/redo support instead of the native
 		//		browser support. By default, we only enable customUndo for IE, as it
 		//		has broken native undo/redo support. Note: the implementation does
-		//		support other browsers which have W3C DOM2 Range API.
+		//		support other browsers which have W3C DOM2 Range API implemented.
 		customUndo: dojo.isIE,
 
 		//	editActionInterval: Integer
@@ -145,16 +199,16 @@ dojo.declare(
 			if(this.customUndo && (cmd=='undo' || cmd=='redo')){
 				return this[cmd]();
 			}else{
+				if(this.customUndo){
+					this.endEditing();
+					this._beginEditing();
+				}
 				try{
-					if(this.customUndo){
-						this.endEditing();
-						this._beginEditing();
-					}
 					var r = this.inherited('execCommand',arguments);
-					if(this.customUndo){
-						this._endEditing();
-					}
-					return r;
+                    if(dojo.isSafari && cmd=='paste' && !r){ //see #4598: safari does not support invoking paste from js
+                        var su = dojo.string.substitute, _isM = navigator.userAgent.indexOf("Macintosh") != -1;
+                        alert(su(this.commands.pasteShortcutSafari,[su(this.commands[_isM ? 'appleKey' : 'ctrlKey'], ['V'])]));
+                    }
 				}catch(e){
 					if(dojo.isMoz && /copy|cut|paste/.test(cmd)){
 						// Warn user of platform limitation.  Cannot programmatically access keyboard. See ticket #4136
@@ -164,8 +218,12 @@ dojo.declare(
 						alert(sub(this.commands.systemShortcutFF,
 							[this.commands[cmd], sub(this.commands[isMac ? 'appleKey' : 'ctrlKey'], [accel[cmd]])]));
 					}
-					return false;
+					r = false;
 				}
+				if(this.customUndo){
+					this._endEditing();
+				}
+				return r;
 			}
 		},
 		queryCommandEnabled: function(cmd){
@@ -174,6 +232,18 @@ dojo.declare(
 			}else{
 				return this.inherited('queryCommandEnabled',arguments);
 			}
+		},
+
+		focus: function(){
+			var restore=0;
+			//console.log('focus',dijit._curFocus==this.editNode)
+			if(this._savedSelection && dojo.isIE){
+				restore = dijit._curFocus!=this.editNode;
+			}
+		    this.inherited(arguments);
+		    if(restore){
+		    	this._restoreSelection();
+		    }
 		},
 		_moveToBookmark: function(b){
 			var bookmark=b;
@@ -264,6 +334,40 @@ dojo.declare(
 			this._steps.push({text: v, bookmark: this._getBookmark()});
 		},
 		onKeyDown: function(e){
+			//We need to save selection if the user TAB away from this editor
+			//no need to call _saveSelection for IE, as that will be taken care of in onBeforeDeactivate
+			if(!dojo.isIE && !this.iframe && e.keyCode==dojo.keys.TAB){
+				this._saveSelection();
+			}
+			if (e.keyCode === dojo.keys.TAB && this.isTabIndent ){
+				dojo.stopEvent(e); //prevent tab from moving focus out of editor
+				// FIXME: this is a poor-man's indent/outdent. It would be
+				// better if it added 4 "&nbsp;" chars in an undoable way.
+				// Unfortunately pasteHTML does not prove to be undoable
+				if (this.queryCommandEnabled((e.shiftKey ? "outdent" : "indent"))){
+					this.execCommand((e.shiftKey ? "outdent" : "indent"));
+				}
+			}else if (dojo.isMoz && this.iframe && !this.isTabIndent){
+				if(	e.keyCode == dojo.keys.TAB && 
+					!e.shiftKey && 
+					!e.ctrlKey && 
+					!e.altKey
+				){
+					// update iframe document title for screen reader
+					this.iframe.contentDocument.title = this._localizedIframeTitles.iframeFocusTitle;
+				
+					// Place focus on the iframe. A subsequent tab or shift tab
+					// will put focus on the correct control.
+					this.iframe.focus();  // this.focus(); won't work
+					dojo.stopEvent(e);
+				}else if(e.keyCode == dojo.keys.TAB && e.shiftKey){
+					// if there is a toolbar, set focus to it, otherwise ignore
+					if(this.toolbar){ // FIXME: this is badly factored!!!
+						this.toolbar.focus();
+					}
+					dojo.stopEvent(e);
+				}
+			}
 			if(!this.customUndo){
 				this.inherited('onKeyDown',arguments);
 				return;
@@ -328,11 +432,33 @@ dojo.declare(
 					case ks.SHIFT:
 					case ks.TAB:
 						break;
-				}	
+				}
 		},
 		_onBlur: function(){
+			//this._saveSelection();
 			this.inherited('_onBlur',arguments);
 			this.endEditing(true);
+		},
+		_saveSelection: function(){
+			this._savedSelection=this._getBookmark();
+			//console.log('save selection',this._savedSelection,this);
+		},
+		_restoreSelection: function(){
+			if(this._savedSelection){
+				//only restore the selection if the current range is collapsed
+    			//if not collapsed, then it means the editor does not lose 
+    			//selection and there is no need to restore it
+    			//if(dojo.withGlobal(this.window,'isCollapsed',dijit)){
+    				//console.log('_restoreSelection true')
+					this._moveToBookmark(this._savedSelection);
+				//}
+				delete this._savedSelection;
+			}
+		},
+		_onFocus: function(){
+			//console.log('_onFocus');
+			this._restoreSelection();
+			this.inherited(arguments);
 		},
 		onClick: function(){
 			this.endEditing(true);
@@ -352,7 +478,7 @@ dojo.subscribe(dijit._scopeName + ".Editor.getPlugin",null,function(o){
 		case "undo": case "redo": case "cut": case "copy": case "paste": case "insertOrderedList":
 		case "insertUnorderedList": case "indent": case "outdent": case "justifyCenter":
 		case "justifyFull": case "justifyLeft": case "justifyRight": case "delete":
-		case "selectAll": case "removeFormat":
+		case "selectAll": case "removeFormat": case "unlink":
 		case "insertHorizontalRule":
 			p = new _p({ command: name });
 			break;

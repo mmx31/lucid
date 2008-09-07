@@ -61,9 +61,28 @@ dojo.declare("dojo.data.ItemFileReadStore", null,{
 		this._reverseRefMap = "_RRM"; // Default attribute for constructing a reverse reference map for use with reference integrity
 		this._loadInProgress = false;	//Got to track the initial load to prevent duelling loads of the dataset.
 		this._queuedFetches = [];
+		if(keywordParameters.urlPreventCache !== undefined){
+			this.urlPreventCache = keywordParameters.urlPreventCache?true:false;
+		}
+		if(keywordParameters.clearOnClose){
+			this.clearOnClose = true;
+		}
 	},
 	
 	url: "",	// use "" rather than undefined for the benefit of the parser (#3539)
+
+	data: null,	// define this so that the parser can populate it
+	
+	//Parameter to allow users to specify if a close call should force a reload or not.
+	//By default, it retains the old behavior of not clearing if close is called.  But
+	//if set true, the store will be reset to default state.  Note that by doing this,
+	//all item handles will become invalid and a new fetch must be issued.
+	clearOnClose: false,
+
+	//Parameter to allow specifying if preventCache should be passed to the xhrGet call or not when loading data from a url.  
+	//Note this does not mean the store calls the server on each fetch, only that the data load has preventCache set as an option.
+	//Added for tracker: #6072
+	urlPreventCache: false,  
 
 	_assertIsItem: function(/* item */ item){
 		//	summary:
@@ -284,7 +303,8 @@ dojo.declare("dojo.data.ItemFileReadStore", null,{
 					this._loadInProgress = true;
 					var getArgs = {
 							url: self._jsonFileUrl, 
-							handleAs: "json-comment-optional"
+							handleAs: "json-comment-optional",
+							preventCache: this.urlPreventCache
 						};
 					var getHandler = dojo.xhrGet(getArgs);
 					getHandler.addCallback(function(data){
@@ -353,6 +373,17 @@ dojo.declare("dojo.data.ItemFileReadStore", null,{
 	close: function(/*dojo.data.api.Request || keywordArgs || null */ request){
 		 //	summary: 
 		 //		See dojo.data.api.Read.close()
+		 if(this.clearOnClose && (this._jsonFileUrl !== "")){
+			 //Reset all internalsback to default state.  This will force a reload
+			 //on next fetch, but only if the data came from a url.  Passed in data
+			 //means it should not clear the data.
+			 this._arrayOfAllItems = [];
+			 this._arrayOfTopLevelItems = [];
+			 this._loadFinished = false;
+			 this._itemsByIdentity = null;
+			 this._loadInProgress = false;
+			 this._queuedFetches = [];
+		 }
 	},
 
 	_getItemsFromLoadedData: function(/* Object */ dataObject){
@@ -368,6 +399,7 @@ dojo.declare("dojo.data.ItemFileReadStore", null,{
 		//		Array of items in store item format.
 		
 		// First, we define a couple little utility functions...
+		var addingArrays = false;
 		
 		function valueIsAnItem(/* anything */ aValue){
 			// summary:
@@ -386,9 +418,9 @@ dojo.declare("dojo.data.ItemFileReadStore", null,{
 			var isItem = (
 				(aValue != null) &&
 				(typeof aValue == "object") &&
-				(!dojo.isArray(aValue)) &&
+				(!dojo.isArray(aValue) || addingArrays) &&
 				(!dojo.isFunction(aValue)) &&
-				(aValue.constructor == Object) &&
+				(aValue.constructor == Object || dojo.isArray(aValue)) &&
 				(typeof aValue._reference == "undefined") && 
 				(typeof aValue._type == "undefined") && 
 				(typeof aValue._value == "undefined")
@@ -433,6 +465,9 @@ dojo.declare("dojo.data.ItemFileReadStore", null,{
 
 		for(i = 0; i < this._arrayOfTopLevelItems.length; ++i){
 			item = this._arrayOfTopLevelItems[i];
+			if(dojo.isArray(item)){
+				addingArrays = true;
+			}
 			addItemAndSubItemsToArrayOfAllItems(item);
 			item[this._rootItemPropName]=true;
 		}
@@ -636,7 +671,8 @@ dojo.declare("dojo.data.ItemFileReadStore", null,{
 					this._loadInProgress = true;
 					var getArgs = {
 							url: self._jsonFileUrl, 
-							handleAs: "json-comment-optional"
+							handleAs: "json-comment-optional",
+							preventCache: this.urlPreventCache
 					};
 					var getHandler = dojo.xhrGet(getArgs);
 					getHandler.addCallback(function(data){
@@ -727,6 +763,7 @@ dojo.declare("dojo.data.ItemFileReadStore", null,{
 				var getArgs = {
 					url: self._jsonFileUrl, 
 					handleAs: "json-comment-optional",
+					preventCache: this.urlPreventCache,
 					sync: true
 				};
 			var getHandler = dojo.xhrGet(getArgs);
@@ -738,9 +775,14 @@ dojo.declare("dojo.data.ItemFileReadStore", null,{
 					//We mainly wanted to sync/wait here.
 					//TODO:  Revisit the loading scheme of this store to improve multi-initial
 					//request handling.
-					if (self._loadInProgress !== true && !self._loadFinished) {
+					if(self._loadInProgress !== true && !self._loadFinished){
 						self._getItemsFromLoadedData(data);
 						self._loadFinished = true;
+					}else if(self._loadInProgress){
+						//Okay, we hit an error state we can't recover from.  A forced load occurred
+						//while an async load was occurring.  Since we cannot block at this point, the best
+						//that can be managed is to throw an error.
+						throw new Error("dojo.data.ItemFileReadStore:  Unable to perform a synchronous load, an async load is in progress."); 
 					}
 				}catch(e){
 					console.log(e);

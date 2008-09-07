@@ -15,7 +15,7 @@ dojo.declare(
 
 		// duration: Integer
 		//		Milliseconds to fade in/fade out
-		duration: 200,
+		duration: dijit.defaultDuration,
 
 		templatePath: dojo.moduleUrl("dijit", "templates/Tooltip.html"),
 
@@ -174,9 +174,8 @@ dojo.declare(
 		position: [],
 
 		postCreate: function(){
-			if(this.srcNodeRef){
-				this.srcNodeRef.style.display = "none";
-			}
+			
+			dojo.addClass(this.domNode,"dijitTooltipData");
 
 			this._connectNodes = [];
 			
@@ -184,7 +183,7 @@ dojo.declare(
 				var node = dojo.byId(id);
 				if (node) {
 					this._connectNodes.push(node);
-					dojo.forEach(["onMouseOver", "onMouseOut", "onFocus", "onBlur", "onHover", "onUnHover"], function(event){
+					dojo.forEach(["onMouseEnter", "onMouseLeave", "onFocus", "onBlur"], function(event){
 						this.connect(node, event.toLowerCase(), "_"+event);
 					}, this);
 					if(dojo.isIE){
@@ -195,15 +194,11 @@ dojo.declare(
 			}, this);
 		},
 
-		_onMouseOver: function(/*Event*/ e){
+		_onMouseEnter: function(/*Event*/ e){
 			this._onHover(e);
 		},
 
-		_onMouseOut: function(/*Event*/ e){
-			if(dojo.isDescendant(e.relatedTarget, e.target)){
-				// false event; just moved from target to target child; ignore.
-				return;
-			}
+		_onMouseLeave: function(/*Event*/ e){
 			this._onUnHover(e);
 		},
 

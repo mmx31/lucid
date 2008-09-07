@@ -2,12 +2,28 @@ dojo.provide("dijit._editor.plugins.AlwaysShowToolbar");
 
 dojo.declare("dijit._editor.plugins.AlwaysShowToolbar", dijit._editor._Plugin,
 	{
+	// summary:
+	//		For auto-expanding editors, this plugin will keep the
+	//		editor's toolbar visible even when the top of the editor
+	//		has scrolled off the top of the viewport (usually when editing a long
+	//		document).
+	// description:
+	//		Specify this in extraPlugins (or plugins) parameter and also set
+	//		height to "".
+	// example:
+	//	|	<div dojoType="dijit.Editor" height=""
+	//	|	extraPlugins="['dijit._editor.plugins.AlwaysShowToolbar']">
+
 	_handleScroll: true,
 	setEditor: function(e){
+		if(!e.iframe){
+			console.log('Port AlwaysShowToolbar plugin to work with Editor without iframe');
+			return;
+		}
+
 		this.editor = e;
-//		setTimeout(dojo.hitch(this,this.enable), 10000);
+
 		e.onLoadDeferred.addCallback(dojo.hitch(this, this.enable));
-//		this.scrollInterval = setInterval(dojo.hitch(this, "globalOnScrollHandler"), 100);
 	},
 	enable: function(d){
 		this._updateHeight();
@@ -43,13 +59,11 @@ dojo.declare("dijit._editor.plugins.AlwaysShowToolbar", dijit._editor._Plugin,
 			this._lastHeight = height;
 			// this.editorObject.style.height = this._lastHeight + "px";
 			dojo.marginBox(e.iframe, { h: this._lastHeight });
-//			this.iframe.height=this._lastHeight+10+'px';
-//			this.iframe.style.height=this._lastHeight+'px';
 		}
 	},
 	_lastHeight: 0,
 	globalOnScrollHandler: function(){
-		var isIE = dojo.isIE && dojo.isIE<7;
+		var isIE6 = dojo.isIE < 7;
 		if(!this._handleScroll){ return; }
 		var tdn = this.editor.toolbar.domNode;
 		var db = dojo.body;
@@ -59,7 +73,7 @@ dojo.declare("dijit._editor.plugins.AlwaysShowToolbar", dijit._editor._Plugin,
 			this._scrollThreshold = dojo._abs(tdn, true).y;
 //			console.log("threshold:", this._scrollThreshold);
 			//what's this for?? comment out for now
-//			if((isIE)&&(db)&&(dojo.style(db, "backgroundIimage")=="none")){
+//			if((isIE6)&&(db)&&(dojo.style(db, "backgroundIimage")=="none")){
 //				db.style.backgroundImage = "url(" + dojo.uri.moduleUri("dijit", "templates/blank.gif") + ")";
 //				db.style.backgroundAttachment = "fixed";
 //			}
@@ -74,7 +88,7 @@ dojo.declare("dijit._editor.plugins.AlwaysShowToolbar", dijit._editor._Plugin,
 				var tdnbox = dojo.marginBox(tdn);
 				this.editor.iframe.style.marginTop = tdnbox.h+"px";
 
-				if(isIE){
+				if(isIE6){
 					s.left = dojo._abs(tdn).x;
 					if(tdn.previousSibling){
 						this._IEOriginalPos = ['after',tdn.previousSibling];
@@ -109,7 +123,7 @@ dojo.declare("dijit._editor.plugins.AlwaysShowToolbar", dijit._editor._Plugin,
 			s.top = "";
 			s.zIndex = "";
 			s.display = "";
-			if(isIE){
+			if(isIE6){
 				s.left = "";
 				dojo.removeClass(tdn,'dijitIEFixedToolbar');
 				if(this._IEOriginalPos){
@@ -129,7 +143,7 @@ dojo.declare("dijit._editor.plugins.AlwaysShowToolbar", dijit._editor._Plugin,
 		dojo.forEach(this._connects, dojo.disconnect);
 //		clearInterval(this.scrollInterval);
 
-		if(dojo.isIE && dojo.isIE<7){
+		if(dojo.isIE < 7){
 			dojo.removeClass(this.editor.toolbar.domNode, 'dijitIEFixedToolbar');
 		}
 	}

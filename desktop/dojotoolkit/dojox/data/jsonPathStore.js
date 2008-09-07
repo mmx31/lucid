@@ -607,7 +607,7 @@ dojo.declare("dojox.data.jsonPathStore",
 			//		reference to the object	 
 
 			var options = options || {};
-			var d=options.data || this._data;
+			var d = options.data || this._data;
 	
 			if (!options.suppressExportMeta && options.clone){
 				data = dojo.clone(d);
@@ -632,7 +632,7 @@ dojo.declare("dojox.data.jsonPathStore",
 					return data;
 				case "json":
 				default:
-					return dojo.toJson(data);
+					return dojo.toJson(data, options.pretty || false);
 			}
 		},	
 
@@ -887,7 +887,7 @@ dojo.declare("dojox.data.jsonPathStore",
 					var pInfo = this._references[rid];
 
 					console.log("deleteItem(): ", pInfo, pInfo.parent);
-					parentItem = pInfo.parent;
+					var parentItem = pInfo.parent;
 					var attribute = pInfo.attribute;	
 					if(parentItem && parentItem[attribute] && !dojo.isArray(parentItem[attribute])){
 						this._setDirty(parentItem);

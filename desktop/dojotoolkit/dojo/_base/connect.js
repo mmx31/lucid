@@ -17,11 +17,32 @@ dojo._listener = {
 		return function(){
 			var ap=Array.prototype, c=arguments.callee, ls=c._listeners, t=c.target;
 			// return value comes from original target function
-			var r=t && t.apply(this, arguments);
+			var r = t && t.apply(this, arguments);
+			// make local copy of listener array so it is immutable during processing
+			var lls;
+			//>>includeStart("connectRhino", kwArgs.profileProperties.hostenvType == "rhino");
+			if(!dojo.isRhino){
+			//>>includeEnd("connectRhino");
+				//>>includeStart("connectBrowser", kwArgs.profileProperties.hostenvType != "rhino");
+				lls = [].concat(ls);
+				//>>includeEnd("connectBrowser");
+			//>>includeStart("connectRhino", kwArgs.profileProperties.hostenvType == "rhino");
+			}else{
+				// FIXME: in Rhino, using concat on a sparse Array results in a dense Array.
+				// IOW, if an array A has elements [0, 2, 4], then under Rhino, "concat [].A"
+				// results in [0, 1, 2, 3, 4], where element 1 and 3 have value 'undefined'
+				// "A.slice(0)" has the same behavior.
+				lls = [];
+				for(var i in ls){
+					lls[i] = ls[i];
+				}
+			}
+			//>>includeEnd("connectRhino");
+
 			// invoke listeners after target function
-			for(var i in ls){
+			for(var i in lls){
 				if(!(i in ap)){
-					ls[i].apply(this, arguments);
+					lls[i].apply(this, arguments);
 				}
 			}
 			// return value comes from original target function
@@ -65,7 +86,7 @@ dojo._listener = {
 		var f = (source||dojo.global)[method];
 		// remember that handle is the index+1 (0 is not a valid handle)
 		if(f && f._listeners && handle--){
-			delete f._listeners[handle]; 
+			delete f._listeners[handle];
 		}
 	}
 };
@@ -275,7 +296,7 @@ dojo.connectPublisher = function(	/*String*/ topic,
 	//	 	The name of the event function in obj. 
 	//	 	I.e. identifies a property obj[event].
 	//	example:
-	//	|	dojo.connectPublisher("/ajax/start", dojo, "xhrGet"};
+	//	|	dojo.connectPublisher("/ajax/start", dojo, "xhrGet");
 	var pf = function(){ dojo.publish(topic, arguments); }
 	return (event) ? dojo.connect(obj, event, pf) : dojo.connect(obj, pf); //Handle
 };

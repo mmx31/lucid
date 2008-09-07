@@ -8,6 +8,9 @@ dojo.experimental("dojox.image.ThumbnailPicker");
 //
 //	document topics.
 
+dojo.require("dojox.fx.scroll"); // is optional, but don't want to dojo[require] it
+dojo.require("dojo.fx.easing"); 
+
 dojo.require("dojo.fx");
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
@@ -90,7 +93,6 @@ dojo.declare("dojox.image.ThumbnailPicker",
 	titleAttr: "title",
 	
 	templatePath: dojo.moduleUrl("dojox.image", "resources/ThumbnailPicker.html"), 
-	tempImgPath: dojo.moduleUrl("dojo", "resources/blank.gif"),
 	
 	// thumbs: Array
 	// Stores the image nodes for the thumbnails.
@@ -143,11 +145,6 @@ dojo.declare("dojox.image.ThumbnailPicker",
 			});
 		}
 	
-		if(this.isScrollable) {
-			// FIXME: does this break builds or anything? 
-			dojo.require("dojox.fx.scroll");
-			dojo.require("dojox.fx.easing"); 
-		}
 		if(this.isClickable){
 			dojo.addClass(this.thumbsNode, "thumbClickable");
 		}
@@ -167,8 +164,8 @@ dojo.declare("dojox.image.ThumbnailPicker",
 		dojo.addClass(this.thumbsNode, "thumb"+classExt);
 		dojo.addClass(this.outerNode, "thumb"+classExt);
 	
-		this.navNextImg.setAttribute("src", this.tempImgPath);
-		this.navPrevImg.setAttribute("src", this.tempImgPath);
+		this.navNextImg.setAttribute("src", this._blankGif);
+		this.navPrevImg.setAttribute("src", this._blankGif);
 		
 		this.connect(this.navPrev, "onclick", "_prev");
 		this.connect(this.navNext, "onclick", "_next");
@@ -355,7 +352,7 @@ dojo.declare("dojox.image.ThumbnailPicker",
 				target: target,
 				win: this.thumbScroller,
 				duration:300,
-				easing:dojox.fx.easing.easeOut,
+				easing:dojo.fx.easing.easeOut,
 				onEnd: dojo.hitch(this, "_checkLoad", img, index)
 			}).play(10);
 		}else{

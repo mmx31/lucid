@@ -29,7 +29,7 @@ dojo.declare(
 	// | 	<div dojoType="dijit.TitlePane" title="Title">
 	// |		<p>I am content</p>
 	// |	</div>
-	//
+
 	// title: String
 	//		Title of the pane
 	title: "",
@@ -40,7 +40,7 @@ dojo.declare(
 
 	// duration: Integer
 	//		Time in milliseconds to fade in/fade out
-	duration: 250,
+	duration: dijit.defaultDuration,
 
 	// baseClass: String
 	//	The root className to use for the various states of this widget
@@ -48,14 +48,16 @@ dojo.declare(
 
 	templatePath: dojo.moduleUrl("dijit", "templates/TitlePane.html"),
 
+	attributeMap: dojo.mixin(dojo.clone(dijit.layout.ContentPane.prototype.attributeMap), {
+		title: {node: "titleNode", type: "innerHTML" }
+	}),
+
 	postCreate: function(){
-		this.setTitle(this.title);
 		if(!this.open){
 			this.hideNode.style.display = this.wipeNode.style.display = "none";
 		}
 		this._setCss();
 		dojo.setSelectable(this.titleNode, false);
-		this.inherited(arguments);
 		dijit.setWaiState(this.containerNode, "labelledby", this.titleNode.id);
 		dijit.setWaiState(this.focusNode, "haspopup", "true");
 
@@ -75,16 +77,27 @@ dojo.declare(
 				hideNode.style.display="none";
 			}
 		});
+		this.inherited(arguments);
 	},
 
-	setContent: function(content){
+	_setOpenAttr: function(/* Boolean */ open){
 		// summary:
+		//		Hook to make attr("open", boolean) control the open/closed state of the pane.
+		// open: Boolean
+		//		True if you want to open the pane, false if you want to close it.
+		if(this.open !== open){ this.toggle(); }
+	},
+
+	_setContentAttr: function(content){
+		// summary:
+		//		Hook to make attr("content", ...) work.
 		// 		Typically called when an href is loaded.  Our job is to make the animation smooth
-		if(!this.open || this._wipeOut.status() == "playing"){
+
+		if(!this.open || !this._wipeOut || this._wipeOut.status() == "playing"){
 			// we are currently *closing* the pane (or the pane is closed), so just let that continue
 			this.inherited(arguments);
 		}else{
-			if(this._wipeIn.status() == "playing"){
+			if(this._wipeIn && this._wipeIn.status() == "playing"){
 				this._wipeIn.stop();
 			}
 
@@ -95,23 +108,32 @@ dojo.declare(
 			this.inherited(arguments);
 
 			// call _wipeIn.play() to animate from current height to new height
-			this._wipeIn.play();
+			if(this._wipeIn){
+				this._wipeIn.play();
+			}else{
+				this.hideNode.style.display = "";
+			}
 		}
 	},
 
 	toggle: function(){
 		// summary: switches between opened and closed state
 		dojo.forEach([this._wipeIn, this._wipeOut], function(animation){
-			if(animation.status() == "playing"){
+			if(animation && animation.status() == "playing"){
 				animation.stop();
 			}
 		});
 
-		this[this.open ? "_wipeOut" : "_wipeIn"].play();
+		var anim = this[this.open ? "_wipeOut" : "_wipeIn"]
+		if(anim){
+			anim.play();
+		}else{
+			this._hideNode.style.display = this.open ? "" : "none";
+		}
 		this.open =! this.open;
 
 		// load content (if this is the first time we are opening the TitlePane
-		// and content is specified as an href, or we have setHref when hidden)
+		// and content is specified as an href, or href was set when hidden)
 		this._loadCheck();
 
 		this._setCss();
@@ -121,7 +143,7 @@ dojo.declare(
 		// summary: set the open/close css state for the TitlePane
 		var classes = ["dijitClosed", "dijitOpen"];
 		var boolIndex = this.open;
-		var node = this.titleBarNode || this.focusNode
+		var node = this.titleBarNode || this.focusNode;
 		dojo.removeClass(node, classes[!boolIndex+0]);
 		node.className += " " + classes[boolIndex+0];
 
@@ -131,9 +153,9 @@ dojo.declare(
 
 	_onTitleKey: function(/*Event*/ e){
 		// summary: callback when user hits a key
-		if(e.keyCode == dojo.keys.ENTER || e.charCode == dojo.keys.SPACE){
+		if(e.charOrCode == dojo.keys.ENTER || e.charOrCode == ' '){
 			this.toggle();
-		}else if(e.keyCode == dojo.keys.DOWN_ARROW && this.open){
+		}else if(e.charOrCode == dojo.keys.DOWN_ARROW && this.open){
 			this.containerNode.focus();
 			e.preventDefault();
 	 	}
@@ -148,6 +170,7 @@ dojo.declare(
 
 	setTitle: function(/*String*/ title){
 		// summary: sets the text of the title
+		dojo.deprecated("dijit.TitlePane.setTitle() is deprecated.  Use attr('title', ...) instead.", "", "2.0");
 		this.titleNode.innerHTML = title;
 	}
 });

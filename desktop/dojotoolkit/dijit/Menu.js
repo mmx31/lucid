@@ -82,7 +82,7 @@ dojo.declare("dijit.Menu",
 		// summary: Handle keyboard based menu navigation.
 		if(evt.ctrlKey || evt.altKey){ return; }
 
-		switch(evt.keyCode){
+		switch(evt.charOrCode){
 			case dojo.keys.RIGHT_ARROW:
 				this._moveToPopup(evt);
 				dojo.stopEvent(evt);
@@ -304,7 +304,7 @@ dojo.declare("dijit.Menu",
 		dijit.popup.open({
 			parent: this,
 			popup: popup,
-			around: from_item.arrowCell,
+			around: from_item.domNode,
 			orient: this.isLeftToRight() ? {'TR': 'TL', 'TL': 'TR'} : {'TL': 'TR', 'TR': 'TL'},
 			onCancel: function(){
 				// called when the child menu is canceled
@@ -336,23 +336,29 @@ dojo.declare("dijit.MenuItem",
 	// Make 3 columns
 	//   icon, label, and expand arrow (BiDi-dependent) indicating sub-menu
 	templateString:
-		 '<tr class="dijitReset dijitMenuItem" '
+		 '<tr class="dijitReset dijitMenuItem" dojoAttachPoint="focusNode" waiRole="menuitem" tabIndex="-1"'
 		+'dojoAttachEvent="onmouseenter:_onHover,onmouseleave:_onUnhover,ondijitclick:_onClick">'
-		+'<td class="dijitReset"><div class="dijitMenuItemIcon ${iconClass}" dojoAttachPoint="iconNode"></div></td>'
-		+'<td tabIndex="-1" class="dijitReset dijitMenuItemLabel" dojoAttachPoint="containerNode,focusNode" waiRole="menuitem"></td>'
-		+'<td class="dijitReset" dojoAttachPoint="arrowCell">'
-			+'<div class="dijitMenuExpand" dojoAttachPoint="expand" style="display:none">'
-			+'<span class="dijitInline dijitArrowNode dijitMenuExpandInner">+</span>'
+		+'<td class="dijitReset" waiRole="presentation"><div class="dijitMenuItemIcon" dojoAttachPoint="iconNode"></div></td>'
+		+'<td class="dijitReset dijitMenuItemLabel" dojoAttachPoint="containerNode"></td>'
+		+'<td class="dijitReset dijitMenuArrowCell" waiRole="presentation">'
+			+'<div dojoAttachPoint="arrowWrapper" style="display: none">'
+				+'<div class="dijitMenuExpand"></div>'
+				+'<span class="dijitMenuExpandA11y">+</span>'
 			+'</div>'
 		+'</td>'
 		+'</tr>',
+
+	attributeMap: dojo.mixin(dojo.clone(dijit._Widget.prototype.attributeMap), {
+		label: {node: "containerNode", type: "innerHTML"},
+		iconClass: {node: "iconNode", type: "class" }
+	}),
 
 	// label: String
 	//	menu text
 	label: '',
 
 	// iconClass: String
-	//	class to apply to div in button to make it display an icon
+	//		Class to apply to div in button to make it display an icon
 	iconClass: "",
 
 	// disabled: Boolean
@@ -360,12 +366,18 @@ dojo.declare("dijit.MenuItem",
 	//  if false, the menu item is enabled
 	disabled: false,
 
+	_fillContent: function(/*DomNode*/ source){
+		// If button label is specified as srcNodeRef.innerHTML rather than
+		// this.params.label, handle it here.
+		if(source && !("label" in this.params)){
+			this.attr('label', source.innerHTML);
+		}
+	},
+
 	postCreate: function(){
 		dojo.setSelectable(this.domNode, false);
-		this.setDisabled(this.disabled);
-		if(this.label){
-			this.setLabel(this.label);
-		}
+		dojo.attr(this.containerNode, "id", this.id+"_text");
+		dijit.setWaiState(this.domNode, "labelledby", this.id+"_text");
 	},
 
 	_onHover: function(){
@@ -393,7 +405,7 @@ dojo.declare("dijit.MenuItem",
 	focus: function(){
 		dojo.addClass(this.domNode, 'dijitMenuItemHover');
 		try{
-			dijit.focus(this.containerNode);
+			dijit.focus(this.focusNode);
 		}catch(e){
 			// this throws on IE (at least) in some scenarios
 		}
@@ -402,16 +414,23 @@ dojo.declare("dijit.MenuItem",
 	_blur: function(){
 		dojo.removeClass(this.domNode, 'dijitMenuItemHover');
 	},
-	
-	setLabel: function(/*String*/ value){
-		this.containerNode.innerHTML=this.label=value;
+
+	setLabel: function(/*String*/ content){
+		dojo.deprecated("dijit.MenuItem.setLabel() is deprecated.  Use attr('label', ...) instead.", "", "2.0");
+		this.attr("label", content);
 	},
 
-	setDisabled: function(/*Boolean*/ value){
-		// summary: enable or disable this menu item
+	setDisabled: function(/*Boolean*/ disabled){
+		dojo.deprecated("dijit.Menu.setDisabled() is deprecated.  Use attr('disabled', bool) instead.", "", "2.0");
+		this.attr('disabled', disabled);
+	},
+	_setDisabledAttr: function(/*Boolean*/ value){
+		// summary:
+		//		Hook for attr('disabled', ...) to work.
+		//		Enable or disable this menu item.
 		this.disabled = value;
 		dojo[value ? "addClass" : "removeClass"](this.domNode, 'dijitMenuItemDisabled');
-		dijit.setWaiState(this.containerNode, 'disabled', value ? 'true' : 'false');
+		dijit.setWaiState(this.focusNode, 'disabled', value ? 'true' : 'false');
 	}
 });
 
@@ -448,9 +467,8 @@ dojo.declare("dijit.PopupMenuItem",
 		dojo.body().appendChild(this.popup.domNode);
 
 		this.popup.domNode.style.display="none";
-		dojo.addClass(this.expand, "dijitMenuExpandEnabled");
-		dojo.style(this.expand, "display", "");
-		dijit.setWaiState(this.containerNode, "haspopup", "true");
+		dojo.style(this.arrowWrapper, "display", "");
+		dijit.setWaiState(this.focusNode, "haspopup", "true");
 	},
 	
 	destroyDescendants: function(){
@@ -479,5 +497,51 @@ dojo.declare("dijit.MenuSeparator",
 	isFocusable: function(){
 		// summary: over ride to always return false
 		return false; // Boolean
+	}
+});
+
+dojo.declare("dijit.CheckedMenuItem",
+	dijit.MenuItem,
+	{
+	// summary: a checkbox-like menu item for toggling on and off
+	
+	templateString:
+		 '<tr class="dijitReset dijitMenuItem" dojoAttachPoint="focusNode" waiRole="menuitemcheckbox" tabIndex="-1"'
+		+'dojoAttachEvent="onmouseenter:_onHover,onmouseleave:_onUnhover,ondijitclick:_onClick">'
+		+'<td class="dijitReset" waiRole="presentation"><div class="dijitMenuItemIcon dijitCheckedMenuItemIcon" dojoAttachPoint="iconNode">'
+		+'<div class="dijitCheckedMenuItemIconChar">&#10003;</div>'
+		+'</div></td>'
+		+'<td class="dijitReset dijitMenuItemLabel" dojoAttachPoint="containerNode,labelNode"></td>'
+		+'<td class="dijitReset dijitMenuArrowCell" waiRole="presentation">'
+			+'<div dojoAttachPoint="arrowWrapper" style="display: none">'
+				+'<div class="dijitMenuExpand"></div>'
+				+'<span class="dijitMenuExpandA11y">+</span>'
+			+'</div>'
+		+'</td>'
+		+'</tr>',
+
+	// checked: Boolean
+	//		Our checked state
+	checked: false,
+	_setCheckedAttr: function(/*Boolean*/ checked){
+		// summary:
+		//		Hook so attr('checked', bool) works.
+		//		Sets the class and state for the check box.
+		dojo.toggleClass(this.iconNode, "dijitCheckedMenuItemIconChecked", checked);
+		dijit.setWaiState(this.domNode, "checked", checked);
+		this.checked = checked;
+	},
+
+	onChange: function(/*Boolean*/ checked){
+		// summary: User defined function to handle change events
+	},
+
+	_onClick: function(/*Event*/ e){
+		// summary: Clicking this item just toggles its state
+		if(!this.disabled){
+			this.attr("checked", !this.checked);
+			this.onChange(this.checked);
+		}
+		this.inherited(arguments);
 	}
 });

@@ -1,5 +1,44 @@
 dojo.provide("dojo.io.iframe");
 
+/*=====
+dojo.declare("dojo.io.iframe.__ioArgs", dojo.__IoArgs, {
+	constructor: function(){
+		//	summary:
+		//		All the properties described in the dojo.__ioArgs type, apply
+		//		to this type. The following additional properties are allowed
+		//		for dojo.io.iframe.send():
+		//	method: String?
+		//		The HTTP method to use. "GET" or "POST" are the only supported
+		//		values.  It will try to read the value from the form node's
+		//		method, then try this argument. If neither one exists, then it
+		//		defaults to POST.
+		//	handleAs: String?
+		//		Specifies what format the result data should be given to the
+		//		load/handle callback. Valid values are: text, html, xml, json,
+		//		javascript. IMPORTANT: For all values EXCEPT html and xml, The
+		//		server response should be an HTML file with a textarea element.
+		//		The response data should be inside the textarea element. Using an
+		//		HTML document the only reliable, cross-browser way this
+		//		transport can know when the response has loaded. For the html
+		//		handleAs value, just return a normal HTML document.  NOTE: xml
+		//		is now supported with this transport (as of 1.1+); a known issue
+		//		is if the XML document in question is malformed, Internet Explorer
+		//		will throw an uncatchable error.
+		//	content: Object?
+		//		If "form" is one of the other args properties, then the content
+		//		object properties become hidden form form elements. For
+		//		instance, a content object of {name1 : "value1"} is converted
+		//		to a hidden form element with a name of "name1" and a value of
+		//		"value1". If there is not a "form" property, then the content
+		//		object is converted into a name=value&name=value string, by
+		//		using dojo.objectToQuery().
+		this.method = method;
+		this.handleAs = handleAs;
+		this.content = content;
+	}
+});
+=====*/
+
 dojo.io.iframe = {
 	create: function(/*String*/fname, /*String*/onloadstr, /*String?*/uri){
 		//	summary:
@@ -22,7 +61,7 @@ dojo.io.iframe = {
 		var turi = uri;
 		if(!turi){
 			if(dojo.config["useXDomain"] && !dojo.config["dojoBlankHtmlUrl"]){
-				console.debug("dojo.io.iframe.create: When using cross-domain Dojo builds,"
+				console.warn("dojo.io.iframe.create: When using cross-domain Dojo builds,"
 					+ " please save dojo/resources/blank.html to your domain and set djConfig.dojoBlankHtmlUrl"
 					+ " to the path on your domain to blank.html");
 			}
@@ -112,38 +151,6 @@ dojo.io.iframe = {
 		return doc;
 	},
 
-	/*=====
-	dojo.io.iframe.__ioArgs = function(kwArgs){
-		//	summary:
-		//		All the properties described in the dojo.__ioArgs type, apply
-		//		to this type. The following additional properties are allowed
-		//		for dojo.io.iframe.send():
-		//	method: String?
-		//		The HTTP method to use. "GET" or "POST" are the only supported
-		//		values.  It will try to read the value from the form node's
-		//		method, then try this argument. If neither one exists, then it
-		//		defaults to POST.
-		//	handleAs: String?
-		//		Specifies what format the result data should be given to the
-		//		load/handle callback. Valid values are: text, html, javascript,
-		//		json. IMPORTANT: For all values EXCEPT html, The server
-		//		response should be an HTML file with a textarea element. The
-		//		response data should be inside the textarea element. Using an
-		//		HTML document the only reliable, cross-browser way this
-		//		transport can know when the response has loaded. For the html
-		//		handleAs value, just return a normal HTML document.  NOTE: xml
-		//		or any other XML type is NOT supported by this transport.
-		//	content: Object?
-		//		If "form" is one of the other args properties, then the content
-		//		object properties become hidden form form elements. For
-		//		instance, a content object of {name1 : "value1"} is converted
-		//		to a hidden form element with a name of "name1" and a value of
-		//		"value1". If there is not a "form" property, then the content
-		//		object is converted into a name=value&name=value string, by
-		//		using dojo.objectToQuery().
-	}
-	=====*/
-
 	send: function(/*dojo.io.iframe.__ioArgs*/args){
 		//summary: function that sends the request to the server.
 		//This transport can only process one send() request at a time, so if send() is called
@@ -172,11 +179,43 @@ dojo.io.iframe = {
 					//Assign correct value based on handleAs value.
 					value = ifd; //html
 					if(handleAs != "html"){
-						value = ifd.getElementsByTagName("textarea")[0].value; //text
-						if(handleAs == "json"){
-							value = dojo.fromJson(value); //json
-						}else if(handleAs == "javascript"){
-							value = dojo.eval(value); //javascript
+						if(handleAs == "xml"){
+							//	FF, Saf 3+ and Opera all seem to be fine with ifd being xml.  We have to
+							//	do it manually for IE.  Refs #6334.
+							if(dojo.isIE){
+								dojo.query("a", dii._frame.contentWindow.document.documentElement).orphan();
+								var xmlText=(dii._frame.contentWindow.document).documentElement.innerText;
+								xmlText=xmlText.replace(/>\s+</g, "><");
+
+								//	do the manual "find the prefix".
+								if(!this._ieXmlDom){
+									for(var i=0, a=["MSXML2", "Microsoft", "MSXML", "MSXML3"], l=a.length; i<l; i++){
+										try{
+											var test=new ActiveXObject(a[i]+".XmlDom");
+											this._ieXmlDom=a[i]+".XmlDom";
+											break;
+										} catch(e){ /* squash it */}
+									}
+									
+									//	recheck to make sure we have XML support.
+									if(!this._ieXmlDom){
+										throw new Error("dojo.io.iframe.send (return handler): your copy of Internet Explorer does not support XML documents.");
+									}
+								}
+
+								//	create the document manually
+								var _xml=new ActiveXObject(this._ieXmlDom);
+								_xml.async=false;
+								_xml.loadXML(xmlText);
+								value=_xml;
+							}
+						} else {
+							value = ifd.getElementsByTagName("textarea")[0].value; //text
+							if(handleAs == "json"){
+								value = dojo.fromJson(value); //json
+							}else if(handleAs == "javascript"){
+								value = dojo.eval(value); //javascript
+							}
 						}
 					}
 				}catch(e){

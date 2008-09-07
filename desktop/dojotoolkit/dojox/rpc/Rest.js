@@ -1,86 +1,117 @@
-dojo.provide("dojox.rpc.Rest");
-dojo.require("dojox.rpc.Service");
-// This provides a HTTP REST service with full range REST verbs include PUT,POST, and DELETE.
-// A normal GET query is done by using the service directly:
-// var services = dojo.rpc.Service({services: {myRestService: {transport: "REST",...
-// services.myRestService("parameters");
-// 
-// The modifying methods can be called as sub-methods of the rest service method like:
-//  services.myRestService.put("parameters","data to put in resource");
-//  services.myRestService.post("parameters","data to post to the resource");
-//  services.myRestService['delete']("parameters");
-dojox.rpc._restMethods = { // these are the common rest methods 
-	put : function(r){
-		// execute a PUT
-		r.url = r.target +'?'+  r.data;
-		r.putData = dojox.rpc._restMethods.sendData;
-		return dojo.rawXhrPut(r);
-	},
-	post : function(r){
-		// execute a POST
-		r.url = r.target +'?'+  r.data;
-		r.postData = dojox.rpc._restMethods.sendData;
-		var def = dojo.rawXhrPost(r);
-		var postObj = dojox.rpc._restMethods.sendObj;
-/*	 This is a possible HTTP-compliant way to determine the id of a posted object	 
- 		def.addCallback(function(result) {
-		 	dojox._newId = def.ioArgs.xhr.getResponseHeader('Content-Location');
-			if (dojox._newId) {// we need some way to communicate the id of the newly created object
-				dojox.rpc._index[postObj._id = dojox._newId] = postObj;
-			}
-			return result; 
-		});*/
-		return def;
-	},
-	"delete" : function(r){
-		r.url = r.target +'?'+  r.data;
-		return dojo.xhrDelete(r);
-	}
-}
+dojo.provide("dojox.rpc.Rest"); 
+// Note: This doesn't require dojox.rpc.Service, and if you want it you must require it 
+// yourself, and you must load it prior to dojox.rpc.Rest.
 
-dojox.rpc._restMethods.put.sender =
-dojox.rpc._restMethods.post.sender = true;// must declare that they send data
-
-dojox.rpc.transportRegistry.register(
-	"REST",function(str){return str == "REST"},{// same as GET... for now. Hoping to add put, post, delete as methods of the method 
-		fire: function(r){
-			r.url=  r.target + (r.data ? '?'+  r.data : '');
-			var def = dojo.xhrGet(r);
-			var newId = dojox.rpc._restQuery;
-			def.addCallback(function(res) {
-				dojox._newId = newId; // we need some way to communicate the id of the newly created object
-				delete dojox.rpc._restQuery;
-				return res;
-			});
-			return def;
-		},
-		getExecutor : function(func,method,svc){
-			var executor = function(id) {
-				dojox.rpc._restQuery = id;
-				return func.apply(this,arguments);	
-			};
-			var restMethods = dojox.rpc._restMethods;
-			for (var i in restMethods) { // add the rest methods to the executor
-				executor[i] = (function() {
-					var restMethod = restMethods[i];//let
-					return function() {
-						
-						if (restMethod.sender) {
-							var sendData = dojox.rpc._restMethods.sendObj = arguments[--arguments.length];
-							var isJson = ((method.contentType || svc._smd.contentType) + '').match(/application\/json/);
-							dojox.rpc._restMethods.sendData = isJson ? dojox.rpc.toJson(sendData,false,method._schema || method.returns) : sendData;// serialize with the right schema for the context;
+// summary:
+// 		This provides a HTTP REST service with full range REST verbs include PUT,POST, and DELETE.
+// description:
+// 		A normal GET query is done by using the service directly:
+// 		| var restService = dojox.rpc.Rest("Project");
+// 		| restService("4");
+//		This will do a GET for the URL "/Project/4".
+//		| restService.put("4","new content");
+//		This will do a PUT to the URL "/Project/4" with the content of "new content".
+//		You can also use the SMD service to generate a REST service:
+// 		| var services = dojox.rpc.Service({services: {myRestService: {transport: "REST",...
+// 		| services.myRestService("parameters");
+//
+// 		The modifying methods can be called as sub-methods of the rest service method like:
+//  	| services.myRestService.put("parameters","data to put in resource");
+//  	| services.myRestService.post("parameters","data to post to the resource");
+//  	| services.myRestService['delete']("parameters");
+(function(){
+	if(dojox.rpc && dojox.rpc.transportRegistry){
+		// register it as an RPC service if the registry is available
+		dojox.rpc.transportRegistry.register(
+			"REST",
+			function(str){return str == "REST";},
+			{
+				getExecutor : function(func,method,svc){
+					return new dojox.rpc.Rest(
+						method.name,
+						(method.contentType||svc._smd.contentType||"").match(/json|javascript/), // isJson
+						null,
+						function(id, args){
+							var request = svc._getRequest(method,[id]);
+							request.url= request.target + (request.data ? '?'+  request.data : '');
+							return request;
 						}
-						for (var j = arguments.length++; j > 0; j--)
-							arguments[j] = arguments[j-1]; // shift them over
-						arguments[0] = dojo.mixin({restMethod: restMethod},method);
-						return svc._executeMethod.apply(svc,arguments);
-					}
-				})();
-				 
+					);
+				}
 			}
-			executor.contentType = method.contentType || svc._smd.contentType; // this is so a Rest service can be examined to know what type of content type to expect
-			return executor;
-		},
-		restMethods:dojox.rpc._restMethods 		
+		);
 	}
-);
+	var drr;
+
+	function index(deferred, service, range, id){
+		deferred.addCallback(function(result){
+			if(range){
+				// try to record the total number of items from the range header
+				range = deferred.ioArgs.xhr && deferred.ioArgs.xhr.getResponseHeader("Content-Range");
+				deferred.fullLength = range && (range=range.match(/\/(.*)/)) && parseInt(range[1]);
+			}
+			return result;
+		});
+		return deferred;
+	}
+	drr = dojox.rpc.Rest = function(/*String*/path, /*Boolean?*/isJson, /*Object?*/schema, /*Function?*/getRequest){
+		// summary:
+		//		Creates a REST service using the provided path.
+		var service;
+		// it should be in the form /Table/
+		path = path.match(/\/$/) ? path : (path + '/');
+		service = function(id, args){
+			return drr._get(service, id, args);
+		};
+		service.isJson = isJson;
+		service._schema = schema;
+		// cache:
+		//		This is an object that provides indexing service
+		// 		This can be overriden to take advantage of more complex referencing/indexing
+		// 		schemes
+		service.cache = {
+			serialize: isJson ? ((dojox.json && dojox.json.ref) || dojo).toJson : function(result){
+				return result;
+			}
+		};
+		// the default XHR args creator:
+		service._getRequest = getRequest || function(id, args){
+			return {
+				url: path + (dojo.isObject(id) ? '?' + dojo.objectToQuery(id) : id == null ? "" : id), 
+				handleAs: isJson?'json':'text', 
+				contentType: isJson?'application/json':'text/plain',
+				sync: dojox.rpc._sync,
+				headers: {
+					Range: args && (args.start >= 0 || args.count >= 0) ?  "items=" + (args.start || '') + '-' + ((args.count && (args.count + (args.start || 0) - 1)) || '') : undefined
+				}
+			};
+		};
+		// each calls the event handler
+		function makeRest(name){
+			service[name] = function(id,content){
+				return drr._change(name,service,id,content); // the last parameter is to let the OfflineRest know where to store the item
+			};
+		}
+		makeRest('put');
+		makeRest('post');
+		makeRest('delete');
+		// record the REST services for later lookup
+		service.servicePath = path;
+		return service;
+	};
+
+	drr._index={};// the map of all indexed objects that have gone through REST processing
+	// these do the actual requests
+	drr._change = function(method,service,id,content){
+		// this is called to actually do the put, post, and delete
+		var request = service._getRequest(id);
+		request[method+"Data"] = content;
+		return index(dojo.xhr(method.toUpperCase(),request,true),service);
+	};
+
+	drr._get= function(service,id, args){
+		args = args || {};
+		// this is called to actually do the get
+		return index(dojo.xhrGet(service._getRequest(id, args)), service, (args.start >= 0 || args.count >= 0), id);
+	};
+})();

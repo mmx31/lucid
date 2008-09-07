@@ -2,7 +2,7 @@ dojo.provide("dojo._base.json");
 
 dojo.fromJson = function(/*String*/ json){
 	// summary:
-	// 		Parses a [JSON](http://json.org) string to return a JavaScript object.
+	// 		Parses a [JSON](http://json.org) string to return a JavaScript object.  Throws for invalid JSON strings.
 	// json: 
 	//		a string literal of a JSON item, for instance:
 	//			`'{ "foo": [ "bar", 1, { "baz": "thud" } ] }'`
@@ -57,9 +57,6 @@ dojo.toJson = function(/*Object*/ it, /*Boolean?*/ prettyPrint, /*String?*/ _ind
 	if(dojo.isString(it)){ 
 		return dojo._escapeString(it); 
 	}
-	if(it.nodeType && it.cloneNode){ // isNode
-		return ""; // FIXME: would something like outerHTML be better here?
-	}
 	// recurse
 	var recurse = arguments.callee;
 	// short-circuit for objects that support "json" serialization
@@ -67,17 +64,18 @@ dojo.toJson = function(/*Object*/ it, /*Boolean?*/ prettyPrint, /*String?*/ _ind
 	var newObj;
 	_indentStr = _indentStr || "";
 	var nextIndent = prettyPrint ? _indentStr + dojo.toJsonIndentStr : "";
-	if(typeof it.__json__ == "function"){
-		newObj = it.__json__();
+	var tf = it.__json__||it.json;
+	if(dojo.isFunction(tf)){
+		newObj = tf.call(it);
 		if(it !== newObj){
 			return recurse(newObj, prettyPrint, nextIndent);
 		}
 	}
-	if(typeof it.json == "function"){
-		newObj = it.json();
-		if(it !== newObj){
-			return recurse(newObj, prettyPrint, nextIndent);
-		}
+	if(it.nodeType && it.cloneNode){ // isNode
+		// we can't seriailize DOM nodes as regular objects because they have cycles
+		// DOM nodes could be serialized with something like outerHTML, but
+		// that can be provided by users in the form of .json or .__json__ function.
+		throw new Error("Can't serialize DOM nodes");
 	}
 
 	var sep = prettyPrint ? " " : "";
@@ -109,9 +107,9 @@ dojo.toJson = function(/*Object*/ it, /*Boolean?*/ prettyPrint, /*String?*/ _ind
 		return null; // null
 	}
 	// generic object code path
-	var output = [];
-	for(var key in it){
-		var keyStr;
+	var output = [], key;
+	for(key in it){
+		var keyStr, val;
 		if(typeof key == "number"){
 			keyStr = '"' + key + '"';
 		}else if(typeof key == "string"){

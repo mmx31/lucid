@@ -69,7 +69,7 @@ dijit.getUniqueId = function(/*String*/widgetType){
 if(dojo.isIE){
 	// Only run this for IE because we think it's only necessary in that case,
 	// and because it causes problems on FF.  See bug #3531 for details.
-	dojo.addOnUnload(function(){
+	dojo.addOnWindowUnload(function(){
 		dijit.registry.forEach(function(widget){ widget.destroy(); });
 	});
 }
@@ -114,7 +114,8 @@ dijit._isElementShown = function(/*Element*/elem){
 	var style = dojo.style(elem);
 	return (style.visibility != "hidden")
 		&& (style.visibility != "collapsed")
-		&& (style.display != "none");
+		&& (style.display != "none")
+		&& (dojo.attr(elem, "type") != "hidden");
 }
 
 dijit.isTabNavigable = function(/*Element*/elem){
@@ -166,13 +167,12 @@ dijit._getTabNavigable = function(/*DOMNode*/root){
 					}
 				}
 			}
-			if(isShown){ walkTree(child) }
+			if(isShown && child.nodeName.toUpperCase() != 'SELECT'){ walkTree(child) }
 		});
 	};
 	if(dijit._isElementShown(root)){ walkTree(root) }
 	return { first: first, last: last, lowest: lowest, highest: highest };
 }
-
 dijit.getFirstInTabbingOrder = function(/*String|DOMNode*/root){
 	// summary:
 	//		Finds the descendant of the specified root node
@@ -188,3 +188,7 @@ dijit.getLastInTabbingOrder = function(/*String|DOMNode*/root){
 	var elems = dijit._getTabNavigable(dojo.byId(root));
 	return elems.last ? elems.last : elems.highest; // Element
 };
+
+// dijit.defaultDuration
+//	Default duration for wipe and fade animations within dijits
+dijit.defaultDuration = dojo.config["defaultDuration"] || 200;

@@ -29,7 +29,7 @@ dojo.declare("dojo.dnd.Avatar", null, {
 		dojo.style(tr, "opacity", 0.9);
 		b.appendChild(tr);
 		var k = Math.min(5, this.manager.nodes.length);
-		var source = this.manager.source;
+		var source = this.manager.source, node;
 		for(var i = 0; i < k; ++i){
 			tr = dojo.doc.createElement("tr");
 			tr.className = "dojoDndAvatarItem";
@@ -67,7 +67,7 @@ dojo.declare("dojo.dnd.Avatar", null, {
 		// summary: updates the avatar to reflect the current DnD state
 		dojo[(this.manager.canDropFlag ? "add" : "remove") + "Class"](this.node, "dojoDndAvatarCanDrop");
 		// replace text
-		dojo.query("tr.dojoDndAvatarHeader td").forEach(function(node){
+		dojo.query("tr.dojoDndAvatarHeader td", this.node).forEach(function(node){
 			node.innerHTML = this._generateText();
 		}, this);
 	},

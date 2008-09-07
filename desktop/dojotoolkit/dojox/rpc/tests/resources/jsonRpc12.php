@@ -1,8 +1,8 @@
 <?php
 	require_once("./JSON.php");
-	
+
 	// FIXME: doesn't look like we really need Pear at all
-	// which decreases the testing burden. 
+	// which decreases the testing burden.
 	// Commenting out.the require and the new File() call.
 
 	// NOTE: File.php is installed via Pear using:
@@ -12,7 +12,7 @@
 	// require_once('File.php');
 
 	// ensure that we don't try to send "html" down to the client
-	header("Content-Type: text/plain");
+	header("Content-Type: application/json");
 
 	$json = new Services_JSON;
 	//$fp = new File();
@@ -34,7 +34,7 @@
 			if (is_array($params)){
 				$results['result']=$params;
 			}else{
-				$results['result']=$params->message;			
+				$results['result']=$params->message;
 			}
 			break;
 		default:
@@ -42,6 +42,7 @@
 			$results['error']=array();
 			$results['error']['code']=-32601;
 			$results['error']["message"]="The requested remote-procedure does not exist / is not available.";
+			header('HTTP/1.1 500 Server Error');
 			break;
 	}
 

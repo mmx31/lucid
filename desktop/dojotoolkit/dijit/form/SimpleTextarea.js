@@ -1,9 +1,9 @@
 dojo.provide("dijit.form.SimpleTextarea");
 
-dojo.require("dijit.form._FormWidget");
+dojo.require("dijit.form.TextBox");
 
 dojo.declare("dijit.form.SimpleTextarea",
-	dijit.form._FormValueWidget,
+	dijit.form.TextBox,
 {
 	// summary:
 	//		A simple textarea that degrades, and responds to
@@ -17,7 +17,7 @@ dojo.declare("dijit.form.SimpleTextarea",
 	baseClass: "dijitTextArea",
 
 	attributeMap: dojo.mixin(dojo.clone(dijit.form._FormValueWidget.prototype.attributeMap),
-		{rows:"focusNode", cols: "focusNode"}),
+		{rows:"textbox", cols: "textbox"}),
 
 	// rows: Number
 	//		The number of rows of text.
@@ -27,7 +27,8 @@ dojo.declare("dijit.form.SimpleTextarea",
 	//		The number of characters per line.
 	cols: "",
 
-	templateString: "<textarea name='${name}' dojoAttachPoint='focusNode,containerNode'>",
+	templatePath: null,
+	templateString: "<textarea name='${name}' dojoAttachPoint='focusNode,containerNode,textbox' autocomplete='off'></textarea>",
 
 	postMixInProperties: function(){
 		if(this.srcNodeRef){
@@ -35,12 +36,10 @@ dojo.declare("dijit.form.SimpleTextarea",
 		}
 	},
 
-	setValue: function(/*String*/ val){
-		this.domNode.value = val;
-		this.inherited(arguments);
-	},
-
-	getValue: function(){
-		return this.domNode.value.replace(/\r/g,"");
+	filter: function(/*String*/ value){
+		if(value){
+			value = value.replace(/\r/g,"");
+		}
+		return this.inherited(arguments);
 	}
 });

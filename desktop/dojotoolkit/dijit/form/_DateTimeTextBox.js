@@ -33,26 +33,27 @@ dojo.declare(
 		},
 		parse: function(/*String*/ value, /*dojo.date.locale.__FormatOptions*/ constraints){
 			//	summary: parses the value as a Date, according to constraints
-			return dojo.date.locale.parse(value, constraints) || undefined; /* can't return null to getValue since that's special */
+			return dojo.date.locale.parse(value, constraints) || (this._isEmpty(value)? null : undefined);
 		},
 
 		serialize: dojo.date.stamp.toISOString,
 
 		//	value: Date
-		//		The value of this widget as a JavaScript Date object.  Use `getValue`/`setValue` to manipulate.
+		//		The value of this widget as a JavaScript Date object.  Use attr("value") / attr("value", val) to manipulate.
 		//		When passed to the parser in markup, must be specified according to `dojo.date.stamp.fromISOString`
 		value: new Date(""),	// value.toString()="NaN"
 
 		//	popupClass: String
 		//		Name of the popup widget class used to select a date/time
 		popupClass: "", // default is no popup = text only
+		
 		_selector: "",
 
 		postMixInProperties: function(){
 			//dijit.form.RangeBoundTextBox.prototype.postMixInProperties.apply(this, arguments);
 			this.inherited(arguments);
 			if(!this.value || this.value.toString() == dijit.form._DateTimeTextBox.prototype.value.toString()){
-				this.value = undefined;
+				this.value = null;
 			}
 			var constraints = this.constraints;
 			constraints.selector = this._selector;
@@ -61,20 +62,20 @@ dojo.declare(
 			if(typeof constraints.min == "string"){ constraints.min = fromISO(constraints.min); }
  			if(typeof constraints.max == "string"){ constraints.max = fromISO(constraints.max); }
 		},
-
+		
 		_onFocus: function(/*Event*/ evt){
 			// summary: open the TimePicker popup
 			this._open();
 		},
 
-		setValue: function(/*Date*/ value, /*Boolean?*/ priorityChange, /*String?*/ formattedValue){
+		_setValueAttr: function(/*Date*/ value, /*Boolean?*/ priorityChange, /*String?*/ formattedValue){
 			// summary:
 			//	Sets the date on this textbox.  Note that `value` must be a Javascript Date object.
 			this.inherited(arguments);
 			if(this._picker){
 				// #3948: fix blank date on popup only
 				if(!value){value=new Date();}
-				this._picker.setValue(value);
+				this._picker.attr('value', value);
 			}
 		},
 
@@ -90,12 +91,15 @@ dojo.declare(
 				var PopupProto=dojo.getObject(this.popupClass, false);
 				this._picker = new PopupProto({
 					onValueSelected: function(value){
-
-						textBox.focus(); // focus the textbox before the popup closes to avoid reopening the popup
+						if(textBox._tabbingAway){
+							delete textBox._tabbingAway;
+						}else{
+							textBox.focus(); // focus the textbox before the popup closes to avoid reopening the popup
+						}
 						setTimeout(dojo.hitch(textBox, "_close"), 1); // allow focus time to take
 
 						// this will cause InlineEditBox and other handlers to do stuff so make sure it's last
-						dijit.form._DateTimeTextBox.superclass.setValue.call(textBox, value, true);
+						dijit.form._DateTimeTextBox.superclass._setValueAttr.call(textBox, value, true);
 					},
 					lang: textBox.lang,
 					constraints: textBox.constraints,
@@ -108,7 +112,7 @@ dojo.declare(
 							(constraints.max && compare(constraints.max, date, "date") < 0));
 					}
 				});
-				this._picker.setValue(this.getValue() || new Date());
+				this._picker.attr('value', this.attr('value') || new Date());
 			}
 			if(!this._opened){
 				dijit.popup.open({
@@ -143,12 +147,12 @@ dojo.declare(
 			// don't focus on <input>.  the user has explicitly focused on something else.
 		},
 
-		getDisplayedValue:function(){
+		_getDisplayedValueAttr: function(){
 			return this.textbox.value;
 		},
 
-		setDisplayedValue:function(/*String*/ value, /*Boolean?*/ priorityChange){
-			this.setValue(this.parse(value, this.constraints), priorityChange, value);
+		_setDisplayedValueAttr: function(/*String*/ value, /*Boolean?*/ priorityChange){
+			this._setValueAttr(this.parse(value, this.constraints), priorityChange, value);
 		},
 
 		destroy: function(){
@@ -160,10 +164,27 @@ dojo.declare(
 		},
 
 		_onKeyPress: function(/*Event*/e){
-			if(dijit.form._DateTimeTextBox.superclass._onKeyPress.apply(this, arguments)){
-				if(this._opened && e.keyCode == dojo.keys.ESCAPE && !e.shiftKey && !e.ctrlKey && !e.altKey){
-					this._close();
-					dojo.stopEvent(e);
+			var p = this._picker, dk = dojo.keys;
+			// Handle the key in the picker, if it has a handler.  If the handler
+			// returns false, then don't handle any other keys.
+			if(p && this._opened && p.handleKey){
+				if(p.handleKey(e) === false){ return; }
+			}
+			if(this._opened && e.charOrCode == dk.ESCAPE && !e.shiftKey && !e.ctrlKey && !e.altKey){
+				this._close();
+				dojo.stopEvent(e);
+			}else if(!this._opened && e.charOrCode == dk.DOWN_ARROW){
+				this._open();
+				dojo.stopEvent(e);
+			}else if(dijit.form._DateTimeTextBox.superclass._onKeyPress.apply(this, arguments)){
+				if(e.charOrCode == dk.TAB){
+					this._tabbingAway = true;
+				}else if(this._opened && (e.keyChar || e.charOrCode == dk.BACKSPACE || e.charOrCode == dk.DELETE)){
+					// Replace the element - but do it after a delay to allow for 
+					// filtering to occur
+					setTimeout(dojo.hitch(this, function(){
+						dijit.placeOnScreenAroundElement(p.domNode.parentNode, this.domNode, {'BL':'TL', 'TL':'BL'}, p.orient ? dojo.hitch(p, "orient") : null);
+					}), 1);
 				}
 			}
 		}

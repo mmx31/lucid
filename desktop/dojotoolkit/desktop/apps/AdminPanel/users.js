@@ -41,6 +41,8 @@ dojo.extend(desktop.apps.AdminPanel, {
 				structure: layout,
 				model: new dojox.grid.data.DojoData(null, null, {store: this._userStore, query: {id: "*"}})
 			});
+			if(this._con) dojo.disconnect(this._con);
+			this._con = dojo.connect(this.main, "resize", grid, "resize");
 			dojo.connect(this._userStore, "onDelete", this, function(a) {
 				desktop.admin.users.remove(a.id[0]); //that feels really hackish
 			})

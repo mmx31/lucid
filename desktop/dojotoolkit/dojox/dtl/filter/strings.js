@@ -83,7 +83,7 @@ dojo.mixin(dojox.dtl.filter.strings, {
 		var width = (lines.length + "").length;
 		for(var i = 0, line; i < lines.length; i++){
 			line = lines[i];
-			output.push(df.strings.ljust(i + 1, width) + ". " + df.htmlstrings.escape(line));
+			output.push(df.strings.ljust(i + 1, width) + ". " + dojox.dtl._base.escape(line));
 		}
 		return output.join("\n");
 	},
@@ -287,13 +287,15 @@ dojo.mixin(dojox.dtl.filter.strings, {
 		}).join("");
 	},
 	wordcount: function(value){
-		return dojox.dtl.text.pySplit(value).length;
+		value = dojo.trim(value);
+		if(!value){ return 0; }
+		return value.split(/\s+/g).length;
 	},
 	wordwrap: function(value, arg){
 		arg = parseInt(arg);
 		// summary: Wraps words at specified line length
 		var output = [];
-		var parts = value.split(/ /g);
+		var parts = value.split(/\s+/g);
 		if(parts.length){
 			var word = parts.shift();
 			output.push(word);

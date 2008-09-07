@@ -48,7 +48,7 @@ dojo.declare("dojox.grid.Sparse", null, {
 });
 
 // sample custom model implementation that works with mysql server.
-dojo.declare("dojox.grid.data.DbTable", dojox.grid.data.Dynamic, {
+dojo.declare("dojox.grid._data.DbTable", dojox.grid._data.Dynamic, {
 	delayedInsertCommit: true,
 	constructor: function(inFields, inData, inServer, inDatabase, inTable) {
 		this.server = inServer;
@@ -224,7 +224,7 @@ dojo.declare("dojox.grid.data.DbTable", dojox.grid.data.Dynamic, {
 			errback: dojo.hitch(this, this.callbacks.removeError, indexes)
 		};
 		this.commitDelete(rows, cbs);
-		dojox.grid.data.Dynamic.prototype.remove.apply(this, arguments);
+		dojox.grid._data.Dynamic.prototype.remove.apply(this, arguments);
 	},
 	cancelModifyRow: function(inRowIndex) {
 		if (this.isDelayedInsert(inRowIndex)) {
@@ -244,7 +244,7 @@ dojo.declare("dojox.grid.data.DbTable", dojox.grid.data.Dynamic, {
 	},
 	removeInsert: function(inRowIndex) {
 		this.clearState(inRowIndex);
-		dojox.grid.data.Dynamic.prototype.remove.call(this, [inRowIndex]);
+		dojox.grid._data.Dynamic.prototype.remove.call(this, [inRowIndex]);
 	},
 	// request data 
 	requestRows: function(inRowIndex, inCount)	{
@@ -278,7 +278,7 @@ dojo.declare("dojox.grid.data.DbTable", dojox.grid.data.Dynamic, {
 		var m = false;
 		if(cache){
 			var data = this.getRow(inRowIndex);
-			if(!dojox.grid.arrayCompare(cache, data)){
+			if(!dojox.grid.util.arrayCompare(cache, data)){
 				m = true;
 				this.update(cache, data, inRowIndex);
 			}	

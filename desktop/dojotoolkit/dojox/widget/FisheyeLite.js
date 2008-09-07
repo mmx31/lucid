@@ -2,7 +2,7 @@ dojo.provide("dojox.widget.FisheyeLite");
 dojo.experimental("dojox.widget.FisheyeLite");
 
 dojo.require("dijit._Widget");
-dojo.require("dojox.fx.easing");
+dojo.require("dojo.fx.easing");
 
 dojo.declare("dojox.widget.FisheyeLite",
 	dijit._Widget,
@@ -37,7 +37,7 @@ dojo.declare("dojox.widget.FisheyeLite",
 	
 	// easeIn: Function
 	//		An easing function to use for the show animation
-	easeIn: dojox.fx.easing.backOut,
+	easeIn: dojo.fx.easing.backOut,
 	
 	// durationOut: Integer
 	//		The Time (in ms) to run the hide animation
@@ -45,24 +45,28 @@ dojo.declare("dojox.widget.FisheyeLite",
 	
 	// easeOut: Function	
 	// 		An easing function to use for the hide animation
-	easeOut: dojox.fx.easing.elasticOut,
+	easeOut: dojo.fx.easing.elasticOut,
 
 	//	properties: Object
 	//			An object of "property":scale pairs
 	//			defaults to font-size with a scale of 2.75
-	properties: { 
-		fontSize: 2.75
-	},
+	properties: null,
 	
 	// unit: String
 	//		Sometimes, you need to specify a unit. Should be part of
 	//		properties attrib, but was trying to shorthand the logic there
 	unit:"px",
 	
+	constructor: function(props, node){
+		this.properties = props.properties || {
+			fontSize: 2.75
+		}
+	},
+	
 	postCreate: function(){
 		
 		this.inherited(arguments);
-		this._target = dojo.query(".fisheyeTarget",this.domNode)[0] || this.domNode;
+		this._target = dojo.query(".fisheyeTarget", this.domNode)[0] || this.domNode;
 		this._makeAnims();
 		
 		this.connect(this.domNode,"onmouseover","show");
@@ -127,5 +131,5 @@ dojo.declare("dojox.widget.FisheyeLite",
 		// summary: stub function fired when Fisheye Item is fully visible and
 		// 		hovered. connect or override use.
 	}
-		
+	
 });

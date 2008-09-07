@@ -63,16 +63,24 @@ dojo.declare(
 		//		See description of dijit.Tooltip.defaultPosition for details on this parameter.
 		tooltipPosition: [],
 
-		setValue: function(){
+		_setValueAttr: function(){
+			// summary:
+			//		Hook so attr('value', ...) works.
 			this.inherited(arguments);
 			this.validate(this._focused);
 		},
 
 		validator: function(/*anything*/value, /*dijit.form.ValidationTextBox.__Constraints*/constraints){
 			// summary: user replaceable function used to validate the text input against the regular expression.
-			return (new RegExp("^(" + this.regExpGen(constraints) + ")"+(this.required?"":"?")+"$")).test(value) &&
+			return (new RegExp("^(?:" + this.regExpGen(constraints) + ")"+(this.required?"":"?")+"$")).test(value) &&
 				(!this.required || !this._isEmpty(value)) &&
 				(this._isEmpty(value) || this.parse(value, constraints) !== undefined); // Boolean
+		},
+
+		_isValidSubset: function(){
+			// summary:
+			//	Returns true if the value is either already valid or could be made valid by appending characters.
+			return this.textbox.value.search(this._partialre) == 0;
 		},
 
 		isValid: function(/*Boolean*/ isFocused){
@@ -95,22 +103,26 @@ dojo.declare(
 			return this.promptMessage; // String
 		},
 
+		_maskValidSubsetError: true,
 		validate: function(/*Boolean*/ isFocused){
 			// summary:
 			//		Called by oninit, onblur, and onkeypress.
 			// description:
 			//		Show missing or invalid messages if appropriate, and highlight textbox field.
 			var message = "";
-			var isValid = this.isValid(isFocused);
+			var isValid = this.disabled || this.isValid(isFocused);
+			if(isValid){ this._maskValidSubsetError = true; }
+			var isValidSubset = !isValid && isFocused && this._isValidSubset();
 			var isEmpty = this._isEmpty(this.textbox.value);
-			this.state = (isValid || (!this._hasBeenBlurred && isEmpty)) ? "" : "Error";
+			this.state = (isValid || (!this._hasBeenBlurred && isEmpty) || isValidSubset) ? "" : "Error";
+			if(this.state == "Error"){ this._maskValidSubsetError = false; }
 			this._setStateClass();
 			dijit.setWaiState(this.focusNode, "invalid", isValid ? "false" : "true");
 			if(isFocused){
 				if(isEmpty){
 					message = this.getPromptMessage(true);
 				}
-				if(!message && this.state == "Error"){
+				if(!message && (this.state == "Error" || (isValidSubset && !this._maskValidSubsetError))){
 					message = this.getErrorMessage(true);
 				}
 			}
@@ -142,11 +154,6 @@ dojo.declare(
 			this._onMouse(e);	// update CSS classes
 		},
 
-		_onkeyup: function(/*Event*/e){
-			this._update(e);
-			this.onkeyup(e);
-		},
-
 		//////////// INITIALIZATION METHODS ///////////////////////////////////////
 
 		constructor: function(){
@@ -160,6 +167,59 @@ dojo.declare(
 			if(this.invalidMessage == "$_unset_$"){ this.invalidMessage = this.messages.invalidMessage; }
 			var p = this.regExpGen(this.constraints);
 			this.regExp = p;
+			var partialre = "";
+			// parse the regexp and produce a new regexp that matches valid subsets
+			// if the regexp is .* then there's no use in matching subsets since everything is valid
+			if(p != ".*"){ this.regExp.replace(/\\.|\[\]|\[.*?[^\\]{1}\]|\{.*?\}|\(\?[=:!]|./g,
+				function (re){
+					switch(re.charAt(0)){
+						case '{':
+						case '+':
+						case '?':
+						case '*':
+						case '^':
+						case '$':
+						case '|':
+						case '(': partialre += re; break;
+						case ")": partialre += "|$)"; break;
+						 default: partialre += "(?:"+re+"|$)"; break;
+					}
+				}
+			);}
+			try{ // this is needed for now since the above regexp parsing needs more test verification
+				"".search(partialre);
+			}catch(e){ // should never be here unless the original RE is bad or the parsing is bad
+				partialre = this.regExp;
+				console.debug('RegExp error in ' + this.declaredClass + ': ' + this.regExp);
+			} // should never be here unless the original RE is bad or the parsing is bad
+			this._partialre = "^(?:" + partialre + ")$";
+		},
+
+		_setDisabledAttr: function(/*Boolean*/ value){
+			this.inherited(arguments);	// call FormValueWidget._setDisabledAttr()
+					if(this.valueNode){
+				this.valueNode.disabled = value;
+					}
+					this._refreshState();
+		},
+		
+		_setRequiredAttr: function(/*Boolean*/ value){
+			this.required = value;
+			dijit.setWaiState(this.focusNode,"required", value);
+					this._refreshState();				
+		},
+
+		postCreate: function(){
+			if(dojo.isIE){ // IE INPUT tag fontFamily has to be set directly using STYLE
+				var s = dojo.getComputedStyle(this.focusNode);
+				if(s){
+					var ff = s.fontFamily;
+					if(ff){
+						this.focusNode.style.fontFamily = ff;
+					}
+				}
+			}
+			this.inherited(arguments);
 		}
 	}
 );
@@ -177,13 +237,15 @@ dojo.declare(
 		//		locale-neutral.
 
 		serialize: function(/*anything*/val, /*Object?*/options){
-			// summary: user replaceable function used to convert the getValue() result to a String
+			// summary: user replaceable function used to convert the attr('value') result to a String
 			return val.toString ? val.toString() : ""; // String
 		},
 
 		toString: function(){
 			// summary: display the widget as a printable string using the widget's value
-			var val = this.filter(this.getValue());
+			
+			// TODO: seems like the filter() call here is unnecessary as attr('value') should do that
+			var val = this.filter(this.attr('value'));
 			return val != null ? (typeof val == "string" ? val : this.serialize(val, this.constraints)) : ""; // String
 		},
 
@@ -192,29 +254,27 @@ dojo.declare(
 			return this.inherited(arguments);
 		},
 
-		setAttribute: function(/*String*/ attr, /*anything*/ value){
+		buildRendering: function(){
 			this.inherited(arguments);
-			switch(attr){
-				case "disabled":
-					if(this.valueNode){
-						this.valueNode.disabled = this.disabled;
-					}
-			}
-		},
 
-		postCreate: function(){
+			// Create a hidden <input> node with the serialized value used for submit
+			// (as opposed to the displayed value)
 			var textbox = this.textbox;
 			var valueNode = (this.valueNode = dojo.doc.createElement("input"));
 			valueNode.setAttribute("type", textbox.type);
-			valueNode.setAttribute("value", this.toString());
 			dojo.style(valueNode, "display", "none");
-			valueNode.name = this.textbox.name;
-			valueNode.disabled = this.textbox.disabled;
-			this.textbox.name = this.textbox.name + "_displayed_";
-			this.textbox.removeAttribute("name");
+			this.valueNode.name = this.textbox.name;
 			dojo.place(valueNode, textbox, "after");
 
+			// try to give the displayed node a different name, or ideally
+			// remove that attribute altogether
+			this.textbox.name = this.textbox.name + "_displayed_";
+			this.textbox.removeAttribute("name");
+		},
+
+		_setDisabledAttr: function(/*Boolean*/ value){
 			this.inherited(arguments);
+			dojo.attr(this.valueNode, 'disabled', value);
 		}
 	}
 );
@@ -247,11 +307,6 @@ dojo.declare(
 		======*/
 		rangeMessage: "",
 
-		compare: function(/*anything*/val1, /*anything*/val2){
-			// summary: compare 2 values
-			return val1 - val2; // anything
-		},
-
 		rangeCheck: function(/*Number*/ primitive, /*dijit.form.RangeBoundTextBox.__Constraints*/ constraints){
 			// summary: user replaceable function used to validate the range of the numeric input value
 			var isMin = "min" in constraints;
@@ -265,7 +320,31 @@ dojo.declare(
 
 		isInRange: function(/*Boolean*/ isFocused){
 			// summary: Need to over-ride with your own validation code in subclasses
-			return this.rangeCheck(this.getValue(), this.constraints);
+			return this.rangeCheck(this.attr('value'), this.constraints);
+		},
+
+		_isDefinitelyOutOfRange: function(){
+			// summary:
+			//	Returns true if the value is out of range and will remain
+			//	out of range even if the user types more characters
+			var val = this.attr('value');
+			var isTooLittle = false;
+			var isTooMuch = false;
+			if("min" in this.constraints){
+				var min = this.constraints.min;
+				val = this.compare(val, ((typeof min == "number") && min >= 0 && val !=0)? 0 : min);
+				isTooLittle = (typeof val == "number") && val < 0;
+			}
+			if("max" in this.constraints){
+				var max = this.constraints.max;
+				val = this.compare(val, ((typeof max != "number") || max > 0)? max : 0);
+				isTooMuch = (typeof val == "number") && val > 0;
+			}
+			return isTooLittle || isTooMuch;
+		},
+
+		_isValidSubset: function(){
+			return this.inherited(arguments) && !this._isDefinitelyOutOfRange();
 		},
 
 		isValid: function(/*Boolean*/ isFocused){
@@ -296,9 +375,11 @@ dojo.declare(
 			}
 		},
 		
-		setValue: function(/*Number*/ value, /*Boolean?*/ priorityChange){
+		_setValueAttr: function(/*Number*/ value, /*Boolean?*/ priorityChange){
+			// summary:
+			//		Hook so attr('value', ...) works.
 			dijit.setWaiState(this.focusNode, "valuenow", value);
-			this.inherited('setValue', arguments);
+			this.inherited(arguments);
 		}
 	}
 );

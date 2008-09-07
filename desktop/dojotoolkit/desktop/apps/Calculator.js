@@ -57,9 +57,11 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 							textbox.setValue(textbox.getValue() + cell);
 						})
 					});
-					dojo.style(button.focusNode, {
+					dojo.query("span.dijitReset.dijitRight.dijitInline", button.domNode).style({
 						width: "100%",
-						height: "100%"
+						height: "100%",
+						paddingLeft: "0px",
+						paddingRight: "0px"
 					});
 					cellNode.appendChild(button.domNode);
 				}

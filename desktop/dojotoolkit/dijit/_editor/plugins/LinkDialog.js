@@ -63,7 +63,7 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 		},
 
 		_setContent: function(staticPanel){
-			this.dropDown.setContent(staticPanel);
+			this.dropDown.attr('content', staticPanel);
 		},
 
 		setValue: function(args){
@@ -86,17 +86,7 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
  		},
 
 		_onCloseDialog: function(){
-			// FIXME: IE is really messed up here!!
-			if(dojo.isIE){
-				if("_savedSelection" in this){
-					var b = this._savedSelection;
-					delete this._savedSelection;
-					this.editor.focus();
-					this.editor._moveToBookmark(b);
-				}
-			}else{
-				this.editor.focus();
-			}
+			this.editor.focus();
 		},
 
 		_onOpenDialog: function(){
@@ -109,10 +99,7 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 			}else{
 				text = dojo.withGlobal(this.editor.window, dijit._editor.selection.getSelectedText);
 			}
-			// FIXME: IE is *really* b0rken
-			if(dojo.isIE){
-				this._savedSelection = this.editor._getBookmark();
-			}
+
 			this.dropDown.reset();
 			this.dropDown.setValues({urlInput: url || '', textInput: text || ''});
 			//dijit.focus(this.urlInput);
@@ -127,7 +114,7 @@ dojo.declare("dijit._editor.plugins.LinkDialog",
 			if(this.button){
 				// display button differently if there is an existing link associated with the current selection
 				var hasA = dojo.withGlobal(this.editor.window, "hasAncestorElement", dijit._editor.selection, [this.tag]);
-				this.button.setAttribute('checked', hasA);
+				this.button.attr('checked', hasA);
 			}
 		}
 */

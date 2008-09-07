@@ -109,8 +109,9 @@ dojo.number._applyPattern = function(/*Number*/value, /*String*/pattern, /*dojo.
 	if(!numberPattern){
 		throw new Error("unable to find a number expression in pattern: "+pattern);
 	}
+	if(options.fractional === false){ options.places = 0; }
 	return pattern.replace(numberPatternRE,
-		dojo.number._formatAbsolute(value, numberPattern[0], {decimal: decimal, group: group, places: options.places}));
+		dojo.number._formatAbsolute(value, numberPattern[0], {decimal: decimal, group: group, places: options.places, round: options.round}));
 }
 
 dojo.number.round = function(/*Number*/value, /*Number*/places, /*Number?*/multiple){
@@ -147,8 +148,8 @@ dojo.number.__FormatAbsoluteOptions = function(){
 	//		the decimal separator
 	//	group: String?
 	//		the group separator
-	//	places: Integer?
-	//		number of decimal places
+	//	places: Integer?|String?
+	//		number of decimal places.  the range "n,m" will format to m places.
 	//	round: Number?
 	//		5 rounds to nearest .5; 0 rounds to nearest whole (default). -1
 	//		means don't round.
@@ -180,6 +181,10 @@ dojo.number._formatAbsolute = function(/*Number*/value, /*String*/pattern, /*doj
 	var valueParts = String(Math.abs(value)).split(".");
 	var fractional = valueParts[1] || "";
 	if(options.places){
+		var comma = dojo.isString(options.places) && options.places.indexOf(",");
+		if(comma){
+			options.places = options.places.substring(comma+1);
+		}
 		valueParts[1] = dojo.string.pad(fractional.substr(0, options.places), options.places, '0', true);
 	}else if(patternParts[1] && options.places !== 0){
 		// Pad fractional with trailing zeros
@@ -252,7 +257,7 @@ dojo.number.__RegexpOptions = function(){
 	//		strict parsing, false by default
 	//	places: Number|String?
 	//		number of decimal places to accept: Infinity, a positive number, or
-	//		a range "n,m".  By default, defined by pattern.
+	//		a range "n,m".  Defined by pattern or Infinity if pattern not provided.
 	this.pattern = pattern;
 	this.type = type;
 	this.locale = locale;
@@ -310,7 +315,7 @@ dojo.number._parseInfo = function(/*Object?*/options){
 			var places = options.places;
 			if(parts.length == 1 || places === 0){flags.fractional = false;}
 			else{
-				if(places === undefined){ places = parts[1].lastIndexOf('0')+1; }
+				if(places === undefined){ places = options.pattern ? parts[1].lastIndexOf('0')+1 : Infinity; }
 				if(places && options.fractional == undefined){flags.fractional = true;} // required fractional, unless otherwise specified
 				if(!options.places && (places < parts[1].length)){ places += "," + parts[1].length; }
 				flags.places = places;
@@ -517,7 +522,7 @@ dojo.number._integerRegexp = function(/*dojo.number.__IntegerRegexpFlags?*/flags
 	}
 	// build sign RE
 	var signRE = dojo.regexp.buildGroupRE(flags.signed,
-		function(q) { return q ? "[-+]" : ""; },
+		function(q){ return q ? "[-+]" : ""; },
 		true
 	);
 

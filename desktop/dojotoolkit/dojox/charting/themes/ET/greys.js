@@ -1,5 +1,6 @@
 dojo.provide("dojox.charting.themes.ET.greys");
 dojo.require("dojox.charting.Theme");
+dojo.deprecated("dojox.charting.themes.ET.greys", "1.3");
 
 (function(){
 	var dxc=dojox.charting;
@@ -7,7 +8,7 @@ dojo.require("dojox.charting.Theme");
 		antiAlias: false,
 		chart: {
 			stroke: null,
-			fill: "transparent"
+			fill: "inherit"
 		},
 		plotarea: {
 			// stroke: { width: 0.2, color: "#666666" },
@@ -43,11 +44,7 @@ dojo.require("dojox.charting.Theme");
 			font:"normal normal normal 7pt Tahoma",	//	label
 			fontColor:"#000"
 		},
-		colors:[]
-	});
-	dxc.themes.ET.greys.defineColors({
-		colors: [
-			// dojo.colorFromHex("#c3c3c3"), 
+		colors:[
 			dojo.colorFromHex("#8a8c8f"), 
 			dojo.colorFromHex("#4b4b4b"),
 			dojo.colorFromHex("#3b444b"), 
@@ -56,4 +53,3 @@ dojo.require("dojox.charting.Theme");
 		]
 	});
 })();
-

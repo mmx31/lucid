@@ -26,20 +26,21 @@ dojo.declare(
 		//
 		// duration: Integer
 		//		Amount of time (in ms) it takes to slide panes
-		duration: 250,
+		duration: dijit.defaultDuration,
 
 		_verticalSpace: 0,
 
+		baseClass: "dijitAccordionContainer",
+		
 		postCreate: function(){
-			this.domNode.style.overflow="hidden";
-			this.inherited("postCreate",arguments); 
+			this.domNode.style.overflow = "hidden";
+			this.inherited(arguments); 
 			dijit.setWaiRole(this.domNode, "tablist");
-			dojo.addClass(this.domNode,"dijitAccordionContainer");
 		},
 
 		startup: function(){
 			if(this._started){ return; }
-			this.inherited("startup",arguments);	
+			this.inherited(arguments);	
 			if(this.selectedChildWidget){
 				var style = this.selectedChildWidget.containerNode.style;
 				style.display = "";
@@ -47,7 +48,16 @@ dojo.declare(
 				this.selectedChildWidget._setSelectedState(true);
 			}
 		},
-
+		
+		_getTargetHeight: function(/* Node */ node){
+			// summary:
+			//		For the given node, returns the height that should be
+			//		set to achieve our vertical space (subtract any padding
+			//		we may have)
+			var cs = dojo.getComputedStyle(node);
+			return Math.max(this._verticalSpace - dojo._getPadBorderExtents(node, cs).h, 0);
+		},
+		
 		layout: function(){
 			// summary: 
 			//		Set the height of the open pane based on what room remains
@@ -59,9 +69,9 @@ dojo.declare(
 				totalCollapsedHeight += child.getTitleHeight();
 			});
 			var mySize = this._contentBox;
-			this._verticalSpace = (mySize.h - totalCollapsedHeight);
+			this._verticalSpace = mySize.h - totalCollapsedHeight;
 			if(openPane){
-				openPane.containerNode.style.height = this._verticalSpace + "px";
+				openPane.containerNode.style.height = this._getTargetHeight(openPane.containerNode) + "px";
 /***
 TODO: this is wrong.  probably you wanted to call resize on the SplitContainer
 inside the AccordionPane??
@@ -87,12 +97,12 @@ inside the AccordionPane??
 				newWidget.setSelected(true);
 				var newContents = newWidget.containerNode;
 				newContents.style.display = "";
-
+				paneHeight = this._getTargetHeight(newWidget.containerNode)
 				animations.push(dojo.animateProperty({
 					node: newContents,
 					duration: this.duration,
 					properties: {
-						height: { start: "1", end: paneHeight }
+						height: { start: 1, end: paneHeight }
 					},
 					onEnd: function(){
 						newContents.style.overflow = "auto";
@@ -103,6 +113,7 @@ inside the AccordionPane??
 				oldWidget.setSelected(false);
 				var oldContents = oldWidget.containerNode;
 				oldContents.style.overflow = "hidden";
+				paneHeight = this._getTargetHeight(oldWidget.containerNode);
 				animations.push(dojo.animateProperty({
 					node: oldContents,
 					duration: this.duration,
@@ -125,7 +136,7 @@ inside the AccordionPane??
 			if(this.disabled || e.altKey || !(e._dijitWidget || e.ctrlKey)){ return; }
 			var k = dojo.keys;
 			var fromTitle = e._dijitWidget;
-			switch(e.keyCode){
+			switch(e.charOrCode){
 				case k.LEFT_ARROW:
 				case k.UP_ARROW:
 					if (fromTitle){
@@ -153,7 +164,7 @@ inside the AccordionPane??
 					}
 					break;
 				default:
-					if(e.ctrlKey && e.keyCode == k.TAB){
+					if(e.ctrlKey && e.charOrCode == k.TAB){
 						this._adjacent(e._dijitWidget, !e.shiftKey)._onTitleClick();
 						dojo.stopEvent(e);
 					}
@@ -173,11 +184,18 @@ dojo.declare("dijit.layout.AccordionPane",
 	// | see dijit.layout.AccordionContainer
 
 	templatePath: dojo.moduleUrl("dijit.layout", "templates/AccordionPane.html"),
+	attributeMap: dojo.mixin(dojo.clone(dijit.layout.ContentPane.prototype.attributeMap), {
+		title: {node: "titleTextNode", type: "innerHTML" }
+	}),
 
+	baseClass: "dijitAccordionPane",
+	
 	postCreate: function(){
-		this.inherited("postCreate",arguments)
+		this.inherited(arguments)
 		dojo.setSelectable(this.titleNode, false);
 		this.setSelected(this.selected);
+		dojo.attr(this.titleTextNode, "id", this.domNode.id+"_title");
+		dijit.setWaiState(this.focusNode, "labelledby", dojo.attr(this.titleTextNode, "id"));
 	},
 
 	getTitleHeight: function(){
@@ -194,6 +212,16 @@ dojo.declare("dijit.layout.AccordionPane",
 		}
 	},
 
+	_onTitleEnter: function(){
+		// summary: callback when someone hovers over my title
+		dojo.addClass(this.focusNode, "dijitAccordionTitle-hover");
+	},
+
+	_onTitleLeave: function(){
+		// summary: callback when someone stops hovering over my title
+		dojo.removeClass(this.focusNode, "dijitAccordionTitle-hover");
+	},
+
 	_onTitleKeyPress: function(/*Event*/ evt){
 		evt._dijitWidget = this;
 		return this.getParent()._onKeyPress(evt);
@@ -202,6 +230,7 @@ dojo.declare("dijit.layout.AccordionPane",
 	_setSelectedState: function(/*Boolean*/ isSelected){
 		this.selected = isSelected;
 		dojo[(isSelected ? "addClass" : "removeClass")](this.titleNode,"dijitAccordionTitle-selected");
+		dijit.setWaiState(this.focusNode, "expanded", isSelected);
 		this.focusNode.setAttribute("tabIndex", isSelected ? "0" : "-1");
 	},
 
@@ -215,7 +244,7 @@ dojo.declare("dijit.layout.AccordionPane",
 		this._setSelectedState(isSelected);
 		if(isSelected){
 			this.onSelected();
-			this._loadCheck(true); // if href specified, trigger load
+			this._loadCheck(); // if href specified, trigger load
 		}
 	},
 

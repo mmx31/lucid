@@ -20,8 +20,14 @@ dojo.declare("dijit.layout.LinkPane",
 	// <a> because we don't want a link.
 	templateString: '<div class="dijitLinkPane"></div>',
 
-	postCreate: function(){
+	 buildRendering: function(){
+		this.inherited(arguments);
 
+		// make getDescendants() work
+		this.containerNode = this.domNode;
+	},
+
+	postCreate: function(){
 		// If user has specified node contents, they become the title
 		// (the link must be plain text)
 		if(this.srcNodeRef){

@@ -1,33 +1,80 @@
 dojo.provide("dojox.fx._base");
-// summary: add-on Animations to dojo.fx
-
+// summary: Experimental and extended Animations beyond Dojo Core / Base functionality. 
+//	Provides advanced Lines, Animations, and convenience aliases.
 dojo.require("dojo.fx"); 
 
+dojo.mixin(dojox.fx, {
+
+	// anim: Function
+	//	Alias of dojo.anim - the shorthand dojo.animateProperty with auto-play
+	anim: dojo.anim,
+
+	// animateProperty: Function
+	//	Alias of dojo.animateProperty - animate any CSS property
+	animateProperty: dojo.animateProperty,
+
+	// fadeTo: Function 
+	//		Fade an element from an opacity to an opacity.
+	//		Omit start: property to detect. End: property required
+	fadeTo: dojo._fade,
+
+	// fadeIn: Function
+	//	Alias of dojo.fadeIn - Fade a node in.
+	fadeIn: dojo.fadeIn,
+	
+	// fadeOut: Function
+	//	Alias of dojo.fadeOut - Fades a node out.
+	fadeOut: dojo.fadeOut,
+
+	// combine: Function
+	//	Alias of dojo.fx.combine - Run animations in parallel
+	combine: dojo.fx.combine,
+
+	// chain: Function
+	//	Alias of dojo.fx.chain - Run animations in sequence
+	chain: dojo.fx.chain,
+
+	// slideTo: Function
+	//	Alias of dojo.fx.slideTo - Slide a node to a defined top/left coordinate
+	slideTo: dojo.fx.slideTo,
+
+	// wipeIn: Function
+	//	Alias of dojo.fx.wipeIn - Wipe a node to visible
+	wipeIn: dojo.fx.wipeIn,
+
+	// wipeOut: Function
+	//	Alias of dojo.fx.wipeOut - Wipe a node to non-visible
+	wipeOut: dojo.fx.wipeOut
+
+});
+
 dojox.fx.sizeTo = function(/* Object */args){
-	// summary: Create an animation that will size a node
+	// summary: Creates an animation that will size a node 
 	// description:
-	//	Returns an animation that will size "node" 
-	//	defined in args Object about it's center to
-	//	a width and height defined by (args.width, args.height), 
-	//	supporting an optional method: chain||combine mixin
-	//	(defaults to chain).	
+	//		Returns an animation that will size the target node
+	//		defined in args Object about it's center to
+	//		a width and height defined by (args.width, args.height), 
+	//		supporting an optional method: chain||combine mixin
+	//		(defaults to chain).	
 	//
-	//	- works best on absolutely or relatively positioned elements? 
+	//	- works best on absolutely or relatively positioned elements
 	//	
 	// example:
 	// |	// size #myNode to 400px x 200px over 1 second
-	// |	dojo.fx.sizeTo({ node:'myNode',
+	// |	dojo.fx.sizeTo({
+	// |		node:'myNode',
 	// |		duration: 1000,
 	// |		width: 400,
 	// |		height: 200,
-	// |		method: "chain"
+	// |		method: "combine"
 	// |	}).play();
 	//
-	var node = (args.node = dojo.byId(args.node));
+
+	var node = args.node = dojo.byId(args.node);
 
 	var method = args.method || "chain"; 
 	if(!args.duration){ args.duration = 500; } // default duration needed
-	if (method=="chain"){ args.duration = Math.floor(args.duration/2); } 
+	if(method == "chain"){ args.duration = Math.floor(args.duration / 2); } 
 	
 	var top, newTop, left, newLeft, width, height = null;
 
@@ -40,16 +87,16 @@ dojox.fx.sizeTo = function(/* Object */args){
 			width = parseInt(cs.width);
 			height = parseInt(cs.height);
 
-			newLeft = left - Math.floor((args.width - width)/2); 
-			newTop = top - Math.floor((args.height - height)/2); 
+			newLeft = left - Math.floor((args.width - width) / 2); 
+			newTop = top - Math.floor((args.height - height) / 2); 
 
 			if(pos != 'absolute' && pos != 'relative'){
 				var ret = dojo.coords(n, true);
 				top = ret.y;
 				left = ret.x;
-				n.style.position="absolute";
-				n.style.top=top+"px";
-				n.style.left=left+"px";
+				n.style.position = "absolute";
+				n.style.top = top + "px";
+				n.style.left = left + "px";
 			}
 		}
 	})(node);
@@ -68,9 +115,10 @@ dojox.fx.sizeTo = function(/* Object */args){
 		}
 	}, args));
 
-	var anim = dojo.fx[((args.method == "combine") ? "combine" : "chain")]([anim1,anim2]);
+	var anim = dojo.fx[(args.method == "combine" ? "combine" : "chain")]([anim1, anim2]);
 	dojo.connect(anim, "beforeBegin", anim, init);
 	return anim; // dojo._Animation
+
 };
 
 dojox.fx.slideBy = function(/* Object */args){
@@ -88,7 +136,7 @@ dojox.fx.slideBy = function(/* Object */args){
 	// |		top: 50, left: -22 
 	// |	}).play();
 
-	var node = (args.node = dojo.byId(args.node));	
+	var node = args.node = dojo.byId(args.node);	
 	var top = null; var left = null;
 
 	var init = (function(n){
@@ -101,9 +149,9 @@ dojox.fx.slideBy = function(/* Object */args){
 				var ret = dojo.coords(n, true);
 				top = ret.y;
 				left = ret.x;
-				n.style.position="absolute";
-				n.style.top=top+"px";
-				n.style.left=left+"px";
+				n.style.position = "absolute";
+				n.style.top = top + "px";
+				n.style.left = left + "px";
 			}
 		}
 	})(node);
@@ -113,11 +161,11 @@ dojox.fx.slideBy = function(/* Object */args){
 			// FIXME: is there a way to update the _Line after creation?
 			// null start values allow chaining to work, animateProperty will
 			// determine them for us (except in ie6? -- ugh)
-			top: {  /* start: top, */ end: top+(args.top||0) },
-			left: { /* start: left,*/ end: left+(args.left||0) }
+			top: top + (args.top || 0),
+			left: left + (args.left || 0) 
 		}
 	}, args));
-	dojo.connect(_anim,"beforeBegin",_anim,init);
+	dojo.connect(_anim, "beforeBegin", _anim, init);
 	return _anim; // dojo._Animation
 };
 
@@ -137,10 +185,10 @@ dojox.fx.crossFade = function(/* Object */args){
 		var op2 = dojo.style(node2, "opacity");
 
 		var _anim = dojo.fx.combine([
-			dojo[((op1==0)?"fadeIn":"fadeOut")](dojo.mixin({
+			dojo[(op1 == 0 ? "fadeIn" : "fadeOut")](dojo.mixin({
 				node: node1
 			},args)),
-			dojo[((op1==0)?"fadeOut":"fadeIn")](dojo.mixin({
+			dojo[(op1 == 0 ? "fadeOut" : "fadeIn")](dojo.mixin({
 				node: node2
 			},args))
 		]);
@@ -160,13 +208,14 @@ dojox.fx.highlight = function(/*Object*/ args){
 	// example:
 	//	dojox.fx.highlight({ node:"foo" }).play(); 
 
-	var node = (args.node = dojo.byId(args.node));
+	var node = args.node = dojo.byId(args.node);
 
 	args.duration = args.duration || 400;
+	
 	// Assign default color light yellow
 	var startColor = args.color || '#ffff99';
 	var endColor = dojo.style(node, "backgroundColor");
-	var wasTransparent = (endColor == "transparent" || endColor == "rgba(0, 0, 0, 0)");
+	var wasTransparent = (endColor == "transparent" || endColor == "rgba(0, 0, 0, 0)") ? endColor : false;
 
 	var anim = dojo.animateProperty(dojo.mixin({
 		properties: {
@@ -174,11 +223,11 @@ dojox.fx.highlight = function(/*Object*/ args){
 		}
 	}, args));
 
-	dojo.connect(anim, "onEnd", anim, function(){
-		if(wasTransparent){
-			node.style.backgroundColor = "transparent";
-		}
-	});
+	if(wasTransparent){
+		dojo.connect(anim, "onEnd", anim, function(){
+			node.style.backgroundColor = wasTransparent;
+		});
+	}
 
 	return anim; // dojo._Animation
 };
@@ -199,7 +248,7 @@ dojox.fx.wipeTo = function(/*Object*/ args){
 	//      units and should be an integer.  Thus a valid args object
 	//      would look something like this:
 	//
-	//      dojox.fx.wipeTo({node: "nodeId", height: 200}).play();
+	//      dojox.fx.wipeTo({ node: "nodeId", height: 200 }).play();
 	//
 	//		Node must have no margin/border/padding, so put another
 	//		node inside your target node for additional styling.
@@ -216,11 +265,11 @@ dojox.fx.wipeTo = function(/*Object*/ args){
 		start: function(){
 			// start at current [computed] height, but use 1px rather than 0
 			// because 0 causes IE to display the whole panel
-			s.overflow="hidden";
-			if(s.visibility=="hidden"||s.display=="none"){
+			s.overflow = "hidden";
+			if(s.visibility == "hidden" || s.display == "none"){
 				s[dir] = "1px";
-				s.display="";
-				s.visibility="";
+				s.display = "";
+				s.visibility = "";
 				return 1;
 			}else{
 				var now = dojo.style(node,dir);
@@ -231,6 +280,168 @@ dojox.fx.wipeTo = function(/*Object*/ args){
 		unit: "px"
 	};
 
-	var anim = dojo.animateProperty(dojo.mixin({ properties: props },args));
+	var anim = dojo.animateProperty(dojo.mixin({ properties: props }, args));
 	return anim; // dojo._Animation
-}
+};
+
+(function(){
+	
+	// because ShrinkSafe will eat this up:	
+	var borderConst = "border",
+		widthConst = "Width",
+		heightConst = "Height",
+		topConst = "Top",
+		rightConst = "Right",
+		leftConst = "Left",
+		bottomConst = "Bottom"
+	;
+
+	dojox.fx.flip = function(/*Object*/ args){
+		// summary: Animate a node flipping following a specific direction
+		//	
+		// description:
+		//		Returns an animation that will flip the
+		//		node around a central axis:
+		//		if args.dir is "left" or "right" --> y axis
+		//		if args.dir is "top" or "bottom" --> x axis
+		//
+		//		This effect is obtained using a border distorsion applied to a helper node.
+		//
+		//		The user can specify three background colors for the helper node:
+		//		darkColor: the darkest color reached during the animation 
+		//		lightColor: the brightest color
+		//		endColor: the final backgroundColor for the node
+		//
+		//	example:
+		//	|	var anim = dojox.fx.flip({ 
+		//	|		node: dojo.byId("nodeId"),
+		//	|		dir: "top",
+		//	|		darkColor: "#555555",
+		//	|		lightColor: "#dddddd",
+		//	|		endColor: "#666666",
+		//	|		duration:300
+		//	|	  });
+
+		var helperNode = dojo.doc.createElement("div");
+
+		var node = args.node = dojo.byId(args.node), 
+			s = node.style,
+			dims = null, 
+			hs = null, 
+			pn = null,
+			lightColor = args.lightColor || "#dddddd", 
+			darkColor = args.darkColor || "#555555",
+			bgColor = dojo.style(args.node, "backgroundColor"), 
+			endColor = args.endColor || bgColor,
+			staticProps = {}, 
+			anims = [],
+			duration = args.duration ? args.duration / 2 : 250,
+			dir = args.dir || "left", 
+			pConst = 0.6, 
+			transparentColor = "transparent";
+
+		// IE6 workaround: IE6 doesn't support transparent borders
+		var convertColor = function(color){
+			return ((new dojo.Color(color)).toHex() === "#000000") ? "#000001" : color;
+		};
+
+		if(dojo.isIE < 7){
+			endColor = convertColor(endColor);
+			lightColor = convertColor(lightColor);
+			darkColor = convertColor(darkColor);
+			bgColor = convertColor(bgColor);
+			transparentColor = "black";
+			helperNode.style.filter = "chroma(color='#000000')";
+		}
+
+		var init = (function(n){
+			return function(){
+				var ret = dojo.coords(n, true);
+				dims = {
+					top: ret.y,
+					left: ret.x,
+					width: ret.w,
+					height: ret.h
+				};
+			}
+		})(node);
+		init();
+
+		// helperNode initialization
+		hs = {
+			position: "absolute",
+			top: dims["top"] + "px",
+			left: dims["left"] + "px",
+			height: "0",
+			width: "0",
+			zIndex: args.zIndex || (s.zIndex || 0),
+			border: "0 solid " + transparentColor,
+			fontSize: "0"
+		};
+		dims["endHeight"] = dims["height"] * pConst; 
+		dims["endWidth"] = dims["width"] * pConst; 
+		var props = [ {}, 
+			{
+				top: dims["top"],
+				left: dims["left"]
+			}
+		];
+		var dynProperties = {
+			left: [leftConst, rightConst, topConst, bottomConst, widthConst, heightConst, "end" + heightConst, leftConst],
+			right: [rightConst, leftConst, topConst, bottomConst, widthConst, heightConst, "end" + heightConst, leftConst],
+			top: [topConst, bottomConst, leftConst, rightConst, heightConst, widthConst, "end" + widthConst, topConst],
+			bottom: [bottomConst, topConst, leftConst, rightConst, heightConst, widthConst, "end" + widthConst, topConst] 
+		}
+		// property names
+		pn = dynProperties[dir];
+
+		staticProps[pn[5].toLowerCase()] = dims[pn[5].toLowerCase()] + "px";
+		staticProps[pn[4].toLowerCase()] = "0";
+		staticProps[borderConst + pn[1] + widthConst] = dims[pn[4].toLowerCase()] + "px";
+		staticProps[borderConst + pn[1] + "Color"] = bgColor;
+
+		var p0 = props[0];
+		p0[borderConst + pn[1] + widthConst] = 0; 
+		p0[borderConst + pn[1] + "Color"] = darkColor; 
+		p0[borderConst + pn[2] + widthConst] = dims[pn[6]] / 2;
+		p0[borderConst + pn[3] + widthConst] = dims[pn[6]] / 2;
+		p0[pn[2].toLowerCase()] = dims[pn[2].toLowerCase()] - dims[pn[6]] / 8;
+		p0[pn[7].toLowerCase()] = dims[pn[7].toLowerCase()] + dims[pn[4].toLowerCase()] / 2;
+		p0[pn[5].toLowerCase()] = dims[pn[6]];
+
+		var p1 = props[1];
+		p1[borderConst + pn[0] + "Color"] = { start: lightColor, end: endColor };
+		p1[borderConst + pn[0] + widthConst] = dims[pn[4].toLowerCase()];
+		p1[borderConst + pn[2] + widthConst] = 0;
+		p1[borderConst + pn[3] + widthConst] = 0;
+		p1[pn[5].toLowerCase()] = { start: dims[pn[6]], end: dims[pn[5].toLowerCase()] };
+
+		dojo.mixin(hs, staticProps);
+		dojo.style(helperNode, hs);
+		dojo.body().appendChild(helperNode);
+
+		var finalize = function(){
+			helperNode.parentNode.removeChild(helperNode);
+			s.visibility = "visible";
+		};
+
+		anims[1] = dojo.animateProperty({
+			node: helperNode, 
+			duration: duration,
+			properties: p1,
+			onEnd: finalize
+		});
+		anims[0] = dojo.animateProperty({
+			node: helperNode, 
+			duration: duration,
+			properties: p0
+		});
+
+		// hide the original node
+		dojo.connect(anims[0], "play", function(){ s.visibility = "hidden"; });
+
+		return dojo.fx.chain(anims); // dojo._Animation
+
+	}
+		
+})();

@@ -1,9 +1,10 @@
 dojo.provide("dojox.storage.GearsStorageProvider");
+dojo.require("dojo.gears");
 dojo.require("dojox.storage.Provider");
 dojo.require("dojox.storage.manager");
 dojo.require("dojox.sql");
 
-if(dojo.isGears){
+if(dojo.gears.available){
 	
 	(function(){
 		// make sure we don't define the gears provider if we're not gears
@@ -65,7 +66,7 @@ if(dojo.isGears){
 			
 			isAvailable: function(){
 				// is Google Gears available and defined?
-				return this._available = dojo.isGears;
+				return this._available = dojo.gears.available;
 			},
 
 			put: function(key, value, resultsHandler, namespace){
@@ -93,12 +94,12 @@ if(dojo.isGears){
 				}catch(e){
 					// indicate we failed
 					console.debug("dojox.storage.GearsStorageProvider.put:", e);
-					resultsHandler(this.FAILED, key, e.toString());
+					resultsHandler(this.FAILED, key, e.toString(), namespace);
 					return;
 				}
 				
 				if(resultsHandler){
-					resultsHandler(dojox.storage.SUCCESS, key, null);
+					resultsHandler(dojox.storage.SUCCESS, key, null, namespace);
 				}
 			},
 
@@ -226,13 +227,13 @@ if(dojo.isGears){
 					// indicate we failed
 					console.debug("dojox.storage.GearsStorageProvider.putMultiple:", e);
 					if(resultsHandler){
-						resultsHandler(this.FAILED, keys, e.toString());
+						resultsHandler(this.FAILED, keys, e.toString(), namespace);
 					}
 					return;
 				}
 				
 				if(resultsHandler){
-					resultsHandler(dojox.storage.SUCCESS, key, null);
+					resultsHandler(dojox.storage.SUCCESS, keys, null, namespace);
 				}
 			},
 

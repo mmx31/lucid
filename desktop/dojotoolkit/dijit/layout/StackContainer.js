@@ -21,11 +21,12 @@ dojo.declare(
 	//	Publishes topics [widgetId]-addChild, [widgetId]-removeChild, and [widgetId]-selectChild
 	//
 	//	Can be base class for container, Wizard, Show, etc.
-	// 
-	//
+
 	// doLayout: Boolean
 	//  if true, change the size of my currently displayed child to match my size
 	doLayout: true,
+
+	baseClass: "dijitStackContainer",
 
 	_started: false,
 /*=====
@@ -35,7 +36,8 @@ dojo.declare(
 	selectedChildWidget: null,
 =====*/
 	postCreate: function(){
-		dijit.setWaiRole((this.containerNode || this.domNode), "tabpanel");
+		this.inherited(arguments);
+		dijit.setWaiRole(this.containerNode, "tabpanel");
 		this.connect(this.domNode, "onkeypress", this._onKeyPress);
 	},
 	
@@ -72,29 +74,35 @@ dojo.declare(
 		this.inherited(arguments);
 	},
 
-	_setupChild: function(/*Widget*/ page){
+	_setupChild: function(/*Widget*/ child){
 		// Summary: prepare the given child
 
-		page.domNode.style.display = "none";
+		this.inherited(arguments);
+
+		child.domNode.style.display = "none";
 
 		// since we are setting the width/height of the child elements, they need
 		// to be position:relative, or IE has problems (See bug #2033)
-		page.domNode.style.position = "relative";
+		child.domNode.style.position = "relative";
 
-		return page; // dijit._Widget
+		// remove the title attribute so it doesn't show up when i hover
+		// over a node
+		child.domNode.title = "";
+
+		return child; // dijit._Widget
 	},
 
 	addChild: function(/*Widget*/ child, /*Integer?*/ insertIndex){
 		// summary: Adds a widget to the stack
 		 
-		dijit._Container.prototype.addChild.apply(this, arguments);
-		child = this._setupChild(child);
+		this.inherited(arguments);
 
 		if(this._started){
-			// in case the tab titles have overflowed from one line to two lines
-			this.layout();
-
 			dojo.publish(this.id+"-addChild", [child, insertIndex]);
+
+			// in case the tab titles have overflowed from one line to two lines
+			// (or, if this if first child, from zero lines to one line)
+			this.layout();
 
 			// if this is the first child, then select it
 			if(!this.selectedChildWidget){
@@ -106,7 +114,7 @@ dojo.declare(
 	removeChild: function(/*Widget*/ page){
 		// summary: Removes the pane from the stack
 
-		dijit._Container.prototype.removeChild.apply(this, arguments);
+		this.inherited(arguments);
 
 		// If we are being destroyed than don't run the code below (to select another page), because we are deleting
 		// every page one by one
@@ -252,6 +260,7 @@ dojo.declare(
 
 			// TODO: change key from object to id, to get more separation from StackContainer
 			this.pane2button = {};		// mapping from panes to buttons
+			this.pane2handles = {};		// mapping from panes to dojo.connect() handles
 			this.pane2menu = {};		// mapping from panes to close menu
 
 			this._subscriptions=[
@@ -291,18 +300,20 @@ dojo.declare(
 			this.addChild(button, insertIndex);
 			this.pane2button[page] = button;
 			page.controlButton = button;	// this value might be overwritten if two tabs point to same container
-			
-			dojo.connect(button, "onClick", dojo.hitch(this,"onButtonClick",page));
+
+			var handles = [];
+			handles.push(dojo.connect(button, "onClick", dojo.hitch(this,"onButtonClick",page)));
 			if(page.closable){
-				dojo.connect(button, "onClickCloseButton", dojo.hitch(this,"onCloseButtonClick",page));
+				handles.push(dojo.connect(button, "onClickCloseButton", dojo.hitch(this,"onCloseButtonClick",page)));
 				// add context menu onto title button
 				var _nlsResources = dojo.i18n.getLocalization("dijit", "common");
 				var closeMenu = new dijit.Menu({targetNodeIds:[button.id], id:button.id+"_Menu"});
 				var mItem = new dijit.MenuItem({label:_nlsResources.itemClose});
-            	dojo.connect(mItem, "onClick", dojo.hitch(this, "onCloseButtonClick", page));
-           		closeMenu.addChild(mItem);
-           		this.pane2menu[page] = closeMenu;
+				handles.push(dojo.connect(mItem, "onClick", dojo.hitch(this, "onCloseButtonClick", page)));
+				closeMenu.addChild(mItem);
+				this.pane2menu[page] = closeMenu;
 			}
+			this.pane2handles[page] = handles;
 			if(!this._currentChild){ // put the first child into the tab order
 				button.focusNode.setAttribute("tabIndex", "0");
 				this._currentChild = page;
@@ -318,16 +329,19 @@ dojo.declare(
 			//   Called whenever a page is removed from the container.
 			//   Remove the button corresponding to the page.
 			if(this._currentChild === page){ this._currentChild = null; }
-			var button = this.pane2button[page];
+			dojo.forEach(this.pane2handles[page], dojo.disconnect);
+			delete this.pane2handles[page];
 			var menu = this.pane2menu[page];
 			if (menu){
-				menu.destroy();
+				menu.destroyRecursive();
+				delete this.pane2menu[page];
 			}
+			var button = this.pane2button[page];
 			if(button){
 				// TODO? if current child { reassign }
 				button.destroy();
+				delete this.pane2button[page];
 			}
-			this.pane2button[page] = null;
 		},
 
 		onSelectChild: function(/*Widget*/ page){
@@ -338,16 +352,16 @@ dojo.declare(
 
 			if(this._currentChild){
 				var oldButton=this.pane2button[this._currentChild];
-				oldButton.setAttribute('checked', false);
+				oldButton.attr('checked', false);
 				oldButton.focusNode.setAttribute("tabIndex", "-1");
 			}
 
 			var newButton=this.pane2button[page];
-			newButton.setAttribute('checked', true);
+			newButton.attr('checked', true);
 			this._currentChild = page;
 			newButton.focusNode.setAttribute("tabIndex", "0");
 			var container = dijit.byId(this.containerId);
-			dijit.setWaiState(container.containerNode || container.domNode, "labelledby", newButton.id);
+			dijit.setWaiState(container.containerNode, "labelledby", newButton.id);
 		},
 
 		onButtonClick: function(/*Widget*/ page){
@@ -388,7 +402,7 @@ dojo.declare(
 			var forward = null;
 			if(e.ctrlKey || !e._djpage){
 				var k = dojo.keys;
-				switch(e.keyCode){
+				switch(e.charOrCode){
 					case k.LEFT_ARROW:
 					case k.UP_ARROW:
 						if(!e._djpage){ forward = false; }
@@ -411,10 +425,10 @@ dojo.declare(
 						break;
 					default:
 						if(e.ctrlKey){
-							if(e.keyCode == k.TAB){
+							if(e.charOrCode == k.TAB){
 								this.adjacent(!e.shiftKey).onClick();
 								dojo.stopEvent(e);
-							}else if(e.keyChar == "w"){
+							}else if(e.charOrCode == "w"){
 								if(this._currentChild.closable){
 									this.onCloseButtonClick(this._currentChild);
 								}

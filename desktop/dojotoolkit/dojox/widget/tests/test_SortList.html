@@ -3,26 +3,34 @@
 <html>
 <head>
 	<title>Dojox SortList Test</title>
+	
+	<!-- required: a default theme file -->
+	<link rel="stylesheet" id="themeStyles" href="../../../dijit/themes/tundra/tundra.css">
+	<link rel="stylesheet" href="../SortList/SortList.css">
+	
 	<style type="text/css">
 		@import "../../../dojo/resources/dojo.css";
-		@import "../../../dijit/themes/tundra/tundra.css";
-		@import "../../../dijit/themes/dijit.css";
 		@import "../../../dijit/tests/css/dijitTests.css"; 
-		@import "../SortList/SortList.css"; 
 	</style>
 
+	<!-- required: dojo.js -->
 	<script type="text/javascript" src="../../../dojo/dojo.js" djConfig="isDebug:true, parseOnLoad: true"></script>
+
+	<!-- do not use! only for testing dynamic themes -->
 	<script type="text/javascript" src="../../../dijit/tests/_testCommon.js"></script>
+	<!-- debugging -->
 	<script type="text/javascript" src="../SortList.js"></script>
+	
 	<script type="text/javascript">
-		// dojo.require("dojox.widget.SortList");
+		dojo.require("dojox.widget.SortList");
 		dojo.require("dijit.layout.TabContainer");
-		dojo.require("dijit.layout.SplitContainer");
+		dojo.require("dijit.layout.BorderContainer");
 		dojo.require("dojo.data.ItemFileReadStore"); 
 		dojo.require("dojo.parser");	// scan page for widgets and instantiate them
 	</script>
 </head>
-<body>
+
+<body class="tundra">
 
 	<h1 class="testTitle">Dojox SortList test</h1>
 
@@ -38,11 +46,11 @@
 		<div dojoType="dojox.widget.SortList" store="stateStore" title="closable" heading="countries" closable="true"></div>
 	</div>
 
-	<h3>Child of a SplitContainer</h3>
-	<div dojoType="dijit.layout.SplitContainer" sizerWidth="7" activeSizing="false" orientaton="vertical" style="width:600px; height:200px;">
-		<div dojoType="dojox.widget.SortList" store="stateStore" title="list 1" layoutAlign="left" sizeShare="33"></div>
-		<div dojoType="dojox.widget.SortList" store="stateStore" title="list 2" layoutAlign="client" sizeShare="33"></div>
-		<div dojoType="dojox.widget.SortList" store="stateStore" title="closable" layoutAlign="right" sizeShare="33"></div>
+	<h3>Child of a BorderContainer</h3>
+	<div dojoType="dijit.layout.BorderContainer" design="sidebar" gutters="true" liveSplitters="true" style="border: 1px solid #ccc; width:600px; height:200px;">
+		<div dojoType="dojox.widget.SortList" splitter="true" store="stateStore" title="list 1" region="leading" style="width: 33%"></div>
+		<div dojoType="dojox.widget.SortList" splitter="true" store="stateStore" title="list 2" region="center"></div>
+		<div dojoType="dojox.widget.SortList" splitter="true" store="stateStore" title="closable" region="trailing" style="width: 33%"></div>
 	</div>
 	
 	<br>

@@ -54,7 +54,10 @@ dojo.declare("dojox.widget.Toaster", [dijit._Widget, dijit._Templated], {
 		postCreate: function(){
 			this.inherited(arguments);
 			this.hide();
-
+			
+			// place node as a child of body for positioning
+			dojo.body().appendChild(this.domNode);
+			
 			this.clipNode.className = "dijitToasterClip";
 			this.containerNode.className += " dijitToasterContainer";
 			this.contentNode.className = "dijitToasterContent";
@@ -75,11 +78,11 @@ dojo.declare("dojox.widget.Toaster", [dijit._Widget, dijit._Templated], {
 				return w.substring(0,1).toUpperCase() + w.substring(1);
 		},
 
-		setContent: function(/*String*/message, /*String*/messageType, /*int?*/duration){
+		setContent: function(/*String|Function*/message, /*String*/messageType, /*int?*/duration){
 			// summary:
 			//		sets and displays the given message and show duration
 			// message:
-			//		the message
+			//		the message. If this is a function, it will be called with this toaster widget as the only argument.
 			// messageType:
 			//		type of message; possible values in messageTypes enumeration ("message", "warning", "error", "fatal")
 			// duration:
@@ -105,10 +108,7 @@ dojo.declare("dojox.widget.Toaster", [dijit._Widget, dijit._Templated], {
 
 			dojo.style(this.containerNode, "opacity", 1);
 
-			if(message && this.isVisible){
-				message = this.contentNode.innerHTML + this.separator + message;
-			}
-			this.contentNode.innerHTML = message;
+			this._setContent(message);
 
 			dojo.addClass(this.containerNode, "dijitToaster" + this._capitalize(messageType || this.defaultType));
 
@@ -171,6 +171,16 @@ dojo.declare("dojox.widget.Toaster", [dijit._Widget, dijit._Templated], {
 			}
 		},
 		
+		_setContent: function(message){
+			if(dojo.isFunction(message)){
+				message(this);
+				return;
+			}
+			if(message && this.isVisible){
+				message = this.contentNode.innerHTML + this.separator + message;
+			}
+			this.contentNode.innerHTML = message;
+		},
 		_cancelHideTimer:function(){
 			if (this._hideTimer){
 				clearTimeout(this._hideTimer);

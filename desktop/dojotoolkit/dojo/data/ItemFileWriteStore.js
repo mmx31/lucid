@@ -256,7 +256,7 @@ dojo.declare("dojo.data.ItemFileWriteStore", dojo.data.ItemFileReadStore, {
 							//Remove the note of the reference to the item and set the values on the modified attribute.
 							this._removeReferenceFromMap(item, containingItem, attribute); 
 							if(newValues.length < oldValues.length){
-								this.setValues(containingItem, attribute, newValues);
+								this._setValueOrValues(containingItem, attribute, newValues, true);
 							}
 						}
 					}
@@ -662,19 +662,6 @@ dojo.declare("dojo.data.ItemFileWriteStore", dojo.data.ItemFileReadStore, {
 		this._assert(!this._saveInProgress);
 
 		var identity;
-		for(identity in this._pending._newItems){
-			var newItem = this._pending._newItems[identity];
-			newItem[this._storeRefPropName] = null;
-			// null out the new item, but don't change the array index so
-			// so we can keep using _arrayOfAllItems.length.
-			this._arrayOfAllItems[newItem[this._itemNumPropName]] = null;
-			if(newItem[this._rootItemPropName]){
-				this._removeArrayElement(this._arrayOfTopLevelItems, newItem);
-			}
-			if(this._itemsByIdentity){
-				delete this._itemsByIdentity[identity];
-			}
-		}
 		for(identity in this._pending._modifiedItems){
 			// find the original item and the modified item that replaced it
 			var originalItem = this._pending._modifiedItems[identity];
@@ -744,6 +731,20 @@ dojo.declare("dojo.data.ItemFileWriteStore", dojo.data.ItemFileReadStore, {
 			}
 		}
 
+		for(identity in this._pending._newItems){
+			var newItem = this._pending._newItems[identity];
+			newItem[this._storeRefPropName] = null;
+			// null out the new item, but don't change the array index so
+			// so we can keep using _arrayOfAllItems.length.
+			this._arrayOfAllItems[newItem[this._itemNumPropName]] = null;
+			if(newItem[this._rootItemPropName]){
+				this._removeArrayElement(this._arrayOfTopLevelItems, newItem);
+			}
+			if(this._itemsByIdentity){
+				delete this._itemsByIdentity[identity];
+			}
+		}
+
 		this._pending = {
 			_newItems:{}, 
 			_modifiedItems:{}, 
@@ -759,7 +760,7 @@ dojo.declare("dojo.data.ItemFileWriteStore", dojo.data.ItemFileReadStore, {
 			var identity = this.getIdentity(item);
 			return new Boolean(this._pending._newItems[identity] || 
 				this._pending._modifiedItems[identity] ||
-				this._pending._deletedItems[identity]); // boolean
+				this._pending._deletedItems[identity]).valueOf(); // boolean
 		}else{
 			// return true if the store is dirty -- which means return true
 			// if there are any new items, dirty items, or modified items
@@ -796,5 +797,24 @@ dojo.declare("dojo.data.ItemFileWriteStore", dojo.data.ItemFileReadStore, {
 		
 		// No need to do anything. This method is here just so that the 
 		// client code can connect observers to it. 
+	},
+
+	close: function(/* object? */ request) {
+		 // summary:
+		 //		Over-ride of base close function of ItemFileReadStore to add in check for store state.
+		 // description:
+		 //		Over-ride of base close function of ItemFileReadStore to add in check for store state.
+		 //		If the store is still dirty (unsaved changes), then an error will be thrown instead of
+		 //		clearing the internal state for reload from the url.
+
+		 //Clear if not dirty ... or throw an error
+		 if(this.clearOnClose){
+			 if(!this.isDirty()){
+				 this.inherited(arguments);
+			 }else if(this._jsonFileUrl !== ""){
+				 //Only throw an error if the store was dirty and we were loading from a url (cannot reload from url until state is saved).
+				 throw new Error("dojo.data.ItemFileWriteStore: There are unsaved changes present in the store.  Please save or revert the changes before invoking close.");
+			 }
+		 }
 	}
 });

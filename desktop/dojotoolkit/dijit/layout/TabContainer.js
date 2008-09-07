@@ -2,6 +2,7 @@ dojo.provide("dijit.layout.TabContainer");
 
 dojo.require("dijit.layout.StackContainer");
 dojo.require("dijit._Templated");
+dojo.requireLocalization("dijit", "common");
 
 dojo.declare("dijit.layout.TabContainer",
 	[dijit.layout.StackContainer, dijit._Templated],
@@ -15,11 +16,17 @@ dojo.declare("dijit.layout.TabContainer",
 	//
 	//	Publishes topics [widgetId]-addChild, [widgetId]-removeChild, and [widgetId]-selectChild
 	//	(where [widgetId] is the id of the TabContainer itself.
-	//
+
 	// tabPosition: String
 	//   Defines where tabs go relative to tab content.
 	//   "top", "bottom", "left-h", "right-h"
 	tabPosition: "top",
+
+	baseClass: "dijitTabContainer",
+	
+	// tabStrip: bool
+	//   Defines whether the tablist gets an extra class for layouting
+	tabStrip: false,
 
 	templateString: null,	// override setting in StackContainer
 	templatePath: dojo.moduleUrl("dijit.layout", "templates/TabContainer.html"),
@@ -28,16 +35,27 @@ dojo.declare("dijit.layout.TabContainer",
 	//		An optional parameter to overrider the default TabContainer controller used.
 	_controllerWidget: "dijit.layout.TabController",
 
-	postCreate: function(){	
+	postMixInProperties: function(){
+		// set class name according to tab position, ex: dijiTabContainerTop
+		this.baseClass += this.tabPosition.charAt(0).toUpperCase() + this.tabPosition.substr(1).replace(/-.*/, "");
 		this.inherited(arguments);
+	},
+
+	postCreate: function(){
+		this.inherited(arguments);
+
 		// create the tab list that will have a tab (a.k.a. tab button) for each tab panel
 		var TabController = dojo.getObject(this._controllerWidget);
 		this.tablist = new TabController({
 			id: this.id + "_tablist",
 			tabPosition: this.tabPosition,
 			doLayout: this.doLayout,
-			containerId: this.id
-		}, this.tablistNode);		
+			containerId: this.id,
+			"class": this.baseClass + "-tabs" + (this.doLayout ? "" : " dijitTabNoLayout")
+		}, this.tablistNode);
+		
+		// add Class for tabstrip
+		if (this.tabStrip){	dojo.addClass(this.tablist.domNode, this.baseClass+"Strip"); }			
 	},
 
 	_setupChild: function(/* Widget */tab){
@@ -52,27 +70,6 @@ dojo.declare("dijit.layout.TabContainer",
 		// wire up the tablist and its tabs
 		this.tablist.startup();
 		this.inherited(arguments);
-
-		if(dojo.isSafari){
-			// sometimes safari 3.0.3 miscalculates the height of the tab labels, see #4058
-			setTimeout(dojo.hitch(this, "layout"), 0);
-		}
-
-		if(dojo.isIE && !this.isLeftToRight() && this.tabPosition == "right-h" &&
-		   this.tablist && this.tablist.pane2button){
-			//need rectify non-closable tab in IE, only for "right-h" mode
-			for(var pane in this.tablist.pane2button){
-				var tabButton = this.tablist.pane2button[pane];
-				if(!tabButton.closeButton){ continue; }
-				tabButtonStyle = tabButton.closeButtonNode.style;
-				tabButtonStyle.position ="absolute";
-				if(dojo.isIE < 7){
-					tabButtonStyle.left = tabButton.domNode.offsetWidth + "px";
-				}else{
-					tabButtonStyle.padding = "0px";
-				}
-			}
-		}
 	},
 
 	layout: function(){
@@ -83,13 +80,14 @@ dojo.declare("dijit.layout.TabContainer",
 		var titleAlign = this.tabPosition.replace(/-h/,"");
 		var children = [
 			{ domNode: this.tablist.domNode, layoutAlign: titleAlign },
+			{ domNode: this.tablistSpacer, layoutAlign: titleAlign },
 			{ domNode: this.containerNode, layoutAlign: "client" }
 		];
 		dijit.layout.layoutChildren(this.domNode, this._contentBox, children);
 
 		// Compute size to make each of my children.
-		// children[1] is the margin-box size of this.containerNode, set by layoutChildren() call above
-		this._containerContentBox = dijit.layout.marginBox2contentBox(this.containerNode, children[1]);
+		// children[2] is the margin-box size of this.containerNode, set by layoutChildren() call above
+		this._containerContentBox = dijit.layout.marginBox2contentBox(this.containerNode, children[2]);
 
 		if(this.selectedChildWidget){
 			this._showChild(this.selectedChildWidget);
@@ -126,31 +124,25 @@ dojo.declare("dijit.layout.TabController",
 	tabPosition: "top",
 
 	// doLayout: Boolean
-	// 	TODOC: deprecate doLayout? not sure.
 	doLayout: true,
 
 	// buttonWidget: String
 	//	The name of the tab widget to create to correspond to each page
 	buttonWidget: "dijit.layout._TabButton",
 
-	postMixInProperties: function(){
-		this["class"] = "dijitTabLabels-" + this.tabPosition + (this.doLayout ? "" : " dijitTabNoLayout");
-		this.inherited(arguments);
-	},
-
-//TODO: can this be accomplished in CSS?
 	_rectifyRtlTabList: function(){
-		//Summary: Rectify the length of all tabs in rtl, otherwise the tab lengths are different in IE
+		//summary: Rectify the width of all tabs in rtl, otherwise the tab widths are different in IE
 		if(0 >= this.tabPosition.indexOf('-h')){ return; }
 		if(!this.pane2button){ return; }
 
-		var maxLen = 0;
+		var maxWidth = 0;
 		for(var pane in this.pane2button){
-			maxLen = Math.max(maxLen, dojo.marginBox(this.pane2button[pane].innerDiv).w);
+			var ow = this.pane2button[pane].innerDiv.scrollWidth;
+			maxWidth = Math.max(maxWidth, ow);
 		}
 		//unify the length of all the tabs
 		for(pane in this.pane2button){
-			this.pane2button[pane].innerDiv.style.width = maxLen + 'px';
+			this.pane2button[pane].innerDiv.style.width = maxWidth + 'px';
 		}	
 	}
 });
@@ -171,6 +163,13 @@ dojo.declare("dijit.layout._TabButton",
 	postCreate: function(){
 		if(this.closeButton){
 			dojo.addClass(this.innerDiv, "dijitClosable");
+			var _nlsResources = dojo.i18n.getLocalization("dijit", "common");
+			if(this.closeButtonNode){
+				dojo.attr(this.closeButtonNode,"title", _nlsResources.itemClose);
+			}
+			if(this.closeText){
+				dojo.attr(this.closeText, "title", _nlsResources.itemClose);
+			}
 		}else{
 			this.closeButtonNode.style.display="none";
 		}

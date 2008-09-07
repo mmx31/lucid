@@ -1,6 +1,7 @@
 dojo.provide("dojox.data.QueryReadStore");
 
 dojo.require("dojo.string");
+dojo.require("dojo.data.util.sorter");
 
 dojo.declare("dojox.data.QueryReadStore",
 	null,
@@ -22,7 +23,7 @@ dojo.declare("dojox.data.QueryReadStore",
 		//		has no way of knowing which field the server will declare as
 		//		identifier.
 		//
-		//	examples:
+		//	example:
 		// |	// The parameter "query" contains the data that are sent to the server.
 		// |	var store = new dojox.data.QueryReadStore({url:'/search.php'});
 		// |	store.fetch({query:{name:'a'}, queryOptions:{ignoreCase:false}});
@@ -77,6 +78,8 @@ dojo.declare("dojox.data.QueryReadStore",
 		// (this also depends on other factors, such as is caching used, etc).
 		_lastServerQuery:null,
 		
+		// Store how many rows we have so that we can pass it to a clientPaging handler
+		_numRows:-1,
 		
 		// Store a hash of the last server request. Actually I introduced this
 		// for testing, so I can check if no unnecessary requests were issued for
@@ -242,7 +245,7 @@ dojo.declare("dojox.data.QueryReadStore",
 				if(requestObject.onBegin){
 					requestObject.onBegin.call(scope, numRows, requestObject);
 				}
-				if(requestObject.sort && this.doClientSorting){
+				if(requestObject.sort && self.doClientSorting){
 					items.sort(dojo.data.util.sorter.createSortFunction(requestObject.sort, self));
 				}
 				if(requestObject.onItem){
@@ -289,6 +292,49 @@ dojo.declare("dojox.data.QueryReadStore",
 				return [this._labelAttr]; //array
 			}
 			return null; //null
+		},
+		
+		_xhrFetchHandler: function(data, request, fetchHandler, errorHandler){
+			data = this._filterResponse(data);
+			if (data.label){
+				this._labelAttr = data.label;
+			}
+			var numRows = data.numRows || -1;
+
+			this._items = [];
+			// Store a ref to "this" in each item, so we can simply check if an item
+			// really origins form here (idea is from ItemFileReadStore, I just don't know
+			// how efficient the real storage use, garbage collection effort, etc. is).
+			dojo.forEach(data.items,function(e){ 
+				this._items.push({i:e, r:this}); 
+			},this); 
+			
+			var identifier = data.identifier;
+			this._itemsByIdentity = {};
+			if(identifier){
+				this._identifier = identifier;
+				var i;
+				for(i = 0; i < this._items.length; ++i){
+					var item = this._items[i].i;
+					var identity = item[identifier];
+					if(!this._itemsByIdentity[identity]){
+						this._itemsByIdentity[identity] = item;
+					}else{
+						throw new Error(this._className+":  The json data as specified by: [" + this.url + "] is malformed.  Items within the list have identifier: [" + identifier + "].  Value collided: [" + identity + "]");
+					}
+				}
+			}else{
+				this._identifier = Number;
+				for(i = 0; i < this._items.length; ++i){
+					this._items[i].n = i;
+				}
+			}
+			
+			// TODO actually we should do the same as dojo.data.ItemFileReadStore._getItemsFromLoadedData() to sanitize
+			// (does it really sanititze them) and store the data optimal. should we? for security reasons???
+			numRows = this._numRows = (numRows === -1) ? this._items.length : numRows;
+			fetchHandler(this._items, request, numRows);
+			this._numRows = numRows;		
 		},
 		
 		_fetchItems: function(request, fetchHandler, errorHandler){
@@ -346,49 +392,13 @@ dojo.declare("dojox.data.QueryReadStore",
 			if(this.doClientPaging && this._lastServerQuery!==null &&
 				dojo.toJson(serverQuery)==dojo.toJson(this._lastServerQuery)
 				){
-				fetchHandler(this._items, request);
+				this._numRows = (this._numRows === -1) ? this._items.length : this._numRows;
+				fetchHandler(this._items, request, this._numRows);
 			}else{
 				var xhrFunc = this.requestMethod.toLowerCase()=="post" ? dojo.xhrPost : dojo.xhrGet;
 				var xhrHandler = xhrFunc({url:this.url, handleAs:"json-comment-optional", content:serverQuery});
 				xhrHandler.addCallback(dojo.hitch(this, function(data){
-					data = this._filterResponse(data);
-					if (data.label){
-						this._labelAttr = data.label;
-					}
-					var numRows = data.numRows || -1;
-	
-					this._items = [];
-					// Store a ref to "this" in each item, so we can simply check if an item
-					// really origins form here (idea is from ItemFileReadStore, I just don't know
-					// how efficient the real storage use, garbage collection effort, etc. is).
-					dojo.forEach(data.items,function(e){ 
-						this._items.push({i:e, r:this}); 
-					},this); 
-					
-					var identifier = data.identifier;
-					this._itemsByIdentity = {};
-					if(identifier){
-						this._identifier = identifier;
-						for(i = 0; i < this._items.length; ++i){
-							var item = this._items[i].i;
-							var identity = item[identifier];
-							if(!this._itemsByIdentity[identity]){
-								this._itemsByIdentity[identity] = item;
-							}else{
-								throw new Error(this._className+":  The json data as specified by: [" + this.url + "] is malformed.  Items within the list have identifier: [" + identifier + "].  Value collided: [" + identity + "]");
-							}
-						}
-					}else{
-						this._identifier = Number;
-						for(i = 0; i < this._items.length; ++i){
-							this._items[i].n = i;
-						}
-					}
-					
-					// TODO actually we should do the same as dojo.data.ItemFileReadStore._getItemsFromLoadedData() to sanitize
-					// (does it really sanititze them) and store the data optimal. should we? for security reasons???
-					numRows = (numRows === -1) ? this._items.length : numRows;
-					fetchHandler(this._items, request, numRows);
+					this._xhrFetchHandler(data, request, fetchHandler, errorHandler);
 				}));
 				xhrHandler.addErrback(function(error){
 					errorHandler(error, request);
@@ -455,7 +465,7 @@ dojo.declare("dojox.data.QueryReadStore",
 			var _errorHandler = function(errorData, requestObject){
 				var scope =  keywordArgs.scope?keywordArgs.scope:dojo.global;
 				if(keywordArgs.onError){
-					keywordArgs.onError.call(scope, error);
+					keywordArgs.onError.call(scope, errorData);
 				}
 			};
 			

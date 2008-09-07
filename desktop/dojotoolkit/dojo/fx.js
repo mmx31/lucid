@@ -95,7 +95,7 @@ dojo.fx = {
 				return false;
 			});
 			if(this._current){
-				this._current.gotoPercent(offset / _current.duration, andPlay);
+				this._current.gotoPercent(offset / this._current.duration, andPlay);
 			}
 			return this;
 		},
@@ -189,7 +189,7 @@ dojo.fx = {
 			dojo.forEach(this._animations, function(a){
 				a.gotoPercent(a.duration < ms ? 1 : (ms / a.duration), andPlay);
 			});
-			this._call("gotoProcent", arguments);
+			this._call("gotoPercent", arguments);
 			return this;
 		},
 		stop: function(/*boolean?*/ gotoEnd){
@@ -307,7 +307,7 @@ dojo.fx.wipeIn = function(/*Object*/ args){
 	//		it's natural height (with no scrollbar).
 	//		Node must have no margin/border/padding.
 	args.node = dojo.byId(args.node);
-	var node = args.node, s = node.style;
+	var node = args.node, s = node.style, o;
 
 	var anim = dojo.animateProperty(dojo.mixin({
 		properties: {
@@ -316,6 +316,7 @@ dojo.fx.wipeIn = function(/*Object*/ args){
 				start: function(){
 					// start at current [computed] height, but use 1px rather than 0
 					// because 0 causes IE to display the whole panel
+					o = s.overflow;
 					s.overflow="hidden";
 					if(s.visibility=="hidden"||s.display=="none"){
 						s.height="1px";
@@ -336,6 +337,7 @@ dojo.fx.wipeIn = function(/*Object*/ args){
 
 	dojo.connect(anim, "onEnd", function(){ 
 		s.height = "auto";
+		s.overflow = o;
 	});
 
 	return anim; // dojo._Animation
@@ -347,6 +349,7 @@ dojo.fx.wipeOut = function(/*Object*/ args){
 	//		from it's current height to 1px, and then hide it.
 	var node = args.node = dojo.byId(args.node);
 	var s = node.style;
+	var o;
 
 	var anim = dojo.animateProperty(dojo.mixin({
 		properties: {
@@ -357,10 +360,12 @@ dojo.fx.wipeOut = function(/*Object*/ args){
 	}, args));
 
 	dojo.connect(anim, "beforeBegin", function(){
+		o = s.overflow;
 		s.overflow = "hidden";
 		s.display = "";
 	});
 	dojo.connect(anim, "onEnd", function(){
+		s.overflow = o;
 		s.height = "auto";
 		s.display = "none";
 	});

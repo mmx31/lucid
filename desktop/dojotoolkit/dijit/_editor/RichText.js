@@ -2,6 +2,7 @@ dojo.provide("dijit._editor.RichText");
 
 dojo.require("dijit._Widget");
 dojo.require("dijit._editor.selection");
+dojo.require("dijit._editor.range");
 dojo.require("dijit._editor.html");
 dojo.require("dojo.i18n");
 dojo.requireLocalization("dijit.form", "Textarea");
@@ -27,18 +28,26 @@ if(!dojo.config["useXDomain"] || dojo.config["allowXdRichTextSave"]){
 		})();
 	}else{
 		//dojo.body() is not available before onLoad is fired
-		try{
+		try {
 			dojo.doc.write('<textarea id="' + dijit._scopeName + '._editor.RichText.savedContent" ' +
 				'style="display:none;position:absolute;top:-100px;left:-100px;height:3px;width:3px;overflow:hidden;"></textarea>');
 		}catch(e){ }
 	}
 }
+
 dojo.declare("dijit._editor.RichText", dijit._Widget, {
-	constructor: function(){
+	constructor: function(params){
 		// summary:
-		//		dijit._editor.RichText is the core of the WYSIWYG editor in dojo, which
-		//		provides the basic editing features. It also encapsulates the differences
-		//		of different js engines for various browsers
+		//		dijit._editor.RichText is the core of dijit.Editor, which provides basic
+		//		WYSIWYG editing features.
+		//
+		// description:
+		//		dijit._editor.RichText is the core of dijit.Editor, which provides basic
+		//		WYSIWYG editing features. It also encapsulates the differences
+		//		of different js engines for various browsers.  Do not use this widget
+		//		with an HTML &lt;TEXTAREA&gt; tag, since the browser unescapes XML escape characters,
+		//		like &lt;.  This can have unexpected behavior and lead to security issues
+		//		such as scripting attacks.
 		//
 		// contentPreFilters: Array
 		//		pre content filter function register array.
@@ -74,7 +83,8 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		if(dojo.isMoz){
 			this.contentPreFilters.push(this._fixContentForMoz);
 			this.contentPostFilters.push(this._removeMozBogus);
-		}else if(dojo.isSafari){
+		}
+		if(dojo.isSafari){
 			this.contentPostFilters.push(this._removeSafariBogus);
 		}
 		//this.contentDomPostFilters.push(this._postDomFixUrlAttributes);
@@ -108,7 +118,8 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 	//		set height to fix the editor at a specific height, with scrolling.
 	//		By default, this is 300px. If you want to have the editor always
 	//		resizes to accommodate the content, use AlwaysShowToolbar plugin
-	//		and set height=""
+	//		and set height="". If this editor is used within a layout widget,
+	//		set height="100%".
 	height: "300px",
 
 	// minHeight: String
@@ -128,9 +139,15 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 	// onLoadDeferred: dojo.Deferred
 	//		deferred which is fired when the editor finishes loading
 	onLoadDeferred: null,
+	
+	// isTabIndent: Boolean
+	//		used to allow tab key and shift-tab to indent and outdent rather than navigate
+	isTabIndent: false,
 
 	postCreate: function(){
-		// summary: init
+		if("textarea" == this.domNode.tagName.toLowerCase()){
+			console.warn("RichText should not be used with the TEXTAREA tag.  See dijit._editor.RichText docs.");
+		}
 		dojo.publish(dijit._scopeName + "._editor.RichText::init", [this]);
 		this.open();
 		this.setupDefaultShortcuts();
@@ -143,30 +160,34 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		// 		implementation does not use Editor commands, but directly
 		//		executes the builtin commands within the underlying browser
 		//		support.
-		var exec = function(cmd, arg){
-			return arguments.length == 1 ? function(){ this.execCommand(cmd); } :
-				function(){ this.execCommand(cmd, arg); };
-		};
+		var exec = dojo.hitch(this, function(cmd, arg){
+			return function(){
+				return !this.execCommand(cmd,arg);
+			};
+		});
 
-		var ctrlKeyHandlers = { b: exec("bold"),
+		var ctrlKeyHandlers = { 
+			b: exec("bold"),
 			i: exec("italic"),
 			u: exec("underline"),
 			a: exec("selectall"),
 			s: function(){ this.save(true); },
+			m: function(){ this.isTabIndent = !this.isTabIndent; },
 
 			"1": exec("formatblock", "h1"),
 			"2": exec("formatblock", "h2"),
 			"3": exec("formatblock", "h3"),
 			"4": exec("formatblock", "h4"),
 
-			"\\": exec("insertunorderedlist") };
+			"\\": exec("insertunorderedlist")
+		};
 
 		if(!dojo.isIE){
 			ctrlKeyHandlers.Z = exec("redo"); //FIXME: undo?
 		}
 
 		for(var key in ctrlKeyHandlers){
-			this.addKeyHandler(key, this.KEY_CTRL, ctrlKeyHandlers[key]);
+			this.addKeyHandler(key, true, false, ctrlKeyHandlers[key]);
 		}
 	},
 
@@ -194,22 +215,27 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		//do not use _cacheLocalBlockFormatNames here, as it will
 		//trigger security warning in IE7
 
-		//in the array below, ul can not come directly after ol,
-		//otherwise the queryCommandValue returns Normal for it
-		var formats = ['p', 'pre', 'address', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ol', 'div', 'ul'];
+		//put p after div, so if IE returns Normal, we show it as paragraph
+		//We can distinguish p and div if IE returns Normal, however, in order to detect that,
+		//we have to call this.document.selection.createRange().parentElement() or such, which
+		//could slow things down. Leave it as it is for now
+		var formats = ['div', 'p', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ol', 'ul', 'address'];
 		var localhtml = "", format, i=0;
 		while((format=formats[i++])){
+			//append a <br> after each element to separate the elements more reliably
 			if(format.charAt(1) != 'l'){
-				localhtml += "<"+format+"><span>content</span></"+format+">";
+				localhtml += "<"+format+"><span>content</span></"+format+"><br/>";
 			}else{
-				localhtml += "<"+format+"><li>content</li></"+format+">";
+				localhtml += "<"+format+"><li>content</li></"+format+"><br/>";
 			}
 		}
 		//queryCommandValue returns empty if we hide editNode, so move it out of screen temporary
-		var div=dojo.doc.createElement('div');
-		div.style.position = "absolute";
-		div.style.left = "-2000px";
-		div.style.top = "-2000px";
+		var div = dojo.doc.createElement('div');
+		dojo.style(div, {
+			position: "absolute",
+			left: "-2000px",
+			top: "-2000px"
+		});
 		dojo.doc.body.appendChild(div);
 		div.innerHTML = localhtml;
 		var node = div.firstChild;
@@ -217,18 +243,28 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			dijit._editor.selection.selectElement(node.firstChild);
 			dojo.withGlobal(this.window, "selectElement", dijit._editor.selection, [node.firstChild]);
 			var nativename = node.tagName.toLowerCase();
-			this._local2NativeFormatNames[nativename] = dojo.doc.queryCommandValue("formatblock");//this.queryCommandValue("formatblock");
+			this._local2NativeFormatNames[nativename] = document.queryCommandValue("formatblock");
+			//this.queryCommandValue("formatblock");
 			this._native2LocalFormatNames[this._local2NativeFormatNames[nativename]] = nativename;
-			node = node.nextSibling;
+			node = node.nextSibling.nextSibling;
 		}
-		dojo.doc.body.removeChild(div);
+		dojo.body().removeChild(div);
 	},
 
 	open: function(/*DomNode?*/element){
-		// summary:
+		//	summary:
 		//		Transforms the node referenced in this.domNode into a rich text editing
-		//		node. This will result in the creation and replacement with an <iframe>
-		//		if designMode(FF)/contentEditable(IE) is used.
+		//		node. 
+		//	description:
+		//		Sets up the editing area asynchronously. This will result in
+		//		the creation and replacement with an <iframe> if
+		//		designMode(FF)/contentEditable(IE) is used and stylesheets are
+		//		specified, if we're in a browser that doesn't support
+		//		contentEditable.
+		//
+		//		A dojo.Deferred object is created at this.onLoadDeferred, and
+		//		users may attach to it to be informed when the rich-text area
+		//		initialization is finalized.
 
 		if((!this.onLoadDeferred)||(this.onLoadDeferred.fired >= 0)){
 			this.onLoadDeferred = new dojo.Deferred();
@@ -238,27 +274,30 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		dojo.publish(dijit._scopeName + "._editor.RichText::open", [ this ]);
 
 		this._content = "";
-		if((arguments.length == 1)&&(element["nodeName"])){ this.domNode = element; } // else unchanged
+		if((arguments.length == 1)&&(element["nodeName"])){ // else unchanged
+			this.domNode = element; 
+		} 
+
+		var dn = this.domNode;
 
 		var html;
-		if(	(this.domNode["nodeName"])&&
-			(this.domNode.nodeName.toLowerCase() == "textarea")){
+		if(	(dn["nodeName"])&&
+			(dn.nodeName.toLowerCase() == "textarea")){
 			// if we were created from a textarea, then we need to create a
 			// new editing harness node.
-			this.textarea = this.domNode;
-			this.name=this.textarea.name;
-			html = this._preFilterContent(this.textarea.value);
-			this.domNode = dojo.doc.createElement("div");
-			this.domNode.setAttribute('widgetId',this.id);
-			this.textarea.removeAttribute('widgetId');
-			this.domNode.cssText = this.textarea.cssText;
-			this.domNode.className += " "+this.textarea.className;
-			dojo.place(this.domNode, this.textarea, "before");
+			var ta = this.textarea = dn;
+			this.name = ta.name;
+			html = this._preFilterContent(ta.value);
+			dn = this.domNode = dojo.doc.createElement("div");
+			dn.setAttribute('widgetId', this.id);
+			ta.removeAttribute('widgetId');
+			dn.cssText = ta.cssText;
+			dn.className += " "+ta.className;
+			dojo.place(dn, ta, "before");
 			var tmpFunc = dojo.hitch(this, function(){
 				//some browsers refuse to submit display=none textarea, so
 				//move the textarea out of screen instead
-				dojo.attr(this.textarea, 'tabIndex', '-1');
-				with(this.textarea.style){
+				with(ta.style){
 					display = "block";
 					position = "absolute";
 					left = top = "-1000px";
@@ -277,33 +316,34 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 
 			// this.domNode.innerHTML = html;
 
-//				if(this.textarea.form){
-//					// FIXME: port: this used to be before advice!!!
-//					dojo.connect(this.textarea.form, "onsubmit", this, function(){
-//						// FIXME: should we be calling close() here instead?
-//						this.textarea.value = this.getValue();
-//					});
-//				}
+			if(ta.form){
+				dojo.connect(ta.form, "onsubmit", this, function(){
+					// FIXME: should we be calling close() here instead?
+					ta.value = this.getValue();
+				});
+			}
 		}else{
-			html = this._preFilterContent(dijit._editor.getChildrenHtml(this.domNode));
-			this.domNode.innerHTML = '';
+			html = this._preFilterContent(dijit._editor.getChildrenHtml(dn));
+			dn.innerHTML = "";
 		}
 		if(html == ""){ html = "&nbsp;"; }
 
-		var content = dojo.contentBox(this.domNode);
+		var content = dojo.contentBox(dn);
 		// var content = dojo.contentBox(this.srcNodeRef);
 		this._oldHeight = content.h;
 		this._oldWidth = content.w;
 
+		this.savedContent = html;
+
 		// If we're a list item we have to put in a blank line to force the
 		// bullet to nicely align at the top of text
-		if(	(this.domNode["nodeName"]) &&
-			(this.domNode.nodeName == "LI") ){
-			this.domNode.innerHTML = " <br>";
+		if(	(dn["nodeName"]) &&
+			(dn.nodeName == "LI") ){
+			dn.innerHTML = " <br>";
 		}
 
-		this.editingArea = dojo.doc.createElement("div");
-		this.domNode.appendChild(this.editingArea);
+		this.editingArea = dn.ownerDocument.createElement("div");
+		dn.appendChild(this.editingArea);
 
 		if(this.name != "" && (!dojo.config["useXDomain"] || dojo.config["allowXdRichTextSave"])){
 			var saveTextarea = dojo.byId(dijit._scopeName + "._editor.RichText.savedContent");
@@ -325,18 +365,12 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		}
 
 		this.isClosed = false;
+
 		// Safari's selections go all out of whack if we do it inline,
 		// so for now IE is our only hero
-		//if(typeof dojo.doc.body.contentEditable != "undefined"){
-		if(dojo.isIE || dojo.isSafari || dojo.isOpera){ // contentEditable, easy		
-
-			if(dojo.config["useXDomain"] && !dojo.config["dojoBlankHtmlUrl"]){
-				console.debug("dijit._editor.RichText: When using cross-domain Dojo builds,"
-				+ " please save dojo/resources/blank.html to your domain and set djConfig.dojoBlankHtmlUrl"
-				+ " to the path on your domain to blank.html");
-			}
-
-			var burl = dojo.config["dojoBlankHtmlUrl"] || (dojo.moduleUrl("dojo", "resources/blank.html")+"");
+		//if(typeof dojo.doc.body.contentEditable != "undefined")
+		if(dojo.isIE || dojo.isSafari || dojo.isOpera){ // contentEditable, easy
+			var burl = dojo.moduleUrl("dojo", "resources/blank.html")+"";
 			var ifr = this.editorObject = this.iframe = dojo.doc.createElement('iframe');
 			ifr.id = this.id+"_iframe";
 			ifr.src = burl;
@@ -388,10 +422,14 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			this._drawIframe(html);
 			this.savedContent = this.getValue(true);
 		}
-
+		
 		// TODO: this is a guess at the default line-height, kinda works
+		if(dn.nodeName == "LI"){
+			dn.lastChild.style.marginTop = "-1.2em";
+		}
+
 		if(this.domNode.nodeName == "LI"){ this.domNode.lastChild.style.marginTop = "-1.2em"; }
-		this.domNode.className += " RichTextEditable";
+		dojo.addClass(this.domNode, "RichTextEditable");
 	},
 
 	//static cache variables shared among all instance of this class
@@ -456,7 +494,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 
 		if(!this.iframe){
 			var ifr = this.iframe = dojo.doc.createElement("iframe");
-			ifr.id=this.id;
+			ifr.id=this.id+"_iframe";
 			// this.iframe.src = "about:blank";
 			// dojo.doc.body.appendChild(this.iframe);
 			// console.debug(this.iframe.contentDocument.open());
@@ -466,7 +504,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			ifrs.border = "none";
 			ifrs.lineHeight = "0"; // squash line height
 			ifrs.verticalAlign = "bottom";
-//			ifrs.scrolling = this.height ? "auto" : "vertical";
+			// ifrs.scrolling = this.height ? "auto" : "vertical";
 			this.editorObject = this.iframe;
 			// get screen reader text for mozilla here, too
 			this._localizedIframeTitles = dojo.i18n.getLocalization("dijit.form", "Textarea");
@@ -633,31 +671,42 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 
 	disabled: true,
 	_mozSettingProps: ['styleWithCSS','insertBrOnReturn'],
-	setDisabled: function(/*Boolean*/ disabled){
+	_setDisabledAttr: function(/*Boolean*/ value){
+		if(!this.editNode || "_delayedDisabled" in this){ 
+			this._delayedDisabled = value;
+			return; 
+		}
+		value = Boolean(value);
 		if(dojo.isIE || dojo.isSafari || dojo.isOpera){
-			if(dojo.isIE){ this.editNode.unselectable = "on"; } // prevent IE from setting focus
-			this.editNode.contentEditable = !disabled;
-			if(dojo.isIE){
+			var preventIEfocus = dojo.isIE && (this.isLoaded || !this.focusOnLoad);
+			if(preventIEfocus){ this.editNode.unselectable = "on"; }
+			this.editNode.contentEditable = !value;
+			if(preventIEfocus){
 				var _this = this;
 				setTimeout(function(){ _this.editNode.unselectable = "off"; }, 0);
 			}
 		}else{ //moz
-			if(disabled){
+			if(value){
 				//AP: why isn't this set in the constructor, or put in mozSettingProps as a hash?
 				this._mozSettings=[false,this.blockNodeForEnter==='BR'];
 			}
-			this.document.designMode=(disabled?'off':'on');
-			if(!disabled && this._mozSettings){
-				dojo.forEach(this._mozSettingProps, function(s,i){
-					this.document.execCommand(s,false,this._mozSettings[i]);
-				},this);
+			this.document.designMode=(value?'off':'on');
+			if(!value && this._mozSettingProps){
+				var ps = this._mozSettingProps;
+				for(var n in ps){
+					if(ps.hasOwnProperty(n)){
+						try{
+							this.document.execCommand(n,false,ps[n]);
+						}catch(e){}
+					}
+				}
 			}
-//			this.document.execCommand('contentReadOnly', false, disabled);
-//				if(disabled){
+//			this.document.execCommand('contentReadOnly', false, value);
+//				if(value){
 //					this.blur(); //to remove the blinking caret
 //				}
 		}
-		this.disabled = disabled;
+		this.disabled = value;
 	},
 
 /* Event handlers
@@ -666,10 +715,10 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 	_isResized: function(){ return false; },
 
 	onLoad: function(/* Event */ e){
-		// summary: handler after the content of the document finishes loading
-		this.isLoaded = true;
+		// summary:
+		//		handler after the content of the document finishes loading
 		if(!this.window.__registeredWindow){
-			this.window.__registeredWindow=true;
+			this.window.__registeredWindow = true;
 			dijit.registerWin(this.window);
 		}
 		if(!dojo.isIE && (this.height || dojo.isMoz)){
@@ -683,43 +732,49 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 				this.iframe.onfocus = function(){ _this.editNode.setActive(); }
 			}
 		}
+		this.focusNode = this.editNode; // for InlineEditBox
 
 		try{
-			this.setDisabled(false);
+			this.attr('disabled',false);
 		}catch(e){
 			// Firefox throws an exception if the editor is initially hidden
 			// so, if this fails, try again onClick by adding "once" advice
 			var handle = dojo.connect(this, "onClick", this, function(){
-				this.setDisabled(false);
+				this.attr('disabled',false);
 				dojo.disconnect(handle);
 			});
 		}
 
 		this._preDomFilterContent(this.editNode);
 
-		var events=this.events.concat(this.captureEvents),i=0,et;
-		while((et=events[i++])){
-			this.connect(this.document, et.toLowerCase(), et);
-		}
-		if(!dojo.isIE){
-			try{ // sanity check for Mozilla
-			//AP: what's the point of this?
-//					this.document.execCommand("useCSS", false, true); // old moz call
-				this.document.execCommand("styleWithCSS", false, false); // new moz call
-				//this.document.execCommand("insertBrOnReturn", false, false); // new moz call
-			}catch(e2){ }
-			// FIXME: when scrollbars appear/disappear this needs to be fired
-		}else{ // IE contentEditable
+		var events = this.events.concat(this.captureEvents);
+		var ap = (this.iframe) ? this.document : this.editNode;
+		dojo.forEach(events, function(item){
+			// dojo.connect(ap, item.toLowerCase(), console, "debug");
+			this.connect(ap, item.toLowerCase(), item);
+		}, this);
+		
+		if(dojo.isIE){ // IE contentEditable
 			// give the node Layout on IE
-			this.connect(this.document, "onmousedown", "_onMouseDown"); // #4996 fix focus
+			this.connect(this.document, "onmousedown", "_onIEMouseDown"); // #4996 fix focus
 			this.editNode.style.zoom = 1.0;
 		}
-
 		if(this.focusOnLoad){
-			setTimeout(dojo.hitch(this, "focus"), 0); // have to wait for IE to set unselectable=off
+			dojo.addOnLoad(dojo.hitch(this, "focus"));
 		}
 
 		this.onDisplayChanged(e);
+
+		if("_delayedDisabled" in this){
+			// We tried to set the disabled attribute previously - but we didn't
+			// have everything set up.  Set it up now that we have our nodes
+			// created
+			var d = this._delayedDisabled;
+			delete this._delayedDisabled;
+			this.attr("disabled", d);
+		}
+		this.isLoaded = true;
+
 		if(this.onLoadDeferred){
 			this.onLoadDeferred.callback(true);
 		}
@@ -740,8 +795,8 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 				this.tabStop.focus();
 			}else if(e.keyCode === dojo.keys.BACKSPACE && this.document.selection.type === "Control"){
 				// IE has a bug where if a non-text object is selected in the editor,
-		  // hitting backspace would act as if the browser's back button was
-		  // clicked instead of deleting the object. see #1069
+				// hitting backspace would act as if the browser's back button was
+				// clicked instead of deleting the object. see #1069
 				dojo.stopEvent(e);
 				this.execCommand("delete");
 			}else if((65 <= e.keyCode&&e.keyCode <= 90) ||
@@ -753,8 +808,8 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		}else if(dojo.isMoz){
 			if(e.keyCode == dojo.keys.TAB && !e.shiftKey && !e.ctrlKey && !e.altKey && this.iframe){
 				// update iframe document title for screen reader
-				this.iframe.contentDocument.title = this._localizedIframeTitles.iframeFocusTitle;
-				
+				var titleObj = dojo.isFF<3 ? this.iframe.contentDocument : this.iframe;
+			 	titleObj.title = this._localizedIframeTitles.iframeFocusTitle;
 				// Place focus on the iframe. A subsequent tab or shift tab will put focus
 				// on the correct control.
 				this.iframe.focus();  // this.focus(); won't work
@@ -767,6 +822,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 				dojo.stopEvent(e);
 			}
 		}
+		return true;
 	},
 
 	onKeyUp: function(e){
@@ -774,82 +830,104 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		return;
 	},
 
-	KEY_CTRL: 1,
-	KEY_SHIFT: 2,
+	setDisabled: function(/*Boolean*/ disabled){
+		dojo.deprecated('dijit.Editor::setDisabled is deprecated','use dijit.Editor::attr("disabled",boolean) instead', 2);
+		this.attr('disabled',disabled);
+	},
+	_setValueAttr: function(/*String*/ value){
+		// summary: registers that attr("value", foo) should call setValue(foo)
+		this.setValue(value);
+	},
 
 	onKeyPress: function(e){
-		// summary: Fired on keypress
-
 		// handle the various key events
-		var modifiers = (e.ctrlKey && !e.altKey) ? this.KEY_CTRL : 0 | e.shiftKey ? this.KEY_SHIFT : 0;
-
-		var key = e.keyChar || e.keyCode;
-		if(this._keyHandlers[key]){
-			// console.debug("char:", e.key);
-			var handlers = this._keyHandlers[key], i = 0, h;
-			while((h = handlers[i++])){
-				if(modifiers == h.modifiers){
-					if(!h.handler.apply(this,arguments)){
+		//console.debug("keyup char:", e.keyChar, e.ctrlKey);
+		var c = (e.keyChar && e.keyChar.toLowerCase()) || e.keyCode
+		var handlers = this._keyHandlers[c];
+		//console.debug("handler:", handlers);
+		var args = arguments;
+		if(handlers){
+			dojo.forEach(handlers, function(h){
+				if((!!h.shift == !!e.shiftKey)&&(!!h.ctrl == !!e.ctrlKey)){
+					if(!h.handler.apply(this, args)){
 						e.preventDefault();
 					}
-					break;
+					// break;
 				}
-			}
+			}, this);
 		}
 
 		// function call after the character has been inserted
-		setTimeout(dojo.hitch(this, function(){
-			this.onKeyPressed(e);
-		}), 1);
+		if(!this._onKeyHitch){
+			this._onKeyHitch=dojo.hitch(this, "onKeyPressed");
+		}
+		setTimeout(this._onKeyHitch, 1);
+		return true;
 	},
 
-	addKeyHandler: function(/*String*/key, /*Int*/modifiers, /*Function*/handler){
+	addKeyHandler: function(/*String*/key, /*Boolean*/ctrl, /*Boolean*/shift, /*Function*/handler){
 		// summary: add a handler for a keyboard shortcut
-		if(!dojo.isArray(this._keyHandlers[key])){ this._keyHandlers[key] = []; }
+		// description:
+		//	The key argument should be in lowercase if it is a letter charater
+		if(!dojo.isArray(this._keyHandlers[key])){
+			this._keyHandlers[key] = [];
+		}
 		this._keyHandlers[key].push({
-			modifiers: modifiers || 0,
+			shift: shift || false,
+			ctrl: ctrl || false,
 			handler: handler
 		});
 	},
 
-	onKeyPressed: function(/*Event*/e){
+	onKeyPressed: function(){
 		this.onDisplayChanged(/*e*/); // can't pass in e
 	},
 
 	onClick: function(/*Event*/e){
-//		console.info('onClick',this._tryDesignModeOn);
+		// console.info('onClick',this._tryDesignModeOn);
 		this.onDisplayChanged(e);
 	},
 
-	_onMouseDown: function(/*Event*/e){ // IE only to prevent 2 clicks to focus
+	_onIEMouseDown: function(/*Event*/e){ // IE only to prevent 2 clicks to focus
 		if(!this._focused && !this.disabled){
 			this.focus();
 		}
 	},
 
+	_savedSelection: null,
 	_onBlur: function(e){
+		// console.info('_onBlur')
+		this._savedSelection = dijit.range.getSelection(this.window);
+
 		this.inherited(arguments);
 		var _c=this.getValue(true);
+		
 		if(_c!=this.savedContent){
 			this.onChange(_c);
 			this.savedContent=_c;
 		}
 		if(dojo.isMoz && this.iframe){
-			this.iframe.contentDocument.title = this._localizedIframeTitles.iframeEditTitle;
+			var titleObj = dojo.isFF<3 ? this.iframe.contentDocument : this.iframe;
+			 titleObj.title = this._localizedIframeTitles.iframeEditTitle;
 		} 
+
 	},
 	_initialFocus: true,
 	_onFocus: function(/*Event*/e){
 		// summary: Fired on focus
-		this.inherited(arguments);
+
+		this._savedSelection = null;
+
+		// console.info('_onFocus')
 		if(dojo.isMoz && this._initialFocus){
 			this._initialFocus = false;
 			if(this.editNode.innerHTML.replace(/^\s+|\s+$/g, "") == "&nbsp;"){
 				this.placeCursorAtStart();
-//					this.execCommand("selectall");
-//					this.window.getSelection().collapseToStart();
+				// this.execCommand("selectall");
+				// this.window.getSelection().collapseToStart();
 			}
 		}
+		this.inherited(arguments);
 	},
 
 	// TODO: why is this needed - should we deprecate this ?
@@ -872,13 +950,13 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			// if we fire the event manually and let the browser handle the focusing, the latest  
 			// cursor position is focused like in FF                         
 			this.iframe.fireEvent('onfocus', document.createEventObject()); // createEventObject only in IE 
-//		}else{
-// TODO: should we throw here?
-//			console.debug("Have no idea how to focus into the editor!");
+		//	}else{
+		// 	// TODO: should we throw here?
+		//	console.debug("Have no idea how to focus into the editor!");
 		}
 	},
 
-//		_lastUpdate: 0,
+	// _lastUpdate: 0,
 	updateInterval: 200,
 	_updateTimer: null,
 	onDisplayChanged: function(/*Event*/e){
@@ -889,14 +967,14 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		//		If you don't want to have update too often,
 		//		onNormalizedDisplayChanged should be used instead
 
-//			var _t=new Date();
-		if(!this._updateTimer){
-//				this._lastUpdate=_t;
-			if(this._updateTimer){
-				clearTimeout(this._updateTimer);
-			}
-			this._updateTimer=setTimeout(dojo.hitch(this,this.onNormalizedDisplayChanged),this.updateInterval);
+		// var _t=new Date();
+		if(this._updateTimer){
+			clearTimeout(this._updateTimer);
 		}
+		if(!this._updateHandler){
+			this._updateHandler = dojo.hitch(this,"onNormalizedDisplayChanged");
+		}
+		this._updateTimer = setTimeout(this._updateHandler, this.updateInterval);
 	},
 	onNormalizedDisplayChanged: function(){
 		// summary:
@@ -904,14 +982,12 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		// description:
 		//		If something needs to happen immidiately after a
 		//		user change, please use onDisplayChanged instead
-		this._updateTimer=null;
+		delete this._updateTimer;
 	},
 	onChange: function(newContent){
 		// summary:
 		//		this is fired if and only if the editor loses focus and
 		//		the content is changed
-
-//			console.log('onChange',newContent);
 	},
 	_normalizeCommand: function(/*String*/cmd){
 		// summary:
@@ -920,19 +996,31 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		//		browser
 
 		var command = cmd.toLowerCase();
-		if(command == "hilitecolor" && !dojo.isMoz){
+		if(command == "formatblock"){
+			if(dojo.isSafari){ command = "heading"; }
+		}else if(command == "hilitecolor" && !dojo.isMoz){
 			command = "backcolor";
 		}
 
 		return command;
 	},
 
+	_qcaCache: {},
 	queryCommandAvailable: function(/*String*/command){
 		// summary:
-		//		Tests whether a command is supported by the host. Clients SHOULD check
-		//		whether a command is supported before attempting to use it, behaviour
-		//		for unsupported commands is undefined.
+		//		Tests whether a command is supported by the host. Clients
+		//		SHOULD check whether a command is supported before attempting
+		//		to use it, behaviour for unsupported commands is undefined.
 		// command: The command to test for
+
+		// memoizing version. See _queryCommandAvailable for computing version
+		var ca = this._qcaCache[command];
+		if(ca != undefined){ return ca; }
+		return this._qcaCache[command] = this._queryCommandAvailable(command);
+	},
+	
+	_queryCommandAvailable: function(/*String*/command){
+
 		var ie = 1;
 		var mozilla = 1 << 1;
 		var safari = 1 << 2;
@@ -967,7 +1055,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			case "inserthorizontalrule": case "insertimage":
 			case "insertorderedlist": case "insertunorderedlist":
 			case "indent": case "outdent": case "formatblock":
-			case "inserthtml": case "undo": case "redo": case "strikethrough":
+			case "inserthtml": case "undo": case "redo": case "strikethrough": case "tabindent":
 				supportedBy = isSupportedBy(mozilla | ie | opera | safari420);
 				break;
 
@@ -1012,6 +1100,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		this.focus();
 
 		command = this._normalizeCommand(command);
+
 		if(argument != undefined){
 			if(command == "heading"){
 				throw new Error("unimplemented");
@@ -1020,7 +1109,9 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			}
 		}
 		if(command == "inserthtml"){
-			argument=this._preFilterContent(argument);
+			//TODO: we shall probably call _preDomFilterContent here as well
+			argument = this._preFilterContent(argument);
+			returnValue = true;
 			if(dojo.isIE){
 				var insertRange = this.document.selection.createRange();
 				if(this.document.selection.type.toUpperCase()=='CONTROL'){
@@ -1034,14 +1125,12 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 				}
 				insertRange.select();
 				//insertRange.collapse(true);
-				returnValue=true;
 			}else if(dojo.isMoz && !argument.length){
 				//mozilla can not inserthtml an empty html to delete current selection
 				//so we delete the selection instead in this case
-				dojo.withGlobal(this.window,'remove',dijit._editor.selection);
-				returnValue=true;
+				this._sCall("remove"); // FIXME
 			}else{
-				returnValue=this.document.execCommand(command, false, argument);
+				returnValue = this.document.execCommand(command, false, argument);
 			}
 		}else if(
 			(command == "unlink")&&
@@ -1053,7 +1142,8 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			// grab selection
 			// Mozilla gets upset if we just store the range so we have to
 			// get the basic properties and recreate to save the selection
-			var selection = this.window.getSelection();
+			//  var selection = this.window.getSelection();
+
 			//	var selectionRange = selection.getRangeAt(0);
 			//	var selectionStartContainer = selectionRange.startContainer;
 			//	var selectionStartOffset = selectionRange.startOffset;
@@ -1061,13 +1151,13 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			//	var selectionEndOffset = selectionRange.endOffset;
 
 			// select our link and unlink
-			var a = dojo.withGlobal(this.window, "getAncestorElement",dijit._editor.selection, ['a']);
-			dojo.withGlobal(this.window, "selectElement", dijit._editor.selection, [a]);
+			var a = this._sCall("getAncestorElement", [ "a" ]);
+			this._sCall("selectElement", [ a ]);
 
-			returnValue=this.document.execCommand("unlink", false, null);
+			returnValue = this.document.execCommand("unlink", false, null);
 		}else if((command == "hilitecolor")&&(dojo.isMoz)){
-//				// mozilla doesn't support hilitecolor properly when useCSS is
-//				// set to false (bugzilla #279330)
+			// mozilla doesn't support hilitecolor properly when useCSS is
+			// set to false (bugzilla #279330)
 
 			this.document.execCommand("styleWithCSS", false, true);
 			returnValue = this.document.execCommand(command, false, argument);
@@ -1076,20 +1166,21 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		}else if((dojo.isIE)&&( (command == "backcolor")||(command == "forecolor") )){
 			// Tested under IE 6 XP2, no problem here, comment out
 			// IE weirdly collapses ranges when we exec these commands, so prevent it
-//				var tr = this.document.selection.createRange();
+			//	var tr = this.document.selection.createRange();
 			argument = arguments.length > 1 ? argument : null;
 			returnValue = this.document.execCommand(command, false, argument);
 
 			// timeout is workaround for weird IE behavior were the text
 			// selection gets correctly re-created, but subsequent input
 			// apparently isn't bound to it
-//				setTimeout(function(){tr.select();}, 1);
+			//	setTimeout(function(){tr.select();}, 1);
 		}else{
 			argument = arguments.length > 1 ? argument : null;
-//				if(dojo.isMoz){
-//					this.document = this.iframe.contentWindow.document
-//				}
+			//	if(dojo.isMoz){
+			//		this.document = this.iframe.contentWindow.document
+			//	}
 
+			console.debug("execCommand:", command, argument);
 			if(argument || command!="createlink"){
 				returnValue = this.document.execCommand(command, false, argument);
 			}
@@ -1106,8 +1197,8 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		command = this._normalizeCommand(command);
 		if(dojo.isMoz || dojo.isSafari){
 			if(command == "unlink"){ // mozilla returns true always
-				// console.debug(dojo.withGlobal(this.window, "hasAncestorElement",dijit._editor.selection, ['a']));
-				return dojo.withGlobal(this.window, "hasAncestorElement",dijit._editor.selection, ['a']);
+				// console.debug(this._sCall("hasAncestorElement", ['a']));
+				this._sCall("hasAncestorElement", ["a"]);
 			}else if(command == "inserttable"){
 				return true;
 			}
@@ -1120,6 +1211,21 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 				return true;
 			}
 		}
+		//should not allow user to indent neither a non-list node nor list item which is the first item in its parent 
+		if(command == 'indent'){
+			var li = this._sCall("getAncestorElement", ["li"]);
+			var n = li && li.previousSibling;
+			while(n){
+				if(n.nodeType == 1){
+				  return true;
+				}
+				n = n.previousSibling;
+			}
+			return false;
+		}else if(command == 'outdent'){
+			//should not allow user to outdent a non-list node
+			return this._sCall("hasAncestorElement", ["li"]);
+		}
 
 		// return this.document.queryCommandEnabled(command);
 		var elem = dojo.isIE ? this.document.selection.createRange() : this.document;
@@ -1127,25 +1233,46 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 	},
 
 	queryCommandState: function(command){
-		// summary: check the state of a given command
+		// summary:
+		//		check the state of a given command and returns true or false
 
 		if(this.disabled){ return false; }
 		command = this._normalizeCommand(command);
-		return this.document.queryCommandState(command);
+		// try{
+			//this.editNode.contentEditable = true;
+			return this.document.queryCommandState(command);
+		// }catch(e){
+		// 	console.debug(e);
+		// 	return false;
+		// }
 	},
 
 	queryCommandValue: function(command){
-		// summary: check the value of a given command
+		// summary:
+		//		check the value of a given command. This matters most for
+		//		custom selections and complex values like font value setting
 
 		if(this.disabled){ return false; }
+		var r;
 		command = this._normalizeCommand(command);
 		if(dojo.isIE && command == "formatblock"){
-			return this._local2NativeFormatNames[this.document.queryCommandValue(command)];
+			r = this._native2LocalFormatNames[this.document.queryCommandValue(command)];
+		}else{
+			r = this.document.queryCommandValue(command);
 		}
 		return this.document.queryCommandValue(command);
 	},
 
 	// Misc.
+
+	_sCall: function(name, args){
+		// summary:
+		//		run the named method of dijit._editor.selection over the
+		//		current editor instance's window, with the passed args
+		dojo.withGlobal(this.window, name, dijit._editor.selection, args);
+	},
+
+	// FIXME: this is a TON of code duplication. Why?
 
 	placeCursorAtStart: function(){
 		// summary:
@@ -1160,22 +1287,22 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 				if(first.nodeType == 3){
 					if(first.nodeValue.replace(/^\s+|\s+$/g, "").length>0){
 						isvalid=true;
-						dojo.withGlobal(this.window, "selectElement", dijit._editor.selection, [first]);
+						this._sCall("selectElement", [ first ]);
 						break;
 					}
 				}else if(first.nodeType == 1){
 					isvalid=true;
-					dojo.withGlobal(this.window, "selectElementChildren",dijit._editor.selection, [first]);
+					this._sCall("selectElementChildren", [ first ]);
 					break;
 				}
 				first = first.nextSibling;
 			}
 		}else{
 			isvalid=true;
-			dojo.withGlobal(this.window, "selectElementChildren",dijit._editor.selection, [this.editNode]);
+			this._sCall("selectElementChildren", [ this.editNode ]);
 		}
 		if(isvalid){
-			dojo.withGlobal(this.window, "collapse", dijit._editor.selection, [true]);
+			this._sCall("collapse", [ true ]);
 		}
 	},
 
@@ -1184,8 +1311,10 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		//		place the cursor at the end of the editing area
 		this.focus();
 
-		//In mozilla, if last child is not a text node, we have to use selectElementChildren on this.editNode.lastChild
-		//otherwise the cursor would be placed at the end of the closing tag of this.editNode.lastChild
+		//In mozilla, if last child is not a text node, we have to use
+		// selectElementChildren on this.editNode.lastChild otherwise the
+		// cursor would be placed at the end of the closing tag of
+		//this.editNode.lastChild
 		var isvalid=false;
 		if(dojo.isMoz){
 			var last=this.editNode.lastChild;
@@ -1193,15 +1322,15 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 				if(last.nodeType == 3){
 					if(last.nodeValue.replace(/^\s+|\s+$/g, "").length>0){
 						isvalid=true;
-						dojo.withGlobal(this.window, "selectElement",dijit._editor.selection, [last]);
+						this._sCall("selectElement", [ last ]);
 						break;
 					}
 				}else if(last.nodeType == 1){
 					isvalid=true;
 					if(last.lastChild){
-						dojo.withGlobal(this.window, "selectElement",dijit._editor.selection, [last.lastChild]);
+						this._sCall("selectElement", [ last.lastChild ]);
 					}else{
-						dojo.withGlobal(this.window, "selectElement",dijit._editor.selection, [last]);
+						this._sCall("selectElement", [ last ]);
 					}
 					break;
 				}
@@ -1209,16 +1338,22 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			}
 		}else{
 			isvalid=true;
-			dojo.withGlobal(this.window, "selectElementChildren",dijit._editor.selection, [this.editNode]);
+			this._sCall("selectElementChildren", [ this.editNode ]);
 		}
 		if(isvalid){
-			dojo.withGlobal(this.window, "collapse", dijit._editor.selection, [false]);
+			this._sCall("collapse", [ false ]);
 		}
 	},
 
 	getValue: function(/*Boolean?*/nonDestructive){
 		// summary:
-		//		return the current content of the editing area (post filters are applied)
+		//		return the current content of the editing area (post filters
+		//		are applied)
+		//	nonDestructive:
+		//		defaults to false. Should the post-filtering be run over a copy
+		//		of the live DOM? Most users should pass "true" here unless they
+		//		*really* know that none of the installed filters are going to
+		//		mess up the editing session.
 		if(this.textarea){
 			if(this.isClosed || !this.isLoaded){
 				return this.textarea.value;
@@ -1227,19 +1362,21 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 
 		return this._postFilterContent(null, nonDestructive);
 	},
+	_getValueAttr: function(){
+		// summary: hook to make attr("value") work
+		return this.getValue();
+	},
 
 	setValue: function(/*String*/html){
 		// summary:
-		//		this function set the content. No undo history is preserved
-
-		if(!this.isLoaded){
-			// try again after the editor is finished loading
-			this.onLoadDeferred.addCallback(dojo.hitch(this, function(){
-				this.setValue(html);
-			}));
+		//		This function sets the content. No undo history is preserved.
+		if(!this.isLoaded){ 
+			// try again after the editor is finished loading 
+			this.onLoadDeferred.addCallback(dojo.hitch(this, function(){ 
+				this.setValue(html); 
+			})); 
 			return;
-		}
-
+		} 
 		if(this.textarea && (this.isClosed || !this.isLoaded)){
 			this.textarea.value=html;
 		}else{
@@ -1248,7 +1385,6 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			node.innerHTML = html;
 			this._preDomFilterContent(node);
 		}
-
 		this.onDisplayChanged();
 	},
 
@@ -1279,14 +1415,19 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 
 	_preFilterContent: function(/*String*/html){
 		// summary:
-		//		filter the input before setting the content of the editing area
+		//		filter the input before setting the content of the editing
+		//		area. DOM pre-filtering may happen after this
+		//		string-based filtering takes place but as of 1.2, this is not
+		//		gauranteed for operations such as the inserthtml command.
 		var ec = html;
 		dojo.forEach(this.contentPreFilters, function(ef){ if(ef){ ec = ef(ec); } });
 		return ec;
 	},
 	_preDomFilterContent: function(/*DomNode*/dom){
 		// summary:
-		//		filter the input
+		//		filter the input's live DOM. All filter operations should be
+		//		considered to be "live" and operating on the DOM that the user
+		//		will be interacting with in their editing session.
 		dom = dom || this.editNode;
 		dojo.forEach(this.contentDomPreFilters, function(ef){
 			if(ef && dojo.isFunction(ef)){
@@ -1295,15 +1436,49 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		}, this);
 	},
 
-	_postFilterContent: function(/*DomNode|DomNode[]|String?*/dom,/*Boolean?*/nonDestructive){
+	_postFilterContent: function(
+		/*DomNode|DomNode[]|String?*/ dom,
+		/*Boolean?*/ nonDestructive){
 		// summary:
 		//		filter the output after getting the content of the editing area
+		//
+		//	description:
+		//		post-filtering allows plug-ins and users to specify any number
+		//		of transforms over the editor's content, enabling many common
+		//		use-cases such as transforming absolute to relative URLs (and
+		//		vice-versa), ensuring conformance with a particular DTD, etc.
+		//		The filters are registered in the contentDomPostFilters and
+		//		contentPostFilters arrays. Each item in the
+		//		contentDomPostFilters array is a function which takes a DOM
+		//		Node or array of nodes as its only argument and returns the
+		//		same. It is then passed down the chain for further filtering.
+		//		The contentPostFilters array behaves the same way, except each
+		//		member operates on strings. Together, the DOM and string-based
+		//		filtering allow the full range of post-processing that should
+		//		be necessaray to enable even the most agressive of post-editing
+		//		conversions to take place.
+		//
+		//		If nonDestructive is set to "true", the nodes are cloned before
+		//		filtering proceeds to avoid potentially destructive transforms
+		//		to the content which may still needed to be edited further.
+		//		Once DOM filtering has taken place, the serialized version of
+		//		the DOM which is passed is run through each of the
+		//		contentPostFilters functions.
+		//
+		//	dom:
+		//		a node, set of nodes, which to filter using each of the current
+		//		members of the contentDomPostFilters and contentPostFilters arrays. 
+		//
+		//	nonDestructive:
+		//		defaults to "false". If true, ensures that filtering happens on
+		//		a clone of the passed-in content and not the actual node
+		//		itself.
 		var ec;
 		if(!dojo.isString(dom)){
 			dom = dom || this.editNode;
 			if(this.contentDomPostFilters.length){
-				if(nonDestructive && dom['cloneNode']){
-					dom = dom.cloneNode(true);
+				if(nonDestructive){
+					dom = dojo.clone(dom);
 				}
 				dojo.forEach(this.contentDomPostFilters, function(ef){
 					dom = ef(dom);
@@ -1313,8 +1488,10 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		}else{
 			ec = dom;
 		}
-		
-		if(!ec.replace(/^(?:\s|\xA0)+/g, "").replace(/(?:\s|\xA0)+$/g,"").length){ ec = ""; }
+
+		if(!dojo.trim(ec.replace(/^\xA0\xA0*/, '').replace(/\xA0\xA0*$/, '')).length){
+			ec = "";
+		}
 
 		//	if(dojo.isIE){
 		//		//removing appended <P>&nbsp;</P> for IE
@@ -1334,14 +1511,21 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		saveTextarea.value += this._SEPARATOR + this.name + ":" + this.getValue();
 	},
 
+
 	escapeXml: function(/*String*/str, /*Boolean*/noSingleQuotes){
-		dojo.deprecated('dijit.Editor::escapeXml is deprecated','use dijit._editor.escapeXml instead', 2);
-		return dijit._editor.escapeXml(str,noSingleQuotes);
+		//summary:
+		//		Adds escape sequences for special characters in XML: &<>"'
+		//		Optionally skips escapes for single quotes
+		str = str.replace(/&/gm, "&amp;").replace(/</gm, "&lt;").replace(/>/gm, "&gt;").replace(/"/gm, "&quot;");
+		if(!noSingleQuotes){
+			str = str.replace(/'/gm, "&#39;");
+		}
+		return str; // string
 	},
 
 	getNodeHtml: function(/* DomNode */node){
 		dojo.deprecated('dijit.Editor::getNodeHtml is deprecated','use dijit._editor.getNodeHtml instead', 2);
-		return dijit._editor.getNodeHtml(node);
+		return dijit._editor.getNodeHtml(node); // String
 	},
 
 	getNodeChildrenHtml: function(/* DomNode */dom){
@@ -1363,7 +1547,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		var changed = (this.savedContent != this._content);
 
 		// line height is squashed for iframes
-		// FIXME: why was this here? if(this.iframe){ this.domNode.style.lineHeight = null; }
+		// FIXME: why was this here? if (this.iframe){ this.domNode.style.lineHeight = null; }
 
 		if(this.interval){ clearInterval(this.interval); }
 
@@ -1380,16 +1564,16 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			dojo._destroyElement(this.domNode);
 			this.domNode = this.textarea;
 		}else{
-//			if(save){
-				//why we treat moz differently? comment out to fix #1061
-//					if(dojo.isMoz){
-//						var nc = dojo.doc.createElement("span");
-//						this.domNode.appendChild(nc);
-//						nc.innerHTML = this.editNode.innerHTML;
-//					}else{
-//						this.domNode.innerHTML = this._content;
-//					}
-//			}
+			// if(save){
+			// why we treat moz differently? comment out to fix #1061
+			//		if(dojo.isMoz){
+			//			var nc = dojo.doc.createElement("span");
+			//			this.domNode.appendChild(nc);
+			//			nc.innerHTML = this.editNode.innerHTML;
+			//		}else{
+			//			this.domNode.innerHTML = this._content;
+			//		}
+			// }
 			this.domNode.innerHTML = save ? this._content : this.savedContent;
 		}
 
@@ -1435,11 +1619,10 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			.replace(/<(\/)?em([ \>])/gi, '<$1i$2' ); // String
 	},
 
-	_srcInImgRegex	: /(?:(<img(?=\s).*?\ssrc=)("|')(.*?)\2)|(?:(<img\s.*?src=)([^"'][^ >]+))/gi ,
-	_hrefInARegex	: /(?:(<a(?=\s).*?\shref=)("|')(.*?)\2)|(?:(<a\s.*?href=)([^"'][^ >]+))/gi ,
-
 	_preFixUrlAttributes: function(/* String */ html){
-		return html.replace(this._hrefInARegex, '$1$4$2$3$5$2 _djrealurl=$2$3$5$2')
-			.replace(this._srcInImgRegex, '$1$4$2$3$5$2 _djrealurl=$2$3$5$2'); // String
+		return html.replace(/(?:(<a(?=\s).*?\shref=)("|')(.*?)\2)|(?:(<a\s.*?href=)([^"'][^ >]+))/gi, 
+				'$1$4$2$3$5$2 _djrealurl=$2$3$5$2')
+			.replace(/(?:(<img(?=\s).*?\ssrc=)("|')(.*?)\2)|(?:(<img\s.*?src=)([^"'][^ >]+))/gi, 
+				'$1$4$2$3$5$2 _djrealurl=$2$3$5$2'); // String
 	}
 });

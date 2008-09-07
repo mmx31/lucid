@@ -30,12 +30,6 @@ dojo.declare("dijit._Templated",
 		//		declared in markup inside it? false by default.
 		widgetsInTemplate: false,
 
-		// containerNode: DomNode
-		//		holds child elements. "containerNode" is generally set via a
-		//		dojoAttachPoint assignment and it designates where children of
-		//		the src dom node will be placed
-		containerNode: null,
-
 		// skipNodeCache: Boolean
 		//		if using a cached widget template node poses issues for a
 		//		particular widget class, it can set this property to ensure
@@ -78,8 +72,10 @@ dojo.declare("dijit._Templated",
 				node = cached.cloneNode(true);
 			}
 
+			this.domNode = node;
+
 			// recurse through the node, looking for, and attaching to, our
-			// attachment points which should be defined on the template node.
+			// attachment points and events, which should be defined on the template node.
 			this._attachTemplateNodes(node);
 
 			var source = this.srcNodeRef;
@@ -87,7 +83,6 @@ dojo.declare("dijit._Templated",
 				source.parentNode.replaceChild(node, source);
 			}
 
-			this.domNode = node;
 			if(this.widgetsInTemplate){
 				var cw = this._supportingWidgets  = dojo.parser.parse(node);
 				this._attachTemplateNodes(cw, function(n,p){
@@ -129,10 +124,11 @@ dojo.declare("dijit._Templated",
 			getAttrFunc = getAttrFunc || function(n,p){ return n.getAttribute(p); };
 
 			var nodes = dojo.isArray(rootNode) ? rootNode : (rootNode.all || rootNode.getElementsByTagName("*"));
-			var x=dojo.isArray(rootNode)?0:-1;
+			var x = dojo.isArray(rootNode) ? 0 : -1;
+			var attrs = {};
 			for(; x<nodes.length; x++){
 				var baseNode = (x == -1) ? rootNode : nodes[x];
-				if(this.widgetsInTemplate && getAttrFunc(baseNode,'dojoType')){
+				if(this.widgetsInTemplate && getAttrFunc(baseNode, "dojoType")){
 					continue;
 				}
 				// Process dojoAttachPoint
@@ -188,7 +184,6 @@ dojo.declare("dijit._Templated",
 						}
 					});
 				}
-
 			}
 		}
 	}
@@ -215,7 +210,12 @@ dijit._Templated.getCachedTemplate = function(templatePath, templateString, alwa
 	var key = templateString || templatePath;
 	var cached = tmplts[key];
 	if(cached){
-		return cached;
+		if(!cached.ownerDocument || cached.ownerDocument == dojo.doc){
+			// string or node of the same document
+			return cached;
+		}
+		// destroy the old cached node of a different document
+		dojo._destroyElement(cached);
 	}
 
 	// If necessary, load template string from template path
@@ -253,7 +253,7 @@ dijit._Templated._sanitizeTemplateString = function(/*String*/tString){
 
 
 if(dojo.isIE){
-	dojo.addOnUnload(function(){
+	dojo.addOnWindowUnload(function(){
 		var cache = dijit._Templated._templateCache;
 		for(var key in cache){
 			var value = cache[key];
@@ -279,6 +279,11 @@ if(dojo.isIE){
 		// summary:
 		//	Attempts to create a set of nodes based on the structure of the passed text.
 
+		if(tn && tn.ownerDocument != dojo.doc){
+			// destroy dummy container of a different document
+			dojo._destroyElement(tn);
+			tn = undefined;
+		}
 		if(!tn){
 			tn = dojo.doc.createElement("div");
 			tn.style.display="none";

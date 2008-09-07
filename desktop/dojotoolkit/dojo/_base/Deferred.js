@@ -327,19 +327,19 @@ dojo.extend(dojo.Deferred, {
 		//		next element on the callback sequence.This is useful for code
 		//		that you want to guarantee to run, e.g. a finalizer.
 		var enclosed = dojo.hitch.apply(dojo, arguments);
-		return this.addCallbacks(enclosed, enclosed);
+		return this.addCallbacks(enclosed, enclosed); // dojo.Deferred
 	},
 
 	addCallback: function(/*Function|Object*/cb, /*String?*/cbfn /*...*/){
 		//	summary: 
 		//		Add a single callback to the end of the callback sequence.
-		return this.addCallbacks(dojo.hitch.apply(dojo, arguments));
+		return this.addCallbacks(dojo.hitch.apply(dojo, arguments)); // dojo.Deferred
 	},
 
 	addErrback: function(cb, cbfn){
 		//	summary: 
 		//		Add a single callback to the end of the callback sequence.
-		return this.addCallbacks(null, dojo.hitch.apply(dojo, arguments));
+		return this.addCallbacks(null, dojo.hitch.apply(dojo, arguments)); // dojo.Deferred
 	},
 
 	addCallbacks: function(cb, eb){
@@ -350,7 +350,7 @@ dojo.extend(dojo.Deferred, {
 		if(this.fired >= 0){
 			this._fire();
 		}
-		return this;
+		return this; // dojo.Deferred
 	},
 
 	_fire: function(){
@@ -369,8 +369,12 @@ dojo.extend(dojo.Deferred, {
 			// Array
 			var f = chain.shift()[fired];
 			if(!f){ continue; }
-			try{
-				res = f(res);
+			var func = function(){
+				var ret = f(res);
+				//If no response, then use previous response.
+				if(typeof ret != "undefined"){
+					res = ret;
+				}
 				fired = ((res instanceof Error) ? 1 : 0);
 				if(res instanceof dojo.Deferred){
 					cb = function(res){
@@ -387,10 +391,16 @@ dojo.extend(dojo.Deferred, {
 					// inlined from _unpause
 					this.paused++;
 				}
-			}catch(err){
-				console.debug(err);
-				fired = 1;
-				res = err;
+			};
+			if(dojo.config.isDebug){
+				func.call(this);
+			}else{
+				try{
+					func.call(this);
+				}catch(err){
+					fired = 1;
+					res = err;
+				}
 			}
 		}
 		this.fired = fired;
