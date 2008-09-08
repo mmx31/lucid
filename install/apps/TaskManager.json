@@ -8,5 +8,6 @@
 	"maturity": "Stable",
 	"category": "System",
 	"icon": "icon-16-apps-utilities-system-monitor",
-	"filetypes": []
+	"filetypes": [],
+	"compatible": "1.0.0"
 }
