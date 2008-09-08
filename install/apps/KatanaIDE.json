@@ -9,5 +9,6 @@
 	"category": "Development",
 	"icon": "katana.png",
 	"filetypes": [],
-	"permissions": ["core.app.write"]
+	"permissions": ["core.app.write"],
+	"compatible": "1.0.0"
 }

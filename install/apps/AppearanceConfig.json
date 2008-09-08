@@ -8,5 +8,6 @@
 	"maturity": "Stable",
 	"category": "Preferences",
 	"icon": "icon-16-apps-preferences-desktop-theme",
-	"filetypes": []
+	"filetypes": [],
+	"compatible": "1.0.0"
 }

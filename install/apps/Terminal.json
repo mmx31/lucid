@@ -8,5 +8,6 @@
 	"maturity": "Stable",
 	"category": "Accessories",
 	"icon": "icon-16-apps-utilities-terminal",
-	"filetypes": []
+	"filetypes": [],
+	"compatible": "1.0.0"
 }

@@ -7,5 +7,6 @@
 	"version": "1.0",
 	"maturity": "Stable",
 	"category": "Games",
-	"filetypes": []
+	"filetypes": [],
+	"compatible": "1.0.0"
 }

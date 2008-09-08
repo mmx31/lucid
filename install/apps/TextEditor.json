@@ -8,5 +8,6 @@
 	"maturity": "Stable",
 	"category": "Accessories",
 	"icon": "icon-16-apps-accessories-text-editor",
-	"filetypes": ["text/*"]
+	"filetypes": ["text/*"],
+	"compatible": "1.0.0"
 }

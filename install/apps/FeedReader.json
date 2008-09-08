@@ -9,5 +9,6 @@
 	"category": "Internet",
 	"icon": "icon-16-apps-internet-news-reader",
 	"filetypes": [],
-	"permissions": ["api.xsite"]
+	"permissions": ["api.xsite"],
+	"compatible": "1.0.0"
 }

@@ -7,5 +7,6 @@
 	"version": "1.0",
 	"maturity": "Stable",
 	"category": "Office",
-	"filetypes": ["text/html"]
+	"filetypes": ["text/html"],
+	"compatible": "1.0.0"
 }

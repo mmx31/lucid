@@ -8,5 +8,6 @@
 	"maturity": "Stable",
 	"category": "Administration",
 	"filetypes": [],
-	"permissions": ["core.administration"]
+	"permissions": ["core.administration"],
+	"compatible": "1.0.0"
 }
