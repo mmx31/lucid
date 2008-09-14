@@ -1,4 +1,13 @@
 dojo.provide("desktop.apps.TaskManager");
+dojo.require("dijit.layout.LayoutContainer");
+dojo.require("dojox.grid.Grid");
+dojo.require("dijit.Toolbar");
+dojo.require("dijit.form.Button");
+dojo.require("dojo.data.ItemFileWriteStore");
+dojo.requireLocalization("desktop", "common");
+dojo.requireLocalization("desktop", "apps");
+dojo.requireLocalization("desktop", "system");
+api.addDojoCss("dojox/grid/_grid/Grid.css");
 
 dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 	kill: function() {
@@ -8,17 +17,9 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 	    }
 	},
 	init: function(args) {
-	    dojo.require("dijit.layout.LayoutContainer");
-	    dojo.require("dijit.layout.ContentPane");
-	    dojo.require("dijit.ProgressBar");
-	    dojo.require("dijit.Toolbar");
-	    dojo.require("dijit.form.Button");
-	    dojo.require("dijit.Menu");
-		dojo.requireLocalization("desktop", "common");
-		dojo.requireLocalization("desktop", "apps");
-		dojo.requireLocalization("desktop", "system");
-		var nls = dojo.i18n.getLocalization("desktop", "common");
+	    var nls = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
+        var sys = dojo.i18n.getLocalization("desktop", "system");
 	    //make window
 	    this.win = new api.Window({
 	        title: app["Task Manager"],
@@ -27,22 +28,92 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 	    });
-	    //var layout = new dijit.layout.LayoutContainer({sizeMin: 60, sizeShare: 60}, document.createElement("div"));
-	    this.main = new dijit.layout.ContentPane({
-	        region: "center"
-	    },
-	    document.createElement("div"));
-	    //layout.addChild(this.main);
-	    //this.toolbar = new dijit.Toolbar({region: "top"});
-	    //layout.addChild(this.toolbar);
-	    this.win.addChild(this.main);
+
+        var store = this.store = new dojo.data.ItemFileWriteStore({
+            data: {
+                id: "instance",
+                items: desktop.app.getInstances()
+            }
+        });
+	    
+        var model = new dojox.grid.data.DojoData(null, null, {
+            store: store,
+            query: {instance: "*"}
+        });
+
+        this.grid = new dojox.Grid({
+	        region: "center",
+            structure: [{
+				cells: [[
+					{field: "instance", name: sys.instance},
+                    {field: "sysname", name: sys.sysname},
+                    {field: "name", name: nls.name},
+                    {field: "status", name: sys.status}
+				]]
+			}],
+            model: model
+	    });
+	    this.win.addChild(this.grid);
 	    this.win.show();
 	    this.win.startup();
-	    this.timer = setTimeout(dojo.hitch(this, "home"), 1000);
-		this.home();
-	
+	    this.timer = setTimeout(dojo.hitch(this, "update"), 1000);
+        this.grid.startup();
 	},
 	
+    update: function() {
+        var processes = desktop.app.getInstances();
+        dojo.forEach(processes, function(instance) {
+            this.store.fetchItemByIdentity({
+                identity: instance.instance,
+                onItem: dojo.hitch(this, function(item) {
+                    if(!this.store.isItem(item)){
+                        this.store.newItem(instance);
+                        return;
+                    }
+                    for(var key in instance) {
+                        if(this.store.getValue(item, key) != instance[key])
+                        this.store.setValue(item, key, instance[key]);
+                    }
+                })
+            });
+        }, this);
+        this.store.fetch({
+            query: {instance: "*"},
+            onItem: dojo.hitch(this, function(item) {
+                var exists = false;
+                var id = this.store.getIdentity(item);
+                dojo.forEach(processes, function(instance) {
+                    if(id==instance.instance)
+                        exists=true;
+                });
+                if(!exists) {
+                    this.store.deleteItem(item);
+                }
+            })
+        })
+        //make menu
+        var sys = dojo.i18n.getLocalization("desktop", "system");
+        var menu = this.menu = new dijit.Menu({});
+        var killApp = new dijit.MenuItem({
+            label: sys.kill,
+            onClick: dojo.hitch(this, function() {
+               var row = this.grid.model.getRow(this.__rowIndex);
+               var id = this.store.getValue(row.__dojo_data_item, "instance");
+               this.executeKill(id);
+            })
+        });
+        menu.addChild(killApp);
+        menu.startup();
+        this.grid.onRowContextMenu = dojo.hitch(this, function(e) {
+            this.__rowIndex = e.rowIndex;
+            this.menu._contextMouse();
+            this.menu._openMyself(e);
+        });
+
+
+        this.timer = setTimeout(dojo.hitch(this, "update"), 1000);
+    },
+
 	executeKill: function(id) {
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 	    if (desktop.app.getInstance(id).status != "killed") {

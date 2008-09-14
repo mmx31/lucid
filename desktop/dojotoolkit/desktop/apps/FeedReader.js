@@ -207,7 +207,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			//this.right.addChild(grid);
 			this.right.startup(); //hack
 			var cpane = this.contentArea = new dijit.layout.ContentPane({region: "bottom", style: "height: 200px;", splitter: true});
-			cpane.setContent("noop");
+			cpane.setContent("&nbsp;");
 			this.right.addChild(cpane);
 			this.right.layout();
 	    this.win.addChild(this.right);
