@@ -60,19 +60,21 @@ dojo.require("dojox.color.Palette");
 				color:"#333",
 				width:1
 			},
-			line:	{ //	gridlines
+			/*
+			line:	{ //	in the future can be used for gridlines
 				color:"#ccc",
 				width:1,
 				style:"Dot",
 				cap:"round"
 			},
-			majorTick:	{ //	major ticks on axis
+			*/
+			majorTick:	{ //	major ticks on axis, and used for major gridlines
 				color:"#666",
 				width:1, 
 				length:6, 
 				position:"center"
 			},
-			minorTick:	{ //	minor ticks on axis
+			minorTick:	{ //	minor ticks on axis, and used for minor gridlines
 				color:"#666", 
 				width:0.8, 
 				length:3, 
@@ -143,6 +145,22 @@ dojo.require("dojox.color.Palette");
 			for(var p in this.markers){ this._markers.push(this.markers[p]); }
 			//	reset the position
 			this._current.marker=0;
+		},
+
+		_clone: function(){
+			//	summary:
+			//		Return a clone of this theme, with the position vars reset to 0.
+			return new dxc.Theme({
+				chart: this.chart,
+				plotarea: this.plotarea,
+				axis: this.axis,
+				series: this.series,
+				marker: this.marker,
+				antiAlias: this.antiAlias,
+				assignColors: this.assignColors,
+				assignMarkers: this.assigneMarkers,
+				colors: dojo.clone(this.colors)
+			});
 		},
 
 		addMarker:function(/*String*/ name, /*String*/ segment){

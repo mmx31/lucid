@@ -25,9 +25,9 @@ dojo.extend(dojox.gfx.Shape, {
 	setFill: function(fill){
 		// summary: sets a fill object (VML)
 		// fill: Object: a fill object
-		//	(see dojox.gfx.defaultLinearGradient, 
-		//	dojox.gfx.defaultRadialGradient, 
-		//	dojox.gfx.defaultPattern, 
+		//	(see dojox.gfx.defaultLinearGradient,
+		//	dojox.gfx.defaultRadialGradient,
+		//	dojox.gfx.defaultPattern,
 		//	or dojo.Color)
 
 		if(!fill){
@@ -149,8 +149,8 @@ dojo.extend(dojox.gfx.Shape, {
 	setStroke: function(stroke){
 		// summary: sets a stroke object (VML)
 		// stroke: Object: a stroke object
-		//	(see dojox.gfx.defaultStroke) 
-	
+		//	(see dojox.gfx.defaultStroke)
+
 		if(!stroke){
 			// don't stroke
 			this.strokeStyle = null;
@@ -158,7 +158,7 @@ dojo.extend(dojox.gfx.Shape, {
 			return this;
 		}
 		// normalize the stroke
-		if(typeof stroke == "string"){
+		if(typeof stroke == "string" || dojo.isArray(stroke) || stroke instanceof dojo.Color){
 			stroke = {color: stroke};
 		}
 		var s = this.strokeStyle = dojox.gfx.makeParameters(dojox.gfx.defaultStroke, stroke);
@@ -182,14 +182,14 @@ dojo.extend(dojox.gfx.Shape, {
 		}
 		return this;	// self
 	},
-	
+
 	_capMap: { butt: 'flat' },
 	_capMapReversed: { flat: 'butt' },
-	
+
 	_translate: function(dict, value) {
 		return (value in dict) ? dict[value] : value;
 	},
-	
+
 	_applyTransform: function() {
 		if(this.fillStyle && this.fillStyle.type == "linear"){
 			this.setFill(this.fillStyle);
@@ -207,7 +207,7 @@ dojo.extend(dojox.gfx.Shape, {
 		}
 		if(skew){
 			skew.on = "f";
-			var mt = matrix.xx.toFixed(8) + " " + matrix.xy.toFixed(8) + " " + 
+			var mt = matrix.xx.toFixed(8) + " " + matrix.xy.toFixed(8) + " " +
 				matrix.yx.toFixed(8) + " " + matrix.yy.toFixed(8) + " 0 0",
 				offset = Math.floor(matrix.dx).toFixed() + "px " + Math.floor(matrix.dy).toFixed() + "px",
 				s = this.rawNode.style,
@@ -237,7 +237,7 @@ dojo.extend(dojox.gfx.Shape, {
 		rawNode.filled  = "f";
 		this.rawNode = rawNode;
 	},
-	
+
 	// move family
 
 	_moveToFront: function(){
@@ -264,7 +264,7 @@ dojo.extend(dojox.gfx.Shape, {
 });
 
 dojo.declare("dojox.gfx.Group", dojox.gfx.Shape, {
-	// summary: a group shape (VML), which can be used 
+	// summary: a group shape (VML), which can be used
 	//	to logically group shapes (e.g, to propagate matricies)
 	constructor: function(){
 		dojox.gfx.vml.Container._init.call(this);
@@ -427,7 +427,7 @@ dojo.declare("dojox.gfx.Image", dojox.gfx.shape.Image, {
 		if(rawNode) rawNode.setAttribute("dojoGfxType", "image");
 	},
 	getEventSource: function() {
-		// summary: returns a Node, which is used as 
+		// summary: returns a Node, which is used as
 		//	a source of events for this shape
 		return this.rawNode ? this.rawNode.firstChild : null;	// Node
 	},
@@ -479,8 +479,8 @@ dojo.declare("dojox.gfx.Image", dojox.gfx.shape.Image, {
 				f.Dx = matrix.dx;
 				f.Dy = matrix.dy;
 			}else{
-				this.rawNode.style.filter = "progid:DXImageTransform.Microsoft.Matrix(M11=" + matrix.xx + 
-					", M12=" + matrix.xy + ", M21=" + matrix.yx + ", M22=" + matrix.yy + 
+				this.rawNode.style.filter = "progid:DXImageTransform.Microsoft.Matrix(M11=" + matrix.xx +
+					", M12=" + matrix.xy + ", M21=" + matrix.yx + ", M22=" + matrix.yy +
 					", Dx=" + matrix.dx + ", Dy=" + matrix.dy + ")";
 			}
 		}
@@ -510,7 +510,7 @@ dojo.declare("dojox.gfx.Text", dojox.gfx.shape.Text, {
 				x -= 10;
 				break;
 		}
-		this.rawNode.path.v = "m" + x.toFixed() + "," + y + 
+		this.rawNode.path.v = "m" + x.toFixed() + "," + y +
 			"l" + (x + 10).toFixed() + "," + y + "e";
 		// find path and text path
 		var p = null, t = null, c = r.childNodes;
@@ -559,22 +559,22 @@ dojo.declare("dojox.gfx.Text", dojox.gfx.shape.Text, {
 		//	it makes a correction for a font size
 		var matrix = dojox.gfx.Shape.prototype._getRealMatrix.call(this);
 		// It appears that text is always aligned vertically at a middle of x-height (???).
-		// It is impossible to obtain these metrics from VML => I try to approximate it with 
+		// It is impossible to obtain these metrics from VML => I try to approximate it with
 		// more-or-less util value of 0.7 * FontSize, which is typical for European fonts.
 		if(matrix){
-			matrix = dojox.gfx.matrix.multiply(matrix, 
+			matrix = dojox.gfx.matrix.multiply(matrix,
 				{dy: -dojox.gfx.normalizedLength(this.fontStyle ? this.fontStyle.size : "10pt") * 0.35});
 		}
 		return matrix;	// dojox.gfx.Matrix2D
 	},
-	getTextWidth: function(){ 
-		// summary: get the text width, in px 
-		var rawNode = this.rawNode, _display = rawNode.style.display; 
-		rawNode.style.display = "inline"; 
-		var _width = dojox.gfx.pt2px(parseFloat(rawNode.currentStyle.width)); 
-		rawNode.style.display = _display; 
-		return _width; 
-	} 
+	getTextWidth: function(){
+		// summary: get the text width, in px
+		var rawNode = this.rawNode, _display = rawNode.style.display;
+		rawNode.style.display = "inline";
+		var _width = dojox.gfx.pt2px(parseFloat(rawNode.currentStyle.width));
+		rawNode.style.display = _display;
+		return _width;
+	}
 });
 dojox.gfx.Text.nodeType = "shape";
 
@@ -610,14 +610,14 @@ dojo.declare("dojox.gfx.Path", dojox.gfx.path.Path, {
 			this.vmlPath += path.join("");
 			this.rawNode.path.v = this.vmlPath + " r0,0 e";
 		}else{
-			this.vmlPath = this.vmlPath.concat(path);
+			Array.prototype.push.apply(this.vmlPath, path);
 		}
 	},
 	setShape: function(newShape){
 		// summary: forms a path using a shape (VML)
 		// newShape: Object: an VML path string or a path object (see dojox.gfx.defaultPath)
 		this.vmlPath = [];
-		this.lastControl = {};
+		this.lastControl.type = "";	// no prior control point
 		dojox.gfx.Path.superclass.setShape.apply(this, arguments);
 		this.vmlPath = this.vmlPath.join("");
 		this.rawNode.path.v = this.vmlPath + " r0,0 e";
@@ -626,236 +626,188 @@ dojo.declare("dojox.gfx.Path", dojox.gfx.path.Path, {
 	_pathVmlToSvgMap: {m: "M", l: "L", t: "m", r: "l", c: "C", v: "c", qb: "Q", x: "z", e: ""},
 	// VML-specific segment renderers
 	renderers: {
-		M: "_moveToA", m: "_moveToR", 
-		L: "_lineToA", l: "_lineToR", 
-		H: "_hLineToA", h: "_hLineToR", 
-		V: "_vLineToA", v: "_vLineToR", 
-		C: "_curveToA", c: "_curveToR", 
-		S: "_smoothCurveToA", s: "_smoothCurveToR", 
-		Q: "_qCurveToA", q: "_qCurveToR", 
-		T: "_qSmoothCurveToA", t: "_qSmoothCurveToR", 
-		A: "_arcTo", a: "_arcTo", 
+		M: "_moveToA", m: "_moveToR",
+		L: "_lineToA", l: "_lineToR",
+		H: "_hLineToA", h: "_hLineToR",
+		V: "_vLineToA", v: "_vLineToR",
+		C: "_curveToA", c: "_curveToR",
+		S: "_smoothCurveToA", s: "_smoothCurveToR",
+		Q: "_qCurveToA", q: "_qCurveToR",
+		T: "_qSmoothCurveToA", t: "_qSmoothCurveToR",
+		A: "_arcTo", a: "_arcTo",
 		Z: "_closePath", z: "_closePath"
 	},
-	_addArgs: function(path, args, from, upto){
-		if(typeof upto == "undefined"){
-			upto = args.length;
-		}
-		if(typeof from == "undefined"){
-			from = 0;
-		}
+	_addArgs: function(path, segment, from, upto){
+		var n = segment instanceof Array ? segment : segment.args;
 		for(var i = from; i < upto; ++i){
-			path.push(" ");
-			path.push(args[i].toFixed());
+			path.push(" ", n[i].toFixed());
 		}
 	},
-	_addArgsAdjusted: function(path, last, args, from, upto){
-		if(typeof upto == "undefined"){
-			upto = args.length;
+	_adjustRelCrd: function(last, segment, step){
+		var n = segment instanceof Array ? segment : segment.args, l = n.length,
+			result = new Array(l), i = 0, x = last.x, y = last.y;
+		if(typeof x != "number"){
+			// there is no last coordinate =>
+			// treat the first pair as an absolute coordinate
+			result[0] = x = n[0];
+			result[1] = y = n[1];
+			i = 2;
 		}
-		if(typeof from == "undefined"){
-			from = 0;
+		if(typeof step == "number" && step != 2){
+			var j = step;
+			while(j <= l){
+				for(; i < j; i += 2){
+					result[i] = x + n[i];
+					result[i + 1] = y + n[i + 1];
+				}
+				x = result[j - 2];
+				y = result[j - 1];
+				j += step;
+			}
+		}else{
+			for(; i < l; i += 2){
+				result[i] = (x += n[i]);
+				result[i + 1] = (y += n[i + 1]);
+			}
 		}
-		for(var i = from; i < upto; i += 2){
-			path.push(" ");
-			path.push((last.x + args[i]).toFixed());
-			path.push(" ");
-			path.push((last.y + args[i + 1]).toFixed());
+		return result;
+	},
+	_adjustRelPos: function(last, segment){
+		var n = segment instanceof Array ? segment : segment.args, l = n.length,
+			result = new Array(l);
+		for(var i = 0; i < l; ++i){
+			result[i] = (last += n[i]);
 		}
+		return result;
 	},
 	_moveToA: function(segment){
-		var p = [" m"], n = segment.args, l = n.length;
-		if(l == 2){
-			this._addArgs(p, n);
-		}else{
-			this._addArgs(p, n, 0, 2);
+		var p = [" m"], n = segment instanceof Array ? segment : segment.args, l = n.length;
+		this._addArgs(p, n, 0, 2);
+		if(l > 2){
 			p.push(" l");
-			this._addArgs(p, n, 2);
+			this._addArgs(p, n, 2, l);
 		}
-		this.lastControl = {};
+		this.lastControl.type = "";	// no control point after this primitive
 		return p;
 	},
 	_moveToR: function(segment, last){
-		var p = ["x" in last ? " t" : " m"], n = segment.args, l = n.length;
-		if(l == 2){
-			this._addArgs(p, n);
-		}else{
-			this._addArgs(p, n, 0, 2);
-			p.push(" r");
-			this._addArgs(p, n, 2);
-		}
-		this.lastControl = {};
-		return p;
+		return this._moveToA(this._adjustRelCrd(last, segment));
 	},
 	_lineToA: function(segment){
-		var p = [" l"];
-		this._addArgs(p, segment.args);
-		this.lastControl = {};
+		var p = [" l"], n = segment instanceof Array ? segment : segment.args;
+		this._addArgs(p, n, 0, n.length);
+		this.lastControl.type = "";	// no control point after this primitive
 		return p;
 	},
-	_lineToR: function(segment){
-		var p = [" r"];
-		this._addArgs(p, segment.args);
-		this.lastControl = {};
-		return p;
+	_lineToR: function(segment, last){
+		return this._lineToA(this._adjustRelCrd(last, segment));
 	},
 	_hLineToA: function(segment, last){
-		var p = [" l"], n = segment.args, l = n.length, y = " " + last.y.toFixed();
+		var p = [" l"], y = " " + last.y.toFixed(),
+			n = segment instanceof Array ? segment : segment.args, l = n.length;
 		for(var i = 0; i < l; ++i){
-			p.push(" ");
-			p.push(n[i].toFixed());
-			p.push(y);
+			p.push(" ", n[i].toFixed(), y);
 		}
-		this.lastControl = {};
+		this.lastControl.type = "";	// no control point after this primitive
 		return p;
 	},
-	_hLineToR: function(segment){
-		var p = [" r"], n = segment.args, l = n.length;
-		for(var i = 0; i < l; ++i){
-			p.push(" ");
-			p.push(n[i].toFixed());
-			p.push(" 0");
-		}
-		this.lastControl = {};
-		return p;
+	_hLineToR: function(segment, last){
+		return this._hLineToA(this._adjustRelPos(last.x, segment), last);
 	},
 	_vLineToA: function(segment, last){
-		var p = [" l"], n = segment.args, l = n.length, x = " " + last.x.toFixed();
+		var p = [" l"], x = " " + last.x.toFixed(),
+			n = segment instanceof Array ? segment : segment.args, l = n.length;
 		for(var i = 0; i < l; ++i){
-			p.push(x);
-			p.push(" ");
-			p.push(n[i].toFixed());
+			p.push(x, " ", n[i].toFixed());
 		}
-		this.lastControl = {};
+		this.lastControl.type = "";	// no control point after this primitive
 		return p;
 	},
-	_vLineToR: function(segment){
-		var p = [" r"], n = segment.args, l = n.length;
-		for(var i = 0; i < l; ++i){
-			p.push(" 0 ");
-			p.push(n[i].toFixed());
-		}
-		this.lastControl = {};
-		return p;
+	_vLineToR: function(segment, last){
+		return this._vLineToA(this._adjustRelPos(last.y, segment), last);
 	},
 	_curveToA: function(segment){
-		var p = [], n = segment.args, l = n.length;
+		var p = [], n = segment instanceof Array ? segment : segment.args, l = n.length,
+			lc = this.lastControl;
 		for(var i = 0; i < l; i += 6){
 			p.push(" c");
 			this._addArgs(p, n, i, i + 6);
 		}
-		this.lastControl = {x: n[l - 4], y: n[l - 3], type: "C"};
+		lc.x = n[l - 4];
+		lc.y = n[l - 3];
+		lc.type = "C";
 		return p;
 	},
 	_curveToR: function(segment, last){
-		var p = [], n = segment.args, l = n.length;
-		for(var i = 0; i < l; i += 6){
-			p.push(" v");
-			this._addArgs(p, n, i, i + 6);
-			this.lastControl = {x: last.x + n[i + 2], y: last.y + n[i + 3]};
-			last.x += n[i + 4];
-			last.y += n[i + 5];
-		}
-		this.lastControl.type = "C";
-		return p;
+		return this._curveToA(this._adjustRelCrd(last, segment, 6));
 	},
 	_smoothCurveToA: function(segment, last){
-		var p = [], n = segment.args, l = n.length;
-		for(var i = 0; i < l; i += 4){
+		var p = [], n = segment instanceof Array ? segment : segment.args, l = n.length,
+			lc = this.lastControl, i = 0;
+		if(lc.type != "C"){
 			p.push(" c");
-			if(this.lastControl.type == "C"){
-				this._addArgs(p, [
-					2 * last.x - this.lastControl.x, 
-					2 * last.y - this.lastControl.y
-				]);
-			}else{
-				this._addArgs(p, [last.x, last.y]);
-			}
-			this._addArgs(p, n, i, i + 4);
+			this._addArgs(p, [last.x, last.y], 0, 2);
+			this._addArgs(p, n, 0, 4);
+			lc.x = n[0];
+			lc.y = n[1];
+			lc.type = "C";
+			i = 4;
 		}
-		this.lastControl = {x: n[l - 4], y: n[l - 3], type: "C"};
+		for(; i < l; i += 4){
+			p.push(" c");
+			this._addArgs(p, [
+				2 * last.x - lc.x,
+				2 * last.y - lc.y
+			], 0, 2);
+			this._addArgs(p, n, i, i + 4);
+			lc.x = n[i];
+			lc.y = n[i + 1];
+		}
 		return p;
 	},
 	_smoothCurveToR: function(segment, last){
-		var p = [], n = segment.args, l = n.length;
-		for(var i = 0; i < l; i += 4){
-			p.push(" v");
-			if(this.lastControl.type == "C"){
-				this._addArgs(p, [
-					last.x - this.lastControl.x, 
-					last.y - this.lastControl.y
-				]);
-			}else{
-				this._addArgs(p, [0, 0]);
-			}
-			this._addArgs(p, n, i, i + 4);
-			this.lastControl = {x: last.x + n[i], y: last.y + n[i + 1]};
-			last.x += n[i + 2];
-			last.y += n[i + 3];
-		}
-		this.lastControl.type = "C";
-		return p;
+		return this._smoothCurveToA(this._adjustRelCrd(last, segment, 4), last);
 	},
 	_qCurveToA: function(segment){
-		var p = [], n = segment.args, l = n.length;
+		var p = [], n = segment instanceof Array ? segment : segment.args, l = n.length,
+			lc = this.lastControl;
 		for(var i = 0; i < l; i += 4){
 			p.push(" qb");
 			this._addArgs(p, n, i, i + 4);
 		}
-		this.lastControl = {x: n[l - 4], y: n[l - 3], type: "Q"};
+		lc.x = n[l - 4];
+		lc.y = n[l - 3];
+		lc.type = "Q";
 		return p;
 	},
 	_qCurveToR: function(segment, last){
-		var p = [], n = segment.args, l = n.length;
-		for(var i = 0; i < l; i += 4){
-			p.push(" qb");
-			this._addArgsAdjusted(p, last, n, i, i + 4);
-			this.lastControl = {x: last.x + n[i], y: last.y + n[i + 1]};
-			last.x += n[i + 2];
-			last.y += n[i + 3];
-		}
-		this.lastControl.type = "Q";
-		return p;
+		return this._qCurveToA(this._adjustRelCrd(last, segment, 4));
 	},
 	_qSmoothCurveToA: function(segment, last){
-		var p = [], n = segment.args, l = n.length;
-		for(var i = 0; i < l; i += 2){
+		var p = [], n = segment instanceof Array ? segment : segment.args, l = n.length,
+			lc = this.lastControl, i = 0;
+		if(lc.type != "Q"){
 			p.push(" qb");
-			if(this.lastControl.type == "Q"){
-				this._addArgs(p, [
-					this.lastControl.x = 2 * last.x - this.lastControl.x, 
-					this.lastControl.y = 2 * last.y - this.lastControl.y
-				]);
-			}else{
-				this._addArgs(p, [
-					this.lastControl.x = last.x, 
-					this.lastControl.y = last.y
-				]);
-			}
+			this._addArgs(p, [
+				lc.x = last.x,
+				lc.y = last.y
+			], 0, 2);
+			lc.type = "Q";
+			this._addArgs(p, n, 0, 2);
+			i = 2;
+		}
+		for(; i < l; i += 2){
+			p.push(" qb");
+			this._addArgs(p, [
+				lc.x = 2 * last.x - lc.x,
+				lc.y = 2 * last.y - lc.y
+			], 0, 2);
 			this._addArgs(p, n, i, i + 2);
 		}
-		this.lastControl.type = "Q";
 		return p;
 	},
 	_qSmoothCurveToR: function(segment, last){
-		var p = [], n = segment.args, l = n.length;
-		for(var i = 0; i < l; i += 2){
-			p.push(" qb");
-			if(this.lastControl.type == "Q"){
-				this._addArgs(p, [
-					this.lastControl.x = 2 * last.x - this.lastControl.x, 
-					this.lastControl.y = 2 * last.y - this.lastControl.y
-				]);
-			}else{
-				this._addArgs(p, [
-					this.lastControl.x = last.x, 
-					this.lastControl.y = last.y
-				]);
-			}
-			this._addArgsAdjusted(p, last, n, i, i + 2);
-		}
-		this.lastControl.type = "Q";
-		return p;
+		return this._qSmoothCurveToA(this._adjustRelCrd(last, segment, 2), last);
 	},
 	_arcTo: function(segment, last){
 		var p = [], n = segment.args, l = n.length, relative = segment.action == "a";
@@ -866,21 +818,23 @@ dojo.declare("dojox.gfx.Path", dojox.gfx.path.Path, {
 				y1 += last.y;
 			}
 			var result = dojox.gfx.arc.arcAsBezier(
-				last, n[i], n[i + 1], n[i + 2], 
+				last, n[i], n[i + 1], n[i + 2],
 				n[i + 3] ? 1 : 0, n[i + 4] ? 1 : 0,
 				x1, y1
 			);
 			for(var j = 0; j < result.length; ++j){
 				p.push(" c");
-				this._addArgs(p, result[j]);
+				var t = result[j];
+				this._addArgs(p, t, 0, t.length);
 			}
-			last = {x: x1, y: y1};
+			last.x = x1;
+			last.y = y1;
 		}
-		this.lastControl = {};
+		this.lastControl.type = "";	// no control point after this primitive
 		return p;
 	},
 	_closePath: function(){
-		this.lastControl = {};
+		this.lastControl.type = "";	// no control point after this primitive
 		return ["x"];
 	}
 });
@@ -900,14 +854,14 @@ dojo.declare("dojox.gfx.TextPath", dojox.gfx.Path, {
 	},
 	setText: function(newText){
 		// summary: sets a text to be drawn along the path
-		this.text = dojox.gfx.makeParameters(this.text, 
+		this.text = dojox.gfx.makeParameters(this.text,
 			typeof newText == "string" ? {text: newText} : newText);
 		this._setText();
 		return this;	// self
 	},
 	setFont: function(newFont){
 		// summary: sets a font for text
-		this.fontStyle = typeof newFont == "string" ? 
+		this.fontStyle = typeof newFont == "string" ?
 			dojox.gfx.splitFontString(newFont) :
 			dojox.gfx.makeParameters(dojox.gfx.defaultFont, newFont);
 		this._setFont();
@@ -972,7 +926,7 @@ dojo.declare("dojox.gfx.Surface", dojox.gfx.shape.Surface, {
 		this.width  = dojox.gfx.normalizedLength(width);	// in pixels
 		this.height = dojox.gfx.normalizedLength(height);	// in pixels
 		if(!this.rawNode) return this;
-		var cs = this.clipNode.style, 
+		var cs = this.clipNode.style,
 			r = this.rawNode, rs = r.style,
 			bs = this.bgNode.style;
 		cs.width  = width;
@@ -988,7 +942,7 @@ dojo.declare("dojox.gfx.Surface", dojox.gfx.shape.Surface, {
 	getDimensions: function(){
 		// summary: returns an object with properties "width" and "height"
 		var t = this.rawNode ? {
-			width:  dojox.gfx.normalizedLength(this.rawNode.style.width), 
+			width:  dojox.gfx.normalizedLength(this.rawNode.style.width),
 			height: dojox.gfx.normalizedLength(this.rawNode.style.height)} : null;
 		if(t.width  <= 0){ t.width  = this.width; }
 		if(t.height <= 0){ t.height = this.height; }
@@ -1008,10 +962,10 @@ dojox.gfx.createSurface = function(parentNode, width, height){
 		c = s.clipNode = p.ownerDocument.createElement("div"),
 		r = s.rawNode = p.ownerDocument.createElement("v:group"),
 		cs = c.style, rs = r.style;
-		
+
 	p.style.width  = width;
 	p.style.height = height;
-		
+
 	cs.position = "absolute";
 	cs.width  = width;
 	cs.height = height;
@@ -1022,7 +976,7 @@ dojox.gfx.createSurface = function(parentNode, width, height){
 	r.coordsize = (width == "100%" ? width : parseFloat(width)) + " " +
 		(height == "100%" ? height : parseFloat(height));
 	r.coordorigin = "0 0";
-	
+
 	// create a background rectangle, which is required to show all other shapes
 	var b = s.bgNode = r.ownerDocument.createElement("v:rect"), bs = b.style;
 	bs.left = bs.top = 0;
@@ -1033,7 +987,7 @@ dojox.gfx.createSurface = function(parentNode, width, height){
 	r.appendChild(b);
 	c.appendChild(r);
 	p.appendChild(c);
-	
+
 	s.width  = dojox.gfx.normalizedLength(width);	// in pixels
 	s.height = dojox.gfx.normalizedLength(height);	// in pixels
 
@@ -1051,6 +1005,11 @@ dojox.gfx.vml.Container = {
 		// shape: dojox.gfx.Shape: an VML shape object
 		if(this != shape.getParent()){
 			this.rawNode.appendChild(shape.rawNode);
+			if(!shape.getParent()){
+				// reapply visual attributes
+				shape.setFill(shape.getFill());
+				shape.setStroke(shape.getStroke());
+			}
 			//dojox.gfx.Group.superclass.add.apply(this, arguments);
 			//this.inherited(arguments);
 			dojox.gfx.shape.Container.add.apply(this, arguments);

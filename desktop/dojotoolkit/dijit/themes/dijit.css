@@ -705,6 +705,7 @@ body .dijitAlignClient { position: absolute; }
 	border-color: gray;
 	border-style: solid;
 	border-width: 0;
+	z-index: 11;
 }
 
 .dijitSplitterActive {
@@ -1151,16 +1152,16 @@ img.dijitColorPaletteUnder {
 	padding: 0 2px;
 	margin: 0 2px;
 }
-.dijit_a11y .dijitTab .closeImage {
-	padding: 0 !important;
-	margin: 0 !important;
-	top: 0 !important;
-	bottom: 0 !important;
-}
+
 .dijit_a11y .closeText {
 	display:inline;
 	margin-left:6px;
 }
+
+.dijit_a11y .dijitTab .dijitClosable .closeImage {
+	display:none;
+}
+
 .dijit_a11y .closeText:hover {
 	border:thin solid;
 }
@@ -1500,6 +1501,11 @@ img.dijitColorPaletteUnder {
 .dijitTextArea {
 	width:100%;
 	overflow: auto;	/* w/out this IE's SimpleTextArea goes to overflow: scroll */
+}
+.dijitTextArea > DIV {
+	text-decoration:none;
+	overflow:auto;
+	min-height: 1.40em;
 }
 
 .dj_ie .dijitTextArea p {

@@ -406,7 +406,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 				this.onLoad();
 				this.savedContent = this.getValue(true);
 			});
-			if(dojo.isIE && dojo.isIE < 7){ // IE 6 is a steaming pile...
+			if(dojo.isIE && dojo.isIE <= 7){ // IE 6/7 is a steaming pile...
 				var t = setInterval(function(){
 					if(ifr.contentWindow.isLoaded){
 						clearInterval(t);
@@ -443,7 +443,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			html="<div>"+html+"</div>";
 		}
 		var font = [ _cs.fontWeight, _cs.fontSize, _cs.fontFamily ].join(" ");
-
+		
 		// line height is tricky - applying a units value will mess things up.
 		// if we can't get a non-units value, bail out.
 		var lineHeight = _cs.lineHeight;
@@ -455,13 +455,14 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		}else{
 			lineHeight = "1.0";
 		}
+		var userStyle = "";
+		this.style.replace(/(^|;)(line-|font-?)[^;]+/g, function(match){ userStyle += match.replace(/^;/g,"") + ';' });
 		return [
 			this.isLeftToRight() ? "<html><head>" : "<html dir='rtl'><head>",
 			(dojo.isMoz ? "<title>" + this._localizedIframeTitles.iframeEditTitle + "</title>" : ""),
 			"<style>",
 			"body,html {",
 			"	background:transparent;",
-			"	font:", font, ";",
 			"	padding: 1em 0 0 0;",
 			"	margin: -1em 0 0 0;", // remove extraneous vertical scrollbar on safari and firefox
 			"	height: 100%;",
@@ -470,6 +471,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			//	   if it gets too wide for the visible area
 			"body{",
 			"	top:0px; left:0px; right:0px;",
+			"	font:", font, ";",
 				((this.height||dojo.isOpera) ? "" : "position: fixed;"),
 			// FIXME: IE 6 won't understand min-height?
 			"	min-height:", this.minHeight, ";",
@@ -483,7 +485,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 			"li{ min-height:1.2em; }",
 			"</style>",
 			this._applyEditingAreaStyleSheets(),
-			"</head><body>"+html+"</body></html>"
+			"</head><body style='"+userStyle+"'>"+html+"</body></html>"
 		].join(""); // String
 	},
 
@@ -545,50 +547,54 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		//	tmpContent.style.display = "none";
 		//	this.editingArea.appendChild(this.iframe);
 
-		var _iframeInitialized = false;
-		// console.debug(this.iframe);
-		// var contentDoc = this.iframe.contentWindow.document;
 
-
-		// note that on Safari lower than 420+, we have to get the iframe
-		// by ID in order to get something w/ a contentDocument property
-
-		var contentDoc = this.iframe.contentDocument;
-		contentDoc.open();
-		if(dojo.isAIR){
-			contentDoc.body.innerHTML = html;
-		}else{
-			contentDoc.write(this._getIframeDocTxt(html));
-		}
-		contentDoc.close();
-
-		// now we wait for onload. Janky hack!
+		// now we wait for the iframe to load. Janky hack!
 		var ifrFunc = dojo.hitch(this, function(){
-			if(!_iframeInitialized){
-				_iframeInitialized = true;
-			}else{ return; }
 			if(!this.editNode){
-				try{
-					if(this.iframe.contentWindow){
-						this.window = this.iframe.contentWindow;
-						this.document = this.iframe.contentWindow.document
-					}else if(this.iframe.contentDocument){
-						// for opera
-						this.window = this.iframe.contentDocument.window;
-						this.document = this.iframe.contentDocument;
+				// Iframe hasn't been loaded yet.
+				// First deal w/the document to be available (may have to wait for it)
+				if(!this.document){
+					try{
+						if(this.iframe.contentWindow){
+							this.window = this.iframe.contentWindow;
+							this.document = this.iframe.contentWindow.document
+						}else if(this.iframe.contentDocument){
+							// for opera
+							// TODO: this method is only being called for FF2; can we remove this?
+							this.window = this.iframe.contentDocument.window;
+							this.document = this.iframe.contentDocument;
+						}
+					}catch(e){}
+					if(!this.document){
+						setTimeout(ifrFunc,50);
+						return;
 					}
-					if(!this.document.body){
-						throw 'Error';
+
+					// note that on Safari lower than 420+, we have to get the iframe
+					// by ID in order to get something w/ a contentDocument property
+					var contentDoc = this.document;
+					contentDoc.open();
+					if(dojo.isAIR){
+						contentDoc.body.innerHTML = html;
+					}else{
+						contentDoc.write(this._getIframeDocTxt(html));
 					}
-				}catch(e){
-					setTimeout(ifrFunc,500);
-					_iframeInitialized = false;
+					contentDoc.close();
+					
+					dojo._destroyElement(tmpContent);
+				}
+
+				// Wait for body to be available
+				// Writing into contentDoc (above) can make <body> temporarily unavailable, may have to delay again
+				if(!this.document.body){
+					//console.debug("waiting for iframe body...");
+					setTimeout(ifrFunc,50);
 					return;
 				}
 
-				dojo._destroyElement(tmpContent);
 				this.onLoad();
 			}else{
+				// Iframe is already loaded, we are just switching the content
 				dojo._destroyElement(tmpContent);
 				this.editNode.innerHTML = html;
 				this.onDisplayChanged();
@@ -1269,7 +1275,7 @@ dojo.declare("dijit._editor.RichText", dijit._Widget, {
 		// summary:
 		//		run the named method of dijit._editor.selection over the
 		//		current editor instance's window, with the passed args
-		dojo.withGlobal(this.window, name, dijit._editor.selection, args);
+		return dojo.withGlobal(this.window, name, dijit._editor.selection, args);
 	},
 
 	// FIXME: this is a TON of code duplication. Why?
