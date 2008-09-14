@@ -66,17 +66,21 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		}));
 		sMenu.addChild(new dijit.MenuSeparator())
 		sMenu.addChild(new dijit.MenuItem({
-			label: l.about,
-			iconClass: "icon-16-apps-help-browser",
-			onClick: function() {
-				api.ui.alertDialog({
-					title: l.about,
-					style: "width: 400px;",
-					message: "<h2>Psych Desktop</h2><b>Version "+desktop.version+"</b><br /><br />Brought to you by:<ul style='padding: 0px; height: 150px; overflow-y: auto;'><li>Will \"Psychcf\" Riley<div style=\"font-size: 10pt;\">Developer/Project Manager</div></li><li>Jay MacDonald<div style=\"font-size: 10pt;\">Developer/Assistant Project Manager</div></li><li>David \"mmx\" Clayton<div style=\"font-size: 10pt;\">UI Designer/Lead Artist</div></li><li>Corey \"nefariousD\" Martin<div style=\"font-size: 10pt;\">Community Contributor</div></li><li>Nicola Rizzo<div style=\"font-size: 10pt;\">CodeTextArea widget in IDE</div></li></ul>"
-				})
-			}
-		}))
-		sMenu.startup();
+            label: l.about,
+            iconClass: "icon-16-apps-help-browser",
+            onClick: function() {
+                var win = new api.Window({
+                    title: l.about,
+                    width: "300px",
+                    height: "300px"
+                });
+                win.addChild(new desktop.ui.Credits({
+                    region: "center"
+                }));
+                win.show();
+            }
+        }))
+        sMenu.startup();
 		return sMenu;
 	},
 	_drawButton: function() {
