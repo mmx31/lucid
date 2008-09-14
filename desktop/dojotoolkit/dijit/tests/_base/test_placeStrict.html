@@ -74,11 +74,11 @@
 	<body class=tundra>
 		<h2 class="pageSubContentTitle">Test dijit.place</h2>
 		<p>Currently this just tests getViewport().  Change the size of your browser window and then reload,
-		and see if it reports the browser window size correctly.<br>
-		<p>All the text below is just filler text...<br>
+		and see if it reports the browser window size correctly.</p>
+		<p>All the text below is just filler text...</p>
 		<!--	to test form submission, you'll need to create an action handler similar to
 			http://www.utexas.edu/teamweb/cgi-bin/generic.cgi -->
-		<form id="form1" action="" name="example" method="post">
+		<form id="form1" action="" name="example" method="get">
 
 			<div class="formQuestion">
 				<span class="emphasize"><label for="q01">First Name:  </label></span>
@@ -104,15 +104,14 @@
 
 			<div class="formQuestion">
 				<span class="emphasize"><label for="q03">Age:  </label></span>
-				<span class="noticeMessage"> TextBox class, <b>tabIndex=1</b>, Attributes: {trim: true, digit: true, class: 'small'}, all but digits extracted.</span>
+				<span class="noticeMessage"> TextBox class, <b>tabIndex=1</b>, Attributes: {trim: true, class: 'small'}, all but digits extracted.</span>
 			</div>
 			<div class="formAnswer">
 				<input id="q03" type="text" name="age" value="38" class="small" tabIndex=1
 					dojoType="dijit.form.NumberTextBox"
 					promptMessage="(optional) Enter an age between 0 and 120"
-					constraints={places:0,min:0,max:120}
+					constraints="{places:0,min:0,max:120}"
 					onChange="console.debug('onChange fired for widget id = ' + this.id + ' with value = ' + arguments[0]);"
-					digit="true"
 					trim="true"
 					/>
 			</div>
@@ -171,7 +170,7 @@
 					regExpGen="dojo.regexp.currency"
 					trim="true"
 					required="true"
-					constraints={fractional:true}
+					constraints="{fractional:true}"
 					invalidMessage="Invalid amount.  Include dollar sign, commas, and cents. Example: $12,000.00" />
 			</div>
 
@@ -186,7 +185,7 @@
 					regExpGen="dojo.regexp.ipAddress"
 					trim="true"
 					required="true"
-					constraints={allowIPv6:false,allowHybrid:false}
+					constraints="{allowIPv6:false,allowHybrid:false}"
 					invalidMessage="Invalid IPv4 address." />
 			</div>
 
@@ -203,7 +202,7 @@
 					trim="true"
 					uppercase = "true"
 					required="true"
-					constraints={allowDottedDecimal:false, allowDottedHex:false, allowDottedOctal:false}
+					constraints="{allowDottedDecimal:false, allowDottedHex:false, allowDottedOctal:false}"
 					invalidMessage="Invalid IPv6 address, please enter eight groups of four hexadecimal digits. x:x:x:x:x:x:x:x" />
 			</div>
 
@@ -218,7 +217,7 @@
 					regExpGen="dojo.regexp.url"
 					trim="true"
 					required="true"
-					constraints={scheme:true}
+					constraints="{scheme:true}"
 					invalidMessage="Invalid URL.  Be sure to include the scheme, http://..." />
 			</div>
 
@@ -259,7 +258,7 @@
 			<div class="formAnswer">
 				<input id="q14" type="text" name="date1" class="medium" value="2005-12-30"
 					dojoType="dijit.form.DateTextBox"
-					constraints={locale:'en-us'}
+					constraints="{locale:'en-us'}"
 					required="true"
 					promptMessage="mm/dd/yyyy"
 					invalidMessage="Invalid date. Use mm/dd/yyyy format." />
@@ -283,7 +282,7 @@
 				<input id="q16" type="text" name="time1" class="medium" value="5:45:00 pm"
 					dojoType="dijit.form.ValidationTextBox"
 					validator="dojo.date.local.parse"
-					constraints={formatLength:'medium',selector:'time'}
+					constraints="{formatLength:'medium',selector:'time'}"
 					trim="true"
 					required="true"
 					invalidMessage="Invalid time." />
@@ -298,7 +297,7 @@
 				<input id="q17" type="text" name="time2" class="medium" value="17:45:00"
 					dojoType="dijit.form.ValidationTextBox"
 					validator="dojo.date.local.parse"
-					constraints={formatLength:'short',selector:'time',timePattern:'HH:mm:ss'}
+					constraints="{formatLength:'short',selector:'time',timePattern:'HH:mm:ss'}"
 					trim="true"
 					required="true"
 					invalidMessage="Invalid time. Use HH:mm:ss where HH is 00 - 23 hours." />
@@ -314,7 +313,7 @@
 				<input id="q18" type="text" name="state" class="small" value="CA"
 					dojoType="dijit.form.ValidationTextBox"
 					regExpGen="dojo.regexp.us.state"
-					constraints={allowTerritories:false}
+					constraints="{allowTerritories:false}"
 					trim="true"
 					uppercase="true"
 					required="true"
@@ -393,8 +392,9 @@
 					<input id="ticket1651" class="medium" value="not null"/>
 			</div>
 
-			<button name="button" onclick="displayData(); return false;">view data</button>
+			<div> <!-- needed for XHTML strict compliance -->
 			<input type="submit" name="submit" />
+			</div>
 		</form>
 	</body>
 </html>

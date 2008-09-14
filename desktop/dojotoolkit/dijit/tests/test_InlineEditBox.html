@@ -16,11 +16,18 @@
 			h3 { font-family: helvetica; font-style: italic; }
 		</style>
 		
+		<!-- required: a default dijit theme: -->
+		<link id="themeStyles" rel="stylesheet" href="../../dijit/themes/tundra/tundra.css">
+		
+		<!-- required: dojo.js -->
 		<script type="text/javascript" src="../../dojo/dojo.js"
-			djConfig="isDebug: true, parseOnLoad: true"></script>
+			djConfig="parseOnLoad: true, isDebug: true"></script>
+		
+		<!-- not needed, for testing alternate themes -->
 		<script type="text/javascript" src="_testCommon.js"></script>
 
 		<script type="text/javascript">
+			dojo.require("dijit.dijit"); // optimize: load dijit layer
 			dojo.require("dojo.data.ItemFileReadStore");
 			dojo.require("dijit.InlineEditBox");
 			dojo.require("dijit.form.Textarea");
@@ -54,7 +61,8 @@
 			*/
 		</script>
 	</head>
-	<body>
+	<body class="tundra">
+
 		<h1 class="testTitle">Dijit InlineEditBox Test</h1>
 
 		<span dojoType="dojo.data.ItemFileReadStore" jsId="stateStore"
@@ -68,7 +76,7 @@
 						{ name: "refrigerator" },
 						{ name: "freezer" },
 						{ name: "stove" },
-						{ name: "heater" },
+						{ name: "heater" }
 					]};
 			</script>
 		</span>
@@ -185,13 +193,13 @@ pulvinar in, consequat ut, leo. Nullam nec est. Aenean id risus blandit
 tortor pharetra congue. Suspendisse pulvinar.
 		</p>
 		These buttons will
-		<button onClick="dijit.byId('areaEditable').setDisabled(true)">disable</button> /
-		<button onClick="dijit.byId('areaEditable').setDisabled(false)">enable</button>
+		<button onClick="dijit.byId('areaEditable').attr('disabled', true)">disable</button> /
+		<button onClick="dijit.byId('areaEditable').attr('disabled', false)">enable</button>
 		the InlineEditBox above.
 		<hr style="width:100%;">
 
 		<h2>Editor</h2>
-		<p id="inlineRTE" dojoType="dijit.InlineEditBox" editor="dijit.Editor"
+		<div id="inlineRTE" dojoType="dijit.InlineEditBox" editor="dijit.Editor""
 			autoSave="false" renderAsHtml="true"
 			editorParams="{height: '', extraPlugins: ['dijit._editor.plugins.AlwaysShowToolbar']}">
 			<b>Aliquam</b> vitae enim. <i>Duis</i> scelerisque metus auctor est venenatis
@@ -206,6 +214,11 @@ rutrum, erat vitae lacinia dictum, pede purus imperdiet lacus, ut
 semper velit ante id metus. Praesent massa dolor, porttitor sed,
 pulvinar in, consequat ut, leo. Nullam nec est. Aenean id risus blandit
 tortor pharetra congue. Suspendisse pulvinar.
+		</div>
+		<p>
+			Note: since the Editor may return a result containing one or more &lt;p&gt; nodes,
+			don't make the InlineEditBox itself a &lt;p&gt; because that would cause nested
+			&lt;p&gt;s, which is illegal, and messes up IE
 		</p>
 		
 		<h2>FilteringSelect (no down arrow, and save/cancel buttons):</h2>
@@ -215,6 +228,7 @@ tortor pharetra congue. Suspendisse pulvinar.
 			 width="200px" autoSave="false">
 			Indiana
 		</span>
+		<button onclick="dijit.byId('filteringSelect2').edit();return false;">Edit previous value</button>
 		after
 		<hr style="width:100%;">
 		

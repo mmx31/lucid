@@ -15,10 +15,6 @@
 				border:1px solid #bfbfbf;
 			}
 
-			body .medium {
-				width: 10em;
-			}
-
 			.noticeMessage {
 				color:#093669;
 				font-size:0.95em;
@@ -30,11 +26,18 @@
 			}
 		</style>
 		
+		<!-- required: the default dijit theme: -->
+		<link id="themeStyles" rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
+
+		<!-- required: dojo.js -->
 		<script type="text/javascript" src="../../../dojo/dojo.js"
-			djConfig="isDebug: true, parseOnLoad: true, extraLocale: ['de-de', 'en-us']"></script>
+			djConfig="isDebug: true, parseOnLoad: true"></script>
+
+		<!-- only needed for alternate theme testing: -->
 		<script type="text/javascript" src="../_testCommon.js"></script>
 
 		<script type="text/javascript">
+			dojo.require("dijit.dijit"); // optimize: load dijit layer
 			dojo.require("dijit.form.TextBox");
 			dojo.require("dijit.form.ValidationTextBox");
 			dojo.require("dijit.form.NumberTextBox");
@@ -47,7 +50,7 @@
 		</script>
 	</head>
 
-	<body>
+	<body class="tundra">
 		<h1 class="testTitle">Test TimeTextBox Widget</h1>
 		<!--	to test form submission, you'll need to create an action handler similar to
 			http://www.utexas.edu/teamweb/cgi-bin/generic.cgi -->
@@ -59,7 +62,7 @@
 			Attributes: {formatLength:'medium'}</span>
 	</div>
 	<div class="testExample">
-		<input id="q1" type="text" name="time1" class="medium" value="T17:45:00"
+		<input id="q1" type="text" name="time1" value="T17:45:00"
 			dojoType="dijit.form.TimeTextBox"
 			constraints="{formatLength:'medium'}"
 			required="true"
@@ -74,7 +77,7 @@
 			Attributes: {formatLength:'short'}</span>
 	</div>
 	<div class="testExample">
-		<input id="q2" type="text" name="time1a" class="medium" value="T17:45:00"
+		<input id="q2" type="text" name="time1a" value="T17:45:00"
 			dojoType="dijit.form.TimeTextBox"
 			constraints="{formatLength:'short'}"
 			required="true"
@@ -87,7 +90,7 @@
 			Attributes: {timePattern:'h:mm:ss a'}</span>
 	</div>
 	<div class="testExample">
-		<input id="q3" type="text" name="time1b" class="medium" value="T17:45:00"
+		<input id="q3" type="text" name="time1b" value="T17:45:00"
 			dojoType="dijit.form.TimeTextBox"
 			constraints="{timePattern:'h:mm:ss a'}"
 			required="true"
@@ -100,7 +103,7 @@
 			Attributes: {timePattern:'HH:mm:ss'}</span>
 	</div>
 	<div class="testExample">
-		<input id="q4" type="text" name="time2" class="medium" value="T17:45:00"
+		<input id="q4" type="text" name="time2" value="T17:45:00"
 			dojoType="dijit.form.TimeTextBox"
 			constraints="{timePattern:'HH:mm:ss'}"
 			required="true"
@@ -113,11 +116,26 @@
 			Attributes: {timePattern:'HH:mm:ss', clickableIncrement:'T00:15:00', visibleIncrement:'T00:15:00', visibleRange:'T01:00:00'}</span>
 	</div>
 	<div class="testExample">
-		<input id="q5" type="text" name="time2" class="medium" value="T17:45:00"
+		<input id="q5" type="text" name="time2" value="T17:45:00"
 			dojoType="dijit.form.TimeTextBox"
 			constraints="{timePattern:'HH:mm:ss', clickableIncrement:'T00:15:00', visibleIncrement:'T00:15:00', visibleRange:'T01:00:00'}"
 			required="true"
 			invalidMessage="Invalid time. Use HH:mm:ss where HH is 00 - 23 hours.">
+	</div>
+
+	<div class="dojoTitlePaneLabel">
+		<label for="q6">Initially empty time text box</label>
+		<span class="noticeMessage">TimeTextBox class,
+			Attributes: {formatLength:'medium'}</span>
+	</div>
+	<div class="testExample">
+		<input id="q6" type="text" name="time6"
+			dojoType="dijit.form.TimeTextBox"
+			constraints="{formatLength:'medium'}"
+			required="true"
+			onChange="dojo.byId('oc6').value=arguments[0]"
+			invalidMessage="Invalid time." />
+		onChange:<input id="oc6" size="34" disabled value="not fired yet!" autocomplete="off">
 	</div>
 
 	<script>

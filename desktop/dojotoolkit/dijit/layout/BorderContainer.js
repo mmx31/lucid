@@ -22,6 +22,7 @@ dojo.declare(
 	//	it will fill the remaining space.  Regions named "leading" and "trailing" may be used just like
 	//	"left" and "right" except that they will be reversed in right-to-left environments.
 	//  Optional splitters may be specified on the edge widgets only to make them resizable by the user.
+	//  NOTE: Splitters must not be more than 50 pixels in width.
 	//
 	// example:
 	// |	<style>
@@ -226,6 +227,9 @@ dojo.declare(
 		// the splitter width == the viewport width (#5824)
 		if(leftSplitterThickness > 50 || rightSplitterThickness > 50){
 			setTimeout(dojo.hitch(this, function(){
+				// Results are invalid.  Clear them out.
+				this._splitterThickness = {};
+
 				for(var region in this._splitters){
 					this._computeSplitterThickness(region);
 				}
@@ -308,15 +312,15 @@ dojo.declare(
 
 		// Nodes in IE don't respond to t/l/b/r, and TEXTAREA doesn't respond in any browser
 		var janky = dojo.isIE || dojo.some(this.getChildren(), function(child){
-			return child.domNode.tagName == "TEXTAREA";
+			return child.domNode.tagName == "TEXTAREA" || child.domNode.tagName == "INPUT";
 		});
 		if(janky){
-			// Set the size of the children the old fashioned way, by calling
-			// childNode.resize({h: int, w: int}) for each child node)
+			// Set the size of the children the old fashioned way, by setting
+			// CSS width and height
 
-			var resizeWidget = function(widget, dim){
+			var resizeWidget = function(widget, changes, result){
 				if(widget){
-					(widget.resize ? widget.resize(dim) : dojo.marginBox(widget.domNode, dim));
+					(widget.resize ? widget.resize(changes, result) : dojo.marginBox(widget.domNode, changes));
 				}
 			};
 

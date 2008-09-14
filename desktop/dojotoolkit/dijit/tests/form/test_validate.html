@@ -39,11 +39,18 @@
 			}
 		</style>
 
+		<!-- required: the default dijit theme: -->
+		<link id="themeStyles" rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
+
+		<!-- required: dojo.js -->
 		<script type="text/javascript" src="../../../dojo/dojo.js"
-			djConfig="isDebug: true, parseOnLoad: true, extraLocale: ['de-de', 'en-us']"></script>
+			djConfig="isDebug: true, parseOnLoad: true, extraLocale: ['de-de']"></script>
+
+		<!-- only needed for alternate theme testing: -->
 		<script type="text/javascript" src="../_testCommon.js"></script>
 
 		<script type="text/javascript">
+			dojo.require("dijit.dijit"); // optimize: load dijit layer
 			dojo.require("dijit.form.TextBox");
 			dojo.require("dijit.form.ValidationTextBox");
 			dojo.require("dijit.form.NumberTextBox");
@@ -53,7 +60,7 @@
 		</script>
 	</head>
 
-	<body>
+	<body class="tundra">
 		<h1 class="testTitle">Dijit Validation Widgets</h1>
 		<!--	to test form submission, you'll need to create an action handler similar to
 			http://www.utexas.edu/teamweb/cgi-bin/generic.cgi -->
@@ -61,7 +68,7 @@
 
 			<div class="dojoTitlePaneLabel">
 				<label for="q01">First Name:  </label>
-				<span class="noticeMessage"> TextBox class, <b>tabIndex=2</b>, Attributes: {trim: true, propercase: true, style: 'width:700px'}, First letter of each word is upper case.</span>
+				<span class="noticeMessage"> TextBox class, <b>tabIndex=2</b>, Attributes: {trim: true, propercase: true, intermediateChanges: true, style: 'width:700px'}, First letter of each word is upper case.</span>
 			</div>
 			<div class="testExample">
 				<input id="q01" type="text" name="firstname" value="testing testing" style="width: 700px;" tabIndex=2
@@ -70,6 +77,7 @@
 					onfocus="console.log('user onfocus handler')"
 					onblur="console.log('user onblur handler')"
 				        onChange="dojo.byId('oc1').value=arguments[0]"
+					intermediateChanges="true"
 					propercase="true" />
 				<br>onChange:<input id="oc1" size="34" disabled value="not fired yet!" autocomplete="off">
 			</div>
@@ -96,9 +104,30 @@
 					maxLength="3"
 					class="small"
 					constraints="{places:0,min:0,max:120}"
-					onChange="console.debug('onChange fired for widget id = ' + this.id + ' with value = ' + arguments[0]);"
+                                        onChange="dojo.byId('oc3').value=''+arguments[0]"
 					tooltipPosition="above, below"
-					/>
+                                >
+				onChange:<input id="oc3" size="14" disabled value="not fired yet!" autocomplete="off">
+				<nobr>
+				<button type=button onclick="dijit.byId('q03').attr('value', null);">set value to null</button>
+				<button type=button onclick="dojo.byId('gv3').value=''+dijit.byId('q03').attr('value');">get value</button>
+				<input id="gv3" size="10" disabled value="" autocomplete="off">
+				</nobr>
+			</div>
+			
+			<div class="dojoTitlePaneLabel">
+				<label for="fav">Favorite Number (1-100):  </label>
+				<span class="noticeMessage"> NumberTextBox class, Attributes: required=true, must be integer, no messages provided,  no initial value specified, maxlength=3</span>
+			</div>
+			<div class="testExample">
+				<input id="fav" type="text" name="fav" class="small"
+					dojoType="dijit.form.NumberTextBox"
+					maxLength="3"
+					constraints="{places:0,min:1,max:100}"
+					dojo.regExpGen="dojo.regexp.integer"
+					required="true">
+					<button onclick="dijit.byId('fav').attr('required', true);return false">attr(required, true)</button>
+					<button onclick="dijit.byId('fav').attr('required', false);return false">attr(required, false)</button>
 			</div>
 
 			<div class="dojoTitlePaneLabel">
@@ -189,7 +218,7 @@
 					regExpGen="dojo.regexp.realNumber"
 					trim="true"
 					required="true"
-					constraints={exponent:true}
+					constraints="{exponent:true}"
 					invalidMessage="Number must be in exponential notation. Example +5E-28" />
 			</div>
 			-->
@@ -219,8 +248,8 @@
 					required="true"
 					currency="EUR"
 					invalidMessage="Invalid amount.  Include dollar sign, commas, and cents." />EUR
-				<button onclick="dijit.byId('q08eur').setAttribute('disabled',true);return false">Disable</button>
-				<button onclick="dijit.byId('q08eur').setAttribute('disabled',false);return false">Enable</button>
+				<button onclick="dijit.byId('q08eur').attr('disabled',true);return false">Disable</button>
+				<button onclick="dijit.byId('q08eur').attr('disabled',false);return false">Enable</button>
 				<button onclick="dijit.byId('q08eur').reset();return false">Reset</button>
 			</div>
 		
@@ -262,7 +291,7 @@
 					regExpGen="dojo.regexp.currency"
 					trim="true"
 					required="true"
-					constraints={fractional:true}
+					constraints="{fractional:true}"
 					invalidMessage="Invalid amount.  Include dollar sign, commas, and cents. Example: $12,000.00" />
 			</div>
 		
@@ -277,7 +306,7 @@
 					regExpGen="dojo.regexp.ipAddress"
 					trim="true"
 					required="true"
-					constraints={allowIPv6:false,allowHybrid:false}
+					constraints="{allowIPv6:false,allowHybrid:false}"
 					invalidMessage="Invalid IPv4 address.">
 			</div>
 		
@@ -294,7 +323,7 @@
 					trim="true"
 					uppercase = "true"
 					required="true"
-					constraints={allowDottedDecimal:false, allowDottedHex:false, allowDottedOctal:false}
+					constraints="{allowDottedDecimal:false, allowDottedHex:false, allowDottedOctal:false}"
 					invalidMessage="Invalid IPv6 address, please enter eight groups of four hexadecimal digits. x:x:x:x:x:x:x:x">
 			</div>
 		
@@ -310,7 +339,7 @@
 					regExpGen="dojo.regexp.url"
 					trim="true"
 					required="true"
-					constraints={scheme:true}
+					constraints="{scheme:true}"
 					invalidMessage="Invalid URL.  Be sure to include the scheme, http://..." />
 			</div>
 		
@@ -393,8 +422,8 @@
 			<div class="testExample">
 				<input id="q24" type="text" name="readOnly" class="medium" readOnly value="cannot type here"
 					dojoType="dijit.form.TextBox">
-				<input type="button" onclick="dijit.byId('q24').setAttribute('readOnly',false);" value="Remove readOnly">
-				<input type="button" onclick="dijit.byId('q24').setAttribute('readOnly',true);" value="Set readOnly">
+				<input type="button" onclick="dijit.byId('q24').attr('readOnly',false);" value="Remove readOnly">
+				<input type="button" onclick="dijit.byId('q24').attr('readOnly',true);" value="Set readOnly">
 			</div>
 
 			<script>

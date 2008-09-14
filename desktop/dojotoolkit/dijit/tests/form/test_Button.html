@@ -18,11 +18,18 @@
 			}
 		</style>
 
+		<!-- required: the default dijit theme: -->
+		<link id="themeStyles" rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
+
+		<!-- required: dojo.js -->
 		<script type="text/javascript" src="../../../dojo/dojo.js"
 			djConfig="isDebug: true, parseOnLoad: true"></script>
+
+		<!-- only needed for alternate theme testing: -->
 		<script type="text/javascript" src="../_testCommon.js"></script>
 
 		<script type="text/javascript">
+			dojo.require("dijit.dijit"); // optimize: load dijit layer
 			dojo.require("dijit.ColorPalette");
 			dojo.require("dijit.Menu");
 			dojo.require("dijit.Tooltip");
@@ -30,18 +37,34 @@
 			dojo.require("dojo.parser");
 		</script>
 	</head>
-<body>
+<body class="tundra">
 	<h1 class="testTitle">Dijit Button Test</h1>
 	<h2>Simple, drop down &amp; combo buttons</h2>
 	<p>
 	Buttons can do an action, display a menu, or both:
 	</p>
-	<div class="box">
+	<p class="box">
+		<button>&lt;button&gt;</button>
+		<input type="button" value="&lt;input type='button'&gt;">
 		<button id="1465" dojoType="dijit.form.Button" onClick='console.log("clicked simple")' iconClass="plusIcon">
 			Create
 		</button>
 		<span dojoType="dijit.Tooltip" connectId="1465">tooltip on button</span>
-		<div dojoType="dijit.form.DropDownButton" iconClass="noteIcon">
+		<button id="1467" dojoType="dijit.form.Button" onClick='console.log("clicked simple")'>
+			View
+		</button>
+		<span dojoType="dijit.Tooltip" connectId="1466">tooltip on button</span>
+		<button dojoType="dijit.form.ComboButton" optionsTitle='save options' onClick='console.log("clicked combo save")'
+				iconClass="plusIcon">
+			<span>Create</span>
+			<div dojoType="dijit.Menu" id="createMenu" style="display: none;">
+				<div dojoType="dijit.MenuItem"  iconClass="dijitEditorIcon dijitEditorIconSave"
+					onClick="console.log('not actually saving anything, just a test!')">Create blank</div>
+				<div dojoType="dijit.MenuItem"
+					onClick="console.log('not actually saving anything, just a test!')">Create from template</div>
+			</div>
+		</button>
+		<button dojoType="dijit.form.DropDownButton" iconClass="noteIcon">
 			<span>Edit<b>!</b></span>
 			<div dojoType="dijit.Menu">
 				<div dojoType="dijit.MenuItem"  iconClass="dijitEditorIcon dijitEditorIconCut"
@@ -66,13 +89,13 @@
 					</div>
 				</div>
 			</div>
-		</div>
-		<div dojoType="dijit.form.DropDownButton" iconClass="noteIcon">
+		</button>
+		<button dojoType="dijit.form.DropDownButton" iconClass="noteIcon">
 			<span>Color</span>
 			<div dojoType="dijit.ColorPalette" id="colorPalette" style="display: none" palette="3x4"
 				onChange="console.log(this.value);"></div>
-		</div>
-		<div dojoType="dijit.form.ComboButton" optionsTitle='save options' onClick='console.log("clicked combo save")'
+		</button>
+		<button dojoType="dijit.form.ComboButton" optionsTitle='save options' onClick='console.log("clicked combo save")'
 				iconClass="plusBlockIcon">
 			<span>Save</span>
 			<div dojoType="dijit.Menu" id="saveMenu" style="display: none;">
@@ -81,16 +104,16 @@
 				<div dojoType="dijit.MenuItem"
 					onClick="console.log('not actually saving anything, just a test!')">Save As</div>
 			</div>
-		</div>
+		</button>
 		<button dojoType="dijit.form.Button" onClick='console.log("clicked simple")' disabled='true' iconClass="plusIcon">
 			Disabled
 		</button>
-	</div>
-	<br clear=both>
+	</p>
+	<br clear="all">
 	<h2>Buttons with no text label</h2>
-	<p>Buttons have showLabel=false so text is not displayed.  Should have title attribute displayed on mouse over</p>
+	<p>Buttons have showLabel=false so text is not displayed.  If no title attribute supplied, Should have label as title attribute displayed on mouse over</p>
 	<div class="box">
-		<button id="1466" dojoType="dijit.form.Button" onClick='console.log("clicked simple button with no text label")' 
+		<button id="1466" dojoType="dijit.form.Button" title="title attrib rather than label" onClick='console.log("clicked simple button with no text label")' 
 		iconClass="plusIcon" showLabel="false">
 		<span><b>Rich</b><i> Text</i> Test!</span>
 		</button>
@@ -109,9 +132,9 @@
 				<div dojoType="dijit.MenuItem"
 					onClick="console.log('not actually saving anything, just a test!')">Save As</div>
 			</div>
-		</div>	
+		</div>
 	</div>
-	<br clear=both>	
+	<br clear="all">
 	<h2>Toggle buttons</h2>
 	<p>The button CSS as well as the icon CSS can change on toggle </p>
 	<div class="box">
@@ -122,7 +145,7 @@
 			Toggle me
 		</button>
 	</div>
-	<br clear=both>
+	<br clear="all">
 	<h2>Sizing</h2>
 	<p>Short button, tall buttons, big buttons, small buttons...
 	These buttons size to their content (just like &lt;button&gt;).</p>
@@ -144,10 +167,10 @@
 		</button>
 		<div style="clear: both;"></div>
 	</div>
-	<br clear=both>
+	<br clear="all">
 	<h2>Customized buttons</h2>
 	<p>Dojo users can customize styles.  Here's an example:</p>
-	<style>
+	<style type="text/css">
 		.acmeButton .dijitButtonNode {
 			background: rgb(96,96,96) !important;
 			color: white !important;
@@ -207,38 +230,51 @@
 		function forEachButton(func){
 			dijit.registry.filter(function(widget){ return widget instanceof dijit.form.Button; }).forEach(func);
 		}
-			var disabled=false;
-		function toggleDisabled(){	
-			disabled=!disabled;
-			forEachButton(function(widget){ widget.setAttribute('disabled',disabled); });
+		var disabled = false;
+		function toggleDisabled(){
+			disabled =! disabled;
+			forEachButton(function(widget){ widget.attr('disabled',disabled); });
 			dojo.byId("toggle").innerHTML= disabled ? "Enable all" : "Disable all";
 		}
 		var labels=["<img src='../images/note.gif' width='20' height='20'>All", "<i>work</i>", "and no", "<h1>play</h1>",
 					 "<span style='color: red'>makes</span>", "Jack", "<h3>a</h3>", "dull",
 					 "<img src='../images/plus.gif' width='16' height='16'>boy"];
-		var idx=0;
+		var idx = 0;
 		function changeLabels(){
 			forEachButton(function(widget){
-				widget.setLabel( labels[idx++ % labels.length]);
+				widget.attr('label', labels[idx++ % labels.length]);
+			});
+		}
+		function getLabels(){
+			forEachButton(function(widget){
+				console.log(widget.attr('label'));
 			});
 		}
 	</script>
 	<div>
 		<button id="toggle" onclick='toggleDisabled()'>Disable all</button>
 		<button onclick='changeLabels()'>Change labels</button>
+		<button onclick='getLabels()'>Get labels</button>
 		<button onclick='location.reload()'>Revert</button>
 	</div>
 	<h3>Button instantiated via javacript:</h3>
-	<div id="buttonContainer"></div>
+	<p id="buttonContainer" style="display: none;"></p>
 	<script type="text/javascript">
-	// See if we can make a button in script and attach it to the DOM ourselves.
-	dojo.addOnLoad(function(){
-		var params = {
-			label: "hello!",
-			name: "programmatic"
-		};
-		var widget = new dijit.form.Button(params, document.getElementById("buttonContainer"));
-	});
+		// See if we can make a button in script and attach it to the DOM ourselves.
+		dojo.addOnLoad(function(){
+			var widget = new dijit.form.Button({
+				label: "hello!",
+				name: "programmatic"
+			});
+			widget.placeAt("buttonContainer");	// place in page
+
+			var widget2 = new dijit.form.Button({
+				label: "hello!",
+				name: "programmatic"
+			});
+			widget2.attr("label", "i'm programmatic too");	// change label (for testing)
+			widget2.placeAt("buttonContainer");	// place in page
+		});
 	</script>
     <h3>DropDownButton instantiated via javacript:</h3>
 	<div id="dropdownButtonContainer"></div>

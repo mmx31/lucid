@@ -27,13 +27,20 @@
 		}
 	</style>
 
+	<!-- required: a default dijit theme: -->
+	<link id="themeStyles" rel="stylesheet" href="../../dijit/themes/tundra/tundra.css">
+	
+	<!-- required: dojo.js -->
 	<script type="text/javascript" src="../../dojo/dojo.js"
 		djConfig="parseOnLoad: true, isDebug: true"></script>
+	
+	<!-- not needed, for testing alternate themes -->
 	<script type="text/javascript" src="_testCommon.js"></script>
 
 	<script language="JavaScript" type="text/javascript">
 		dojo.require("dojo.dnd.Source");
 		dojo.require("dojo.data.ItemFileWriteStore");
+		dojo.require("dijit.dijit"); // optimize: load dijit layer
 		dojo.require("dijit.Declaration");
 		dojo.require("dijit.Tree");
 		dojo.require("dijit.Menu");
@@ -41,28 +48,32 @@
 		dojo.require("dojo.parser");	// scan page for widgets and instantiate them
 
 		// Hash of id-->item for all the items (including children) in the data store.
-		var items = {};
+		var allItems = {};
 
 		function deleteItem(){
 			store.deleteItem(selectedItem);
+			store.save(); 
 
 			resetForms();
 			loadItemsTable();
 		}
 
 		function newItem(){
-			var pInfo = selectedItem ? {parent: selectedItem, attribute:"children"} : null;
-			console.debug(pInfo);
+			var pInfo = selectedItem ? {parent: selectedItem, attribute:"children"} : null,
+				item = {
+					id: dojo.byId('nId').value,
+					name: dojo.byId("nLabel").value,
+					someProperty: dojo.byId("nSomeProperty").value,
+					children: dojo.query("> *", "nChildren").map( function(child){
+								var id = child.id;
+								return allItems[id];
+							})
+				};
 
-			store.newItem({
-				id: dojo.byId('nId').value,
-				name: dojo.byId("nLabel").value,
-				someProperty: dojo.byId("nSomeProperty").value,
-				children: dojo.query("> *", "nChildren").map( function(child){
-							var id = child.id;
-							return items[id];
-						})
-			},pInfo);
+			console.debug("New item: ", item, ", pInfo = ", pInfo);
+
+			store.newItem(item, pInfo);
+			store.save();
 
 			resetForms();
 			loadItemsTable();
@@ -87,18 +98,6 @@
 
 			dojo.byId("nPotentialChildren").innerHTML = "";
 			nPotentialChildrenDragSource.clearItems();
-			for(var id in items){
-				var item = items[id],
-					label = store.getLabel(item);
-				dojo.byId("nPotentialChildren").innerHTML +=
-					"<div class='dojoDndItem' id='" + id + "'>" +
-						label +
-					"</div>";
-				nPotentialChildrenDragSource.setItem(id, {
-					data: label,
-					type: ["text"]
-				});
-			}
 		}
 
 		function updateItem(){
@@ -110,12 +109,14 @@
 				if (dojo.byId("uSomeProperty").value != store.getValue(selectedItem, "someProperty")){
 					store.setValue(selectedItem, "someProperty", dojo.byId("uSomeProperty").value);
 				}
-				
+	
 				var children = dojo.query("> *", "uChildren").map( function(child){
 					var id = child.id;
-					return items[id];
+					return allItems[id];
 				});
 				store.setValues(selectedItem, "children", children);
+
+				store.save();
 
 				resetForms();
 				loadItemsTable();
@@ -131,9 +132,8 @@
 
 		function loadItemsTable(){
 			// summary: for each item in the datastore generate a row in the table
-			
 			function processItem(item){
-				items[store.getIdentity(item)] = item;
+				allItems[store.getIdentity(item)] = item;
 
 				var vals = {
 					itemId: store.getIdentity(item),
@@ -159,14 +159,16 @@
 				//dojo.forEach(vals.children, processItem);
 			}
 
-			items = {};
+			allItems = {};
 			dijit.registry.byClass("ItemRow").forEach(function(widget){ widget.destroy(); });
 			store.fetch({onItem: processItem});
 		}
 
 		function onSelectItem(item){
 			resetForms();
+			loadItemsTable();
 
+			console.log("Selected item: ", item ? store.getLabel(item) : "none");
 			selectedItem = item;
 
 			if(item){	
@@ -186,17 +188,15 @@
 					uChildrenDragSource.setItem(id, {
 						data: label,
 						type: ["text"]
-					});
-					
-					dojo.byId('nParent').value = item ? store.getLabel(item) : "";
+					});					
 				});
 				
 				// and the items that could be children but aren't currently
 				// (including items that would cause cycles, because i'm lazy)
-				for(var id in items){
-					var item = items[id];
-					if(dojo.indexOf(children, item) == -1){
-						var label = store.getLabel(item);
+				for(var id in allItems){
+					var child = allItems[id];
+					if(dojo.indexOf(children, child) == -1){
+						var label = store.getLabel(child);
 						dojo.byId("uPotentialChildren").innerHTML +=
 							"<div class='dojoDndItem' id='" + id + "'>" +
 								label +
@@ -208,11 +208,14 @@
 					}
 				}
 			}
+			
+			// New Item section
+			dojo.byId('nParent').value = item ? store.getLabel(item) : "";
 		}
 	</script>
 
 </head>
-<body>
+<body class="tundra">
 
 	<h1 class="testTitle">Dijit Tree Test - dojo.data.Notification API support</h1>
 
@@ -225,8 +228,8 @@
 	<br />
 	<h2>Selected Item:</h2>
 	<div class="box">
-		<label for="uLabel">Name:</label>				<input id="uLabel" width="50" value="Enter Node Label" /><br />
-		<label for="uSomeProperty">Description:</label> <input id="uSomeProperty" width="50" value="Some Test Property" /><br /><br />
+		<label for="uLabel">Name:</label>				<input id="uLabel" width="50" value="Enter Node Label"  autocomplete="off"/><br />
+		<label for="uSomeProperty">Description:</label> <input id="uSomeProperty" width="50" value="Some Test Property"  autocomplete="off"/><br /><br />
 		<div style="float:left; margin-right: 2em;">
 			<label for="uChildren">Children (in order):</label>
 			<div dojoType="dojo.dnd.Source" class="container" id="uChildren" jsId="uChildrenDragSource"></div>
@@ -243,10 +246,10 @@
 	<h2>New Item</h2>
 	<p>Enter an Id, Name, and optionally a description to be added as a new item to the store.  Upon successful addition, the tree will recieve notification of this event and respond accordingly.  If you select a node the item will be added to that node, otherwise the item will be added to the tree root. "Id" is the identifer here and as such must be unique for all items in the store.</p>
 	<div class="box">
-		<label for="nId">Id:</label>					<input id="nId" width="50" value="Enter Item Id" /><br />
-		<label for="nLabel">Name:</label>				<input id="nLabel" width="50" value="Enter Item Name" /><br />
-		<label for="nSomeProperty">Description:</label> <input id="nSomeProperty" width="50" value="Enter Some Property Value" /><br /><br />
-		<label for="nParent">Parent:</label>			<input id="nParent" readonly /><br /><br />
+		<label for="nId">Id:</label>					<input id="nId" width="50" value="Enter Item Id"  autocomplete="off"/><br />
+		<label for="nLabel">Name:</label>				<input id="nLabel" width="50" value="Enter Item Name"  autocomplete="off"/><br />
+		<label for="nSomeProperty">Description:</label> <input id="nSomeProperty" width="50" value="Enter Some Property Value"  autocomplete="off"/><br /><br />
+		<label for="nParent">Parent:</label>			<input id="nParent" readonly autocomplete="off"/><br /><br />
 		<div style="float:left; margin-right: 2em;">
 			Children (in order):
 			<div dojoType="dojo.dnd.Source" class="container" id="nChildren" jsId="nChildrenDragSource"></div>
@@ -266,16 +269,18 @@
 		flat view of the items in the data store.
 		TODO: use the table widget from the mail demo, or dojox.Grid
 	-->
-	<div dojoType="dijit.Declaration" widgetClass="ItemRow" defaults="{ item: {}, itemId: 'thud', name: 10, someProperty: 'foo', children: {} }">
-		Id: ${itemId}, Name: ${name}
+	<div dojoType="dijit.Declaration" widgetClass="ItemRow" defaults="{ item: {}, itemId: 'thud', label: 'foo', someProperty: 'foo', children: {} }">
+		Id: ${itemId}, Label: ${label}
 
 		Children:
 		<span class="dijitInline" dojoAttachPoint="childrenContainerNode"></span>
 
 		<script type='dojo/connect' event='postCreate'>
-			dojo.forEach(this.children, function(childItem){
-				this.childrenContainerNode.innerHTML += "<span class='itemReference'>" + store.getLabel(childItem) + "</span>";
-			}, this);
+			var children = 
+				dojo.map(this.children, function(childItem){
+					return "<span class='itemReference'>" + store.getLabel(childItem) + "</span>";
+				});
+			this.childrenContainerNode.innerHTML = children.join(" ");
 		</script>
 	</div>
 	<div id="itemsTable"></div>

@@ -60,7 +60,9 @@ tests.register("tests.date.locale",
 	t.is("11.08.06", dojo.date.locale.format(date, {formatLength:'short',selector:'date', locale:'de-at'}));
 	t.is("06/08/11", dojo.date.locale.format(date, {formatLength:'short',selector:'date', locale:'ja-jp'}));
 
-	t.is("12:55 AM", dojo.date.locale.format(date, {formatLength:'short',selector:'time', locale:'en-us'}));
+	t.is("6", dojo.date.locale.format(date, {datePattern:'E', selector:'date'}));
+
+	t.is("12:55 a.m.", dojo.date.locale.format(date, {formatLength:'short',selector:'time', locale:'en-us'}));
 	t.is("12:55:12", dojo.date.locale.format(date, {timePattern:'h:m:s',selector:'time'}));
 	t.is("12:55:12.35", dojo.date.locale.format(date, {timePattern:'h:m:s.SS',selector:'time'}));
 	t.is("24:55:12.35", dojo.date.locale.format(date, {timePattern:'k:m:s.SS',selector:'time'}));
@@ -87,6 +89,10 @@ tests.register("tests.date.locale",
 	t.is( aug_11_2006, dojo.date.locale.parse("8/11/2006", {formatLength:'short', selector:'date', locale:'en'}));
 	// ...but not in strict mode
 	t.f( Boolean(dojo.date.locale.parse("8/11/2006", {formatLength:'short', selector:'date', locale:'en', strict:true})));
+
+	// test dates with no spaces
+	t.is( aug_11_2006, dojo.date.locale.parse("11Aug2006", {selector: 'date', datePattern: 'ddMMMyyyy'}));
+	t.is( new Date(2006, 7, 1), dojo.date.locale.parse("Aug2006", {selector: 'date', datePattern: 'MMMyyyy'}));
 
 	//en: 'medium' fmt: MMM d, yyyy
 	// Tolerate either 8 or 08 for month part.
@@ -232,12 +238,38 @@ tests.register("tests.date.locale",
 		{
 			name: "parse_times",
 			runTest: function(t){
+				var time = new Date(2006, 7, 11, 12, 30);
+				var tformat = {selector:'time', strict:true, timePattern:"h:mm a", locale:'en'};
+			
+				t.is(time.getHours(), dojo.date.locale.parse("12:30 p.m.", tformat).getHours());
+				t.is(time.getMinutes(), dojo.date.locale.parse("12:30 p.m.", tformat).getMinutes());
+			}
+		},
+		{
+			name: "format_patterns",
+			runTest: function(t){
+				var time = new Date(2006, 7, 11, 12, 30);
+				var tformat = {selector:'time', strict:true, timePattern:"h 'o''clock'", locale:'en'};
+//BUG				t.is(time.getHours(), dojo.date.locale.parse("12 o'clock", tformat).getHours());
 
-	var time = new Date(2006, 7, 11, 12, 30);
-	var tformat = {selector:'time', strict:true, timePattern:"h:mm a", locale:'en'};
+				tformat = {selector:'time', strict:true, timePattern:" 'Hour is' h", locale:'en'};
+				t.is(time.getHours(), dojo.date.locale.parse(" Hour is 12", tformat).getHours());
 
-	t.is(time.getHours(), dojo.date.locale.parse("12:30 PM", tformat).getHours());
-	t.is(time.getMinutes(), dojo.date.locale.parse("12:30 PM", tformat).getMinutes());
+				tformat = {selector:'time', strict:true, timePattern:"'Hour is' h", locale:'en'};
+				t.is(time.getHours(), dojo.date.locale.parse("Hour is 12", tformat).getHours());
+			}
+		},
+		{
+			name: "parse_patterns",
+			runTest: function(t){
+				var time = new Date(2006, 7, 11, 12, 30);
+				var tformat = {selector:'time', strict:true, timePattern:"h 'o''clock'", locale:'en'};
+//BUG				t.is(time.getHours(), dojo.date.locale.parse("12 o'clock", tformat).getHours());
+
+				tformat = {selector:'time', strict:true, timePattern:" 'Hour is' h", locale:'en'};
+				t.is(time.getHours(), dojo.date.locale.parse(" Hour is 12", tformat).getHours());
+				tformat = {selector:'time', strict:true, timePattern:"'Hour is' h", locale:'en'};
+				t.is(time.getHours(), dojo.date.locale.parse("Hour is 12", tformat).getHours());
 			}
 		},
 		{

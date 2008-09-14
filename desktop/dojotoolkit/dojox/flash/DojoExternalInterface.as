@@ -28,7 +28,7 @@ class DojoExternalInterface{
 		DojoExternalInterface.available = ExternalInterface.available;
 		
 		// make sure we can play nice in XD settings
-		System.security.allowDomain(_root.xdomain);
+		System.security.allowDomain(unescape(_root.xdomain));
 	}
 	
 	/** Called when we are finished adding methods through addCallback. */
@@ -101,13 +101,14 @@ class DojoExternalInterface{
 			return data;
 		}
 		
+		//      JAC: Using unicode character 0001 to store instead of Unicode null 
+		//      which causes trouble 
+		data = replaceStr(data, "&custom_null;", "\u0001");
+		
 		// we have to use custom encodings for certain characters when passing
 		// them over; for example, passing a backslash over as //// from JavaScript
 		// to Flash doesn't work
 		data = replaceStr(data, "&custom_backslash;", "\\");
-		
-		data = replaceStr(data, "\\\'", "\'");
-		data = replaceStr(data, "\\\"", "\"");
 		
 		return data;
 	}
@@ -116,6 +117,10 @@ class DojoExternalInterface{
 		if(!data || typeof data != "string"){
 			return data;
 		}
+		
+		// double encode all entity values, or they will be mis-decoded 
+		// by Flash when returned 
+		data = replaceStr(data, "&", "&amp;");
 		
 		// certain XMLish characters break Flash's wire serialization for
 		// ExternalInterface; encode these into a custom encoding, rather than
@@ -127,6 +132,7 @@ class DojoExternalInterface{
 		
 		// needed for IE
 		data = replaceStr(data, '\\', '&custom_backslash;');
+		data = replaceStr(data, "\u0001", "&custom_null;");
 		
 		// encode control characters and JavaScript delimiters
 		data = replaceStr(data, "\n", "\\n");
@@ -166,6 +172,6 @@ class DojoExternalInterface{
 		if(path.indexOf("'%20'%20quality=") != -1){
 			path = path.substring(0, path.indexOf("'%20'%20quality="));
 		}
-		return path;
+		return unescape(path);
 	}
 }

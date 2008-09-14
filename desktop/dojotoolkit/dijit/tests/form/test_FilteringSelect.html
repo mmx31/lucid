@@ -9,8 +9,14 @@
 		@import "../css/dijitTests.css";
 	</style>
 
+	<!-- required: the default dijit theme: -->
+	<link id="themeStyles" rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
+
+	<!-- required: dojo.js -->
 	<script type="text/javascript" src="../../../dojo/dojo.js"
 		djConfig="isDebug: true, parseOnLoad: true"></script>
+
+	<!-- only needed for alternate theme testing: -->
 	<script type="text/javascript" src="../_testCommon.js"></script>
 
 	<script type="text/javascript">
@@ -30,11 +36,14 @@
 			label = label.toLowerCase();
 			return label;
 		}
+		
 	</script>
 </head>
 
-<body>
+<body class="tundra">
+	
 	<h1 class="testTitle">Dojo FilteringSelect Widget Test</h1>
+
 	<div dojoType="dojo.data.ItemFileReadStore" jsId="myStore"
 		url="../_data/states.json"></div>
 	<div dojoType="dojo.data.ItemFileReadStore" jsId="myStore2"
@@ -60,7 +69,7 @@
 	<hr>
 
 	<form action="#" method="GET">
-		<p>FilteringSelect #1: inlined data, autoComplete=false:</p>
+		<p>FilteringSelect #1: inlined data, autoComplete=false, required="false":</p>
 		<label for="setvaluetest2">state list 1:</label>
 		<select	dojoType="dijit.form.FilteringSelect"
 				id="setvaluetest2"
@@ -70,8 +79,8 @@
 				onChange="dojo.byId('oc1').value=arguments[0]"
 				onFocus="console.log('user focus handler')"
 				onBlur="console.log('user blur handler')"
+				required="false"
 		>
-			<option value="blank"></option>
 			<option value="AL">Alabama</option>
 			<option value="AK">Alaska</option>
 			<option value="AS">American Samoa</option>
@@ -135,8 +144,8 @@
 			<option value="WY">Wyoming</option>
 		</select>
 		onChange:<input id="oc1" disabled value="not fired yet!" autocomplete="off">
-		<input type="button" value="Set displayed value to Kentucky (valid)" onClick="dijit.byId('setvaluetest2').setDisplayedValue('Kentucky')">
-		<input type="button" value="Set displayed value to Canada (invalid)" onClick="dijit.byId('setvaluetest2').setDisplayedValue('Canada')">
+		<input type="button" value="Set displayed value to Kentucky (valid)" onClick="dijit.byId('setvaluetest2').attr('displayedValue', 'Kentucky')">
+		<input type="button" value="Set displayed value to Canada (invalid)" onClick="dijit.byId('setvaluetest2').attr('displayedValue', 'Canada')">
 		<hr>
 
 		<div dojoType="dojo.data.ItemFileReadStore" jsId="stateStore"
@@ -240,7 +249,6 @@
 		>
 		<br>
 		<hr>
-		<div >
 		<p>FilteringSelect #11: deep data, initial query of type=country:</p>
 		<label for="state11">query list:</label>
 		<input searchAttr="name"
@@ -277,6 +285,30 @@
 		<br>
 		<hr>
 		<input type="submit">
+		
+		<hr>
+		<p>FilteringSelect #13 - Programatic</p>
+		<script type="text/javascript">
+			dojo.addOnLoad(function(){
+				var data = {
+					identifier:"label",
+					items:[
+						{ label:"ugh<b>bar</b>" },
+						{ label:"<em>emphasis</em>" }
+					]
+				};
+				var store = new dojo.data.ItemFileReadStore({ data: data });
+				var foo = new dijit.form.FilteringSelect({
+					store: store,
+					searchAttr:"label",
+					labelType:"html",
+					labelAttr:"label"
+				});
+				dojo.byId("programatic").appendChild(foo.domNode);
+			});
+		</script>
+		<div id="programatic"></div>
+		
 	</form>
 	<p>
 		this is some text below the combo boxes. It shouldn't get pushed out of
@@ -286,7 +318,7 @@
 
 	<select>
 	  <option>test for</option>
-	  <option">IE bleed through</option>
+	  <option>IE bleed through</option>
 	  <option>problem</option>
 	</select>
 

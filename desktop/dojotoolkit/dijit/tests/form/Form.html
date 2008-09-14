@@ -8,13 +8,21 @@
 		@import "../../../dojo/resources/dojo.css";
 		@import "../css/dijitTests.css";
 	</style>
+
+	<!-- required: the default dijit theme: -->
+	<link id="themeStyles" rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
+
+	<!-- required: dojo.js -->
 	<script type="text/javascript" src="../../../dojo/dojo.js"
 		djConfig="isDebug: true, parseOnLoad: true"></script>
+
+	<!-- only needed for alternate theme testing: -->
 	<script type="text/javascript" src="../_testCommon.js"></script>
 
 	<script type="text/javascript">
 		dojo.require("doh.runner");
 		dojo.require("dojo.date");
+		dojo.require("dijit.dijit"); // optimize: load dijit layer
 		dojo.require("dijit.form.Form");
 		dojo.require("dijit.layout.LayoutContainer");
 		dojo.require("dijit.layout.ContentPane");
@@ -40,6 +48,10 @@
 			console.log("Object is: " + dojo.toJson(obj, true));
 			dijit.byId('myForm').setValues(obj);
 		}
+		
+		function validate(){
+			console.log(dijit.byId('myForm').validate());
+		}
 
 		// make dojo.toJson() print dates correctly (this feels a bit dirty)
 		Date.prototype.json = function(){ return dojo.date.stamp.toISOString(this, {selector: 'date'});};
@@ -58,7 +70,9 @@
 							t1: "line 1\nline 2",
 							st1: "simple line 1\nsimple line 2",
 							richtext: "<h1>original</h1><p>This is the default content</p>",
-							filename: ""
+							filename: "",
+							readOnlyWidget: "Should be returned",
+							"submitButton":"Submit"
 						};
 
 		// we change the form to these values
@@ -73,8 +87,16 @@
 							t1: "new line 1\nnew line 2",
 							st1: "new simple line 1\nnew simple line 2",
 							richtext: "<h1>changed</h1><p>This is the changed content set by setValues</p>",
-							filename: ""
+							filename: "",
+							readOnlyWidget: "Should be returned",
+							"submitButton":"Submit"
 						};
+		var particalchanged = {
+							foo: {bar: {baz: {quux: d("2006-01-01")} } },
+							available: {from: d("2006-11-02"), to: d("2007-11-02")},
+							plop: {combo: "two"},
+							cb2: ["2"]
+		};
 		// we reset the form to these values
 		var reset =	{
 							foo: {bar: {baz: {quux: d("2007-12-30")} } },
@@ -87,10 +109,13 @@
 							t1: "line 1\nline 2",
 							st1: "simple line 1\nsimple line 2",
 							richtext: "<h1>changed</h1><p>This is the changed content set by setValues</p>", // not a form element, so not reset
-							filename: ""
+							filename: "",
+							readOnlyWidget: "Should be returned",
+							"submitButton":"Submit"
 						};
 
 		dojo.addOnLoad(function(){
+			var resetready=false;
 			doh.register("dijit.form.Form",
 				[
 					function getValues(){
@@ -103,8 +128,28 @@
 						doh.is( dojo.toJson(original), dojo.toJson(values) );
 					},
 					function setValues(){
-						dijit.byId("myForm").setValues(changed);
-						doh.is( dojo.toJson(changed), dojo.toJson(dijit.byId("myForm").getValues()) );
+						// Textarea is firing postCreate in FF2/Mac AFTER this test runs!
+						// Slow down the test!
+						var d=new doh.Deferred();
+						var f=dijit.byId("myForm");
+
+						var defer=function(){
+							if(dijit.byId('t1')._resetValue!==undefined){
+								f.setValues(changed);
+								try{ // in a Deferred setTimeout so doh won't hear doh.is exceptions
+									doh.is( dojo.toJson(changed), dojo.toJson(f.getValues()) );
+									f.setValues(particalchanged);
+									resetready=true;
+									d.callback(doh.is( dojo.toJson(dojo.mixin(changed,particalchanged)), dojo.toJson(f.getValues()) ));
+								}catch(e){
+									d.errback(e);
+								}
+							}else{
+								setTimeout(defer,1);
+							}
+						};
+						setTimeout(defer,1);
+						return d;
 					},
 					function nameAttributeSurvived(){  // ticket:4753
 						var radios = dojo.query(".RadioButton", dijit.byId("radio-cells")).forEach(
@@ -114,8 +159,25 @@
 						
 					},
 					function resetTest(){
-						dijit.byId("myForm").reset();
-						doh.is( dojo.toJson(reset), dojo.toJson(dijit.byId("myForm").getValues()) );
+						// we have to wait for setValues to finish
+						var d=new doh.Deferred();
+						var defer=function(){
+							if(resetready){
+								dijit.byId("myForm").reset();
+								try{ // in a Deferred setTimeout so doh won't hear doh.is exceptions
+									d.callback(doh.is( dojo.toJson(reset), dojo.toJson(dijit.byId("myForm").getValues()) ));
+								}catch(e){
+									d.errback(e);
+								}
+							}else{
+								setTimeout(defer,1);
+							}
+						};
+						setTimeout(defer,1);
+						return d;
+					},
+					function testValidate(){
+						doh.is(dijit.byId("myForm").validate(), true);
 					}
 				]
 			);
@@ -124,7 +186,7 @@
 
 	</script>
 </head>
-<body>
+<body class="tundra">
 	<h1>Form Widget Unit Test</h1>
 	<p>
 		The form widget takes data in a form and serializes/deserializes it, so
@@ -340,15 +402,36 @@ simple line 2</textarea>
 						<input dojoType="dijit.form.TextBox" name="filename" type="file">
 					</td>
 				</tr>
+				<tr>
+					<td>Disabled Widget</td>
+					<td>Disabled</td>
+					<td>
+						<input dojoType="dijit.form.TextBox" name="disabledWidget" disabled="disabled" value="Should not be returned">
+					</td>
+				</tr>
+				<tr>
+					<td>Disabled Required Widget</td>
+					<td>Disabled Required</td>
+					<td>
+						<input dojoType="dijit.form.ValidationTextBox" name="disabledRequiredWidget" disabled="disabled" required="true" value="">
+					</td>
+				</tr>
+				<tr>
+					<td>Read-only Widget</td>
+					<td>Read Only</td>
+					<td>
+						<input dojoType="dijit.form.TextBox" name="readOnlyWidget" readOnly value="Should be returned">
+					</td>
+				</tr>
 			</tbody>
 		</table>
 
-		<button dojoType=dijit.form.Button onClick="getValues();">Get Values from form!</button>
-		<button dojoType=dijit.form.Button onClick="setValues();">Set Values to form!</button>
-		<button dojoType=dijit.form.Button type="submit">Submit</button>
-		<button dojoType=dijit.form.Button type="reset">Reset</button>
+		<button dojoType="dijit.form.Button" onClick="getValues();">Get Values from form!</button>
+		<button dojoType="dijit.form.Button" onClick="setValues();">Set Values to form!</button>
+		<button dojoType="dijit.form.Button" onClick="validate();">Validate form!</button>
+		<button dojoType="dijit.form.Button" type="submit" name="submitButton" value="Submit">Submit</button>
+		<button dojoType="dijit.form.Button" type="reset">Reset</button>
 	</form>
-
 
 </body>
 </html>

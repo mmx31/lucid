@@ -206,6 +206,9 @@ tests.register("tests.number",
 	t.t(isNaN(dojo.number.parse("")));
 	t.t(isNaN(dojo.number.parse("abcd")));
 
+	// should allow unlimited precision, by default
+	t.is(1.23456789, dojo.number.parse("1.23456789", {locale: "en-us"}));
+
 	//test whitespace
 //	t.is(-1234567, dojo.number.parse("  -1,234,567  ", {locale: "en-us"}));
 
@@ -951,7 +954,7 @@ function test_number_format_pad(){
 	var expect =([   "2%", "1%", "2%", "2%", "1%",
                 	 "0%", "0%", "1%", "1%", "1%",
                 	 "0", "2", "0.0", "0.2", "0.00",
-                	 "0.02", "0.000", "0.002",]);
+                	 "0.02", "0.000", "0.002"]);
 	for(var i = 0; i <input.length; i ++){
 		tests.number.checkFormatParseCycle(t, {pattern:patterns[i],round:true},input[i],expect[i],false);
 	}

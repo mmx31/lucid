@@ -2,9 +2,43 @@ dojo.provide("dijit._editor.plugins.EnterKeyHandling");
 
 dojo.declare("dijit._editor.plugins.EnterKeyHandling", dijit._editor._Plugin, {
 	// summary:
-	//		This plugin tries to handle enter key events to make all 
-	//		browsers have identical behaviors.  Specifically, it fixes
-	//		the "line spacing problem" on IE.
+	//		This plugin tries to make all browsers have identical behavior
+	//		when the user presses the ENTER key.
+	//		Specifically, it fixes the double-spaced line problem on IE.
+	// description:
+	//		On IE the ENTER key creates a new paragraph, which visually looks
+	//		bad (ie, "double-spaced") and is also different than FF, which
+	//		makes a <br> in that.
+	//
+	//		In this plugin's default operation, where blockNodeForEnter==BR, it
+	//		makes the Editor on IE appear to work like other browsers, by:
+	//			1. changing the CSS for the <p> node to not have top/bottom margins,
+	//				thus eliminating the double-spaced appearance.
+	//			2. adds the singleLinePsToRegularPs callback when the
+	//				editor writes out it's data, in order to convert adjacent <p>
+	//				nodes into a single node
+	//		There's also a pre-filter to convert a single <p> with <br> line breaks
+	//		 into separate <p> nodes, to mirror the post-filter.
+	//
+	//		(Note: originally based on http://bugs.dojotoolkit.org/ticket/2859)
+	//
+	//		If you set the blockNodeForEnter option to another value, then this
+	//		plugin will monitor keystrokes (as they are typed) and apparently
+	//		update the editor's content on the fly so that the ENTER key will
+	//		either create a new <div>, or a new <p>.
+	//
+	//		This is useful because in some cases, you need the editor content to be
+	//		consistent with the serialized html even while the user is editing
+	//		(such as in a collaboration mode extension to the editor).
+	//
+	//		The handleEnterKey() code was mainly written for the IE double-spacing
+	//		issue that is now handled in the pre/post filters.  And it has some
+	//		issues... on IE setting blockNodeForEnter to P or BR
+	//		causes screen jumps as you type (making it unusable), and on safari
+	//		it just has no effect (safari creates a <div> every time the user
+	//		hits the enter key).  But apparently useful for case mentioned above.
+	//
+	//		(Note: originally based on http://bugs.dojotoolkit.org/ticket/1331)
 
 	// blockNodeForEnter: String
 	//		this property decides the behavior of Enter key. It can be either P,
@@ -109,12 +143,20 @@ dojo.declare("dijit._editor.plugins.EnterKeyHandling", dijit._editor._Plugin, {
 	bogusHtmlContent: '&nbsp;',
 	blockNodes: /^(?:P|H1|H2|H3|H4|H5|H6|LI)$/,
 	handleEnterKey: function(e){
-		// summary: manually handle enter key event to make the behavior consistant across
-		//	all supported browsers. See property blockNodeForEnter for available options
-		if(!this.blockNodeForEnter){ return true; } //let browser handle this
+		// summary:
+		//		Manually handle enter key event to make the behavior consistant across
+		//		all supported browsers. See property blockNodeForEnter for available options
+		
+		 // let browser handle this
+		// TODO: delete.  this code will never fire because 
+		// onKeyPress --> handleEnterKey is only called when blockNodeForEnter != null
+		if(!this.blockNodeForEnter){ return true; }
+
 		var selection, range, newrange, doc=this.editor.document,br;
 		if(e.shiftKey  //shift+enter always generates <br>
 			|| this.blockNodeForEnter=='BR'){
+			// TODO: above condition 'this.blockNodeForEnter=='BR'' is meaningless,
+			// onKeyPress --> handleEnterKey is only called when blockNodeForEnter != BR
 			var parent = dojo.withGlobal(this.editor.window, "getParentElement", dijit._editor.selection);
 			var header = dijit.range.getAncestor(parent,this.blockNodes);
 			if(header){
@@ -258,6 +300,10 @@ dojo.declare("dijit._editor.plugins.EnterKeyHandling", dijit._editor._Plugin, {
 		}
 	},
 	_fixNewLineBehaviorForIE: function(d){
+		// summary:
+		//		Insert CSS so <p> nodes don't have spacing around them,
+		//		thus hiding the fact that ENTER key on IE is creating new
+		//		paragraphs
 		if(this.editor.document.__INSERTED_EDITIOR_NEWLINE_CSS === undefined){
 			var lineFixingStyles = "p{margin:0 !important;}";
 			var insertCssText = function(
@@ -313,6 +359,12 @@ dojo.declare("dijit._editor.plugins.EnterKeyHandling", dijit._editor._Plugin, {
 		return null;
 	},
 	regularPsToSingleLinePs: function(element, noWhiteSpaceInEmptyP){
+		// summary:
+		//		Converts a <p> node containing <br>'s into multiple <p> nodes.
+		// description:
+		//		See singleLinePsToRegularPs().   This method does the
+		//		opposite thing, and is used as a pre-filter when loading the
+		//		editor, to mirror the effects of the post-filter at end of edit.
 		function wrapLinesInPs(el){
 		  // move "lines" of top-level text nodes into ps
 			function wrapNodes(nodes){
@@ -329,9 +381,8 @@ dojo.declare("dijit._editor.plugins.EnterKeyHandling", dijit._editor._Plugin, {
 			var currentNode;
 			while(currentNodeIndex < el.childNodes.length){
 				currentNode = el.childNodes[currentNodeIndex];
-				if( (currentNode.nodeName!='BR') &&
-					(currentNode.nodeType==1) &&
-					(dojo.style(currentNode, "display")!="block")
+				if( currentNode.nodeType==3 ||	// text node
+					(currentNode.nodeType==1 && currentNode.nodeName!='BR' && dojo.style(currentNode, "display")!="block")
 				){
 					nodesInLine.push(currentNode);
 				}else{
@@ -395,7 +446,37 @@ dojo.declare("dijit._editor.plugins.EnterKeyHandling", dijit._editor._Plugin, {
 	},
 
 	singleLinePsToRegularPs: function(element){
+		// summary:
+		//		Called as post-filter.
+		//		Apparently collapses adjacent <p> nodes into a single <p>
+		//		nodes with <br> separating each line.
+		//
+		//	example:
+		//		Given this input:
+		//	|	<p>line 1</p>
+		//	|	<p>line 2</p>
+		//	|	<ol>
+		//	|		<li>item 1
+		//	|		<li>item 2
+		//	|	</ol>
+		//	|	<p>line 3</p>
+		//	|	<p>line 4</p>
+		//
+		//		Will convert to:
+		//	|	<p>line 1<br>line 2</p>
+		//	|	<ol>
+		//	|		<li>item 1
+		//	|		<li>item 2
+		//	|	</ol>
+		//	|	<p>line 3<br>line 4</p>
+		//
+		// Not sure why this situation would even come up after the pre-filter and
+		// the enter-key-handling code.
+	
 		function getParagraphParents(node){
+			// summary:
+			//		Used to get list of all nodes that contain paragraphs.
+			//		Seems like that would just be the very top node itself, but apparently not.
 			var ps = node.getElementsByTagName('p');
 			var parents = [];
 			for(var i=0; i<ps.length; i++){

@@ -421,6 +421,7 @@ dojox.flash.Embed.prototype = {
 			// simply invalidates the Flash object in the cache all the time to
 			// keep it loading fresh. -- Brad Neuberg
 			swflocObject += "?cachebust=" + new Date().getTime();
+			swflocObject += "&baseUrl=" + escape(dojoUrl);
 			swflocObject += "&xdomain=" + escape(xdomainBase);
 		}
 
@@ -466,10 +467,8 @@ dojox.flash.Embed.prototype = {
 		// using same mechanism on all browsers now to write out
 		// Flash object into page
 
-		// document.write no longer works correctly
-		// due to Eolas patent workaround in IE;
-		// nothing happens (i.e. object doesn't
-		// go into page if we use it)
+		// document.write no longer works correctly due to Eolas patent workaround
+		// in IE; nothing happens (i.e. object doesn't go into page if we use it)
 		dojo.connect(dojo, "loaded", dojo.hitch(this, function(){
 			// Prevent putting duplicate SWFs onto the page
 			var containerId = this.id + "Container";
@@ -592,21 +591,11 @@ dojox.flash.Communicator.prototype = {
 			return data;
 		}
 		
-		// double encode all entity values, or they will be mis-decoded
-		// by Flash when returned
-		var entityRE = /\&([^;]*)\;/g;
-		data = data.replace(entityRE, "&amp;$1;");
-
-		// entity encode XML-ish characters, or Flash's broken XML serializer
-		// breaks
-		data = data.replace(/</g, "&lt;");
-		data = data.replace(/>/g, "&gt;");
-
 		// transforming \ into \\ doesn't work; just use a custom encoding
 		data = data.replace("\\", "&custom_backslash;");
 
-		data = data.replace(/\0/g, "\\0"); // null character
-		data = data.replace(/\"/g, "&quot;");
+		// also use custom encoding for the null character to avoid problems 
+		data = data.replace(/\0/g, "&custom_null;");
 
 		return data;
 	},
@@ -627,6 +616,9 @@ dojox.flash.Communicator.prototype = {
 		if(!data || typeof data != "string"){
 			return data;
 		}
+		
+		// needed for IE; \0 is the NULL character 
+		data = data.replace(/\&custom_null\;/g, "\0");
 	
 		// certain XMLish characters break Flash's wire serialization for
 		// ExternalInterface; these are encoded on the 
@@ -637,9 +629,6 @@ dojox.flash.Communicator.prototype = {
 		data = data.replace(/\&custom_lt\;/g, "<");
 		data = data.replace(/\&custom_gt\;/g, ">");
 		data = data.replace(/\&custom_backslash\;/g, '\\');
-		
-		// needed for IE; \0 is the NULL character
-		data = data.replace(/\\0/g, "\0");
 		
 		return data;
 	},

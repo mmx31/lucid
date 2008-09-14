@@ -20,11 +20,18 @@
 		}
 	</style>
 	
-	<script type="text/javascript" djConfig="isDebug: true,parseOnLoad:true"
-		src="../../../dojo/dojo.js"></script>
+	<!-- required: the default dijit theme: -->
+	<link id="themeStyles" rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
+
+	<!-- required: dojo.js -->
+	<script type="text/javascript" src="../../../dojo/dojo.js"
+		djConfig="isDebug: true, parseOnLoad: true"></script>
+
+	<!-- only needed for alternate theme testing: do NOT use in your code! -->
 	<script type="text/javascript" src="../_testCommon.js"></script>
 
 	<script type="text/javascript">
+		dojo.require("dijit.dijit"); // optimize: load dijit layer
 		dojo.require("dijit.layout.ContentPane");
 		dojo.require("dijit.layout.TabContainer");
 		dojo.require("dijit.Tooltip");
@@ -71,7 +78,7 @@
 		});
 	</script>
 </head>
-<body>
+<body class="tundra">
 
 	<h1 class="testTitle">Dijit layout.TabContainer (delayed) remote tests</h1>
 

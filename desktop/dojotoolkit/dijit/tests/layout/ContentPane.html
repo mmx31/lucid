@@ -2,7 +2,7 @@
 		"http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-	<title>Test ContentPane</title>
+	<title>ContentPane DOH test</title>
 	<style type="text/css">
 		@import "../../../dojo/resources/dojo.css";
 		@import "../../themes/tundra/tundra.css";
@@ -24,6 +24,7 @@
 	<script type="text/javascript">
 		dojo.require("doh.runner");
 		dojo.require("dijit.layout.ContentPane");
+		dojo.require("dojo.data.ItemFileReadStore");
 		dojo.require("dijit._Container");
 		dojo.require("dijit._Templated");
 		dojo.require("dijit.layout.StackContainer");
@@ -59,7 +60,7 @@
 							pane2 = new dijit.layout.ContentPane({
 								preventCache: true
 							}, dojo.byId("pane2"));
-							pane2.setContent();// pass undefined on purpose
+							pane2.attr("content", "");// pass undefined on purpose
 						},
 						runTest: function(t){
 							t.assertEqual(0, dijit._Container.prototype.getChildren.call(pane2).length);
@@ -69,11 +70,11 @@
 					{
 						name: "setContent_String",
 						setUp: function(){
-							pane2.setContent();
+							pane2.attr("content", "");
 						},
 						runTest: function(t){
 							var msg = "<h3>a simple html string</h3>";
-							pane2.setContent(msg);
+							pane2.attr("content", msg);
 							t.assertEqual(msg, pane2.domNode.innerHTML.toLowerCase());
 						}
 					},
@@ -81,15 +82,15 @@
 						name: "setContent_DOMNode",
 						setUp: function(t){
 							var div = dojo.doc.createElement('div');
-							div.innerHTML = "setContent( [DOMNode] )";
+							div.innerHTML = "attr('content', [DOMNode] )";
 							div.setAttribute('dojoType', 'dijit.TestWidget');
-							pane2.setContent(div);
+							pane2.attr("content", div);
 						},
 						runTest: function(t){
 							t.assertEqual(1, dijit._Container.prototype.getChildren.call(pane2).length);
 						},
 						tearDown: function(t){
-							pane2.setContent(); // clear content for next test
+							pane2.attr("content", ""); // clear content for next test
 						}
 					},
 					{
@@ -101,7 +102,7 @@
 											+"<div dojotype='dijit.TestWidget'>below</div>";
 
 							var list = div.childNodes;
-							pane2.setContent(div.childNodes);
+							pane2.attr("content", div.childNodes);
 						},
 						runTest: function(t){
 							t.assertEqual(2, dijit._Container.prototype.getChildren.call(pane2).length);
@@ -117,7 +118,7 @@
 					{
 						name: "setContent_dojo_NodeList",
 						setUp: function(t){
-							pane2.setContent();
+							pane2.attr("content", "");
 						},
 						runTest: function(t){
 							var div = dojo.doc.createElement('div');
@@ -130,7 +131,7 @@
 								list.push(n.cloneNode(true));
 							});
 
-							pane2.setContent(list);
+							pane2.attr("content", list);
 							t.assertEqual(4, pane2.domNode.childNodes.length);
 						}
 					},
@@ -142,7 +143,7 @@
 
 							// test that it's actually working
 							pane2.extractContent = true;
-							pane2.setContent('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" '
+							pane2.attr("content", '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" '
 								+'"http://www.w3.org/TR/html4/strict.dtd">'
 								+'<html><head><style>body{font-weight:bold;}</style></head>'
 								+'<body>extractContent test</body></html>');
@@ -161,7 +162,7 @@
 						name: "setHref_loading",
 						timeout: 1800,
 						setUp: function(t){
-							pane2.setHref('getResponse.php?messId=1');
+							pane2.attr('href', 'getResponse.php?messId=1');
 						},
 						runTest: function(t){
 							var d = new tests.Deferred();
@@ -177,11 +178,11 @@
 						name: "setHref_then_cancel",
 						timeout: 2800,
 						setUp: function(t){
-							pane2.setContent();// clear previous
+							pane2.attr("content", "");// clear previous
 						},
 						runTest: function(t){
 							var msg = "This should NEVER be seen!";
-							pane2.setHref('getResponse.php?delay=1000&message='+encodeURI(msg));
+							pane2.attr('href', 'getResponse.php?delay=1000&message='+encodeURI(msg));
 							var d = new t.Deferred();
 							setTimeout(d.getTestCallback(
 								function(){
@@ -199,15 +200,15 @@
 						name: "setHref_cancels_previous_setHref",
 						timeout: 2800,
 						setUp: function(t){
-							pane2.setContent();
+							pane2.attr("content", "");
 						},
 						runTest: function(t){
 							var msgCanceled = "This should be canceled";
-							pane2.setHref("getResponse.php?delay=1000&message="+encodeURI(msgCanceled));
+							pane2.attr('href', "getResponse.php?delay=1000&message="+encodeURI(msgCanceled));
 
 							var msg = "This message should win over the previous";
 							setTimeout(function(){
-								pane2.setHref("getResponse.php?message="+encodeURI(msg));
+								pane2.attr('href', "getResponse.php?message="+encodeURI(msg));
 							}, 900);
 
 							var d = new t.Deferred();
@@ -223,15 +224,15 @@
 						name: "setContent_cancels_setHref",
 						timeout: 2800,
 						setUp: function(t){
-							pane2.setContent();
+							pane2.attr("content", "");
 						},
 						runTest: function(t){
 							var msgCanceled = "This message be canceled";
-							pane2.setHref("getResponse.php?delay=1000&message="+encodeURI(msgCanceled));
+							pane2.attr('href', "getResponse.php?delay=1000&message="+encodeURI(msgCanceled));
 
 							var msg = "This message should win over the inflight one";
 							setTimeout(function(){
-								pane2.setContent(msg);
+								pane2.attr("content", msg);
 							}, 900);
 
 							var d = new t.Deferred();
@@ -247,7 +248,7 @@
 						name: "refresh",
 						timeout: 1900,
 						setUp: function(t){
-							pane2.setHref("getResponse.php?message="+encodeURI('initial load'));
+							pane2.attr('href', "getResponse.php?message="+encodeURI('initial load'));
 						},
 						runTest: function(t){
 							var msg = 'refreshed load'
@@ -270,12 +271,12 @@
 						name: "isLoaded",
 						timeout: 1800,
 						setUp: function(t){
-							pane2.setContent();
+							pane2.attr("content", "");
 						},
 						runTest: function(t){
 							t.assertTrue(pane2.isLoaded);
 
-							pane2.setHref("getResponse.php?delay=300&message=test");
+							pane2.attr('href', "getResponse.php?delay=300&message=test");
 
 							t.assertFalse(pane2.isLoaded);
 
@@ -302,11 +303,11 @@
 						timeout: 1800,
 						setUp: function(t){
 							pane2.domNode.style.display = 'none';
-							pane2.setContent();
+							pane2.attr("content", "");
 						},
 						runTest: function(t){
 							pane2._msg = "This text should not be loaded until after widget is shown";
-							pane2.setHref("getResponse.php?message="+encodeURI(pane2._msg));
+							pane2.attr('href', "getResponse.php?message="+encodeURI(pane2._msg));
 							var d = new t.Deferred();
 							setTimeout(d.getTestCallback(
 								function(){
@@ -323,7 +324,7 @@
 						name: "onDownloadError",
 						timeout: 1800,
 						setUp: function(t){
-							pane2.setContent();
+							pane2.attr("content", "");
 						},
 						runTest: function(t){
 							var res = {};
@@ -344,7 +345,7 @@
 							var evtHandle = dojo.connect(pane2, 'onDownloadError', this, 'onError');
 
 							// test onDownloadError
-							pane2.setHref('nonexistant');
+							pane2.attr('href', 'nonexistant');
 
 							// do the test
 							var d = new t.Deferred();
@@ -376,7 +377,7 @@
 						name: "onLoad|Unload_onDownloadStart|End",
 						timeout: 2400,
 						setUp:function(t){
-							pane2.setContent();
+							pane2.attr("content", "");
 						},
 						runTest:function(t){
 							var obj = {
@@ -402,7 +403,7 @@
 							var loadHandler = dojo.connect(pane2, 'onLoad', obj, 'load');
 							var unloadHandler = dojo.connect(pane2, 'onUnload', obj, 'unload');
 
-							pane2.setHref('getResponse.php?delay=400');
+							pane2.attr('href', 'getResponse.php?delay=400');
 
 							var d = new t.Deferred();
 							setTimeout(function(){
@@ -451,18 +452,24 @@
 						//		We actually dont need to test anything here, just setUp
 						name: "setUp_StackContainer",
 						setUp:function(t){
+							// create a StackContainer
 							st = dojo.byId('stackcontainer');
 							dojo.addClass(st, 'box');
 							st = new dijit.layout.StackContainer({}, st);
 
+							// the first child (by default) is the one that will
+							// be shown
 							st.addChild(new dijit.TestWidget());
+							
+							// the second child *won't* be shown until selected
 							pane3 = new dijit.layout.ContentPane({
 								href:'getResponse.php?delay=300&message=Loaded!',
 								preventCache: true
 							}, dojo.doc.createElement('div'));
 							st.addChild(pane3);
 
-							pane3.startup(); // starts the ContentPane
+							// start the StackContainer; shouldn't cause ContentPane to load.
+							st.startup();
 						},
 						runTest:function(t){
 							t.assertTrue(st);
@@ -526,6 +533,8 @@
 						}
 					},
 					{
+						// Test if a plain ContentPane downloads it's contents when startup() is called.
+						// Nothing in particular to do with StackContainer.
 						name: "downloadTriggeredOnStartup",
 						timeout: 1800,
 						runTest: function(t){
@@ -533,9 +542,8 @@
 							var pane4 = new dijit.layout.ContentPane({
 								href:href,
 								preventCache: true
-							}, dojo.doc.createElement('div'));
-
-							dojo.place(pane4.domNode, pane3.domNode, 'after');
+							});
+							pane4.placeAt(st.domNode, "after");
 
 							pane4.startup(); // parser should call startup when djConfig.parseOnLoad=true
 
@@ -550,16 +558,115 @@
 				]
 			);
 
+			// Tests for doLayout parameter.
+			// When this parameter is true, the single ContentPane child is resized
+			// to match the size of the ContentPane.
+			var pane5;
+			doh.registerGroup("doLayout",
+				[
+					{
+						name: "simple",
+						setUp: function(t){
+							pane5 = new dijit.layout.ContentPane({
+								content:"<div dojoType='dijit.layout.StackContainer'></div>"
+							}, dojo.byId("pane5"));
+							console.log(pane5);
+						},
+						runTest: function(t){
+							// since there's just a single child it should be marked
+							// for layout/resize along w/the ContentPane
+							t.assertTrue(pane5._singleChild);
+						},
+						tearDown: function(t){
+							pane5.destroyRecursive();
+						}
+					},
+					{
+						name: "false",
+						setUp: function(t){
+							pane5 = new dijit.layout.ContentPane({
+								content:
+									"<div dojoType='dijit.layout.StackContainer'></div>",
+								doLayout: false
+							}, dojo.byId("pane5"));
+						},
+						runTest: function(t){
+							// since doLayout=false shouldn't try to resize child
+							t.assertFalse(pane5._singleChild);
+						},
+						tearDown: function(t){
+							pane5.destroyRecursive();
+						}
+					},
+					{
+						name: "mixed",
+						setUp: function(t){
+							pane5 = new dijit.layout.ContentPane({
+								content:
+									"<span>hello world</span>" +
+									"<div dojoType='dijit.layout.StackContainer'></div>"
+							}, dojo.byId("pane5"));
+						},
+						runTest: function(t){
+							// since there's plain HTML along with the widget, ContentPane shouldn't try to adjust
+							// this size of the widget (since that would cover up the other HTML)
+							t.assertFalse(pane5._singleChild);
+						},
+						tearDown: function(t){
+							pane5.destroyRecursive();
+						}
+					},
+					{
+						name: "two widgets",
+						setUp: function(t){
+							pane5 = new dijit.layout.ContentPane({
+								content:
+									"<div dojoType='dijit.layout.StackContainer'></div>" +
+									"<div dojoType='dijit.layout.StackContainer'></div>"
+							}, dojo.byId("pane5"));
+						},
+						runTest: function(t){
+							// since there are multiple children, neither should be marked
+							// for layout/resize along w/the ContentPane
+							t.assertFalse(pane5._singleChild);
+						},
+						tearDown: function(t){
+							pane5.destroyRecursive();
+						}
+					},
+					{
+						name: "dojo.data",
+						setUp: function(t){
+							pane5 = new dijit.layout.ContentPane({
+								content:
+									"<div dojoType='dojo.data.ItemFileReadStore' jsId='dd'></div>" +
+									"<div dojoType='dijit.layout.StackContainer' id='sc'></div>"
+							}, dojo.byId("pane5"));
+						},
+						runTest: function(t){
+							// there are two children but one is invisible, so the other should be marked
+							// for layout/resize along w/the ContentPane
+							t.assertTrue(dd);
+							t.assertTrue(dijit.byId("sc"));
+							t.assertEqual(pane5._singleChild, dijit.byId("sc"));
+						},
+						tearDown: function(t){
+							pane5.destroyRecursive();
+						}
+					}
+				]
+			);
+
 			doh.run();
 		});
 	</script>
 </head>
 <body class="tundra">
-	<h2>dijit.layout.ContentPane test</h2>
+	<h2>dijit.layout.ContentPane DOH test</h2>
 	<h3>Test designed to run on localhost (minimize impact from network latency)</h3>
 
 	<h4>This should NOT be parsed automatically</h4>
-	<div dojoType="dijit.layout.ContentPane" class="box" hasShadow="true" id="pane1">
+	<div dojoType="dijit.layout.ContentPane" class="box" id="pane1">
 		<div dojoType='dijit.TestWidget'>If this has a different background and a red border, the page parsed when it shouldn't</div>
 	</div>
 	<br/><h3>Testing ContentPane</h3>
@@ -573,5 +680,6 @@
 	</div>
 	<br/><br/>
 	<div id='stackcontainer'></div>
+	<div id="pane5"></div>
 </body>
 </html>

@@ -20,11 +20,18 @@
 		}
 	</style>
 	
+	<!-- required: the default dijit theme: -->
+	<link id="themeStyles" rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
+
+	<!-- required: dojo.js -->
 	<script type="text/javascript" src="../../../dojo/dojo.js"
 		djConfig="isDebug: true, parseOnLoad: true"></script>
+
+	<!-- only needed for alternate theme testing: do NOT use in your code! -->
 	<script type="text/javascript" src="../_testCommon.js"></script>
 
 	<script type="text/javascript">
+		dojo.require("dijit.dijit"); // optimize: load dijit layer
 		dojo.require("dijit.layout.ContentPane");
 		dojo.require("dijit.layout.TabContainer");
 		dojo.require("dijit.Tooltip");
@@ -37,7 +44,7 @@
 		}
 	</script>
 </head>
-<body>
+<body class="tundra">
 
 	<h1 class="testTitle">Dijit layout.TabContainer doLayout=false tests</h1>
 
@@ -88,12 +95,12 @@
 			</p>
 		</div>
 
-		<div dojoType="dijit.layout.TabContainer" title="Inlined Sub TabContainer">	
+		<div dojoType="dijit.layout.TabContainer" title="Inlined Sub TabContainer" doLayout="false">	
 			<a dojoType="dijit.layout.LinkPane" href="tab1.html">SubTab 1</a>		
 			<a dojoType="dijit.layout.LinkPane" href="tab2.html" selected="true">SubTab 2</a>
 		</div>
 
-		<a dojoType="dijit.layout.LinkPane" href="tab3.html">Sub TabContainer from href</a>	
+		<a dojoType="dijit.layout.LinkPane" href="tab3_noLayout.html">Sub TabContainer from href</a>	
 	</div>
 
 	<p>

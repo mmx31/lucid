@@ -4,9 +4,6 @@
 <head>
 	<title>Testing MultiSelect form widget | The Dojo Toolkit</title>
 
-	<link rel="stylesheet" type="text/css" media="screen"
-		href="../../../dijit/themes/tundra/tundra.css">
-
 	<style type="text/css">
 	@import "../../../dijit/tests/css/dijitTests.css";
 	#select, #select2 {
@@ -16,12 +13,21 @@
 	}
 	</style>
 	
-	<script type="text/javascript" djConfig="isDebug:true, parseOnLoad: true"
-		src="../../../dojo/dojo.js"></script>
+
+	<!-- required: the default dijit theme: -->
+	<link id="themeStyles" rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
+
+	<!-- required: dojo.js -->
+	<script type="text/javascript" src="../../../dojo/dojo.js"
+		djConfig="isDebug: true, parseOnLoad: true"></script>
+
+	<!-- only needed for alternate theme testing: -->
+	<script type="text/javascript" src="../_testCommon.js"></script>
 
 	<script type="text/javascript">
 		var globalVals = null;
 
+		dojo.require("dijit.dijit"); // optimize: load dijit layer
 		dojo.require("dijit.form.MultiSelect");
 
 		// needed for tests:
@@ -72,9 +78,9 @@
 				
 			// there is only one debug button
 			dojo.query(".debug").connect("onclick",function(e){
-				console.log('select getValue:',dijit.byId("select").getValue());
-				console.log('select2 getValue:',dijit.byId("select2").getValue());
-				console.log('select3 getValue:',dijit.byId("select3").getValue());
+				console.log('select value:',dijit.byId("select").attr('value'));
+				console.log('select2 value:',dijit.byId("select2").attr('value'));
+				console.log('select3 value:',dijit.byId("select3").attr('value'));
 			});
 				
 			// natural form reaction:
@@ -93,7 +99,7 @@
 		
 		<h1 class="testTitle">dijit.form.MultiSelect:</h1>
 		
-		<form action="null.html" method="get" id="test">
+		<form action="#" method="get" id="test">
 		
 			<select id="select" multiple="true" size="7" name="easing">
 				<option class="clone" value="dojo._defaultEasing">dojo._defaultEasing</option>
@@ -115,7 +121,7 @@
 
 		</form>
 
-		<button class="debug">call getValue()</button>
+		<button class="debug">call attr('value')</button>
 
 		<h3>markup:</h3>
 
@@ -133,6 +139,6 @@
 
 		<br><br>
 		<button class='invert' id="i3">invert markup list</button>
-		<button class='set' id="s1" onclick="dijit.byId('select3').setValue(['VA', 'WA']);">set markup list to [VA, WA]</button>
+		<button class='set' id="s1" onclick="dijit.byId('select3').attr('value', ['VA', 'WA']);">set markup list to [VA, WA]</button>
 </body>
 </html>

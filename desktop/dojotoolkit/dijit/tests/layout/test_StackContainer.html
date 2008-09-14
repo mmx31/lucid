@@ -15,12 +15,19 @@
 			border-style: dashed !important;
 		}
 	</style>
+	
+	<!-- required: the default dijit theme: -->
+	<link id="themeStyles" rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
 
+	<!-- required: dojo.js -->
 	<script type="text/javascript" src="../../../dojo/dojo.js"
 		djConfig="isDebug: true, parseOnLoad: true"></script>
+
+	<!-- only needed for alternate theme testing: do NOT use in your code! -->
 	<script type="text/javascript" src="../_testCommon.js"></script>
 
 	<script type="text/javascript">
+		dojo.require("dijit.dijit"); // optimize: load dijit layer
 		dojo.require("dijit.layout.ContentPane");
 		dojo.require("dijit.layout.StackContainer");
 		dojo.require("dijit.form.Button");
@@ -29,16 +36,16 @@
 		function selected(page){
 			console.debug("page selected " + page.id);
 			var widget=dijit.byId("myStackContainer");
-			dijit.byId("previous").setAttribute("disabled", page.isFirstChild);
-			dijit.byId("next").setAttribute("disabled", page.isLastChild);
-			dijit.byId("previous2").setAttribute("disabled", page.isFirstChild);
-			dijit.byId("next2").setAttribute("disabled", page.isLastChild);
+			dijit.byId("previous").attr("disabled", page.isFirstChild);
+			dijit.byId("next").attr("disabled", page.isLastChild);
+			dijit.byId("previous2").attr("disabled", page.isFirstChild);
+			dijit.byId("next2").attr("disabled", page.isLastChild);
 		}
 		dojo.subscribe("myStackContainer-selectChild", selected);
 	</script>
 </head>
 
-<body>
+<body class="tundra">
 	<h1 class="testTitle">A Tale Of Two Cities</h1>
 
 	<button dojoType="dijit.form.Button" id="previous"

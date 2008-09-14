@@ -1,10 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
     <head>
-
 		<title>BorderContainer Experiments | The Dojo Toolkit</title>
 		
-		<link rel="stylesheet" href="../../themes/tundra/tundra.css" />
+		<!-- only needed for test files: -->
 		<style type="text/css">
 			@import "../../../dojo/resources/dojo.css";
 			@import "../css/dijitTests.css";
@@ -22,11 +21,19 @@
 			.wrapper { padding:25px; }
 			.bc { margin:10px; border:2px solid #ededed; }
 		</style>
-	
+
+		<!-- required: the default dijit theme: -->
+		<link id="themeStyles" rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
+
+		<!-- required: dojo.js -->
 		<script type="text/javascript" src="../../../dojo/dojo.js"
-				djConfig="parseOnLoad:true, isDebug:true"></script>
+			djConfig="isDebug: true, parseOnLoad: true"></script>
+
+		<!-- only needed for alternate theme testing: -->
+		<script type="text/javascript" src="../_testCommon.js"></script>
 
 		<script type="text/javascript">
+			dojo.require("dijit.dijit"); // optimize: load dijit layer
 			dojo.require("dijit.form.Button");
 			dojo.require("dijit.layout.ContentPane");
 			dojo.require("dijit.layout.BorderContainer");
@@ -204,36 +211,36 @@
 	
 			<div class="bc" dojoType="dijit.layout.BorderContainer" style="height:200px">
 				<div dojoType="dijit.layout.ContentPane" region="center" splitter="true">
-					Sinlge pane - center (splitter) (this is unsupported, and does not work)
+					Single pane - center (splitter) (this is unsupported, and does not work)
 				</div>
 				<div dojoType="dijit.layout.ContentPane" region="right">
-					Sinlge pane - right (no splitter)
+					Single pane - right (no splitter)
 				</div>
 			</div>
 		
 			<div class="bc" dojoType="dijit.layout.BorderContainer" style="height:200px">
 				<div dojoType="dijit.layout.ContentPane" region="center">
-					Sinlge pane - center (no splitter)
+					Single pane - center (no splitter)
 				</div>
 				<div dojoType="dijit.layout.ContentPane" region="right" splitter="true">
-					Sinlge pane - right (splitter)
+					Single pane - right (splitter)
 				</div>
 			</div>
 		</div>
 	
 		<div class="bc" dojoType="dijit.layout.BorderContainer" style="width:200px; height:400px;">
 			<div dojoType="dijit.layout.ContentPane" region="top" splitter="true">
-				Sinlge pane - top (splitter)
+				Single pane - top (splitter)
 				
 			</div>
 			<div dojoType="dijit.layout.ContentPane" region="center">
-				Sinlge pane - center
+				Single pane - center
 			</div>
 		</div>
 	
 		<div class="bc" dojoType="dijit.layout.BorderContainer" style="width:200px; height:400px;">
 			<div dojoType="dijit.layout.ContentPane" region="center">
-				Sinlge pane - center
+				Single pane - center
 			</div>
 			<div dojoType="dijit.layout.ContentPane" region="bottom" splitter="true">
 				Single Pane Bottom (splitter)

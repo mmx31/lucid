@@ -5,7 +5,7 @@
 			@import "../../resources/dojo.css";
 		</style>
 		<script type="text/javascript" src="../../dojo.js" 
-			djConfig="isDebug: true, debugAtAllCosts: false, noFirebugLite: true"></script>
+			djConfig="isDebug: true, debugAtAllCosts: false, popup: false, noFirebugLite: true"></script>
 		<script type="text/javascript" src="../../../util/doh/runner.js"></script>
 		<script type="text/javascript">
 			dojo.require("doh.runner");
@@ -13,6 +13,10 @@
 			dojo.addOnLoad(function(){
 				doh.register("t", 
 					[
+						// "doh.t(false, 'howdy!')",
+						// "doh.f(true, 'howdy!')",
+						// "doh.e(Error, window, function(){ throw new Error(); })",
+
 						// basic sanity checks
 						"doh.is(4, (dojo.query('h3')).length);",
 						"doh.is(1, (dojo.query('h1:first-child')).length);",
@@ -89,17 +93,60 @@
 						"doh.is(3, dojo.query('#t h3:nth-child(2n+1)').length);",
 						"doh.is(1, dojo.query('#t h3:nth-child(even)').length);",
 						"doh.is(1, dojo.query('#t h3:nth-child(2n)').length);",
-						"doh.is(0, dojo.query('#t h3:nth-child(2n+3)').length);",
+						"doh.is(1, dojo.query('#t h3:nth-child(2n+3)').length);",
 						"doh.is(2, dojo.query('#t h3:nth-child(1)').length);",
 						"doh.is(1, dojo.query('#t > h3:nth-child(1)').length);",
 						"doh.is(3, dojo.query('#t :nth-child(3)').length);",
 						"doh.is(0, dojo.query('#t > div:nth-child(1)').length);",
 						"doh.is(7, dojo.query('#t span').length);",
+						"doh.is(3, dojo.query('#t > *:nth-child(n+10)').length);",
+						"doh.is(1, dojo.query('#t > *:nth-child(n+12)').length);",
+						"doh.is(10, dojo.query('#t > *:nth-child(-n+10)').length);",
+						"doh.is(5, dojo.query('#t > *:nth-child(-2n+10)').length);",
+						"doh.is(6, dojo.query('#t > *:nth-child(2n+2)').length);",
+						"doh.is(5, dojo.query('#t > *:nth-child(2n+4)').length);",
+						"doh.is(5, dojo.query('#t > *:nth-child(2n+4)').length);",
+						"doh.is(12, dojo.query('#t > *:nth-child(n-5)').length);",
+						"doh.is(6, dojo.query('#t > *:nth-child(2n-5)').length);",
+						
+						// :checked pseudo-selector
+						"doh.is(2, dojo.query('#t2 > :checked').length);",
+						"doh.is(dojo.byId('checkbox2'), dojo.query('#t2 > input[type=checkbox]:checked')[0]);",
+						"doh.is(dojo.byId('radio2'), dojo.query('#t2 > input[type=radio]:checked')[0]);",
+
+						// cross-document queries
+						{
+
+							name: "crossDocumentQuery",
+							setUp: function(){
+								dojo.require("dojo.io.iframe");
+								this.t3 = window.frames["t3"];
+								this.doc = dojo.io.iframe.doc(t3);
+								this.doc.open();
+								this.doc.write([
+									"<html><head>",
+									"<title>inner document</title>",
+									"</head>",
+									"<body>",
+									"<div id='st1'><h3>h3 <span>span <span> inner <span>inner-inner</span></span></span> endh3 </h3></div>",
+									"</body>",
+									"</html>"
+								].join(""));
+							},
+							runTest: function(){
+								doh.is(1, dojo.query('h3', dojo.byId("st1", this.doc)).length);
+								// use a long query to force a test of the XPath system on FF. see bug #7075
+								doh.is(1, dojo.query('h3 > span > span > span', dojo.byId("st1", this.doc)).length);
+								doh.is(1, dojo.query('h3 > span > span > span', this.doc.body.firstChild).length);
+							}
+						},
+
 						// :empty pseudo-selector
 						"doh.is(4, dojo.query('#t > span:empty').length);",
 						"doh.is(6, dojo.query('#t span:empty').length);",
 						"doh.is(0, dojo.query('h3 span:empty').length);",
 						"doh.is(1, dojo.query('h3 :not(:empty)').length);",
+
 						// escaping of ":" chars inside an ID
 						function silly_IDs1(){
 							doh.t(document.getElementById("silly:id::with:colons"));
@@ -111,11 +158,27 @@
 						},
 						function xml(){
 							try{
-								var doc = dojox.data.dom.createDocument("<ResultSet><Result>One</Result><Result>Two</Result></ResultSet>");
-								console.debug(doc);
-								console.debug(dojox.data.dom.innerXML(doc.documentElement));
-								console.debug(dojo.query("Result", doc.documentElement).length);
-							}catch(e){ console.debug(e); }
+								var doc = dojox.data.dom.createDocument([
+									"<ResultSet>",
+										"<Result>One</Result>",
+										"<RESULT>Two</RESULT>",
+										"<result>Three</result>",
+										"<result>Four</result>",
+									"</ResultSet>"
+								].join("")
+								);
+								var de = doc.documentElement;
+								console.debug(dojox.data.dom.innerXML(de));
+
+								doh.is(2, dojo.query("result", de).length);
+								doh.is(1, dojo.query("Result", de).length);
+								doh.is(1, dojo.query("RESULT", de).length);
+								doh.is(0, dojo.query("resulT", de).length);
+								doh.is(0, dojo.query("rEsulT", de).length);
+							}catch(e){ 
+								console.debug(e);
+								// debugger;
+							}
 						}
 					]
 				);
@@ -146,9 +209,18 @@
 				<div id="child3" qux="true"></div>
 			</div>
 			<div qux="true"></div>
-			<input id="notbug" name="bug" type="hidden" value="failed" /> 
-			<input id="bug" type="hidden" value="passed" /> 
+			<input id="notbug" name="bug" type="hidden" value="failed"> 
+			<input id="bug" type="hidden" value="passed"> 
 		</div>
+		<div id="t2">
+			<input type="checkbox" name="checkbox1" id="checkbox1" value="foo">
+			<input type="checkbox" name="checkbox2" id="checkbox2" value="bar" checked>
+
+			<input type="radio" name="radio" id="radio1" value="thinger">
+			<input type="radio" name="radio" id="radio2" value="stuff" checked>
+			<input type="radio" name="radio" id="radio3" value="blah">
+		</div>
+		<iframe id="t3" name="t3" src="../../resources/blank.html"></iframe>
 	</body>
 </html>
 

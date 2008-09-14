@@ -15,8 +15,9 @@ h1.testTitle {
 .plusIcon, .plusBlockIcon {
 	background-image: url(../images/plus.gif);
 	background-repeat: no-repeat; 
-	width: 16px;
-	height: 16px;
+	background-position: center center;
+	width: 18px;
+	height: 18px;
 }
 .plusBlockIcon {
 	display: block !important;
@@ -24,8 +25,9 @@ h1.testTitle {
 .noteIcon {
 	background-image: url(../images/note.gif);
 	background-repeat: no-repeat; 
-	width: 20px;
-	height: 20px;
+	background-position: center center;
+	width: 18px;
+	height: 18px;
 }
 .flatScreenIcon {
 	background-image: url(../images/flatScreen.gif);
@@ -55,24 +57,60 @@ h1.testTitle {
 	visibility:visible; 
 }
 
-.customFolderOpenedIcon, .customFolderClosedIcon {
-	background-image: url('../../demos/mail/icons.png'); /* mail icons sprite image */
+body .customFolderOpenedIcon, body .customFolderClosedIcon {
+	background-image: url('../images/folderIcons.png'); /* mail icons sprite image */
 	background-repeat: no-repeat;
-	width: 16px;
-	height: 16px;
-	text-align: center;
-	padding-right:4px;
+	width: 18px;
+	height: 18px;
     background-position: -44px;
 }
 
 .dj_ie6 .customFolderOpenedIcon, .dj_ie6 .customFolderClosedIcon {
-	background-image: url('../../demos/mail/icons.gif');
+	background-image: url('../images/folderIcons.gif');
 }
 
 .customFolderClosedIcon {
     background-position: -154px;
 }
 
-body .medium {
-        font-size: larger; /* help test widget sizing */
+#testMatrix {
+	width:100%;
+	text-align:center;
+}
+#testMatrix tr > td {
+	text-align:left;
+}
+#testMatrix tr.top {
+	background:blue;
+	color:#fff;
+}
+#testMatrix tr.top th {
+	padding:6px;
+}
+#testMatrix tr.tests {
+	background:#666;
+	padding:3px;
+	padding-left:6px;
+	padding-right:6px;
+	color:#fff;
+}
+#testMatrix tr.tests th {
+	text-align:center;
+}
+#testMatrix tr.spacer {
+	background:#dedede;
+	color:#666;
+}
+#testMatrix tr.spacer td {
+	padding:6px;
+}
+#testMatrix tr.testRow td {
+	text-align:center;
+}
+#testMatrix tr.testRow td.label {
+	text-align:left;
+	padding-left:15px;
+}
+#testMatrix tr.alt {
+	background:#ededed;
 }

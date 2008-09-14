@@ -123,6 +123,11 @@
 									responseText: "\tblag\n/*"+dojo.toJson(jsonObj)+"*/\n\r\t\r"
 								})
 							);
+							t.is(jsonObj,
+								dojo._contentHandlers["json-comment-optional"]({
+									responseText: "\tblag\n/*"+dojo.toJson(jsonObj)+"*/\n\r\t\r"
+								})
+							);
 						},
 						function jsContentHandler(t){
 							var jsonObj = {
@@ -152,7 +157,8 @@
 								baz: [
 									{ thonk: "blarg" },
 									"xyzzy!"
-								]
+								],
+								documentElement: "Element" //Added to make IE happy.
 							};
 							t.is(fauxObj,
 								dojo._contentHandlers["xml"]({ responseXML: fauxObj })
@@ -298,7 +304,7 @@
 							var d = new doh.Deferred();
 							var td = dojo.rawXhrPost({
 								url: "xhr.html", // self
-								postContent: "foo=bar&color=blue&height=average",
+								postData: "foo=bar&color=blue&height=average",
 								handle: function(res, ioArgs){
 									if((dojo._isDocumentOk(ioArgs.xhr))||
 										(ioArgs.xhr.status == 405)
@@ -387,6 +393,8 @@
 				<option value="thonk" selected>thonk</option>
 			</select>
 			<textarea name="textarea">textarea_value</textarea>
+			<button name="button1" value="buttonValue1">This is a button that should not be in formToObject.</button>
+			<input type="file" name="fileParam1" value="fileValue1"> File input should not show up in formToObject.
 		</form>
 		<form id="f3" style="border: 1px solid black;">
 			<input type="hidden" name="spaces" value="string with spaces">
