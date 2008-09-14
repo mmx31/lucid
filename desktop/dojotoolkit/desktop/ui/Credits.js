@@ -32,7 +32,7 @@ dojo.declare("desktop.ui.Credits", dijit._Widget, {
 						api.textContent(li, p[0]);
 						var addPos = function(str) {
 							var div = document.createElement("div");
-							dojo.style(div, "fontSize", "10pt");
+							dojo.style(div, "fontSize", "8pt");
 							api.textContent(div, str);
 							li.appendChild(div);
 						}

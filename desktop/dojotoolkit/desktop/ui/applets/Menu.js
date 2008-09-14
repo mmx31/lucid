@@ -75,7 +75,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 					height: "300px"
 				});
 				win.addChild(new desktop.ui.Credits({
-					layoutAlign: "client"
+					region: "center"
 				}));
 				win.show();
 			}
