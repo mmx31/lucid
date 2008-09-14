@@ -168,7 +168,8 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	
 	    this.right = new dijit.layout.BorderContainer({
 	        minSize: 50,
-			region: "center"
+			region: "center",
+            gutters: false
 	    });
 			this.gridStore = new dojo.data.ItemFileWriteStore({
 				data: {
@@ -201,6 +202,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			var div = document.createElement("div");
 			div.appendChild(grid.domNode);
 			gridPane.setContent(grid.domNode);
+            dojo.connect(gridPane, "resize", grid, "resize");
 			this.right.addChild(gridPane);
 			//this.right.addChild(grid);
 			this.right.startup(); //hack
