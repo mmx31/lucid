@@ -91,6 +91,7 @@ desktop.config = {
 			applets: [
 				{"settings": {}, "pos": 0.00, "declaredClass": "desktop.ui.applets.Menubar"},
 				{"settings": {}, "pos": 0.85, "declaredClass": "desktop.ui.applets.Netmonitor"},
+				{"settings": {}, "pos": 0.71, "declaredClass": "desktop.ui.applets.User"},
 				{"settings": {}, "pos": 0.88, "declaredClass": "desktop.ui.applets.Clock"}
 			]
 		},

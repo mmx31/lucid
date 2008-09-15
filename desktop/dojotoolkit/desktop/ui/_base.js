@@ -23,6 +23,7 @@ dojo.require("desktop.ui.Applet");
 dojo.require("desktop.ui.Credits");
 dojo.require("desktop.ui.Panel");
 dojo.require("desktop.ui.applets.Clock");
+dojo.require("desktop.ui.applets.User");
 dojo.require("desktop.ui.applets.Menu");
 dojo.require("desktop.ui.applets.Menubar");
 dojo.require("desktop.ui.applets.Netmonitor");
@@ -129,7 +130,7 @@ dojo.mixin(desktop.ui, {
 	appletList: {
 		"Accessories": ["Clock"],
 		"Internet": ["Twitter"],
-		"Desktop & Windows": ["Taskbar"],
+		"Desktop & Windows": ["Taskbar", "User"],
 		"System": ["Netmonitor", "Quota"],
 		"Utilities": ["Menu", "Menubar", "Separator"]
 	}
