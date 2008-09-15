@@ -1,0 +1,113 @@
+.desktopApplet .dijit button {
+	border: 0px none;
+}
+.dijit .desktopPanel .desktopApplet .dijitButtonNode button,
+.dijit .desktopPanel .desktopApplet .dijitButtonNode,
+.dijit .desktopPanel .desktopApplet .dijitToolbar {
+	background: transparent none repeat scroll 0%;
+	border: 0px none;
+	padding: 0px;
+	padding-bottom: 1px;
+}
+.dijit .desktopPanel .desktopApplet .dijitToolbar {
+	border: 0px none;
+}
+
+.desktopPanel {
+	font-size: 10pt;
+	height: inherit;
+}
+.desktopPanel * {
+	font-size: 10pt;
+}
+.desktopPanel-start, .desktopPanel-end, .desktopPanel-middle {
+	height: inherit;
+}
+
+/* Applets */
+.desktopApplet {
+	position: absolute;
+	height: inherit;
+}
+.desktopPanelHorizontal .desktopApplet {
+	height: 100%;
+}
+.desktopPanelVertical .desktopApplet {
+	width: 100%;
+}
+.desktopAppletHandle {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background-color: #666;
+	display: none;
+	z-index: 1000;
+}
+.desktopPanelHorizontal .desktopAppletHandle {
+	height: 100%;
+	width: 10px;
+}
+.desktopPanelVertical .desktopAppletHandle {
+	width: 100%;
+	height: 10px;
+}
+.desktopAppletHandleShow {
+	display: block;
+	cursor: move;
+}
+.desktopPanel {
+	position: absolute;
+	background-color: white;
+	/*overflow: hidden;*/
+}
+.desktopAppletFullspan .desktopAppletContent {
+	width: 100%;
+	height: 100%;
+}
+.uiArea {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 10;
+	background: none;
+}
+.uiAreaContainer {
+	z-index: 90;
+}
+.uiAreaWidget {
+	display: none;
+	z-index: 100;
+}
+.mainFileArea {
+	z-index: 10;
+}
+.wallpaper {
+	z-index: 20;
+	background-position: 50% 50%;
+}
+/****** Widget Layer *******/
+.widgetLayer {	
+	opacity: 0.8;
+	filter: alpha(opacity=80);
+}
+
+/* taskbar */
+
+.taskBarItem {
+	cursor: pointer;
+	font-size: 10pt;
+	white-space: nowrap;
+	text-align: center;
+	overflow: hidden;
+}
+
+.taskBarItem img {
+	vertical-align: middle;
+	margin-right: 5px;
+	margin-left: 5px;	
+	height: 16px;
+	width: 16px;
+}
+

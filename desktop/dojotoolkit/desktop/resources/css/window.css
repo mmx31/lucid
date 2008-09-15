@@ -1,0 +1,143 @@
+.win-handle {
+	cursor: hand;
+}
+
+.win {
+	position: absolute;
+	top: 50px;
+	left: 50px;
+}
+
+.win-tl {
+	position: relative;
+	z-index: 1;
+    background-repeat: no-repeat;
+    /* default formatting */
+    height: 20px;
+}
+
+.win-tr {
+	background-repeat: no-repeat;
+	background-position: top right;
+}
+
+.win-tc {
+	overflow: hidden;
+	background-repeat: repeat-x;
+	vertical-align: middle;
+}
+
+.win-title {
+	white-space: nowrap;
+	width: auto;
+	position: absolute;
+	left: 0px;
+	width: 100%;
+	z-index: 1;
+	cursor: default;
+}
+.win-buttons {
+	background-repeat: no-repeat;
+	position: absolute;
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+	right: 0px;
+	z-index: 10;
+}
+
+.win-max,
+.win-min,
+.win-close {
+	float: right;
+	background-repeat: no-repeat;
+    /* default formatting */
+    width: 10px;
+    height: 10px;
+}
+
+.win-bmw {
+	position: relative;
+	height: 100%;
+}
+
+.win-ml {
+	position: relative;
+	overflow: hidden;
+	z-index: 1;
+	background-repeat: repeat-y;
+	height: 100%;
+}
+
+.win-mr {
+	background-repeat: repeat-y;
+	background-position: top right;
+	height: 100%;
+}
+
+.win-mc {
+	overflow: hidden;
+	height: 100%; /* temporary untill I find a better solution */
+    /* default formatting */
+    background: white;
+}
+
+.win-bl {
+	position: relative;
+	overflow: hidden;
+	z-index: 1;
+	background-repeat: no-repeat;
+}
+
+.win-br {
+	background-repeat: no-repeat;
+	background-position: top right;
+}
+
+.win-bc {
+	background-repeat: repeat-x;
+}
+
+.win-resize {
+	z-index: 100;
+	position: absolute;
+}
+
+.win-icon {
+	float: left;
+	margin-right: 5px;
+}
+
+/*if not IE we can use the method that works :D */
+
+.win > .win-bmw,
+.win-bmw > .win-ml,
+.win-ml > .win-mr,
+.win-mr > .win-mc {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	height: auto;
+	width: auto;
+}
+
+.win-bmw > .win-bl {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+}
+
+.dojoxResizeHandleClone {
+	position:absolute; top:0; left:0; 
+	border:1px dashed #666; 
+	z-index:999; 
+}
+
+/* default formatting */
+
+.win .win-bmw {
+    top: 20px;
+}
