@@ -1,0 +1,7 @@
+.selectedItem {
+	background-color: #eeeeee;
+}
+/*
+	YOU MUST LEAVE THIS AS THE FIRST RULE DEFINITION
+	(otherwise we cannot change it dynamically)
+*/
