@@ -8,5 +8,6 @@
 	"Separator": "Separador",
 	"Clock": "Reloj",
 	"Network Monitor": "Red de seguimiento",
-	"Window List": "Ventana de lista"
+	"Window List": "Ventana de lista",
+    "User": "Usuario"
 })

@@ -8,5 +8,6 @@
 	"Separator": "Separator",
 	"Clock": "Clock",
 	"Network Monitor": "Network Monitor",
-	"Window List": "Window List"
+	"Window List": "Window List",
+    "User": "User"
 })
