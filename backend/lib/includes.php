@@ -11,7 +11,6 @@
 		$path = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR;
 	    $GLOBALS['path'] = $path;
 	}
-	@include("MDB2.php");
 	$includes = array(
 		"lib/util.php",
 		(class_exists(MDB2) ? null : "lib/MDB2.php"),
