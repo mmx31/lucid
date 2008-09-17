@@ -335,7 +335,7 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 		this.maximized = true;
 		var viewport = dijit.getViewport();
 		dojo.addClass(this.domNode, "win-maximized");
-		if(this._drag) this._drag.onMouseUp(); this._drag.destroy();
+		if(this._drag) /*this._drag.onMouseUp(window.event);*/ this._drag.destroy();
 		this.killResizer();
 		this.pos.top = dojo.style(this.domNode, "top");
 		this.pos.left = dojo.style(this.domNode, "left");
