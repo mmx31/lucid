@@ -56,7 +56,7 @@ djConfig = {
 	//		conditions, Dojo auto-detects the correct location from which it
 	//		was loaded. You may need to manually configure `baseUrl` in cases
 	//		where you have renamed `dojo.js` or in which `<base>` tags confuse
-	//		some browsers (e.g., IE 6). The variable `dojo.baseUrl` is assigned
+	//		some browsers (e.g. IE 6). The variable `dojo.baseUrl` is assigned
 	//		either the value of `djConfig.baseUrl` if one is provided or the
 	//		auto-detected root if not. Other modules are located relative to
 	//		this path.
@@ -83,7 +83,11 @@ djConfig = {
 	//		`djConfig.addOnLoad = [myObject, "functionName"];` and for object with
 	//		function reference use
 	//		`djConfig.addOnLoad = [myObject, function(){}];`
-	addOnLoad: null
+	addOnLoad: null,
+	// require: Array
+	//		An array of module names to be loaded immediately after dojo.js has been included
+	//		in a page. 
+	require: []
 }
 =====*/
 
@@ -181,7 +185,7 @@ dojo.global = {
 =====*/
 	dojo.locale = d.config.locale;
 	
-	var rev = "$Rev: 15129 $".match(/\d+/);
+	var rev = "$Rev: 15295 $".match(/\d+/);
 
 	dojo.version = {
 		// summary: 
@@ -196,7 +200,7 @@ dojo.global = {
 		//		Descriptor flag. If total version is "1.2.0beta1", will be "beta1"
 		//	revision: Number
 		//		The SVN rev from which dojo was pulled
-		major: 1, minor: 1, patch: 0, flag: "dev",
+		major: 1, minor: 2, patch: 0, flag: "rc1",
 		revision: rev ? +rev[0] : 999999, //FIXME: use NaN?
 		toString: function(){
 			with(d.version){
@@ -278,8 +282,8 @@ dojo.global = {
 		//	|	var flattened = dojo.mixin(
 		//	|		{
 		//	|			name: "Frylock",
-		//	|			braces: true,
-		//	|		}
+		//	|			braces: true
+		//	|		},
 		//	|		{
 		//	|			name: "Carl Brutanananadilewski"
 		//	|		}
