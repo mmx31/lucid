@@ -66,7 +66,7 @@ dojo.require("dojox.rpc.Rest");
 			};			
 			for(i =0; i < actions.length;i++){ // iterate through the actions to execute
 				var action = actions[i];
-				dojox.rpc.JsonRest._contentId = action.content && action.content.__id; // this is used by LocalStorageRest
+				dojox.rpc.JsonRest._contentId = action.content && action.content.__id; // this is used by OfflineRest
 				var isPost = action.method == 'post';
 				// send the content location to the server
 				contentLocation = isPost && dojox.rpc.JsonRest._contentId;
@@ -76,14 +76,21 @@ dojo.require("dojox.rpc.Rest");
 									serviceAndId.id,
 									dojox.json.ref.toJson(action.content, false, service.servicePath, true)
 								);
-				(function(object,dfd){
+				var schema = jr.schemas[service.servicePath];								
+				(function(object, dfd, idAttr){
 					dfd.addCallback(function(value){
 						try{
 							// Implements id assignment per the HTTP specification
 							var newId = dfd.ioArgs.xhr.getResponseHeader("Location");
-							//TODO: Do correct relative URL calculation and do idAttribute assignment 
-							object.__id = newId;
-							Rest._index[newId] = object; 
+							//TODO: match URLs if the servicePath is relative...
+							if(newId){
+								object.__id = newId;
+								var objectId = newId.match(/\/([^\/]*)$/);
+								if(idAttr && objectId){
+									object[idAttr] = objectId[1];
+								}
+								Rest._index[newId] = object;
+							} 
 						}catch(e){}
 						if(!(--left)){
 							if(kwArgs.onComplete){
@@ -91,7 +98,7 @@ dojo.require("dojox.rpc.Rest");
 							}
 						}
 					});
-				})(isPost && action.content,dfd);
+				})(isPost && action.content, dfd, schema && schema._idAttr);
 								
 				dfd.addErrback(function(value){
 					
@@ -243,7 +250,7 @@ dojo.require("dojox.rpc.Rest");
 			//		This is a JSON Schema object to associate with objects returned by this service
 			servicePath = servicePath || service.servicePath;
 			servicePath = service.servicePath = servicePath.match(/\/$/) ? servicePath : (servicePath + '/'); // add a trailing / if needed
-			jr.schemas[servicePath] = schema || service._schema || {};
+			service._schema = jr.schemas[servicePath] = schema || service._schema || {};
 			jr.services[servicePath] = service;
 		},
 		byId: function(service, id){
