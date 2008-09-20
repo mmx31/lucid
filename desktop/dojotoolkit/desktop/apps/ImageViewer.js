@@ -34,7 +34,7 @@ dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
 			toolbar.addChild(new dijit.form.Button(a));
 		});
 		this.win.addChild(toolbar);
-		this.dragPane = new dojox.layout.DragPane({region: "center", style: "overflow: scroll;"});
+		this.dragPane = new dojox.layout.DragPane({region: "center", style: "overflow: auto;"});
 		this.win.addChild(this.dragPane);
 		this.win.show();
 		this.win.startup();
@@ -63,5 +63,10 @@ dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
 			this.dragPane.domNode.appendChild(this.imgNode);
 		}
 		dojo.query("img", this.imgNode)[0].src = api.filesystem.embed(path);
+        dojo.query("*", this.imgNode).style({
+            "MozUserFocus": "ignore",
+            "MozUserInput": "disabled",
+            "MozUserSelect": "none"
+        });
 	}
 })
