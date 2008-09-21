@@ -1,5 +1,14 @@
 dojo.provide("desktop.apps.WordProcessor");
-dojo.require("dijit.form.SimpleTextarea");
+dojo.require("dijit.Toolbar");
+dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit.Editor");
+dojo.require("dijit._editor.plugins.TextColor");
+dojo.require("dijit._editor.plugins.FontChoice");
+dojo.require("dijit._editor.plugins.LinkDialog");
+
+dojo.requireLocalization("desktop", "common");
+dojo.requireLocalization("desktop", "apps");
+dojo.requireLocalization("desktop", "messages");
 
 dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	newAs: false,
@@ -10,14 +19,6 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	        this.window.close();
 	},
 	init: function(args) {
-		dojo.require("dijit.Toolbar");
-		dojo.require("dijit.layout.ContentPane");
-		dojo.require("dojo.parser");
-		dojo.require("dijit.Editor");
-		dojo.requireLocalization("desktop", "common");
-		dojo.requireLocalization("desktop", "apps");
-		dojo.requireLocalization("desktop", "messages");
-		
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
@@ -65,7 +66,19 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    });
 	    this.statusbar.setLabel(msg.noFileOpen);
 	    this.window.addChild(this.statusbar);
-	    var editor = this.editor = new dijit.Editor({region: "center"}, document.body.appendChild(document.createElement("div")));
+	    var editor = this.editor = new dijit.Editor({
+	    	region: "center",
+	    	extraPlugins: [
+	    	    "|",
+                "createLink",
+                "insertImage",
+                "|",
+                "fontName",
+                "fontSize",
+                "formatBlock",
+                "foreColor"
+	    	]
+	    }, document.body.appendChild(document.createElement("div")));
 		editor.startup();
 		this.window.addChild(editor);
 	    this.window.show();
