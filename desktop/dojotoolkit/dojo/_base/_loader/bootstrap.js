@@ -185,7 +185,7 @@ dojo.global = {
 =====*/
 	dojo.locale = d.config.locale;
 	
-	var rev = "$Rev: 15295 $".match(/\d+/);
+	var rev = "$Rev: 15307 $".match(/\d+/);
 
 	dojo.version = {
 		// summary: 
@@ -200,7 +200,7 @@ dojo.global = {
 		//		Descriptor flag. If total version is "1.2.0beta1", will be "beta1"
 		//	revision: Number
 		//		The SVN rev from which dojo was pulled
-		major: 1, minor: 2, patch: 0, flag: "rc1",
+		major: 1, minor: 2, patch: 0, flag: "rc2",
 		revision: rev ? +rev[0] : 999999, //FIXME: use NaN?
 		toString: function(){
 			with(d.version){
