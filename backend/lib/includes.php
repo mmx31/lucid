@@ -13,7 +13,7 @@
 	}
 	$includes = array(
 		"lib/util.php",
-		(class_exists(MDB2) ? null : "lib/MDB2.php"),
+		"lib/MDB2.php",
 		"configuration.php",
 		"lib/output.php",
 		"models/base.php"
