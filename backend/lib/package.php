@@ -101,9 +101,9 @@ class package {
 		$app->version = $info['version'];
 		$app->maturity = $info['maturity'];
 		$app->category = $info['category'];
-		$app->filetypes = $info['filetypes'] ? $info['filetypes'] : array();
-		$app->permissions = $info['permissions'] ? $info['permissions'] : array();
-		if($info['icon']) $app->icon = $info['icon'];
+		$app->filetypes = array_key_exists('filetypes', $info) ? $info['filetypes'] : array();
+		$app->permissions = array_key_exists('permissions', $info) ? $info['permissions'] : array();
+		if(array_key_exists('icon', $info)) $app->icon = $info['icon'];
 		$app->save();
 	}
 	function _install_theme($info, $path) {
