@@ -38,7 +38,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 				this._quotaUI[item.type] = ui.getValue;
 			}, this);
 			this.main.setContent(div);
-			this.win.startup();
+			this.win.layout();
 		}))
 	},
 	makeQuotaRow: function(item, showDefault) {

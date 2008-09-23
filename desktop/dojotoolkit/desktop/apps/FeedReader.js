@@ -12,13 +12,13 @@ dojo.require("dijit.form.CheckBox");
 dojo.require("dijit.Dialog");
 dojo.require("dojo.data.ItemFileWriteStore");
 dojo.require("dojo.date.locale");
-dojo.require("dojox.grid.Grid");
+dojo.require("dojox.grid.DataGrid");
 dojo.require("dojox.validate.web");
 dojo.require("dojox.encoding.digests.MD5");
 dojo.requireLocalization("desktop", "common");
 dojo.requireLocalization("desktop", "messages");
 dojo.requireLocalization("desktop", "apps");
-api.addDojoCss("dojox/grid/_grid/Grid.css");
+api.addDojoCss("dojox/grid/resources/Grid.css");
 		
 dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	currentFeed: false,
@@ -85,7 +85,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 								id: 6,
 								label: "Psychcf's blog",
 								title: "Psychcf's blog",
-								url: "http://psychdesigns.net/psych/rss.xml",
+								url: "http://psychdesigns.net/blog/?feed=rss2",
 								category: false
 							}
 						]
@@ -177,7 +177,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 					items: []
 				}
 			});
-			var grid = this.grid = new dojox.Grid({
+			var grid = this.grid = new dojox.grid.DataGrid({
 				structure: [{
 					cells: [[
 						{field: "Date", name: cm.date, formatter: function(str) {
@@ -186,15 +186,16 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 						{field: "Title", name: cm.title, width: 15}
 					]]
 				}],
-				model: new dojox.grid.data.DojoData(null, null, {store: this.gridStore, query: {Title: "*"}}),
+                store: this.gridStore,
+                query: {Title: "*"},
 				onStyleRow: dojo.hitch(this, function(inRow) {
-					if (this.grid.model.getRow(inRow.index) === undefined)
+					if (!this.grid.getItem(inRow.index))
     					return;
-					if(this.gridStore.getValue(this.grid.model.getRow(inRow.index).__dojo_data_item, "Read"))
+					if(this.gridStore.getValue(this.grid.getItem(inRow.index), "Read"))
 						inRow.customStyles = '';
 					else
 						inRow.customStyles = 'font-weight: bold;';
-					dojox.Grid.prototype.onStyleRow.apply(this.grid, arguments);
+					dojox.grid.DataGrid.prototype.onStyleRow.apply(this.grid, arguments);
 				})
 			})
 			dojo.connect(grid, "onRowClick", this, "showItem");
@@ -421,7 +422,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 				this.gridStore.setValue(item, "Read", true);
 			}),
 			onComplete: dojo.hitch(this, function() {
-				this.grid.refresh();
+				this.grid.update();
 				this.updateCount(this.currentFeed, false);
 			})
 		});
@@ -468,7 +469,8 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 					items: []
 				}
 			});
-			this.grid.setModel(new dojox.grid.data.DojoData(null, null, {store: this.gridStore, query: {Title: "*"}}));
+			this.grid.setStore(this.gridStore);
+            this.grid.setQuery({Title: "*"});
 		}
 		dojo.style(this.loadNode, "display", "block");
 	    api.xhr({
@@ -542,13 +544,13 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	},
 	showItem: function() {
 		var s = this.grid.selection.getSelected();
-		var row = this.grid.model.getRow(s[0]);
-		var title = this.gridStore.getValue(row.__dojo_data_item, "Title");
-		var url = this.gridStore.getValue(row.__dojo_data_item, "Url");
-		var content = this.gridStore.getValue(row.__dojo_data_item, "Content");
-		var guid = this.gridStore.getValue(row.__dojo_data_item, "Guid");
+		var row = s[0];
+		var title = this.gridStore.getValue(row, "Title");
+		var url = this.gridStore.getValue(row, "Url");
+		var content = this.gridStore.getValue(row, "Content");
+		var guid = this.gridStore.getValue(row, "Guid");
 		var hash = dojox.encoding.digests.MD5(guid || title);
-		
+
 		this.hashStore.fetch({
 			query: {hash: hash},
 			onComplete: dojo.hitch(this, function(items) {
@@ -566,7 +568,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			})
 		});
 		
-		this.grid.refresh();
+		this.grid.update();
 		
 		var text = "<div style='background-color: #eee; padding: 3px;'><a href='"+url+"'>" + title + "</a></div><div style='padding: 15px;'>" + content + "</div>";
 		

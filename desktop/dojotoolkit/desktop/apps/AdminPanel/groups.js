@@ -10,7 +10,6 @@ dojo.extend(desktop.apps.AdminPanel, {
 			dropDown: this.createGroupDialog()
 		});
 		this.toolbar.addChild(button);
-		this.main.setContent(cmn.loading);
 		desktop.admin.groups.list(dojo.hitch(this, function(data) {
 			for(var i=0;i<data.length;i++) {
 				data[i].permissions = dojo.toJson(data[i].permissions);
@@ -28,9 +27,10 @@ dojo.extend(desktop.apps.AdminPanel, {
 					items: data
 				}
 			});
-			var grid = this._groupGrid = new dojox.Grid({
+			var grid = this._groupGrid = new dojox.grid.DataGrid({
 				structure: layout,
-				model: new dojox.grid.data.DojoData(null, null, {store: this._groupStore, query: {id: "*"}})
+                store: this._groupStore,
+                query: {id: "*"}
 			});
 			if(this._con) dojo.disconnect(this._con);
 			this._con = dojo.connect(this.main, "resize", grid, "resize");
@@ -52,13 +52,13 @@ dojo.extend(desktop.apps.AdminPanel, {
 				{
 					label: cmn["delete"],
 					onClick: dojo.hitch(this, function(e) {
-						var row = this._groupGrid.model.getRow(this.__rowIndex);
+						var row = this._groupGrid.getItem(this.__rowIndex);
 						api.ui.yesnoDialog({
 							title: sys.groupDelConfirm,
 							message: sys.delFromSys.replace("%s", row.name),
 							callback: dojo.hitch(this, function(a) {
 								if(a == false) return;
-								this._groupStore.deleteItem(row.__dojo_data_item);
+								this._groupStore.deleteItem(row);
 							})
 						})
 					})
@@ -74,7 +74,6 @@ dojo.extend(desktop.apps.AdminPanel, {
 							return dojo.fromJson(this._groupStore.getValue(row, "permissions"));
 						}),
 						dojo.hitch(this, function(row, newPerms){
-							console.log(newPerms);
 							this._groupStore.setValue(row, "permissions", dojo.toJson(newPerms));
 							desktop.admin.groups.set({
 								id: this._groupStore.getValue(row, "id"),
@@ -90,13 +89,13 @@ dojo.extend(desktop.apps.AdminPanel, {
 				{
 					label: sys.modifyQuotaGeneric,
 					onClick: dojo.hitch(this, function() {
-						var row = this._groupGrid.model.getRow(this.__rowIndex);
+						var row = this._groupGrid.getItem(this.__rowIndex);
 						var info = {
-							name: this._groupStore.getValue(row.__dojo_data_item, "name"),
-							size: this._groupStore.getValue(row.__dojo_data_item, "quota")
+							name: this._groupStore.getValue(row, "name"),
+							size: this._groupStore.getValue(row, "quota")
 						};
 						this.makeQuotaWin(info, dojo.hitch(this, function(value) {
-							this._groupStore.setValue(row.__dojo_data_item, "quota", value);
+							this._groupStore.setValue(row, "quota", value);
 						}));
 					})
 				}
@@ -110,7 +109,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 				this._groupMenu._openMyself(e);
 			});
 			document.body.appendChild(menu.domNode);
-			this.win.startup();
+			this.win.layout();
 		}));
 	},
 	
@@ -181,7 +180,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 	groupMemberDialog: function(group) {
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
-		var row = this._groupGrid.model.getRow(this.__rowIndex).__dojo_data_item;
+		var row = this._groupGrid.getItem(this.__rowIndex);
 		var window = new api.Window({
 			title: sys.manageGroupMembers.replace("%s", this._groupStore.getValue(row, "name")),
 			width: "400px",

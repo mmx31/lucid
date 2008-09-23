@@ -6,7 +6,6 @@ dojo.extend(desktop.apps.AdminPanel, {
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var permNls = dojo.i18n.getLocalization("desktop", "permissions");
-		this.main.setContent(cmn.loading);
 		
 		desktop.admin.permissions.list(dojo.hitch(this, function(data) {
 			var layout = [{
@@ -39,15 +38,16 @@ dojo.extend(desktop.apps.AdminPanel, {
 				if(id == false || attribute != "initial") return;
 				desktop.admin.permissions.setDefault(id, newVal);
 			})
-			var grid = this._permGrid = new dojox.Grid({
+			var grid = this._permGrid = new dojox.grid.DataGrid({
 				structure: layout,
-				model: new dojox.grid.data.DojoData(null, null, {store: this._permStore, query: {id: "*"}})
+                store: this._permStore,
+                query: {id: "*"}
 			});
 			if(this._con) dojo.disconnect(this._con);
 			this._con = dojo.connect(this.main, "resize", grid, "resize");
 			this.main.setContent(this._permGrid.domNode);
 			this._permGrid.render();
-			this.win.startup();
+			this.win.layout();
 		}));
 	}
 })

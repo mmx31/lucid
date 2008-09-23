@@ -1,13 +1,13 @@
 dojo.provide("desktop.apps.TaskManager");
 dojo.require("dijit.layout.LayoutContainer");
-dojo.require("dojox.grid.Grid");
+dojo.require("dojox.grid.DataGrid");
 dojo.require("dijit.Toolbar");
 dojo.require("dijit.form.Button");
 dojo.require("dojo.data.ItemFileWriteStore");
 dojo.requireLocalization("desktop", "common");
 dojo.requireLocalization("desktop", "apps");
 dojo.requireLocalization("desktop", "system");
-api.addDojoCss("dojox/grid/_grid/Grid.css");
+api.addDojoCss("dojox/grid/resources/Grid.css");
 
 dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 	kill: function() {
@@ -36,12 +36,7 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
             }
         });
 	    
-        var model = new dojox.grid.data.DojoData(null, null, {
-            store: store,
-            query: {instance: "*"}
-        });
-
-        this.grid = new dojox.Grid({
+        this.grid = new dojox.grid.DataGrid({
 	        region: "center",
             structure: [{
 				cells: [[
@@ -51,7 +46,8 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
                     {field: "status", name: sys.status}
 				]]
 			}],
-            model: model
+            store: store,
+            query: {instance: "*"}
 	    });
 	    this.win.addChild(this.grid);
 	    this.win.show();
@@ -97,8 +93,8 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
         var killApp = new dijit.MenuItem({
             label: sys.kill,
             onClick: dojo.hitch(this, function() {
-               var row = this.grid.model.getRow(this.__rowIndex);
-               var id = this.store.getValue(row.__dojo_data_item, "instance");
+               var row = this.grid.getItem(this.__rowIndex);
+               var id = this.store.getValue(row, "instance");
                this.executeKill(id);
             })
         });
