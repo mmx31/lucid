@@ -88,7 +88,7 @@ class Desktop_Package {
 		);
 	}
 	function _insert_application_meta($info) {
-		global $App;
+        global $App;
 		$app = new $App();
 		$app->sysname = $info['sysname'];
 		$app->name = $info['name'];
@@ -97,10 +97,11 @@ class Desktop_Package {
 		$app->version = $info['version'];
 		$app->maturity = $info['maturity'];
 		$app->category = $info['category'];
-		$app->filetypes = $info['filetypes'] ? $info['filetypes'] : array();
-		$app->permissions = $info['permissions'] ? $info['permissions'] : array();
-		if($info['icon']) $app->icon = $info['icon'];
+		$app->filetypes = array_key_exists('filetypes', $info) ? $info['filetypes'] : array();
+		$app->permissions = array_key_exists('permissions', $info) ? $info['permissions'] : array();
+		if(array_key_exists('icon', $info)) $app->icon = $info['icon'];
 		$app->save();
+
 	}
 	function _install_theme($info, $path) {
 		$newpath = dirname(dirname(dirname(dirname(__FILE__))))."/desktop/themes/".strtolower($info['name']);
