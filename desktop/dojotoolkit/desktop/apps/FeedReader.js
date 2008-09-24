@@ -454,7 +454,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			sum += this.feedCounter[key];
 		}
 		var app = dojo.i18n.getLocalization("desktop", "apps");
-		this.win.setTitle(app["Feed Reader"]+(sum > 0 ? " ("+sum+")" : ""));
+		this.win.attr("title", app["Feed Reader"]+(sum > 0 ? " ("+sum+")" : ""));
 	},
 	fetchFeed: function(item, noGrid)
 	{
