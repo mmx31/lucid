@@ -57,13 +57,13 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 							textbox.setValue(textbox.getValue() + cell);
 						})
 					});
-					dojo.query("span.dijitReset.dijitRight.dijitInline", button.domNode).style({
-						width: "100%",
-						height: "100%",
+					dojo.query("span.dijitReset.dijitInline", button.domNode).style({
+						width: "inherit",
+						height: "inherit",
 						paddingLeft: "0px",
 						paddingRight: "0px"
 					});
-					cellNode.appendChild(button.domNode);
+                    cellNode.appendChild(button.domNode);
 				}
 				else {
 					this.eNode = document.createElement("div");
