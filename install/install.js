@@ -254,8 +254,34 @@ install = new function() {
 		if(num == "6") text = "Database query error";
 		if(num == "4") text = "Database connection error";
 		dojo.byId("taskList").innerHTML += "<div class='installError'>***Installation Error***</div>"
-		+ "<div class='installError'>"+text+"</div>";
+		+ "<div class='installError'>"+text+"</div>"
+        + "<a href='javascript:install.toggleDebugBox();'>Full Details</a>";
+        var textarea = document.createElement("textarea");
+        textarea.innerHTML = data;
+        textarea.id="debugBox";
+        dojo.style(textarea, {
+            width: "450px",
+            height: "150px",
+            display: "none",
+            opacity: 0
+        });
+        dojo.byId("taskList").appendChild(textarea);
 	}
+    this.toggleDebugBox = function() {
+        var node = dojo.byId("debugBox")
+        if(dojo.style(node, "display") == "none") {
+            dojo.style(node, "display", "block");
+            dojo.fadeIn({node: node}).play();
+        }
+        else {
+            dojo.fadeOut({
+                node: node,
+                onEnd: function() {
+                    dojo.style(node, "display", "none");
+                }
+            }).play();
+        }
+    }
 	this.tasks = {
 		permissions: function(callback) {
 			dojo.xhrPost({
