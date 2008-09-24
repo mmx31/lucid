@@ -38,9 +38,10 @@ dojo.extend(desktop.apps.AdminPanel, {
 					items: data
 				}
 			});
-			var grid = this._appGrid = new dojox.Grid({
+			var grid = this._appGrid = new dojox.grid.DataGrid({
 				structure: layout,
-				model: new dojox.grid.data.DojoData(null, null, {store: this._appStore, query: {sysname: "*"}})
+                store: this._appStore,
+                query: {sysname: "*"}
 			});
 			if(this._con) dojo.disconnect(this._con);
 			this._con = dojo.connect(this.main, "resize", grid, "resize");
@@ -54,13 +55,13 @@ dojo.extend(desktop.apps.AdminPanel, {
 				{
 					label: cmn["delete"],
 					onClick: dojo.hitch(this, function(e) {
-						var row = this._appGrid.model.getRow(this.__rowIndex);
+						var row = this._appGrid.getItem(this.__rowIndex);
 						api.ui.yesnoDialog({
 							title: sys.appDelConfirm,
 							message: sys.delFromSys.replace("%s", row.name),
 							callback: dojo.hitch(this, function(a) {
 								if(a == false) return;
-								this._appStore.deleteItem(row.__dojo_data_item);
+								this._appStore.deleteItem(row);
 							})
 						})
 					})
@@ -75,7 +76,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 				this._appMenu._openMyself(e);
 			});
 			document.body.appendChild(menu.domNode);
-			this.win.startup();
+			this.win.layout();
 		}));
 	},
 	installPackage: function() {

@@ -11,7 +11,6 @@ dojo.extend(desktop.apps.AdminPanel, {
 			dropDown: this.newUserDialog()
 		});
 		this.toolbar.addChild(button);
-		this.main.setContent(cmn.loading);
 		desktop.admin.users.list(dojo.hitch(this, function(data) {
 			for(var i=0;i<data.length;i++) {
 				data[i].permissions = dojo.toJson(data[i].permissions);
@@ -37,9 +36,10 @@ dojo.extend(desktop.apps.AdminPanel, {
 					items: data
 				}
 			});
-			var grid = this._userGrid = new dojox.Grid({
+			var grid = this._userGrid = new dojox.grid.DataGrid({
 				structure: layout,
-				model: new dojox.grid.data.DojoData(null, null, {store: this._userStore, query: {id: "*"}})
+                store: this._userStore,
+                query: {id: "*"}
 			});
 			if(this._con) dojo.disconnect(this._con);
 			this._con = dojo.connect(this.main, "resize", grid, "resize");
@@ -61,13 +61,13 @@ dojo.extend(desktop.apps.AdminPanel, {
 				{
 					label: cmn["delete"],
 					onClick: dojo.hitch(this, function(e) {
-						var row = this._userGrid.model.getRow(this.__rowIndex);
+						var row = this._userGrid.getItem(this.__rowIndex);
 						api.ui.yesnoDialog({
 							title: sys.userDelConfirm,
 							message: sys.delFromSys.replace("%s", row.username),
 							callback: dojo.hitch(this, function(a) {
 								if(a == false) return;
-								this._userStore.deleteItem(row.__dojo_data_item);
+								this._userStore.deleteItem(row);
 							})
 						})
 					})
@@ -75,7 +75,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 				{
 					label: usr.changePassword,
 					onClick: dojo.hitch(this, function(e) {
-						var row = this._userGrid.model.getRow(this.__rowIndex);
+						var row = this._userGrid.getItem(this.__rowIndex);
 						var win = new api.Window({
 							title: sys.chUsersPassword.replace("%s", row.username),
 							width: "250px",
@@ -124,7 +124,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 							label: cmn.ok,
 							onClick: dojo.hitch(this, function() {
 								if(input1.getValue() != input2.getValue()) return errBox.textContent = usr.passwordsDontMatch;
-								this._userStore.setValue(row.__dojo_data_item, "password", input1.getValue());
+								this._userStore.setValue(row, "password", input1.getValue());
 								win.close();
 							})
 						})
@@ -159,13 +159,13 @@ dojo.extend(desktop.apps.AdminPanel, {
 				{
 					label: sys.modifyQuotaGeneric,
 					onClick: dojo.hitch(this, function() {
-						var row = this._userGrid.model.getRow(this.__rowIndex);
+						var row = this._userGrid.getItem(this.__rowIndex);
 						var info = {
-							name: this._userStore.getValue(row.__dojo_data_item, "username"),
-							size: this._userStore.getValue(row.__dojo_data_item, "quota")
+							name: this._userStore.getValue(row, "username"),
+							size: this._userStore.getValue(row, "quota")
 						};
 						this.makeQuotaWin(info, dojo.hitch(this, function(value) {
-							this._userStore.setValue(row.__dojo_data_item, "quota", value);
+							this._userStore.setValue(row, "quota", value);
 						}));
 					})
 				}
@@ -179,7 +179,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 				this._userMenu._openMyself(e);
 			});
 			document.body.appendChild(menu.domNode);
-			this.win.startup();
+			this.win.layout();
 		}));
 	},
 	newUserDialog: function() {

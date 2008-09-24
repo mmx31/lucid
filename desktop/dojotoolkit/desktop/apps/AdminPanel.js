@@ -8,12 +8,13 @@ dojo.require("dijit.form.Button");
 dojo.require("dijit.form.CheckBox");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.form.FilteringSelect");
-dojo.require("dojox.grid.Grid");
+dojo.require("dojox.grid.DataGrid");
+dojo.require("dojox.grid._data.editors");
 dojo.require("dojo.data.ItemFileWriteStore");
 dojo.require("dijit.Menu");
 dojo.require("dijit.Dialog");
 dojo.require("dojox.widget.FileInputAuto");
-api.addDojoCss("dojox/grid/_grid/Grid.css");
+api.addDojoCss("dojox/grid/resources/Grid.css");
 api.addDojoCss("dojox/widget/FileInput/FileInput.css");
 
 //require parts of admin panel
