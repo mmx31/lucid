@@ -84,11 +84,11 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 	
 		dojo.connect(this.surfacePane.containerNode, "oncontextmenu", dojo, "stopEvent");
 		
-		this.makeBoard(10, 10);
-		setTimeout(dojo.hitch(this, function() {
-			var tHeight = this.toolbar.domNode.offsetHeight;
-			this.win.resize({w: 200, h: 200+tHeight});
-		}), 200);
+        this.makeBoard(10, 10);
+        setTimeout(dojo.hitch(this, function() {
+            var tHeight = this.toolbar.domNode.offsetHeight;
+            this.win.resize({width: "200px", height: (200+tHeight)+"px"});
+        }), 200);
 	},
 
 	startGame: function()
@@ -97,15 +97,15 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 		var tHeight = this.toolbar.domNode.offsetHeight;
 		if ( this.difficulty == "Easy" ) {
 			//console.debug("resizing..");
-			
+			this.win.resize({width: "200px", height: (200+tHeight)+"px"});
 			this.surface.clear();
 			this.makeBoard(10, 10);
 		} else if ( this.difficulty == "Medium" ) {
-			this.win.resize({w:300, h:300+tHeight});
+			this.win.resize({width:"300px", height:(300+tHeight)+"px"});
 			this.surface.clear();
 			this.makeBoard(15, 15);
 		} else if ( this.difficulty == "Hard" ) {
-			this.win.resize({w:600, h:300+tHeight});
+			this.win.resize({width:"600px", height:(300+tHeight)+"px"});
 			this.surface.clear();
 			this.makeBoard(30,15);
 		}
