@@ -366,10 +366,12 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 		else
 		{
 			//api.log("maximizing...");
-			win.style.top = max.T;
-			win.style.left = max.L;
-			win.style.width = (viewport.h - max.R - max.L)+"px";
-			win.style.height = (viewport.h - max.B - max.T)+"px";
+            dojo.style(win, {
+                top: max.T+"px",
+                left: max.L+"px",
+                width: (viewport.w - max.R - max.L)+"px",
+                height: (viewport.h - max.B - max.T)+"px"
+            });
 			this.resize();
 		}
 	},
