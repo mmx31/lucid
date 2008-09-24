@@ -168,7 +168,8 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	
 	    this.right = new dijit.layout.BorderContainer({
 	        minSize: 50,
-			region: "center"
+			region: "center",
+            gutters: false
 	    });
 			this.gridStore = new dojo.data.ItemFileWriteStore({
 				data: {
@@ -202,11 +203,12 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			var div = document.createElement("div");
 			div.appendChild(grid.domNode);
 			gridPane.setContent(grid.domNode);
+            dojo.connect(gridPane, "resize", grid, "resize");
 			this.right.addChild(gridPane);
 			//this.right.addChild(grid);
 			this.right.startup(); //hack
 			var cpane = this.contentArea = new dijit.layout.ContentPane({region: "bottom", style: "height: 200px;", splitter: true});
-			cpane.setContent("noop");
+			cpane.setContent("&nbsp;");
 			this.right.addChild(cpane);
 			this.right.layout();
 	    this.win.addChild(this.right);
@@ -452,7 +454,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			sum += this.feedCounter[key];
 		}
 		var app = dojo.i18n.getLocalization("desktop", "apps");
-		this.win.setTitle(app["Feed Reader"]+(sum > 0 ? " ("+sum+")" : ""));
+		this.win.attr("title", app["Feed Reader"]+(sum > 0 ? " ("+sum+")" : ""));
 	},
 	fetchFeed: function(item, noGrid)
 	{
