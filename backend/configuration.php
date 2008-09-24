@@ -1,10 +1,10 @@
 <?php
 	$GLOBALS['db'] = Array(
-		"database" => "sqlite:////asdf?mode=666",
+		"database" => "sqlite:////var/db/desktop.db?mode=666",
 		"prefix" => ""
 	);
 	$GLOBALS['conf'] = Array(
-		"salt" => "9175dccd198010d3ccd0014bedf8fe0e",
+		"salt" => "869795292c38a6760afedae377886521",
 		"public" => true,
 		"crosstalkThrottle" => false
 	);
