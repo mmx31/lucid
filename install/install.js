@@ -103,8 +103,20 @@ install = new function() {
 			{
 				dijit.byId("next").setDisabled(false);
 			}
+			else if(form.db_url != "")
+				dijit.byId("next").setDisabled(false);
 			else
 				dijit.byId("next").setDisabled(true);
+		}
+	}
+	this.fixurlStr = function(e)
+	{
+		if(typeof e != "object") var e = {target: {id: ""}};
+		if (e.target.id != "urlstr") {
+			var p = dijit.byId("form").getValues();
+			dijit.byId("urlstr").setValue(
+				p.db_type+"://"+(p.db_type == "sqlite" ? "/" : "")+(p.db_username ? p.db_username+(p.db_password ? ":"+p.db_password : "")+"@" : "") + p.db_host + (p.db_type == "sqlite" ? "?mode=666" : "") + (p.db_name ? "/" + p.db_name : "")
+			);
 		}
 	}
 	this.getPerms = function()
@@ -242,8 +254,34 @@ install = new function() {
 		if(num == "6") text = "Database query error";
 		if(num == "4") text = "Database connection error";
 		dojo.byId("taskList").innerHTML += "<div class='installError'>***Installation Error***</div>"
-		+ "<div class='installError'>"+text+"</div>";
+		+ "<div class='installError'>"+text+"</div>"
+        + "<a href='javascript:install.toggleDebugBox();'>Full Details</a>";
+        var textarea = document.createElement("textarea");
+        textarea.innerHTML = data;
+        textarea.id="debugBox";
+        dojo.style(textarea, {
+            width: "450px",
+            height: "150px",
+            display: "none",
+            opacity: 0
+        });
+        dojo.byId("taskList").appendChild(textarea);
 	}
+    this.toggleDebugBox = function() {
+        var node = dojo.byId("debugBox")
+        if(dojo.style(node, "display") == "none") {
+            dojo.style(node, "display", "block");
+            dojo.fadeIn({node: node}).play();
+        }
+        else {
+            dojo.fadeOut({
+                node: node,
+                onEnd: function() {
+                    dojo.style(node, "display", "none");
+                }
+            }).play();
+        }
+    }
 	this.tasks = {
 		permissions: function(callback) {
 			dojo.xhrPost({
@@ -354,12 +392,8 @@ install = new function() {
 		dojo.xhrPost({
 				url: "./backend.php?action=installdatabase",
 				content: {
-					db_type: form.db_type,
-					db_host: form.db_host,
-					db_name: form.db_name,
+					db_url: form.db_url,
 					db_prefix: form.db_prefix,
-					db_username: form.db_username,
-					db_password: form.db_password,
 					conf_public: form.conf_public,
 					conf_throttle: form.conf_throttle
 				},
