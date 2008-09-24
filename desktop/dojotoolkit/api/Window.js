@@ -127,8 +127,6 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 		//	summary:
 		//		Shows the window
 		desktop.ui._area.addChild(this);
-		dojo.style(this.domNode, "width", this.width);
-		dojo.style(this.domNode, "height", this.height);
 		this.titleNode.innerHTML = this.title;
 		this._winListItem = desktop.ui._windowList.newItem({
 			label: this.title,
@@ -137,14 +135,15 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 		});
 		if(this.maximized == true) this.maximize();
 		dojo.style(this.domNode, "display", "block");
-		// offset the window size so that the container is the exact size specified
-		var calcWidth = this.domNode.offsetWidth;
+        this.resize({
+            width: this.width,
+            height: this.height
+        });
+		//calculate the middle of the desktop.ui.Area container
+        var calcWidth = this.domNode.offsetWidth;
 		var calcHeight = this.domNode.offsetHeight;
 		var bodyWidth = this.containerNode.offsetWidth;
 		var bodyHeight = this.containerNode.offsetHeight;
-		dojo.style(this.domNode, "width", ((calcWidth - bodyWidth)+calcWidth)+"px");
-		dojo.style(this.domNode, "height", ((calcHeight - bodyHeight)+calcHeight)+"px");
-		//calculate the middle of the desktop.ui.Area container
 		var viewport = dijit.getViewport();
 		var topCount = 0;
 		dojo.query(".desktopPanelTop", "desktop_ui_Area_0").forEach(function(panel) {
@@ -521,7 +520,21 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 		this.inherited(arguments);
 		this.domNode = oldNode;
 	},
-	resize: function() {
+	resize: function(/*Object?*/size) {
+        // resize the window
+        if(size) {
+            dojo.style(this.domNode, {
+                width: size.width,
+                height: size.height
+            });
+            // offset the window size so that the container is the exact size specified
+		    var calcWidth = this.domNode.offsetWidth;
+		    var calcHeight = this.domNode.offsetHeight;
+		    var bodyWidth = this.containerNode.offsetWidth;
+		    var bodyHeight = this.containerNode.offsetHeight;
+		    dojo.style(this.domNode, "width", ((calcWidth - bodyWidth)+calcWidth)+"px");
+		    dojo.style(this.domNode, "height", ((calcHeight - bodyHeight)+calcHeight)+"px");
+        }
 		//hack so we don't have to deal with BorderContainer's method using this.domNode
 		var oldNode = this.domNode;
 		this.domNode = this.containerNode;
