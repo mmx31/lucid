@@ -22,7 +22,8 @@ dojo.extend(desktop.apps.AdminPanel, {
 					field: field
 				};
 				if(field == "initial") {
-					args.editor = dojox.grid.editors.Bool;
+					args.type = dojox.grid.cells.Bool;
+                    args.editable = true;
 				}
 				layout[0].cells[0].push(args);
 			}

@@ -18,7 +18,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			var layout = [{
 				cells: [[
 					{name: sys.name, field: "name"},
-					{name: sys.description, field: "description", editor: dojox.grid.editors.Input}
+					{name: sys.description, field: "description", editable: true, type: dojox.grid.cells.Cell}
 				]]
 			}];
 			this._groupStore = new dojo.data.ItemFileWriteStore({
