@@ -26,7 +26,10 @@ dojo.extend(desktop.apps.AdminPanel, {
 					name: sys[field] || usr[field],
 					field: field
 				};
-				if(field == "name" || field == "username" || field == "email") args.editor = dojox.grid.editors.Input;
+				if(field == "name" || field == "username" || field == "email") {
+                    args.type = dojox.grid.cells.Cell;
+                    args.editable = true;
+                }
 				layout[0].cells[0].push(args);
 			}
 			
@@ -36,6 +39,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 					items: data
 				}
 			});
+            console.log("asdf");
 			var grid = this._userGrid = new dojox.grid.DataGrid({
 				structure: layout,
                 store: this._userStore,
