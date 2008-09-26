@@ -242,6 +242,11 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 				})
 			});
 		}
+        else {
+            //delete any child feeds
+            var children = this.feedStore.getValues(this.currentFeed, "children");
+            dojo.forEach(children, function(item) { this.feedStore.deleteItem(item); }, this);
+        }
 		var name = this.feedStore.getValue(this.currentFeed, "title");
 		this.feedCounter[name] = 0;
 		this.fixWinTitle();
