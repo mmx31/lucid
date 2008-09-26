@@ -252,6 +252,14 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		this.fixWinTitle();
 		this.feedStore.deleteItem(this.currentFeed);
 		this.feedStore.save();
+        //clear the grid
+        this.gridStore.fetch({
+            query: {Title: "*"},
+            onItem: dojo.hitch(this.gridStore, function(item) {
+                this.deleteItem(item);
+            })
+        });
+        this.contentArea.setContent("");
 	},
 	
 	addFeedDialog: function()
