@@ -118,7 +118,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	        dropDown: this.addFeedDialog()
 	    });
 	    this.toolbar.addChild(button);
-	    var button = new dijit.form.Button({
+	    var button = this.removeButton = new dijit.form.Button({
 	        label: cm.remove,
 	        iconClass: "icon-22-actions-list-remove",
 	        onClick: dojo.hitch(this, this.removeFeed)
@@ -458,6 +458,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	},
 	fetchFeed: function(item, noGrid)
 	{
+        this.removeButton.attr("disabled", true);
 		var FEED_URL = this.feedStore.getValue(item, "url");
 		var url = FEED_URL;
 		var FEED_ITEM = item;
@@ -515,6 +516,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 								});
 								newHashes = true;
 							}
+                            this.removeButton.attr("disabled", false);
 						})
 					});
 	            }, this);
