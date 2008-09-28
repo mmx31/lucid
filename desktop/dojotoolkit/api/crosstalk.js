@@ -20,7 +20,7 @@ api.crosstalk = {
 		//		returns a handle that you can use to unregister the handler (see unregisterHandler)
 		var session = api.crosstalk.session;
 		var p = session[session.length] = {
-			appid: (instance ? desktop.app.instances[instance].id : -1),
+			appsysname: (instance ? desktop.app.instances[instance].sysname : -1),
 			callback: handler,
 			instance: instance || -1,
 			topic: topic
@@ -61,7 +61,7 @@ api.crosstalk = {
 		//}
 	},
 		
-	publish: function(/*String*/topic, /*Array*/args, /*Int?*/userid, /*Int?*/appid, /*Int?*/instance)
+	publish: function(/*String*/topic, /*Array*/args, /*Int?*/userid, /*String?*/appsysname, /*Int?*/instance)
 	{
 		//	summary:
 		//		publish an event to be sent
@@ -83,7 +83,7 @@ api.crosstalk = {
 				topic: topic,
 				userid: userid || -1,
 				args: dojo.toJson(args),
-				appid: appid || -1,
+				appsysname: appsysname || -1,
 				instance: instance || -1
 			},
 	    	error: function(type, error) {
@@ -105,7 +105,7 @@ api.crosstalk = {
 			//cycle through the handlers stored and find a handler for the event
 			dojo.forEach(this.session, function(handler) {
 				//matching the appid and topic are required
-				if(handler.appid == event.appid
+				if(handler.appsysname == event.appsysname
 				&& handler.topic == event.topic) {
 					//matching the instance isn't
 					//but if it's provided and this handler is not of he correct instance, return
@@ -124,15 +124,15 @@ api.crosstalk = {
 			var handled = false;
 			checkForHandler(event);
 			if(handled == false && event.instance == -1) {
-				if(event.appid == -1) return; //system call
+				if(event.appsysname == -1) return; //system call
 				//check to see if there's allready an instance of this app running
 				var instances = desktop.app.getInstances();
 				for(var i=0;i<instances.length;i++) {
 					//if there is allready an instance running, it must not handle any crosstalk events. Skip the event.
-					if(instances[i].appid == event.appid) return;
+					if(instances[i].sysname == event.appsysname) return;
 				}
 				//otherwise, launch the app
-				desktop.app.launch(event.appid, {}, function(app) {
+				desktop.app.launch(event.appsysname, {}, function(app) {
 					//check for a handler again
 					checkForHandler(event);
 					//if there's still no handler, kill the app
