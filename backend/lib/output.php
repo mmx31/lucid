@@ -56,6 +56,7 @@ class intOutput {
 		"quota_exceeded" => 12,
 		"remote_authentication_failed" => 13,
 		"remote_connection_failed" => 14,
+		"not_compatible" => 15
 	);
 	function __construct($val=false) {
 		if($val !== false) $this->set($val);
