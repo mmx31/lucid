@@ -11,7 +11,7 @@
 	{
 		var $sender = array('type' => 'integer', 'length' => 11);
 		var $userid = array('type' => 'integer', 'length' => 11);
-		var $appid = array('type' => 'integer', 'length' => 11);
+		var $appsysname = array('type' => 'text');
 		var $args = array('type' => 'text');
 		var $topic = array('type' => 'text');
 		var $instance = array('type' => 'integer', 'length' => 11);
