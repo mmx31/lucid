@@ -98,7 +98,6 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		{
 			var n = dojo.i18n.getLocalization("api", "console");
 			if(params == "") { this.write("kill: "+n.usage+": kill ["+n.instance+"]\n"); }
-			else if(params == "0") { this.write("kill: "+n.sysCannotBeKilled+"\n"); }
 			else {
 			if(desktop.app.kill(params) == 1) { this.write("kill: "+n.procKilled+"\n"); }
 			else { this.write("kill: "+n.procKillFail+"\n"); }

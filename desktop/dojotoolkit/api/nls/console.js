@@ -17,7 +17,6 @@
 	"dir": "dir",
 	"text": "text",
 	"usage": "usage",
-	"sysCannotBeKilled": "system cannot be killed",
 	"procKilled": "process killed",
 	"procKillFail": "process kill failed",
 	"needDirName": "need a dir name!",
