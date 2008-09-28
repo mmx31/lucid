@@ -12,23 +12,28 @@ import("api.vfs.Base");
 import("models.user");
 
 //check for mimetype function, if not make one so that it uses the Fileinfo pecl module
+function findexts ($filename)
+{
+	$filename = strtolower($filename) ;
+	$exts = split("[/\\.]", $filename) ;
+	$n = count($exts)-1;
+	$exts = $exts[$n];
+	return $exts;
+} 
 function mime_content_type_alt($file) {
-			//Guess the mimetype based on extension
-			if(is_dir($file)) return "text/directory";
-			import("api.fs_mimetypes");
-			global $fs_mimetypes;
-			$info = pathinfo($filename);
-			$ext = $info['extension'];
-			foreach($fs_mimetypes as $key=>$value) {
-				if($ext == $key) return $value;
-				$exts = explode($key, " ");
-				if(count($exts) > 0) {
-					foreach($exts as $check) {
-						if($ext == $check) return $value;
-					}
-				}
-			}
-			return "text/plain";
+	//Guess the mimetype based on extension
+	if(is_dir($file)) return "text/directory";
+	import("api.fs_mimetypes");
+	global $fs_mimetypes;
+	$ext = findexts($file);
+	foreach($fs_mimetypes as $key=>$value) {
+		if($ext == $key) return $value;
+		$exts = explode(" ",$key);
+		for($a=0;$a<count($exts);$a++) {
+			if($exts[$a] == $ext) return $value;
+		}
+	}
+	return "text/plain";
 }
 if (!function_exists('mime_content_type')) {
 	if(function_exists('finfo_open')) {
@@ -58,8 +63,7 @@ if (!function_exists('mime_content_type')) {
 			if(is_dir($file)) return "text/directory";
 			import("api.fs_mimetypes");
 			global $fs_mimetypes;
-			$info = pathinfo($filename);
-			$ext = $info['extension'];
+			$ext = findexts($file);
 			foreach($fs_mimetypes as $key=>$value) {
 				if($ext == $key) return $value;
 				$exts = explode($key, " ");
