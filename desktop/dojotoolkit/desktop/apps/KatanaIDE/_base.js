@@ -502,7 +502,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 								+"dojo.declare(\"desktop.apps."+info.sysname+"\", desktop.apps._App, {\r\n"
 								+"	init: function(args) {\r\n"
 								+"		/*Startup code goes here*/\r\n"
-								+"	}\r\n"
+								+"	},\r\n"
 								+"	kill: function(args) {\r\n"
 								+"		/*Cleanup code goes here*/\r\n"
 								+"	}\r\n"
