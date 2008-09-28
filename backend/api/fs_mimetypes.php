@@ -1,4 +1,5 @@
 <?php
+global $fs_mimetypes;
 $fs_mimetypes = array(
 	"hqx" => "application/mac-binhex40",
 	"cpt" => "application/mac-compactpro",
@@ -73,3 +74,4 @@ $fs_mimetypes = array(
 	"ice" => "x-conference/x-cooltalk",
 	"wrl vrml" => "x-world/x-vrml",
 );
+?>

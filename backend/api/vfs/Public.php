@@ -38,7 +38,7 @@ class PublicFs extends BaseFs {
 			$r["modified"] = date ("F d Y H:i:s.", filemtime($f));
 			$r["size"] = filesize($f);
 			$r["type"] = mime_content_type($f);
-			//TODO: guess mimetype based on extension?
+			if($r["type"] == false) { $r["type"] = mime_content_type_alt($f); }
 		}
 		//get ID3 info if available
 		if(function_exists("id3_get_tag")) {
