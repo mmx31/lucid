@@ -32,7 +32,7 @@
 			foreach($result as $row) {
 				array_push($array, array(
 					sender => $row->sender,
-					appid => $row->appid,
+					appsysname => $row->appsysname,
 					instance => $row->instance,
 					args => $row->args,
 					topic => $row->topic
@@ -44,7 +44,7 @@
 	    if ($_GET['action'] == "sendEvent")
 	    {
 			$p = new $Crosstalk();
-			foreach(array("args", "userid", "appid", "instance", "topic") as $item) {
+			foreach(array("args", "userid", "appsysname", "instance", "topic") as $item) {
 				$p->$item = $_POST[$item];
 			}
 			$p->sender = $_SESSION['userid'];
