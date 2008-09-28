@@ -105,6 +105,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 			iconClass: "icon-22-actions-list-add",
 			onClick: function() {
 				api.ui.fileDialog({
+					title: nc.chooseWall,
 					callback: function(path) {
 						if(path) {
 							var p = api.filesystem.embed(path);

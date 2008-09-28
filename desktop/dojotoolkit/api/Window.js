@@ -82,7 +82,7 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 	width: "600px",
 	//	title: String
 	//		The window's title
-	title: "",
+	title: "(untitled)",
 	//	resizable: Boolean
 	//		Weather or not the window is resizable.
 	resizable: true,
