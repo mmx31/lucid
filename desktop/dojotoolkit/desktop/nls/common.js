@@ -46,5 +46,8 @@
 	"markAsRead": "Mark as read",
 	"login": "Log in",
 	"create": "Create",
-	"chooseWall": "Choose a wallpaper"
+	"chooseWall": "Choose a wallpaper",
+	"total": "Total",
+	"remaining": "Remaining",
+	"used": "Used"
 })

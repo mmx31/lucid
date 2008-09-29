@@ -15,10 +15,11 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		dojo.requireLocalization("desktop", "common");
 		dojo.requireLocalization("desktop", "apps");
 		dojo.requireLocalization("desktop", "places");
-		
+		dojo.requireLocalization("desktop", "system");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var places = dojo.i18n.getLocalization("desktop", "places");
+		var sys = dojo.i18n.getLocalization("desktop", "system");
 		this.win = new api.Window({
 			title: app["File Browser"],
 			iconClass: this.iconClass,
@@ -79,6 +80,12 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 				label: cm.refresh
 			});
 			this.toolbar.addChild(button);
+			this.quotabutton = new dijit.form.Button({
+				onClick: dojo.hitch(this, "quotaNotice"),
+				iconClass: "icon-16-places-user-home",
+				label: sys.quota
+			});
+			this.toolbar.addChild(this.quotabutton);
 			this.upbutton = new dijit.form.Button({
 				onClick: dojo.hitch(this, "openUploader"),
 				iconClass: "icon-16-actions-mail-send-receive",
@@ -118,7 +125,30 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		this.win.onClose = dojo.hitch(this, this.kill);
 		this.fileArea.refresh();
 	},
-	
+	quotaNotice: function() {
+		var cm = dojo.i18n.getLocalization("desktop", "common");
+		var sys = dojo.i18n.getLocalization("desktop", "system");
+		if(typeof(this.quotaWin) != "undefined") { if(!this.quotaWin.closed) { return; } }
+		api.filesystem.getQuota(this.fileArea.path, dojo.hitch(this, function(values) {
+			values.total = Math.round(values.total / 1024); values.remaining = Math.round(values.remaining / 1024); values.used = Math.round(values.used / 1024); 
+			this.quotaWin = new api.Window({
+				title: sys.quota,
+				resizable: false,
+				height: "75px",
+				width: "175px"
+			});
+			this.windows.push(this.quotaWin);
+			var content = new dijit.layout.ContentPane({});
+			var central = document.createElement("div");
+			central.innerHTML = cm.total+": "+values.total+"kb<br>";
+			central.innerHTML += cm.used+": "+values.used+"kb<br>";
+			central.innerHTML += cm.remaining+": "+values.remaining+"kb";
+			content.setContent(central);
+			this.quotaWin.addChild(content);
+			this.quotaWin.show();
+			this.quotaWin.startup();
+		}));
+	},
 	openUploader: function() {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var uploader = new dojox.widget.FileInputAuto({
