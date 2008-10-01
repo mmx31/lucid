@@ -30,6 +30,11 @@ api.xhr = function(/*dojo.__ioArgs|String*/args) {
 		}
 		url += ".php?section="+escape(mod[mod.length-2]);
 		url += "&action="+escape(mod[mod.length-1])
+
+        // WORKAROUND, see #159 for more info
+        if(str == "api.fs.io.upload")
+            return "../backend/api/fs_uploader_workaround.php?vars="+dojo.cookie("desktop_session");
+
 		return url;
 	}
 	if(dojo.isString(args)) {

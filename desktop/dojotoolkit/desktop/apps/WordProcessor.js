@@ -64,7 +64,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    this.statusbar = new api.StatusBar({
 	        region: "bottom"
 	    });
-	    this.statusbar.setLabel(msg.noFileOpen);
+	    this.statusbar.attr("label", msg.noFileOpen);
 	    this.window.addChild(this.statusbar);
 	    var editor = this.editor = new dijit.Editor({
 	    	region: "center",
@@ -106,7 +106,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    this.editing = false;
 	    this.fileEditing = "";
 	    this.newAs = true;
-	    this.statusbar.setLabel(msg.editingFile.replace("%s", cmn.untitled));
+	    this.statusbar.attr("label", msg.editingFile.replace("%s", cmn.untitled));
 	
 	},
 	processClose: function() {
@@ -116,7 +116,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    this.newAs = false;
 	    this.editing = false;
 	    this.fileEditing = "";
-	    this.statusbar.setLabel(msg.noFileOpen);
+	    this.statusbar.attr("label", msg.noFileOpen);
 	
 	},
 	processOpen: function() {
@@ -134,7 +134,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    if (path == false) {
 	        return false;
 	    }
-	    this.statusbar.setLabel(msg.openingFile.replace("%s", path));
+	    this.statusbar.attr("label", msg.openingFile.replace("%s", path));
 	    this.newAs = true;
 	    this.editor.setDisabled(true);
 	    api.filesystem.readFileContents(path, dojo.hitch(this, function(content) {
@@ -143,7 +143,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	            this.editing = true;
 	            this.newAs = true;
 	            this.fileEditing = path;
-	            this.statusbar.setLabel(msg.editingFile.replace("%s", path));
+	            this.statusbar.attr("label", msg.editingFile.replace("%s", path));
         }));
 	
 	},
@@ -152,7 +152,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (this.editing) {
         api.filesystem.writeFileContents(this.fileEditing, "<html>"+this.editor.getValue()+"</html>");
-        this.statusbar.setLabel(msg.fileSaved);
+        this.statusbar.attr("label", msg.fileSaved);
 	    }
 	    else {
 	        this.processSaveAs();

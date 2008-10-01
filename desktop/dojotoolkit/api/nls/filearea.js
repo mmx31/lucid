@@ -15,5 +15,13 @@
 	"alreadyExists": "A file with that name already exists",
 	"cut": "Cut",
 	"copy": "Copy",
-	"paste": "Paste"
+	"paste": "Paste",
+	"connFailed": "Remote Connection Failed",
+	"enterPass": "Enter Password",
+	"forgetImmediate": "Forget Immediately",
+	"rememberForever": "Remember Forever",
+	"connect": "Connect",
+	"cancel": "Cancel",
+	"uploading": "Uploading %s file(s)...",
+	"uploadingComplete": "Upload complete"
 })

@@ -61,7 +61,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 		this.editor = new dijit.form.SimpleTextarea({
 			region: "center"
 		});
-	    this.statusbar.setLabel(msg.noFileOpen);
+	    this.statusbar.attr("label", msg.noFileOpen);
 	    this.window.addChild(this.editor);
 	    this.window.addChild(this.statusbar);
 	    this.window.show();
@@ -77,7 +77,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    this.editing = false;
 	    this.fileEditing = "";
 	    this.newAs = true;
-	    this.statusbar.setLabel(msg.editingFile.replace("%s", cm.untitled));
+	    this.statusbar.attr("label", msg.editingFile.replace("%s", cm.untitled));
 	
 	},
 	processClose: function() {
@@ -86,7 +86,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    this.newAs = false;
 	    this.editing = false;
 	    this.fileEditing = "";
-	    this.statusbar.setLabel(msg.noFileOpen);
+	    this.statusbar.attr("label", msg.noFileOpen);
 	
 	},
 	processOpen: function() {
@@ -103,7 +103,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	        return false;
 	    }
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
-	    this.statusbar.setLabel(msg.openingFile.replace("%s", path));
+	    this.statusbar.attr("label", msg.openingFile.replace("%s", path));
 	    this.newAs = true;
 	    this.editor.setDisabled(true);
 	    api.filesystem.readFileContents(path, dojo.hitch(this, function(content) {
@@ -112,7 +112,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
             this.newAs = true;
             this.editor.setDisabled(false);
             this.fileEditing = path;
-            this.statusbar.setLabel(msg.editingFile.replace("%s", path));
+            this.statusbar.attr("label", msg.editingFile.replace("%s", path));
         }));
 	
 	},
@@ -121,7 +121,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (this.editing) {
 	        api.filesystem.writeFileContents(this.fileEditing, this.editor.getValue());
-	        this.statusbar.setLabel(msg.fileSaved);
+	        this.statusbar.attr("label", msg.fileSaved);
 	
 	    }
 	    else {

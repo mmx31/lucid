@@ -15,5 +15,13 @@
 	"alreadyExists": "Un archivo con ese nombre ya existe",
 	"cut": "Corte",
 	"copy": "Copie",
-	"paste": "Pegue"
+	"paste": "Pegue",
+	"connFailed": "Error de conexión remota",
+	"enterPass": "Ingresar Contraseña",
+	"forgetImmediate": "Inmediatamente olvidar",
+	"rememberForever": "Recuerde para siempre",
+	"connect": "Conectar",
+	"cancel": "Cancelar",
+	"uploading": "Carga de %s archivo(s)...",
+	"uploadingComplete": "Completado la subida"
 })
