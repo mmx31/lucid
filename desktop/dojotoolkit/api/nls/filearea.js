@@ -21,5 +21,7 @@
 	"forgetImmediate": "Forget Immediately",
 	"rememberForever": "Remember Forever",
 	"connect": "Connect",
-	"cancel": "Cancel"
+	"cancel": "Cancel",
+	"uploading": "Uploading %s file(s)...",
+	"uploadingComplete": "Upload complete"
 })

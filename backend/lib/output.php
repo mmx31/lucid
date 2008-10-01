@@ -121,6 +121,23 @@ class textareaOutput extends jsonOutput {
 	}
 }
 
+class flashOutput extends jsonOutput {
+	function __destruct() {
+		if($this->dooutput) {
+			header("Content-Type: text/plain; charset=utf-8");
+			if(isset($php_errormsg))
+			{
+				$this->append("core_error", $php_errormsg);
+			}
+			$arr = array();
+			foreach($this->output as $key => $value) {
+			    $arr[] = $key."=".$value;
+			}
+			echo implode(",", $arr);
+		}
+	}
+}
+
 class filterableOutput extends jsonOutput {
 	function __destruct() {
 		if($this->dooutput) {

@@ -212,40 +212,7 @@ if($_GET['section'] == "io")
 		$out = new intOutput("ok");
 	}
 	if($_GET['action'] == "upload") {
-		$user = $User->get_current();
-		if(!$user->has_permission("api.filesystem.upload")) { 
-			$out = new textareaOutput(array(
-				status => "failed",
-				details => "Contact administrator; Your account lacks uploading permissions."
-			));
-		}
-		if(!isset($_SESSION['userid'])) {
-			$out = new textareaOutput(array(
-				status => "failed",
-				details => "Session is dead, please log in again"
-			));
-		}
-		if(isset($_FILES['uploadedfile']['name'])) {
-			$_FILES['uploadedfile']['name']=str_replace("..", "", $_FILES['uploadedfile']['name']);
-			$content = file_get_contents($_FILES['uploadedfile']['tmp_name']);
-			if($content !== false && $module->write($sentpath . "/" . $_FILES['uploadedfile']['name'], $content)) {
-				$out = new textareaOutput(array(
-					status => "success",
-					details => $_FILES['uploadedfile']['name']
-				));
-			} else{
-				$out = new textareaOutput(array(
-					status => "failed",
-					details => "Contact administrator; could not write to disk"
-				));
-			}
-		}
-		else {
-			$out = new textareaOutput(array(
-				status => "failed",
-				details => "No file uploaded"
-			));
-		}
+        import("api.fs_upload");
 	}
 	if($_GET['action'] == "download") {
 		import("models.user");

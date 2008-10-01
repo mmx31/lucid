@@ -1,6 +1,7 @@
 @import url('css/window.css');
 @import url('css/panels.css');
 @import url('css/filearea.css');
+@import url('css/statusbar.css');
 
 html, body {
 	overflow: hidden;

@@ -27,7 +27,7 @@
 			}
 			else
 			{
-				return FALSE;
+                return FALSE;
 			}
 		}
 		function authenticate($user, $pass)

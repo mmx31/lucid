@@ -1,21 +1,22 @@
 dojo.provide("desktop.apps.FileBrowser");
+dojo.require("dijit.Toolbar");
+dojo.require("dijit.layout.LayoutContainer");
+dojo.require("dijit.layout.SplitContainer");
+dojo.require("dijit.form.Button");
+dojo.require("dijit.form.TextBox");
+dojo.require("dijit.Dialog");
+dojo.require("dojox.form.FileUploader");
+api.addDojoCss("dojox/form/resources/FileInput.css");
+dojo.require("dojox.widget.FileInputAuto");
+dojo.requireLocalization("desktop", "common");
+dojo.requireLocalization("desktop", "apps");
+dojo.requireLocalization("desktop", "places");
+dojo.requireLocalization("api", "filearea");
 
 dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 	windows: [],
 	init: function(args)
 	{
-		dojo.require("dijit.Toolbar");
-		dojo.require("dijit.layout.LayoutContainer");
-		dojo.require("dijit.layout.SplitContainer");
-		dojo.require("dijit.form.Button");
-		dojo.require("dijit.form.TextBox");
-		dojo.require("dijit.Dialog");
-		api.addDojoCss("dojox/widget/FileInput/FileInput.css");
-		dojo.require("dojox.widget.FileInputAuto");
-		dojo.requireLocalization("desktop", "common");
-		dojo.requireLocalization("desktop", "apps");
-		dojo.requireLocalization("desktop", "places");
-		dojo.requireLocalization("desktop", "system");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var places = dojo.i18n.getLocalization("desktop", "places");
@@ -25,40 +26,42 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
-			this.fileArea = new api.Filearea({path: (args.path || "file://"), region: "center"})
-			this.pane = new dijit.layout.ContentPane({region: "left", splitter: true, minSize: 120, style: "width: 120px;"});
-			var menu = new dijit.Menu({
-				style: "width: 100%;"
+		this.fileArea = new api.Filearea({path: (args.path || "file://"), region: "center"})
+		this.pane = new dijit.layout.ContentPane({region: "left", splitter: true, minSize: 120, style: "width: 120px;"});
+		var menu = new dijit.Menu({
+			style: "width: 100%;"
+		});
+		dojo.forEach(desktop.config.filesystem.places, function(item) {
+			var item = new dijit.MenuItem({label: places[item.name] || item.name,
+				iconClass: item.icon || "icon-16-places-folder",
+				onClick: dojo.hitch(this.fileArea, "setPath", item.path)
 			});
-			dojo.forEach(desktop.config.filesystem.places, function(item) {
-				var item = new dijit.MenuItem({label: places[item.name] || item.name,
-					iconClass: item.icon || "icon-16-places-folder",
-					onClick: dojo.hitch(this.fileArea, "setPath", item.path)
-				});
-				menu.addChild(item);
-			}, this);
-			this.pane.setContent(menu.domNode);
-			this.win.addChild(this.pane);
-			this.win.addChild(this.fileArea);
-			
-			this.pathbar = new dijit.Toolbar({region: "center"});
-			this.pathbox = new dijit.form.TextBox({
-				style: "width: 90%;",
-				value: args.path || "file://"
-			});
-			dojo.connect(this.fileArea, "onPathChange", this, function() {
-				this.pathbox.setValue(this.fileArea.path);
-			});
-			this.pathbar.addChild(this.pathbox);
-			this.goButton = new dijit.form.Button({
-				label: cm.go,
-				onClick: dojo.hitch(this, function() {
-					this.fileArea.setPath(this.pathbox.getValue());
-				})
-			});
-			this.pathbar.addChild(this.goButton);
-			
-			
+			menu.addChild(item);
+		}, this);
+		this.pane.setContent(menu.domNode);
+		this.win.addChild(this.pane);
+		this.win.addChild(this.fileArea);
+		
+		this.pathbar = new dijit.Toolbar({region: "center"});
+		this.pathbox = new dijit.form.TextBox({
+			style: "width: 90%;",
+			value: args.path || "file://"
+		});
+		dojo.connect(this.fileArea, "onPathChange", this, function() {
+			this.pathbox.setValue(this.fileArea.path);
+			this.fixUploadPath(this.fileArea.path);
+			this.statusbar.attr("label", "&nbsp;");
+		});
+		this.pathbar.addChild(this.pathbox);
+		this.goButton = new dijit.form.Button({
+			label: cm.go,
+			onClick: dojo.hitch(this, function() {
+				this.fileArea.setPath(this.pathbox.getValue());
+			})
+		});
+		this.pathbar.addChild(this.goButton);
+		
+		
 		this.toolbar = new dijit.Toolbar({region: "top"});
 			var button = new dijit.form.Button({
 				onClick: dojo.hitch(this.fileArea, function() {
@@ -82,12 +85,11 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 			this.toolbar.addChild(button);
 			this.quotabutton = new dijit.form.Button({
 				onClick: dojo.hitch(this, "quotaNotice"),
-				iconClass: "icon-16-places-user-home",
+				iconClass: "icon-16-devices-drive-harddisk",
 				label: sys.quota
 			});
 			this.toolbar.addChild(this.quotabutton);
 			this.upbutton = new dijit.form.Button({
-				onClick: dojo.hitch(this, "openUploader"),
 				iconClass: "icon-16-actions-mail-send-receive",
 				label: cm.upload
 			});
@@ -119,11 +121,15 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		bCont.addChild(this.toolbar);
 		bCont.addChild(this.pathbar);
 		this.win.addChild(bCont);
+		// Status bar
+		this.statusbar = new api.StatusBar({region: "bottom"});
+		this.win.addChild(this.statusbar);
 		this.win.show();
 		bCont.startup();
 		this.win.startup();
 		this.win.onClose = dojo.hitch(this, this.kill);
 		this.fileArea.refresh();
+		setTimeout(dojo.hitch(this, "makeUploader"), 1000);
 	},
 	quotaNotice: function() {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
@@ -143,56 +149,103 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 			central.innerHTML = cm.total+": "+values.total+"kb<br>";
 			central.innerHTML += cm.used+": "+values.used+"kb<br>";
 			central.innerHTML += cm.remaining+": "+values.remaining+"kb";
+            // TODO: get a progress bar in here?
 			content.setContent(central);
 			this.quotaWin.addChild(content);
 			this.quotaWin.show();
 			this.quotaWin.startup();
 		}));
 	},
-	openUploader: function() {
-		var cm = dojo.i18n.getLocalization("desktop", "common");
-		var uploader = new dojox.widget.FileInputAuto({
-			name: "uploadedfile",
-			url: api.xhr("api.fs.io.upload")+"&path="+encodeURIComponent(this.fileArea.path),
-			onComplete: dojo.hitch(this, function(data, ioArgs, widgetRef){
-				widgetRef.setMessage(data.status+": "+data.details);
-				this.fileArea.refresh();
-				dojo.publish("fsSizeChange", [this.fileArea.path]);
-			})
+	makeUploader: function() {
+	    this.uploader = new dojox.form.FileUploader({
+		    button: this.upbutton,
+		    degradable: true,
+		    //uploadUrl: api.xhr("api.fs.io.upload")+"&path="+encodeURIComponent(this.fileArea.path),
+            uploadUrl: api.xhr("api.fs.io.upload")+"?path="+encodeURIComponent(this.fileArea.path),
+		    uploadOnChange: true,
+            selectMultipleFiles: true
 		});
-		var win = new api.Window({
-			title: cm.upload,
-			width: "400px",
-			height: "100px"
-		});
-		this.windows.push(win);
-		var cpane = new dijit.layout.ContentPane({
-			region: "center",
-			style: "padding: 10px;"
-		});
-		var div = document.createElement("div");
-		dojo.addClass(div, "tundra");
-		div.appendChild(uploader.domNode);
-		cpane.setContent(div);
-		win.addChild(cpane);
-		
-		
-		var bpane = new dijit.layout.ContentPane({
-			region: "bottom"
-		});
-		var div = document.createElement("div");
-		var button = new dijit.form.Button({
-			label: cm.close,
-			onClick: dojo.hitch(win, "close")
-		});
-		div.appendChild(button.domNode);
-		dojo.addClass(div, "floatRight");
-		bpane.setContent(div);
-		win.addChild(bpane);
-		
-		dojo.style(uploader.inputNode, "width", "163px");
-		uploader.startup();
-		win.show();
+        if(!dojox.embed.Flash.available){
+            //fix button (workaround)
+            this.fixButton();
+            dojo.connect(this.uploader, "_connectInput", this, "fixButton");
+        }
+        this.doUploaderConnects();
+	},
+	
+    fixButton: function() {
+        var node = this.uploader.fileInputs[0];
+        setTimeout(dojo.hitch(this, function() {
+            var butNode = this.upbutton.domNode;
+            var right = node.offsetWidth-butNode.offsetWidth
+            dojo.style(node, {
+                top: "0px",
+                left: "-"+right+"px",
+                clip: "rect(0px, "+right-butNode.offsetWidth+"px, "+butNode.offsetHeight+"px, "+right+"px)"
+            });
+            dojo.style(node.parentNode, {position: "absolute", top: "0px", left: "0px"});
+            dojo.query("span.dijitReset.dijitRight.dijitInline", this.upbutton.domNode).style("position", "relative");
+        }), 500);
+    },
+
+	fixUploadPath: function(path) {
+	    var loc = window.location.href.split("/");
+		loc.pop();
+		loc = loc.join("/")+"/";
+        //var newUrl = loc+api.xhr("api.fs.io.upload")+"&path="+encodeURIComponent(this.fileArea.path);
+        var newUrl = loc+api.xhr("api.fs.io.upload")+"?path="+encodeURIComponent(this.fileArea.path);
+		this.uploader.uploadUrl = newUrl;
+		if(this.uploader.flashObject)
+	        this.uploader.flashObject.uploadUrl = newUrl
+	},
+	
+	doUploaderConnects: function() {
+		var nls = dojo.i18n.getLocalization("api", "filearea");
+	    var uploader = this.uploader;
+	    dojo.connect(uploader, "onChange", this, function(dataArray) {
+	       this.statusbar.attr({
+	            label: nls.uploading.replace("%s", dataArray.length),
+	            showProgress: true
+	       });
+	       this.statusbar.update({
+	            indeterminate: true
+	       });
+	    });
+	    dojo.connect(uploader, "onProgress", this, function(dataArray) {
+	        var progress = 0;
+	        var total = 0;
+	        dojo.forEach(dataArray, function(file) {
+	            progress += file.bytesLoaded;
+	            total += file.bytesTotal;
+	        });
+	        this.statusbar.update({
+	            indeterminate: false,
+	            progress: progress,
+	            maximum: total
+	        });
+            //workaround
+            if(progress >= total) uploader.onComplete([{status: "success"}]);
+	    });
+	    uploader.onComplete = dojo.hitch(this, function(data) {
+	        if(data[data.length-1].status == "success") {
+	           this.statusbar.attr({
+	                label: nls.uploadingComplete,
+	                showProgress: false
+	           });
+	           this.fileArea.refresh();
+	        }else{
+	           this.statusbar.attr({
+	                label: "Error: "+data.details,
+	                showProgress: false
+	           });
+	        }
+	    });
+        dojo.connect(uploader, "onError", this, function(data) {
+            this.statusbar.attr({
+                label: "Error",
+                showProgress: false
+            });
+        });
 	},
 	
 	kill: function() {

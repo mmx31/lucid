@@ -1,0 +1,9 @@
+.desktopStatusBar .dijitProgressBar {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 120px;
+}
+.desktopStatusBar {
+    position: relative;
+}

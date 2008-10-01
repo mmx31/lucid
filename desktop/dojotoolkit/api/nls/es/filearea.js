@@ -21,5 +21,7 @@
 	"forgetImmediate": "Inmediatamente olvidar",
 	"rememberForever": "Recuerde para siempre",
 	"connect": "Conectar",
-	"cancel": "Cancelar"
+	"cancel": "Cancelar",
+	"uploading": "Carga de %s archivo(s)...",
+	"uploadingComplete": "Completado la subida"
 })
