@@ -122,7 +122,7 @@
 			import("models.user");
 			$user = $User->get_current();
 			if(!$user->has_permission("core.app.write")) internal_error("permission_denied");
-			if(!isset($_POST['filename'])) {
+			//if(!isset($_POST['filename'])) {
 				$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
 				$p = $App->filter("sysname", $_POST['sysname']);
 				if($p === false) { $app = new App(array(sysname => $_POST['sysname'])); }
@@ -132,7 +132,7 @@
 						$app->$item = $_POST[$item];
 				}
 				$app->save();
-			}
+			//}
 			if(isset($_POST['filename'])) {
 				$_POST['filename'] = str_replace("..", "", $_POST['filename']);
 				file_put_contents($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['filename'], $_POST['content']);
