@@ -54,7 +54,6 @@
 	// ==========================================================================
 	statusCell = { field: 'col3', name: 'Status', styles: 'text-align: center;', type: dojox.grid.cells.Select, options: [ "new", "read", "replied" ] };
 	gridLayout = [{
-		width: '200px',
 		defaultCell: { width: 8, editable: true, styles: 'text-align: right;'  },
 		cells: [
 			{ name: 'Id', field: 'id', width: 3 },
@@ -96,7 +95,7 @@
 	dojox.grid.DataGrid Basic Editing test
 </h2>
 <div id="controls">
-	<button onclick="grid.refresh()">Refresh</button>&nbsp;&nbsp;&nbsp;
+	<button onclick="grid.render()">Refresh</button>&nbsp;&nbsp;&nbsp;
 	<button onclick="grid.edit.focusEditor()">Focus Editor</button>
 	<button onclick="grid.focus.next()">Next Focus</button>&nbsp;&nbsp;&nbsp;
 	<button onclick="addRow()">Add Row</button>
