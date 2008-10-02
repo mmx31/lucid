@@ -6,6 +6,7 @@
 	"Administration Panel": "Administration Panel",
     "Checkers": "Checkers",
 	"Calculator": "Calculator",
+    "Contacts": "Contacts",
 	"Feed Reader": "Feed Reader",
 	"Word Processor": "Word Processor",
 	"Text Editor": "Text Editor",

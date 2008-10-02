@@ -1,0 +1,13 @@
+{
+	"type": "application",
+	"sysname": "Contacts",
+	"name": "Contacts",
+	"author": "Psychcf",
+	"email": "will@psychdesigns.net",
+	"version": "1.0",
+	"maturity": "Stable",
+	"category": "Office",
+	"icon": "icon-16-mimetypes-x-office-address-book",
+	"filetypes": [],
+	"compatible": "1.0.0"
+}
