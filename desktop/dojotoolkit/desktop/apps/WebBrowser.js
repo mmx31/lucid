@@ -1,4 +1,10 @@
 dojo.provide("desktop.apps.WebBrowser");
+dojo.require("dijit.Toolbar");
+dojo.require("dijit.form.Form");
+dojo.require("dijit.form.Button");
+dojo.require("dijit.layout.ContentPane");
+dojo.requireLocalization("desktop", "apps");
+dojo.requireLocalization("desktop", "common");
 
 dojo.declare("desktop.apps.WebBrowser", desktop.apps._App, {
 	kill: function() {
@@ -6,12 +12,6 @@ dojo.declare("desktop.apps.WebBrowser", desktop.apps._App, {
 	},
 	init: function(args)
 	{
-		dojo.require("dijit.Toolbar");
-		dojo.require("dijit.form.Form");
-		dojo.require("dijit.form.Button");
-		dojo.require("dijit.layout.ContentPane");
-		dojo.requireLocalization("desktop", "apps");
-		dojo.requireLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		this.win = new api.Window({
