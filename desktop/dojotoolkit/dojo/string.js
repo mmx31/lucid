@@ -11,7 +11,7 @@ dojo.string.rep = function(/*String*/str, /*Integer*/num){
 	//		Efficiently replicate a string `n` times.
 	//	str:
 	//		the string to replicate
-	//	n:
+	//	num:
 	//		number of times to replicate the string
 	
 	if(num <= 0 || !str){ return ""; }
@@ -41,7 +41,8 @@ dojo.string.pad = function(/*String*/text, /*Integer*/size, /*String?*/ch, /*Boo
 	//	end:
 	//		adds padding at the end if true, otherwise pads at start
 	//	example:
-	//		
+	//	|	// Fill the string to length 10 with "+" characters on the right.  Yields "Dojo++++++".
+	//	|	dojo.string.pad("Dojo", 10, "+", true);
 
 	if(!ch){
 		ch = '0';

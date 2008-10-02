@@ -32,8 +32,8 @@ dojox.validate.isText = function(/*String*/value, /*Object?*/flags){
 dojox.validate._isInRangeCache = {};
 dojox.validate.isInRange = function(/*String*/value, /*Object?*/flags){
 	// summary:
-	//	Validates whether a string denoting an integer, 
-	//	real number, or monetary value is between a max and min. 
+	//	Validates whether a string denoting a number
+	//	is between a max and min. 
 	//
 	// value: A string
 	// flags: {max:Number, min:Number, decimal:String}

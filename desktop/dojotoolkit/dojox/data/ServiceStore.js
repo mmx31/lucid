@@ -118,7 +118,7 @@ dojo.declare("dojox.data.ServiceStore",
 			//		property to look up value for	
 	
 			var val = this.getValue(item,property);
-			return val instanceof Array ? val : [val];
+			return val instanceof Array ? val : val === undefined ? [] : [val];
 		},
 
 		getAttributes: function(item){
@@ -201,23 +201,19 @@ dojo.declare("dojox.data.ServiceStore",
 			// items (maybe more than currently in the result set).
 			// for example:
 			//	| {totalCount:10,[{id:1},{id:2}]}
-			if(results instanceof Array){
-				for (var i = 0; i < results.length; i++){
-					results[i] = this._processResults(results[i], deferred).items;
-				}
-			}
-			else{
-				// index the results, assigning ids as necessary
+			
+			// index the results, assigning ids as necessary
 
-				if (results && typeof results == 'object'){
-					var id = results.__id;
-					if(!id){// if it hasn't been assigned yet
-						if(this.idAttribute){
-							// use the defined id if available
-							id = results[this.idAttribute];
-						}else{
-							id = this._currentId++;
-						}
+			if (results && typeof results == 'object'){
+				var id = results.__id;
+				if(!id){// if it hasn't been assigned yet
+					if(this.idAttribute){
+						// use the defined id if available
+						id = results[this.idAttribute];
+					}else{
+						id = this._currentId++;
+					}
+					if(id !== undefined){
 						var existingObj = this._index[id];
 						if(existingObj){
 							for(var j in existingObj){
@@ -228,6 +224,9 @@ dojo.declare("dojox.data.ServiceStore",
 						results.__id = id;
 						this._index[id] = results;
 					}
+				}
+				for (var i in results){
+					results[i] = this._processResults(results[i], deferred).items;
 				}
 			}
 			var count = results.length;
@@ -343,7 +342,9 @@ dojo.declare("dojox.data.ServiceStore",
 				// convert the different spellings
 				return this.fetch({
 						query: args.identity,
-						onComplete: args.onItem
+						onComplete: args.onItem,
+						onError: args.onError,
+						scope: args.scope
 					}).results;
 			}
 			return item;
