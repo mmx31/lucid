@@ -4,5 +4,7 @@
     "name": "Name",
     "email": "Email",
     "phone": "Phone Number",
-    "address": "Address"
+    "address": "Address",
+    "import": "Import",
+    "export": "Export"
 })
