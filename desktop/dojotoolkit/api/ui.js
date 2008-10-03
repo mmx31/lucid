@@ -257,10 +257,12 @@ api.ui = {
 			});
 		}
 		var button = new dijit.form.Button({label: cm.loadOrSave, onClick: dojo.hitch(this, function() { 
+			var solved = false;
 			dojo.forEach(file.getChildren(), function(item) {
 				if(item.type=="text/directory") {
 					if(file.path+item.name == address.getValue()) {
 						file.setPath(file.path+item.name);
+						solved = true;
 						return;
 					}
 				}
@@ -268,10 +270,14 @@ api.ui = {
 					if(file.path+item.name == address.getValue()) {
 						object.callback(file.path+item.name);
 						dialog.close();
+						solved = true;
 						return;
 					}
 				}		
 			});
+			if(!solved) {
+				object.callback(address.getValue());
+			}
 		})});
 		var ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function() {
 			object.callback(false);
