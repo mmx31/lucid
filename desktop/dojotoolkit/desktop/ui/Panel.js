@@ -235,6 +235,8 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				this.addChild(applet);
 				applet.startup();
 				desktop.ui.save();
+				this.unlock();
+				api.ui.notify(l.unlocknote);
 			}
 		});
 		win.show();

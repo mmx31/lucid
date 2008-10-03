@@ -8,5 +8,6 @@
 	"panelProperties": "Panel Properties",
 	"thickness": "Thickness",
 	"opacity": "Opacity",
-	"width": "Width"
+	"width": "Width",
+	"unlocknote": "Panel unlocked so you can move the new applet"
 })
