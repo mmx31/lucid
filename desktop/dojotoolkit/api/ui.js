@@ -257,11 +257,21 @@ api.ui = {
 			});
 		}
 		var button = new dijit.form.Button({label: cm.loadOrSave, onClick: dojo.hitch(this, function() { 
-			var p = address.getValue();
-			var f = "";
-			if(object.types) { f = select.getValue(); }
-			object.callback(p+f);
-			dialog.close();
+			dojo.forEach(file.getChildren(), function(item) {
+				if(item.type=="text/directory") {
+					if(file.path+item.name == address.getValue()) {
+						file.setPath(file.path+item.name);
+						return;
+					}
+				}
+				else {
+					if(file.path+item.name == address.getValue()) {
+						object.callback(file.path+item.name);
+						dialog.close();
+						return;
+					}
+				}		
+			});
 		})});
 		var ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function() {
 			object.callback(false);
