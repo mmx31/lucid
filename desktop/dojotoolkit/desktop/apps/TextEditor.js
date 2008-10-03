@@ -64,6 +64,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    this.statusbar.attr("label", msg.noFileOpen);
 	    this.window.addChild(this.editor);
 	    this.window.addChild(this.statusbar);
+	    this.editor.setDisabled(true);
 	    this.window.show();
 	    this.window.startup();
 		if(args.file) this._processOpen(args.file);
@@ -83,6 +84,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	processClose: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    this.editor.setDisabled(true);
+		this.editor.setValue("");
 	    this.newAs = false;
 	    this.editing = false;
 	    this.fileEditing = "";
