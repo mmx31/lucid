@@ -24,14 +24,29 @@ dojo.declare("desktop.apps._App", null, {
 		this.instance = info.instance;
 		this.compatible = info.compatible;
 		if(!desktop.version.isCompatible(info.compatible)) {
-			api.ui.alertDialog({title: this.name, message: "This program is not compatible with this version of Lucid Desktop.<br>Please check the Lucid Desktop site or contact the application distributor for a compatible edition.<br><br>App: "+this.compatible+"<br>Desktop: "+desktop.version.toString()});
-			this.status = "killed";
-			var pid = this.instance;
-			//allow the garbage collector to free up memory
-			setTimeout(function(){
-				desktop.app.instances[pid]=null;
-			}, desktop.config.window.animSpeed + 1000);
-			return false;
+			api.ui.yesnoDialog({title: "Compatibility Note: "+this.name, message: "This program may not be compatible with this version of Lucid Desktop.<br>Please check the Lucid Desktop site or contact the application distributor for a compatible edition.<br><br>App: "+this.compatible+"<br>Desktop: "+desktop.version.toString()+"<br><br><br>Launching this application may cause undesired effects.<br>Are you sure you wish to launch the application?",callback: dojo.hitch(this, function(value) {
+			if(value) {
+				try {
+					this.init(info.args||{});
+				}
+				catch(e) {
+					console.error(e);
+				}
+				this.status = "active";
+				if(typeof info.callback == "function") info.callback(this);
+			}
+			else {
+				this.status = "killed";
+				var pid = this.instance;
+				//allow the garbage collector to free up memory
+				setTimeout(function(){
+					desktop.app.instances[pid]=null;
+				}, desktop.config.window.animSpeed + 1000);
+				return false;
+			}
+			})
+			});
+			return;
 		}
 		try {
 			this.init(info.args||{});
