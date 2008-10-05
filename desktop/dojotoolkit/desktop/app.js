@@ -109,6 +109,17 @@ desktop.app = {
 			for (app in this.appList) {
 				for (key in this.appList[app].filetypes) {
 					var parts = this.appList[app].filetypes[key].split("/");
+					if (parts[0] == typeParts[0] && (parts[1] == typeParts[1])) {
+						if(file) args.file = file;
+						desktop.app.launch(this.appList[app].sysname, args);
+						return;
+					}
+				}
+			}
+			var typeParts = type.split("/");
+			for (app in this.appList) {
+				for (key in this.appList[app].filetypes) {
+					var parts = this.appList[app].filetypes[key].split("/");
 					if (parts[0] == typeParts[0] && (parts[1] == "*" || parts[1] == typeParts[1])) {
 						if(file) args.file = file;
 						desktop.app.launch(this.appList[app].sysname, args);
