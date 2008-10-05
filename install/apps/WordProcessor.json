@@ -7,7 +7,7 @@
 	"version": "1.0",
 	"maturity": "Stable",
 	"category": "Office",
-    "icon": "icon-16-mimetypes-x-office-document"
+    "icon": "icon-16-mimetypes-x-office-document",
 	"filetypes": ["text/html"],
 	"compatible": "1.0.0"
 }
