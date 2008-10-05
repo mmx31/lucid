@@ -24,7 +24,7 @@ dojo.declare("desktop.apps._App", null, {
 		this.instance = info.instance;
 		this.compatible = info.compatible;
 		if(!desktop.version.isCompatible(info.compatible)) {
-			api.ui.alertDialog({title: "Lucid Desktop", message: "This program is not compatible with this version of Lucid Desktop"});
+			api.ui.alertDialog({title: this.name, message: "This program is not compatible with this version of Lucid Desktop.<br>Please check the Lucid Desktop site or contact the application distributor for a compatible edition.<br><br>App: "+this.compatible+"<br>Desktop: "+desktop.version.toString()});
 			this.status = "killed";
 			var pid = this.instance;
 			//allow the garbage collector to free up memory
