@@ -258,8 +258,8 @@ api.ui = {
 		}
 		var button = new dijit.form.Button({label: cm.loadOrSave, onClick: dojo.hitch(this, function() { 
 			var solved = false;
-			dojo.forEach(file.getChildren(), function(item) {
-				if(item.type=="text/directory") {
+			dojo.forEach(file.getChildren(), function(item) { //Works for existing files
+				if(item.type=="text/directory") { // Is it a directory?
 					if(file.path+item.name == address.getValue()) {
 						file.setPath(file.path+item.name);
 						solved = true;
@@ -267,7 +267,7 @@ api.ui = {
 					}
 				}
 				else {
-					if(file.path+item.name == address.getValue()) {
+					if(file.path+item.name == address.getValue()) { // Is it a file?
 						object.callback(file.path+item.name);
 						dialog.close();
 						solved = true;
@@ -275,8 +275,9 @@ api.ui = {
 					}
 				}		
 			});
-			if(!solved) {
+			if(!solved) { //Are we creating a new file?
 				object.callback(address.getValue());
+				dialog.close();
 			}
 		})});
 		var ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function() {
