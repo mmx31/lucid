@@ -28,7 +28,7 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 	    });
-
+		var content = this.content = new dijit.layout.ContentPane({region: "center"});
         var store = this.store = new dojo.data.ItemFileWriteStore({
             data: {
                 id: "instance",
@@ -49,7 +49,8 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
             store: store,
             query: {instance: "*"}
 	    });
-	    this.win.addChild(this.grid);
+		content.setContent(this.grid.domNode);
+	    this.win.addChild(content);
 	    this.win.show();
 	    this.win.startup();
 	    this.timer = setTimeout(dojo.hitch(this, "update"), 1000);
@@ -132,7 +133,7 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 	    }
 	    this.home();
 	
-	},
+	}/*,
 	home: function() {
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
@@ -151,5 +152,5 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 	    }
 	    this.main.setContent(html);
 	    this.timer = setTimeout(dojo.hitch(this, this.home), 1000);
-	}
+	}*/
 })
