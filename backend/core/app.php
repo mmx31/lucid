@@ -87,7 +87,7 @@
 					if($continue) continue;
 				}
 				$item = array();
-				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "icon", "filetypes") as $key) {
+				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "icon", "filetypes", 'compatible') as $key) {
 					$item[$key] = $v->$key;
 				}
 				array_push($list, $item);
@@ -102,7 +102,7 @@
 			foreach($p as $d => $v)
 			{
 				$item = array();
-				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "filetypes") as $key) {
+				foreach(array("sysname", "name", "author", "email", "maturity", "category", "version", "filetypes", "compatible") as $key) {
 					$item[$key] = $v->$key;
 				}
 				$item["files"] = array();

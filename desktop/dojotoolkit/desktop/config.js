@@ -8,6 +8,13 @@ desktop.version = {
 	flag: "dev",
 	toString: function() {
 		return this.major+"."+this.minor+"."+this.patch+this.flag;
+	},
+	isCompatible: function(version) {
+		//in the future, we will need to add numbers for future releases
+		if(this.major+"."+this.minor+"."+this.patch == version) //Same version as installed; obviously compatible
+			return true;
+		var versionArray = version.split("."); 
+		//Insert compatiblity data here once we release a new release.
 	}
 };
 

@@ -101,6 +101,7 @@ class package {
 		$app->version = $info['version'];
 		$app->maturity = $info['maturity'];
 		$app->category = $info['category'];
+		$app->compatible = $info['compatible'];
 		$app->filetypes = array_key_exists('filetypes', $info) ? $info['filetypes'] : array();
 		$app->permissions = array_key_exists('permissions', $info) ? $info['permissions'] : array();
 		if(array_key_exists('icon', $info)) $app->icon = $info['icon'];

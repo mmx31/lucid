@@ -7,6 +7,7 @@ dojo.declare("desktop.apps._App", null, {
 	instance: -1,
 	status: "",
 	iconClass: "",
+	compatible: "",
 	constructor: function(info) {
 		this.status = "init";
 		this.name = info.name;
@@ -21,6 +22,16 @@ dojo.declare("desktop.apps._App", null, {
 			}, desktop.config.window.animSpeed + 1000);
         });
 		this.instance = info.instance;
+		if(!desktop.version.isCompatible(this.compatible)) {
+			api.ui.alertDialog({title: "Lucid Desktop", message: "This program is not compatible with this version of Lucid Desktop"});
+			this.status = "killed";
+			var pid = this.instance;
+			//allow the garbage collector to free up memory
+			setTimeout(function(){
+				desktop.app.instances[pid]=null;
+			}, desktop.config.window.animSpeed + 1000);
+			return false;
+		}
 		try {
 			this.init(info.args||{});
 		}
