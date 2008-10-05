@@ -16,6 +16,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 		desktop.app.list(dojo.hitch(this, function(data) {
 			for(var i=0;i<data.length;i++) {
 				data[i].filetypes = data[i].filetypes.join(", ");
+				data[i].compatible = data[i].compatible.join(", ");
 				data[i].name = apps[data[i].name] || data[i].name;
 				data[i].category = mnus[data[i].category.toLowerCase()];
 				delete data[i].files;
@@ -98,6 +99,13 @@ dojo.extend(desktop.apps.AdminPanel, {
 			onComplete: dojo.hitch(this, function(data,ioArgs,widgetRef) {
 				if(data.status && data.status == "success"){
 					widgetRef.overlay.innerHTML = sys.appInstallSuccess;
+					//check for compatibility
+					if(!data.compatible) {
+					    api.ui.alertDialog({
+					        title: sys.notCompatible,
+					        message: sys.notCompatibleText
+					    });
+					}
 					this.apps.call(this, []);
 				}else{
 					widgetRef.overlay.innerHTML = cmn.error+": "+data.error;

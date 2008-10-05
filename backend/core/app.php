@@ -40,8 +40,9 @@
 			if(isset($_FILES['uploadedfile']['name'])) {
 				$target_path = '../../tmp/'.$_FILES['uploadedfile']['name'];
 				if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)
-				&& package::install($target_path)) {
-					$out->append("status", "success");
+				&& $res = package::install($target_path)) {
+    				$out->append("status", "success");
+                    $out->append("compatible", package::compatible($res["compatible"]));
 				} else{
 				   $out->append("error", "Problem accessing uploaded file");
 				}

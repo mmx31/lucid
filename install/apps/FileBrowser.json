@@ -9,5 +9,5 @@
 	"category": "System",
 	"icon": "icon-16-apps-system-file-manager",
 	"filetypes": ["text/directory"],
-	"compatible": "1.0.0"
+	"compatible": ["1.0.0"]
 }

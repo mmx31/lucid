@@ -9,5 +9,5 @@
 	"category": "Preferences",
 	"icon": "icon-16-apps-preferences-desktop-theme",
 	"filetypes": [],
-	"compatible": "1.0.0"
+	"compatible": ["1.0.0"]
 }

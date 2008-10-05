@@ -9,5 +9,5 @@
 	"category": "System",
 	"icon": "icon-16-apps-utilities-system-monitor",
 	"filetypes": [],
-	"compatible": "1.0.0"
+	"compatible": ["1.0.0"]
 }

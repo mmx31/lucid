@@ -60,5 +60,8 @@
 	"themes": "Themes",
 	"preview": "Preivew",
 	"quota": "Quota",
-	"unlimited": "Unlimited"
+	"unlimited": "Unlimited",
+	"compatible": "Compatibility",
+	"notCompatible": "Package incompatible",
+	"notCompatibleText": "The package you have installed may be incompatible with this version of Lucid. Please check the provider's site for an up-to-date version."
 })

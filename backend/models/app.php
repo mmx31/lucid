@@ -19,7 +19,7 @@
 		var $icon = array('type' => "text");
 		var $filetypes = array('type' => "array");
 		var $permissions = array('type' => "array");
-		var $compatible = array('type' => "text");
+		var $compatible = array('type' => "array");
 	}
 	global $App;
 	$App = new App();

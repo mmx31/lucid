@@ -59,5 +59,8 @@
 	"preview": "Preview",
 	"markAsRead": "Marcar como leído",
 	"quota": "Cuota",
-	"unlimited": "Ilimitado"
+	"unlimited": "Ilimitado",
+	"compatible": "Compatibilidad",
+	"notCompatible": "Paquete incompatible",
+	"notCompatibleText": "El paquete que ha instalado puede ser incompatible con esta versión de Lucid. Por favor, compruebe el sitio del proveedor para una actualizada versión."
 })

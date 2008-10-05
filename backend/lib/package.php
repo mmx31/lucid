@@ -12,6 +12,16 @@ import("models.app");
 import("lib.unzip");
 
 class package {
+    function compatible($versions) {
+        $data = file_get_contents($GLOBALS['path']."../desktop/dojotoolkit/desktop/resources/version.json");
+        $version = Zend_Json::decode($data);
+        foreach($versions as $check) {
+            $check = explode(".", $check);
+            if(!($check[0] == $version["major"] && $check[1] == $version["minor"]))
+                return false;
+        }
+        return true;
+    }
 	function install($path, $unzip=true) {
 		if($unzip) {
 			$zip = new dUnzip2($path);
