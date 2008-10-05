@@ -88,6 +88,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	
 		setTimeout(dojo.hitch(this, function() {
 			editor = dijit.byId(editor.id);
+			editor.extraPlugins = [];
 			delete editor.toolbar;
 			editor.postCreate();
 			if(args.file) 

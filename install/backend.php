@@ -182,7 +182,6 @@
 			"../backend/configuration.php",
 			"../files/",
 			"../public/",
-			"../apps/",
 			"../tmp/",
 			"../desktop/dojotoolkit/desktop/resources/themes/",
 			"../desktop/dojotoolkit/desktop/apps/"

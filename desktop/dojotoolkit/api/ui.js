@@ -262,6 +262,28 @@ api.ui = {
 			if(object.types) { f = select.getValue(); }
 			object.callback(p+f);
 			dialog.close();
+			var solved = false;
+			dojo.forEach(file.getChildren(), function(item) { //Works for existing files
+				if(item.type=="text/directory") { // Is it a directory?
+					if(file.path+item.name == address.getValue()) {
+						file.setPath(file.path+item.name);
+						solved = true;
+						return;
+					}
+				}
+				else {
+					if(file.path+item.name == address.getValue()) { // Is it a file?
+						object.callback(file.path+item.name);
+						dialog.close();
+						solved = true;
+						return;
+					}
+				}		
+			});
+			if(!solved) { //Are we creating a new file?
+				object.callback(address.getValue());
+				dialog.close();
+			}
 		})});
 		var ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function() {
 			object.callback(false);

@@ -109,6 +109,17 @@ desktop.app = {
 			for (app in this.appList) {
 				for (key in this.appList[app].filetypes) {
 					var parts = this.appList[app].filetypes[key].split("/");
+					if (parts[0] == typeParts[0] && (parts[1] == typeParts[1])) {
+						if(file) args.file = file;
+						desktop.app.launch(this.appList[app].sysname, args);
+						return;
+					}
+				}
+			}
+			var typeParts = type.split("/");
+			for (app in this.appList) {
+				for (key in this.appList[app].filetypes) {
+					var parts = this.appList[app].filetypes[key].split("/");
 					if (parts[0] == typeParts[0] && (parts[1] == "*" || parts[1] == typeParts[1])) {
 						if(file) args.file = file;
 						desktop.app.launch(this.appList[app].sysname, args);
@@ -140,15 +151,18 @@ desktop.app = {
 			pid = desktop.app.instances.length;
 			var realName = "";
 			var icon = "";
+			var compatible = "";
 			dojo.forEach(desktop.app.appList, function(item) {
 				if(item.sysname != name) return;
 				realName = item.name;
 				icon = item.icon;
+				compatible = item.compatible;
 			})
 			var instance = desktop.app.instances[pid] = new desktop.apps[name]({
 				sysname: name,
 				name: realName,
 				instance: pid,
+				compatible: compatible,
 				icon: icon,
 				args: args,
 				callback: callback
