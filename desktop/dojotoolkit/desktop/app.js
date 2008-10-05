@@ -151,15 +151,18 @@ desktop.app = {
 			pid = desktop.app.instances.length;
 			var realName = "";
 			var icon = "";
+			var compatible = "";
 			dojo.forEach(desktop.app.appList, function(item) {
 				if(item.sysname != name) return;
 				realName = item.name;
 				icon = item.icon;
+				compatible = item.compatible;
 			})
 			var instance = desktop.app.instances[pid] = new desktop.apps[name]({
 				sysname: name,
 				name: realName,
 				instance: pid,
+				compatible: compatible,
 				icon: icon,
 				args: args,
 				callback: callback

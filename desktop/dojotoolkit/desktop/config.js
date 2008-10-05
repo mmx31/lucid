@@ -11,10 +11,13 @@ desktop.version = {
 	},
 	isCompatible: function(version) {
 		//in the future, we will need to add numbers for future releases
+		console.log(this.major+"."+this.minor+"."+this.patch);
+		console.log(version);
 		if(this.major+"."+this.minor+"."+this.patch == version) //Same version as installed; obviously compatible
 			return true;
-		var versionArray = version.split("."); 
+		var versionArray = version.split(".");
 		//Insert compatiblity data here once we release a new release.
+		return false;
 	}
 };
 

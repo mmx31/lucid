@@ -22,7 +22,8 @@ dojo.declare("desktop.apps._App", null, {
 			}, desktop.config.window.animSpeed + 1000);
         });
 		this.instance = info.instance;
-		if(!desktop.version.isCompatible(this.compatible)) {
+		this.compatible = info.compatible;
+		if(!desktop.version.isCompatible(info.compatible)) {
 			api.ui.alertDialog({title: "Lucid Desktop", message: "This program is not compatible with this version of Lucid Desktop"});
 			this.status = "killed";
 			var pid = this.instance;
