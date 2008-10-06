@@ -8,5 +8,5 @@
 	"maturity": "Stable",
 	"category": "Graphics",
 	"filetypes": ["image/*"],
-	"compatible": "1.0.0"
+	"compatible": ["1.0.0"]
 }

@@ -9,5 +9,5 @@
 	"category": "Internet",
 	"icon": "icon-16-apps-internet-web-browser",
 	"filetypes": ["text/x-uri"],
-	"compatible": "1.0.0"
+	"compatible": ["1.0.0"]
 }

@@ -9,5 +9,5 @@
 	"category": "Accessories",
 	"icon": "icon-16-apps-accessories-text-editor",
 	"filetypes": ["text/*"],
-	"compatible": "1.0.0"
+	"compatible": ["1.0.0"]
 }

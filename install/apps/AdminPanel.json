@@ -9,5 +9,5 @@
 	"category": "Administration",
 	"filetypes": [],
 	"permissions": ["core.administration"],
-	"compatible": "1.0.0"
+	"compatible": ["1.0.0"]
 }

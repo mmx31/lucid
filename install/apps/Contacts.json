@@ -9,5 +9,5 @@
 	"category": "Office",
 	"icon": "icon-16-mimetypes-x-office-address-book",
 	"filetypes": [],
-	"compatible": "1.0.0"
+	"compatible": ["1.0.0"]
 }

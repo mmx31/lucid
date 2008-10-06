@@ -1,25 +1,22 @@
 dojo.provide("desktop.version");
 dojo.provide("desktop.config");
-
 desktop.version = {
-	major: 1,
-	minor: 0,
-	patch: 0,
-	flag: "dev",
-	toString: function() {
-		return this.major+"."+this.minor+"."+this.patch+this.flag;
-	},
-	isCompatible: function(version) {
-		//in the future, we will need to add numbers for future releases
-		console.log(this.major+"."+this.minor+"."+this.patch);
-		console.log(version);
-		if(this.major+"."+this.minor+"."+this.patch == version) //Same version as installed; obviously compatible
-			return true;
-		var versionArray = version.split(".");
-		//Insert compatiblity data here once we release a new release.
-		return false;
-	}
+    major: 0,
+    minor: 0,
+    patch: 0,
+    flag: "dev",
+    toString: function() {
+	    return this.major+"."+this.minor+"."+this.patch+"."+this.flag;
+    }
 };
+dojo.xhrGet({
+    url: dojo.moduleUrl("desktop.resources", "version.json"),
+    sync: true, //so that we have the version ready before doing anything else
+    load: function(data) {
+        dojo.mixin(desktop.version, data);
+    },
+    handleAs: "json"
+})
 
 desktop.config = {
 	//	summary:
