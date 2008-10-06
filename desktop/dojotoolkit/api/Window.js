@@ -86,6 +86,9 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 	//	resizable: Boolean
 	//		Weather or not the window is resizable.
 	resizable: true,
+    //  alwaysOnTop: Boolean
+    //      Weather or not the window stays on top of all the other windows.
+    alwaysOnTop: false,
 	//	pos: Object
 	//		Internal variable used by the window maximizer
 	pos: {},
