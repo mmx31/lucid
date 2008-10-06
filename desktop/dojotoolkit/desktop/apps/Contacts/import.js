@@ -19,6 +19,18 @@ dojo.provide("desktop.apps.Contacts.import");
 
         },
         importData: function(path, onComplete, onError) {
+            api.filesystem.readFileContents(path, function(data) {
+                var re = /([^\:\;\s]+)((;[\w=]+\:)|(\:))([\S ]+)/mgi;
+                var matches = data.match(re);
+                dojo.forEach(matches, function(match) {
+                    console.log(match);
+                    var info = re.exec(match);
+                    if(!info) return;
+                    var key = info[1];
+                    var value = info[5];
+                    console.log(key, value);
+                });
+            }, onError);
         }
     });
 })();
