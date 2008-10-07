@@ -20,12 +20,14 @@ dojo.provide("desktop.apps.Contacts.export");
         },
         exportData: function(path, onComplete, onError) {
             var data = [];
-            this.contactStore.fetch({
+            var store = this.contactStore;
+            store.fetch({
                 query: {id: "*"},
                 onItem: function(item) {
                    var card = "BEGIN:VCARD\nVERSION:3.0\n";
                    for(var key in keys) {
-                       card += keys[key]+":"+this.getValue(item, key)+"\n";
+                       if(store.hasAttribute(item, key) && store.getValue(item, key) != "")
+                           card += keys[key]+":"+store.getValue(item, key)+"\n";
                    }
                    card += "END:VCARD";
                    data.push(card);
