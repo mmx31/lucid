@@ -30,7 +30,8 @@ dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
 		    }
 		});
 		dojo.connect(contactStore, "onSet", function() { contactStore.save(); });
-		
+		dojo.connect(contactStore, "onDelete", function() { contactStore.save(); });
+        dojo.connect(contactStore, "onNew", function() { contactStore.save(); });
 		var toolbar = new dijit.Toolbar({region: "top"});
 		
 		var newButton = new dijit.form.Button({
