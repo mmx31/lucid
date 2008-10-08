@@ -44,7 +44,10 @@ if($_GET['section'] == "package" && $cur->has_permission("core.administration"))
 			$_FILES['uploadedfile']['name'] = str_replace("..", "", $_FILES['uploadedfile']['name']);
 			$target_path = '../../tmp/'.$_FILES['uploadedfile']['name'];
 			if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
-				if(package::install($target_path)) $out->append("status", "success");
+				if($res = package::install($target_path)){
+                    $out->append("status", "success");
+                    $out->append("compatible", package::compatible($res["compatible"]));
+                }
 				else $out->append("error", "Problem installing package");
 			} else{
 			   $out->append("error", "Problem accessing uploaded package");

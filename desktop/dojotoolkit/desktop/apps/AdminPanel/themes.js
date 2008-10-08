@@ -98,6 +98,13 @@ dojo.extend(desktop.apps.AdminPanel, {
 			onComplete: dojo.hitch(this, function(data,ioArgs,widgetRef) {
 				if(data.status && data.status == "success"){
 					widgetRef.overlay.innerHTML = sys.themeInstallSuccess;
+                    //check for compatibility
+					if(!data.compatible) {
+					    api.ui.alertDialog({
+					        title: sys.notCompatible,
+					        message: sys.notCompatibleText
+					    });
+					}
 					this.themes.call(this, []);
 				}else{
 					widgetRef.overlay.innerHTML = cmn.error+": "+data.error;
