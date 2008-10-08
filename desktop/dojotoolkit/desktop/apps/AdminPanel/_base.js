@@ -80,8 +80,8 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 	permDialog: function(grid, lbl, permissions, callback) {
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
-		var perms = dojo.i18n.getLocalization("desktop", "permissions");
-		var row = grid.model.getRow(this.__rowIndex).__dojo_data_item;
+		var permsNls = dojo.i18n.getLocalization("desktop", "permissions");
+		var row = grid.getItem(this.__rowIndex);
 		var perms = permissions(row);
 		this.__rowIndex = null;
 		var win = new api.Window({
@@ -100,10 +100,10 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 				var tr = document.createElement("tr");
 				
 				var td = document.createElement("td");
-				td.textContent = item.name;
+				td.innerHTML = item.name;
 				tr.appendChild(td);
 				var td = document.createElement("td");
-				td.textContent = perms[item.name] || item.description;
+				td.innerHTML = permsNls[item.name] || item.description;
 				tr.appendChild(td);
 				
 				var td = document.createElement("td");
