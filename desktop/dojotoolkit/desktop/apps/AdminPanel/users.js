@@ -15,6 +15,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			for(var i=0;i<data.length;i++) {
 				data[i].permissions = dojo.toJson(data[i].permissions);
 				data[i].groups = dojo.toJson(data[i].groups);
+                data[i].logged = !!data[i].logged;
 			};
 			var layout = [{
 				cells: [[]]
@@ -29,6 +30,9 @@ dojo.extend(desktop.apps.AdminPanel, {
 				if(field == "name" || field == "username" || field == "email") {
                     args.type = dojox.grid.cells.Cell;
                     args.editable = true;
+                }
+                if(field == "logged") {
+                    args.type = dojox.grid.cells.Bool;
                 }
 				layout[0].cells[0].push(args);
 			}
