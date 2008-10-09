@@ -1,14 +1,13 @@
-dojo.provide("desktop.apps.KatanaIDE._codeTextArea.plugins.Bookmarks");
+dojo.provide("dojox.widget._codeTextArea.plugins.Bookmarks");
 dojo.require("dijit.Menu");
 dojo.require("dijit.Dialog");
 
-desktop.apps.KatanaIDE._codeTextArea.plugins.Bookmarks.startup = function(args){
+dojox.widget._codeTextArea.plugins.Bookmarks.startup = function(args){
 	var targetLine = 0;
 	var targetBookmark = {};
 	var bookmarks = [];
 	
     var source = args.source;
-	var areaCoords = dojo.coords(source.domNode);
 	var lineHeight = source.lineHeight;
 	var _action = "add";
 	// right bar
@@ -17,10 +16,6 @@ desktop.apps.KatanaIDE._codeTextArea.plugins.Bookmarks.startup = function(args){
 	with(bookmarksBar.style){
 		height = source.getHeight() + "px";
 	}
-
-//    dijit.placeOnScreenAroundElement(bookmarksBar, source.domNode, {'TR' : 'TL'});
-//	source.domNode.parentNode.appendChild(bookmarksBar);
-
 
 	// dialog
 	var _bookmarkDialogNode = document.createElement("div");
@@ -113,6 +108,7 @@ desktop.apps.KatanaIDE._codeTextArea.plugins.Bookmarks.startup = function(args){
             dojo.stopEvent(evt);
             document.body.focus();
         }
+        evt.stopPropagation();
     });
 	var hasBookmark = function(index){
 		var _hasBookmark = false;
@@ -148,11 +144,10 @@ desktop.apps.KatanaIDE._codeTextArea.plugins.Bookmarks.startup = function(args){
 		_action = "remove";
 	};
 
-	var leftBandMenu = new dijit.Menu({id:[source.leftBand.id] + "-menu"});
-	leftBandMenu.bindDomNode(source.leftBand);
+	var leftBandMenu = new dijit.Menu({targetNodeIds: [source.leftBand.id], id:[source.leftBand.id] + "-menu"});
 
 	var onMenuOpen = function(e){
-		targetLine = parseInt((e.y - areaCoords.y) / lineHeight);
+		targetLine = parseInt((e.y + source.domNode.scrollTop - dojo.coords(source.domNode).y) / lineHeight);
 		leftBandMenu.destroyDescendants();
 		var menuItem;
 		if(!hasBookmark(targetLine)){

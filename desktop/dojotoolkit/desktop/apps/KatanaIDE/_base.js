@@ -310,31 +310,42 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			height: "100%",
 			overflow: "hidden"
 		});
-		this.store.fetchItemByIdentity({
-			identity: "useEditorLite",
-			onItem: dojo.hitch(this, function(item) {
-				var editor = new desktop.apps.KatanaIDE[!this.store.getValue(item, "value") ? "CodeTextArea" : "EditorLite"]({
-					width: "100%",
-					height: "100%",
-					plugins: "BlinkingCaret GoToLineDialog Bookmarks MatchingBrackets",
-					colorsUrl: dojo.moduleUrl("desktop.apps.KatanaIDE.data", "javascript_dojo_color.json"),
-					autocompleteUrl: dojo.moduleUrl("desktop.apps.KatanaIDE.data", "javascript_dojo_ac.json"),
-					
-					closable: true,
-					title: filename.substring(filename.lastIndexOf("/")+1) || filename,
-					ide_info: {
-						fileName: filename,
-						appName: appname,
-						editor: editor
-					}
+		this.store.fetch({
+			query: {key:"useEditorLite"},
+			onComplete: dojo.hitch(this, function(items) {
+			    var item = items[0];
+				var pane = new dijit.layout.ContentPane({
+				    closable: true,
+				    style: "padding: 0px; overflow: hidden;",
+					title: filename.substring(filename.lastIndexOf("/")+1) || filename
 				});
-				this.tabArea.addChild(editor);
-				this.tabArea.selectChild(editor);
-				editor.startup();
-				if(content != "")
-					editor.massiveWrite(content);
-				editor.setCaretPosition(0, 0); 
-				setTimeout(dojo.hitch(this.tabArea, "layout"), 100);
+				pane.setContent(div);
+				this.tabArea.addChild(pane);
+				this.tabArea.selectChild(pane);
+				var editor = new desktop.apps.KatanaIDE[this.store.getValue(item, "value") ? "EditorLite" : "CodeTextArea"]({
+				    plugins: "BlinkingCaret GoToLineDialog Bookmarks MatchingBrackets",
+				    resizeTo: pane.id,
+				    colorsUrl: dojo.moduleUrl("desktop.apps.KatanaIDE.data", "javascript_dojo_color.json"),
+				    autocompleteUrl: dojo.moduleUrl("desktop.apps.KatanaIDE.data", "javascript_dojo_ac.json")
+			    }, div);
+			    pane.ide_info = {
+				    fileName: filename,
+				    appName: appname,
+				    editor: editor
+			    }
+			    editor.startup();
+				dojo.connect(pane, "onClose", function() {
+				    pane.resize = function() {};
+				    editor.destroy();
+				});
+				setTimeout(dojo.hitch(this, function() {
+				    if(content != "")
+					    editor.massiveWrite(content);
+					editor.parseFragment(0, 0);
+					editor.setCaretPosition(0,0);
+					editor.parseViewport(); 
+                    this.tabArea.layout();
+				}), 200);
 			})
 		})
 	},
