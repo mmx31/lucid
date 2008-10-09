@@ -10,6 +10,11 @@ dojo.require("dojox.data.dom");
 dojo.require("dijit._Templated");
 dojo.require("dijit.form.ComboBox");
 
+dojo.require("desktop.apps.KatanaIDE._codeTextArea.plugins.BlinkingCaret");
+dojo.require("desktop.apps.KatanaIDE._codeTextArea.plugins.GoToLineDialog");
+dojo.require("desktop.apps.KatanaIDE._codeTextArea.plugins.Bookmarks");
+dojo.require("desktop.apps.KatanaIDE._codeTextArea.plugins.MatchingBrackets");
+
 dojo.declare(
     "desktop.apps.KatanaIDE.CodeTextArea",
 	[dijit._Widget, dijit._Templated],
@@ -136,16 +141,16 @@ dojo.declare(
 
             this.attachEvents();
             document.body.focus();
-            dojo.connect(dojo.body(), "onclick", this, function(e){ 
-				e.stopPropagation();
-				return false; 
-			});
+            //dojo.connect(dojo.body(), "onclick", this, function(e){ 
+			//	e.stopPropagation();
+			//	return false; 
+			//});
             //dojo.connect(this.domNode, "onmouseup", this, "setCaretPositionAtPointer");
             dojo.connect(this.domNode, "onmouseup", this, "mouseUpHandler");
             dojo.connect(this.domNode, "onmousedown", this, "startSelection");
 //            dojo.connect(this.domNode, "onmousemove", this, "mouseMoveHandler");
 //            dojo.connect(document.body, "onselectstart", this, "startSelection"); // ie
-            dojo.connect(this.domNode, "onclick", this, "blur");
+            //dojo.connect(this.domNode, "onclick", this, "blur");
             this.setCaretPosition(0, 0); 
         },
 		mouseUpHandler: function(e){
@@ -162,10 +167,11 @@ dojo.declare(
 			this.addToSelection(kwPar);
 		},
         startSelection: function(e){
-			if(this.getSelection().getSelectedText().length){
-				this.getSelection().collapse();
-			}
+    		if(this.getSelection().getSelectedText().length){
+    			if(e.button != 2) this.getSelection().collapse();
+    		}
 			this.setCaretPositionAtPointer(e);
+			
 			this.selectInProgress = true;
 //            dojo.stopEvent(e);
 //            e.preventDefault();

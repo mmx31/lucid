@@ -1,6 +1,6 @@
-dojo.provide("dojox.widget._codeTextArea.plugins.MatchingBrackets");
+dojo.provide("desktop.apps.KatanaIDE._codeTextArea.plugins.MatchingBrackets");
 
-dojox.widget._codeTextArea.plugins.MatchingBrackets.startup = function(args){
+desktop.apps.KatanaIDE._codeTextArea.plugins.MatchingBrackets.startup = function(args){
 	var source = args.source;
 	var brackets = [];
 	var currentBrackets = [];

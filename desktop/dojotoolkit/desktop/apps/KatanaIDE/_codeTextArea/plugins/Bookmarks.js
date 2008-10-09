@@ -1,8 +1,8 @@
-dojo.provide("dojox.widget._codeTextArea.plugins.Bookmarks");
+dojo.provide("desktop.apps.KatanaIDE._codeTextArea.plugins.Bookmarks");
 dojo.require("dijit.Menu");
 dojo.require("dijit.Dialog");
 
-dojox.widget._codeTextArea.plugins.Bookmarks.startup = function(args){
+desktop.apps.KatanaIDE._codeTextArea.plugins.Bookmarks.startup = function(args){
 	var targetLine = 0;
 	var targetBookmark = {};
 	var bookmarks = [];
