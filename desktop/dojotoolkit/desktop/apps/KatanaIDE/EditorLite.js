@@ -10,7 +10,8 @@ dojo.declare("desktop.apps.KatanaIDE.EditorLite", dijit.form.SimpleTextarea, {
 			width: this.width,
 			height: this.height
 		});
-		this.connect("onkeypress", this, "_onKey");
+		dojo.connect(this.domNode, "onkeypress", this, "_onKey");
+		dojo.style(this.domNode, "fontFamily", "monospace");
 	},
 	_onKey: function(e) {
 		dojo.fixEvent(e);
@@ -43,5 +44,7 @@ dojo.declare("desktop.apps.KatanaIDE.EditorLite", dijit.form.SimpleTextarea, {
 	},
 	getContent: function() {
 		return this.getValue();
-	}
+	},
+	parseFragment: function(x, y) {},
+	parseViewport: function() {}
 })

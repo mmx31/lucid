@@ -243,6 +243,122 @@
 				}
 			}
 		},
+		"dijit":{
+			children: {
+				BackgroundIframe: {
+				},
+				ColorPalette: {
+				},
+				Declaration: {
+				},
+				Dialog: {
+				},
+				DialogUnderlay: {
+				},
+				Editor: {
+				},
+				InlineEditBox: {
+				},
+				Menu: {
+				},
+				MenuItem: {
+				},
+				MenuSeparator: {
+				},
+				PopMenuItem: {
+				},
+				ProgressBar: {
+				},
+				TitlePane: {
+				},
+				Toolbar: {
+				},
+				ToolbarSeparator: {
+				},
+				Tooltip: {
+				},
+				TooltipDialog: {
+				},
+				Tree: {
+				},
+				WidgetSet: {
+				},
+				byId: {
+				},
+				byNode: {
+				},
+				defaultDuration: {
+				},
+				focus: {
+				},
+				form: {
+				},
+				getBookmark: {
+				},
+				getDocumentWindow: {
+				},
+				getEnclosingWidget: {
+				},
+				getFirstInTabbingOrder: {
+				},
+				getFocus: {
+				},
+				getLastInTabbingOrder: {
+				},
+				getUniqueId: {
+				},
+				getViewport: {
+				},
+				getWaiRole: {
+				},
+				getWaiState: {
+				},
+				hasWaiRole: {
+				},
+				hasWaiState: {
+				},
+				isCollapsed: {
+				},
+				isTabNavigable: {
+				},
+				layout: {
+				},
+				moveToBookmark: {
+				},
+				placeOnScreen: {
+				},
+				placeOnScreenAroundElement: {
+				},
+				placeOnScreenAroundNode: {
+				},
+				placeOnScreenAroundRectangle: {
+				},
+				placementRegistry: {
+				},
+				popup: {
+				},
+				range: {
+				},
+				registerWin: {
+				},
+				registry: {
+				},
+				removeWaiRole: {
+				},
+				removeWaiState: {
+				},
+				scrollIntoView: {
+				},
+				setWaiRole: {
+				},
+				setWaiState: {
+				},
+				typematic: {
+				},
+				wai: {
+				}
+			}
+		},
     	"window": {
             link: {},
             children: {
@@ -257,6 +373,10 @@
                         "forms": {
                         },
                         "getElementById()": {
+                        },
+                        "getElementsByTagName()": {
+                        },
+                        "getElementsByName()": {
                         }
                     }
                 }, 

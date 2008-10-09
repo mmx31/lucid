@@ -25,5 +25,9 @@
     },
     "Color|Deferred|NodeList|addClass|addOnLoad|addOnUnload|animateProperty|attr|baseUrl|blendColors|body|boxModel|byId|clone|colorFromArray|colorFromHex|colorFromRgb|colorFromString|config|connect|connectPublisher|contentBox|coords|declare|delegate|deprecated|disconnect|doc|eval|every|exists|experimental|extend|fadeIn|fadeOut|filter|fixEvent|forEach|formToJson|formToObject|formToQuery|fromJson|getComputedStyle|getObject|global|hasAttr|hasClass|hitch|indexOf|isAIR|isAlien|isArray|isArrayLike|isBrowser|isDescendant|isFF|isFunction|isGears|isIE|isKhtml|isMobile|isMoz|isMozilla|isObject|isOpera|isQuirks|isRhino|isSpidermonkey|isString|keys|lastIndexOf|loaded|locale|map|marginBox|mixin|moduleUrl|objectToQuery|partial|place|platformRequire|provide|publish|query|queryToObject|rawXhrPost|rawXhrPut|registerModulePath|removeAttr|removeClass|require|requireAfterIf|requireIf|requireLocalization|setContext|setObject|setSelectable|some|stopEvent|style|subscribe|toJson|toJsonIndentStr|toggleClass|trim|unloaded|unsubscribe|version|withDoc|withGlobal|xhr|xhrDelete|xhrGet|xhrPost|xhrPut|": {
         className: "dojoFunction"
-    }
+    },
+	"BackgroundIframe|ColorPalette|Declaration|Dialog|DialogUnderlay|Editor|InlineEditBox|Menu|MenuItem|MenuSeparator|PopMenuItem|ProgressBar|TitlePane|Toolbar|ToolbarSeparator|Tooltip|TooltipDialog|Tree|WidgetSet|byId|byNode|defaultDuration|focus|form|getBookmark|getDocumentWindow|getEnclosingWidget|getFirstInTabbingOrder|getFocus|getLastInTabbingOrder|getUniqueId|getViewport|getWaiRole|getWaiState|hasWaiRole|hasWaiState|isCollapsed|isTabNavigable|layout|moveToBookmark|placeOnScreen|placeOnScreenAroundElement|placeOnScreenAroundNode|placeOnScreenAroundRectangle|placementRegistry|popup|range|registerWin|registry|removeWaiRole|removeWaiState|scrollIntoView|setWaiRole|setWaiState|typematic|wai|":{
+		className: "dijit"
+	}
+    
 }

@@ -1,6 +1,6 @@
-dojo.provide("desktop.apps.KatanaIDE._codeTextArea.plugins.MatchingBrackets");
+dojo.provide("dojox.widget._codeTextArea.plugins.MatchingBrackets");
 
-desktop.apps.KatanaIDE._codeTextArea.plugins.MatchingBrackets.startup = function(args){
+dojox.widget._codeTextArea.plugins.MatchingBrackets.startup = function(args){
 	var source = args.source;
 	var brackets = [];
 	var currentBrackets = [];
@@ -138,7 +138,7 @@ desktop.apps.KatanaIDE._codeTextArea.plugins.MatchingBrackets.startup = function
 	dojo.subscribe(source.id + "::writeToken", pushBracket);
 	dojo.subscribe(source.id + "::CaretMove", setBracketColors);
 	dojo.subscribe(source.id + "::removeCharAtCaret", setBracketColors);
-	dojo.subscribe(source.id + "::massiveWrite", makeBracketsList);
+	dojo.subscribe(source.id + "::documentParsed", makeBracketsList);
+    dojo.subscribe(source.id + "::viewportParsed", makeBracketsList);
 	dojo.subscribe(source.id + "::KeyPressed", gotoMatchingBracket);
-
 };
