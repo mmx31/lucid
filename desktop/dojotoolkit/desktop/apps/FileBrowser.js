@@ -89,11 +89,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 				label: sys.quota
 			});
 			this.toolbar.addChild(this.quotabutton);
-			this.upbutton = new dijit.form.Button({
-				iconClass: "icon-16-actions-mail-send-receive",
-				label: cm.upload
-			});
-			this.toolbar.addChild(this.upbutton);
+            this.makeUploadButton();
 			var load = this.loadNode = document.createElement("div");
 			dojo.addClass(load, "icon-loading-indicator");
 			dojo.style(load, {
@@ -188,6 +184,17 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
         }), 500);
     },
 
+    makeUploadButton: function() {
+        if(this.upbutton)
+            this.upbutton.destroy();
+        var cm = dojo.i18n.getLocalization("desktop", "common");
+        this.upbutton = new dijit.form.Button({
+			iconClass: "icon-16-actions-mail-send-receive",
+			label: cm.upload
+		});
+		this.toolbar.addChild(this.upbutton);
+    },
+
 	fixUploadPath: function(path) {
 	    var loc = window.location.href.split("/");
 		loc.pop();
@@ -195,8 +202,11 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
         //var newUrl = loc+api.xhr("api.fs.io.upload")+"&path="+encodeURIComponent(this.fileArea.path);
         var newUrl = loc+api.xhr("api.fs.io.upload")+"?path="+encodeURIComponent(this.fileArea.path);
 		this.uploader.uploadUrl = newUrl;
-		if(this.uploader.flashObject)
-	        this.uploader.flashObject.uploadUrl = newUrl
+		if(this.uploader.flashObject){
+            this.uploader.destroy();
+            this.makeUploadButton();
+            this.makeUploader();
+        }
 	},
 	
 	doUploaderConnects: function() {

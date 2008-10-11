@@ -7,7 +7,6 @@ function mlog($d) {
     fclose($f);
 }
 
-
 function upload_output($data) {
     if( isset($_FILES['Filedata'])){
         // flash
@@ -21,6 +20,7 @@ function upload_output($data) {
 
 function handle_upload($file) {
     global $module;
+    global $sentpath;
     $file['name']=str_replace("..", "", $file['name']);
 	$content = file_get_contents($file['tmp_name']);
 	return ($content !== false && $module->write($sentpath . "/" . $file['name'], $content));
