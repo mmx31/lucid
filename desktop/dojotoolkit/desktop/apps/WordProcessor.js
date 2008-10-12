@@ -112,8 +112,8 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	},
 	processClose: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
-	    this.editor.setDisabled(true);
 	    this.editor.replaceValue("");
+	    this.editor.setDisabled(true);
 	    this.newAs = false;
 	    this.editing = false;
 	    this.fileEditing = "";
