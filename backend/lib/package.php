@@ -41,6 +41,7 @@ class package {
 		
 		if($unzip) rmdir($unzipPath);
 		$info['installedFiles']=$ret;
+		unlink($unzipPath."/meta.json");
 		return $info;
 	}
 	function remove($package) {
