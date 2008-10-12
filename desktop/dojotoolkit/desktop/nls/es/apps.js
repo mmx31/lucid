@@ -17,5 +17,6 @@
 	"MineSweep": "Mina de barrendero",
 	"Appearance": "Apariencia",
 	"Account Information": "Información de la cuenta",
-	"Startup Applications": "Aplicaciones de inicio"
+	"Startup Applications": "Aplicaciones de inicio",
+    "Update Manager": "Actualización Manager"
 })

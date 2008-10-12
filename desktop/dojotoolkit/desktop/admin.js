@@ -1,6 +1,19 @@
 dojo.provide("desktop.admin");
 
 desktop.admin = {
+    init: function() {
+        api.xhr({
+            backend: "core.user.info.isAdmin",
+            load: function(data) {
+                desktop.admin.isAdmin = data.isAdmin;
+            },
+            sync: true,
+            handleAs: "json"
+        });
+    },
+    //  isAdmin: Boolean
+    //      Is the current user an administrator?
+    isAdmin: null,
 	//	summary:
 	//		Contains administration functions
 	//		The user must be an administrator to use these, otherwise the

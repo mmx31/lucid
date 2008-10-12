@@ -25,6 +25,11 @@
 			$out->append("email", $user->email);
 			$out->append("lastauth", $user->lastauth);
 		}
+        if($_GET['action'] == "isAdmin") {
+            $u = $User->get_current();
+            $out = new jsonOutput();
+            $out->append("isAdmin", $u->has_permission("core.administration"));
+        }
 		if($_GET['action'] == "set") {
 			$id = $_POST['id'];
 			$info = array();

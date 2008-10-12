@@ -1,0 +1,14 @@
+{
+	"type": "application",
+	"sysname": "UpdateManager",
+	"name": "Update Manager",
+	"author": "Psychcf",
+	"email": "will@psychdesigns.net",
+	"version": "1.0",
+	"maturity": "Stable",
+	"category": "Administration",
+	"icon": "icon-16-apps-system-installer",
+	"filetypes": [],
+    "permissions": "core.administration",
+	"compatible": ["1.0.0"]
+}

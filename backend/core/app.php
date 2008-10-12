@@ -79,7 +79,7 @@
 			{
 				//check permission metadata
 				//if the user does not have the right permissions, skip it
-				if(!empty($v->permissions)) {
+				if(!empty($v->permissions) && is_array($v->permissions)) {
 					$continue = false;
 					$user = $User->get_current();
 					foreach($v->permissions as $perm) {

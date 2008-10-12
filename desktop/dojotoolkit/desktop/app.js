@@ -4,9 +4,6 @@ dojo.require("desktop.apps._App");
 desktop.app = {
 	//	summary:
 	//		Contains all the app functions of the desktop
-	//	apps: Object
-	//		Contains a cache of each app
-	apps: {},
 	//	appList: Array,
 	//		Contains a list of each app's information (loaded on startup)
 	appList: [],
@@ -19,7 +16,7 @@ desktop.app = {
 	init: function() {
 		//	summary:
 		//		Loads the app list from the server
-		this.onConfigApply = dojo.subscribe("configApply", this, this.startupApps);
+		this.onConfigApply = dojo.subscribe("configApply", this, "startupApps");
 		api.xhr({
 			backend: "core.app.fetch.list",
 			load: dojo.hitch(this, function(data, ioArgs) {
@@ -44,11 +41,9 @@ desktop.app = {
 		//	summary:
 		//		Launches the apps specified in desktop.config to launch on startup
 		dojo.unsubscribe(this.onConfigApply);
-		g = desktop.config.startupapps;
+		var g = desktop.config.startupApps;
 		for(var f in g)
-		{
-			desktop.app.launch(g[f]);
-		}
+			desktop.app.launch(g[f], {onStartup: true});
 	},
 	launchHandler: function(/*String?*/file, /*Object?*/args, /*String?*/format) {
 		//	summary:
