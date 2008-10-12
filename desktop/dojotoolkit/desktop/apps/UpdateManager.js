@@ -9,17 +9,17 @@ dojo.declare("desktop.apps.UpdateManager", desktop.apps._App, {
     init: function(args){
         this.drawUi = !args.onStartup;
         if(desktop.admin.isAdmin){
-            /*api.xhr({
+            api.xhr({
                 xsite: true,
                 url: "http://www.lucid-desktop.org/download/latest.json",
                 load: dojo.hitch(this, "checkVersion"),
                 handleAs: "json"
-            });*/
+            });
             //debugging
-            setTimeout(dojo.hitch(this, "checkVersion", {
+            /*setTimeout(dojo.hitch(this, "checkVersion", {
                 stable: null,
                 unstable: "1.0.1.stable"
-            }), 2000);
+            }), 2000);*/
             if(this.drawUi) {
                 var app = dojo.i18n.getLocalization("desktop", "apps");
                 var cmn = dojo.i18n.getLocalization("desktop", "common");
