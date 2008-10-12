@@ -35,6 +35,10 @@ dependencies ={
 			dependencies: ["desktop.apps.EmailClient"]
 		},
 		{
+			name: "../desktop/apps/Contacts.js",
+			dependencies: ["desktop.apps.Contacts"]
+		},
+		{
 			name: "../desktop/apps/FeedReader.js",
 			dependencies: ["desktop.apps.FeedReader"]
 		},
@@ -73,6 +77,10 @@ dependencies ={
 		{
 			name: "../desktop/apps/TextEditor.js",
 			dependencies: ["desktop.apps.TextEditor"]
+		},
+		{
+			name: "../desktop/apps/UpdateManager.js",
+			dependencies: ["desktop.apps.UpdateManager"]
 		},
 		{
 			name: "../desktop/apps/WebBrowser.js",
