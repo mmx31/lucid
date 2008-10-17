@@ -33,11 +33,11 @@
 .win-title {
 	color: white;
 	font-weight: bold;
-	padding-top: 2px;
+	padding-top: 6px;
 	margin-right: 55px;
 	width: auto;
 	overflow: hidden;
-	padding-left: 10px;
+	padding-left: 0px;
 	position: relative;
 }
 .win-tr,
