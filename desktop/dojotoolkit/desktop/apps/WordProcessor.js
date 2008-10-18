@@ -99,6 +99,12 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 		}), 500);
 	
 	},
+    updateTitle: function(path) {
+        var app = dojo.i18n.getLocalization("desktop", "apps");
+        if(!path) return this.window.attr("title", app["Text Editor"]);
+        var files = path.split("/");
+        this.window.attr("title", files[files.length-1]+" - "+app["Text Editor"]);
+    },
 	processNew: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
@@ -108,7 +114,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    this.fileEditing = "";
 	    this.newAs = true;
 	    this.statusbar.attr("label", msg.editingFile.replace("%s", cmn.untitled));
-	
+	    this.updateTitle(cmn.untitled);
 	},
 	processClose: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
@@ -118,7 +124,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    this.editing = false;
 	    this.fileEditing = "";
 	    this.statusbar.attr("label", msg.noFileOpen);
-	
+	    this.updateTitle(false);
 	},
 	processOpen: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
@@ -135,6 +141,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    if (path == false) {
 	        return false;
 	    }
+        this.updateTitle(path);
 	    this.statusbar.attr("label", msg.openingFile.replace("%s", path));
 	    this.newAs = true;
 	    this.editor.setDisabled(true);
