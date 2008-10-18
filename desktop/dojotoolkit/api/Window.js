@@ -91,7 +91,7 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
     alwaysOnTop: false,
 	//	pos: Object
 	//		Internal variable used by the window maximizer
-	pos: {},
+	pos: {top: 0, left: 0, width: 0, height: 0},
 	//	_minimizeAnim: Boolean
 	//		Set to true when the window is in the middle of a minimize animation.
 	//		This is to prevent a bug where the size is captured mid-animation and restores weird.
@@ -123,6 +123,7 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 		}
 		this.connect(window,'onresize',"_onResize");
 		dojo.style(this.domNode, "position", "absolute"); //override /all/ css values for this one
+        this.pos = {top: 0, left: 0, width: 0, height: 0};
 		this.inherited(arguments);
 	},
 	show: function()
@@ -264,11 +265,11 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 			this._minimizeAnim = true;
 			if(desktop.config.fx < 3) this._toggleBody(false);
 			var pos = dojo.coords(this.domNode, true);
-			this.left = pos.x;
-			this.top = pos.y;
+			this.pos.left = pos.x;
+			this.pos.top = pos.y;
 			var win = this.domNode;
-			this._width = dojo.style(win, "width");
-			this._height = dojo.style(win, "height");
+			this.pos.width = dojo.style(win, "width");
+			this.pos.height = dojo.style(win, "height");
 			var taskbar = dijit.byNode(dojo.query(".desktopTaskbarApplet")[0].parentNode);
 			if(taskbar) var pos = dojo.coords(taskbar._buttons[this.id], true);
 			else var pos = {x: 0, y: 0, w: 0, h: 0};
@@ -313,10 +314,10 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 				duration: desktop.config.window.animSpeed,
 				properties: {
 					opacity: {end: 100},
-					top: {end: this.top},
-					left: {end: this.left},
-					height: {end: this._height},
-					width: {end: this._width}
+					top: {end: this.pos.top},
+					left: {end: this.pos.left},
+					height: {end: this.pos.height},
+					width: {end: this.pos.width}
 				},
 				easing: dojox.fx.easing.easeOut
 			});
@@ -548,12 +549,14 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 	_onResize: function(e) {
 		//	summary:
 		//		Event handler. Resizes the window when the screen is resized.
-		if (this.maximized && !this.minimized) {
+		if(this.maximized && !this.minimized) {
 			var max = desktop.ui._area.getBox();
 			var c = dojo.coords(this.domNode);
 			var v = dijit.getViewport();
-			dojo.style(this.domNode, "width", v.w - max.L - max.R);
-			dojo.style(this.domNode, "height", v.h - max.T - max.B);
+            dojo.style(this.domNode, {
+                width: (v.w - max.L - max.R)+"px",
+                height: (v.h - max.T - max.B)+"px"
+            });
 		}
 		else if(this.maximized && this.minimized) {
 			var max = desktop.ui._area.getBox();
