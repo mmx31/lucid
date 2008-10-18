@@ -70,6 +70,12 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 		if(args.file) this._processOpen(args.file);
 		else this.processNew();
 	},
+    updateTitle: function(path) {
+        var app = dojo.i18n.getLocalization("desktop", "apps");
+        if(!path) return this.window.attr("title", app["Text Editor"]);
+        var files = path.split("/");
+        this.window.attr("title", files[files.length-1]+" - "+app["Text Editor"]);
+    },
 	processNew: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
@@ -79,7 +85,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    this.fileEditing = "";
 	    this.newAs = true;
 	    this.statusbar.attr("label", msg.editingFile.replace("%s", cm.untitled));
-	
+        this.updateTitle(cm.untitled);
 	},
 	processClose: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
@@ -89,7 +95,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    this.editing = false;
 	    this.fileEditing = "";
 	    this.statusbar.attr("label", msg.noFileOpen);
-	
+	    this.updateTitle(false);
 	},
 	processOpen: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
@@ -104,6 +110,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    if (path == false) {
 	        return false;
 	    }
+        this.updateTitle(path);
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    this.statusbar.attr("label", msg.openingFile.replace("%s", path));
 	    this.newAs = true;

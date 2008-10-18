@@ -68,5 +68,9 @@ dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
             "MozUserInput": "disabled",
             "MozUserSelect": "none"
         });
+        //update win title
+        var app = dojo.i18n.getLocalization("desktop", "apps");
+        var files = path.split("/");
+        this.win.attr("title", files[files.length-1]+" - "+app["Image Viewer"]);
 	}
 })

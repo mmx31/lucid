@@ -26,7 +26,8 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
-		this.fileArea = new api.Filearea({path: (args.path || "file://"), region: "center"})
+		this.fileArea = new api.Filearea({path: (args.path || "file://"), region: "center"});
+        this.updateTitle(this.fileArea.path);
 		this.pane = new dijit.layout.ContentPane({region: "left", splitter: true, minSize: 120, style: "width: 120px;"});
 		var menu = new dijit.Menu({
 			style: "width: 100%;"
@@ -51,6 +52,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 			this.pathbox.setValue(this.fileArea.path);
 			this.fixUploadPath(this.fileArea.path);
 			this.statusbar.attr("label", "&nbsp;");
+            this.updateTitle(this.fileArea.path);
 		});
 		this.pathbar.addChild(this.pathbox);
 		this.goButton = new dijit.form.Button({
@@ -127,6 +129,12 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		this.fileArea.refresh();
 		setTimeout(dojo.hitch(this, "makeUploader"), 1000);
 	},
+    updateTitle: function(path) {
+        var folders = path.split("/");
+        var text = folders[folders.length-1] || folders[folders.length-2] || path;
+        var app = dojo.i18n.getLocalization("desktop", "apps");
+        this.win.attr("title", text + " - "+app["File Browser"]);
+    },
 	quotaNotice: function() {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var sys = dojo.i18n.getLocalization("desktop", "system");

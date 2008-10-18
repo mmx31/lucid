@@ -117,6 +117,11 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 		if(args.file) this.openFile(args.file);
 		else if(args.url) this.openURL(args.url);
 	},
+    updateTitle: function(text) {
+        var app = dojo.i18n.getLocalization("desktop", "apps");
+        if(!text) return this.win.attr("title", app["Music Player"]);
+        this.win.attr("title", text+" - "+app["Music Player"]);
+    },
 	sound: false,
 	play: function() {
 		if(this.sound) {
@@ -210,9 +215,12 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 			var i = this.sound.id3();
 		if(c.id3 && i) {
 			var output = "<div>"+i.songname+"</div><div>"+i.artist+" - "+i.album+"</div>";
+            this.updateTitle(i.songname+" by "+i.artist); //TODO: translate?
 		}
-		else
+		else {
 			var output = this.filename;
+            this.updateTitle(this.filename);
+        }
 		if(!(c.position && c.duration)) {
 			this.box.domNode.innerHTML = output + "<div style='position: absolute; top:25%; right: 0px;'>" + "?:??/?:??" + "</div>";
 			return;
