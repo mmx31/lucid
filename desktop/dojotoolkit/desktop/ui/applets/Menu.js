@@ -66,21 +66,21 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
 		}));
 		sMenu.addChild(new dijit.MenuSeparator())
 		sMenu.addChild(new dijit.MenuItem({
-			label: l.about,
-			iconClass: "icon-16-apps-help-browser",
-			onClick: function() {
-				var win = new api.Window({
-					title: l.about,
-					width: "300px",
-					height: "300px"
-				});
-				win.addChild(new desktop.ui.Credits({
-					region: "center"
-				}));
-				win.show();
-			}
-		}))
-		sMenu.startup();
+            label: l.about,
+            iconClass: "icon-16-apps-help-browser",
+            onClick: function() {
+                var win = new desktop.widget.Window({
+                    title: l.about,
+                    width: "300px",
+                    height: "300px"
+                });
+                win.addChild(new desktop.ui.Credits({
+                    region: "center"
+                }));
+                win.show();
+            }
+        }))
+        sMenu.startup();
 		return sMenu;
 	},
 	_drawButton: function() {

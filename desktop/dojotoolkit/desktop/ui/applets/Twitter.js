@@ -39,12 +39,12 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 		if(error) {
 			var messageNode = document.createElement("div");
 			dojo.style(messageNode, "textAlign", "center");
-			api.textContent(messageNode, actNls.authFail)
+			desktop.textContent(messageNode, actNls.authFail)
 			div.appendChild(messageNode);
 		}
 		dojo.forEach(["username", "password"], function(label) {
 			var row = document.createElement("div");
-			api.textContent(row, actNls[label]+": ");
+			desktop.textContent(row, actNls[label]+": ");
 			var textbox = this.loginUi[label] = new dijit.form.TextBox({
 				type: (label == "password" ? "password" : "text")
 			});
@@ -76,7 +76,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 			}
 		}
 		this.timer = setTimeout(dojo.hitch(this, "getInfo"), 1000*60*5);
-		api.xhr({
+		desktop.xhr({
 			xsite: true,
 			url: "http://twitter.com/statuses/friends_timeline.json",
 			auth: authInfo,
@@ -145,14 +145,14 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 	makeTextbox: function(div) {
 		var header = document.createElement("div");
 		dojo.style(header, "position", "relative");
-		api.textContent(header, "What are you doing?");
+		desktop.textContent(header, "What are you doing?");
 		var counter = document.createElement("div");
 		dojo.style(counter, {
 			position: "absolute",
 			top: "0px",
 			right: "0px"
 		});
-		api.textContent(counter, "140");
+		desktop.textContent(counter, "140");
 		header.appendChild(counter);
 		div.appendChild(header);
 		var area = document.createElement("div");
@@ -167,7 +167,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 			style: "width: 300px;",
 			onChange: function(value) {
 				var length = value.split("").length;
-				api.textContent(counter, 140-length);
+				desktop.textContent(counter, 140-length);
 				button.setDisabled(length >= 140);
 			}
 		});
@@ -182,7 +182,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 	},
 	postUpdate: function(string) {
 		if(string == "") return;
-		api.xhr({
+		desktop.xhr({
 			xsite: true,
 			url: "http://twitter.com/statuses/update.json",
 			content: {

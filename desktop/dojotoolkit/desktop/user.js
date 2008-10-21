@@ -34,7 +34,7 @@ desktop.user = {
 		//	summary:
 		//		Gets the information of a certain user
 		if(!options.id) { options.id = "0"; }
-		api.xhr({
+		desktop.xhr({
 	        backend: "core.user.info.get",
 			content: {
 				id: options.id,
@@ -91,7 +91,7 @@ desktop.user = {
 		}
 		if(typeof op.permissions != "undefined") op.permissions = dojo.toJson(op.permissions);
 		if(typeof op.groups != "undefined") op.groups = dojo.toJson(op.groups);
-		api.xhr({
+		desktop.xhr({
 			backend: "core.user.info.set",
 			content: op,
 			load: function(data) {
@@ -106,7 +106,7 @@ desktop.user = {
 		if(desktop.reload) { return false; }
 		desktop.config.save(true);
 		dojo.publish("desktoplogout", []);
-		api.xhr({
+		desktop.xhr({
 			backend: "core.user.auth.logout",
 			sync: true,
 			load: function(data, ioArgs){
@@ -118,7 +118,7 @@ desktop.user = {
 				}
 				else
 				{
-					api.log("Error communicating with server, could not log out");
+					desktop.log("Error communicating with server, could not log out");
 				}
 			}
 		});
@@ -134,7 +134,7 @@ desktop.user = {
 		password = dojox.encoding.base64.encode(b);
 		delete b;
 		//then, send it to the server
-		api.xhr({
+		desktop.xhr({
 			backend: "core.user.auth.login",
 			content: {
 				password: password

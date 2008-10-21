@@ -1,16 +1,7 @@
-dojo.provide("api.Sound");
-dojo.require("dojox.flash");
+dojo.require("dijit._Widget");
+dojo.provide("desktop.Sound");
 
-if (dojox.flash.info.capable == true) {
-	dojox.flash.addLoadedListener(function() {
-		console.log("js:flash loaded");
-	});
-	dojox.flash.Embed.prototype.width = 1;
-	dojox.flash.Embed.prototype.height = 1;
-	dojox.flash.setSwf(dojo.moduleUrl("api.sound", "objManager.swf")+"", false);
-}
-
-dojo.declare("api.Sound", null, {
+dojo.declare("desktop.Sound", dijit._Widget, {
 	//	summary:
 	//		An API that allows an app to play audio content.
 	//		Abstracts between HTML5 audio tags, flash-based audio, and embed tags
@@ -35,12 +26,15 @@ dojo.declare("api.Sound", null, {
 		id3: true
 	},
 	backend: null,
-	constructor: function(/*Object*/params) {
-		dojo.mixin(this, params);
+	postCreate: function() {
+		this.domNode.style.position="absolute";
+		this.domNode.style.left="-999px";
+		this.domNode.style.top="-999px";
+		document.body.appendChild(this.domNode);
 		var backends = ["html", "flash", "embed"];
 		for(var k in backends) {
 			var i = backends[k];
-			var backend = new api.Sound[i]({
+			var backend = new desktop.Sound[i]({
 				src: this.src,
 				loop: this.loop,
 				autoStart: this.autoStart
@@ -101,16 +95,20 @@ dojo.declare("api.Sound", null, {
 		//	summary:
 		//		Returns id3 information (if available)
 	},
-	destroy: function() {
+	uninitialize: function() {
 		this.backend.uninitialize();
+		document.body.removeChild(this.domNode);
 	}
 });
 
-dojo.declare("api.Sound._backend", null, {
+dojo.declare("desktop.Sound._backend", null, {
 	//	summary:
 	//		The base sound backend class
-	//		Most of these properties are repeated in api.Sound, see that for more info
+	//		Most of these properties are repeated in desktop.Sound, see that for more info
 	id: "",
+	//	domNode: domNode
+	//	A domNode that things like embed elements can be added to
+	domNode: null,
 	src: "",
 	loop: false,
 	autoStart: false,
@@ -153,10 +151,10 @@ dojo.declare("api.Sound._backend", null, {
 	}
 });
 	
-dojo.declare("api.Sound.html", api.Sound._backend, {
+dojo.declare("desktop.Sound.html", desktop.Sound._backend, {
 	//	summary:
 	//		Sound backend for the HTML5 audio tag
-	//		See api.Sound._backend for more info
+	//		See desktop.Sound._backend for more info
 	htmlSound: null,
 	capabilities: {
 		play: true,
@@ -199,10 +197,10 @@ dojo.declare("api.Sound.html", api.Sound._backend, {
 	}
 });
 	
-dojo.declare("api.Sound.flash", api.Sound._backend, {
+dojo.declare("desktop.Sound.flash", desktop.Sound._backend, {
 	//	summary:
 	//		Sound backend for adobe flash player
-	//		See api.Sound._backend for more info
+	//		See desktop.Sound._backend for more info
 	_startPos: 0,
 	playing: false,
 	play: function() {
@@ -250,18 +248,18 @@ dojo.declare("api.Sound.flash", api.Sound._backend, {
 	}
 });
 	
-dojo.declare("api.Sound.embed", api.Sound._backend, {
+dojo.declare("desktop.Sound.embed", desktop.Sound._backend, {
 	//	summary:
 	//		Sound backend for the embed tag
 	//		There is a known issue where XHRs are cut off when the embed tag is created.
 	//		We have no clue why this happens. If you know, please get in touch with us.
-	//		See api.Sound._backend for more info
+	//		See desktop.Sound._backend for more info
 	capabilities: {
 		play: true,
 		pause: false,
 		stop: true,
 		duration: false,
-		position: true, //emulated
+		position: true,
 		volume: false,
 		id3: false
 	},
@@ -284,13 +282,5 @@ dojo.declare("api.Sound.embed", api.Sound._backend, {
 	uninitialize: function() {
 		clearInterval(this.timer);
 		this.stop();
-		document.body.removeChild(this.domNode);
-	},
-	startup: function() {
-		this.domNode = document.createElement("div");
-		this.domNode.style.position="absolute";
-		this.domNode.style.left="-999px";
-		this.domNode.style.top="-999px";
-		document.body.appendChild(this.domNode);
 	}
 });

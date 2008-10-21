@@ -1,7 +1,7 @@
-dojo.provide("api.Registry");
+dojo.provide("desktop.Registry");
 dojo.require("dojo.data.ItemFileWriteStore");
 
-dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
+dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 	//	summary:
 	//		An API that allows storage in a table format for users.
 	//		This is basically a persistant dojo.data store with write capabilities.
@@ -20,14 +20,14 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 		
 		this._jsonData = null;
 		this.exists(dojo.hitch(this, function(e) {
-			if(e == true) this.url = this._jsonFileUrl = api.xhr("api.registry.stream.load")
+			if(e == true) this.url = this._jsonFileUrl = desktop.xhr("api.registry.stream.load")
 			+ "&appname=" + encodeURIComponent(args.appname)
 			+ "&name=" + encodeURIComponent(args.name);
 			else this.data = this._jsonData = args.data;
 		}), true);
 	},
 	_saveEverything: function(saveCompleteCallback, saveFailedCallback, newFileContentString) {
-		api.xhr({
+		desktop.xhr({
 			backend: ("api.registry.stream.save"),
 			content: {
 				value: newFileContentString,
@@ -50,7 +50,7 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 		//		a callback function. The first argument passed to it is true if it does exist, false if it does not.
 		//	sync:
 		//		should the call be syncronous? defaults to false
-		api.xhr({
+		desktop.xhr({
 			backend: "api.registry.info.exists",
 			sync: sync,
 			content: {
@@ -69,7 +69,7 @@ dojo.declare("api.Registry", dojo.data.ItemFileWriteStore, {
 		//		Deletes the store on the server.
 		//	callback:
 		//		a callback function. The first argument passed to it is true if deletion was successful, false if it failed.
-		api.xhr({
+		desktop.xhr({
 			backend: "api.registry.stream.delete",
 			content: {
 				name: this.__desktop_name,

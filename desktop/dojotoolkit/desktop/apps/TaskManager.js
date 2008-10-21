@@ -7,7 +7,7 @@ dojo.require("dojo.data.ItemFileWriteStore");
 dojo.requireLocalization("desktop", "common");
 dojo.requireLocalization("desktop", "apps");
 dojo.requireLocalization("desktop", "system");
-api.addDojoCss("dojox/grid/resources/Grid.css");
+desktop.addDojoCss("dojox/grid/resources/Grid.css");
 
 dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 	kill: function() {
@@ -21,7 +21,7 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 		var app = dojo.i18n.getLocalization("desktop", "apps");
         var sys = dojo.i18n.getLocalization("desktop", "system");
 	    //make window
-	    this.win = new api.Window({
+	    this.win = new desktop.widget.Window({
 	        title: app["Task Manager"],
 	        width: "400px",
 	        height: "450px",
@@ -115,17 +115,17 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 	    if (desktop.app.getInstance(id).status != "killed") {
 	        if(desktop.app.kill(id)) {
-	        api.ui.notify(sys.killSuccess.replace("%s", id));
+	        desktop.dialog.notify(sys.killSuccess.replace("%s", id));
 		}
 		else {
-			api.ui.notify({
+			desktop.dialog.notify({
 				message: sys.killFail.replace("%s", id),
 				type: "error"
 			});
 		}
 	    }
 	    else {
-	        api.ui.notify({
+	        desktop.dialog.notify({
 	            type: "warning",
 	            message: sys.allreadyKilled
 	        });

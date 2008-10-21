@@ -9,7 +9,7 @@ dojo.declare("desktop.apps.UpdateManager", desktop.apps._App, {
     init: function(args){
         this.drawUi = !args.onStartup;
         if(desktop.admin.isAdmin){
-            api.xhr({
+            desktop.xhr({
                 xsite: true,
                 url: "http://www.lucid-desktop.org/download/latest.json",
                 load: dojo.hitch(this, "checkVersion"),
@@ -24,7 +24,7 @@ dojo.declare("desktop.apps.UpdateManager", desktop.apps._App, {
                 var app = dojo.i18n.getLocalization("desktop", "apps");
                 var cmn = dojo.i18n.getLocalization("desktop", "common");
                 var nls = dojo.i18n.getLocalization("desktop.apps.UpdateManager", "messages");
-                var win = this.window = new api.Window({
+                var win = this.window = new desktop.widget.Window({
                     title: app["Update Manager"],
                     width: "400px",
                     height: "300px",
@@ -116,7 +116,7 @@ dojo.declare("desktop.apps.UpdateManager", desktop.apps._App, {
     },
     notifyPopup: function(version){
         var nls = dojo.i18n.getLocalization("desktop.apps.UpdateManager", "messages");
-        api.ui.notify({
+        desktop.dialog.notify({
             message: nls.updatesFound.replace("%s", version)
                     +"<br /><a href=\"javascript://\" onClick=\"desktop.app.launch('"+this.sysname+"');\">"+nls.moreDetails+"</a>",
             duration: 10000

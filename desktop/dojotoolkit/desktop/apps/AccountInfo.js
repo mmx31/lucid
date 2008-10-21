@@ -4,7 +4,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 	init: function(args) {
 		var l = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
-		var win = this.win = new api.Window({
+		var win = this.win = new desktop.widget.Window({
 			title: l.accountInfo,
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
@@ -103,7 +103,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		desktop.user.get({callback: function(info) {
 			elems["name"].setValue(info.name);
 			elems["email"].setValue(info.email);
-			api.textContent(usernameSpan, info.username);
+			desktop.textContent(usernameSpan, info.username);
 		}});
 		dojo.connect(win, "onClose", this, function() {
 			var args = {};
@@ -124,7 +124,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 						desktop.config.locale = elem.getValue();
 						if(oldLocale != desktop.config.locale) {
 							dojo.cookie("desktopLocale", desktop.config.locale);
-							api.ui.notify(l.restartDesktopForLangChange);
+							desktop.dialog.notify(l.restartDesktopForLangChange);
 						}
 						break;
 				}
@@ -141,7 +141,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		if(this.passwordWin) return this.passwordWin.bringToFront();
 		var l = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
-		var win = this.passwordWin = new api.Window({
+		var win = this.passwordWin = new desktop.widget.Window({
 			title: l.changePassword,
 			width: "450px",
 			height: "350px",
@@ -158,11 +158,11 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		dojo.style(row4, "textAlign", "center");
 		var onChange = dojo.hitch(this, function() {
 			if(this.newpasswd.getValue() == this.confpasswd.getValue()) {
-				api.textContent(row4, l.passwordsMatch);
+				desktop.textContent(row4, l.passwordsMatch);
 				this.chPasswdButton.setDisabled(false)
 			}
 			else {
-				api.textContent(row4, l.passwordsDontMatch);
+				desktop.textContent(row4, l.passwordsDontMatch);
 				this.chPasswdButton.setDisabled(true);
 			}
 		});
@@ -199,7 +199,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 					authButton.setDisabled(data);
 					newpasswd.setDisabled(!data);
 					confpasswd.setDisabled(!data);
-					api.textContent(row4, (data ? l.authSuccess : l.authFail));
+					desktop.textContent(row4, (data ? l.authSuccess : l.authFail));
 					this._authTimeout = setTimeout(resetForm, 5*60*1000);
 				}))
 				current.setValue("");
@@ -224,7 +224,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 			label: l.changePassword,
 			disabled: true,
 			onClick: dojo.hitch(this, function() {
-				api.textContent(row4, l.changingPassword)
+				desktop.textContent(row4, l.changingPassword)
 				current.setDisabled(true);
 				this.authButton.setDisabled(true);
 				newpasswd.setDisabled(true);
@@ -235,7 +235,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 					password: newpasswd.getValue(),
 					callback: function() {
 						resetForm();
-						api.textContent(row4, l.passwordChangeSuccessful);
+						desktop.textContent(row4, l.passwordChangeSuccessful);
 						clearTimeout(this._authTimeout);
 					}
 				})

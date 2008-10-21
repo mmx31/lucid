@@ -11,11 +11,11 @@ dojo.declare("desktop.ui.Credits", dijit._Widget, {
 	startup: function() {
 
 		var head = document.createElement("h2");
-		api.textContent(head, "Psych Desktop");
+		desktop.textContent(head, "Psych Desktop");
 		this.domNode.appendChild(head);
 		
 		var version = document.createElement("b");
-		api.textContent(version, "Version "+desktop.version);
+		desktop.textContent(version, "Version "+desktop.version);
 		this.domNode.appendChild(version);
 		
 		dojo.xhrGet({
@@ -23,17 +23,17 @@ dojo.declare("desktop.ui.Credits", dijit._Widget, {
 			load: dojo.hitch(this, function(data) {
 				dojo.forEach(data, function(item) {
 					var head = document.createElement("h4");
-					api.textContent(head, item.title);
+					desktop.textContent(head, item.title);
 					this.domNode.appendChild(head);
 					var ul = document.createElement("ul");
 					dojo.style(ul, {padding: "0px"});
 					dojo.forEach(item.items, function(p) {
 						var li = document.createElement("li");
-						api.textContent(li, p[0]);
+						desktop.textContent(li, p[0]);
 						var addPos = function(str) {
 							var div = document.createElement("div");
 							dojo.style(div, "fontSize", "8pt");
-							api.textContent(div, str);
+							desktop.textContent(div, str);
 							li.appendChild(div);
 						}
 						if(dojo.isString(p[1]))

@@ -1,11 +1,11 @@
-dojo.provide("api.Filearea");
+dojo.provide("desktop.widget.Filearea");
 dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dijit.Menu");
 dojo.require("dijit.form.TextBox");
 dojo.requireLocalization("desktop", "common");
-dojo.requireLocalization("api", "filearea");
+dojo.requireLocalization("desktop.widget", "filearea");
 
-api._fileareaClipboard = {
+desktop.widget._fileareaClipboard = {
 	type: "", // can be 'cut' or 'copy
 	path: "", //the parent directory of the file
 	name: "", //the name of the file
@@ -13,7 +13,7 @@ api._fileareaClipboard = {
 	widgetRef: null //a reference to the widget
 };
 
-dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
+dojo.declare("desktop.widget.Filearea", dijit.layout._LayoutWidget, {
 	//	path: String
 	//		the path that the filearea should start at
 	path: "file://",
@@ -29,7 +29,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 	menu: null,
 	postCreate: function() {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
-		var nf = dojo.i18n.getLocalization("api", "filearea");
+		var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
 		
 		this.connect(this.domNode, "onmousedown", "_onClick");
 		this.connect(this.domNode, "oncontextmenu", "_onRightClick");
@@ -55,7 +55,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 			label: nf.paste,
 			iconClass: "icon-16-actions-edit-paste",
 			onClick: dojo.hitch(this, function() {
-				var clip = api._fileareaClipboard;
+				var clip = desktop._fileareaClipboard;
 				if(clip.type == "") return;
 				var isParent = dojo.hitch(this, function(target, clip) {
 						if(clip.mimetype != "text/directory") return false; //can't be a parent if we're not a dir!
@@ -85,10 +85,10 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 					})
 				if(clip.type == "cut") {
 					var name = this._fixDuplicateFilename(clip.name, clip.mimetype);
-					if(isParent(this.path+name, clip)) return api.ui.notify({message: nf.parentErr, type: "warning", duration: 5000});
+					if(isParent(this.path+name, clip)) return desktop.dialog.notify({message: nf.parentErr, type: "warning", duration: 5000});
 					this._loadStart();
 					if(clip.widgetRef && clip.widgetRef.getParent().path == this.path) return;
-					api.filesystem.move(clip.path+clip.name, this.path+name, dojo.hitch(this, function() {
+					desktop.filesystem.move(clip.path+clip.name, this.path+name, dojo.hitch(this, function() {
 						var parentID;
 						if(clip.widgetRef) {
 							var p = clip.widgetRef.getParent();
@@ -107,9 +107,9 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				}
 				if(clip.type == "copy") {
 					var name = this._fixDuplicateFilename(clip.name, clip.mimetype);
-					if(isParent(this.path+name, clip)) return api.ui.notify({message: nf.parentErr, type: "warning", duration: 5000});
+					if(isParent(this.path+name, clip)) return desktop.dialog.notify({message: nf.parentErr, type: "warning", duration: 5000});
 					this._loadStart();
-					api.filesystem.copy(clip.path+clip.name, this.path+name, dojo.hitch(this, function() {
+					desktop.filesystem.copy(clip.path+clip.name, this.path+name, dojo.hitch(this, function() {
 						this._loadEnd();
 						this.refresh();
 						dojo.publish("filearea:"+this.path, [this.id]);
@@ -211,7 +211,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 	_onClick: function(e)
 	{
 		var w = dijit.getEnclosingWidget(e.target);
-		if (w.declaredClass == "api.Filearea._Icon") {
+		if (w.declaredClass == "desktop.widget.Filearea._Icon") {
 			w._dragStart(e);
 			if (dojo.hasClass(e.target, "fileIcon")) 
 				w._onIconClick(e);
@@ -233,14 +233,14 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		//		Makes a folder in the current dir
 		
 		//TODO: Alert the user if that dir allready exists
-		var nf = dojo.i18n.getLocalization("api", "filearea");
-		api.ui.inputDialog({
+		var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
+		desktop.dialog.input({
 			title: nf.createFolder,
 			message: nf.createFolderText,
 			callback: dojo.hitch(this, function(dirname) {
 				if(dirname == "") return;
 				dirname = this._fixDuplicateFilename(dirname, "text/directory");
-				api.filesystem.createDirectory(this.path+dirname, dojo.hitch(this, function() {
+				desktop.filesystem.createDirectory(this.path+dirname, dojo.hitch(this, function() {
 					dojo.publish("filearea:"+this.path, [this.id]);
 					this.refresh();
 				}));
@@ -248,10 +248,10 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		});
 	},
 	_makeLauncher: function() {
-		var nf = dojo.i18n.getLocalization("api", "filearea");
+		var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var appNls = dojo.i18n.getLocalization("desktop", "apps");
-		var win = new api.Window({
+		var win = new desktop.Window({
 			title: nf.createLauncher,
 			width: "300px",
 			height: "200px"
@@ -262,13 +262,13 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		var div = document.createElement("div");
 		
 		var row0 = document.createElement("div");
-		api.textContent(row0, nf.name+": ");
+		desktop.textContent(row0, nf.name+": ");
 		var nameBox = new dijit.form.TextBox({});
 		row0.appendChild(nameBox.domNode);
 		div.appendChild(row0);
 		
 		var row1 = document.createElement("div");
-		api.textContent(row1, nf.application+": ");
+		desktop.textContent(row1, nf.application+": ");
 		var appItems = [];
 		dojo.forEach(desktop.app.appList, function(item) {
 			appItems.push({
@@ -290,7 +290,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		div.appendChild(row1);
 		
 		var row2 = document.createElement("div");
-		api.textContent(row2, nf.arguments+": ");
+		desktop.textContent(row2, nf.arguments+": ");
 		var argBox = new dijit.form.TextBox({});
 		row2.appendChild(argBox.domNode);
 		div.appendChild(row2);
@@ -321,7 +321,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 					if(parsedArg[0])
 						args[parsedArg[0]] = parsedArg[1] || true;
 				});
-				api.filesystem.writeFileContents(
+				desktop.filesystem.writeFileContents(
 					this.path+this._fixDuplicateFilename(name+".desktop", "text/plain"),
 					app+"\n"+dojo.toJson(args),
 					dojo.hitch(this, function() {
@@ -343,14 +343,14 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		//		Makes a file in the current dir
 		
 		//TODO: Alert the user if that file allready exists
-		var nf = dojo.i18n.getLocalization("api", "filearea");
-		api.ui.inputDialog({
+		var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
+		desktop.dialog.input({
 			title: nf.createFile,
 			message: nf.createFileText,
 			callback: dojo.hitch(this, function(filename) {
 				if(filename == "") return;
 				filename = this._fixDuplicateFilename(filename, "text/plain");
-				api.filesystem.writeFileContents(this.path+filename, "", dojo.hitch(this, function() {
+				desktop.filesystem.writeFileContents(this.path+filename, "", dojo.hitch(this, function() {
 					dojo.publish("filearea:"+this.path, [this.id]);
 					this.refresh();
 				}));
@@ -364,7 +364,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		//		passes click event to the appropriate child widget
 		//		if a widget wasn't clicked on, we open our own menu
 		var w = dijit.getEnclosingWidget(e.target);
-		if(w.declaredClass == "api.Filearea._Icon")
+		if(w.declaredClass == "desktop.widget.Filearea._Icon")
 		{
 			w.menu._contextMouse();
 			w.menu._openMyself(e);
@@ -397,7 +397,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 		if(this._lsHandle) this._lsHandle.cancel();
 		//list the path
 		this._loadStart();
-		this._lsHandle = api.filesystem.listDirectory(this.path, dojo.hitch(this, function(array) {
+		this._lsHandle = desktop.filesystem.listDirectory(this.path, dojo.hitch(this, function(array) {
 			this._lsHandle = null;
 			//make a new widget for each item returned
 			dojo.forEach(array, function(item) {
@@ -405,7 +405,7 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 				var p = name.lastIndexOf(".");
 				var ext = name.substring(p+1, name.length);
 				var icon = desktop.config.filesystem.icons[ext.toLowerCase()];
-				var wid = new api.Filearea._Icon({
+				var wid = new desktop.widget.Filearea._Icon({
 					label: name,
 					name: name,
 					path: item.path,
@@ -467,8 +467,8 @@ dojo.declare("api.Filearea", dijit.layout._LayoutWidget, {
 	}
 })
 
-dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Contained], {
-	templatePath: dojo.moduleUrl("api", "templates/Filearea_Item.html"),
+dojo.declare("desktop.widget.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Contained], {
+	templatePath: dojo.moduleUrl("desktop.widget", "templates/Filearea_Item.html"),
 	//	label: string
 	//		The label shown underneath the icon
 	label: "File",
@@ -499,7 +499,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 	_dragTopicPublished: false,
 	postCreate: function() {
 		var nc = dojo.i18n.getLocalization("desktop", "common");
-		var nf = dojo.i18n.getLocalization("api", "filearea");
+		var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
 		
 		this.connect(this.iconNode, "ondblclick", "_onDblClick");
 		this.connect(this.labelNode, "ondblclick", "rename");
@@ -540,16 +540,16 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			var menuDl = new dijit.PopupMenuItem({iconClass: "icon-16-actions-document-open", label: nc.download});
 			var menu2 = new dijit.Menu({parentMenu: menuDl});
 			menu2.addChild(new dijit.MenuItem({label: nf.asFile, onClick: dojo.hitch(this, function(e) {
-				api.filesystem.download(this.getParent().path+this.name);
+				desktop.filesystem.download(this.getParent().path+this.name);
 			})}));
 			menu2.addChild(new dijit.MenuItem({label: nf.asZip ,onClick: dojo.hitch(this, function(e) {
-				api.filesystem.download(this.getParent().path+this.name, "zip");
+				desktop.filesystem.download(this.getParent().path+this.name, "zip");
 			})}));
 			menu2.addChild(new dijit.MenuItem({label: nf.asTgz, onClick: dojo.hitch(this, function(e) {
-				api.filesystem.download(this.getParent().path+this.name, "gzip");
+				desktop.filesystem.download(this.getParent().path+this.name, "gzip");
 			})}));
 			menu2.addChild(new dijit.MenuItem({label: nf.asTbz2, onClick: dojo.hitch(this, function(e) {
-				api.filesystem.download(this.getParent().path+this.name, "bzip");
+				desktop.filesystem.download(this.getParent().path+this.name, "bzip");
 			})}));
 			menu2.startup();
 			menuDl.popup = menu2;
@@ -559,7 +559,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			label: nf.cut,
 			iconClass: "icon-16-actions-edit-cut",
 			onClick: dojo.hitch(this, function() {
-				api._fileareaClipboard = {
+				desktop._fileareaClipboard = {
 					type: "cut",
 					path: this.getParent().path,
 					name: this.name,
@@ -572,7 +572,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			label: nf.copy,
 			iconClass: "icon-16-actions-edit-copy",
 			onClick: dojo.hitch(this, function() {
-				api._fileareaClipboard = {
+				desktop._fileareaClipboard = {
 					type: "copy",
 					path: this.getParent().path,
 					name: this.name,
@@ -634,8 +634,8 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			this._dragTopicPublished = false;
 		}
 		var newTarget = dijit.getEnclosingWidget(e.target);
-		if(newTarget.declaredClass && (newTarget.declaredClass == "api.Filearea" || newTarget.declaredClass == "api.Filearea._Icon")) 
-			var targetPath = (newTarget.declaredClass != "api.Filearea"
+		if(newTarget.declaredClass && (newTarget.declaredClass == "desktop.widget.Filearea" || newTarget.declaredClass == "desktop.widget.Filearea._Icon")) 
+			var targetPath = (newTarget.declaredClass != "desktop.widget.Filearea"
 				? (newTarget.type == "text/directory" ? newTarget.getParent().path+newTarget.name+"/" : newTarget.getParent().path)
 				: newTarget.path);
 		if (this._docNode) {
@@ -673,7 +673,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 				this._docNode = null;
 			});
 			if (desktop.config.fx > 0 &&
-			(!(newTarget.declaredClass == "api.Filearea" || newTarget.declaredClass=="api.Filearea._Icon") || isParent(targetPath))) {
+			(!(newTarget.declaredClass == "desktop.widget.Filearea" || newTarget.declaredClass=="desktop.widget.Filearea._Icon") || isParent(targetPath))) {
 				var l = dojo.coords(this.domNode);
 				var anim = dojo.animateProperty({
 					node: this._docNode,
@@ -688,45 +688,45 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			else 
 				onEnd();
 			
-			var nf = dojo.i18n.getLocalization("api", "filearea");
-			if(isParent(targetPath)) api.ui.notify({message: nf.parentErr, type: "warning", duration: 5000});
+			var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
+			if(isParent(targetPath)) desktop.dialog.notify({message: nf.parentErr, type: "warning", duration: 5000});
 			if(((e.shiftKey && newTarget.type != "text/directory") || newTarget.id != this.getParent().id)
 			&& newTarget.id != this.id
 			&& !isParent(targetPath)
-			&& (newTarget.declaredClass == "api.Filearea" || newTarget.declaredClass == "api.Filearea._Icon")) {
+			&& (newTarget.declaredClass == "desktop.widget.Filearea" || newTarget.declaredClass == "desktop.widget.Filearea._Icon")) {
 				var _loadParent = this.getParent();
 				_loadParent._loadStart();
 				if (e.shiftKey) {
 					//copy the file
-					if(newTarget.declaredClass == "api.Filearea") 
+					if(newTarget.declaredClass == "desktop.widget.Filearea") 
 						var name = newTarget._fixDuplicateFilename(this.name, this.type);
 					else
 						var name = (newTarget.type == "text/directory" ? 
 									this.name : //TODO: fix the name server side? or at least show an error message...
 									newTarget.getParent()._fixDuplicateFilename(this.name, this.type));
-					api.filesystem.copy(this.getParent().path + "/" + this.name, targetPath + name, function(){
+					desktop.filesystem.copy(this.getParent().path + "/" + this.name, targetPath + name, function(){
 						_loadParent._loadEnd();
-						if(newTarget.declaredClass == "api.Filearea") newTarget.refresh();
+						if(newTarget.declaredClass == "desktop.widget.Filearea") newTarget.refresh();
 						dojo.publish("filearea:"+targetPath, [newTarget.id]);
 						//TODO: copy myself and add me to newTarget?
 					});
 				}
 				else {
 					//move the file
-					if(newTarget.declaredClass == "api.Filearea") 
+					if(newTarget.declaredClass == "desktop.widget.Filearea") 
 						var name = newTarget._fixDuplicateFilename(this.name, this.type);
 					else
 						var name = (newTarget.type == "text/directory" ? 
 									this.name : //TODO: fix the name server side? or at least show an error message...
 									newTarget.getParent()._fixDuplicateFilename(this.name, this.type));
-					api.filesystem.move(this.getParent().path + "/" + this.name, targetPath + name, dojo.hitch(this, function(){
+					desktop.filesystem.move(this.getParent().path + "/" + this.name, targetPath + name, dojo.hitch(this, function(){
 						_loadParent._loadEnd();
 						var p = this.getParent();
 						p.removeChild(this);
 						p.layout();
 						this.name = name;
 						this.label = this._formatLabel(name);
-						if(newTarget.declaredClass == "api.Filearea") {
+						if(newTarget.declaredClass == "desktop.widget.Filearea") {
 							newTarget.addChild(this);
 							newTarget.layout();
 							this.fixStyle();
@@ -788,7 +788,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			if(value == this.name) return;
 			value = this.getParent()._fixDuplicateFilename(value, this.type);
 			this.getParent()._loadStart();
-			api.filesystem.move(this.getParent().path+this.name, value, dojo.hitch(this, function() {
+			desktop.filesystem.move(this.getParent().path+this.name, value, dojo.hitch(this, function() {
 				if(desktop.config.filesystem.hideExt) {
 					var pos = value.lastIndexOf(".");
 					if(pos != -1) {
@@ -807,7 +807,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 	{
 		//	summary:
 		//		Delete the file on the filesystem this instance represents
-		api.filesystem.remove(this.getParent().path+this.name, dojo.hitch(this, function() {
+		desktop.filesystem.remove(this.getParent().path+this.name, dojo.hitch(this, function() {
 			var p = this.getParent();
 			this.destroy();
 			p.layout();
@@ -843,7 +843,7 @@ dojo.declare("api.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Cont
 			this.textBack,
 			this.textHidden
 		], function(node) {
-			api.textContent(node, this.label);
+			desktop.textContent(node, this.label);
 		}, this);
 	}
 })

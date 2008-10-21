@@ -13,7 +13,7 @@ dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
 		dojo.requireLocalization("desktop", "apps");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
-		this.win = new api.Window({
+		this.win = new desktop.widget.Window({
 			title: app["Image Viewer"],
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
@@ -24,7 +24,7 @@ dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
 				label: cm.open,
 		        iconClass: "icon-16-actions-document-open",
 				onClick: dojo.hitch(this, function() {
-					api.ui.fileDialog({
+					desktop.dialog.file({
 						title: "Choose an image to open",
 						callback: dojo.hitch(this, "open")
 					});
@@ -62,7 +62,7 @@ dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
 			
 			this.dragPane.domNode.appendChild(this.imgNode);
 		}
-		dojo.query("img", this.imgNode)[0].src = api.filesystem.embed(path);
+		dojo.query("img", this.imgNode)[0].src = desktop.filesystem.embed(path);
         dojo.query("*", this.imgNode).style({
             "MozUserFocus": "ignore",
             "MozUserInput": "disabled",

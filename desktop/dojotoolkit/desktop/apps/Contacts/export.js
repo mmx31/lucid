@@ -10,7 +10,7 @@ dojo.provide("desktop.apps.Contacts.export");
     dojo.extend(desktop.apps.Contacts, {
         doExport: function() {
             var msg = dojo.i18n.getLocalization("desktop", "messages");
-            api.ui.fileDialog({
+            desktop.dialog.file({
 	            title: msg.chooseFileSave,
 	            callback: dojo.hitch(this, function(path) {
                    this.exportData(path, function(){}, function(){}); //TODO: add notifications? 
@@ -33,7 +33,7 @@ dojo.provide("desktop.apps.Contacts.export");
                    data.push(card);
                 },
                 onComplete: function() {
-                   api.filesystem.writeFileContents(path, data.join("\n\n"), onComplete, onError);
+                   desktop.filesystem.writeFileContents(path, data.join("\n\n"), onComplete, onError);
                 }
             });
         }

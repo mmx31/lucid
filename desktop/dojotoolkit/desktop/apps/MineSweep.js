@@ -27,7 +27,7 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 		dojo.requireLocalization("desktop", "apps");
 		var nls = dojo.i18n.getLocalization("desktop", "games");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
-		this.win = new api.Window({
+		this.win = new desktop.widget.Window({
 			title: app["MineSweep"],
 			width: "200px",
 			height: "230px",
@@ -322,7 +322,6 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 		this.squaresRevealed++;
 		//console.debug( this.squaresRevealed + " squares revealed.. " + this.squaresToWin + " needed to win" );
 		if ( this.squaresRevealed >= this.squaresToWin ) {
-			//api.ui.alertDialog({ title: "Congratulations!", message: "You win!" });
 			this.gameWin();
 			return;
 		}

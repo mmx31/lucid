@@ -1,9 +1,9 @@
-dojo.provide("api.StatusBar");
+dojo.provide("desktop.widget.StatusBar");
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit.ProgressBar");
 
-dojo.declare("api.StatusBar", [dijit._Widget, dijit._Templated], {
+dojo.declare("desktop.widget.StatusBar", [dijit._Widget, dijit._Templated], {
 	label: "&nbsp;",
 	templateString: "<div class='desktopStatusBar'>"
 	+"<div dojoAttachPoint='labelNode'>${label}</div>"

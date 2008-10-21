@@ -29,7 +29,7 @@ desktop.config = {
 	load: function(cback) {
 		//	summary:
 		//		Loads the configuration from the server
-		api.xhr({
+		desktop.xhr({
 	        backend: "core.config.stream.load",
 	        load: function(data, ioArgs) {
 				if(data == "") {
@@ -58,7 +58,7 @@ desktop.config = {
 			if(dojo.isFunction(desktop.config[key])) continue;
 			config[key] = dojo.clone(desktop.config[key]);
 		}
-		api.xhr({
+		desktop.xhr({
             backend: "core.config.stream.save",
 			sync: sync,
             content: {value: dojo.toJson(config)}

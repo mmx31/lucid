@@ -4,7 +4,7 @@ dojo.require("dojox.grid.DataGrid");
 dojo.require("dojox.grid.cells.dijit");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.form.Button");
-api.addDojoCss("dojox/grid/resources/Grid.css");
+desktop.addDojoCss("dojox/grid/resources/Grid.css");
 dojo.requireLocalization("desktop", "apps");
 dojo.requireLocalization("desktop.apps.Contacts", "Contacts");
 dojo.requireLocalization("desktop", "messages");
@@ -14,14 +14,14 @@ dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
         var nls = dojo.i18n.getLocalization("desktop.apps.Contacts", "Contacts");
         var app = dojo.i18n.getLocalization("desktop", "apps");
 		this.windows = [];
-		var win = new api.Window({
+		var win = new desktop.widget.Window({
 			title: app["Contacts"],
             iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
 		this.windows.push(win);
 		
-		var contactStore = this.contactStore = new api.Registry({
+		var contactStore = this.contactStore = new desktop.Registry({
 		    name: "contacts",
 		    appname: this.sysname,
 		    data: {

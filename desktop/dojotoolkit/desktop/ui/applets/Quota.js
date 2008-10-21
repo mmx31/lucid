@@ -22,7 +22,7 @@ dojo.declare("desktop.ui.applets.Quota", desktop.ui.Applet, {
 	},
 	update: function(path) {
 		if(path.indexOf(this.path) != 0) return;
-		api.filesystem.getQuota(path, dojo.hitch(this, function(v) {
+		desktop.filesystem.getQuota(path, dojo.hitch(this, function(v) {
 			this.pBar.update({
 				maximum: v.total,
 				progress: v.used,

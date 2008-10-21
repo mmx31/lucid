@@ -53,7 +53,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 					label: cmn["delete"],
 					onClick: dojo.hitch(this, function(e) {
 						var row = this._groupGrid.getItem(this.__rowIndex);
-						api.ui.yesnoDialog({
+						desktop.dialog.yesno({
 							title: sys.groupDelConfirm,
 							message: sys.delFromSys.replace("%s", row.name),
 							callback: dojo.hitch(this, function(a) {
@@ -181,7 +181,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var row = this._groupGrid.getItem(this.__rowIndex);
-		var window = new api.Window({
+		var window = new desktop.widget.Window({
 			title: sys.manageGroupMembers.replace("%s", this._groupStore.getValue(row, "name")),
 			width: "400px",
 			height: "200px"

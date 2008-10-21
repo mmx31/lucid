@@ -17,7 +17,7 @@ desktop.app = {
 		//	summary:
 		//		Loads the app list from the server
 		this.onConfigApply = dojo.subscribe("configApply", this, "startupApps");
-		api.xhr({
+		desktop.xhr({
 			backend: "core.app.fetch.list",
 			load: dojo.hitch(this, function(data, ioArgs) {
 				this.appList = data;
@@ -31,7 +31,7 @@ desktop.app = {
 								+"background-image: url('"+dojo.moduleUrl("desktop.apps."+item.sysname, item.icon)+"');"
 								+"}";
 				});
-				api.textContent(style, contents);
+				desktop.textContent(style, contents);
 				document.getElementsByTagName("head")[0].appendChild(style);
 			}),
 			handleAs: "json"
@@ -61,7 +61,7 @@ desktop.app = {
 			var l = file.lastIndexOf(".");
 			var ext = file.substring(l + 1, file.length);
 			if (ext == "desktop") {
-				api.filesystem.readFileContents(file, dojo.hitch(this, function(content){
+				desktop.filesystem.readFileContents(file, dojo.hitch(this, function(content){
 					var c = content.split("\n");
 					desktop.app.launch(c[0], dojo.fromJson(c[1]));
 				}));
@@ -69,7 +69,7 @@ desktop.app = {
 			}
 		}
 		if(!format) {
-			api.filesystem.info(file, dojo.hitch(this, function(f){
+			desktop.filesystem.info(file, dojo.hitch(this, function(f){
 				var type = f.type;
 				this._launchHandler(file, type, args);
 			}));
@@ -123,7 +123,7 @@ desktop.app = {
 				}
 			}
 		}
-		api.ui.alertDialog({
+		desktop.dialog.alert({
 			title: "Error",
 			message: "Cannot open " + file + ", no app associated with " + type
 		});
@@ -139,7 +139,7 @@ desktop.app = {
 		//	callback:
 		//		a callback once the app has initiated
 		dojo.publish("launchApp", [name]);
-		api.log("launching app "+name);
+		desktop.log("launching app "+name);
 		dojo["require"]("desktop.apps."+name);
 		var pid = false;
 		try {
@@ -202,7 +202,7 @@ desktop.app = {
 		//		Lists the apps available on the server
 		//	callback:
 		//		a callback function. First argument passed is an array with desktop.app._listCallbackItem objects for each app.
-		api.xhr({
+		desktop.xhr({
 			backend: "core.app.fetch.listAll",
 			load: callback,
 			handleAs: "json"
@@ -243,12 +243,12 @@ desktop.app = {
 		//	instance:
 		//		the instance ID to kill
 		try {
-			api.log("procSystem: killing instance "+instance);
+			desktop.log("procSystem: killing instance "+instance);
 			desktop.app.instances[instance].kill();	//Pre-Kill the instance
 			return true;
 		}
 		catch(err) {
-			api.log("procSystem: killing instance "+instance+" failed. setting status to zombie.");
+			desktop.log("procSystem: killing instance "+instance+" failed. setting status to zombie.");
 			console.error(err);
 			desktop.app.instances[instance].status = "zombie";
 			return false;
@@ -298,19 +298,19 @@ desktop.app = {
 		//		saves an app to the server
 		if((app.sysname||app.filename)||(app.sysname&&app.filename))
 		{
-			  api.log("IDE API: Saving application...");
-	          api.xhr({
+			  desktop.log("IDE API: Saving application...");
+	          desktop.xhr({
 	               backend: "core.app.write.save",
 	               content : app,
 		       error: function(data, ioArgs) {
 						if(app.error) app.error(data, ioArgs);
-						api.log("IDE API: Save error");
+						desktop.log("IDE API: Save error");
 			},
 	               load: function(data, ioArgs){
 						app.callback(data.sysname||true);
-						api.log("IDE API: Save Sucessful");
+						desktop.log("IDE API: Save Sucessful");
 						delete desktop.app.apps[parseInt(data.id)];
-						api.xhr({
+						desktop.xhr({
 							backend: "core.app.fetch.list",
 							load: dojo.hitch(this, function(data, ioArgs) {
 								this.appList = data;
@@ -324,7 +324,7 @@ desktop.app = {
 	     }
 		 else
 		 {
-			api.log("IDE API: Error! Could not save. Not all required strings in the object are defined.");
+			desktop.log("IDE API: Error! Could not save. Not all required strings in the object are defined.");
 		 	return false;
 		 }
 	},
@@ -335,7 +335,7 @@ desktop.app = {
 		//		the path to the folder to create, relative to the apps directory
 		//	callback:
 		//		a callback function once the operation is complete
-		return api.xhr({
+		return desktop.xhr({
 			backend: "core.app.write.createFolder",
 			content: {
 				dirname: path
@@ -355,7 +355,7 @@ desktop.app = {
 		//		the filename to open. If excluded, the callback will get an array of filenames
 		//	callback:
 		//		A callback function. Gets passed a desktop.app._saveArgs object, excluding the callback.
-		api.xhr({
+		desktop.xhr({
 			backend: "core.app.fetch.full",
 			content: {
 				sysname: name,
@@ -380,7 +380,7 @@ desktop.app = {
 		//		the new name of the file
 		//	callback:
 		//		a callback function once the action is complete
-		return api.xhr({
+		return desktop.xhr({
 			backend: "core.app.write.rename",
 			content: {
 				origName: origName,
@@ -403,7 +403,7 @@ desktop.app = {
 		var args = {};
 		if(name) args.sysname = name
 		if(filePath) args.filePath = filePath;
-		api.xhr({
+		desktop.xhr({
 			backend: "core.app.write.remove",
 			content: args,
 			load: function(d) {

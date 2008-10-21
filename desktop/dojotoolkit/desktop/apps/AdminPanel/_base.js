@@ -13,7 +13,7 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		//make window
-		this.win = new api.Window({
+		this.win = new desktop.widget.Window({
 			title: app["Administration Panel"],
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill"),
@@ -84,7 +84,7 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 		var row = grid.getItem(this.__rowIndex);
 		var perms = permissions(row);
 		this.__rowIndex = null;
-		var win = new api.Window({
+		var win = new desktop.widget.Window({
 			title: sys.permsFor.replace("%s", lbl(row))
 		});
 		this.windows.push(win);

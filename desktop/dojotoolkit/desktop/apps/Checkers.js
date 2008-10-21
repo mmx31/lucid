@@ -7,7 +7,7 @@ dojo.declare("desktop.apps.Checkers", desktop.apps._App, {
 		dojo.require("dojox.gfx.move");
 		dojo.requireLocalization("desktop", "apps");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
-		this.win = new api.Window({
+		this.win = new desktop.widget.Window({
 			title: app["Checkers"],
 			width: "400px",
 			height: "400px",
