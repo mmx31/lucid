@@ -14,8 +14,8 @@ dojo.require("dojo.data.ItemFileWriteStore");
 dojo.require("dijit.Menu");
 dojo.require("dijit.Dialog");
 dojo.require("dojox.widget.FileInputAuto");
-api.addDojoCss("dojox/grid/resources/Grid.css");
-api.addDojoCss("dojox/widget/FileInput/FileInput.css");
+desktop.addDojoCss("dojox/grid/resources/Grid.css");
+desktop.addDojoCss("dojox/widget/FileInput/FileInput.css");
 
 //require parts of admin panel
 dojo.require("desktop.apps.AdminPanel._base");

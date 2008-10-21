@@ -11,7 +11,7 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 		dojo.require("dijit.layout.ContentPane");
 		dojo.requireLocalization("desktop", "apps");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
-		var win = this.win = new api.Window({
+		var win = this.win = new desktop.widget.Window({
 			title: app["Calculator"],
 			width: "200px",
 			height: "270px",
@@ -85,7 +85,7 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 	},
 	clear: function(t) {
 		this.answerShown = false;
-		api.textContent(this.eNode, "");
+		desktop.textContent(this.eNode, "");
 		t.setValue("");
 	},
 	answerShown: false,

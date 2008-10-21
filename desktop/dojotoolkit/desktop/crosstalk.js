@@ -1,5 +1,5 @@
-dojo.provide("api.crosstalk");
-api.crosstalk = {
+dojo.provide("desktop.crosstalk");
+desktop.crosstalk = {
 	//	summary:
 	//		An API that allows an app to communicate with other applications on a system-wide level. 
 	//	session: Array
@@ -18,7 +18,7 @@ api.crosstalk = {
 		//		a handler function that is called when something for this event is published
 		//	returns:
 		//		returns a handle that you can use to unregister the handler (see unregisterHandler)
-		var session = api.crosstalk.session;
+		var session = desktop.crosstalk.session;
 		var p = session[session.length] = {
 			appsysname: (instance ? desktop.app.instances[instance].sysname : -1),
 			callback: handler,
@@ -33,7 +33,7 @@ api.crosstalk = {
 		//		unregister an event handler
 		//	handle:
 		//		a handle that was returned from subscribe()
-		api.crosstalk.session[handle] = null;
+		desktop.crosstalk.session[handle] = null;
 	},
 	_internalCheck: function()
 	{
@@ -47,16 +47,16 @@ api.crosstalk = {
 		//	if(i != null) eventsToHandle=true;
 		//})
 		//if (!eventsToHandle) { // no data in array (no handlers registered)
-		//	//api.log("Crosstalk API: No events to process...");
+		//	//desktop.log("Crosstalk API: No events to process...");
 		//	this.setup_timer();
 		//}
 		//else { // handlers found. ask to obtain any events.
-			//api.log("Crosstalk API: Checking for events...");
-        	api.xhr({
+			//desktop.log("Crosstalk API: Checking for events...");
+        	desktop.xhr({
 	        	backend: "api.crosstalk.io.checkForEvents",
 				handleAs: "json",
 	        	load: dojo.hitch(this, "_internalCheck2"),
-	        	error: function(type, error) { api.log("Error in Crosstalk call: "+error.message); }
+	        	error: function(type, error) { desktop.log("Error in Crosstalk call: "+error.message); }
         	});
 		//}
 	},
@@ -77,7 +77,7 @@ api.crosstalk = {
 		//	instance:
 		//		the specific app instance to send it to.
 		//		omit to send it to all instances
-    	api.xhr({
+    	desktop.xhr({
 	    	backend: "api.crosstalk.io.sendEvent",
 			content: {
 				topic: topic,
@@ -87,7 +87,7 @@ api.crosstalk = {
 				instance: instance || -1
 			},
 	    	error: function(type, error) {
-				api.log("Error in Crosstalk call: "+error.message);
+				desktop.log("Error in Crosstalk call: "+error.message);
 				this.setup_timer();
 			}
     	});

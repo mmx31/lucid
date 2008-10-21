@@ -10,7 +10,7 @@ dojo.provide("desktop.apps.Contacts.import");
     dojo.extend(desktop.apps.Contacts, {
         doImport: function() {
             var msg = dojo.i18n.getLocalization("desktop", "messages");
-            api.ui.fileDialog({
+            desktop.dialog.file({
 	            title: msg.chooseFileOpen,
 	            callback: dojo.hitch(this, function(path) {
                    this.importData(path, function(){}, function(){}); //TODO: add notifications? 
@@ -20,7 +20,7 @@ dojo.provide("desktop.apps.Contacts.import");
         },
         importData: function(path, onComplete, onError) {
             var store = this.contactStore;
-            api.filesystem.readFileContents(path, function(data) {
+            desktop.filesystem.readFileContents(path, function(data) {
                 var re = /^([^\:;\r\n]+)(([^:]+\:)|(\:))(.+)$/mg;
                 var vcard = {};
                 var info;

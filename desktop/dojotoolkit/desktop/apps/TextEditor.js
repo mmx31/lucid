@@ -21,7 +21,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 		
-	    this.window = new api.Window({
+	    this.window = new desktop.widget.Window({
 			title: app["Text Editor"],
 			iconClass: this.iconClass,
 	        onClose: dojo.hitch(this, "kill")
@@ -55,7 +55,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	        iconClass: "icon-16-actions-process-stop"
 	    }));
 	    this.window.addChild(toolbar);
-	    this.statusbar = new api.StatusBar({
+	    this.statusbar = new desktop.widget.StatusBar({
 	        region: "bottom"
 	    });
 		this.editor = new dijit.form.SimpleTextarea({
@@ -99,7 +99,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	},
 	processOpen: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
-	    api.ui.fileDialog({
+	    desktop.dialog.file({
 	        title: msg.chooseFileOpen,
 	        callback: dojo.hitch(this, "_processOpen")
 	    });
@@ -115,7 +115,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    this.statusbar.attr("label", msg.openingFile.replace("%s", path));
 	    this.newAs = true;
 	    this.editor.setDisabled(true);
-	    api.filesystem.readFileContents(path, dojo.hitch(this, function(content) {
+	    desktop.filesystem.readFileContents(path, dojo.hitch(this, function(content) {
 			this.editor.setValue(content);
             this.editing = true;
             this.newAs = true;
@@ -129,7 +129,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	processSave: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (this.editing) {
-	        api.filesystem.writeFileContents(this.fileEditing, this.editor.getValue());
+	        desktop.filesystem.writeFileContents(this.fileEditing, this.editor.getValue());
 	        this.statusbar.attr("label", msg.fileSaved);
 	
 	    }
@@ -142,7 +142,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	processSaveAs: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (this.newAs) {
-	        api.ui.fileDialog({
+	        desktop.dialog.file({
 	            title: msg.chooseFileSave,
 	            callback: dojo.hitch(this, 
 	            function(path) {

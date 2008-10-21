@@ -6,12 +6,12 @@ dojo.declare("desktop.apps.Terminal", desktop.apps._App, {
 		dojo.require("dijit.layout.LayoutContainer");
 		dojo.requireLocalization("desktop", "apps");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
-		this.win = new api.Window({
+		this.win = new desktop.widget.Window({
 			title: app["Terminal"],
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
-		this.term = new api.Console({region: "center", path: (args.path || "/")})
+		this.term = new desktop.widget.Console({region: "center", path: (args.path || "/")})
 		var killMyself = dojo.hitch(this, "kill");
 		this.term.aliases.exit = function(params){
 			killMyself();

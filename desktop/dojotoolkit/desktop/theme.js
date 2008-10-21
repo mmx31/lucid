@@ -68,7 +68,7 @@ desktop.theme = {
 		//		a callback function. First arg is an array of desktop.theme._listArgs objects.
 		//	sync:
 		//		Should the call be synchronous? defaults to false.
-		api.xhr({
+		desktop.xhr({
 			backend: "core.theme.get.list",
 			load: callback,
 			sync: sync || false,
@@ -85,7 +85,7 @@ desktop.theme = {
 		//		a callback once the action has been completed
 		//	onError:
 		//		a callback if there's an error
-		var df = api.xhr({
+		var df = desktop.xhr({
 			backend: "core.theme.package.remove",
 			content: {
 				themename: name

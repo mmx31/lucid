@@ -18,7 +18,7 @@ dojo.require("dojox.encoding.digests.MD5");
 dojo.requireLocalization("desktop", "common");
 dojo.requireLocalization("desktop", "messages");
 dojo.requireLocalization("desktop", "apps");
-api.addDojoCss("dojox/grid/resources/Grid.css");
+desktop.addDojoCss("dojox/grid/resources/Grid.css");
 		
 dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	currentFeed: false,
@@ -28,12 +28,12 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		this.feedCounter = {};
-	    this.win = new api.Window({
+	    this.win = new desktop.widget.Window({
 	        title: app["Feed Reader"],
 			iconClass: this.iconClass,
 	        onClose: dojo.hitch(this, this.kill)
 	    });
-		var store = this.feedStore = new api.Registry({
+		var store = this.feedStore = new desktop.Registry({
 			appname: this.sysname,
 			name: "rssFeeds",
 			data: {
@@ -93,7 +93,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 				]
 			}
 		});
-		this.hashStore = new api.Registry({
+		this.hashStore = new desktop.Registry({
 			appname: this.sysname,
 			name: "feedItemHashes",
 			data: {
@@ -487,7 +487,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
             this.grid.setQuery({Title: "*"});
 		}
 		dojo.style(this.loadNode, "display", "block");
-	    api.xhr({
+	    desktop.xhr({
 	        url: url,
 	        preventCache: true,
 			xsite: true,
@@ -496,12 +496,12 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 				var hashes = [];
 				var newHashes = false;
 	            dojo.forEach(items, function(item) {
-	                var title = api.textContent(item.getElementsByTagName("title")[0]);
-	                var content = api.textContent(item.getElementsByTagName("description")[0]);
-	                var url = api.textContent(item.getElementsByTagName("link")[0]);
-	                var date = api.textContent((item.getElementsByTagName("pubDate")[0] ||
+	                var title = desktop.textContent(item.getElementsByTagName("title")[0]);
+	                var content = desktop.textContent(item.getElementsByTagName("description")[0]);
+	                var url = desktop.textContent(item.getElementsByTagName("link")[0]);
+	                var date = desktop.textContent((item.getElementsByTagName("pubDate")[0] ||
 								item.getElementsByTagName("dc:date")[0] || {textContent: ""}));
-	                var guid = api.textContent((item.getElementsByTagName("guid")[0] || {textContent: ""}));
+	                var guid = desktop.textContent((item.getElementsByTagName("guid")[0] || {textContent: ""}));
 					var dateObj = new Date(date);
 					if(isNaN(dateObj.getDay())) {
 						//must be an ISO string

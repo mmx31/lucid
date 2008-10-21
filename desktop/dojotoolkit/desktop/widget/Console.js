@@ -1,9 +1,9 @@
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Container");
-dojo.provide("api.Console");
-dojo.requireLocalization("api", "console");
-dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained], {
+dojo.provide("desktop.widget.Console");
+dojo.requireLocalization("desktop.widget", "console");
+dojo.declare("desktop.widget.Console", [dijit._Widget, dijit._Templated, dijit._Contained], {
 	//	summary:
 	//		A console widget that you can embed in an app
 	//
@@ -61,7 +61,7 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		help: function(params)
 		{
-			var n = dojo.i18n.getLocalization("api", "console");
+			var n = dojo.i18n.getLocalization("desktop.widget", "console");
 			var text = n.helpHeader;
 			dojo.forEach(["reload", "echo", "ls", "cd", "pwd", "cat", "mkdir", "rm", "rmdir", "ps", "kill", "clear", "logout"], function(a) {
 				var s = a;
@@ -96,7 +96,7 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		kill: function(params)
 		{
-			var n = dojo.i18n.getLocalization("api", "console");
+			var n = dojo.i18n.getLocalization("desktop.widget", "console");
 			if(params == "") { this.write("kill: "+n.usage+": kill ["+n.instance+"]\n"); }
 			else {
 			if(desktop.app.kill(params) == 1) { this.write("kill: "+n.procKilled+"\n"); }
@@ -122,9 +122,9 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		ls: function(params)
 		{
-			var n = dojo.i18n.getLocalization("api", "console");
+			var n = dojo.i18n.getLocalization("desktop.widget", "console");
 			if(params == "") params = this.path;
-			api.filesystem.listDirectory(params, dojo.hitch(this, function(array) {
+			desktop.filesystem.listDirectory(params, dojo.hitch(this, function(array) {
 				var i = 0;
 				var out = "";
 				while(i < array.length) {
@@ -142,35 +142,35 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		},
 		mkdir: function(params)
 		{
-			var n = dojo.i18n.getLocalization("api", "console");
+			var n = dojo.i18n.getLocalization("desktop.widget", "console");
 			if(params == "") {
 				this.write("mkdir: "+n.needDirName+"\n");
 			}
 			else {
-				api.filesystem.createDirectory(params);
+				desktop.filesystem.createDirectory(params);
 			}
 			this.detach();
 		},
 		rm: function(params)
 		{
-			var n = dojo.i18n.getLocalization("api", "console");
+			var n = dojo.i18n.getLocalization("desktop.widget", "console");
 			if(params == "") {
 				this.write("rm: "+n.needFileName+"\n");
 			}
 			else {
-				api.filesystem.remove(params);
+				desktop.filesystem.remove(params);
 			}
 			this.detach();
 		},
 		cat: function(params)
 		{
-			var n = dojo.i18n.getLocalization("api", "console");
+			var n = dojo.i18n.getLocalization("desktop.widget", "console");
 			if(params == "") {
 				this.write("cat: "+n.needFileName+"\n");
 				this.detach();
 			}
 			else {
-				api.filesystem.readFileContents(this.path + params, dojo.hitch(this, function(content) {
+				desktop.filesystem.readFileContents(this.path + params, dojo.hitch(this, function(content) {
 					this.write(content+"\n");
 					this.detach();
 				}));
@@ -245,10 +245,10 @@ dojo.declare("api.Console", [dijit._Widget, dijit._Templated, dijit._Contained],
 		var text = this.stdout;
 		var doScroll = this.domNode.scrollHeight - this.domNode.offsetHeight == this.domNode.scrollTop;
 		if(this.appAttached === false) text += this.inputLine();
-		api.textContent(this.domNode, "");
+		desktop.textContent(this.domNode, "");
 		dojo.forEach(text.split("\n"), function(val, i) {
 			var row = document.createElement("div");
-			api.textContent(row, val);
+			desktop.textContent(row, val);
 			this.domNode.appendChild(row);
 		}, this)
 		if(doScroll) {

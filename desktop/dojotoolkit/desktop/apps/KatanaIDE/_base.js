@@ -11,13 +11,13 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var ideLocale = dojo.i18n.getLocalization("desktop.apps.KatanaIDE", "ide");
 		this.windows = [];
-		this.win = new api.Window({
+		this.win = new desktop.widget.Window({
 			title: app["Katana IDE"],
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
 		
-		this.store = new api.Registry({
+		this.store = new desktop.Registry({
 			name: "settings",
 			appname: this.sysname,
 			data: {
@@ -115,7 +115,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 	},
 	makeMenu: function(tree) {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
-		var nf = dojo.i18n.getLocalization("api", "filearea");
+		var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var menu = new dijit.Menu({});
 		dojo.connect(menu, "_openMyself", this, function(e){
@@ -135,8 +135,8 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			label: nf.createFolder,
 			iconClass: "icon-16-actions-folder-new",
 			onClick: dojo.hitch(this, function() {
-				var nf = dojo.i18n.getLocalization("api", "filearea");
-				api.ui.inputDialog({
+				var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
+				desktop.dialog.input({
 					title: nf.createFolder,
 					message: nf.createFolderText,
 					callback: dojo.hitch(this, function(dirname) {
@@ -151,7 +151,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 							},
 							queryOptions: {deep: true},
 							onComplete: dojo.hitch(this, function(items) {
-								if(items.length != 0) return api.ui.notify({
+								if(items.length != 0) return desktop.dialog.notify({
 									type: "warning",
 									message: nf.alreadyExists
 								})
@@ -176,8 +176,8 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			label: nf.createFile,
 			iconClass: "icon-16-actions-document-new",
 			onClick: dojo.hitch(this, function() {
-				var nf = dojo.i18n.getLocalization("api", "filearea");
-				api.ui.inputDialog({
+				var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
+				desktop.dialog.input({
 					title: nf.createFile,
 					message: nf.createFileText,
 					callback: dojo.hitch(this, function(filename) {
@@ -193,7 +193,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 							},
 							queryOptions: {deep: true},
 							onComplete: dojo.hitch(this, function(items) {
-								if(items.length != 0) return api.ui.notify({
+								if(items.length != 0) return desktop.dialog.notify({
 									type: "warning",
 									message: nf.alreadyExists
 								})
@@ -226,9 +226,9 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		menu.addChild(new dijit.MenuItem({
 			label: cm.rename,
 			onClick: dojo.hitch(this, function() {
-				var nf = dojo.i18n.getLocalization("api", "filearea");
+				var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
 				var cmn = dojo.i18n.getLocalization("desktop", "common");
-				api.ui.inputDialog({
+				desktop.dialog.input({
 					title: cmn.rename,
 					initial: this.appStore.getValue(this._contextItem, "name"),
 					callback: dojo.hitch(this, function(filename) {
@@ -245,7 +245,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 							},
 							queryOptions: {deep: true},
 							onComplete: dojo.hitch(this, function(items) {
-								if(items.length != 0) return api.ui.notify({
+								if(items.length != 0) return desktop.dialog.notify({
 									type: "warning",
 									message: nf.alreadyExists
 								})
@@ -292,7 +292,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 					}));
 				})
 				if(!fname) 
-					api.ui.yesnoDialog({
+					desktop.dialog.yesno({
 						title: sys.appDelConfirm,
 						message: sys.delFromSys.replace("%s", this.appStore.getValue(this._contextItem, "name")),
 						callback: dojo.hitch(this, function(a) {
@@ -445,7 +445,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		var ideLocale = dojo.i18n.getLocalization("desktop.apps.KatanaIDE", "ide");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		
-		var win = new api.Window({
+		var win = new desktop.widget.Window({
 			title: ideLocale.createNewApp,
 			width: "350px",
 			height: "150px"
@@ -478,8 +478,8 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 							sysname: sysBox.getValue()
 						},
 						onComplete: dojo.hitch(this, function(items) {
-							var nf = dojo.i18n.getLocalization("api", "filearea");
-							if(items.length != 0) return api.ui.notify({
+							var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
+							if(items.length != 0) return desktop.dialog.notify({
 								type: "warning",
 								message: nf.alreadyExists
 							})

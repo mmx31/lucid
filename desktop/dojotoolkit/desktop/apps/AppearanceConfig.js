@@ -5,7 +5,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 		//	summary:
 		//		Shows the appearance configuration dialog
 		var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
-		var win = this.wallWin = new api.Window({
+		var win = this.wallWin = new desktop.widget.Window({
 			title: l.appearancePrefs,
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
@@ -104,11 +104,11 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 			label: nc.add,
 			iconClass: "icon-22-actions-list-add",
 			onClick: function() {
-				api.ui.fileDialog({
+				desktop.dialog.file({
 					title: nc.chooseWall,
 					callback: function(path) {
 						if(path) {
-							var p = api.filesystem.embed(path);
+							var p = desktop.filesystem.embed(path);
 							for(var key in desktop.config.wallpaper.storedList) {
 								var val = desktop.config.wallpaper.storedList[key];
 								if(val == p) return;
@@ -173,7 +173,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 			img.title = item.name;
 			p.appendChild(img);
 			var subtitle = document.createElement("div");
-			api.textContent(subtitle, item.name);
+			desktop.textContent(subtitle, item.name);
 			dojo.style(subtitle, "textAlign", "center");
 			p.appendChild(subtitle);
 			if(desktop.config.theme == item.sysname) dojo.addClass(p, "selectedItem");

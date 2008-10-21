@@ -56,7 +56,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 					label: cmn["delete"],
 					onClick: dojo.hitch(this, function(e) {
 						var row = this._themeGrid.getItem(this.__rowIndex);
-						api.ui.yesnoDialog({
+						desktop.dialog.yesno({
 							title: sys.themeDelConfirm,
 							message: sys.delFromSys.replace("%s", row.name),
 							callback: dojo.hitch(this, function(a) {
@@ -82,7 +82,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 	installThemePackage: function() {
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
-		var win = new api.Window({
+		var win = new desktop.widget.Window({
 			title: sys.installThemePackage,
 			width: "300px",
 			height: "200px"
@@ -94,13 +94,13 @@ dojo.extend(desktop.apps.AdminPanel, {
 		div.innerHTML = sys.installThemeInstructions;
 		var uploader = new dojox.widget.FileInputAuto({
 			name: "uploadedfile",
-			url: api.xhr("core.theme.package.install"),
+			url: desktop.xhr("core.theme.package.install"),
 			onComplete: dojo.hitch(this, function(data,ioArgs,widgetRef) {
 				if(data.status && data.status == "success"){
 					widgetRef.overlay.innerHTML = sys.themeInstallSuccess;
                     //check for compatibility
 					if(!data.compatible) {
-					    api.ui.alertDialog({
+					    desktop.dialog.alert({
 					        title: sys.notCompatible,
 					        message: sys.notCompatibleText
 					    });

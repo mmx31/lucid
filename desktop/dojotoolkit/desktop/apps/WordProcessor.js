@@ -23,7 +23,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 		
-	    this.window = new api.Window({
+	    this.window = new desktop.widget.Window({
 			title: app["Word Processor"],
 			iconClass: this.iconClass,
 	        onClose: dojo.hitch(this, this.kill)
@@ -61,7 +61,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	        region: "center"
 	    },
 	    document.createElement("div"));
-	    this.statusbar = new api.StatusBar({
+	    this.statusbar = new desktop.widget.StatusBar({
 	        region: "bottom"
 	    });
 	    this.statusbar.attr("label", msg.noFileOpen);
@@ -128,7 +128,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	},
 	processOpen: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
-	    api.ui.fileDialog({
+	    desktop.dialog.file({
 	        title: msg.chooseFileOpen,
 		types: [{type: ".html"}],
 	        callback: dojo.hitch(this, this._processOpen)
@@ -145,7 +145,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    this.statusbar.attr("label", msg.openingFile.replace("%s", path));
 	    this.newAs = true;
 	    this.editor.setDisabled(true);
-	    api.filesystem.readFileContents(path, dojo.hitch(this, function(content) {
+	    desktop.filesystem.readFileContents(path, dojo.hitch(this, function(content) {
 	            this.editor.setDisabled(false);
 	            this.editor.replaceValue(content);
 	            this.editing = true;
@@ -159,7 +159,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	processSave: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (this.editing) {
-        api.filesystem.writeFileContents(this.fileEditing, "<html>"+this.editor.getValue()+"</html>");
+        desktop.filesystem.writeFileContents(this.fileEditing, "<html>"+this.editor.getValue()+"</html>");
         this.statusbar.attr("label", msg.fileSaved);
 	    }
 	    else {
@@ -171,7 +171,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	processSaveAs: function() {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (this.newAs) {
-	        api.ui.fileDialog({
+	        desktop.dialog.file({
 	            title: msg.chooseFileSave,
 	            callback: dojo.hitch(this, 
 	            function(path) {

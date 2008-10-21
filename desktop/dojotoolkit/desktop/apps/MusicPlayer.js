@@ -11,7 +11,7 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 		dojo.requireLocalization("desktop", "apps");
 		var nls = this.nls = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
-		this.win = new api.Window({
+		this.win = new desktop.widget.Window({
 			title: app["Music Player"],
 			width: "500px",
 			height: "150px",
@@ -171,14 +171,14 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 		}
 	},
 	openURLDialog: function() {
-		api.ui.inputDialog({
+		desktop.dialog.input({
 			title: this.nls.openUrl,
 			callback: dojo.hitch(this, this.openURL)
 		});
 	},
 	openURL: function(fileurl) {
 		if ( fileurl) {
-			this.sound = new api.Sound({
+			this.sound = new desktop.Sound({
 				src: fileurl
 			});
 			this.play();
@@ -187,15 +187,15 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 		}
 	},
 	openFileDialog: function() {
-		api.ui.fileDialog({
+		desktop.dialog.file({
 			title: "Select audio file to open",
 			callback: dojo.hitch(this, this.openFile)
 		});
 	},
 	openFile: function(file) {
 		if (file) {
-			this.sound = new api.Sound({
-				src: api.filesystem.embed(file)
+			this.sound = new desktop.Sound({
+				src: desktop.filesystem.embed(file)
 			});
 			this.play();
 			file = file.split("/");

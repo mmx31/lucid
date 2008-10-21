@@ -41,7 +41,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		if(v.length >= 18) {
 			v = v.slice(0, 18) + "...";
 		}
-		api.textContent(this._labels[store.getValue(item, "id")], v);
+		desktop.textContent(this._labels[store.getValue(item, "id")], v);
 	},
 	onNew: function(item) {
 		var store = desktop.ui._windowList;
@@ -59,7 +59,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		if(store.hasAttribute(item, "icon")) domNode.innerHTML = "<div class='"+store.getValue(item, "icon")+"' style='float: left;'></div>";
 		
 		var labelNode = document.createElement("div");
-		api.textContent(labelNode, v);
+		desktop.textContent(labelNode, v);
 		domNode.appendChild(labelNode);
 		
 		this._winconnects[store.getValue(item, "id")] = dojo.connect(domNode, "onclick", dijit.byId(store.getValue(item, "id")), "_onTaskClick");

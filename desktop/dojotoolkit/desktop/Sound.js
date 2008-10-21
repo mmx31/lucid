@@ -1,7 +1,7 @@
 dojo.require("dijit._Widget");
-dojo.provide("api.Sound");
+dojo.provide("desktop.Sound");
 
-dojo.declare("api.Sound", dijit._Widget, {
+dojo.declare("desktop.Sound", dijit._Widget, {
 	//	summary:
 	//		An API that allows an app to play audio content.
 	//		Abstracts between HTML5 audio tags, flash-based audio, and embed tags
@@ -34,7 +34,7 @@ dojo.declare("api.Sound", dijit._Widget, {
 		var backends = ["html", "flash", "embed"];
 		for(var k in backends) {
 			var i = backends[k];
-			var backend = new api.Sound[i]({
+			var backend = new desktop.Sound[i]({
 				src: this.src,
 				loop: this.loop,
 				autoStart: this.autoStart
@@ -101,10 +101,10 @@ dojo.declare("api.Sound", dijit._Widget, {
 	}
 });
 
-dojo.declare("api.Sound._backend", null, {
+dojo.declare("desktop.Sound._backend", null, {
 	//	summary:
 	//		The base sound backend class
-	//		Most of these properties are repeated in api.Sound, see that for more info
+	//		Most of these properties are repeated in desktop.Sound, see that for more info
 	id: "",
 	//	domNode: domNode
 	//	A domNode that things like embed elements can be added to
@@ -151,10 +151,10 @@ dojo.declare("api.Sound._backend", null, {
 	}
 });
 	
-dojo.declare("api.Sound.html", api.Sound._backend, {
+dojo.declare("desktop.Sound.html", desktop.Sound._backend, {
 	//	summary:
 	//		Sound backend for the HTML5 audio tag
-	//		See api.Sound._backend for more info
+	//		See desktop.Sound._backend for more info
 	htmlSound: null,
 	capabilities: {
 		play: true,
@@ -197,10 +197,10 @@ dojo.declare("api.Sound.html", api.Sound._backend, {
 	}
 });
 	
-dojo.declare("api.Sound.flash", api.Sound._backend, {
+dojo.declare("desktop.Sound.flash", desktop.Sound._backend, {
 	//	summary:
 	//		Sound backend for adobe flash player
-	//		See api.Sound._backend for more info
+	//		See desktop.Sound._backend for more info
 	_startPos: 0,
 	playing: false,
 	play: function() {
@@ -248,12 +248,12 @@ dojo.declare("api.Sound.flash", api.Sound._backend, {
 	}
 });
 	
-dojo.declare("api.Sound.embed", api.Sound._backend, {
+dojo.declare("desktop.Sound.embed", desktop.Sound._backend, {
 	//	summary:
 	//		Sound backend for the embed tag
 	//		There is a known issue where XHRs are cut off when the embed tag is created.
 	//		We have no clue why this happens. If you know, please get in touch with us.
-	//		See api.Sound._backend for more info
+	//		See desktop.Sound._backend for more info
 	capabilities: {
 		play: true,
 		pause: false,

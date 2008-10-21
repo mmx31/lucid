@@ -1,6 +1,6 @@
-dojo.provide("api.filesystem");
+dojo.provide("desktop.filesystem");
 dojo.require("dojo.io.iframe");
-api.filesystem = { 
+desktop.filesystem = { 
 	//	summary:
 	//		A server-side virtual filesystem
 	/*=====
@@ -43,7 +43,7 @@ api.filesystem = {
 		//		a callback function to fire on error
 
         var df = new dojo.Deferred();
-		api.xhr({
+		desktop.xhr({
 	        backend: "api.fs.io.getFolder",
 			content: {
 				path: path,
@@ -78,7 +78,7 @@ api.filesystem = {
 		//		a callback function to fire on error
 
 		var df = new dojo.Deferred();
-        var xhr = api.xhr({
+        var xhr = desktop.xhr({
 	        backend: "api.fs.io.getFile",
 			content: {
 				path: path,
@@ -117,7 +117,7 @@ api.filesystem = {
 		//		a callback function to fire on error
 
 		var df = new dojo.Deferred();
-		var xhr=api.xhr({
+		var xhr=desktop.xhr({
 			backend: "api.fs.io.writeFile",
 			content: {
 				path: path,
@@ -131,7 +131,7 @@ api.filesystem = {
 				else
 					return this._errCheck(	data,
 											dojo.hitch(this, "writeFileContents", path, content, onComplete, onError),
-											dojo.hitch(df, "errback", Error(api._errorCodes[data])),
+											dojo.hitch(df, "errback", Error(desktop._errorCodes[data])),
 											dojo.hitch(df, "errback"));
 				var p = path.lastIndexOf("/");
 				dojo.publish("filearea:"+path.substring(0, p+1), []);
@@ -169,7 +169,7 @@ api.filesystem = {
 			var newpath = to;
 		}
 		var df = new dojo.Deferred();
-        var xhr = api.xhr({
+        var xhr = desktop.xhr({
 	        backend: "api.fs.io.renameFile",
 			content: {
 				path: from,
@@ -183,7 +183,7 @@ api.filesystem = {
 				else
 					this._errCheck(	data,
 									dojo.hitch(this, "move", from, to, onComplete, onError),
-									dojo.hitch(df, "errback", Error(api._errorCodes[data])),
+									dojo.hitch(df, "errback", Error(desktop._errorCodes[data])),
 									dojo.hitch(df, "errback"));
 			}),
 	        error: function(e) {
@@ -208,7 +208,7 @@ api.filesystem = {
 		//		A callback to be fired on error
 
 		var df = new dojo.Deferred();
-        var xhr = api.xhr({
+        var xhr = desktop.xhr({
 	        backend: "api.fs.io.createDirectory",
 			content: {
 				path: path,
@@ -221,7 +221,7 @@ api.filesystem = {
 				else
 					this._errCheck(	data,
 									dojo.hitch(this, "createDirectory", path, onComplete, onError),
-									dojo.hitch(df, "errback", Error(api._errorCodes[data])),
+									dojo.hitch(df, "errback", Error(desktop._errorCodes[data])),
 									dojo.hitch(df, "errback"));
 			}),
 		        error: function(e) {
@@ -246,7 +246,7 @@ api.filesystem = {
 		//		a callback function to be fired on error
 
 		var df = new dojo.Deferred();
-        var xhr = api.xhr({
+        var xhr = desktop.xhr({
 	        backend: "api.fs.io.removeFile",
 			content: {
 				path: path
@@ -257,7 +257,7 @@ api.filesystem = {
 				else
 					this._errCheck(	data,
 									dojo.hitch(this, "remove", path, onComplete, onError),
-									dojo.hitch(df, "errback", Error(api._errorCodes[data])),
+									dojo.hitch(df, "errback", Error(desktop._errorCodes[data])),
 									dojo.hitch(df, "errback"));
 			}),
 	        error: function(e) {
@@ -286,7 +286,7 @@ api.filesystem = {
 		//		a callback function to be fired on error
 
 		var df = new dojo.Deferred();
-        var xhr = api.xhr({
+        var xhr = desktop.xhr({
 	        backend: "api.fs.io.copyFile",
 			content: {
 				path: from,
@@ -299,7 +299,7 @@ api.filesystem = {
 				else
 					this._errCheck(	data,
 									dojo.hitch(this, "copy", from, to, onComplete, onError),
-									dojo.hitch(df, "errback", Error(api._errorCodes[data])),
+									dojo.hitch(df, "errback", Error(desktop._errorCodes[data])),
 									dojo.hitch(df, "errback"));
 			}),
 	        error: function(e) {
@@ -328,7 +328,7 @@ api.filesystem = {
 		//	onError:
 		//		a callback function to be fired on error
 		var df = new dojo.Deferred();
-        var xhr = api.xhr({
+        var xhr = desktop.xhr({
 	        backend: "api.fs.io.getQuota",
 			content: {
 				path: path,
@@ -361,7 +361,7 @@ api.filesystem = {
 		//	onError:
 		//		a callback function to be fire on an error.
 		var df = new dojo.Deferred();
-		var xhr = api.xhr({
+		var xhr = desktop.xhr({
 			backend: "api.fs.io.info",
 			content: {
 				path: path,
@@ -394,7 +394,7 @@ api.filesystem = {
 		//		Possible values are "zip", "gzip", or "bzip"
 		//		When this argument is not provided, it downloads the uncompressed file.
 		//		If downloading a directory, this argument defaults to "zip".
-		var url = api.xhr("api.fs.io.download") + "&path=" + encodeURIComponent(path) + (as ? "&as=" + encodeURIComponent(as) : "");
+		var url = desktop.xhr("api.fs.io.download") + "&path=" + encodeURIComponent(path) + (as ? "&as=" + encodeURIComponent(as) : "");
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	},
@@ -405,22 +405,22 @@ api.filesystem = {
 		//		the path to the file on the filesystem
 		//	returns:
 		//		a string containing a url
-		return api.xhr("api.fs.io.display") + "&path=" + path;
+		return desktop.xhr("api.fs.io.display") + "&path=" + path;
 	},
 	_errCheck: function(code, retry, callback, errback) {
 		if(typeof code != "number")
 			return callback(code);
 		if(!code) code=-1;
-		err = Error(api._errorCodes[code]);
+		err = Error(desktop._errorCodes[code]);
 		code = err.message;
-		var nf = dojo.i18n.getLocalization("api", "filearea");
+		var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
 		if(code == "remote_authentication_failed") {
-			var win = new api.Window({
+			var win = new desktop.widget.Window({
 				title: nf.enterPass,
 				width: "250px",
 				height: "120px"
 			});
-			var v = new api.filesystem._PassForm({
+			var v = new desktop.filesystem._PassForm({
 				region: "center",
 				onCancel: function() { errback(err); win.close(); },
 				onSubmit: function() {
@@ -436,7 +436,7 @@ api.filesystem = {
 			win.startup();
 		}
 		else if(code == "remote_connection_failed") {
-			api.ui.notify(nf.connFailed);
+			desktop.dialog.notify(nf.connFailed);
 			errback(err);
 		}
 		else
@@ -444,11 +444,11 @@ api.filesystem = {
 	}
 }
 
-dojo.declare("api.filesystem._PassForm", [dijit._Widget, dijit._Templated, dijit._Contained], {
-	templatePath: dojo.moduleUrl("api", "templates/filesystem_PassForm.html"),
+dojo.declare("desktop.filesystem._PassForm", [dijit._Widget, dijit._Templated, dijit._Contained], {
+	templatePath: dojo.moduleUrl("desktop.widget", "templates/filesystem_PassForm.html"),
 	widgetsInTemplate: true,
 	postCreate: function() {
-		var nf = dojo.i18n.getLocalization("api", "filearea"); //save us the trouble of making a seperate translation file
+		var nf = dojo.i18n.getLocalization("desktop.widget", "filearea"); //save us the trouble of making a seperate translation file
 		this.titleNode.innerHTML = nf.enterPass;
 		this.forgetNode.setAttribute("checked", true);
 		this.forgetLabelNode.innerHTML = nf.forgetImmediate;

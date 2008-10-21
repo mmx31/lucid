@@ -2,7 +2,7 @@ dojo.provide("desktop.admin");
 
 desktop.admin = {
     init: function() {
-        api.xhr({
+        desktop.xhr({
             backend: "core.user.info.isAdmin",
             load: function(data) {
                 desktop.admin.isAdmin = data.isAdmin;
@@ -23,7 +23,7 @@ desktop.admin = {
 		//		Gets the amount of free space on the server
 		//	callback:
 		//		a callback function. Passes an object as an argument with two properties: 'free', and 'total'
-		return api.xhr({
+		return desktop.xhr({
 			backend: "core.administration.general.diskspace",
 			load: callback,
 			handleAs: "json"
@@ -52,7 +52,7 @@ desktop.admin = {
 			//		a callback function to pass the results to.
 			//		The callback will get a single array of values as it's first argument.
 			//		Each slot in the array will be a desktop.admin.permissions._listArgs object with the permission's information
-			api.xhr({
+			desktop.xhr({
 				backend: "core.administration.permissions.list",
 				load: callback,
 				handleAs: "json"
@@ -67,7 +67,7 @@ desktop.admin = {
 			//		the default value of the permission
 			//	callback:
 			//		a callback function once the operation is completed
-			return api.xhr({
+			return desktop.xhr({
 				backend: "core.administration.permissions.setDefault",
 				content: {
 					id: permission,
@@ -100,7 +100,7 @@ desktop.admin = {
 			//		Lists groups on the server
 			//	callback:
 			//		a callback function. First arg is an array with desktop.admin.groups._listArgs objects
-			return api.xhr({
+			return desktop.xhr({
 				backend: "core.administration.groups.list",
 				load: callback|| function(){},
 				handleAs: "json"
@@ -112,7 +112,7 @@ desktop.admin = {
 			var callback = args.callback;
 			delete args.callback;
 			args.permissions = dojo.toJson(args.permissions || {});
-			api.xhr({
+			desktop.xhr({
 				backend: "core.administration.groups.add",
 				content: args,
 				load: function(data) {
@@ -128,7 +128,7 @@ desktop.admin = {
 			//		the id of the group to remove
 			//	callback:
 			//		a callback function once the operation is complete
-			api.xhr({
+			desktop.xhr({
 				backend: "core.administration.groups.delete",
 				content: {
 					id: id
@@ -144,7 +144,7 @@ desktop.admin = {
 			var callback = args.callback;
 			delete args.callback;
 			if(typeof args.permissions != "undefined") args.permissions = dojo.toJson(args.permissions);
-			api.xhr({
+			desktop.xhr({
 				backend: "core.administration.groups.set",
 				content: args,
 				load: function(data) {
@@ -159,7 +159,7 @@ desktop.admin = {
 			//		the id of the group to get the members of
 			//	callback:
 			//		callback function. First argument is an array of the users. See desktop.user.get for the attributes of each object in the array.
-			api.xhr({
+			desktop.xhr({
 				backend: "core.administration.groups.getMembers",
 				content: {
 					id: id
@@ -177,7 +177,7 @@ desktop.admin = {
 			//		the user's id
 			//	callback:
 			//		a callback for once the operation has been completed
-			api.xhr({
+			desktop.xhr({
 				backend: "core.administration.groups.addMember",
 				content: {
 					groupid: id,
@@ -197,7 +197,7 @@ desktop.admin = {
 			//		the user's id
 			//	callback:
 			//		a callback for once the operation has been completed
-			api.xhr({
+			desktop.xhr({
 				backend: "core.administration.groups.removeMember",
 				content: {
 					groupid: id,
@@ -218,7 +218,7 @@ desktop.admin = {
 			//		list all users on the system
 			//	callback:
 			//		a callback function. Gets passed an array of desktop.user._setArgs objects
-			api.xhr({
+			desktop.xhr({
 				backend: ("core.administration.users.list"),
 				load: function(data, ioArgs) {
 					callback(dojo.fromJson(data));
@@ -235,7 +235,7 @@ desktop.admin = {
 			delete info.callback;
 			info.permissions = dojo.toJson(info.permissions || []);
 			info.groups = dojo.toJson(info.groups || []);
-			api.xhr({
+			desktop.xhr({
 				backend: "core.administration.users.create",
 				content: info,
 				load: function(data) {
@@ -253,7 +253,7 @@ desktop.admin = {
 			//	callback:
 			//		a callback function once the process is complete. passes a single parameter.
 			//		If it's false the user's deletion failed. If true, it was successful.
-			api.xhr({
+			desktop.xhr({
 				backend: "core.administration.users.delete",
 				content: {
 					id: id
@@ -271,7 +271,7 @@ desktop.admin = {
 			//		a callback function. Passes a single object as a parameter, with two keys;
 			//		'total', the total number of users on the system, and 'online', the number of users currently online. 
 			//		Both are integers.
-			api.xhr({
+			desktop.xhr({
 				backend: "core.administration.users.online",
 				load: callback,
 				handleAs: "json"
@@ -289,7 +289,7 @@ desktop.admin = {
 		list: function(/*Function*/callback) {
 			//	summary:
 			//		list the different quotas that you can set
-			api.xhr({
+			desktop.xhr({
 				backend: "core.administration.quota.list",
 				load: callback,
 				handleAs: "json"
@@ -305,7 +305,7 @@ desktop.admin = {
 			//		|	user: 1024,
 			//		|	group: 0
 			//		|}
-			api.xhr({
+			desktop.xhr({
 				backend: "core.administration.quota.set",
 				content: {
 					quotas: dojo.toJson(quotas)

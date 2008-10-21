@@ -7,7 +7,7 @@ dojo.declare("desktop.apps.StartupConfig", desktop.apps._App, {
 	cbs: {},
 	init: function(args) {
 		var appNls = dojo.i18n.getLocalization("desktop", "apps");
-		var win = this.win = new api.Window({
+		var win = this.win = new desktop.widget.Window({
 			title: appNls["Startup Applications"],
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill"),
@@ -35,7 +35,7 @@ dojo.declare("desktop.apps.StartupConfig", desktop.apps._App, {
 			var row = document.createElement("div");
 			var label = document.createElement("span");
 			dojo.style(label, "marginLeft", "5px");
-			api.textContent(label, appNls[app.name] || app.name);
+			desktop.textContent(label, appNls[app.name] || app.name);
 			row.appendChild(cb.domNode);
 			row.appendChild(label);
 			div.appendChild(row);

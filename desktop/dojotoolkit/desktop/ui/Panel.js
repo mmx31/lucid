@@ -93,7 +93,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			this.propertiesWin.bringToFront();
 			return;
 		}
-		var win = this.propertiesWin = new api.Window({
+		var win = this.propertiesWin = new desktop.widget.Window({
 			title: l.panelProperties,
 			width: "180px",
 			height: "200px",
@@ -173,7 +173,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 			this.window.bringToFront();
 			return;
 		}
-		var win = this.window = new api.Window({
+		var win = this.window = new desktop.widget.Window({
 			title: l.addToPanel,
 			onClose: dojo.hitch(this, function() {
 				this.window = false;
@@ -197,7 +197,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				fontWeight: "bold",
 				marginTop: "10px"
 			})
-			api.textContent(header, a[key] || key);
+			desktop.textContent(header, a[key] || key);
 			div.appendChild(header);
 			div.appendChild(document.createElement("hr"));
 			for(var applet in desktop.ui.appletList[key]) {
@@ -236,7 +236,7 @@ dojo.declare("desktop.ui.Panel", [dijit._Widget, dijit._Templated, dijit._Contai
 				applet.startup();
 				desktop.ui.save();
 				this.unlock();
-				api.ui.notify(l.unlocknote);
+				desktop.dialog.notify(l.unlocknote);
 			}
 		});
 		win.show();

@@ -70,7 +70,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 					label: cmn["delete"],
 					onClick: dojo.hitch(this, function(e) {
 						var row = this._userGrid.getItem(this.__rowIndex);
-						api.ui.yesnoDialog({
+						desktop.dialog.yesno({
 							title: sys.userDelConfirm,
 							message: sys.delFromSys.replace("%s", row.username),
 							callback: dojo.hitch(this, function(a) {
@@ -84,7 +84,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 					label: usr.changePassword,
 					onClick: dojo.hitch(this, function(e) {
 						var row = this._userGrid.getItem(this.__rowIndex);
-						var win = new api.Window({
+						var win = new desktop.widget.Window({
 							title: sys.chUsersPassword.replace("%s", row.username),
 							width: "250px",
 							height: "200px"

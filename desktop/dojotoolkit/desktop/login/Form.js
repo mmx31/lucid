@@ -1,4 +1,4 @@
-dojo.provide("login.Form");
+dojo.provide("desktop.login.Form");
 dojo.config.parseOnLoad=true;
 dojo.require("dojo.parser");
 dojo.require("dijit._Widget");
@@ -11,9 +11,9 @@ dojo.require("dijit.form.CheckBox");
 dojo.require("dojox.validate.web");
 dojo.require("dojo.cookie");
 
-dojo.declare("login.Form", dijit.form.Form, {
+dojo.declare("desktop.login.Form", dijit.form.Form, {
 	templateString: null,
-	templatePath: dojo.moduleUrl("login", "Form.html"),
+	templatePath: dojo.moduleUrl("desktop.login", "Form.html"),
 	_popup: null,
 	widgetsInTemplate: true,
 	preload: true,
@@ -186,24 +186,24 @@ dojo.declare("login.Form", dijit.form.Form, {
 		return false;
 	},
 	_showRegister: function() {
-		var form = new login._RegisterDialog({
+		var form = new desktop.login._RegisterDialog({
 			parentForm: this
 		});
 		form.show();
 	},
 	_showResetPass: function() {
 		console.log("test");
-		var form = new login._ResetPassDialog({
+		var form = new desktop.login._ResetPassDialog({
 			parentForm: this
 		});
 		form.show();
 	}
 });
 
-dojo.declare("login._RegisterDialog", dijit.Dialog, {
+dojo.declare("desktop.login._RegisterDialog", dijit.Dialog, {
 	title: "Register",
 	templateString: null,
-	templatePath: dojo.moduleUrl("login", "RegisterDialog.html"),
+	templatePath: dojo.moduleUrl("desktop.login", "RegisterDialog.html"),
 	parentForm: null,
 	postCreate: function() {
 		this.inherited(arguments);
@@ -279,10 +279,10 @@ dojo.declare("login._RegisterDialog", dijit.Dialog, {
 	}
 });
 
-dojo.declare("login._ResetPassDialog", dijit.Dialog, {
+dojo.declare("desktop.login._ResetPassDialog", dijit.Dialog, {
 	title: "Reset Password",
 	templateString: null,
-	templatePath: dojo.moduleUrl("login", "ResetPassDialog.html"),
+	templatePath: dojo.moduleUrl("desktop.login", "ResetPassDialog.html"),
 	parentForm: null,
 	postCreate: function() {
 		this.inherited(arguments);

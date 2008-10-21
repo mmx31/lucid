@@ -6,12 +6,12 @@ dojo.require("dijit.form.Button");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.Dialog");
 dojo.require("dojox.form.FileUploader");
-api.addDojoCss("dojox/form/resources/FileInput.css");
+desktop.addDojoCss("dojox/form/resources/FileInput.css");
 dojo.require("dojox.widget.FileInputAuto");
 dojo.requireLocalization("desktop", "common");
 dojo.requireLocalization("desktop", "apps");
 dojo.requireLocalization("desktop", "places");
-dojo.requireLocalization("api", "filearea");
+dojo.requireLocalization("desktop.widget", "filearea");
 
 dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 	windows: [],
@@ -21,12 +21,12 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var places = dojo.i18n.getLocalization("desktop", "places");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
-		this.win = new api.Window({
+		this.win = new desktop.widget.Window({
 			title: app["File Browser"],
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
-		this.fileArea = new api.Filearea({path: (args.path || "file://"), region: "center"});
+		this.fileArea = new desktop.widget.Filearea({path: (args.path || "file://"), region: "center"});
         this.updateTitle(this.fileArea.path);
 		this.pane = new dijit.layout.ContentPane({region: "left", splitter: true, minSize: 120, style: "width: 120px;"});
 		var menu = new dijit.Menu({
@@ -120,7 +120,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		bCont.addChild(this.pathbar);
 		this.win.addChild(bCont);
 		// Status bar
-		this.statusbar = new api.StatusBar({region: "bottom"});
+		this.statusbar = new desktop.widget.StatusBar({region: "bottom"});
 		this.win.addChild(this.statusbar);
 		this.win.show();
 		bCont.startup();
@@ -139,9 +139,9 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		if(typeof(this.quotaWin) != "undefined") { if(!this.quotaWin.closed) { return; } }
-		api.filesystem.getQuota(this.fileArea.path, dojo.hitch(this, function(values) {
+		desktop.filesystem.getQuota(this.fileArea.path, dojo.hitch(this, function(values) {
 			values.total = Math.round(values.total / 1024); values.remaining = Math.round(values.remaining / 1024); values.used = Math.round(values.used / 1024); 
-			this.quotaWin = new api.Window({
+			this.quotaWin = new desktop.widget.Window({
 				title: sys.quota,
 				resizable: false,
 				height: "75px",
@@ -164,8 +164,8 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 	    this.uploader = new dojox.form.FileUploader({
 		    button: this.upbutton,
 		    degradable: true,
-		    //uploadUrl: api.xhr("api.fs.io.upload")+"&path="+encodeURIComponent(this.fileArea.path),
-            uploadUrl: api.xhr("api.fs.io.upload")+"?path="+encodeURIComponent(this.fileArea.path),
+		    //uploadUrl: desktop.xhr("api.fs.io.upload")+"&path="+encodeURIComponent(this.fileArea.path),
+            uploadUrl: desktop.xhr("api.fs.io.upload")+"?path="+encodeURIComponent(this.fileArea.path),
 		    uploadOnChange: true,
             selectMultipleFiles: true
 		});
@@ -207,8 +207,8 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 	    var loc = window.location.href.split("/");
 		loc.pop();
 		loc = loc.join("/")+"/";
-        //var newUrl = loc+api.xhr("api.fs.io.upload")+"&path="+encodeURIComponent(this.fileArea.path);
-        var newUrl = loc+api.xhr("api.fs.io.upload")+"?path="+encodeURIComponent(this.fileArea.path);
+        //var newUrl = loc+desktop.xhr("api.fs.io.upload")+"&path="+encodeURIComponent(this.fileArea.path);
+        var newUrl = loc+desktop.xhr("api.fs.io.upload")+"?path="+encodeURIComponent(this.fileArea.path);
 		this.uploader.uploadUrl = newUrl;
 		if(this.uploader.flashObject){
             this.uploader.destroy();
@@ -218,7 +218,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 	},
 	
 	doUploaderConnects: function() {
-		var nls = dojo.i18n.getLocalization("api", "filearea");
+		var nls = dojo.i18n.getLocalization("desktop.widget", "filearea");
 	    var uploader = this.uploader;
 	    dojo.connect(uploader, "onChange", this, function(dataArray) {
 	       this.statusbar.attr({

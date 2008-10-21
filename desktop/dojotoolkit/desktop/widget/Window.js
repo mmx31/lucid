@@ -1,15 +1,15 @@
-dojo.provide("api.Window");
+dojo.provide("desktop.widget.Window");
 dojo.require("dojox.layout.ResizeHandle");
 dojo.require("dojo.dnd.move");
 dojo.require("dojox.fx.easing");
 dojo.require("dijit._Templated");
 dojo.require("dijit.layout.BorderContainer");
 
-dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
+dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 	//	summary:
 	//		The window widget
 	//	example:
-	//	|	var win = new api.Window({
+	//	|	var win = new desktop.widget.Window({
 	//	|		title: "Foo",
 	//	|		height: "200px",
 	//	|		width: "400px"
@@ -20,7 +20,7 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 	//	|	win.show();
 	//	|	win.startup();
 	//	|	setTimeout(dojo.hitch(win, "close"), 1000*5);
-	templatePath: dojo.moduleUrl("api", "templates/Window.html"),
+	templatePath: dojo.moduleUrl("desktop.widget", "templates/Window.html"),
 	//	_winListItem: storeItem
 	//		The store item that represents this window on desktop.ui._windowList
 	_winListItem: null,
@@ -348,7 +348,7 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 		var max = desktop.ui._area.getBox();
 		if(desktop.config.fx >= 2)
 		{
-			//api.log("maximizing... (in style!)");
+			//desktop.log("maximizing... (in style!)");
 			if(desktop.config.fx < 3) this._toggleBody(false);
 			var anim = dojo.animateProperty({
 				node: this.domNode,
@@ -368,7 +368,7 @@ dojo.declare("api.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 		}
 		else
 		{
-			//api.log("maximizing...");
+			//desktop.log("maximizing...");
             dojo.style(win, {
                 top: max.T+"px",
                 left: max.L+"px",

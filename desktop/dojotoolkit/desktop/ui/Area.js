@@ -12,7 +12,7 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 	drawn: false,
 	postCreate: function() {
 		var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
-		var filearea = this.filearea = new api.Filearea({
+		var filearea = this.filearea = new desktop.widget.Filearea({
 			path: "file://Desktop/",
 			subdirs: false,
 			vertical: true,

@@ -69,7 +69,7 @@ dojo.declare("desktop.ui.applets.Menu", desktop.ui.Applet, {
             label: l.about,
             iconClass: "icon-16-apps-help-browser",
             onClick: function() {
-                var win = new api.Window({
+                var win = new desktop.widget.Window({
                     title: l.about,
                     width: "300px",
                     height: "300px"

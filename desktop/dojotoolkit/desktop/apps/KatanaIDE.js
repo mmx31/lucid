@@ -15,10 +15,10 @@ dojo.requireLocalization("desktop", "common");
 dojo.requireLocalization("desktop", "apps");
 dojo.requireLocalization("desktop.ui", "menus");
 dojo.requireLocalization("desktop", "system");
-dojo.requireLocalization("api", "filearea");
+dojo.requireLocalization("desktop.widget", "filearea");
 dojo.requireLocalization("desktop.apps.KatanaIDE", "ide");
 
 dojo.require("desktop.apps.KatanaIDE._base");
 dojo.require("desktop.apps.KatanaIDE.CodeTextArea");
 dojo.require("desktop.apps.KatanaIDE.EditorLite");
-api.addDojoCss("desktop/apps/KatanaIDE/codeEditor.css");
+desktop.addDojoCss("desktop/apps/KatanaIDE/codeEditor.css");

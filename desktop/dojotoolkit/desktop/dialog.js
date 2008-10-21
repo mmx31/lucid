@@ -1,13 +1,13 @@
-dojo.provide("api.ui");
+dojo.provide("desktop.dialog");
 dojo.require("dijit.layout.ContentPane");
 dojo.require("dijit.form.FilteringSelect");
 dojo.require("dojox.widget.Toaster");
 dojo.requireLocalization("desktop", "common");
 
-api.ui = {
+desktop.dialog = {
 	//	summary:
 	//		An API that provides things like dialogs and such
-	alertDialog: function(/*Object*/object)
+	alert: function(/*Object*/object)
 	{
 		//	summary:
 		//		Shows a simple alert dialog
@@ -26,7 +26,7 @@ api.ui = {
 			dojo.connect(box, 'onUnload', object.callback);
 		}
 	},
-	authenticationDialog: function(/*Object*/object)
+	authentication: function(/*Object*/object)
 	{
 		//	summary:
 		//		Shows a simple authentication dialog
@@ -43,7 +43,7 @@ api.ui = {
 		if(!object.program) { object.program = ac.unknown; }
 		var times = 3;
 		var success = 1;
-		var win = this.authenticationWin = new api.Window({
+		var win = this.authenticationWin = new desktop.widget.Window({
 			title: ac.authRequired,
 			width: "450px",
 			height: "350px",
@@ -85,7 +85,7 @@ api.ui = {
 		row2.appendChild(authButton.domNode);
 		row2.appendChild(closeButton.domNode);
 		var row4 = document.createElement("div");
-		api.textContent(row4, ac.attemptsRemaining+": ");
+		desktop.textContent(row4, ac.attemptsRemaining+": ");
 		row3.innerHTML = times;
 		row4.appendChild(row3);
 		var main = document.createElement("div"); main.appendChild(row1); main.appendChild(row2); main.appendChild(row4);
@@ -100,7 +100,7 @@ api.ui = {
 		}
 				
 	},
-	inputDialog: function(/*Object*/object)
+	input: function(/*Object*/object)
 	{
 		//	summary:
 		//		A dialog with a text field
@@ -113,9 +113,9 @@ api.ui = {
 		//	object: {callback: Function?}
 		//		a callback function. The first argument is the inputted string if the user clicked OK, but false if the user clicked cancel or closed the window.
 		//	example:
-		//	|	api.ui.inputDialog({title: "UI Test", message: "What is your name?", callback: api.log});
+		//	|	desktop.dialog.input({title: "UI Test", message: "What is your name?", callback: desktop.log});
 		var cm = dojo.i18n.getLocalization("desktop", "common");
-		var dialog = new api.Window();
+		var dialog = new desktop.widget.Window();
 		dialog.title = object.title;	
 		dialog.width = "400px";
 		dialog.height = "150px";
@@ -141,7 +141,7 @@ api.ui = {
 		dialog.show();
 		dialog.startup();
 	},
-	yesnoDialog: function(/*Object*/object)
+	yesno: function(/*Object*/object)
 	{
 		//	summary:
 		//		A yes or no dialog
@@ -152,13 +152,13 @@ api.ui = {
 		//	object: {callback: Function?}
 		//		a callback function. The first argument is true if the user clicked yes, and false if the user clicked no or closed the window.
 		//	example:
-		//	|	api.ui.yesnoDialog({title: "UI Test", message: "Did you sign your NDA?", callback: function(p) {
+		//	|	desktop.dialog.yesno({title: "UI Test", message: "Did you sign your NDA?", callback: function(p) {
 		//	|		if(p) alert("Good for you!");
 		//	|		else alert("Then sign it allready!");
 		//	|	});
 		
 		var cm = dojo.i18n.getLocalization("desktop", "common");
-		var dialog = new api.Window();
+		var dialog = new desktop.widget.Window();
 		dialog.title = object.title;	
 		dialog.width = "400px";
 		dialog.height = "150px";
@@ -182,7 +182,7 @@ api.ui = {
 		dialog.show();
 		dialog.startup();
 	},
-	fileDialog: function(/*Object*/object)
+	file: function(/*Object*/object)
 	{
 		//	summary:
 		//		Shows a file selector dialog
@@ -199,11 +199,11 @@ api.ui = {
 		//dojo.require("dijit.form.FilteringSelect");
 		dojo.require("dijit.Toolbar");
 		dojo.require("dijit.Menu");
-		var dialog = new api.Window(); //Make the window
+		var dialog = new desktop.widget.Window(); //Make the window
 		dialog.title = object.title;
 		dialog.width = "500px";
 		dialog.height = "300px";
-		var file = new api.Filearea({path: "file://", onItem: dojo.hitch(this, function(path) {
+		var file = new desktop.widget.Filearea({path: "file://", onItem: dojo.hitch(this, function(path) {
 			object.callback(path);
 			dialog.close();
 		})}); //Make the fileArea
@@ -322,7 +322,7 @@ api.ui = {
 		dojo.publish("desktop_notification", [message]);
 	},
 	init: function() {
-		api.addDojoCss("dojox/widget/Toaster/Toaster.css"); //TODO: theme it!
+		desktop.addDojoCss("dojox/widget/Toaster/Toaster.css"); //TODO: theme it!
 		var toaster = new dojox.widget.Toaster({
 			messageTopic: "desktop_notification",
 			positionDirection: desktop.config.toasterPos

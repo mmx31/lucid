@@ -153,7 +153,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		item.type = item.name;
 		var ui = this.makeQuotaRow(item, true);
-		var win = new api.Window({
+		var win = new desktop.widget.Window({
 			title: sys.modifyQuota.replace("%s", item.name),
 			width: "400px",
 			height: "100px"

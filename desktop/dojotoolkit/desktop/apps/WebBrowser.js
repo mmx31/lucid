@@ -14,7 +14,7 @@ dojo.declare("desktop.apps.WebBrowser", desktop.apps._App, {
 	{
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
-		this.win = new api.Window({
+		this.win = new desktop.widget.Window({
 			title: app["Web Browser"],
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
