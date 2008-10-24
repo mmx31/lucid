@@ -97,6 +97,7 @@ desktop.dialog = {
 		});
 		win.show();
 		win.startup();
+        current.focus();
 		}
 				
 	},
@@ -140,6 +141,7 @@ desktop.dialog = {
 		dialog.showClose = false;
 		dialog.show();
 		dialog.startup();
+        text.focus();
 	},
 	yesno: function(/*Object*/object)
 	{
@@ -181,6 +183,7 @@ desktop.dialog = {
 		dialog.showClose = false;
 		dialog.show();
 		dialog.startup();
+        blah.focus();
 	},
 	file: function(/*Object*/object)
 	{
