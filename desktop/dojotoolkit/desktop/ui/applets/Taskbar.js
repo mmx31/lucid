@@ -71,6 +71,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 			dojo.style(domNode, "opacity", 0);
 			dojo.fadeIn({node: domNode, duration: desktop.config.window.animSpeed}).play();
 		}
+        dijit.byId(store.getValue(item, "id"))._menu.bindDomNode(domNode);
 	},
 	onDelete: function(item) {
 		var node = this._buttons[item.id[0]];
