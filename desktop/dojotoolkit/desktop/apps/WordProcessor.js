@@ -5,6 +5,7 @@ dojo.require("dijit.Editor");
 dojo.require("dijit._editor.plugins.TextColor");
 dojo.require("dijit._editor.plugins.FontChoice");
 dojo.require("dijit._editor.plugins.LinkDialog");
+dojo.require("dijit._editor.plugins.TabIndent");
 
 dojo.requireLocalization("desktop", "common");
 dojo.requireLocalization("desktop", "apps");
@@ -76,8 +77,11 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
                 "fontName",
                 "fontSize",
                 "formatBlock",
-                "foreColor"
-	    	]
+                "foreColor",
+                "|",
+                'tabIndent'
+	    	],
+            isTabIndent: true
 	    }, document.body.appendChild(document.createElement("div")));
 		editor.startup();
 		this.window.addChild(editor);

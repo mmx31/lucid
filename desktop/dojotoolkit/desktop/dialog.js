@@ -97,7 +97,8 @@ desktop.dialog = {
 		});
 		win.show();
 		win.startup();
-        current.focus();
+        setTimeout(dojo.hitch(current, "focus"), 400);
+
 		}
 				
 	},
@@ -123,7 +124,7 @@ desktop.dialog = {
 		var onClose = dojo.connect(dialog, "onClose", null, function() {object.callback(false)});
 		var details = new dijit.layout.ContentPane({region: "center"}, document.createElement("div"));
 		var text = new dijit.form.TextBox({value: object.initial || ""});
-		all = document.createElement("div");
+		var all = document.createElement("div");
 		var blah = new dijit.form.Button({label: cm.ok, onClick: dojo.hitch(this, function() {  dojo.disconnect(onClose); object.callback(text.getValue()); dialog.close(); })});
 		var ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function() {  dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
 		var line = document.createElement("div");
@@ -141,7 +142,7 @@ desktop.dialog = {
 		dialog.showClose = false;
 		dialog.show();
 		dialog.startup();
-        text.focus();
+        setTimeout(dojo.hitch(text, "focus"), 400);
 	},
 	yesno: function(/*Object*/object)
 	{
@@ -166,7 +167,7 @@ desktop.dialog = {
 		dialog.height = "150px";
 		var onClose = dojo.connect(dialog, "onClose", null, function() {object.callback(false)});
 		var details = new dijit.layout.ContentPane({region: "center"}, document.createElement("div"));
-		all = document.createElement("div");
+		var all = document.createElement("div");
 		var blah = new dijit.form.Button({label: cm.yes, onClick: dojo.hitch(this, function() { dojo.disconnect(onClose); object.callback(true); dialog.close(); })});
 		var ablah = new dijit.form.Button({label: cm.no, onClick: dojo.hitch(this, function() { dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
 		var line = document.createElement("div");
@@ -183,7 +184,7 @@ desktop.dialog = {
 		dialog.showClose = false;
 		dialog.show();
 		dialog.startup();
-        blah.focus();
+        setTimeout(dojo.hitch(blah, "focus"), 400);
 	},
 	file: function(/*Object*/object)
 	{
