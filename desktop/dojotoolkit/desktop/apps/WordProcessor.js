@@ -186,6 +186,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	                this.fileEditing = path;
 	                this.newAs = true;
 	                this.processSave();
+                    this.updateTitle(path);
 	            })
 	        });
 	
