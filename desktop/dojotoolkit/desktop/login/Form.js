@@ -18,6 +18,7 @@ dojo.declare("desktop.login.Form", dijit.form.Form, {
 	widgetsInTemplate: true,
 	preload: true,
 	autoRedirect: false,
+    focusOnLoad: false,
 	label: "Desktop Login",
 	postCreate: function() {
 		this.inherited(arguments);
@@ -31,6 +32,8 @@ dojo.declare("desktop.login.Form", dijit.form.Form, {
 				});
 			})
 		}
+        if(this.focusOnLoad)
+            this.usernameField.focus();
 		this.checkForLogin();
 		this.setRadioButton();
 	},

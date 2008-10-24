@@ -4,6 +4,8 @@ dojo.require("dojo.dnd.move");
 dojo.require("dojox.fx.easing");
 dojo.require("dijit._Templated");
 dojo.require("dijit.layout.BorderContainer");
+dojo.require("dijit.Menu");
+dojo.requireLocalization("desktop.widget", "window");
 
 dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Templated], {
 	//	summary:
@@ -124,8 +126,57 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		this.connect(window,'onresize',"_onResize");
 		dojo.style(this.domNode, "position", "absolute"); //override /all/ css values for this one
         this.pos = {top: 0, left: 0, width: 0, height: 0};
+        this._makeMenu();
 		this.inherited(arguments);
 	},
+    _makeMenu: function(){
+        //  summary:
+        //      Makes the context menu for the window title
+        var nls = dojo.i18n.getLocalization("desktop.widget", "window");
+        var menu = this._menu = new dijit.Menu();
+        this._menuItems = {};
+        menu.addChild(this._menuItems.min = new dijit.MenuItem({
+            label: nls.minimize,
+            onClick: dojo.hitch(this, "minimize")
+        }));
+        menu.addChild(this._menuItems.max = new dijit.MenuItem({
+            label: nls.maximize,
+            onClick: dojo.hitch(this, "maximize")
+        }));
+        menu.addChild(new dijit.MenuSeparator({}));
+        menu.addChild(new dijit.CheckedMenuItem({
+            label: nls.alwaysOnTop,
+            onChange: dojo.hitch(this, function(val) {
+                this.alwaysOnTop = val;
+                this.bringToFront();
+            })
+        }));
+        menu.addChild(new dijit.MenuSeparator({}));
+        menu.addChild(new dijit.MenuItem({
+            label: nls.close,
+            onClick: dojo.hitch(this, "close")
+        }));
+        menu.bindDomNode(this.titleNode);
+        this._fixMenu();
+    },
+    _fixMenu: function(){
+        var nls = dojo.i18n.getLocalization("desktop.widget", "window");
+        var items = this._menuItems;
+        if(this.maximized){
+            items.max.attr("label", nls.unmaximize);
+            items.max.onClick = dojo.hitch(this, "unmaximize");
+        }else{
+            items.max.attr("label", nls.maximize);
+            items.max.onClick = dojo.hitch(this, "maximize");
+        }
+        if(this.minimized){
+            items.min.attr("label", nls.restore);
+            items.min.onClick = dojo.hitch(this, "restore");
+        }else{
+            items.min.attr("label", nls.minimize);
+            items.min.onClick = dojo.hitch(this, "minimize");
+        }
+    },
 	show: function()
 	{
 		//	summary:
@@ -297,7 +348,8 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			dojo.style(this.domNode, "opacity", 100)
 			dojo.style(this.domNode, "display", "none");
 		}
-		this.minimized = true;
+        this.minimized = true;
+        this._fixMenu();
 	},
 	restore: function()
 	{
@@ -329,6 +381,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			anim.play();
 		}
 		this.minimized = false;
+        this._fixMenu();
 	},
 	maximize: function()
 	{
@@ -336,6 +389,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		//		Maximizes the window
 		this.onMaximize();
 		this.maximized = true;
+        this._fixMenu();
 		var viewport = dijit.getViewport();
 		dojo.addClass(this.domNode, "win-maximized");
 		if(this._drag) /*this._drag.onMouseUp(window.event);*/ this._drag.destroy();
@@ -445,6 +499,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			setTimeout(dojo.hitch(this, "resize"), 100)
 		}
 		this.maximized = false;
+        this._fixMenu();
 	},
 	bringToFront: function()
 	{
@@ -455,7 +510,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		//		false if it was already on top
 		var maxZindex = 10;
 		var alwaysOnTopNum = 0;		// Number of wins with 'alwaysOnTop' property set to true
-		var topWins = new Array();	// Array of reffernces to win widgets with 'alwaysOnTop' property set to true
+		var topWins = [];	// Array of reffernces to win widgets with 'alwaysOnTop' property set to true
 		var winWidget;			// Reffernce to window widget by dom node
 		this.getParent().getChildren().forEach(function(wid) {
 			var node = wid.domNode;
@@ -463,9 +518,9 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			if(zindex > maxZindex && zindex != "auto") {
 				maxZindex = zindex;
 			}
-			if ( wid.alwaysOnTop == true ) {
+			if (wid.alwaysOnTop == true) {
 				alwaysOnTopNum++;
-				topWins.push( winWidget );
+				topWins.push(winWidget);
 			}
 		})
 		var zindex = dojo.style(this.domNode, "zIndex");
@@ -477,7 +532,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			if ( topWins.length > 0 ) {
 				dojo.forEach(topWins, function(win) {
 					maxZindex++;
-					dojo.style(topWins[i].domNode, "zIndex", maxZindex);
+					dojo.style(win.domNode, "zIndex", maxZindex);
 				});
 			}
 			return true;
@@ -488,6 +543,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		if(!this.closed) this.onClose();
 		if(this._winListItem) desktop.ui._windowList.deleteItem(this._winListItem);
 		if(this._drag) this._drag.destroy();
+        if(this._menu) this._menu.destroy();
 		if(this.sizeHandle) this.sizeHandle.destroy();
 	},
 	close: function()

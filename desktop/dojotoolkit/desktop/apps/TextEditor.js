@@ -129,7 +129,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    if (this.editing) {
 	        desktop.filesystem.writeFileContents(this.fileEditing, this.editor.getValue());
 	        this.statusbar.attr("label", msg.fileSaved);
-	
+            	
 	    }
 	    else {
 	        this.processSaveAs();
@@ -151,6 +151,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	                this.fileEditing = path;
 	                this.newAs = true;
 	                this.processSave();
+                    this.updateTitle(path);
 	            })
 	        });
 	
