@@ -49,14 +49,14 @@ dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
 		toolbar.addChild(removeButton);
         
         var exportButton = new dijit.form.Button({
-		    label: nls.export,
-		    onClick: dojo.hitch(this, "doExport")
+            label: nls.export,
+            onClick: dojo.hitch(this, "doExport")
 		});
 		toolbar.addChild(exportButton);
 
         var importButton = new dijit.form.Button({
-		    label: nls.import,
-		    onClick: dojo.hitch(this, "doImport")
+            label: nls.import,
+            onClick: dojo.hitch(this, "doImport")
 		});
 		toolbar.addChild(importButton);
 
