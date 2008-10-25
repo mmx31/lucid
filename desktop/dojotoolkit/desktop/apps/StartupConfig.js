@@ -23,7 +23,7 @@ dojo.declare("desktop.apps.StartupConfig", desktop.apps._App, {
 			//make checkbox
 			var onStartup = false;
 			dojo.forEach(desktop.config.startupApps, function(item) {
-				if(item == app.sysname) onStartup = true;
+				if(item == app.sysname || item.name == app.sysname) onStartup = true;
 			});
 			var cb = new dijit.form.CheckBox({
 				checked: onStartup,
@@ -46,12 +46,25 @@ dojo.declare("desktop.apps.StartupConfig", desktop.apps._App, {
 		win.startup();
 	},
 	saveConfig: function() {
-		var config = [];
+        var sApps = desktop.config.startupApps;
+        var config = dojo.clone(sApps);
 		for(var key in this.cbs) {
-			if(!this.cbs[key].checked) continue;
-			config.push(key);
+			if(!this.cbs[key].checked){
+                for(var i in sApps){
+                    if(sApps[i] == key || sApps[i].name == key)
+                        config.splice(i, 1);
+                }
+            }else{
+                var exists = false;
+                for(var i in sApps){
+                    if(sApps[i] == key || sApps[i].name == key)
+                        exists = true;
+                }
+                if(!exists)
+                    config.push(key);
+            }
+            desktop.config.startupApps = config;
 		}
-		desktop.config.startupApps = config;
 	},
 	kill: function() {
 		if(!this.win.closed) this.win.close();
