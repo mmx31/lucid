@@ -134,7 +134,9 @@ desktop.config = {
 	theme: "Minuit",
 	//	startupApps: Array
 	//		An array of app sysnames to launch at startup
-	startupApps: ["UpdateManager"],
+	startupApps: [
+        {name: "UpdateManager", arguments: {background: true}}
+    ],
 	//	window: Object
 	//		window settings
 	//		constrain - should the window be constrained to the screen's edge?
