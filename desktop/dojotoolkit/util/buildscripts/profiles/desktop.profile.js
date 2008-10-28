@@ -6,8 +6,8 @@ dependencies ={
         	dependencies: ["desktop.desktop"]
         },
         {
-        	name: "../login/Form.js",
-        	dependencies: ["login.Form"]
+        	name: "../desktop/login/Form.js",
+        	dependencies: ["desktop.login.Form"]
         },
 		//APPS
 		{
@@ -93,8 +93,6 @@ dependencies ={
     ],
     prefixes: [
         [ "desktop", "../desktop" ],
-        [ "api", "../api" ],
-        [ "login", "../login" ],
         [ "dijit", "../dijit" ],
         [ "dojox", "../dojox" ]
     ]
