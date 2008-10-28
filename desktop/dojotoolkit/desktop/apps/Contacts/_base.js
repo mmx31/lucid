@@ -55,7 +55,7 @@ dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
 		toolbar.addChild(exportButton);
 
         var importButton = new dijit.form.Button({
-            label: nls.["import"],
+            label: nls["import"],
             onClick: dojo.hitch(this, "doImport")
 		});
 		toolbar.addChild(importButton);
