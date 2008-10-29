@@ -23,5 +23,6 @@
 	"connect": "Connect",
 	"cancel": "Cancel",
 	"uploading": "Uploading %s file(s)...",
-	"uploadingComplete": "Upload complete"
+	"uploadingComplete": "Upload complete",
+    "openWith": "Open With..."
 })

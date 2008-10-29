@@ -341,10 +341,9 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 				setTimeout(dojo.hitch(this, function() {
 				    if(content != "")
 					    editor.massiveWrite(content);
-					editor.parseFragment(0, 0);
 					editor.setCaretPosition(0,0);
-					editor.parseViewport(); 
                     this.tabArea.layout();
+                    editor.startup();
 				}), 200);
 			})
 		})

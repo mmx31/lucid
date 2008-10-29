@@ -2,8 +2,10 @@ dojo.provide("desktop.widget.Filearea");
 dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dijit.Menu");
 dojo.require("dijit.form.TextBox");
+dojo.require("dijit.Tree");
 dojo.requireLocalization("desktop", "common");
 dojo.requireLocalization("desktop.widget", "filearea");
+dojo.requireLocalization("desktop", "apps");
 
 desktop.widget._fileareaClipboard = {
 	type: "", // can be 'cut' or 'copy
@@ -537,6 +539,7 @@ dojo.declare("desktop.widget.Filearea._Icon", [dijit._Widget, dijit._Templated, 
 		
 		var menu = this.menu = new dijit.Menu({});
 		menu.addChild(new dijit.MenuItem({label: nc.open, iconClass: "icon-16-actions-document-open", onClick: dojo.hitch(this, "_onDblClick")}));
+        menu.addChild(new dijit.MenuItem({label: nf.openWith, onClick: dojo.hitch(this, "_openWith")}));
 			var menuDl = new dijit.PopupMenuItem({iconClass: "icon-16-actions-document-open", label: nc.download});
 			var menu2 = new dijit.Menu({parentMenu: menuDl});
 			menu2.addChild(new dijit.MenuItem({label: nf.asFile, onClick: dojo.hitch(this, function(e) {
@@ -588,6 +591,8 @@ dojo.declare("desktop.widget.Filearea._Icon", [dijit._Widget, dijit._Templated, 
 	},
 	uninitialize: function() {
 		dojo.forEach(this._subscriptions, dojo.unsubscribe);
+        if(!this._win.closed)
+            this._win.close();
 	},
 	_dragStart: function(e) {
 		if(e.button != (dojo.isIE ? 1 : 0)) return;
@@ -771,6 +776,79 @@ dojo.declare("desktop.widget.Filearea._Icon", [dijit._Widget, dijit._Templated, 
 		});
 		this.highlight();
 	},
+    _openWith: function() {
+        if(this._win && !this._win.closed) return this._win.bringToFront();
+        var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
+        var cm = dojo.i18n.getLocalization("desktop", "common");
+        var win = this._win = new desktop.widget.Window({
+            title: nf.openWith,
+            height: "350px",
+            width: "300px"
+        });
+        var p = new dijit.layout.ContentPane({region: "top"});
+        p.setContent(this.name);
+        win.addChild(p);
+
+        var p = new dijit.layout.ContentPane({region: "bottom"});
+		var body = document.createElement("div");
+        dojo.style(body, "textAlign", "right");
+        var cancel = new dijit.form.Button({
+            label: cm.cancel,
+            onClick: dojo.hitch(win, "close")
+        });
+        var open = new dijit.form.Button({
+            label: cm.open,
+            onClick: dojo.hitch(this, "_handleOpenWith")
+        });
+		dojo.forEach([cancel.domNode, open.domNode], function(c) {
+			dojo.addClass(c, "dijitInline");
+			body.appendChild(c);
+		});
+		p.setContent(body);
+		win.addChild(p);
+        this._makeAppTree(win);
+        win.show();
+    },
+    _makeAppTree: function(win) {
+        this._selectedApp = false;
+        var appList = dojo.clone(desktop.app.appList);
+        var app = dojo.i18n.getLocalization("desktop", "apps");
+        dojo.forEach(appList, function(e) {
+            e.label = app[e.name] || e.name;
+        });
+        var store = new dojo.data.ItemFileReadStore({
+            data: {
+                identifier: "sysname",
+                label: "label",
+                items: appList
+            }
+        });
+        var tree = new dijit.Tree({
+            store: store,
+            onClick: dojo.hitch(this, function(item){
+                this._selectedApp = store.getValue(item, "sysname");
+            }),
+            getIconClass: function(item, opened) {
+                var iconClass = "";
+                if(item) {
+                    iconClass = store.getValue(item, "icon");
+                    if(iconClass && iconClass.indexOf(".") !== -1)
+                        iconClass = "icon-app-"+store.getValue(item, "sysname");
+                }
+                return (!item || this.model.mayHaveChildren(item)) ? (opened ? "dijitFolderOpened" : "dijitFolderClosed") : iconClass;
+            }
+        });
+        var p = new dijit.layout.ContentPane({region: "center"});
+        var div = document.createElement("div");
+        div.appendChild(tree.domNode);
+        p.setContent(div);
+        win.addChild(p);
+    },
+    _handleOpenWith: function() {
+        if(!this._selectedApp) return;
+        desktop.app.launch(this._selectedApp, {file: this.path});
+        this._win.close();
+    },
 	rename: function() {
 		//	summary:
 		//		show a textbox that renames the file

@@ -23,5 +23,6 @@
 	"connect": "Conectar",
 	"cancel": "Cancelar",
 	"uploading": "Carga de %s archivo(s)...",
-	"uploadingComplete": "Completado la subida"
+	"uploadingComplete": "Completado la subida",
+    "openWith": "Abrir con..."
 })
