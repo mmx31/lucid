@@ -23,14 +23,6 @@ dojo.declare("desktop.apps._App", null, {
         });
 		this.instance = info.instance;
 		this.compatible = info.compatible;
-		try {
-			this.init(info.args||{});
-		}
-		catch(e) {
-			console.error(e);
-		}
-		this.status = "active";
-		if(typeof info.callback == "function") info.callback(this);
 	},
 	init: function(args) {
 		//	summary:
