@@ -114,7 +114,9 @@ desktop.crosstalk = {
 					//check to see if the topic matches
 					if(event.topic != handler.topic) return;
 					//ok, we found a match
-					handler.callback.apply(dojo.global, dojo.fromJson(event.args));
+					args = dojo.fromJson(event.args);
+					args._crosstalk = {topic: event.topic, instance: event.instance, appsysname: event.appsysname, sender: event.sender};
+					handler.callback(args);
 					handled = true;
 				}
 			}, this);
@@ -124,7 +126,7 @@ desktop.crosstalk = {
 			var handled = false;
 			checkForHandler(event);
 			if(handled == false && event.instance == -1) {
-				if(event.appsysname == -1) return; //system call
+				if(event.appsysname == -1) return; //system call - TODO: Handle?
 				//check to see if there's allready an instance of this app running
 				var instances = desktop.app.getInstances();
 				for(var i=0;i<instances.length;i++) {
