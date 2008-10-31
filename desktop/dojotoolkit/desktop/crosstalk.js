@@ -134,7 +134,7 @@ desktop.crosstalk = {
 					if(instances[i].sysname == event.appsysname) return;
 				}
 				//otherwise, launch the app
-				desktop.app.launch(event.appsysname, {}, function(app) {
+				desktop.app.launch(event.appsysname, {crosstalk: true}, function(app) {
 					//check for a handler again
 					checkForHandler(event);
 					//if there's still no handler, kill the app
