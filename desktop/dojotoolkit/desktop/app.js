@@ -168,6 +168,14 @@ desktop.app = {
 				args: args,
 				callback: callback
 			});
+			try {
+				instance.init(args||{});
+			}
+			catch(e) {
+				console.error(e);
+			}
+			instance.status = "active";
+			if(typeof instance.callback == "function") instance.callback(this);
 		}
 		catch(e) {
 			console.error(e);
