@@ -175,7 +175,7 @@ desktop.app = {
 				console.error(e);
 			}
 			instance.status = "active";
-			if(typeof instance.callback == "function") instance.callback(this);
+			if(typeof instance.callback == "function") instance.callback(instance);
 		}
 		catch(e) {
 			console.error(e);
