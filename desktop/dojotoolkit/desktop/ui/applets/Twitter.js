@@ -189,7 +189,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 				status: string
 			},
 			auth: {
-				username: this.settings.username,
+				username: this.settings.username
 			},
 			load: dojo.hitch(this, function() {
 				this.textbox.setValue("");
