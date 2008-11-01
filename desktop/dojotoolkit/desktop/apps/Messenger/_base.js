@@ -53,6 +53,7 @@ dojo.declare("desktop.apps.Messenger", desktop.apps._App, {
 		}
 	},
 	drawUI: function(details) {
+		this._draw = true;
 		var nls = dojo.i18n.getLocalization("desktop.apps.Messenger", "Strings");
 		this.windows = [];
 		var win = this.window = new desktop.widget.Window({
