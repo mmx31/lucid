@@ -11,12 +11,14 @@ dojo.declare("desktop.apps.Messenger", desktop.apps._App, {
 			desktop.user.get({callback: dojo.hitch(this, this.drawUI)}); //OH YA WE ARE DRAW UI
         },
 	prepare: function() {
-		var instances = desktop.app.getInstances();
+		var instances = desktop.app.instances;
 		for(var i=0;i<instances.length;i++) {
 			//One instance at a time.. please.
 			if(instances[i].sysname == this.sysname && instances[i].instance != this.instance) {
 				if(!instances[i]._draw)
-					desktop.user.get({callback: dojo.hitch(this, instances[i].drawUI)});
+					desktop.user.get({callback: dojo.hitch(this, function(result) { 
+						instances[i].drawUI(result);							
+					})});
 				return false;
 			}
 		}
@@ -84,6 +86,7 @@ dojo.declare("desktop.apps.Messenger", desktop.apps._App, {
 		var button = new dijit.form.Button({
 		    label: nls.background,
 		    onClick: dojo.hitch(this, function() {
+				this.window.onClose = dojo.hitch(this, function(){});
 				this._draw = false;
 				this.window.close();
 				desktop.dialog.notify({message: nls.backgroundInfo});
