@@ -6,8 +6,8 @@ dojo.requireLocalization("desktop.apps.Messenger", "Strings");
 dojo.declare("desktop.apps.Messenger", desktop.apps._App, {
 	init: function(args) {
 		if(!this.prepare()) { this.kill(true); return false; } //Already running?
-		this._draw = !this.crosstalk; //Are we drawing the UI, or is this a launch from crosstalk?
-		if(this._draw)
+		this._draw = !args.crosstalk; //Are we drawing the UI, or is this a launch from crosstalk?
+		if(this._draw && !args.background)
 			desktop.user.get({callback: dojo.hitch(this, this.drawUI)}); //OH YA WE ARE DRAW UI
         },
 	prepare: function() {
@@ -78,6 +78,15 @@ dojo.declare("desktop.apps.Messenger", desktop.apps._App, {
 		    label: nls.startIM,
 		    onClick: dojo.hitch(this, function() {
 				this.send("im");
+		    })
+		});
+		row2.appendChild(button.domNode);
+		var button = new dijit.form.Button({
+		    label: nls.background,
+		    onClick: dojo.hitch(this, function() {
+				this._draw = false;
+				this.window.close();
+				desktop.dialog.notify({message: nls.backgroundInfo});
 		    })
 		});
 		row2.appendChild(button.domNode);

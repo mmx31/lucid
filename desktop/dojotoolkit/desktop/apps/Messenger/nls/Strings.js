@@ -12,5 +12,7 @@
     "messageSend": "Please type in the message to send.",
     "sent": "Message sent!",
     "uuid": "Your userid is:",
-    "uid": "userid"
+    "uid": "userid",
+    "background": "Run in background",
+    "backgroundInfo": "Now running in the background. To get the UI back again, re-launch the program."
 })
