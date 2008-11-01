@@ -1,0 +1,11 @@
+{
+	"type": "application",
+	"sysname": "Messenger",
+	"name": "Internal Messenger",
+	"author": "Jaymacdonald",
+	"email": "Jaymac407@gmail.com",
+	"version": "1.0",
+	"maturity": "Stable",
+	"category": "System",
+	"compatible": ["1.0.0"]
+}

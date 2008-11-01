@@ -165,8 +165,7 @@ desktop.app = {
 				instance: pid,
 				compatible: compatible,
 				icon: icon,
-				args: args,
-				callback: callback
+				args: args
 			});
 			try {
 				instance.init(args||{});
@@ -175,7 +174,7 @@ desktop.app = {
 				console.error(e);
 			}
 			instance.status = "active";
-			if(typeof instance.callback == "function") instance.callback(instance);
+			if(typeof callback == "function") callback(instance);
 		}
 		catch(e) {
 			console.error(e);
