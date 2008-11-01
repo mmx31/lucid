@@ -89,7 +89,8 @@ desktop.crosstalk = {
 				instance: instance || -1
 			},
 			load: function(data, ioArgs) {
-				callback(data);
+				if(callback)
+					callback(data);
 			},
 	    		error: function(type, error) {
 				desktop.log("Error in Crosstalk call: "+error.message);
