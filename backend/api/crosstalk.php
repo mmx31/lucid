@@ -19,6 +19,7 @@
 		//die('you windows n00b');
 	}
 	import("models.crosstalk");
+	import("models.user");
 	if($_GET['section'] == "io")
 	{
 		if ($_GET['action'] == "checkForEvents")
@@ -41,6 +42,17 @@
 			}
 			$out = new jsonOutput($array);
 		}
+		if($_GET['action'] == "cancelEvent")
+	     {
+			$event = $Crosstalk->get($_POST['id']);
+			$cur = $User->get_current();
+			if($event->sender == $_SESSION['userid'] || $cur->has_permission("core.administration")) {
+				$event->delete();
+				$out = intOutput("ok");
+			}
+			else
+				$out = intOutput("permission_denied");
+	}
 	    if ($_GET['action'] == "sendEvent")
 	    {
 			$p = new $Crosstalk();
@@ -52,7 +64,7 @@
 				$p->userid = $p->sender;
 			}
 			$p->save();
-		    $out = new intOutput("ok");
+		    echo($p->id);
 		}
 	}
 ?>

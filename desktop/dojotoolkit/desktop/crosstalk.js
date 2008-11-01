@@ -61,7 +61,7 @@ desktop.crosstalk = {
 		//}
 	},
 		
-	publish: function(/*String*/topic, /*Array*/args, /*Int?*/userid, /*String?*/appsysname, /*Int?*/instance)
+	publish: function(/*String*/topic, /*Array*/args, /*Int?*/userid, /*String*/appsysname, /*Int?*/instance, /*Function*/callback)
 	{
 		//	summary:
 		//		publish an event to be sent
@@ -72,11 +72,13 @@ desktop.crosstalk = {
 		//	userid:
 		//		the specific user to send the event to.
 		//		Omit to send to all users (the current user must be an admin to do this)
-		//	appid:
-		//		the appid to send it to. Omit to send as a system event
+		//	appsysname:
+		//		the appname to send it to. Omit to send as a system event
 		//	instance:
 		//		the specific app instance to send it to.
 		//		omit to send it to all instances
+		//	callback:
+		//		will return a ID to cancel the request
     	desktop.xhr({
 	    	backend: "api.crosstalk.io.sendEvent",
 			content: {
@@ -86,7 +88,33 @@ desktop.crosstalk = {
 				appsysname: appsysname || -1,
 				instance: instance || -1
 			},
-	    	error: function(type, error) {
+			load: function(data, ioArgs) {
+				callback(data);
+			},
+	    		error: function(type, error) {
+				desktop.log("Error in Crosstalk call: "+error.message);
+				this.setup_timer();
+			}
+    	});
+	},
+
+	cancel: function(/*Int?*/id, /*Function*/callback)
+	{
+		//	summary:
+		//		cancel a pending event
+		//	id:
+		//		the event ID to cancel
+		//	callback:
+		//		returns 0 ok or 7 access_denied
+    	desktop.xhr({
+	    	backend: "api.crosstalk.io.cancelEvent",
+			content: {
+				id: id
+			},
+			load: function(data, ioArgs) {
+				callback(data);
+			},
+	    		error: function(type, error) {
 				desktop.log("Error in Crosstalk call: "+error.message);
 				this.setup_timer();
 			}
