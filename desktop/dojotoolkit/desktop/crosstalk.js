@@ -33,7 +33,7 @@ desktop.crosstalk = {
 		//		unregister an event handler
 		//	handle:
 		//		a handle that was returned from subscribe()
-		desktop.crosstalk.session[handle] = null;
+		delete desktop.crosstalk.session[handle];
 	},
 	_internalCheck: function()
 	{
@@ -100,48 +100,55 @@ desktop.crosstalk = {
 		
 		if(data == "") { this.setup_timer(); return; }
 		// No events here.
+		try {
+			var checkForHandler = dojo.hitch(this, function(event) {
+				//cycle through the handlers stored and find a handler for the event
+				dojo.forEach(this.session, function(handler) {
+					//A subscribed handler is required
+					if(typeof handler == "undefined") return false;
+					//matching the appid and topic are required
+					if(handler.appsysname == event.appsysname
+					&& handler.topic == event.topic) {
+						//matching the instance isn't
+						//but if it's provided and this handler is not of he correct instance, return
+						if(event.instance != -1
+						&& event.instance != handler.instance) return false;
+						//check to see if the topic matches
+						if(event.topic != handler.topic) return false;
+						//ok, we found a match
+						var args = dojo.fromJson(event.args);
+						args._crosstalk = {topic: event.topic, instance: event.instance, appsysname: event.appsysname, sender: event.sender};
+						handler.callback(args);
+						handled = true;
+						return true;
+					}
+				}, this);
+			})
 		
-		var checkForHandler = dojo.hitch(this, function(event) {
-			//cycle through the handlers stored and find a handler for the event
-			dojo.forEach(this.session, function(handler) {
-				//matching the appid and topic are required
-				if(handler.appsysname == event.appsysname
-				&& handler.topic == event.topic) {
-					//matching the instance isn't
-					//but if it's provided and this handler is not of he correct instance, return
-					if(event.instance != -1
-					&& event.instance != handler.instance) return;
-					//check to see if the topic matches
-					if(event.topic != handler.topic) return;
-					//ok, we found a match
-					args = dojo.fromJson(event.args);
-					args._crosstalk = {topic: event.topic, instance: event.instance, appsysname: event.appsysname, sender: event.sender};
-					handler.callback(args);
-					handled = true;
+			dojo.forEach(data, function(event) {
+				var handled = false;
+				checkForHandler(event);
+				if(handled == false && event.instance == -1) {
+					if(event.appsysname == -1) return; //system call - TODO: Handle?
+					//check to see if there's allready an instance of this app running
+					var instances = desktop.app.getInstances();
+					for(var i=0;i<instances.length;i++) {
+						//if there is allready an instance running, it must not handle any crosstalk events. Skip the event.
+						if(instances[i].sysname == event.appsysname) return;
+					}
+					//otherwise, launch the app
+					desktop.app.launch(event.appsysname, {crosstalk: true}, function(app) {
+						//check for a handler again
+						var handled = checkForHandler(event);
+						//if there's still no handler, kill the app
+						if(handled == false) app.kill();
+					})
 				}
 			}, this);
-		})
-		
-		dojo.forEach(data, function(event) {
-			var handled = false;
-			checkForHandler(event);
-			if(handled == false && event.instance == -1) {
-				if(event.appsysname == -1) return; //system call - TODO: Handle?
-				//check to see if there's allready an instance of this app running
-				var instances = desktop.app.getInstances();
-				for(var i=0;i<instances.length;i++) {
-					//if there is allready an instance running, it must not handle any crosstalk events. Skip the event.
-					if(instances[i].sysname == event.appsysname) return;
-				}
-				//otherwise, launch the app
-				desktop.app.launch(event.appsysname, {crosstalk: true}, function(app) {
-					//check for a handler again
-					checkForHandler(event);
-					//if there's still no handler, kill the app
-					if(handled == false) app.kill();
-				})
-			}
-		}, this);
+		}
+		catch(err) {
+			console.log(err);
+		}
 		this.setup_timer();
 	},
 	init: function()
