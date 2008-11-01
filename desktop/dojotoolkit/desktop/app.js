@@ -224,10 +224,20 @@ desktop.app = {
 	//PROCESS MANAGEMENT FUNCTIONS
 	getInstances: function() {
 		//	summary:
-		//		Returns an array of the current instances
-		
-		//TODO: this behaves way too differently from getInstance.
-		//		it returns different keys, and does not return an array with references to the actual instance.
+		//		Returns an array of the current valid instances
+		returnObject = [];
+		for(var x = 0; x<desktop.app.instances.length; x++){
+			if (desktop.app.instances[x] != 'null') {
+				try { if(typeof desktop.app.instances[x].status == "string")
+					returnObject.push(desktop.app.instances[x]);
+				} catch(e) { }
+			}
+		}
+		return returnObject;
+	},
+	getInstancesStatus: function() {
+		//	summary:
+		//		Returns an array of the current valid instances status
 		var returnObject = [];
 		for(var x = 0; x<desktop.app.instances.length; x++){
 				if (desktop.app.instances[x] != null) {

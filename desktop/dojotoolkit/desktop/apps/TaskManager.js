@@ -32,7 +32,7 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
         var store = this.store = new dojo.data.ItemFileWriteStore({
             data: {
                 id: "instance",
-                items: desktop.app.getInstances()
+                items: desktop.app.getInstancesStatus()
             }
         });
 	    
@@ -58,7 +58,7 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 	},
 	
     update: function() {
-        var processes = desktop.app.getInstances();
+        var processes = desktop.app.getInstancesStatus();
         dojo.forEach(processes, function(instance) {
             this.store.fetchItemByIdentity({
                 identity: instance.instance,

@@ -81,6 +81,7 @@ desktop.crosstalk = {
 		//		will return a ID to cancel the request
     	desktop.xhr({
 	    	backend: "api.crosstalk.io.sendEvent",
+			number: true,
 			content: {
 				topic: topic,
 				userid: userid || -1,

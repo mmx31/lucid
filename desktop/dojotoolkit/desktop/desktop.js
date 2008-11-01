@@ -128,9 +128,9 @@ desktop.xhr = function(/*dojo.__ioArgs|String*/args) {
 	
 	var xhr = dojo.xhrPost(dojo.mixin(args, {
 		load: function(data) {
-			if(typeof parseInt(data) == "number" && parseInt(data) > 0) {
+			if(typeof parseInt(data) == "number" && parseInt(data) > 0 && !args.number) {
 				console.error(data); //TODO: we should alert the user in some cases, or possibly retry the request. OR FUCKTARD, RETURN AN ERROR, NE?
-				df.errback(err);
+				df.errback(data);
 			}
 			else
 				df.callback(data);

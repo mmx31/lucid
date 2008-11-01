@@ -11,7 +11,7 @@ dojo.declare("desktop.apps.Messenger", desktop.apps._App, {
 			desktop.user.get({callback: dojo.hitch(this, this.drawUI)}); //OH YA WE ARE DRAW UI
         },
 	prepare: function() {
-		var instances = desktop.app.instances;
+		var instances = desktop.app.getInstances();
 		for(var i=0;i<instances.length;i++) {
 			//One instance at a time.. please.
 			if(instances[i].sysname == this.sysname && instances[i].instance != this.instance) {
