@@ -5,7 +5,7 @@ dojo.requireLocalization("desktop.apps.Messenger", "Strings");
 
 dojo.declare("desktop.apps.Messenger", desktop.apps._App, {
 	init: function(args) {
-		if(!this.prepare()) this.kill(true); //Already running?
+		if(!this.prepare()) { this.kill(true); return false; } //Already running?
 		this._draw = !this.crosstalk; //Are we drawing the UI, or is this a launch from crosstalk?
 		if(this._draw)
 			desktop.user.get({callback: dojo.hitch(this, this.drawUI)}); //OH YA WE ARE DRAW UI
@@ -16,7 +16,7 @@ dojo.declare("desktop.apps.Messenger", desktop.apps._App, {
 			//One instance at a time.. please.
 			if(instances[i].sysname == this.sysname && instances[i].instance != this.instance) {
 				if(!instances[i]._draw)
-					instances[i].drawUI();
+					desktop.user.get({callback: dojo.hitch(this, instances[i].drawUI)});
 				return false;
 			}
 		}
