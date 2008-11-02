@@ -19,6 +19,3 @@ dojo.declare("desktop.apps.Messenger", desktop.apps._App, {
 	}
 });
 
-dojo.require("desktop.apps.Messenger.store");
-dojo.require("desktop.apps.Messenger.ui");
-dojo.require("desktop.apps.Messenger.io");
