@@ -292,7 +292,7 @@ dojo.declare("desktop.login._ResetPassDialog", dijit.Dialog, {
 	parentForm: null,
 	postCreate: function() {
 		this.inherited(arguments);
-		new dijit.form.TextBox({name: "user"}, this.userInputNode);
+		new dijit.form.TextBox({name: "username"}, this.userInputNode);
 		new dijit.form.TextBox({name: "email"}, this.emailInputNode);
 	},
 	onSubmit: function(e){
@@ -300,7 +300,7 @@ dojo.declare("desktop.login._ResetPassDialog", dijit.Dialog, {
 		var contents = this.getValues();
 		this.submitNode.disabled=true;
 		this.errorNode.innerHTML = "";
-		if(contents.email && contents.user)
+		if(contents.email && contents.username)
 		{
 			if(dojox.validate.isEmailAddress(contents.email))
 			{
