@@ -1,0 +1,8 @@
+<form dojoAttachPoint='containerNode' dojoAttachEvent='onreset:_onReset,onsubmit:_onSubmit'>
+   <label for="${id}_username">Buddy's Username:</label>
+   <input dojoType="dijit.form.TextBox" name="username" />
+   <div style="text-align: right; margin-top: 5px;">
+      <div dojoType="dijit.form.Button" class="dijitInline" label="Cancel" dojoAttachEvent="onClick:onCancel"></div>
+      <div dojoType="dijit.form.Button" class="dijitInline" iconClass="icon-22-actions-list-add" label="Add" dojoAttachEvent="onClick:onSubmit"></div>
+   </div>
+</form> 

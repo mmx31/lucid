@@ -33,7 +33,7 @@ desktop.user = {
 	get: function(/*desktop.user._getArgs*/options) {
 		//	summary:
 		//		Gets the information of a certain user
-		if(!options.id) { options.id = "0"; }
+		if(!options.id && !options.username && !options.email) { options.id = "0"; }
 		desktop.xhr({
 	        backend: "core.user.info.get",
 			content: {

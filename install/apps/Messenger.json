@@ -1,0 +1,12 @@
+{
+	"type": "application",
+	"sysname": "Messenger",
+	"name": "Instant Messenger",
+	"author": "Jaymacdonald",
+	"email": "Jaymac407@gmail.com",
+	"version": "1.0",
+	"maturity": "Stable",
+	"category": "Internet",
+    "icon": "icon-16-apps-internet-group-chat",
+	"compatible": ["1.0.0"]
+}
