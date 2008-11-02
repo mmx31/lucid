@@ -10,7 +10,7 @@ dojo.extend(desktop.apps.Messenger, {
     },
     sendMessage: function(uid, msg) {
         this.pushMsg(uid, msg, true);
-        desktop.crosstalk.publish("IM", {text: msg}, false, this.sysname);
+        desktop.crosstalk.publish("IM", {text: msg}, uid, this.sysname);
     },
     recieveMessage: function(msg) {
         var uid = msg._crosstalk.sender;        

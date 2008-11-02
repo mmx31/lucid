@@ -19,7 +19,8 @@ dojo.extend(desktop.apps.Messenger, {
             title: "Buddy List",
             iconClass: this.iconClass,
             width: "220px",
-            height: "400px"
+            height: "400px",
+            onClose: dojo.hitch(this, "kill")
         });
         this.windows.push(win);
         this.unameUi = {};
