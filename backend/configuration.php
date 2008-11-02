@@ -4,7 +4,7 @@
 		"prefix" => ""
 	);
 	$GLOBALS['conf'] = Array(
-		"salt" => "3a7b071737e28d7aab8767c6efb89f84",
+		"salt" => "c125da007063e542d39ee01b2916ee0b",
 		"public" => true,
 		"crosstalkThrottle" => false
 	);

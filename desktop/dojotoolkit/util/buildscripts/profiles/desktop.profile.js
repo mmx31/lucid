@@ -51,6 +51,10 @@ dependencies ={
 			dependencies: ["desktop.apps.KatanaIDE"]
 		},
 		{
+			name: "../desktop/apps/Messenger.js",
+			dependencies: ["desktop.apps.Messenger"]
+		},
+		{
 			name: "../desktop/apps/MineSweep.js",
 			dependencies: ["desktop.apps.MineSweep"]
 		},

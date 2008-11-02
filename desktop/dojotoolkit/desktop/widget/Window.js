@@ -30,6 +30,9 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 	//	closed: Boolean
 	//		Is the window closed?
 	closed: false,
+    //  shown: Boolean
+    //      Is the window shown?
+    shown: false,
 	//	iconClass: String?
 	//		the class to give the icon node
 	iconClass: "",
@@ -181,6 +184,9 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 	{
 		//	summary:
 		//		Shows the window
+        if(this.shown)
+           return;
+        this.shown = true;
 		desktop.ui._area.addChild(this);
 		this.titleNode.innerHTML = this.title;
 		this._winListItem = desktop.ui._windowList.newItem({

@@ -18,12 +18,22 @@
 			if($x && $y) $user = $User->filter($x, $y);
 			else if($_POST['id'] == "0") { $user = $User->get_current(); }
 			else { $user = $User->get($_POST['id']); }
-			$out = new jsonOutput();
-			$out->append("id", $user->id);
-			$out->append("name", $user->name);
-			$out->append("username", $user->username);
-			$out->append("email", $user->email);
-			$out->append("lastauth", $user->lastauth);
+            if($user !== false) {
+                if(is_array($user)) {
+                    $user = $user[0];
+                }
+			    $out = new jsonOutput();
+			    $out->append("id", $user->id);
+			    $out->append("name", $user->name);
+			    $out->append("username", $user->username);
+			    $out->append("email", $user->email);
+			    $out->append("lastauth", $user->lastauth);
+                $out->append("exists", true);
+            }
+            else {
+                $out = new jsonOutput();
+                $out->append("exists", false);
+            }
 		}
         if($_GET['action'] == "isAdmin") {
             $u = $User->get_current();
