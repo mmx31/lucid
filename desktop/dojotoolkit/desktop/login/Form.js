@@ -44,12 +44,12 @@ dojo.declare("desktop.login.Form", dijit.form.Form, {
 				if(data == 0) {
 					if(this.autoRedirect) {
 						if(dojo.cookie("desktopWindowPref") == "current") {
-							this.errorNode.innerHTML = "You are allready logged in. Redirecting to desktop...";
+							this.errorNode.innerHTML = "You are already logged in. Redirecting to desktop...";
 							this.submitNode.setDisabled(true);
 							window.location = dojo.baseUrl+"../../index.html";
 						}
 						else if(winClosed) {
-							this.errorNode.innerHTML = "You are allready logged in. <a href='" + dojo.baseUrl + "../../index.html'>Click here</a> to open the desktop.";
+							this.errorNode.innerHTML = "You are already logged in. <a href='" + dojo.baseUrl + "../../index.html'>Click here</a> to open the desktop.";
 							dojo.query("a", this.errorNode).forEach(function(elem) {
 								elem.href="javascript:void(0);";
 								dojo.connect(elem, "onclick", this, "onLinkClick");
@@ -57,7 +57,7 @@ dojo.declare("desktop.login.Form", dijit.form.Form, {
 						}
 						else {
 							if (this._popUp()) {
-								this.errorNode.innerHTML = "You are allready logged in. Window opened.";
+								this.errorNode.innerHTML = "You are already logged in. Window opened.";
 								this.submitNode.setDisabled(true);
 								this._winCheck();
 							}
@@ -71,7 +71,7 @@ dojo.declare("desktop.login.Form", dijit.form.Form, {
 						}
 					}
 					else 
-						this.errorNode.innerHTML = "You are allready logged in. <a href='" + dojo.baseUrl + "../../index.html'>Click here</a> to continue to the desktop.";
+						this.errorNode.innerHTML = "You are already logged in. <a href='" + dojo.baseUrl + "../../index.html'>Click here</a> to continue to the desktop.";
 						dojo.query("a", this.errorNode).forEach(function(elem) {
 							elem.href="javascript:void(0);";
 							dojo.connect(elem, "onclick", this, "onLinkClick");
@@ -224,14 +224,17 @@ dojo.declare("desktop.login._RegisterDialog", dijit.Dialog, {
 		{
 			if(contents.username.indexOf("..") != -1) {
 				this.errorNode.innerHTML = "Username cannot contain two consecutive '.'s";
+				this.submitNode.disabled=false;
 				return;
 			}
 			if(contents.username.indexOf("/") != -1) {
 				this.errorNode.innerHTML = "Username cannot contain any slashes";
+				this.submitNode.disabled=false;
 				return;
 			}
 			if(contents.username.indexOf("\\") != -1) {
 				this.errorNode.innerHTML = "Username cannot contain any slashes";
+				this.submitNode.disabled=false;
 				return;
 			}
 			if(contents.password == contents.confPassword)
@@ -251,7 +254,7 @@ dojo.declare("desktop.login._RegisterDialog", dijit.Dialog, {
 							if(data == "1")
 							{
 								this.errorNode.innerHTML = "Username already exists";
-								this.submitNode.setDisabled(false);
+								this.submitNode.disabled=false;
 							}
 							else if(data == "0")
 							{
@@ -264,19 +267,19 @@ dojo.declare("desktop.login._RegisterDialog", dijit.Dialog, {
 				else
 				{
 					this.errorNode.innerHTML = "Please enter a valid email";
-					this.submitNode.setDisabled(false);
+					this.submitNode.disabled=false;
 				}
 			}
 			else
 			{
 				this.errorNode.innerHTML = "Two passwords don't match";
-				this.submitNode.setDisabled(false);
+				this.submitNode.disabled=false;
 			}
 		}
 		else
 		{
 			this.errorNode.innerHTML = "Please fill in all fields";
-			this.submitNode.setDisabled(false);
+			this.submitNode.disabled=false;
 		}
 		return false;
 	}
@@ -292,7 +295,8 @@ dojo.declare("desktop.login._ResetPassDialog", dijit.Dialog, {
 		new dijit.form.TextBox({name: "user"}, this.userInputNode);
 		new dijit.form.TextBox({name: "email"}, this.emailInputNode);
 	},
-	onSubmit: function(){
+	onSubmit: function(e){
+		dojo.stopEvent(e);
 		var contents = this.getValues();
 		this.submitNode.disabled=true;
 		this.errorNode.innerHTML = "";
@@ -307,12 +311,12 @@ dojo.declare("desktop.login._ResetPassDialog", dijit.Dialog, {
 						if(data == "2")
 						{
 							this.errorNode.innerHTML = "Email on file and username don't match";
-							this.submitNode.setDisabled(false);
+							this.submitNode.disabled=false;
 						}
 						else if(data == "1")
 						{
 							this.errorNode.innerHTML = "No such user";
-							this.submitNode.setDisabled(false);
+							this.submitNode.disabled=false;
 						}
 						else if(data == "0")
 						{
@@ -325,13 +329,13 @@ dojo.declare("desktop.login._ResetPassDialog", dijit.Dialog, {
 			else
 			{
 				this.errorNode.innerHTML = "Please enter a valid email";
-				this.submitNode.setDisabled(false);
+				this.submitNode.disabled=false;
 			}
 		}
 		else
 		{
 			this.errorNode.innerHTML = "Please fill out all fields";
-			this.submitNode.setDisabled(false);
+			this.submitNode.disabled=false;
 		}
 		return false;
 	}
