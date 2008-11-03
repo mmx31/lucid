@@ -81,7 +81,7 @@ dojo.extend(desktop.apps.Messenger, {
     makeImWindow: function(item){
         var store = this.buddyStore;
         var uiSlot = this.unameUi[store.getValue(item, "id")];
-        if(uiSlot && uiSlot.win && !uiSlot.win.closed)
+        if(uiSlot && !uiSlot.win.closed)
             return uiSlot.win.bringToFront();
         var win = new desktop.widget.Window({
             title: store.getValue(item, "username"),
@@ -165,7 +165,7 @@ dojo.extend(desktop.apps.Messenger, {
 
         
         var nameSpan = document.createElement("span");
-        desktop.textContent(nameSpan, username+": ");
+        desktop.textContent(nameSpan, (local ? "me" : username)+": ");
         div.appendChild(nameSpan);
 
         dojo.style(nameSpan, {

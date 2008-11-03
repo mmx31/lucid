@@ -6,7 +6,7 @@ dojo.extend(desktop.apps.Messenger, {
         this.listener = desktop.crosstalk.subscribe("IM", dojo.hitch(this, "recieveMessage"), this.instance); 
     },
     removeListener: function() {
-        desktop.crosstalk.unsubscrive(this.listener);
+        desktop.crosstalk.unsubscribe(this.listener);
     },
     sendMessage: function(uid, msg) {
         this.pushMsg(uid, msg, true);
