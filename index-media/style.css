@@ -72,3 +72,15 @@ a {
 	left: 0px;
 	background-image: url('./bl.png');
 }
+
+#plink {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    color: #bbb;
+    z-index: 500;
+    text-decoration: none;
+}
+#plink:hover {
+    color: #ddd;
+}
