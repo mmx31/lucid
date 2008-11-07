@@ -14,9 +14,9 @@ a {
 	width: 100%;
 	height: 100%;
 	z-index: 10;
-	background-image: url(../desktop/dojotoolkit/desktop/resources/themes/Minuit/wallpaper.png);
+	background-image: url(../desktop/dojotoolkit/desktop/resources/themes/green/wallpaper.png);
 	background-position: center center;
-	background-color: #696969;
+	background-color: #32cd32;
 }
 #centerForm {
 	z-index: 100;
@@ -34,7 +34,7 @@ a {
 }
 .mainBox {
 	text-align: center;
-	background-color: #fff;
+	background-color: white;
 	margin: 0px;
 }
 #top, #bottom {
@@ -71,4 +71,16 @@ a {
 #bl {
 	left: 0px;
 	background-image: url('./bl.png');
+}
+
+#plink {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    color: #bbb;
+    z-index: 500;
+    text-decoration: none;
+}
+#plink:hover {
+    color: #ddd;
 }
