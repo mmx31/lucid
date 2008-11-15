@@ -8,7 +8,7 @@
 
 	require("../lib/includes.php");
 	//check loads, crosstalk can be hefty on the server
-	if(function_exists('sys_getloadavg') && $GLOBALS['config']['crosstalkThrottle']) { //We have a UNIX system! Yay!
+	if(function_exists('sys_getloadavg') && $GLOBALS['conf']['crosstalkThrottle']) { //We have a UNIX system! Yay!
 		$load = sys_getloadavg();
 		if ($load[0] > 75) {
 		    header('HTTP/1.1 503 Too busy, try again later');
