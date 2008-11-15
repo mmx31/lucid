@@ -5,6 +5,9 @@ desktop.crosstalk = {
 	//	session: Array
 	//		handler storage
 	session: [],
+    //  msgQueue: Array
+    //      a queue of messages for the dispacher to handle
+    msgQueue: [],
 	subscribe: function(/*String*/topic, /*Function*/handler, /*Int?*/instance)
 	{
 		//	summary:
@@ -55,7 +58,12 @@ desktop.crosstalk = {
         	desktop.xhr({
 	        	backend: "api.crosstalk.io.checkForEvents",
 				handleAs: "json",
-	        	load: dojo.hitch(this, "_internalCheck2"),
+	        	load: dojo.hitch(this, function(data) {
+                    dojo.forEach(data, function(msg) {
+                        this.msgQueue.push(msg);
+                    }, this);
+                    this._internalCheck2();
+                }),
 	        	error: function(type, error) { desktop.log("Error in Crosstalk call: "+error.message); }
         	});
 		//}
@@ -79,6 +87,11 @@ desktop.crosstalk = {
 		//		omit to send it to all instances
 		//	callback:
 		//		will return a ID to cancel the request
+        if(!userid){
+            //publish locally
+
+            return;
+        }
     	desktop.xhr({
 	    	backend: "api.crosstalk.io.sendEvent",
 			number: true,
@@ -123,15 +136,16 @@ desktop.crosstalk = {
     	});
 	},
 	
-	_internalCheck2: function(data, ioArgs)
+	_internalCheck2: function()
 	{	
 		//summary:
 		//		the crosstalk api checker, stage2, compare the results with the handled handlers
-		
-		if(data == "") { this.setup_timer(); return; }
+		var data = this.msgQueue
+		if(data.length == 0) { this.setup_timer(); return; }
 		// No events here.
 		try {
 			var checkForHandler = dojo.hitch(this, function(event) {
+                if(!event) return;
 				//cycle through the handlers stored and find a handler for the event
 				dojo.forEach(this.session, function(handler) {
 					//A subscribed handler is required
@@ -155,11 +169,11 @@ desktop.crosstalk = {
 				}, this);
 			})
 		
-			dojo.forEach(data, function(event) {
+			dojo.forEach(data, function(event, key) {
 				var handled = false;
-				checkForHandler(event);
+				handled = checkForHandler(event);
 				if(handled == false && event.instance == -1) {
-					if(event.appsysname == -1) return; //system call - TODO: Handle?
+					if(!event.appsysname) return; //system call - TODO: Handle?
 					//check to see if there's allready an instance of this app running
 					var instances = desktop.app.getInstances();
 					for(var i=0;i<instances.length;i++) {
@@ -174,6 +188,7 @@ desktop.crosstalk = {
 						if(handled == false) app.kill();
 					})
 				}
+                delete data[key];
 			}, this);
 		}
 		catch(err) {

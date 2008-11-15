@@ -591,7 +591,7 @@ dojo.declare("desktop.widget.Filearea._Icon", [dijit._Widget, dijit._Templated, 
 	},
 	uninitialize: function() {
 		dojo.forEach(this._subscriptions, dojo.unsubscribe);
-        if(!this._win.closed)
+        if(typeof this._win != "undefined" && !this._win.closed)
             this._win.close();
 	},
 	_dragStart: function(e) {
