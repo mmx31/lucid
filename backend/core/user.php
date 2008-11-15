@@ -12,9 +12,9 @@
 	if($_GET['section'] == "info")
 	{
 		if ($_GET['action'] == "get") {
-			if($_POST['username']) { $x = "username"; $y = $_POST['username']; }
-			if($_POST['name']) { $x = "name"; $y = $_POST['name']; }
-			if($_POST['email']) { $x = "email"; $y = $_POST['email']; }
+			if(array_key_exists('username', $_POST)) { $x = "username"; $y = $_POST['username']; }
+			if(array_key_exists('name', $_POST)) { $x = "name"; $y = $_POST['name']; }
+			if(array_key_exists('email', $_POST)) { $x = "email"; $y = $_POST['email']; }
 			if($x && $y) $user = $User->filter($x, $y);
 			else if($_POST['id'] == "0") { $user = $User->get_current(); }
 			else { $user = $User->get($_POST['id']); }
