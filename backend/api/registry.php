@@ -46,7 +46,7 @@
 		{
 			$p = $User->get_current();
 			$result = $Registry->filter(array("userid" => $p->id, "appname" => $_POST['appname'], "name" => $_POST['name']));
-			$out = new jsonOutput(array(exists=>($result != false)));
+			$out = new jsonOutput(array("exists"=>($result != false)));
 		}
 	}
 ?>

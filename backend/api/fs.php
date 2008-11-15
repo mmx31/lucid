@@ -205,7 +205,7 @@ if($_GET['section'] == "io")
 	}
 	if ($_GET['action'] == "getFile") {
 		$content = $module->read($sentpath);
-		$out = new jsonOutput(array(contents => $content));
+		$out = new jsonOutput(array("contents" => $content));
 	}
 	if ($_GET['action'] == "writeFile") {
 		$module->write($sentpath, $_POST['content']);

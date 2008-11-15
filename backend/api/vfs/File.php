@@ -48,7 +48,7 @@ class FileFs extends BaseFs {
 		return true;
 	}
 		
-	function _getSize($directory) //works for files and folders
+	function _getSize($directory, $format=false) //works for files and folders
 	{
 		$size = 0;
 		if(substr($directory,-1) == '/')
