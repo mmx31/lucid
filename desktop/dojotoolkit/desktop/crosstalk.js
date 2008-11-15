@@ -89,7 +89,7 @@ desktop.crosstalk = {
 		//		will return a ID to cancel the request
         if(!userid){
             //publish locally
-
+            this.msgQueue.push({topic: topic, instance: instance, appsysname: appsysname, sender: null});
             return;
         }
     	desktop.xhr({
