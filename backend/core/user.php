@@ -12,6 +12,8 @@
 	if($_GET['section'] == "info")
 	{
 		if ($_GET['action'] == "get") {
+            $x = null;
+            $y = null;
 			if(array_key_exists('username', $_POST)) { $x = "username"; $y = $_POST['username']; }
 			if(array_key_exists('name', $_POST)) { $x = "name"; $y = $_POST['name']; }
 			if(array_key_exists('email', $_POST)) { $x = "email"; $y = $_POST['email']; }

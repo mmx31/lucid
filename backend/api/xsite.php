@@ -21,7 +21,7 @@ if($user->has_permission("api.xsite"))
 	$url = $params["url"];
 	import("lib.net.Request");
 	$reqArgs = array(
-		allowRedirects => true
+		"allowRedirects" => true
 	);
 	$p = new HTTP_Request($url, $reqArgs);
 	$p->setMethod(HTTP_REQUEST_METHOD_GET);
@@ -32,10 +32,10 @@ if($user->has_permission("api.xsite"))
 		if(array_key_exists("password", $auth)) {
 			//create/update the entry in the DB
 			$entries = $Auth->filter(array(
-				appid => $params["appid"],
-				server => $server[1],
-				username => $auth["username"],
-				userid => $user->id
+				"appid" => $params["appid"],
+				"server" => $server[1],
+				"username" => $auth["username"],
+				"userid" => $user->id
 			));
 			//get encryption stuff going
 			$blowfish = Crypt_Blowfish::factory("ecb");
@@ -45,11 +45,11 @@ if($user->has_permission("api.xsite"))
 			{
 				//create
 				$entry = new $Auth(array(
-					appid => $params["appid"],
-					server => $server[1],
-					username => $auth["username"],
-					userid => $user->id,
-					password => $blowfish->encrypt($auth["password"]),
+					"appid" => $params["appid"],
+					"server" => $server[1],
+					"username" => $auth["username"],
+					"userid" => $user->id,
+					"password" => $blowfish->encrypt($auth["password"]),
 				));
 			}
 			else {
@@ -62,10 +62,10 @@ if($user->has_permission("api.xsite"))
 		else {
 			//fetch password from the db
 			$entries = $Auth->filter(array(
-				appid => $params["appid"],
-				server => $server[1],
-				username => $auth["username"],
-				userid => $user->id
+				"appid" => $params["appid"],
+				"server" => $server[1],
+				"username" => $auth["username"],
+				"userid" => $user->id
 			));
 			$entry = $entries[0];
 			$blowfish = Crypt_Blowfish::factory("ecb");
