@@ -106,7 +106,7 @@ if($user->has_permission("api.xsite"))
 		"503" => "Gateway Timeout"
 	) as $key => $value) {
 		if($p->getResponseCode() == $key)
-			header("HTTP/1.0 ".$key." ".value);
+			header("HTTP/1.0 ".$key." ".$value);
 	}
 
 	
