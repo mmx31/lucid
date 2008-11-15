@@ -5,8 +5,13 @@ html, body {
 	color: #444;
 }
 a {
-	color: #44AA44;
+	color: #777;
 }
+
+.mainBox a {
+    font-size: 8pt;
+}
+
 #bg {
 	position: absolute;
 	top: 0px;
@@ -14,9 +19,9 @@ a {
 	width: 100%;
 	height: 100%;
 	z-index: 10;
-	background-image: url(../desktop/dojotoolkit/desktop/resources/themes/green/wallpaper.png);
+	background-image: url(../desktop/dojotoolkit/desktop/resources/themes/Minuit/wallpaper.png);
 	background-position: center center;
-	background-color: #32cd32;
+	background-color: #696969;
 }
 #centerForm {
 	z-index: 100;
@@ -25,12 +30,12 @@ a {
 	margin-right: auto;
 	position: relative;
 	margin-top: 13%;
-	opacity: 0.8;
+	opacity: 0.75;
 }
 .desktop_message {
 	font-size: 14pt;
 	font-weight: bold;
-	margin-bottom: 10px;
+	margin-bottom: 5px;
 }
 .mainBox {
 	text-align: center;
@@ -84,3 +89,25 @@ a {
 #plink:hover {
     color: #ddd;
 }
+
+.desktopInputLabel {
+    display: block;
+    font-size: 8pt;
+    margin-left: 25px;
+    text-align: left;
+}
+
+.dijitTextBox {
+    display: block;
+    width: 300px !important;
+    margin-left: 25px !important;
+    font-size: 18pt !important;
+    margin-bottom: 5px !important;
+}
+
+.dijitRadio {
+    margin-bottom: 5px !important;
+    margin-top: 5px !important;
+}
+
+
