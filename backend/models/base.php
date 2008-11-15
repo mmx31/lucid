@@ -143,12 +143,7 @@
 				return $return;
 			}
 			else {
-                if(isset($this->$var){
-    				return $this->$var;
-                }
-                else{
-                    return null;
-                }
+   				return $this->$var;
 			}
 		}
 		
