@@ -52,7 +52,7 @@ function import($module) {
 //sessions and cookies
 function get_basepath() {
 	$curpath = explode("/", $_SERVER['REQUEST_URI']);
-	$dir = $GLOBALS['installing'] ? "install" : ($GLOBALS['mobile'] ? "mobile" : "backend");
+	$dir = array_key_exists('installing', $GLOBALS) ? "install" : (array_key_exists('mobile', $GLOBALS) ? "mobile" : "backend");
 	while($curpath[count($curpath)-1] != $dir) {
 		if(count($curpath) == 0) return "/";
 		array_pop($curpath);
