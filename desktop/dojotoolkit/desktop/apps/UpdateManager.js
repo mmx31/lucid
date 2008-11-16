@@ -13,6 +13,7 @@ dojo.declare("desktop.apps.UpdateManager", desktop.apps._App, {
                 xsite: true,
                 url: "http://www.lucid-desktop.org/download/latest.json",
                 load: dojo.hitch(this, "checkVersion"),
+                error: dojo.hitch(this, "handleError"),
                 handleAs: "json"
             });
             //debugging
@@ -88,6 +89,11 @@ dojo.declare("desktop.apps.UpdateManager", desktop.apps._App, {
             var l = this.parseVersion(versions.unstable);
         }
         this.notify(l, this.isNewer(v, l));
+    },
+    handleError: function(e){
+        if(!this.drawUi) return;
+        this.header.setContent("<h1>"+nls.comError+"</h1>");
+        this.center.setContent(nls.comDesc);
     },
     notify: function(version, isNewer){
         if(this.drawUi)
