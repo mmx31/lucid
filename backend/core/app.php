@@ -124,6 +124,9 @@
 			$user = $User->get_current();
 			if(!$user->has_permission("core.app.write")) internal_error("permission_denied");
 			//if(!isset($_POST['filename'])) {
+                if(!array_key_exists("sysname", $_POST)){
+                    $_POST['sysname']="";
+                }
 				$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
 				$p = $App->filter("sysname", $_POST['sysname']);
 				if($p === false) { $app = new App(array("sysname" => $_POST['sysname'])); }
