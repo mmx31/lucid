@@ -126,7 +126,7 @@
 			//if(!isset($_POST['filename'])) {
 				$_POST['sysname'] = str_replace("..", "", $_POST['sysname']);
 				$p = $App->filter("sysname", $_POST['sysname']);
-				if($p === false) { $app = new App(array(sysname => $_POST['sysname'])); }
+				if($p === false) { $app = new App(array("sysname" => $_POST['sysname'])); }
 				else { $app = $p[0]; }
 				foreach(array('name', 'author', 'email', 'version', 'maturity', 'category') as $item) {
 					if(isset($_POST[$item]))
@@ -138,7 +138,7 @@
 				$_POST['filename'] = str_replace("..", "", $_POST['filename']);
 				file_put_contents($GLOBALS['path']."/../desktop/dojotoolkit/desktop/apps/".$_POST['filename'], $_POST['content']);
 			}
-			$out = new jsonOutput(array(status => "ok"));
+			$out = new jsonOutput(array("status" => "ok"));
 			if($app) $out->append("sysname", $app->sysname);
 		}
 		if($_GET['action'] == "createFolder") {
