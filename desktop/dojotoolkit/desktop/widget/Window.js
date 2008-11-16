@@ -514,11 +514,12 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		//	returns:
 		//		true if it had to be raised
 		//		false if it was already on top
-		var maxZindex = 10;
+		var maxZindex = 11;
 		var alwaysOnTopNum = 0;		// Number of wins with 'alwaysOnTop' property set to true
 		var topWins = [];	// Array of reffernces to win widgets with 'alwaysOnTop' property set to true
 		var winWidget;			// Reffernce to window widget by dom node
 		this.getParent().getChildren().forEach(function(wid) {
+            if(typeof wid == "undefined") return;
 			var node = wid.domNode;
 			var zindex = dojo.style(node, "zIndex")
 			if(zindex > maxZindex && zindex != "auto") {
@@ -606,7 +607,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		this.domNode = this.containerNode;
 		this.inherited(arguments);
 		this.domNode = oldNode;
-		this.getChildren().forEach(function(wid) { if(wid.resize) wid.resize(); });
+		this.getChildren().forEach(function(wid) { if(typeof wid != "undefined" && wid.resize) wid.resize(); });
 	},
 	_onResize: function(e) {
 		//	summary:
