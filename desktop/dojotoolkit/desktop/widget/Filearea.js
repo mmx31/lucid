@@ -846,7 +846,7 @@ dojo.declare("desktop.widget.Filearea._Icon", [dijit._Widget, dijit._Templated, 
     },
     _handleOpenWith: function() {
         if(!this._selectedApp) return;
-        desktop.app.launch(this._selectedApp, {file: this.path});
+        desktop.app.launch(this._selectedApp, {file: this.getParent().path+this.name});
         this._win.close();
     },
 	rename: function() {
