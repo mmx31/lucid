@@ -91,7 +91,10 @@ dojo.declare("desktop.apps.UpdateManager", desktop.apps._App, {
         this.notify(l, this.isNewer(v, l));
     },
     handleError: function(e){
-        if(!this.drawUi) return;
+        if(!this.drawUi){
+            this.kill();
+            return;
+        }
         this.header.setContent("<h1>"+nls.comError+"</h1>");
         this.center.setContent(nls.comDesc);
     },
