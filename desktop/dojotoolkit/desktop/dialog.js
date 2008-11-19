@@ -143,6 +143,10 @@ desktop.dialog = {
 		dialog.show();
 		dialog.startup();
         setTimeout(dojo.hitch(text, "focus"), 400);
+        dojo.connect(text.domNode, "onkeyup", this, function(e) {
+            if(e.keyCode == dojo.keys.ENTER)
+                blah.onClick();
+        });
 	},
 	yesno: function(/*Object*/object)
 	{
