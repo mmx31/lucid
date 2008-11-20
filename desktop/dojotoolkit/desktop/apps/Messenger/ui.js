@@ -143,13 +143,15 @@ dojo.extend(desktop.apps.Messenger, {
                             id: uid,
                             callback: dojo.hitch(this, function(info) {
                                 var item = this.addBuddy(info);
-                                this.makeImWindow(item);
+                                var win = this.makeImWindow(item);
                                 this.pushMsg(uid, msg);
+                                win.show();
                             })
                         });
                     }else{
-                        this.makeImWindow(items[0]);
+                        var win = this.makeImWindow(items[0]);
                         this.pushMsg(uid, msg);
+                        win.show();
                     }
                 })
             });
@@ -168,7 +170,6 @@ dojo.extend(desktop.apps.Messenger, {
 
         
         var nameSpan = document.createElement("span");
-        desktop.textContent(nameSpan, (local ? "me" : username)+": ");
         div.appendChild(nameSpan);
 
         dojo.style(nameSpan, {
@@ -179,7 +180,14 @@ dojo.extend(desktop.apps.Messenger, {
         var msgSpan = document.createElement("span");
         desktop.textContent(msgSpan, message);
         div.appendChild(msgSpan);
-
+        
+        if(local){
+            this.getCurrentUsername(function(name) {
+                desktop.textContent(nameSpan, name+": ");
+            });
+        }else{
+            desktop.textContent(nameSpan, username+": ");
+        }
         return div;
     },
     drawAddBuddyDialog: function() {
