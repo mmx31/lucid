@@ -16,7 +16,7 @@ dojo.extend(desktop.apps.Messenger, {
     makeBuddyListWin: function() {
         if(this.buddyListWin && !this.buddyListWin.closed) return this.BuddyListWin;
         var win = this.buddyListWin = new desktop.widget.Window({
-            title: "Buddy List",
+            title: "Contact List",
             iconClass: this.iconClass,
             width: "220px",
             height: "400px",
@@ -32,7 +32,7 @@ dojo.extend(desktop.apps.Messenger, {
         });
         
         var addButton = new dijit.form.Button({
-            label: "Add Buddy",
+            label: "Add User",
             iconClass: "icon-16-actions-list-add",
             onClick: dojo.hitch(this, "drawAddBuddyDialog"),
             getIconClass: function(item, opened) {
@@ -42,7 +42,7 @@ dojo.extend(desktop.apps.Messenger, {
         toolbar.addChild(addButton);
         
         var removeButton = this.removeBuddyButton = new dijit.form.Button({
-            label: "Remove Buddy",
+            label: "Remove User",
             iconClass: "icon-16-actions-list-remove",
             disabled: true,
             onClick: dojo.hitch(this, function() {
@@ -57,8 +57,14 @@ dojo.extend(desktop.apps.Messenger, {
 
         win.addChild(toolbar);
 
-        var tree = new dijit.Tree({
+        var model = new dijit.tree.ForestStoreModel({
             store: store,
+            rootLabel: "Contacts"
+        });
+
+        var tree = new dijit.Tree({
+            model: model,
+            region: "center",
             onClick: dojo.hitch(this, function(item) {
                 if(this.selectedBuddy == item) {
                     var imWin = this.makeImWindow(item);
@@ -71,10 +77,7 @@ dojo.extend(desktop.apps.Messenger, {
             })
         });
 
-        var treePane = new dijit.layout.ContentPane({region: "center"});
-        treePane.setContent(this.wrapWid(tree));
-
-        win.addChild(treePane);
+        win.addChild(tree);
         tree.startup();
         return win;
     },

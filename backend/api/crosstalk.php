@@ -32,11 +32,11 @@
 			$array = array();
 			foreach($result as $row) {
 				array_push($array, array(
-					sender => $row->sender,
-					appsysname => $row->appsysname,
-					instance => $row->instance,
-					args => $row->args,
-					topic => $row->topic
+					"sender" => $row->sender,
+					"appsysname" => $row->appsysname,
+					"instance" => $row->instance,
+					"args" => $row->args,
+					"topic" => $row->topic
 				));
 				$row->delete();
 			}

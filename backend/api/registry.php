@@ -36,8 +36,8 @@
 		{
 			$p = $User->get_current();
 			$result = $Registry->filter(array("userid" => $p->id, "appname" => $_POST['appname'], "name" => $_POST['name']));			
-			if(isset($result[0])) { $result[0]->delete(); $out = new jsonOutput(array(exists=>true)); }
-			else { $out = new jsonOutput(array(exists=>false)); }
+			if(isset($result[0])) { $result[0]->delete(); $out = new jsonOutput(array("exists"=>true)); }
+			else { $out = new jsonOutput(array("exists"=>false)); }
 		}
 	}
 	if($_GET['section'] == "info")

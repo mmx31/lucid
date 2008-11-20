@@ -140,14 +140,14 @@ desktop.crosstalk = {
 	{	
 		//summary:
 		//		the crosstalk api checker, stage2, compare the results with the handled handlers
-		var data = this.msgQueue
+		var data = this.msgQueue;
 		if(data.length == 0) { this.setup_timer(); return; }
 		// No events here.
 		try {
 			var checkForHandler = dojo.hitch(this, function(event) {
-                if(!event) return;
 				//cycle through the handlers stored and find a handler for the event
-				dojo.forEach(this.session, function(handler) {
+				var handled = false;
+                dojo.forEach(this.session, function(handler) {
 					//A subscribed handler is required
 					if(typeof handler == "undefined") return false;
 					//matching the appid and topic are required
@@ -167,12 +167,13 @@ desktop.crosstalk = {
 						return true;
 					}
 				}, this);
+                return handled;
 			})
-		
-			dojo.forEach(data, function(event, key) {
-				var handled = false;
-				handled = checkForHandler(event);
-				if(handled == false && event.instance == -1) {
+			
+            dojo.forEach(data, function(event, key) {
+                if(!event) return;
+				var handled = checkForHandler(event);
+				if(handled == false && (event.instance == -1 || event.instance == "null")) {
 					if(!event.appsysname) return; //system call - TODO: Handle?
 					//check to see if there's allready an instance of this app running
 					var instances = desktop.app.getInstances();
@@ -181,12 +182,12 @@ desktop.crosstalk = {
 						if(instances[i].sysname == event.appsysname) return;
 					}
 					//otherwise, launch the app
-					desktop.app.launch(event.appsysname, {crosstalk: true}, function(app) {
+					desktop.app.launch(event.appsysname, {crosstalk: true}, dojo.hitch(this, function(app) {
 						//check for a handler again
 						var handled = checkForHandler(event);
 						//if there's still no handler, kill the app
 						if(handled == false) app.kill();
-					})
+					}))
 				}
                 delete data[key];
 			}, this);
