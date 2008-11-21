@@ -105,6 +105,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		dojo.setSelectable(this.titleNode, false);
 		this.domNode.title="";
 		this.makeDragger();
+        this.shown = false;
 		this.sizeHandle = new dojox.layout.ResizeHandle({
 			targetContainer: this.domNode,
 			activeResize: (desktop.config.fx >= 2),
@@ -607,7 +608,10 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		this.domNode = this.containerNode;
 		this.inherited(arguments);
 		this.domNode = oldNode;
-		this.getChildren().forEach(function(wid) { if(typeof wid != "undefined" && wid.resize) wid.resize(); });
+		dojo.forEach(this.getChildren(), function(wid){
+            if(typeof wid != "undefined" && typeof wid.resize == "function")
+                wid.resize();
+        });
 	},
 	_onResize: function(e) {
 		//	summary:
