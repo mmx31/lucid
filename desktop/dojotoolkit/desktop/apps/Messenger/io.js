@@ -12,10 +12,12 @@ dojo.extend(desktop.apps.Messenger, {
     sendMessage: function(uid, msg){
         this.pushMsg(uid, msg, true);
         desktop.crosstalk.publish("IM", {text: msg}, uid, this.sysname);
+        this.playSend();
     },
     recieveMessage: function(msg){
         var uid = msg._crosstalk.sender;        
         this.pushMsg(uid, msg.text, false);
+        this.playReceive();
     },
     getCurrentUsername: function(cback){
         if(this.currentUsername) cback(this.currentUsername);
