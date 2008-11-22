@@ -169,7 +169,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		    uploadOnChange: true,
             selectMultipleFiles: true
 		});
-        if(!dojox.embed.Flash.available){
+        if(dojox.embed.Flash.available > 9){
             //fix button (workaround)
             this.fixButton();
             dojo.connect(this.uploader, "_connectInput", this, "fixButton");
@@ -179,8 +179,12 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 	
     fixButton: function() {
         var node = this.uploader.fileInputs[0];
+        console.log(node);
         setTimeout(dojo.hitch(this, function() {
             var butNode = this.upbutton.domNode;
+            var upNode = this.uploader._formNode;
+            butNode.appendChild(upNode);
+            dojo.style(butNode, "position", "relative");
             var right = node.offsetWidth-butNode.offsetWidth
             dojo.style(node, {
                 top: "0px",
