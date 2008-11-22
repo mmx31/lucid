@@ -21,7 +21,7 @@ class PublicFs extends FileFs {
 class PublicFs extends BaseFs {
 	var $_username;
 	function _basePath($path=false) {
-		return $GLOBALS['path'] . "/../public/" . ($path ? $path : "");
+		return $GLOBALS['path'] . "/../public/all/" . ($path ? $path : "");
 	}
 	function _getRealPath($path) {
 		return $this->_basePath($path);
