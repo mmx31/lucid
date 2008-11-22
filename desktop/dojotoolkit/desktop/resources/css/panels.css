@@ -82,6 +82,7 @@
 }
 .mainFileArea {
 	z-index: 10;
+    position: absolute;
 }
 .wallpaper {
 	z-index: 20;
