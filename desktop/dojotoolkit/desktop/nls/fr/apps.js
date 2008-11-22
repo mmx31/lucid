@@ -1,0 +1,22 @@
+({
+	"Image Viewer": "Lecteur d'image",
+	"Katana IDE": "Katana IDE",
+	"Web Browser": "Fureteur internet",
+	"File Browser": "Explorateur de fichiers",
+	"Administration Panel": "Panneau d'administration",
+   "Checkers": "Jeu de dames",
+	"Calculator": "Calculatrice",
+   "Contacts": "Contacts",
+	"Feed Reader": "Lecteur de flux",
+	"Word Processor": "Traitement de texte",
+	"Text Editor": "Éditeur de texte",
+	"Task Manager": "Gestionnaire des tâches",
+	"Terminal": "Terminal",
+	"Music Player": "Lecteur de musique",
+	"Email Client": "Client de courriel",
+	"MineSweep": "Démineur",
+	"Appearance": "Apparence",
+	"Account Information": "Information du compte",
+	"Startup Applications": "Démarrage",
+   "Update Manager": "Gestionnaire de mise à jour"
+})
