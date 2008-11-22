@@ -6,3 +6,4 @@ dojo.require("desktop.apps.Messenger._base");
 dojo.require("desktop.apps.Messenger.store");
 dojo.require("desktop.apps.Messenger.ui");
 dojo.require("desktop.apps.Messenger.io");
+dojo.require("desktop.apps.Messenger.sound");

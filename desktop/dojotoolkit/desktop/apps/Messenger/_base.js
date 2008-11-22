@@ -8,6 +8,7 @@ dojo.declare("desktop.apps.Messenger", desktop.apps._App, {
         this.windows = [];
     	var win = this.makeBuddyListWin(); //OH YA WE ARE DRAW UI
         this.setListener();
+        this.initSounds();
         win.show();
     },
     kill: function(stright) {
@@ -15,6 +16,7 @@ dojo.declare("desktop.apps.Messenger", desktop.apps._App, {
             if(!win.closed)
 		        win.close();
 		});
+        this.cleanupSounds();
 		this.removeListener(); //Tell crosstalk we are no longer intrested in recieving events.
 	}
 });
