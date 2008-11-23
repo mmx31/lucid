@@ -46,7 +46,9 @@
 	     {
 			$event = $Crosstalk->get($_POST['id']);
 			$cur = $User->get_current();
-			if($event->sender == $_SESSION['userid'] || $cur->has_permission("core.administration")) {
+			if(!$event)
+				$out = intOutput("ok");
+			else if($event->sender == $_SESSION['userid'] || $cur->has_permission("core.administration")) {
 				$event->delete();
 				$out = intOutput("ok");
 			}
