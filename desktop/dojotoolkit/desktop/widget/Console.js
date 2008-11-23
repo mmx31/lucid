@@ -147,7 +147,7 @@ dojo.declare("desktop.widget.Console", [dijit._Widget, dijit._Templated, dijit._
 				this.write("mkdir: "+n.needDirName+"\n");
 			}
 			else {
-				desktop.filesystem.createDirectory(params);
+				desktop.filesystem.createDirectory(this.path + "/" + params);
 			}
 			this.detach();
 		},
@@ -158,7 +158,7 @@ dojo.declare("desktop.widget.Console", [dijit._Widget, dijit._Templated, dijit._
 				this.write("rm: "+n.needFileName+"\n");
 			}
 			else {
-				desktop.filesystem.remove(params);
+				desktop.filesystem.remove(this.path + "/" + params);
 			}
 			this.detach();
 		},
@@ -170,7 +170,7 @@ dojo.declare("desktop.widget.Console", [dijit._Widget, dijit._Templated, dijit._
 				this.detach();
 			}
 			else {
-				desktop.filesystem.readFileContents(this.path + params, dojo.hitch(this, function(content) {
+				desktop.filesystem.readFileContents(this.path + "/" + params, dojo.hitch(this, function(content) {
 					this.write(content+"\n");
 					this.detach();
 				}));
