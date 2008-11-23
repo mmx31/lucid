@@ -30,6 +30,7 @@
 			    $out->append("username", $user->username);
 			    $out->append("email", $user->email);
 			    $out->append("lastauth", $user->lastauth);
+                $out->append("logged", $user->logged);
                 $out->append("exists", true);
             }
             else {

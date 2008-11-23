@@ -9,6 +9,8 @@ dojo.declare("desktop.apps.Messenger", desktop.apps._App, {
     	var win = this.makeBuddyListWin(); //OH YA WE ARE DRAW UI
         this.setListener();
         this.initSounds();
+        this.timer = setInterval(dojo.hitch(this, "updateStatus"), 10000);
+        this.updateStatus();
         win.show();
     },
     kill: function(stright) {
@@ -18,6 +20,7 @@ dojo.declare("desktop.apps.Messenger", desktop.apps._App, {
 		});
         this.cleanupSounds();
 		this.removeListener(); //Tell crosstalk we are no longer intrested in recieving events.
+        clearInterval(this.timer);
 	}
 });
 
