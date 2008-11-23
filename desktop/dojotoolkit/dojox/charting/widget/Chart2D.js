@@ -112,9 +112,17 @@ dojo.require("dojox.charting.action2d.Tooltip");
 			}, false);
 			if(render){ c.render(); }
 		},
+		destroy: function(){
+			// summary: properly destroy the widget
+			this.chart.destroy();
+			this.inherited(arguments);
+		},
 		resize: function(box){
-			dojo.marginBox(this.domNode, box);
-			this.chart.resize();
+			// summary: resize the widget
+			if(box.w > 0 && box.h > 0){
+				dojo.marginBox(this.domNode, box);
+				this.chart.resize();
+			}
 		}
 	});
 	

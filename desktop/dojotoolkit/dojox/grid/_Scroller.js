@@ -140,7 +140,7 @@ dojo.provide("dojox.grid._Scroller");
 		},
 		measurePage: function(inPageIndex){
 			var n = this.getDefaultPageNode(inPageIndex);
-			return n.innerHTML ? n.offsetHeight : 0;
+			return (n&&n.innerHTML) ? n.offsetHeight : 0;
 		},
 		positionPage: function(inPageIndex, inPos){
 			for(var i=0; i<this.colCount; i++){
@@ -204,7 +204,10 @@ dojo.provide("dojox.grid._Scroller");
 		},
 		destroyPage: function(inPageIndex){
 			for(var i=0; i<this.colCount; i++){
-				dojo._destroyElement(this.invalidatePageNode(inPageIndex, this.pageNodes[i]));
+				var n = this.invalidatePageNode(inPageIndex, this.pageNodes[i]);
+				if(n){
+					dojo._destroyElement(n);
+				}
 			}
 		},
 		pacify: function(inShouldPacify){
