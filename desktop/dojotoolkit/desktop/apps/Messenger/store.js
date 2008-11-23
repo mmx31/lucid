@@ -24,8 +24,23 @@ dojo.extend(desktop.apps.Messenger, {
         }
         this.buddyStore.newItem({
             id: info.id,
-            username: info.username
+            username: info.username,
+            logged: info.logged
         });
         this.buddyStore.save();
+    },
+    updateStatus: function(){
+        var store = this.buddyStore;
+        store.fetch({
+            query: {id: "*"},
+            onItem: function(item){
+                desktop.user.get({
+                    id: store.getValue(item, "id"),
+                    callback: function(info){
+                        store.setValue(item, "logged", !!parseInt(info.logged));
+                    }
+                });
+            }
+        });
     }
 });

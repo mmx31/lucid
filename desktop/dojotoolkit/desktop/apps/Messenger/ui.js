@@ -65,6 +65,15 @@ dojo.extend(desktop.apps.Messenger, {
         var tree = new dijit.Tree({
             model: model,
             region: "center",
+            getIconClass: function(item, opened) {
+                var iconClass = "";
+                if(store.isItem(item) && store.hasAttribute(item, "logged")) {
+                    iconClass = store.getValue(item, "logged") ? "icon-16-apps-system-users" : "icon-16-actions-system-log-out";
+                    return iconClass;
+                }
+                return (!item || this.model.mayHaveChildren(item)) ? (opened ? "dijitFolderOpened" : "dijitFolderClosed") : iconClass;
+            },
+
             onClick: dojo.hitch(this, function(item) {
                 if(this.selectedBuddy == item) {
                     var imWin = this.makeImWindow(item);
