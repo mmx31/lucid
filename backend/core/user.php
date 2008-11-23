@@ -121,6 +121,14 @@
 			$user->logout();
 			$out = new intOutput("ok");
 		}
+        if($_GET['action'] == "quickLogout")
+		{
+			$user = $User->get_current();
+			$user->logged = 0;
+            $user->save();
+			$out = new intOutput("ok");
+		}
+
 		if($_GET['action'] == "resetpass")
 		{
 			$p = $User->filter("username", $_POST['username']);

@@ -5,11 +5,7 @@ desktop.user = {
 	//	summary:
 	//		functions that can be used to do user-related tasks
 	init: function() {
-		this.beforeUnloadEvent = dojo.addOnUnload(function(e)
-		{
-			desktop.config.save(true);
-			//desktop.user.logout();
-		});
+		this.beforeUnloadEvent = dojo.addOnUnload(dojo.hitch(this, "quickLogout"));
 	},
 	/*=====
 	_getArgs: {
@@ -103,7 +99,6 @@ desktop.user = {
 	{
 		//	summary:
 		//		logs a user out
-		if(desktop.reload) { return false; }
 		desktop.config.save(true);
 		dojo.publish("desktoplogout", []);
 		desktop.xhr({
@@ -123,6 +118,17 @@ desktop.user = {
 			}
 		});
 	},
+    quickLogout: function(){
+        //  summary:
+        //      Logs a user out, but doesn't clear their session.
+        //      This basically just sets their 'logged' property to false in the database, so they appear to be logged out
+        desktop.config.save(true);
+        if(desktop.reload) { return false; }
+        desktop.xhr({
+            backend: "core.user.auth.quickLogout",
+            sync: true
+        });
+    },
 	authenticate: function(/*String*/password, /*Function?*/callback) {
 		//	summary:
 		//		re-authenticates the user so that he/she can change their password
