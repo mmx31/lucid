@@ -15,7 +15,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			for(var i=0;i<data.length;i++) {
 				data[i].permissions = dojo.toJson(data[i].permissions);
 				data[i].groups = dojo.toJson(data[i].groups);
-                data[i].logged = !!data[i].logged;
+                data[i].logged = !!parseInt(data[i].logged);
 			};
 			var layout = [{
 				cells: [[]]

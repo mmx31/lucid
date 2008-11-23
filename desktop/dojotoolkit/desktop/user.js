@@ -6,6 +6,10 @@ desktop.user = {
 	//		functions that can be used to do user-related tasks
 	init: function() {
 		this.beforeUnloadEvent = dojo.addOnUnload(dojo.hitch(this, "quickLogout"));
+        //makes sure we appear logged in according to the DB
+        desktop.xhr({
+            backend: "core.user.auth.quickLogin"
+        });
 	},
 	/*=====
 	_getArgs: {

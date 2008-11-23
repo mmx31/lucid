@@ -128,7 +128,13 @@
             $user->save();
 			$out = new intOutput("ok");
 		}
-
+        if($_GET['action'] == "quickLogin")
+		{
+			$user = $User->get_current();
+			$user->logged = 1;
+            $user->save();
+			$out = new intOutput("ok");
+		}
 		if($_GET['action'] == "resetpass")
 		{
 			$p = $User->filter("username", $_POST['username']);
