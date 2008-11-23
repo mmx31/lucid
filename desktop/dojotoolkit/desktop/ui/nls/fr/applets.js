@@ -1,7 +1,7 @@
 ({
 	"Accessories": "Accessoires",
 	"Desktop & Windows": "Bureau et fenêtres",
-	"System": "Sysèmet",
+	"System": "Système",
 	"Utilities": "Utilitaires",
 	"Menu": "Menu",
 	"Menubar": "Barre d'outils",

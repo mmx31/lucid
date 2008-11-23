@@ -1,8 +1,8 @@
 ({
-    "close": "Close",
-    "minimize": "Minimize",
-    "maximize": "Maximize",
-    "unmaximize": "Unmaximize",
-    "restore": "Restore",
-    "alwaysOnTop": "Always On Top"
+    "close": "Fermer",
+    "minimize": "Réduire",
+    "maximize": "Agrandir",
+    "unmaximize": "Restaurer",
+    "restore": "Restaurer",
+    "alwaysOnTop": "Toujours visible"
 })

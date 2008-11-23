@@ -9,5 +9,5 @@
 	"thickness": "Épaisseur",
 	"opacity": "Opacité",
 	"width": "Largeur",
-	"unlocknote": "Panneau débarré. Vous pouvez déplacer le nouvel applet"
+	"unlocknote": "Panneau débarré. Vous pouvez déplacer le nouvel applet."
 })
