@@ -12,7 +12,7 @@
 	"asTgz": "as TGZ (GZIP)",
 	"asTbz2": "as TBZ2 (BZIP)",
 	"parentErr": "Erreur: Impossible de déplacer/copier un répertoire sur lui-même",
-	"alreadyExists": "Un fichier de ce nom exist déjà",
+	"alreadyExists": "Un fichier de ce nom existe déjà",
 	"cut": "Couper",
 	"copy": "Copier",
 	"paste": "Coller",
@@ -24,5 +24,5 @@
 	"cancel": "Annuler",
 	"uploading": "Transfert du/des fichier/s %s...",
 	"uploadingComplete": "Transfert complété",
-    "openWith": "Ouvrir avec..."
+   "openWith": "Ouvrir avec..."
 })

@@ -1,7 +1,7 @@
 ({
 	"en": "Anglais",
 	"en-us": "Anglais (États-Unis)",
-	"en-gb": "English (Grande Bretagne)",
+	"en-gb": "Anglais (Grande Bretagne)",
 	"es": "Espagnol",
 	"fr": "Français"
 })

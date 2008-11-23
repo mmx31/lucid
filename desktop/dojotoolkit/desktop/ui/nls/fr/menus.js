@@ -11,7 +11,7 @@
 	"office": "Office",
 	"system": "Système",
 	"preferences": "Préférences",
-	"about": "À propos de sych Desktop",
+	"about": "À propos de Psych Desktop",
 	"logOut": "Déconnexion",
 	"appearance": "Apparence",
 	"accountInfo": "Information sur le compte",

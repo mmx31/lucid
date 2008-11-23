@@ -12,7 +12,7 @@
 	"basic": "Basic",
 	"basicDesc": "Fournit des effets de transition de base ne nécessitant pas un ordinateur puissant.",
 	"extra": "Extra",
-	"extraDesc": "Fournit un environnement de bureau avec des effets de transition supplémentaires nécesitant un ordinateur plus rapide.",
+	"extraDesc": "Fournit un environnement de bureau avec des effets de transition supplémentaires nécessitant un ordinateur plus rapide.",
 	"insane": "Fou",
-	"insaneDesc": "Fourit un environnement de bureau avec tous les effets de transition. Nécessite un ordinateur puissant et un fureteur moderne et rapide."
+	"insaneDesc": "Fournit un environnement de bureau avec tous les effets de transition. Nécessite un ordinateur puissant et un fureteur moderne et rapide."
 })
