@@ -84,7 +84,7 @@ if($_GET['section'] == "io")
 	$_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop hacking.
 	//parse url for the protocol
 	$protocolPart = explode("://", $sentpath, 2);
-	if($protocolPart[0] == $_POST['path']) { $protocol = "file"; }
+	if(!$protocolPart) { $protocol = "file"; }
 	else { $sentpath = $protocolPart[1]; $protocol = $protocolPart[0]; }
 	$sentpath = str_replace("..", "", $sentpath);
 	//construct the class
