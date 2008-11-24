@@ -253,7 +253,7 @@ dojo.declare("desktop.widget.Filearea", dijit.layout._LayoutWidget, {
 		var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var appNls = dojo.i18n.getLocalization("desktop", "apps");
-		var win = new desktop.Window({
+		var win = new desktop.widget.Window({
 			title: nf.createLauncher,
 			width: "300px",
 			height: "200px"
