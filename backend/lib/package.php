@@ -38,7 +38,7 @@ class package {
 		if($info == false) return false;
 		$method="_install_".$info['type'];
 		$ret = package::$method($info, $unzipPath);
-		
+		if(!$ret) return false;
 		if($unzip) rmdir($unzipPath);
 		$info['installedFiles']=$ret;
 		unlink($unzipPath."/meta.json");
@@ -89,6 +89,8 @@ class package {
         }
     }
 	function _install_application($info, $path) {
+		$exists = $App->filter("sysname", $info['sysname']);
+		if($exists) return false;
 		package::_insert_application_meta($info);
 		$backendDir = $GLOBALS['path']."../apps/".$app->sysname;
 		if(is_dir($path."/files")) package::_recursive_copy($path."/backends", $backendDir);
