@@ -55,6 +55,14 @@
 			else
 				$out = intOutput("permission_denied");
 	}
+	    if ($_GET['action'] == "eventExists")
+	    {
+		$array = array();
+		$event = $Crosstalk->get($_POST['id']);
+		if(!$event) $array['exists'] = false;
+		else $array['exists'] = true;
+		$out = new jsonOutput($array);
+	    }
 	    if ($_GET['action'] == "sendEvent")
 	    {
 			$p = new $Crosstalk();

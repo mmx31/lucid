@@ -68,7 +68,29 @@ desktop.crosstalk = {
         	});
 		//}
 	},
-		
+	exists: function(/*Int?*/id, /*Function*/callback)
+	{
+		//	summary:
+		//		checks to see if an event exists
+		//	id:
+		//		the event ID to check
+		//	callback:
+		//		returns true exists or false nonexistant
+    		desktop.xhr({
+		    	backend: "api.crosstalk.io.eventExists",
+			handleAs: "json",
+				content: {
+					id: id
+				},
+				load: function(data, ioArgs) {
+					callback(data.exists);
+				},
+		    		error: function(type, error) {
+					desktop.log("Error in Crosstalk call: "+error.message);
+					this.setup_timer();
+				}
+	    	});
+	},	
 	publish: function(/*String*/topic, /*Array*/args, /*Int?*/userid, /*String*/appsysname, /*Int?*/instance, /*Function*/callback)
 	{
 		//	summary:
