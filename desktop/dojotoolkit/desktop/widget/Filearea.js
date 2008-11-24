@@ -58,6 +58,7 @@ dojo.declare("desktop.widget.Filearea", dijit.layout._LayoutWidget, {
 			iconClass: "icon-16-actions-edit-paste",
 			onClick: dojo.hitch(this, function() {
 				var clip = desktop._fileareaClipboard;
+				if(!clip) return;
 				if(clip.type == "") return;
 				var isParent = dojo.hitch(this, function(target, clip) {
 						if(clip.mimetype != "text/directory") return false; //can't be a parent if we're not a dir!
