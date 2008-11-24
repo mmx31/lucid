@@ -100,6 +100,3 @@ dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
         });
 	}
 });
-
-dojo.require("desktop.apps.Contacts.import");
-dojo.require("desktop.apps.Contacts.export");
