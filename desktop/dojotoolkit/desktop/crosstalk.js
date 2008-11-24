@@ -223,6 +223,10 @@ desktop.crosstalk = {
 	{
 		// start checking for events
 		this.setup_timer();
+		// internal events
+		this.subscribe("quotaupdate", dojo.hitch(this, function() {
+			dojo.publish("fsSizeChange", ["file://"]);
+		}));
 	},
 	setup_timer: function()
 	{

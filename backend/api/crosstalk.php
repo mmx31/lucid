@@ -65,16 +65,21 @@
 	    }
 	    if ($_GET['action'] == "sendEvent")
 	    {
-			$p = new $Crosstalk();
-			foreach(array("args", "userid", "appsysname", "instance", "topic") as $item) {
-				$p->$item = $_POST[$item];
+			$cur = $User->get_current();
+			if($_POST['appsysname'] == -1 && $cur->has_permission("core.administration") == false) //NOTE: Only admins should send system events; remove in future if changes
+					$out = intOutput("permission_denied");
+			else {
+				$p = new $Crosstalk();
+				foreach(array("args", "userid", "appsysname", "instance", "topic") as $item) {
+					$p->$item = $_POST[$item];
+				}
+				$p->sender = $_SESSION['userid'];
+				if($p->userid == 0) {
+					$p->userid = $p->sender;
+				}
+				$p->save();
+			        echo($p->id);
 			}
-			$p->sender = $_SESSION['userid'];
-			if($p->userid == 0) {
-				$p->userid = $p->sender;
-			}
-			$p->save();
-		    echo($p->id);
 		}
 	}
 ?>

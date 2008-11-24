@@ -174,6 +174,8 @@ dojo.extend(desktop.apps.AdminPanel, {
 						};
 						this.makeQuotaWin(info, dojo.hitch(this, function(value) {
 							this._userStore.setValue(row, "quota", value);
+							var id = this._userStore.getValue(row, "id");
+							desktop.crosstalk.publish("quotaupdate", {}, id, null, null);
 						}));
 					})
 				}
