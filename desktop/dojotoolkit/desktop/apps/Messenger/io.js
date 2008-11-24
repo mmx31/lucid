@@ -11,8 +11,15 @@ dojo.extend(desktop.apps.Messenger, {
     },
     sendMessage: function(uid, msg){
         this.pushMsg(uid, msg, true);
-        desktop.crosstalk.publish("IM", {text: msg}, uid, this.sysname);
+        desktop.crosstalk.publish("IM", {text: msg}, uid, this.sysname, null, dojo.hitch(this, function(messageID) { var kd = setTimeout(dojo.hitch(this, function() {this.checkSent(messageID, uid);}), 2000);}));
         this.playSend();
+    },
+    checkSent: function(id, uid){
+	desktop.crosstalk.exists(id, dojo.hitch(this, function(notsent) {
+		if(notsent) {
+			this.pushMsg(uid, "System: User is offline or is experiencing network difficulites. Message will be sent when user is back online.");
+		}
+	}));
     },
     recieveMessage: function(msg){
         var uid = msg._crosstalk.sender;        
