@@ -21,6 +21,11 @@ if($_GET['section'] == "stream")
 		else { $u = $result[0]; }
 		$u->value = $_POST['value'];
 		$u->save();
+		if($_POST['logged'] == true) {
+			$p = $User->get_current();
+			$p->logged = true;
+			$p->save();
+		}
 		$out = new intOutput();
 		$out->set("ok");
 	}
