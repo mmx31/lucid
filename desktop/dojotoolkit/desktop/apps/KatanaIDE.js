@@ -5,6 +5,7 @@ dojo.require("dijit.layout.ContentPane");
 dojo.require("dijit.Tree");
 dojo.require("dijit.form.Textarea");
 dojo.require("dijit.form.Button");
+dojo.require("dijit.form.ValidationTextBox");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.Toolbar");
 dojo.require("dijit.Dialog");

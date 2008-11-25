@@ -458,7 +458,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		
 		var row = document.createElement("div");
 		row.textContent = ideLocale.sysname+": ";
-		var sysBox = new dijit.form.TextBox({required: true});
+		var sysBox = new dijit.form.ValidationTextBox({required: true, regExp: "[A-Za-z][\\w]+"});
 		row.appendChild(sysBox.domNode);
 		div.appendChild(row);
 		
