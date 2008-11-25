@@ -341,10 +341,9 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 				setTimeout(dojo.hitch(this, function() {
 				    if(content != "")
 					    editor.massiveWrite(content);
-					editor.parseFragment(0, 0);
 					editor.setCaretPosition(0,0);
-					editor.parseViewport(); 
                     this.tabArea.layout();
+                    editor.startup();
 				}), 200);
 			})
 		})
@@ -459,7 +458,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		
 		var row = document.createElement("div");
 		row.textContent = ideLocale.sysname+": ";
-		var sysBox = new dijit.form.TextBox({required: true});
+		var sysBox = new dijit.form.ValidationTextBox({required: true, regExp: "[A-Za-z][\\w]+"});
 		row.appendChild(sysBox.domNode);
 		div.appendChild(row);
 		
@@ -513,7 +512,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 								+"dojo.declare(\"desktop.apps."+info.sysname+"\", desktop.apps._App, {\r\n"
 								+"	init: function(args) {\r\n"
 								+"		/*Startup code goes here*/\r\n"
-								+"	}\r\n"
+								+"	},\r\n"
 								+"	kill: function(args) {\r\n"
 								+"		/*Cleanup code goes here*/\r\n"
 								+"	}\r\n"
