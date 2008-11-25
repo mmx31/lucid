@@ -222,7 +222,10 @@ desktop.crosstalk = {
 	init: function()
 	{
 		// start checking for events
-		this.setup_timer();
+		var listener = dojo.subscribe("configApply", dojo.hitch(this, function(){
+            this.setup_timer();
+            dojo.unsubscribe(listener);
+        }));
 		// internal events
 		this.subscribe("quotaupdate", dojo.hitch(this, function() {
 			dojo.publish("fsSizeChange", ["file://"]);
@@ -232,7 +235,11 @@ desktop.crosstalk = {
 	{
 		//	summary:
 		//		Starts checking the server for messages
-		this.timer = setTimeout(dojo.hitch(this, "_internalCheck"), desktop.config.crosstalkPing);
+        var time = desktop.config.crosstalkPing || 100000;
+        this.timer = setTimeout(dojo.hitch(this, "_internalCheck"), time);
+        setTimeout(function(){
+            dojo.publish("crosstalkInit", []);
+        }, time+200);
 	},
 	stop: function()
 	{

@@ -16,7 +16,8 @@ desktop.app = {
 	init: function() {
 		//	summary:
 		//		Loads the app list from the server
-		this.onConfigApply = dojo.subscribe("configApply", this, function() {
+		var xtalkInit = dojo.subscribe("crosstalkInit", this, function() {
+            dojo.unsubscribe(xtalkInit);
             setTimeout(dojo.hitch(this, "startupApps"), 300);
         });
 		desktop.xhr({
@@ -42,7 +43,6 @@ desktop.app = {
 	startupApps: function() {
 		//	summary:
 		//		Launches the apps specified in desktop.config to launch on startup
-		dojo.unsubscribe(this.onConfigApply);
 		var g = desktop.config.startupApps;
         dojo.forEach(desktop.config.startupApps, function(app) {
             if(typeof app == "object")
