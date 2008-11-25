@@ -75,7 +75,16 @@ dojo.extend(desktop.apps.AdminPanel, {
 							message: sys.delFromSys.replace("%s", row.username),
 							callback: dojo.hitch(this, function(a) {
 								if(a == false) return;
+								var id = this._userStore.getValue(row, "id");
 								this._userStore.deleteItem(row);
+								desktop.crosstalk.publish("accountremoval", {}, id, null, null, dojo.hitch(this, function(id) {
+									setTimeout(dojo.hitch(this, function() {
+										desktop.crosstalk.exists(id, dojo.hitch(this, function(notsent) {
+											if(notsent)
+												desktop.crosstalk.cancel(id);
+										}));
+									}), 2500);
+								}));
 							})
 						})
 					})
@@ -175,7 +184,14 @@ dojo.extend(desktop.apps.AdminPanel, {
 						this.makeQuotaWin(info, dojo.hitch(this, function(value) {
 							this._userStore.setValue(row, "quota", value);
 							var id = this._userStore.getValue(row, "id");
-							desktop.crosstalk.publish("quotaupdate", {}, id, null, null);
+							desktop.crosstalk.publish("quotaupdate", {}, id, null, null, dojo.hitch(this, function(id) {
+								setTimeout(dojo.hitch(this, function() {
+									desktop.crosstalk.exists(id, dojo.hitch(this, function(notsent) {
+										if(notsent)
+											desktop.crosstalk.cancel(id);
+									}));
+								}), 2500);
+							}));
 						}));
 					})
 				}
