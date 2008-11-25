@@ -68,7 +68,29 @@ desktop.crosstalk = {
         	});
 		//}
 	},
-		
+	exists: function(/*Int?*/id, /*Function*/callback)
+	{
+		//	summary:
+		//		checks to see if an event exists
+		//	id:
+		//		the event ID to check
+		//	callback:
+		//		returns true exists or false nonexistant
+    		desktop.xhr({
+		    	backend: "api.crosstalk.io.eventExists",
+			handleAs: "json",
+				content: {
+					id: id
+				},
+				load: function(data, ioArgs) {
+					callback(data.exists);
+				},
+		    		error: function(type, error) {
+					desktop.log("Error in Crosstalk call: "+error.message);
+					this.setup_timer();
+				}
+	    	});
+	},	
 	publish: function(/*String*/topic, /*Array*/args, /*Int?*/userid, /*String*/appsysname, /*Int?*/instance, /*Function*/callback)
 	{
 		//	summary:
@@ -200,13 +222,24 @@ desktop.crosstalk = {
 	init: function()
 	{
 		// start checking for events
-		this.setup_timer();
+		var listener = dojo.subscribe("configApply", dojo.hitch(this, function(){
+            this.setup_timer();
+            dojo.unsubscribe(listener);
+        }));
+		// internal events
+		this.subscribe("quotaupdate", dojo.hitch(this, function() {
+			dojo.publish("fsSizeChange", ["file://"]);
+		}));
 	},
 	setup_timer: function()
 	{
 		//	summary:
 		//		Starts checking the server for messages
-		this.timer = setTimeout(dojo.hitch(this, "_internalCheck"), desktop.config.crosstalkPing);
+        var time = desktop.config.crosstalkPing || 100000;
+        this.timer = setTimeout(dojo.hitch(this, "_internalCheck"), time);
+        setTimeout(function(){
+            dojo.publish("crosstalkInit", []);
+        }, time+200);
 	},
 	stop: function()
 	{
