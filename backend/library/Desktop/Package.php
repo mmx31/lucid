@@ -7,11 +7,25 @@
 */
 
 
-class Desktop_Package {
+import("lib.Json.Json");
+import("models.app");
+import("lib.unzip");
+
+class package {
+    function compatible($versions) {
+        $data = file_get_contents($GLOBALS['path']."../desktop/dojotoolkit/desktop/resources/version.json");
+        $version = Zend_Json::decode($data);
+        foreach($versions as $check) {
+            $check = explode(".", $check);
+            if(!($check[0] == $version["major"] && $check[1] == $version["minor"]))
+                return false;
+        }
+        return true;
+    }
 	function install($path, $unzip=true) {
 		if($unzip) {
-			$zip = new Desktop_Unzip($path);
-			$unzipPath=dirname(dirname(dirname(dirname(__FILE__))))."/tmp/".basename($path)."_contents/";
+			$zip = new dUnzip2($path);
+			$unzipPath=$GLOBALS['path']."/../tmp/".basename($path)."_contents/";
 			$zip->getList();
 			if (!file_exists($unzipPath)) { mkdir($unzipPath); }
 			$zip->unzipAll($unzipPath);
@@ -24,9 +38,10 @@ class Desktop_Package {
 		if($info == false) return false;
 		$method="_install_".$info['type'];
 		$ret = package::$method($info, $unzipPath);
-		
+		if(!$ret) return false;
 		if($unzip) rmdir($unzipPath);
 		$info['installedFiles']=$ret;
+		unlink($unzipPath."/meta.json");
 		return $info;
 	}
 	function remove($package) {
@@ -74,12 +89,14 @@ class Desktop_Package {
         }
     }
 	function _install_application($info, $path) {
+		$exists = $App->filter("sysname", $info['sysname']);
+		if($exists) return false;
 		package::_insert_application_meta($info);
-		$backendDir = dirname(dirname(dirname(dirname(__FILE__))))."/apps/".$app->sysname;
+		$backendDir = $GLOBALS['path']."../apps/".$app->sysname;
 		if(is_dir($path."/files")) package::_recursive_copy($path."/backends", $backendDir);
-		$sysDir = dirname(dirname(dirname(dirname(__FILE__))))."/desktop/dojotoolkit/desktop/apps/".$app->sysname;
+		$sysDir = $GLOBALS['path']."../desktop/dojotoolkit/desktop/apps/".$app->sysname;
 		if(is_dir($path."/".$app->sysname)) package::_recursive_copy($path."/".$app->sysname, $sysDir);
-		$appFile = dirname(dirname(dirname(dirname(__FILE__))))."/desktop/dojotoolkit/desktop/apps/".$app->sysname.".js";
+		$appFile = $GLOBALS['path']."../desktop/dojotoolkit/desktop/apps/".$app->sysname.".js";
 		copy($path."/".$app->sysname.".js", $appFile);
 		return array(
 			"/apps/".$app->sysname,
@@ -88,7 +105,7 @@ class Desktop_Package {
 		);
 	}
 	function _insert_application_meta($info) {
-        global $App;
+		global $App;
 		$app = new $App();
 		$app->sysname = $info['sysname'];
 		$app->name = $info['name'];
@@ -97,14 +114,14 @@ class Desktop_Package {
 		$app->version = $info['version'];
 		$app->maturity = $info['maturity'];
 		$app->category = $info['category'];
+		$app->compatible = $info['compatible'];
 		$app->filetypes = array_key_exists('filetypes', $info) ? $info['filetypes'] : array();
 		$app->permissions = array_key_exists('permissions', $info) ? $info['permissions'] : array();
 		if(array_key_exists('icon', $info)) $app->icon = $info['icon'];
 		$app->save();
-
 	}
 	function _install_theme($info, $path) {
-		$newpath = dirname(dirname(dirname(dirname(__FILE__))))."/desktop/themes/".strtolower($info['name']);
+		$newpath = $GLOBALS['path']."/../desktop/themes/".strtolower($info['name']);
 		@mkdir($newpath, 0777);
 		package::_recursive_copy($path."/".strtolower($info['name']), $newpath);
 		copy($path."/meta.json", $newpath."/meta.json");
@@ -132,8 +149,8 @@ class Desktop_Package {
 		$installedFiles = array();
 		foreach($dirs as $dir) {
 			$dir = substr($dir, 0, count($path));
-			if(!is_dir(dirname(dirname(dirname(dirname(__FILE__))))."/desktop/dojotoolkit/".$dir."/".$info['locale'])) {
-				rename($path."/".$dir, dirname(dirname(dirname(dirname(__FILE__))))."/desktop/dojotoolkit/".$dir);
+			if(!is_dir($GLOBALS['path']."/../desktop/dojotoolkit/".$dir."/".$info['locale'])) {
+				rename($path."/".$dir, $GLOBALS['path']."/../desktop/dojotoolkit/".$dir);
 				array_push($installedFiles, "desktop/dojotoolkit/".$dir);
 			}
 		}
@@ -156,8 +173,8 @@ class Desktop_Package {
 				}
 			}
 		}
-		rcopy($path."/root/", dirname(dirname(dirname(dirname(__FILE__))))."/");
 		@include($path . "/update.php");
+		rcopy($path."/root/", $GLOBALS['path']."/../");
 		return array(); //cannot uninstall updates
 	}
 }
