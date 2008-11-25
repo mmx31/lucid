@@ -22,7 +22,6 @@ if($_GET['section'] == "stream")
 		$u->value = $_POST['value'];
 		$u->save();
 		if($_POST['logged'] == true) {
-			$p = $User->get_current();
 			$p->logged = true;
 			$p->save();
 		}
