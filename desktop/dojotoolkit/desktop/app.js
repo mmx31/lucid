@@ -45,10 +45,12 @@ desktop.app = {
 		//		Launches the apps specified in desktop.config to launch on startup
 		var g = desktop.config.startupApps;
         dojo.forEach(desktop.config.startupApps, function(app) {
-            if(typeof app == "object")
+            if(typeof app == "object") {
+		app.arguments._startup = true;
                 desktop.app.launch(app.name, app.arguments);
+	    }
             else
-                desktop.app.launch(app);
+                desktop.app.launch(app, {_startup: true});
         });
 	},
 	launchHandler: function(/*String?*/file, /*Object?*/args, /*String?*/format) {

@@ -7,6 +7,8 @@ dojo.requireLocalization("desktop.apps.UpdateManager", "messages");
 dojo.declare("desktop.apps.UpdateManager", desktop.apps._App, {
     drawUi: true,
     init: function(args){
+	if(!args.background && args._startup)
+		args.background = args._startup;
         this.drawUi = !args.background;
         if(desktop.admin.isAdmin){
             desktop.xhr({
