@@ -26,7 +26,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, "kill")
 		});
-		this.fileArea = new desktop.widget.Filearea({path: (args.path || "file://"), region: "center"});
+		this.fileArea = new desktop.widget.FileArea({path: (args.path || "file://"), region: "center"});
         this.updateTitle(this.fileArea.path);
 		this.pane = new dijit.layout.ContentPane({region: "left", splitter: true, minSize: 120, style: "width: 120px;"});
 		var menu = new dijit.Menu({
