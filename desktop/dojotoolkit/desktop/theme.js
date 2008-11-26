@@ -8,7 +8,7 @@ desktop.theme = {
 	draw: function()
 	{
 		if(dojo.isIE) document.execCommand('BackgroundImageCache', false, true);
-		dojo.subscribe("configApply", this, function(conf) {
+		dojo.subscribe("configApply", this, function(conf){
 			desktop.theme.set(conf.theme);
 		});
 	},
@@ -22,7 +22,7 @@ desktop.theme = {
 		dojo.forEach(this.fileList, function(e)
 		{
 			var elem = dojo.byId("desktop_theme_"+e);
-			if(elem) {
+			if(elem){
 				elem.parentNode.removeChild(elem);
 				elem = null;
 			}
@@ -75,7 +75,7 @@ desktop.theme = {
 			handleAs: "json"
 		});
 	},
-	remove: function(/*String*/name, /*String?*/onComplete, /*String?*/onError) {
+	remove: function(/*String*/name, /*String?*/onComplete, /*String?*/onError){
 		//	summary:
 		//		removes a theme from the system
 		//		must be an administrator to use this

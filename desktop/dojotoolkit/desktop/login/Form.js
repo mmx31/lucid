@@ -20,10 +20,10 @@ dojo.declare("desktop.login.Form", dijit.form.Form, {
 	autoRedirect: false,
     focusOnLoad: false,
 	label: "Desktop Login",
-	postCreate: function() {
+	postCreate: function(){
 		this.inherited(arguments);
-		if(this.preloadDesktop) {
-			var ontype = dojo.connect(this.domNode, "onkeydown", this, function() {
+		if(this.preloadDesktop){
+			var ontype = dojo.connect(this.domNode, "onkeydown", this, function(){
 				dojo.disconnect(ontype);
 				// pre-fetch the desktop.js file
 				// in built versions, this should have everything we need
@@ -37,33 +37,33 @@ dojo.declare("desktop.login.Form", dijit.form.Form, {
 		this.checkForLogin();
 		this.setRadioButton();
 	},
-	checkForLogin: function(winClosed) {
+	checkForLogin: function(winClosed){
 		dojo.xhrGet({
 			url: dojo.baseUrl + "../../../backend/core/bootstrap.php?section=check&action=loggedin",
-			load: dojo.hitch(this, function(data) {
-				if(data == 0) {
-					if(this.autoRedirect) {
-						if(dojo.cookie("desktopWindowPref") == "current") {
+			load: dojo.hitch(this, function(data){
+				if(data == 0){
+					if(this.autoRedirect){
+						if(dojo.cookie("desktopWindowPref") == "current"){
 							this.errorNode.innerHTML = "You are already logged in. Redirecting to desktop...";
 							this.submitNode.setDisabled(true);
 							window.location = dojo.baseUrl+"../../index.html";
 						}
-						else if(winClosed) {
+						else if(winClosed){
 							this.errorNode.innerHTML = "You are already logged in. <a href='" + dojo.baseUrl + "../../index.html'>Click here</a> to open the desktop.";
-							dojo.query("a", this.errorNode).forEach(function(elem) {
+							dojo.query("a", this.errorNode).forEach(function(elem){
 								elem.href="javascript:void(0);";
 								dojo.connect(elem, "onclick", this, "onLinkClick");
 							}, this);
 						}
 						else {
-							if (this._popUp()) {
+							if (this._popUp()){
 								this.errorNode.innerHTML = "You are already logged in. Window opened.";
 								this.submitNode.setDisabled(true);
 								this._winCheck();
 							}
 							else {
 								this.errorNode.innerHTML = "Your popup blocker is blocking the window. <a href='" + dojo.baseUrl + "../../index.html'>Click here</a> to try again.";
-								dojo.query("a", this.errorNode).forEach(function(elem) {
+								dojo.query("a", this.errorNode).forEach(function(elem){
 									elem.href="javascript:void(0);";
 									dojo.connect(elem, "onclick", this, "onLinkClick");
 								}, this);
@@ -72,7 +72,7 @@ dojo.declare("desktop.login.Form", dijit.form.Form, {
 					}
 					else 
 						this.errorNode.innerHTML = "You are already logged in. <a href='" + dojo.baseUrl + "../../index.html'>Click here</a> to continue to the desktop.";
-						dojo.query("a", this.errorNode).forEach(function(elem) {
+						dojo.query("a", this.errorNode).forEach(function(elem){
 							elem.href="javascript:void(0);";
 							dojo.connect(elem, "onclick", this, "onLinkClick");
 						}, this);
@@ -80,30 +80,30 @@ dojo.declare("desktop.login.Form", dijit.form.Form, {
 			})
 		})
 	},
-	setRadioButton: function() {
+	setRadioButton: function(){
 		if(!dojo.cookie("desktopWindowPref") || dojo.cookie("desktopWindowPref") == "current")
 			this.currentRadioNode.attr("checked", true);
 		else
 			this.newRadioNode.attr("checked", true);
 	},
-	onLinkClick: function() {
-		if(dojo.cookie("desktopWindowPref") == "current") {
+	onLinkClick: function(){
+		if(dojo.cookie("desktopWindowPref") == "current"){
 			window.location = dojo.baseUrl+"../../index.html";
 		}
 		else {
-			if (this._popUp()) {
+			if (this._popUp()){
 			}
 			else {
 				this.errorNode.innerHTML = "Your popup blocker is blocking the window. <a href='" + dojo.baseUrl + "../../index.html'>Click here</a> to try again.";
-				dojo.query("a", this.errorNode).forEach(function(elem) {
+				dojo.query("a", this.errorNode).forEach(function(elem){
 					elem.href="javascript:void(0);";
 					dojo.connect(elem, "onclick", this, "onLinkClick");
 				}, this);
 			}
 		}
 	},
-	_winCheck: function() {
-		if(this._popup.closed === false) {setTimeout(dojo.hitch(this, "_winCheck"), 500);}
+	_winCheck: function(){
+		if(this._popup.closed === false){setTimeout(dojo.hitch(this, "_winCheck"), 500);}
 		else {
 			this.submitNode.setDisabled(false);
 			this.errorNode.innerHTML = "";
@@ -121,7 +121,7 @@ dojo.declare("desktop.login.Form", dijit.form.Form, {
 		else
 			return true;
 	},
-	onSubmit: function(e) {
+	onSubmit: function(e){
 		dojo.stopEvent(e);
 		if(this.submitNode.disabled == true) return;
 		var contents = this.getValues();
@@ -141,12 +141,12 @@ dojo.declare("desktop.login.Form", dijit.form.Form, {
 				{
 					if(data == "0")
 					{
-						if(contents.windowAct == "current") {
+						if(contents.windowAct == "current"){
 							this.errorNode.innerHTML = "Logged in. Redirecting to desktop...";
 							window.location = dojo.baseUrl+"../../index.html";
 						}
 						else {
-							if (this._popUp()) {
+							if (this._popUp()){
 								this._winCheck();
 								this.domNode.username.value = "";
 								this.domNode.password.value = "";
@@ -188,13 +188,13 @@ dojo.declare("desktop.login.Form", dijit.form.Form, {
 		}
 		return false;
 	},
-	_showRegister: function() {
+	_showRegister: function(){
 		var form = new desktop.login._RegisterDialog({
 			parentForm: this
 		});
 		form.show();
 	},
-	_showResetPass: function() {
+	_showResetPass: function(){
 		console.log("test");
 		var form = new desktop.login._ResetPassDialog({
 			parentForm: this
@@ -208,7 +208,7 @@ dojo.declare("desktop.login._RegisterDialog", dijit.Dialog, {
 	templateString: null,
 	templatePath: dojo.moduleUrl("desktop.login", "RegisterDialog.html"),
 	parentForm: null,
-	postCreate: function() {
+	postCreate: function(){
 		this.inherited(arguments);
 		new dijit.form.TextBox({name: "username"}, this.usernameInputNode);
 		new dijit.form.TextBox({name: "email"}, this.emailInputNode);
@@ -222,17 +222,17 @@ dojo.declare("desktop.login._RegisterDialog", dijit.Dialog, {
 		this.errorNode.innerHTML = "";
 		if(contents.username && contents.email && contents.password && contents.confPassword)
 		{
-			if(contents.username.indexOf("..") != -1) {
+			if(contents.username.indexOf("..") != -1){
 				this.errorNode.innerHTML = "Username cannot contain two consecutive '.'s";
 				this.submitNode.disabled=false;
 				return;
 			}
-			if(contents.username.indexOf("/") != -1) {
+			if(contents.username.indexOf("/") != -1){
 				this.errorNode.innerHTML = "Username cannot contain any slashes";
 				this.submitNode.disabled=false;
 				return;
 			}
-			if(contents.username.indexOf("\\") != -1) {
+			if(contents.username.indexOf("\\") != -1){
 				this.errorNode.innerHTML = "Username cannot contain any slashes";
 				this.submitNode.disabled=false;
 				return;
@@ -290,7 +290,7 @@ dojo.declare("desktop.login._ResetPassDialog", dijit.Dialog, {
 	templateString: null,
 	templatePath: dojo.moduleUrl("desktop.login", "ResetPassDialog.html"),
 	parentForm: null,
-	postCreate: function() {
+	postCreate: function(){
 		this.inherited(arguments);
 		new dijit.form.TextBox({name: "username"}, this.userInputNode);
 		new dijit.form.TextBox({name: "email"}, this.emailInputNode);
@@ -307,7 +307,7 @@ dojo.declare("desktop.login._ResetPassDialog", dijit.Dialog, {
 				dojo.xhrPost({
 					url: dojo.baseUrl+"../../../backend/core/user.php?section=auth&action=resetpass",
 					content: contents,
-					load: dojo.hitch(this, function(data, ioArgs) {
+					load: dojo.hitch(this, function(data, ioArgs){
 						if(data == "2")
 						{
 							this.errorNode.innerHTML = "Email on file and username don't match";

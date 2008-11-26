@@ -1,7 +1,7 @@
 dojo.provide("desktop.apps.AdminPanel.apps");
 
 dojo.extend(desktop.apps.AdminPanel, {
-	apps: function() {
+	apps: function(){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var apps = dojo.i18n.getLocalization("desktop", "apps");
@@ -13,8 +13,8 @@ dojo.extend(desktop.apps.AdminPanel, {
 		});
 		this.toolbar.addChild(button);
 		
-		desktop.app.list(dojo.hitch(this, function(data) {
-			for(var i=0;i<data.length;i++) {
+		desktop.app.list(dojo.hitch(this, function(data){
+			for(var i=0;i<data.length;i++){
 				data[i].filetypes = data[i].filetypes.join(", ");
 				data[i].compatible = data[i].compatible.join(", ");
 				data[i].name = apps[data[i].name] || data[i].name;
@@ -25,7 +25,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 				cells: [[]]
 			}];
 			//make headers
-			for(var field in data[0]) {
+			for(var field in data[0]){
 				var args = {
 					name: sys[field],
 					field: field
@@ -46,7 +46,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			});
 			if(this._con) dojo.disconnect(this._con);
 			this._con = dojo.connect(this.main, "resize", grid, "resize");
-			dojo.connect(this._appStore, "onDelete", this, function(a) {
+			dojo.connect(this._appStore, "onDelete", this, function(a){
 				desktop.app.remove(a.sysname[0]); //that feels really hackish
 			})
 			this.main.setContent(this._appGrid.domNode);
@@ -55,23 +55,23 @@ dojo.extend(desktop.apps.AdminPanel, {
 			dojo.forEach([
 				{
 					label: cmn["delete"],
-					onClick: dojo.hitch(this, function(e) {
+					onClick: dojo.hitch(this, function(e){
 						var row = this._appGrid.getItem(this.__rowIndex);
 						desktop.dialog.yesno({
 							title: sys.appDelConfirm,
 							message: sys.delFromSys.replace("%s", row.name),
-							callback: dojo.hitch(this, function(a) {
+							callback: dojo.hitch(this, function(a){
 								if(a == false) return;
 								this._appStore.deleteItem(row);
 							})
 						})
 					})
 				}
-			], function(item) {
+			], function(item){
 				var menuItem = new dijit.MenuItem(item);
 				menu.addChild(menuItem);
 			});
-			this._appGrid.onRowContextMenu = dojo.hitch(this, function(e) {
+			this._appGrid.onRowContextMenu = dojo.hitch(this, function(e){
 				this.__rowIndex = e.rowIndex;
 				this._appMenu._contextMouse();
 				this._appMenu._openMyself(e);
@@ -80,7 +80,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			this.win.layout();
 		}));
 	},
-	installPackage: function() {
+	installPackage: function(){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var win = new desktop.widget.Window({
@@ -96,11 +96,11 @@ dojo.extend(desktop.apps.AdminPanel, {
 		var uploader = new dojox.widget.FileInputAuto({
 			name: "uploadedfile",
 			url: desktop.xhr("core.app.install.package"),
-			onComplete: dojo.hitch(this, function(data,ioArgs,widgetRef) {
+			onComplete: dojo.hitch(this, function(data,ioArgs,widgetRef){
 				if(data.status && data.status == "success"){
 					widgetRef.overlay.innerHTML = sys.appInstallSuccess;
 					//check for compatibility
-					if(!data.compatible) {
+					if(!data.compatible){
 					    desktop.dialog.alert({
 					        title: sys.notCompatible,
 					        message: sys.notCompatibleText

@@ -1,7 +1,7 @@
 dojo.provide("desktop.apps.MusicPlayer");
 
 dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
-	init: function(args) {
+	init: function(args){
 		dojo.require("dijit.Toolbar");
 		dojo.require("dijit.form.Button");
 		dojo.require("dijit.form.Slider");
@@ -30,24 +30,24 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 				iconClass: "icon-16-actions-document-open",
 				onClick: dojo.hitch(this, this.openURLDialog)
 			}
-		], function(item) {
+		], function(item){
 			toolbar.addChild(new dijit.form.Button(item));
 		})
 		this.win.addChild(toolbar);
 		var volume = new dijit.form.VerticalSlider({
-			onChange: dojo.hitch(this, function(val) {
+			onChange: dojo.hitch(this, function(val){
 				this.sound.volume(val);
 				dojo.removeClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-high");
 				dojo.removeClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-medium");
 				dojo.removeClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-low");
 				dojo.removeClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-muted");
-				if(val == 0) {
+				if(val == 0){
 					dojo.addClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-muted");
 				}
-				else if(val > 0 && val < 33) {
+				else if(val > 0 && val < 33){
 					dojo.addClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-low");
 				}
-				else if(val >= 33 && val <= 66) {
+				else if(val >= 33 && val <= 66){
 					dojo.addClass(this.ui.volume.iconNode, "icon-32-status-audio-volume-medium");
 				}
 				else {
@@ -83,7 +83,7 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 				onChange: dojo.hitch(this, this.skip)
 			})
 		};
-		dojo.connect(this.ui.slider.domNode, "onmousedown", this, function() {
+		dojo.connect(this.ui.slider.domNode, "onmousedown", this, function(){
 			this.stopTicker();
 		});
 		var ticker = this.ui.ticker;
@@ -96,12 +96,12 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 		})
 		ticker.innerHTML = "&nbsp;0:00/00:00&nbsp;";
 		var client = new dijit.Toolbar({region: "center"});
-		for(var name in this.ui) {
+		for(var name in this.ui){
 			var item = this.ui[name];
-			if(item.declaredClass == "dijit.form.Button") {
+			if(item.declaredClass == "dijit.form.Button"){
 				dojo.style(item.domNode, "width", "40px");
 			}
-			if (item.declaredClass) {
+			if (item.declaredClass){
 				client.addChild(item);
 			}
 			else {
@@ -117,17 +117,17 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 		if(args.file) this.openFile(args.file);
 		else if(args.url) this.openURL(args.url);
 	},
-    updateTitle: function(text) {
+    updateTitle: function(text){
         var app = dojo.i18n.getLocalization("desktop", "apps");
         if(!text) return this.win.attr("title", app["Music Player"]);
         this.win.attr("title", text+" - "+app["Music Player"]);
     },
 	sound: false,
-	play: function() {
-		if(this.sound) {
+	play: function(){
+		if(this.sound){
 			this.is_playing=true;
 			this.sound.play();
-			if(this.sound.capabilities.pause) {
+			if(this.sound.capabilities.pause){
 				dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
 				dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
 				this.ui.play.setLabel(this.nls.pause);
@@ -137,8 +137,8 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 			this.startTicker();
 		}
 	},
-	pause: function() {
-		if(this.sound && this.sound.capabilities.pause) {
+	pause: function(){
+		if(this.sound && this.sound.capabilities.pause){
 			this.is_playing = false;
 			this.sound.pause();
 			dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
@@ -148,18 +148,18 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 			this.stopTicker();
 		}
 	},
-	skip: function(value) {
-		if (!this.ignoreOnChange) {
+	skip: function(value){
+		if (!this.ignoreOnChange){
 			var d = this.sound.duration();
 			this.sound.position((value / 100) * d);
-			if(this.is_playing) {
+			if(this.is_playing){
 				this.sound.play();
 				this.startTicker();
 			}
 		}
 	},
-	stop: function() {
-		if(this.sound) {
+	stop: function(){
+		if(this.sound){
 			this.is_playing = false;
 			dojo.removeClass(this.ui.play.iconNode, "icon-32-actions-media-playback-pause");
 			dojo.addClass(this.ui.play.iconNode, "icon-32-actions-media-playback-start");
@@ -170,14 +170,14 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 			this.ui.slider.setValue(0);
 		}
 	},
-	openURLDialog: function() {
+	openURLDialog: function(){
 		desktop.dialog.input({
 			title: this.nls.openUrl,
 			callback: dojo.hitch(this, this.openURL)
 		});
 	},
-	openURL: function(fileurl) {
-		if ( fileurl) {
+	openURL: function(fileurl){
+		if ( fileurl){
 			this.sound = new desktop.Sound({
 				src: fileurl
 			});
@@ -186,14 +186,14 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 			this.filename = fileurl.pop();
 		}
 	},
-	openFileDialog: function() {
+	openFileDialog: function(){
 		desktop.dialog.file({
 			title: "Select audio file to open",
 			callback: dojo.hitch(this, this.openFile)
 		});
 	},
-	openFile: function(file) {
-		if (file) {
+	openFile: function(file){
+		if (file){
 			this.sound = new desktop.Sound({
 				src: desktop.filesystem.embed(file)
 			});
@@ -202,18 +202,18 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 			this.filename = file.pop();
 		}
 	},
-	startTicker: function() {
+	startTicker: function(){
 		if(!this.__ticker) this.__ticker = setInterval(dojo.hitch(this, "updateTicker"), 1000);
 	},
-	stopTicker: function() {
+	stopTicker: function(){
 		clearInterval(this.__ticker);
 		this.__ticker = false;
 	},
-	updateTicker: function() {
+	updateTicker: function(){
 		var c = this.sound.capabilities;
 		if(c.id3)
 			var i = this.sound.id3();
-		if(c.id3 && i) {
+		if(c.id3 && i){
 			var output = "<div>"+i.songname+"</div><div>"+i.artist+" - "+i.album+"</div>";
             this.updateTitle(i.songname+" by "+i.artist); //TODO: translate?
 		}
@@ -221,7 +221,7 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 			var output = this.filename;
             this.updateTitle(this.filename);
         }
-		if(!(c.position && c.duration)) {
+		if(!(c.position && c.duration)){
 			this.box.domNode.innerHTML = output + "<div style='position: absolute; top:25%; right: 0px;'>" + "?:??/?:??" + "</div>";
 			return;
 		}
@@ -236,15 +236,15 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 		var dur = this.formatTime(d);
 		this.box.domNode.innerHTML = output + "<div style='position: absolute; top:25%; right: 0px;'>" + pos + "/" + dur + "</div>";
 	},
-	formatTime: function(ms) {
+	formatTime: function(ms){
 		var ts = ms/1000;
 		var m = Math.floor((ts/60));
 		var s = Math.floor(ts % 60);
 		
-		if (s == 60) { m++; s = 0; }
+		if (s == 60){ m++; s = 0; }
 		return m+":"+(s < 10 ? "0"+s : s );
 	},
-	kill: function() {
+	kill: function(){
 		this.stopTicker();
 		if(this.sound) this.sound.destroy();
 		if(!this.win.closed) this.win.close();

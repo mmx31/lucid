@@ -8,12 +8,12 @@ dojo.declare("desktop.apps._App", null, {
 	status: "",
 	iconClass: "",
 	compatible: "",
-	constructor: function(info) {
+	constructor: function(info){
 		this.status = "init";
 		this.name = info.name;
 		this.id = this.sysname = this.declaredClass.substring(this.declaredClass.lastIndexOf(".")+1);
 		this.iconClass = info.icon ? (info.icon.indexOf(".") === -1 ? info.icon : "icon-app-"+this.sysname) : "";
-		dojo.connect(this, "kill", this, function() {
+		dojo.connect(this, "kill", this, function(){
             this.status = "killed";
 			var pid = this.instance;
 			//allow the garbage collector to free up memory
@@ -24,7 +24,7 @@ dojo.declare("desktop.apps._App", null, {
 		this.instance = info.instance;
 		this.compatible = info.compatible;
 	},
-	init: function(args) {
+	init: function(args){
 		//	summary:
 		//		start the app
 		
@@ -33,7 +33,7 @@ dojo.declare("desktop.apps._App", null, {
 		//accidentally launched
 		this.kill();
 	},
-	kill: function() {
+	kill: function(){
 		//	summary:
 		//		cleanup ui, disconnect events, etc.
 	}

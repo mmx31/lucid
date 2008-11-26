@@ -180,7 +180,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			var grid = this.grid = new dojox.grid.DataGrid({
 				structure: [{
 					cells: [[
-						{field: "Date", name: cm.date, formatter: function(str) {
+						{field: "Date", name: cm.date, formatter: function(str){
 							return dojo.date.locale.format(new Date(str));
 						}},
 						{field: "Title", name: cm.title, width: 15}
@@ -188,7 +188,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 				}],
                 store: this.gridStore,
                 query: {Title: "*"},
-				onStyleRow: dojo.hitch(this, function(inRow) {
+				onStyleRow: dojo.hitch(this, function(inRow){
 					if (!this.grid.getItem(inRow.index))
     					return;
 					if(this.gridStore.getValue(this.grid.getItem(inRow.index), "Read"))
@@ -228,16 +228,16 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	    this.fetchFeed(e);
 	},
 	
-	removeFeed: function(t) {
+	removeFeed: function(t){
 		if(!this.feedStore.isItem(this.currentFeed)) return;
-		if(this.feedStore.getValue(this.currentFeed, "category") == false) {
+		if(this.feedStore.getValue(this.currentFeed, "category") == false){
 			//delete any hashes
 			this.hashStore.fetch({
 				query: {feed: this.feedStore.getValue(this.currentFeed, "url")},
-				onItem: dojo.hitch(this, function(item) {
+				onItem: dojo.hitch(this, function(item){
 					this.hashStore.deleteItem(item);
 				}),
-				onComplete: dojo.hitch(this, function() {
+				onComplete: dojo.hitch(this, function(){
 					this.hashStore.save();
 				})
 			});
@@ -245,7 +245,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
         else {
             //delete any child feeds
             var children = this.feedStore.getValues(this.currentFeed, "children");
-            dojo.forEach(children, function(item) { this.feedStore.deleteItem(item); }, this);
+            dojo.forEach(children, function(item){ this.feedStore.deleteItem(item); }, this);
         }
 		var name = this.feedStore.getValue(this.currentFeed, "title");
 		this.feedCounter[name] = 0;
@@ -255,7 +255,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
         //clear the grid
         this.gridStore.fetch({
             query: {Title: "*"},
-            onItem: dojo.hitch(this.gridStore, function(item) {
+            onItem: dojo.hitch(this.gridStore, function(item){
                 this.deleteItem(item);
             })
         });
@@ -269,7 +269,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	    this._form = {
 	        title: new dijit.form.TextBox({required: true}),
 		isCategory: new dijit.form.CheckBox({
-			onChange: dojo.hitch(this, function(val) {
+			onChange: dojo.hitch(this, function(val){
 				if(!this._form) return;
 				this._form.url.setDisabled(val);
 				this._form.category.setDisabled(val);
@@ -281,7 +281,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			query: {category: true}
 		}),
 	        url: new dijit.form.ValidationTextBox({
-			isValid: function(isFocused) {
+			isValid: function(isFocused){
 				return dojox.validate.isUrl(this.textbox.value);
 			}
 		}),
@@ -338,20 +338,20 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	    });
 		var div = document.createElement("div");
 		dojo.style(div, "color", "red");
-	    dojo.connect(button, "onClick", this, function(e) {
+	    dojo.connect(button, "onClick", this, function(e){
 			if(this._form.title.getValue() == "") return;
-			if(!this._form.isCategory.checked) {
+			if(!this._form.isCategory.checked){
 				if(!this._form.url.isValid()) return;
 				if(!this._form.category.isValid()) return;
 			}
 			if(!this._form.icon.isValid()) return;
-			this.feedStore.fetch({query: {title: this._form.title.getValue()}, onComplete: dojo.hitch(this, function(f) {
-				if(typeof f[0] != "undefined") {
+			this.feedStore.fetch({query: {title: this._form.title.getValue()}, onComplete: dojo.hitch(this, function(f){
+				if(typeof f[0] != "undefined"){
 					var msg = dojo.i18n.getLocalization("desktop", "messages");
 					div.innerHTML = msg.allreadyExists;
 					return;
 				}
-				var makeItem = dojo.hitch(this, function(items) {
+				var makeItem = dojo.hitch(this, function(items){
 					var maxID = this.feedStore._arrayOfAllItems.length; //feels hackish
 					var item = this.feedStore.newItem({
 						id: maxID,
@@ -367,7 +367,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 					this.updateCount(item);
 					this.feedStore.save();
 				});
-				if(!this._form.isCategory.checked) {
+				if(!this._form.isCategory.checked){
 					this.feedStore.fetch({
 						query: {
 							category: true,
@@ -398,12 +398,12 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	
 	kill: function()
 	{
-	    if (typeof(this.win) != "undefined") {
+	    if (typeof(this.win) != "undefined"){
 	        this.win.close();
 	    }
 		if(this.updateTimer) clearInterval(this.updateTimer);
 	},
-	refresh: function() {
+	refresh: function(){
 		this.feedStore.fetch({
 			query: {
 				url: "*"
@@ -411,19 +411,19 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 			queryOptions: {
 				deep: true
 			},
-			onItem: dojo.hitch(this, function(item) {
+			onItem: dojo.hitch(this, function(item){
 				this.updateCount(item, true);
 			})
 		})
 	},
 	
-	markAllRead: function() {
-		/*this.feedStore.fetch({onItem: dojo.hitch(this, function(item) {
+	markAllRead: function(){
+		/*this.feedStore.fetch({onItem: dojo.hitch(this, function(item){
 			this.updateCount(item);
 		})})*/
 		this.hashStore.fetch({
 			query: {feed: this.feedStore.getValue(this.currentFeed, "url")},
-			onItem: dojo.hitch(this, function(item) {
+			onItem: dojo.hitch(this, function(item){
 				this.hashStore.setValue(item, "read", true);
 				console.log(item);
 			})
@@ -431,25 +431,25 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		this.hashStore.save();
 		this.gridStore.fetch({
 			query: {Title:"*"},
-			onItem: dojo.hitch(this, function(item) {
+			onItem: dojo.hitch(this, function(item){
 				this.gridStore.setValue(item, "Read", true);
 			}),
-			onComplete: dojo.hitch(this, function() {
+			onComplete: dojo.hitch(this, function(){
 				this.grid.update();
 				this.updateCount(this.currentFeed, false);
 			})
 		});
 	},
 	
-	updateCount: function(item, fetchFeed) {
+	updateCount: function(item, fetchFeed){
 		var store = this.feedStore;
-		var onComplete = dojo.hitch(this, function() {
+		var onComplete = dojo.hitch(this, function(){
 			this.hashStore.fetch({
 				query: {
 					feed: store.getValue(item, "url"),
 					read: false
 				},
-				onComplete: dojo.hitch(this, function(items) {
+				onComplete: dojo.hitch(this, function(items){
 					store.setValue(item, "label", store.getValue(item, "title")+(items.length > 0 ? " ("+items.length+")" : ""))
 					this.feedCounter[store.getValue(item, "title")] = items.length;
 					this.fixWinTitle();
@@ -461,9 +461,9 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		else onComplete();
 		
 	},
-	fixWinTitle: function() {
+	fixWinTitle: function(){
 		var sum = 0;
-		for(var key in this.feedCounter) {
+		for(var key in this.feedCounter){
 			sum += this.feedCounter[key];
 		}
 		var app = dojo.i18n.getLocalization("desktop", "apps");
@@ -475,7 +475,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		var FEED_URL = this.feedStore.getValue(item, "url");
 		var url = FEED_URL;
 		var FEED_ITEM = item;
-		if(!noGrid) {
+		if(!noGrid){
 			this.gridStore.close();
 			this.gridStore = new dojo.data.ItemFileWriteStore({
 				data: {
@@ -491,11 +491,11 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	        url: url,
 	        preventCache: true,
 			xsite: true,
-	        load: dojo.hitch(this, function(data, ioArgs) {
+	        load: dojo.hitch(this, function(data, ioArgs){
 	            var items = data.getElementsByTagName("item");
 				var hashes = [];
 				var newHashes = false;
-	            dojo.forEach(items, function(item) {
+	            dojo.forEach(items, function(item){
 	                var title = desktop.textContent(item.getElementsByTagName("title")[0]);
 	                var content = desktop.textContent(item.getElementsByTagName("description")[0]);
 	                var url = desktop.textContent(item.getElementsByTagName("link")[0]);
@@ -503,7 +503,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 								item.getElementsByTagName("dc:date")[0] || {textContent: ""}));
 	                var guid = desktop.textContent((item.getElementsByTagName("guid")[0] || {textContent: ""}));
 					var dateObj = new Date(date);
-					if(isNaN(dateObj.getDay())) {
+					if(isNaN(dateObj.getDay())){
 						//must be an ISO string
 						dateObj = dojo.date.stamp.fromISOString(date);
 					}
@@ -512,7 +512,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 					hashes.push(hash);
 					this.hashStore.fetch({
 						query: {hash: hash},
-						onComplete: dojo.hitch(this, function(items) {
+						onComplete: dojo.hitch(this, function(items){
 							if(!noGrid) this.gridStore.newItem({
 								Read: !(items.length == 0 || !this.hashStore.getValue(items[0], "read")),
 								Title: title,
@@ -521,7 +521,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 								Url: url,
 								Guid: guid||title
 							});
-							if(items.length == 0) {
+							if(items.length == 0){
 								this.hashStore.newItem({
 									hash: hash,
 									feed: FEED_URL,
@@ -537,15 +537,15 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 				var change = false;
 				this.hashStore.fetch({
 					query: {feed: FEED_URL},
-					onItem: dojo.hitch(this, function(item) {
-						for(var key in hashes) {
+					onItem: dojo.hitch(this, function(item){
+						for(var key in hashes){
 							var hash = hashes[key];
 							if(hash == this.hashStore.getValue(item, "hash")) return;
 						}
 						this.hashStore.deleteItem(item);
 						change = true;
 					}),
-					onComplete: dojo.hitch(this, function() {
+					onComplete: dojo.hitch(this, function(){
 						if(change || newHashes) this.hashStore.save();
 						this.updateCount(FEED_ITEM, false);
 						dojo.style(this.loadNode, "display", "none");
@@ -557,7 +557,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 	    });
 	
 	},
-	showItem: function() {
+	showItem: function(){
 		var s = this.grid.selection.getSelected();
 		var row = s[0];
 		var title = this.gridStore.getValue(row, "Title");
@@ -568,8 +568,8 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 
 		this.hashStore.fetch({
 			query: {hash: hash},
-			onComplete: dojo.hitch(this, function(items) {
-				if(this.hashStore.getValue(items[0], "read") == false) {
+			onComplete: dojo.hitch(this, function(items){
+				if(this.hashStore.getValue(items[0], "read") == false){
 					this.hashStore.setValue(items[0], "read", true);
 					this.hashStore.save();
 				}
@@ -577,7 +577,7 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		});
 		this.gridStore.fetch({
 			query: {Title: title},
-			onComplete: dojo.hitch(this, function(items) {
+			onComplete: dojo.hitch(this, function(items){
 				this.gridStore.setValue(items[0], "Read", true);
 				this.updateCount(this.currentFeed, false);
 			})
@@ -588,10 +588,10 @@ dojo.declare("desktop.apps.FeedReader", desktop.apps._App, {
 		var text = "<div style='background-color: #eee; padding: 3px;'><a href='"+url+"'>" + title + "</a></div><div style='padding: 15px;'>" + content + "</div>";
 		
 		this.contentArea.setContent(text);
-		dojo.query("a", this.contentArea.domNode).forEach(function(node) {
-			dojo.connect(node, "onclick", node, function(e) {
+		dojo.query("a", this.contentArea.domNode).forEach(function(node){
+			dojo.connect(node, "onclick", node, function(e){
 				if(!e.shiftKey
-				&& !e.ctrlKey) {
+				&& !e.ctrlKey){
 					desktop.app.launchHandler(null, {url: this.href}, "text/x-uri");
 					e.preventDefault();
 				}

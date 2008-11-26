@@ -10,7 +10,7 @@ dojo.requireLocalization("desktop", "common");
 dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 	dispName: "Twitter",
 	loginUi: {},
-	postCreate: function() {
+	postCreate: function(){
 		var dialog = this.dialog = new dijit.TooltipDialog({});
 		var button = new dijit.form.DropDownButton({
 			dropDown: dialog,
@@ -19,30 +19,30 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 		this.addChild(button);
 		this.inherited("postCreate", arguments);
 	},
-	startup: function() {
+	startup: function(){
 		if(!this.settings.username)
 			this.drawLoginForm();
 		else
 			this.getInfo();
 	},
-	uninitialize: function() {
+	uninitialize: function(){
 		clearTimeout(this.timer);
 	},
-	drawLoginForm: function(error) {
-		for(var key in this.loginUi) {
+	drawLoginForm: function(error){
+		for(var key in this.loginUi){
 			this.loginUi[key].destroy();
 		}
 		if(this.settings.username)
 			delete this.settings.username;
 		var actNls = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
 		var div = document.createElement("div");
-		if(error) {
+		if(error){
 			var messageNode = document.createElement("div");
 			dojo.style(messageNode, "textAlign", "center");
 			desktop.textContent(messageNode, actNls.authFail)
 			div.appendChild(messageNode);
 		}
-		dojo.forEach(["username", "password"], function(label) {
+		dojo.forEach(["username", "password"], function(label){
 			var row = document.createElement("div");
 			desktop.textContent(row, actNls[label]+": ");
 			var textbox = this.loginUi[label] = new dijit.form.TextBox({
@@ -62,8 +62,8 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 		div.appendChild(row);
 		this.dialog.setContent(div);
 	},
-	getInfo: function() {
-		if(!this.settings.username) {
+	getInfo: function(){
+		if(!this.settings.username){
 			var authInfo = {
 				username: this.loginUi.username.getValue(),
 				password: this.loginUi.password.getValue()
@@ -85,15 +85,15 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 			handleAs: "json"
 		})
 	},
-	drawInfo: function(data) {
-		if(!this.settings.username) {
+	drawInfo: function(data){
+		if(!this.settings.username){
 			this.settings = dojo.mixin(this.settings, {
 				username: this.loginUi.username.getValue()
 			});
 			this.loginUi.username.setValue("");
 			this.loginUi.password.setValue("");
 		}
-		if(!this.contentNode) {
+		if(!this.contentNode){
 			var main = document.createElement("div");
 			this.makeTextbox(main);
 			this.contentNode = document.createElement("div");
@@ -103,7 +103,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 		var div = this.contentNode;
 		div.innerHTML = "";
 		var count = 0;
-		dojo.forEach(data, function(item) {
+		dojo.forEach(data, function(item){
 			if(count++ > 5) return;
 			var row = document.createElement("div");
 			dojo.style(row, {
@@ -115,11 +115,11 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 			var text = "";
 			var items=item.text.split("\n")
 			var allItems = [];
-			for(var i in items) {
+			for(var i in items){
 				var newItems = items[i].split(" ");
-				dojo.forEach(newItems, function(item) { allItems.push(item); });
+				dojo.forEach(newItems, function(item){ allItems.push(item); });
 			}
-			dojo.forEach(allItems, function(item) {
+			dojo.forEach(allItems, function(item){
 				if(dojox.validate.isUrl(item) && parseInt(item.charAt(0)).toString() == "NaN")
 					text += "<a href='"+item+"'>"+(item.length >= 28 ? item.substring(0, 28)+"..." : item)+"</a> ";
 				else
@@ -130,10 +130,10 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 							+text
 							+"<a href='http://www.twitter.com/"+item.user.screen_name+"/statuses/"+item.id+"'>"
 							+dojo.date.locale.format(date)+"</a>";
-			dojo.query("a", row).forEach(function(node) {
-				dojo.connect(node, "onclick", node, function(e) {
+			dojo.query("a", row).forEach(function(node){
+				dojo.connect(node, "onclick", node, function(e){
 					if(!e.shiftKey
-					&& !e.ctrlKey) {
+					&& !e.ctrlKey){
 						desktop.app.launchHandler(null, {url: this.href}, "text/x-uri");
 						e.preventDefault();
 					}
@@ -142,7 +142,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 			div.appendChild(row);
 		})
 	},
-	makeTextbox: function(div) {
+	makeTextbox: function(div){
 		var header = document.createElement("div");
 		dojo.style(header, "position", "relative");
 		desktop.textContent(header, "What are you doing?");
@@ -158,14 +158,14 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 		var area = document.createElement("div");
 		var button = new dijit.form.Button({
 			label: "Update",
-			onClick: dojo.hitch(this, function() {
+			onClick: dojo.hitch(this, function(){
 				this.postUpdate(this.textbox.getValue());
 			})
 		});
 		var tb = this.textbox = new dijit.form.Textarea({
 			intermediateChanges: true,
 			style: "width: 300px;",
-			onChange: function(value) {
+			onChange: function(value){
 				var length = value.split("").length;
 				desktop.textContent(counter, 140-length);
 				button.setDisabled(length >= 140);
@@ -180,7 +180,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 		div.appendChild(bRow);
 		
 	},
-	postUpdate: function(string) {
+	postUpdate: function(string){
 		if(string == "") return;
 		desktop.xhr({
 			xsite: true,
@@ -191,7 +191,7 @@ dojo.declare("desktop.ui.applets.Twitter", desktop.ui.Applet, {
 			auth: {
 				username: this.settings.username
 			},
-			load: dojo.hitch(this, function() {
+			load: dojo.hitch(this, function(){
 				this.textbox.setValue("");
 				this.getInfo();
 			}),

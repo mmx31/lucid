@@ -7,8 +7,8 @@ dojo.declare("desktop.apps.Messenger.widget.AddBuddyForm", dijit.form.Form, {
     widgetsInTemplate: true,
     templateString: null,
     templatePath: dojo.moduleUrl("desktop.apps.Messenger.widget.templates", "AddBuddyForm.html"),
-    onSubmit: function() {
+    onSubmit: function(){
     },
-    onCancel: function() {
+    onCancel: function(){
     }
 });

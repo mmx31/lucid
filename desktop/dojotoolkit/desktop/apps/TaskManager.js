@@ -10,13 +10,13 @@ dojo.requireLocalization("desktop", "system");
 desktop.addDojoCss("dojox/grid/resources/Grid.css");
 
 dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
-	kill: function() {
+	kill: function(){
 	    clearTimeout(this.timer);
-	    if (!this.win.closed) {
+	    if (!this.win.closed){
 	        this.win.close();
 	    }
 	},
-	init: function(args) {
+	init: function(args){
 	    var nls = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
         var sys = dojo.i18n.getLocalization("desktop", "system");
@@ -57,17 +57,17 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
         this.grid.startup();
 	},
 	
-    update: function() {
+    update: function(){
         var processes = desktop.app.getInstancesStatus();
-        dojo.forEach(processes, function(instance) {
+        dojo.forEach(processes, function(instance){
             this.store.fetchItemByIdentity({
                 identity: instance.instance,
-                onItem: dojo.hitch(this, function(item) {
+                onItem: dojo.hitch(this, function(item){
                     if(!this.store.isItem(item)){
                         this.store.newItem(instance);
                         return;
                     }
-                    for(var key in instance) {
+                    for(var key in instance){
                         if(this.store.getValue(item, key) != instance[key])
                         this.store.setValue(item, key, instance[key]);
                     }
@@ -76,14 +76,14 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
         }, this);
         this.store.fetch({
             query: {instance: "*"},
-            onItem: dojo.hitch(this, function(item) {
+            onItem: dojo.hitch(this, function(item){
                 var exists = false;
                 var id = this.store.getIdentity(item);
-                dojo.forEach(processes, function(instance) {
+                dojo.forEach(processes, function(instance){
                     if(id==instance.instance)
                         exists=true;
                 });
-                if(!exists) {
+                if(!exists){
                     this.store.deleteItem(item);
                 }
             })
@@ -93,7 +93,7 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
         var menu = this.menu = new dijit.Menu({});
         var killApp = new dijit.MenuItem({
             label: sys.kill,
-            onClick: dojo.hitch(this, function() {
+            onClick: dojo.hitch(this, function(){
                var row = this.grid.getItem(this.__rowIndex);
                var id = this.store.getValue(row, "instance");
                this.executeKill(id);
@@ -101,7 +101,7 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
         });
         menu.addChild(killApp);
         menu.startup();
-        this.grid.onRowContextMenu = dojo.hitch(this, function(e) {
+        this.grid.onRowContextMenu = dojo.hitch(this, function(e){
             this.__rowIndex = e.rowIndex;
             this.menu._contextMouse();
             this.menu._openMyself(e);
@@ -111,10 +111,10 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
         this.timer = setTimeout(dojo.hitch(this, "update"), 1000);
     },
 
-	executeKill: function(id) {
+	executeKill: function(id){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
-	    if (desktop.app.getInstance(id).status != "killed") {
-	        if(desktop.app.kill(id)) {
+	    if (desktop.app.getInstance(id).status != "killed"){
+	        if(desktop.app.kill(id)){
 	        desktop.dialog.notify(sys.killSuccess.replace("%s", id));
 		}
 		else {
@@ -134,15 +134,15 @@ dojo.declare("desktop.apps.TaskManager", desktop.apps._App, {
 	    this.home();
 	
 	}/*,
-	home: function() {
+	home: function(){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 	    var data = desktop.app.getInstances();
 	    var html = "<table style='width: 100%;'><thead><tr style='background-color: #dddddd;'><td>"+sys.name+"</td><td>"+sys.instance+"</td><td>"+sys.id+"</td><td>"+sys.status+"</td><td>"+sys.actions+"</td></tr></thead><tbody>";
-	    for (var x = 0; x < data.length; x++) {
-	        if (typeof(data[x]) == "object") {
+	    for (var x = 0; x < data.length; x++){
+	        if (typeof(data[x]) == "object"){
 	            // Error handler, for some reason, it sometimes fucksup.
-	            if (data[x].status != "killed") {
+	            if (data[x].status != "killed"){
 	                html += "<tr><td>" + (app[data[x].name] || data[x].name) + "</td><td>" + data[x].instance + "</td><td>" + data[x].sysname + "</td><td>" + sys[data[x].status] + "</td><td><a href='javascript:void(0);' onClick='desktop.app.instances[" + this.instance + "].executeKill("+ data[x].instance + ")'>"+sys.kill+"</a></td></tr>";
 	
 	            }

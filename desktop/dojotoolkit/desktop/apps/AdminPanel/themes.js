@@ -1,7 +1,7 @@
 dojo.provide("desktop.apps.AdminPanel.themes");
 
 dojo.extend(desktop.apps.AdminPanel, {
-	themes: function() {
+	themes: function(){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var apps = dojo.i18n.getLocalization("desktop", "apps");
@@ -13,8 +13,8 @@ dojo.extend(desktop.apps.AdminPanel, {
 		});
 		this.toolbar.addChild(button);
 		
-		desktop.theme.list(dojo.hitch(this, function(data) {
-			for(var i=0;i<data.length;i++) {
+		desktop.theme.list(dojo.hitch(this, function(data){
+			for(var i=0;i<data.length;i++){
 				var src = dojo.moduleUrl("desktop.resources.themes."+data[i].sysname, data[i].preview);
 				data[i].preview = "<img style='width: 150px; height: 130px;' src='"+src+"' />";
 			};
@@ -22,7 +22,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 				cells: [[]]
 			}];
 			//make headers
-			for(var field in data[0]) {
+			for(var field in data[0]){
 				if(field == "sysname"
 				|| field == "wallpaper") continue;
 				var args = {
@@ -45,7 +45,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			});
 			if(this._con) dojo.disconnect(this._con);
 			this._con = dojo.connect(this.main, "resize", grid, "resize");
-			dojo.connect(this._themeStore, "onDelete", this, function(a) {
+			dojo.connect(this._themeStore, "onDelete", this, function(a){
 				desktop.theme.remove(a.sysname[0]); //that feels really hackish
 			})
 			this.main.setContent(this._themeGrid.domNode);
@@ -54,23 +54,23 @@ dojo.extend(desktop.apps.AdminPanel, {
 			dojo.forEach([
 				{
 					label: cmn["delete"],
-					onClick: dojo.hitch(this, function(e) {
+					onClick: dojo.hitch(this, function(e){
 						var row = this._themeGrid.getItem(this.__rowIndex);
 						desktop.dialog.yesno({
 							title: sys.themeDelConfirm,
 							message: sys.delFromSys.replace("%s", row.name),
-							callback: dojo.hitch(this, function(a) {
+							callback: dojo.hitch(this, function(a){
 								if(a == false) return;
 								this._themeStore.deleteItem(row);
 							})
 						})
 					})
 				}
-			], function(item) {
+			], function(item){
 				var menuItem = new dijit.MenuItem(item);
 				menu.addChild(menuItem);
 			});
-			this._themeGrid.onRowContextMenu = dojo.hitch(this, function(e) {
+			this._themeGrid.onRowContextMenu = dojo.hitch(this, function(e){
 				this.__rowIndex = e.rowIndex;
 				this._themeMenu._contextMouse();
 				this._themeMenu._openMyself(e);
@@ -79,7 +79,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			this.win.layout();
 		}));
 	},
-	installThemePackage: function() {
+	installThemePackage: function(){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var win = new desktop.widget.Window({
@@ -95,11 +95,11 @@ dojo.extend(desktop.apps.AdminPanel, {
 		var uploader = new dojox.widget.FileInputAuto({
 			name: "uploadedfile",
 			url: desktop.xhr("core.theme.package.install"),
-			onComplete: dojo.hitch(this, function(data,ioArgs,widgetRef) {
+			onComplete: dojo.hitch(this, function(data,ioArgs,widgetRef){
 				if(data.status && data.status == "success"){
 					widgetRef.overlay.innerHTML = sys.themeInstallSuccess;
                     //check for compatibility
-					if(!data.compatible) {
+					if(!data.compatible){
 					    desktop.dialog.alert({
 					        title: sys.notCompatible,
 					        message: sys.notCompatibleText

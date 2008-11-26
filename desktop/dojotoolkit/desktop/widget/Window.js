@@ -39,15 +39,15 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 	//	liveSplitters: Boolean
 	//		specifies whether splitters resize as you drag (true) or only upon mouseup (false)
 	liveSplitters: false,
-	onClose: function() {
+	onClose: function(){
 		//	summary:
 		//		What to do on destroying of the window
 	},
-	onResize: function() {
+	onResize: function(){
 		//	summary:
 		//		What to do on the resizing of the window
 	},
-	onMinimize: function() {
+	onMinimize: function(){
 		//	summary:
 		//		What to do on the minimizing of the window
 	},
@@ -56,7 +56,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 	 * 
 	 * What to do upon maximize of window
 	 */
-	onMaximize: function() {
+	onMaximize: function(){
 		//	summary:
 		//		What to do upon maximize of window
 	},
@@ -101,7 +101,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 	//		Set to true when the window is in the middle of a minimize animation.
 	//		This is to prevent a bug where the size is captured mid-animation and restores weird.
 	_minimizeAnim: false,
-	postCreate: function() {
+	postCreate: function(){
 		dojo.setSelectable(this.titleNode, false);
 		this.domNode.title="";
 		this.makeDragger();
@@ -150,7 +150,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
         menu.addChild(new dijit.MenuSeparator({}));
         menu.addChild(new dijit.CheckedMenuItem({
             label: nls.alwaysOnTop,
-            onChange: dojo.hitch(this, function(val) {
+            onChange: dojo.hitch(this, function(val){
                 this.alwaysOnTop = val;
                 this.bringToFront();
             })
@@ -208,7 +208,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		var bodyHeight = this.containerNode.offsetHeight;
 		var viewport = dijit.getViewport();
 		var topCount = 0;
-		dojo.query(".desktopPanelTop", "desktop_ui_Area_0").forEach(function(panel) {
+		dojo.query(".desktopPanelTop", "desktop_ui_Area_0").forEach(function(panel){
 			topCount += panel.offsetHeight;
 		});
 		var topStyle = ((viewport.h/2) - (((calcHeight - bodyHeight)+calcHeight)/2));
@@ -216,30 +216,30 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			top: (topStyle > topCount ? topStyle : topCount)+"px",
 			left: ((viewport.w/2) - (((calcWidth - bodyWidth)+calcWidth)/2))+"px"
 		});
-		if (desktop.config.fx >= 2) {
+		if (desktop.config.fx >= 2){
 			if (desktop.config.fx < 3) this._toggleBody(false);
 			dojo.style(this.domNode, "opacity", 0);
 			var anim = dojo.fadeIn({
 				node: this.domNode,
 				duration: desktop.config.window.animSpeed
 			});
-			dojo.connect(anim, "onEnd", this, function() {
+			dojo.connect(anim, "onEnd", this, function(){
 				if (desktop.config.fx < 3) this._toggleBody(true);
 				this.resize();
 			});
 			anim.play();
 		} else this.resize();
-		if(!this._started) {
+		if(!this._started){
 			this.startup();
 		}
 		this.bringToFront();
 	},
-	_toggleBody: function(/*Boolean*/show) {
+	_toggleBody: function(/*Boolean*/show){
 		//	summary:
 		//		Toggles the display of the window's body
 		//	show:
 		//		If true the body is shown, if false then the body is hidden.
-		if(show) {
+		if(show){
 			dojo.style(this.containerNode, "display", "block");
 			dojo.style(this.dragContainerNode, "display", "none");
 		}
@@ -248,7 +248,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			dojo.style(this.dragContainerNode, "display", "block");
 		}
 	},
-	_setTitleAttr: function(/*String*/title) {
+	_setTitleAttr: function(/*String*/title){
 		//	summary:
 		//		Sets window title after window creation
 		//	title:
@@ -258,12 +258,12 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			desktop.ui._windowList.setValue(this._winListItem, "label", title);
 		this.title = title;
 	},
-	setTitle: function(/*String*/title) {
+	setTitle: function(/*String*/title){
 		if(dojo.version.major >= 1 && dojo.version.minor >= 2)
 			dojo.deprecated("window.setTitle", "setTitle is deprecated. Please use dojo.attr(\"title\", \"value\");", "1.1");
 		return this._setTitleAttr(title);
 	},
-	_getPoints: function(/*Object*/box) {
+	_getPoints: function(/*Object*/box){
 		//	summary:
 		//		Get the points of a box (as if it were on an xy plane)
 		//	box:
@@ -291,13 +291,13 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			if(!this.bringToFront()) this.minimize();
 		}
 	},
-	_toggleMaximize: function() {
+	_toggleMaximize: function(){
 		//	summary:
 		//		Toggles the window being maximized
 		if(this.maximized == true) this.unmaximize();
 		else this.maximize();
 	},
-	makeResizer: function() {
+	makeResizer: function(){
 		//	summary:
 		//		Internal method that makes a resizer for the window.
 		dojo.style(this.sizeHandle.domNode, "display", "block");
@@ -343,7 +343,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 				},
 				easing: dojox.fx.easing.easeIn
 			});
-			dojo.connect(anim, "onEnd", this, function() {
+			dojo.connect(anim, "onEnd", this, function(){
 				dojo.style(this.domNode, "display", "none");
 				if(desktop.config.fx < 3) this._toggleBody(true);
 				this._minimizeAnim = false;
@@ -380,7 +380,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 				},
 				easing: dojox.fx.easing.easeOut
 			});
-			dojo.connect(anim, "onEnd", this, function() {
+			dojo.connect(anim, "onEnd", this, function(){
 				if(desktop.config.fx < 3) this._toggleBody(true);
 				this.resize();
 				this._minimizeAnim = false;
@@ -421,7 +421,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 				},
 				duration: desktop.config.window.animSpeed
 			});
-			dojo.connect(anim, "onEnd", this, function() {
+			dojo.connect(anim, "onEnd", this, function(){
 				if(desktop.config.fx < 3) this._toggleBody(true);
 				this.resize();
 			});
@@ -459,7 +459,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			if(desktop.config.fx < 3) this._toggleBody(false);
 		}));
 		this._dragStopListener = dojo.connect(this._drag, "onMoveStop", dojo.hitch(this, function(mover){
-			if (desktop.config.fx < 3) {
+			if (desktop.config.fx < 3){
 				this._toggleBody(true);
 				this.resize();
 			}
@@ -488,7 +488,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 				},
 				duration: desktop.config.window.animSpeed
 			});
-			dojo.connect(anim, "onEnd", this, function(e) {
+			dojo.connect(anim, "onEnd", this, function(e){
 				if(desktop.config.fx < 3) this._toggleBody(true);
 				this.resize();
 			});
@@ -519,14 +519,14 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		var alwaysOnTopNum = 0;		// Number of wins with 'alwaysOnTop' property set to true
 		var topWins = [];	// Array of reffernces to win widgets with 'alwaysOnTop' property set to true
 		var winWidget;			// Reffernce to window widget by dom node
-		dojo.forEach(this.getParent().getChildren(), function(wid) {
+		dojo.forEach(this.getParent().getChildren(), function(wid){
             if(typeof wid == "undefined") return;
 			var node = wid.domNode;
 			var zindex = dojo.style(node, "zIndex")
-			if(zindex > maxZindex && zindex != "auto") {
+			if(zindex > maxZindex && zindex != "auto"){
 				maxZindex = zindex;
 			}
-			if (wid.alwaysOnTop == true) {
+			if (wid.alwaysOnTop == true){
 				alwaysOnTopNum++;
 				topWins.push(winWidget);
 			}
@@ -537,8 +537,8 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			maxZindex++;
 			dojo.style(this.domNode, "zIndex", maxZindex);
 			// Check for win widgets with 'alwaysOnTop' property set to true
-			if ( topWins.length > 0 ) {
-				dojo.forEach(topWins, function(win) {
+			if ( topWins.length > 0 ){
+				dojo.forEach(topWins, function(win){
 					maxZindex++;
 					dojo.style(win.domNode, "zIndex", maxZindex);
 				});
@@ -547,7 +547,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		}
 		return false;
 	},
-	uninitialize: function() {
+	uninitialize: function(){
 		if(!this.closed) this.onClose();
 		if(this._winListItem) desktop.ui._windowList.deleteItem(this._winListItem);
 		if(this._drag) this._drag.destroy();
@@ -558,15 +558,15 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 	{
 		//	summary:
 		//		closes the window
-		if (!this.closed) {
+		if (!this.closed){
 			this.closed = true;
 			if(this._winListItem) desktop.ui._windowList.deleteItem(this._winListItem);
 			this._winListItem = false;
 			this.onClose();
-			var onEnd = dojo.hitch(this, function() {
+			var onEnd = dojo.hitch(this, function(){
 				this.destroy();
 			})
-			if (desktop.config.fx >= 2) {
+			if (desktop.config.fx >= 2){
 				if(desktop.config.fx < 3) this._toggleBody(false);
 				var anim = dojo.fadeOut({
 					node: this.domNode,
@@ -588,9 +588,9 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		this.inherited(arguments);
 		this.domNode = oldNode;
 	},
-	resize: function(/*Object?*/size) {
+	resize: function(/*Object?*/size){
         // resize the window
-        if(size) {
+        if(size){
             dojo.style(this.domNode, {
                 width: size.width,
                 height: size.height
@@ -613,10 +613,10 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
                 wid.resize();
         });
 	},
-	_onResize: function(e) {
+	_onResize: function(e){
 		//	summary:
 		//		Event handler. Resizes the window when the screen is resized.
-		if(this.maximized && !this.minimized) {
+		if(this.maximized && !this.minimized){
 			var max = desktop.ui._area.getBox();
 			var c = dojo.coords(this.domNode);
 			var v = dijit.getViewport();
@@ -625,7 +625,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
                 height: (v.h - max.T - max.B)+"px"
             });
 		}
-		else if(this.maximized && this.minimized) {
+		else if(this.maximized && this.minimized){
 			var max = desktop.ui._area.getBox();
 			var v = dijit.getViewport();
 			this.pos.width = v.w - max.L - max.R;
@@ -633,7 +633,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		}
 		this.resize();
 	},
-	startup: function() {
+	startup: function(){
 		//	summary:
 		//		starts the widget up
 		if(this._started) return;

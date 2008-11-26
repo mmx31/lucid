@@ -4,7 +4,7 @@ dojo.require("dojox.encoding.base64");
 desktop.user = {
 	//	summary:
 	//		functions that can be used to do user-related tasks
-	init: function() {
+	init: function(){
 		this.beforeUnloadEvent = dojo.addOnUnload(dojo.hitch(this, "quickLogout"));
         //makes sure we appear logged in according to the DB
         desktop.xhr({
@@ -27,13 +27,13 @@ desktop.user = {
 		email: "",
 		//	callback: Function
 		//		A callback function. First argument is a desktop.user._setArgs object, excluding the callback property
-		callback: function(info) {}
+		callback: function(info){}
 	},
 	=====*/
-	get: function(/*desktop.user._getArgs*/options) {
+	get: function(/*desktop.user._getArgs*/options){
 		//	summary:
 		//		Gets the information of a certain user
-		if(!options.id && !options.username && !options.email) { options.id = "0"; }
+		if(!options.id && !options.username && !options.email){ options.id = "0"; }
 		desktop.xhr({
 	        backend: "core.user.info.get",
 			content: {
@@ -42,9 +42,9 @@ desktop.user = {
 				email: options.email,
 				username: options.username
 			},
-	        load: function(data, ioArgs) {
+	        load: function(data, ioArgs){
 				data = dojo.fromJson(data);
-	        	if(options.callback) { options.callback(data); }
+	        	if(options.callback){ options.callback(data); }
 			}
         });
 	},
@@ -72,15 +72,15 @@ desktop.user = {
 		//		the user's disk quota, in bytes
 		//	callback: Function?
 		//		a callback function. Not required.
-		callback: function() {}
+		callback: function(){}
 	},
 	=====*/
-	set: function(/*desktop.user._setArgs*/op) {
+	set: function(/*desktop.user._setArgs*/op){
 		//	summary:
 		//		changes a user's information
 		var callback = op.callback || false;
 		delete op.callback;
-		if(op.password) {
+		if(op.password){
 			//base64 encode it
 			var b = [];
 			for(var i = 0; i < op.password.length; ++i){
@@ -94,7 +94,7 @@ desktop.user = {
 		desktop.xhr({
 			backend: "core.user.info.set",
 			content: op,
-			load: function(data) {
+			load: function(data){
 				if(callback) callback(data);
 			}
 		})		
@@ -127,13 +127,13 @@ desktop.user = {
         //      Logs a user out, but doesn't clear their session.
         //      This basically just sets their 'logged' property to false in the database, so they appear to be logged out
         desktop.config.save(true, false);
-        if(desktop.reload) { return false; }
+        if(desktop.reload){ return false; }
         desktop.xhr({
             backend: "core.user.auth.quickLogout",
             sync: true
         });
     },
-	authenticate: function(/*String*/password, /*Function?*/callback) {
+	authenticate: function(/*String*/password, /*Function?*/callback){
 		//	summary:
 		//		re-authenticates the user so that he/she can change their password
 		//first, base64 encode the password to stay at least somewhat secure
@@ -149,7 +149,7 @@ desktop.user = {
 			content: {
 				password: password
 			},
-			load: function(data) {
+			load: function(data){
 				callback(data == "0");
 			}
 		})

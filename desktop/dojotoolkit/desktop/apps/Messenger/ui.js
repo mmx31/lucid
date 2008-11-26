@@ -13,7 +13,7 @@ dojo.extend(desktop.apps.Messenger, {
     selectedBuddy: null,
     removeBuddyButton: null,
     unameUi: {},
-    makeBuddyListWin: function() {
+    makeBuddyListWin: function(){
         if(this.buddyListWin && !this.buddyListWin.closed) return this.BuddyListWin;
         var win = this.buddyListWin = new desktop.widget.Window({
             title: "Contact List",
@@ -35,7 +35,7 @@ dojo.extend(desktop.apps.Messenger, {
             label: "Add User",
             iconClass: "icon-16-actions-list-add",
             onClick: dojo.hitch(this, "drawAddBuddyDialog"),
-            getIconClass: function(item, opened) {
+            getIconClass: function(item, opened){
                 return "icon-16-apps-system-users";
             }
         });
@@ -45,7 +45,7 @@ dojo.extend(desktop.apps.Messenger, {
             label: "Remove User",
             iconClass: "icon-16-actions-list-remove",
             disabled: true,
-            onClick: dojo.hitch(this, function() {
+            onClick: dojo.hitch(this, function(){
                 if(!this.selectedBuddy) return;
                 store.deleteItem(this.selectedBuddy);
                 store.save();
@@ -65,17 +65,17 @@ dojo.extend(desktop.apps.Messenger, {
         var tree = new dijit.Tree({
             model: model,
             region: "center",
-            getIconClass: function(item, opened) {
+            getIconClass: function(item, opened){
                 var iconClass = "";
-                if(store.isItem(item) && store.hasAttribute(item, "logged")) {
+                if(store.isItem(item) && store.hasAttribute(item, "logged")){
                     iconClass = store.getValue(item, "logged") ? "icon-16-apps-system-users" : "icon-16-actions-system-log-out";
                     return iconClass;
                 }
                 return (!item || this.model.mayHaveChildren(item)) ? (opened ? "dijitFolderOpened" : "dijitFolderClosed") : iconClass;
             },
 
-            onClick: dojo.hitch(this, function(item) {
-                if(this.selectedBuddy == item) {
+            onClick: dojo.hitch(this, function(item){
+                if(this.selectedBuddy == item){
                     var imWin = this.makeImWindow(item);
                     if(imWin.shown) imWin.bringToFront();
                     else imWin.show();
@@ -109,7 +109,7 @@ dojo.extend(desktop.apps.Messenger, {
 
         var inputBox = new desktop.apps.Messenger.widget.MessageBox({
             region: "bottom",
-            onSend: dojo.hitch(this, function(msg) {
+            onSend: dojo.hitch(this, function(msg){
                 this.sendMessage(store.getValue(item, "id"), msg);
             })
         }); 
@@ -124,9 +124,9 @@ dojo.extend(desktop.apps.Messenger, {
         this.windows.push(win);
         return win;
     },
-    pushMsg: function(uid, msg, local) {
+    pushMsg: function(uid, msg, local){
         var uiSlot = this.unameUi[uid];
-        if(uiSlot && uiSlot.win && !uiSlot.win.closed) {
+        if(uiSlot && uiSlot.win && !uiSlot.win.closed){
             var node = uiSlot.msgPane.domNode;
             var line = this.msgToNode(uiSlot.username, msg, local);
             node.appendChild(line);
@@ -135,7 +135,7 @@ dojo.extend(desktop.apps.Messenger, {
 				win: node,
 				duration: 500,
 				easing:dojo.fx.easing.easeOut,
-                onEnd: function() {
+                onEnd: function(){
                     node.scrollTop = node.scrollHeight+node.offsetHeight;
                     node.scrollLeft = 0;
                 }
@@ -145,12 +145,12 @@ dojo.extend(desktop.apps.Messenger, {
             var store = this.buddyStore;
             store.fetch({
                 query: {id: uid},
-                onComplete: dojo.hitch(this, function(items) {
-                    if(items.length == 0) {
+                onComplete: dojo.hitch(this, function(items){
+                    if(items.length == 0){
                         //add the user who sent this to the buddy list
                         desktop.user.get({
                             id: uid,
-                            callback: dojo.hitch(this, function(info) {
+                            callback: dojo.hitch(this, function(info){
                                 var item = this.addBuddy(info);
                                 var win = this.makeImWindow(item);
                                 this.pushMsg(uid, msg);
@@ -166,7 +166,7 @@ dojo.extend(desktop.apps.Messenger, {
             });
         }
     },
-    msgToNode: function(username, message, local) {
+    msgToNode: function(username, message, local){
         var div = document.createElement("div");
         
         var timeSpan = document.createElement("span");
@@ -191,7 +191,7 @@ dojo.extend(desktop.apps.Messenger, {
         div.appendChild(msgSpan);
         
         if(local){
-            this.getCurrentUsername(function(name) {
+            this.getCurrentUsername(function(name){
                 desktop.textContent(nameSpan, name+": ");
             });
         }else{
@@ -199,7 +199,7 @@ dojo.extend(desktop.apps.Messenger, {
         }
         return div;
     },
-    drawAddBuddyDialog: function() {
+    drawAddBuddyDialog: function(){
         var win = new desktop.widget.Window({
             title: "Add Buddy",
             width: "350px",
@@ -207,7 +207,7 @@ dojo.extend(desktop.apps.Messenger, {
         });
         
         var form = new desktop.apps.Messenger.widget.AddBuddyForm({
-            onSubmit: dojo.hitch(this, function() {
+            onSubmit: dojo.hitch(this, function(){
                 var values = form.getValues();
                 desktop.user.get({
                     username: values.username,
@@ -223,7 +223,7 @@ dojo.extend(desktop.apps.Messenger, {
         this.windows.push(win);
         win.show();
     },
-    wrapWid: function(widget) {
+    wrapWid: function(widget){
         var div = document.createElement("div");
         div.appendChild(widget.domNode);
         return div;

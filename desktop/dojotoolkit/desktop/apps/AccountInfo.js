@@ -1,7 +1,7 @@
 dojo.provide("desktop.apps.AccountInfo");
 
 dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
-	init: function(args) {
+	init: function(args){
 		var l = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var win = this.win = new desktop.widget.Window({
@@ -27,7 +27,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		chpasswd.appendChild(button.domNode);
 		
 		topContent = document.createElement("div");
-		dojo.forEach([picture, chpasswd], function(item) {
+		dojo.forEach([picture, chpasswd], function(item){
 			topContent.appendChild(item.domNode || item);
 		}, this);
 		top.setContent(topContent);
@@ -40,7 +40,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		
 		var langs = [];
 		var intLangs = dojo.i18n.getLocalization("desktop", "languages");
-		for(var key in intLangs) {
+		for(var key in intLangs){
 			langs.push({value: key, label: intLangs[key]});
 		}
 		
@@ -52,7 +52,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 			email: {
 				widget: "ValidationTextBox",
 				params: {
-					isValid: function(blah) {
+					isValid: function(blah){
 						return dojox.validate.isEmailAddress(this.textbox.value);
 					}
 				}
@@ -75,7 +75,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		}
 		var div = document.createElement("div");
 		var elems = {};
-		for(var key in rows) {
+		for(var key in rows){
 			var row = document.createElement("div");
 			dojo.style(row, "marginBottom", "5px");
 			row.innerHTML = l[key]+":&nbsp;";
@@ -96,23 +96,23 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		p.appendChild(close.domNode)
 		bottom.setContent(p)
 		
-		dojo.forEach([top, client, bottom], function(wid) {
+		dojo.forEach([top, client, bottom], function(wid){
 			win.addChild(wid);
 			wid.startup();
 		}, this);
-		desktop.user.get({callback: function(info) {
+		desktop.user.get({callback: function(info){
 			elems["name"].setValue(info.name);
 			elems["email"].setValue(info.email);
 			desktop.textContent(usernameSpan, info.username);
 		}});
-		dojo.connect(win, "onClose", this, function() {
+		dojo.connect(win, "onClose", this, function(){
 			var args = {};
-			for(var key in elems) {
+			for(var key in elems){
 				var elem = elems[key];
-				if(typeof elem.isValid != "undefined") {
+				if(typeof elem.isValid != "undefined"){
 					if(!elem.isValid()) continue;
 				}
-				switch(key) {
+				switch(key){
 					case "name":
 						args.name = elem.getValue();
 						break;
@@ -122,7 +122,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 					case "language":
 						var oldLocale = desktop.config.locale;
 						desktop.config.locale = elem.getValue();
-						if(oldLocale != desktop.config.locale) {
+						if(oldLocale != desktop.config.locale){
 							dojo.cookie("desktopLocale", desktop.config.locale);
 							desktop.dialog.notify(l.restartDesktopForLangChange);
 						}
@@ -135,7 +135,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		win.show();
 		win.startup();
 	},
-	password: function() {
+	password: function(){
 		//	summary:
 		//		Shows the password change dialog
 		if(this.passwordWin) return this.passwordWin.bringToFront();
@@ -145,7 +145,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 			title: l.changePassword,
 			width: "450px",
 			height: "350px",
-			onClose: dojo.hitch(this, function() {
+			onClose: dojo.hitch(this, function(){
 				this.passwordWin = false;
 				clearTimeout(this._authTimeout);
 			})
@@ -156,8 +156,8 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		var client = new dijit.layout.ContentPane({region: "center"});
 		var row4 = document.createElement("div");
 		dojo.style(row4, "textAlign", "center");
-		var onChange = dojo.hitch(this, function() {
-			if(this.newpasswd.getValue() == this.confpasswd.getValue()) {
+		var onChange = dojo.hitch(this, function(){
+			if(this.newpasswd.getValue() == this.confpasswd.getValue()){
 				desktop.textContent(row4, l.passwordsMatch);
 				this.chPasswdButton.setDisabled(false)
 			}
@@ -178,7 +178,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		row1.innerHTML = l.currentPassword+":&nbsp;";
 		var current = new dijit.form.TextBox({type: "password", style: "width: 125px;"});
 		row1.appendChild(current.domNode);
-		var resetForm = dojo.hitch(this, function() {
+		var resetForm = dojo.hitch(this, function(){
 				current.setValue("");
 				newpasswd.setValue("");
 				confpasswd.setValue("");
@@ -190,11 +190,11 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		});
 		var authButton = this.authButton = new dijit.form.Button({
 			label: l.authenticate,
-			onClick: dojo.hitch(this, function() {
+			onClick: dojo.hitch(this, function(){
 				current.setDisabled(true);
 				this.authButton.setDisabled(true);
 				
-				desktop.user.authenticate(current.getValue(), dojo.hitch(this, function(data) {
+				desktop.user.authenticate(current.getValue(), dojo.hitch(this, function(data){
 					current.setDisabled(data);
 					authButton.setDisabled(data);
 					newpasswd.setDisabled(!data);
@@ -223,7 +223,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		div.appendChild((this.chPasswdButton = new dijit.form.Button({
 			label: l.changePassword,
 			disabled: true,
-			onClick: dojo.hitch(this, function() {
+			onClick: dojo.hitch(this, function(){
 				desktop.textContent(row4, l.changingPassword)
 				current.setDisabled(true);
 				this.authButton.setDisabled(true);
@@ -233,7 +233,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 				
 				desktop.user.set({
 					password: newpasswd.getValue(),
-					callback: function() {
+					callback: function(){
 						resetForm();
 						desktop.textContent(row4, l.passwordChangeSuccessful);
 						clearTimeout(this._authTimeout);
@@ -243,13 +243,13 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		})).domNode);
 		bottom.setContent(div);
 		
-		dojo.forEach([top, bottom, client], function(e) {
+		dojo.forEach([top, bottom, client], function(e){
 			win.addChild(e);
 		});
 		win.show();
 		win.startup();
 	},
-	kill: function() {
+	kill: function(){
 		if(!this.win.closed) this.win.close();
 		if(this.passwordWin && !this.passwordWin.closed) this.passwordWin.close();
 	}

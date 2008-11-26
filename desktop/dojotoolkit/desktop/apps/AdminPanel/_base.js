@@ -1,15 +1,15 @@
 dojo.provide("desktop.apps.AdminPanel._base");
 
 dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
-	kill: function() {
-		if(!this.win.closed) { this.win.close(); }
-		if(this._userMenu) { this._userMenu.destroy(); }
-		dojo.forEach(this.windows, function(win) {
+	kill: function(){
+		if(!this.win.closed){ this.win.close(); }
+		if(this._userMenu){ this._userMenu.destroy(); }
+		dojo.forEach(this.windows, function(win){
 			if(!win.closed) win.close();
 		})
 	},
 	windows: [],
-	init: function(args) {
+	init: function(args){
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		//make window
@@ -66,18 +66,18 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 		this.win.onClose = dojo.hitch(this, this.kill);
 		setTimeout(dojo.hitch(this, this.home), 100);
 	},
-	home: function() {
+	home: function(){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		this.toolbar.destroyDescendants();
-		desktop.admin.users.online(dojo.hitch(this, function(data) {
+		desktop.admin.users.online(dojo.hitch(this, function(data){
 			var h = sys.usersOnline+": <div dojoType='dijit.ProgressBar' progress='"+data.online+"' maximum='"+data.total+"'></div>";
-			desktop.admin.diskspace(dojo.hitch(this, function(data) {
+			desktop.admin.diskspace(dojo.hitch(this, function(data){
 				h += sys.diskUsage+": <div dojoType='dijit.ProgressBar' progress='"+(data.total-data.free)+"' maximum='"+data.total+"'></div>"
 				this.main.setContent(h);
 			}));
 		}));
 	},
-	permDialog: function(grid, lbl, permissions, callback) {
+	permDialog: function(grid, lbl, permissions, callback){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var permsNls = dojo.i18n.getLocalization("desktop", "permissions");
@@ -95,8 +95,8 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 		dojo.style(tab, "overflow-y", "auto");
 		tab.innerHTML = "<tr><th>"+sys.name+"</td><th>"+sys.description+"</th><th>"+sys.allow+"</th><th>"+sys.deny+"</th><th>"+sys["default"]+"</th></tr>";
 		var radioWidgets = {};
-		desktop.admin.permissions.list(dojo.hitch(this, function(list) {
-			dojo.forEach(list, function(item) {
+		desktop.admin.permissions.list(dojo.hitch(this, function(list){
+			dojo.forEach(list, function(item){
 				var tr = document.createElement("tr");
 				
 				var td = document.createElement("td");
@@ -146,9 +146,9 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 			cont.appendChild(cancel.domNode);
 			var save = new dijit.form.Button({
 				label: cmn.save,
-				onClick: dojo.hitch(this, function() {
+				onClick: dojo.hitch(this, function(){
 					var newPerms = {};
-					dojo.forEach(list, function(item) {
+					dojo.forEach(list, function(item){
 						if(radioWidgets[item.name].def.checked == true) return;
 						if(radioWidgets[item.name].deny.checked == true) newPerms[item.name] = false;
 						if(radioWidgets[item.name].allow.checked == true) newPerms[item.name] = true;

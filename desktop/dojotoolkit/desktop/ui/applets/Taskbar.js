@@ -8,7 +8,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 	_labels: {},
 	_storeconnects: [],
 	_winconnects: [],
-	postCreate: function() {
+	postCreate: function(){
 		dojo.addClass(this.containerNode, "desktopTaskbarApplet");
 		var tbl = document.createElement("table");
 		var tbody = document.createElement("tbody");
@@ -18,7 +18,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		this.containerNode.appendChild(tbl);
 		this.inherited(arguments);
 	},
-	startup: function() {
+	startup: function(){
 		var store = desktop.ui._windowList;
 		this._storeconnects = [
 			dojo.connect(store, "onNew", this, "onNew"),
@@ -29,21 +29,21 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 			onItem: dojo.hitch(this, "onNew")
 		});
 	},
-	uninitialize: function() {
-		dojo.forEach(this._storeconnects, function(e) {
+	uninitialize: function(){
+		dojo.forEach(this._storeconnects, function(e){
 			dojo.disconnect(e);
 		});
 		this.inherited("uninitialize", arguments);
 	},
-	onSet: function(item, attribute, oldValue, v) {
+	onSet: function(item, attribute, oldValue, v){
 		var store = desktop.ui._windowList;
 		if(attribute != "label") return;
-		if(v.length >= 18) {
+		if(v.length >= 18){
 			v = v.slice(0, 18) + "...";
 		}
 		desktop.textContent(this._labels[store.getValue(item, "id")], v);
 	},
-	onNew: function(item) {
+	onNew: function(item){
 		var store = desktop.ui._windowList;
 		var domNode=document.createElement("td");
 		dojo.setSelectable(domNode, false);
@@ -52,7 +52,7 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		else dojo.addClass(domNode, "taskBarItemVertical");
 		
 		var v = store.getValue(item, "label");
-		if(v.length >= 18) {
+		if(v.length >= 18){
 			v = v.slice(0, 18) + "...";
 		}
 		
@@ -67,20 +67,20 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		this._buttons[store.getValue(item, "id")] = domNode;
 		this._labels[store.getValue(item, "id")] = labelNode;
 		this.trNode.appendChild(domNode);
-		if(desktop.config.fx > 0) {
+		if(desktop.config.fx > 0){
 			dojo.style(domNode, "opacity", 0);
 			dojo.fadeIn({node: domNode, duration: desktop.config.window.animSpeed}).play();
 		}
         dijit.byId(store.getValue(item, "id"))._menu.bindDomNode(domNode);
 	},
-	onDelete: function(item) {
+	onDelete: function(item){
 		var node = this._buttons[item.id[0]];
 		dojo.disconnect(this._winconnects[item.id[0]]);
-		var onEnd = function() {
+		var onEnd = function(){
 			node.parentNode.removeChild(node);
 			node=null;
 		}
-		if (desktop.config.fx >= 1) {
+		if (desktop.config.fx >= 1){
 			var fade = dojo.fadeOut({
 				node: node,
 				duration: desktop.config.window.animSpeed

@@ -7,7 +7,7 @@ dojo.declare("desktop.ui.applets.Quota", desktop.ui.Applet, {
 	dispName: "Quota",
 	appletIcon: "icon-32-devices-drive-harddisk",
 	path: "file://",
-	postCreate: function() {
+	postCreate: function(){
 		var bar = this.pBar = new dijit.ProgressBar({
 			indeterminate: true,
 			maximum: 0,
@@ -20,9 +20,9 @@ dojo.declare("desktop.ui.applets.Quota", desktop.ui.Applet, {
 		this.update(this.path);
 		this.inherited("postCreate", arguments);
 	},
-	update: function(path) {
+	update: function(path){
 		if(path.indexOf(this.path) != 0) return;
-		desktop.filesystem.getQuota(path, dojo.hitch(this, function(v) {
+		desktop.filesystem.getQuota(path, dojo.hitch(this, function(v){
 			this.pBar.update({
 				maximum: v.total,
 				progress: v.used,
@@ -30,7 +30,7 @@ dojo.declare("desktop.ui.applets.Quota", desktop.ui.Applet, {
 			});
 		}));
 	},
-	uninitialize: function() {
+	uninitialize: function(){
 		dojo.unsubscribe(this.timer);
 	}
 });

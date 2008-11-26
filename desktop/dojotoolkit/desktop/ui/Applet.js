@@ -27,12 +27,12 @@ dojo.declare("desktop.ui.Applet", [dijit._Widget, dijit._Templated, dijit._Conta
 	//	appletIcon: String
 	//		The applet's iconClass on the "Add to panel" dialog.
 	appletIcon: "icon-32-categories-applications-other",
-	postCreate: function() {
+	postCreate: function(){
 		this._moveable = new desktop.ui._appletMoveable(this.domNode, {
 			handle: this.handleNode,
-			constraints: dojo.hitch(this, function() {
+			constraints: dojo.hitch(this, function(){
 				var c = {};
-				if (this.getParent().getOrientation() == "horizontal") {
+				if (this.getParent().getOrientation() == "horizontal"){
 					var c = {
 						t: 0,
 						l: 0,
@@ -51,11 +51,11 @@ dojo.declare("desktop.ui.Applet", [dijit._Widget, dijit._Templated, dijit._Conta
 				return c;
 			})
 		});
-		this._moveable.onMoved = dojo.hitch(this, function(e, f) {
+		this._moveable.onMoved = dojo.hitch(this, function(e, f){
 			var pos = dojo.style(this.domNode, (this.getParent().getOrientation() == "horizontal" ? "left" : "top"));
 			var barSize = dojo.style(this.getParent().domNode, (this.getParent().getOrientation() == "horizontal" ? "width" : "height"));
 			this.pos = pos/barSize;
-			dojo.forEach(this.getParent().getChildren(), function(item) {
+			dojo.forEach(this.getParent().getChildren(), function(item){
 				item._calcSpan();
 			});
 			desktop.ui.save();
@@ -67,18 +67,18 @@ dojo.declare("desktop.ui.Applet", [dijit._Widget, dijit._Templated, dijit._Conta
 			{
 				label: "Remove from panel",
 				iconClass: "icon-16-actions-list-remove",
-				onClick: dojo.hitch(this, function() {
+				onClick: dojo.hitch(this, function(){
 					this.destroy();
 					desktop.ui.save();
 				})
 			}
-		], function(args) {
+		], function(args){
 			var item = new dijit.MenuItem(args);
 			menu.addChild(item);
 		});
 		//TODO: get it so that applets don't overlap eachother
 	},
-	resize: function() {
+	resize: function(){
 		//	summary:
 		//		fixes orientation and size of the applet
 		var size = dojo.style(this.getParent().domNode, this.getParent().getOrientation() == "horizontal" ? "width" : "height");
@@ -86,19 +86,19 @@ dojo.declare("desktop.ui.Applet", [dijit._Widget, dijit._Templated, dijit._Conta
 		dojo.style(this.domNode, (this.getParent().getOrientation() != "horizontal" ? "left" : "top"), "0px");
 		this._calcSpan(size);
 	},
-	_calcSpan: function(/*Integer?*/size) {
+	_calcSpan: function(/*Integer?*/size){
 		//	summary:
 		//		If the fullspan property is true, this calculates the width or height of the applet,
 		//		so that it is as big as possible without overlapping the next applet
 		//	size:
 		//		an optional argument to save an extra dojo.style call. This is the width/height of the parent panel (depending on orientation).
-		if(this.fullspan) {
+		if(this.fullspan){
 			if(!size) size = dojo.style(this.getParent().domNode, this.getParent().getOrientation() == "horizontal" ? "width" : "height");
 			var nextApplet = size;
 			var children = this.getParent().getChildren();
-			for(var a in children) {
+			for(var a in children){
 				var child = children[a];
-				if(child.pos > this.pos) {
+				if(child.pos > this.pos){
 					nextApplet = child.pos*size;
 					break;
 				}
@@ -107,32 +107,32 @@ dojo.declare("desktop.ui.Applet", [dijit._Widget, dijit._Templated, dijit._Conta
 			dojo.style(this.domNode, this.getParent().getOrientation() == "horizontal" ? "height" : "width", "100%");
 		}
 	},
-	uninitalize: function() {
+	uninitalize: function(){
 		this._moveable.destroy();
 	},
-	_mouseover: function() {
+	_mouseover: function(){
 		//	summary:
 		//		Event handler for when the onmouseover event
 		//		Shows the repositioning handle if the applet is unlocked
 		if(!this.locked) dojo.addClass(this.handleNode, "desktopAppletHandleShow");
 	},
-	_mouseout: function() {
+	_mouseout: function(){
 		//	summary:
 		//		Event handler for the onmouseout event
 		//		Hides the repositioning handle
 		dojo.removeClass(this.handleNode, "desktopAppletHandleShow");
 	},
-	lock: function() {
+	lock: function(){
 		//	summary:
 		//		Locks the applet
 		this.locked=true;
 	},
-	unlock: function() {
+	unlock: function(){
 		//	summary:
 		//		Unlocks the applet
 		this.locked=false;
 	},
-	setOrientation: function(/*String*/orientation) {
+	setOrientation: function(/*String*/orientation){
 		//	summary:
 		//		Add any special things you need to do in order to change orientation in this function.
 		//	orientation:

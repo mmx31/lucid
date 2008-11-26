@@ -7,8 +7,8 @@ dojo.requireLocalization("desktop", "apps");
 dojo.requireLocalization("desktop", "common");
 
 dojo.declare("desktop.apps.WebBrowser", desktop.apps._App, {
-	kill: function() {
-		if(!this.win.closed) { this.win.close(); }
+	kill: function(){
+		if(!this.win.closed){ this.win.close(); }
 	},
 	init: function(args)
 	{
@@ -35,7 +35,7 @@ dojo.declare("desktop.apps.WebBrowser", desktop.apps._App, {
 		this.win.show();
 		if(args.url) this.go(args.url);
 		else this.go("http://www.google.com/");
-		/*this.interval = setInterval(dojo.hitch(this, function() {
+		/*this.interval = setInterval(dojo.hitch(this, function(){
 			var loc = this.Iframe.contentWindow.location;
 			this.Iframe.top = {
 				location: loc

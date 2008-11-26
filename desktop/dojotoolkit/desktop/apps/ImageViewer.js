@@ -1,12 +1,12 @@
 dojo.provide("desktop.apps.ImageViewer");
 
 dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
-	kill: function() {
+	kill: function(){
 		if(!this.win.closed) this.win.close();
 		if(this.timer) clearInterval(this.timer);
 	},
 	imgNode: false,
-	init: function(args) {
+	init: function(args){
 		dojo.require("dijit.Toolbar");
 		dojo.require("dojox.layout.DragPane");
 		dojo.requireLocalization("desktop", "common");
@@ -23,14 +23,14 @@ dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
 			{
 				label: cm.open,
 		        iconClass: "icon-16-actions-document-open",
-				onClick: dojo.hitch(this, function() {
+				onClick: dojo.hitch(this, function(){
 					desktop.dialog.file({
 						title: "Choose an image to open",
 						callback: dojo.hitch(this, "open")
 					});
 				})
 			}
-		], function(a) {
+		], function(a){
 			toolbar.addChild(new dijit.form.Button(a));
 		});
 		this.win.addChild(toolbar);
@@ -41,8 +41,8 @@ dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
 		if(typeof args.file != "undefined") this.open(args.file);
 	},
 	timer: false,
-	open: function(path) {
-		if(!this.imgNode) {
+	open: function(path){
+		if(!this.imgNode){
 			this.imgNode = document.createElement("div");
 			var img = document.createElement("img");
 			this.imgNode.appendChild(img);
@@ -55,7 +55,7 @@ dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
 			dojo.style(overlay, "zIndex", "100");
 			this.imgNode.appendChild(overlay);
 	
-			this.timer = setInterval(dojo.hitch(this, function() {
+			this.timer = setInterval(dojo.hitch(this, function(){
 				dojo.style(overlay, "width", this.dragPane.domNode.scrollWidth+"px");
 				dojo.style(overlay, "height", this.dragPane.domNode.scrollHeight+"px");
 			}), 1000);

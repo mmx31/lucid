@@ -52,7 +52,7 @@ dojo.mixin(desktop.ui, {
 	//	_drawn: Boolean
 	//		true after the UI has been drawn
 	_drawn: false,
-	_draw: function() {
+	_draw: function(){
 		//	summary:
 		//		creates a desktop.ui.Area widget and places it on the screen
 		//		waits for the config to load so we can get the locale set right
@@ -63,27 +63,27 @@ dojo.mixin(desktop.ui, {
 		document.body.appendChild(desktop.ui._area.domNode);
 		this._area.updateWallpaper();
 		this.makePanels();
-		dojo.subscribe("configApply", this, function() {
+		dojo.subscribe("configApply", this, function(){
 			this._area.updateWallpaper();
 		});
 	},
-	init: function() {
-		dojo.subscribe("configApply", this, function() {
+	init: function(){
+		dojo.subscribe("configApply", this, function(){
 			if(desktop.config.fx > 0) setTimeout(dojo.hitch(this, "_draw"), 100);
 			else this._draw();
 		});
 		dojo.require("dojo.dnd.autoscroll");
-		dojo.dnd.autoScroll = function(e) {} //in order to prevent autoscrolling of the window
+		dojo.dnd.autoScroll = function(e){} //in order to prevent autoscrolling of the window
 	},
 	//	drawn: Boolean
 	//		have the panels been drawn yet?
     drawn: false,
-	makePanels: function() {
+	makePanels: function(){
 		//	summary:
 		//		the first time it is called it draws each panel based on what's stored in the configuration,
 		//		after that it cycles through each panel and calls it's _place(); method
-        if(this.drawn) {
-	        dojo.query(".desktopPanel").forEach(function(panel) {
+        if(this.drawn){
+	        dojo.query(".desktopPanel").forEach(function(panel){
 		       var p = dijit.byNode(panel);
 		       p._place();
 	        }, this);
@@ -91,7 +91,7 @@ dojo.mixin(desktop.ui, {
         }
         this.drawn = true;
         var panels = desktop.config.panels;
-		dojo.forEach(panels, function(panel) {
+		dojo.forEach(panels, function(panel){
 			var args = {
 				thickness: panel.thickness,
 				span: panel.span,
@@ -107,12 +107,12 @@ dojo.mixin(desktop.ui, {
 		});
 		desktop.ui._area.resize();
 	},
-	save: function() {
+	save: function(){
 		//	summary:
 		//		Cylces through each panel and stores each panel's information in desktop.config
 		//		so it can be restored during the next login
 		desktop.config.panels = [];
-		dojo.query(".desktopPanel").forEach(function(panel, i) {
+		dojo.query(".desktopPanel").forEach(function(panel, i){
 			var wid = dijit.byNode(panel);
 			desktop.config.panels[i] = {
 				thickness: wid.thickness,

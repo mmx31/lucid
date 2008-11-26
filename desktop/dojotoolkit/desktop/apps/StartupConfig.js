@@ -5,7 +5,7 @@ dojo.requireLocalization("desktop", "apps");
 
 dojo.declare("desktop.apps.StartupConfig", desktop.apps._App, {
 	cbs: {},
-	init: function(args) {
+	init: function(args){
 		var appNls = dojo.i18n.getLocalization("desktop", "apps");
 		var win = this.win = new desktop.widget.Window({
 			title: appNls["Startup Applications"],
@@ -19,10 +19,10 @@ dojo.declare("desktop.apps.StartupConfig", desktop.apps._App, {
 			style: "overflow-y: auto; padding: 5px;"
 		});
 		var div = document.createElement("div");
-		dojo.forEach(desktop.app.appList, function(app) {
+		dojo.forEach(desktop.app.appList, function(app){
 			//make checkbox
 			var onStartup = false;
-			dojo.forEach(desktop.config.startupApps, function(item) {
+			dojo.forEach(desktop.config.startupApps, function(item){
 				if(item == app.sysname || item.name == app.sysname) onStartup = true;
 			});
 			var cb = new dijit.form.CheckBox({
@@ -45,10 +45,10 @@ dojo.declare("desktop.apps.StartupConfig", desktop.apps._App, {
 		win.show();
 		win.startup();
 	},
-	saveConfig: function() {
+	saveConfig: function(){
         var sApps = desktop.config.startupApps;
         var config = dojo.clone(sApps);
-		for(var key in this.cbs) {
+		for(var key in this.cbs){
 			if(!this.cbs[key].checked){
                 for(var i in sApps){
                     if(sApps[i] == key || sApps[i].name == key)
@@ -66,7 +66,7 @@ dojo.declare("desktop.apps.StartupConfig", desktop.apps._App, {
             desktop.config.startupApps = config;
 		}
 	},
-	kill: function() {
+	kill: function(){
 		if(!this.win.closed) this.win.close();
 		desktop.config.save();
 	}
