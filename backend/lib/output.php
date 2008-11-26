@@ -21,6 +21,11 @@ class objOutput {
 			print_r($output);
 		}
 	}
+	function flush()
+	{
+		$this->__destruct();
+		$this->dooutput = false;
+	}
 	function append($name, $item)
 	{
 		$this->output[$name] = $item;
