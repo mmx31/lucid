@@ -1,7 +1,7 @@
 dojo.provide("desktop.apps.AdminPanel.users");
 
 dojo.extend(desktop.apps.AdminPanel, {
-	users: function() {
+	users: function(){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var usr = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
@@ -11,8 +11,8 @@ dojo.extend(desktop.apps.AdminPanel, {
 			dropDown: this.newUserDialog()
 		});
 		this.toolbar.addChild(button);
-		desktop.admin.users.list(dojo.hitch(this, function(data) {
-			for(var i=0;i<data.length;i++) {
+		desktop.admin.users.list(dojo.hitch(this, function(data){
+			for(var i=0;i<data.length;i++){
 				data[i].permissions = dojo.toJson(data[i].permissions);
 				data[i].groups = dojo.toJson(data[i].groups);
                 data[i].logged = !!parseInt(data[i].logged);
@@ -21,17 +21,17 @@ dojo.extend(desktop.apps.AdminPanel, {
 				cells: [[]]
 			}];
 			//make headers
-			for(var field in data[0]) {
+			for(var field in data[0]){
 				if(field == "permissions" || field == "groups" || field == "quota") continue;
 				var args = {
 					name: sys[field] || usr[field],
 					field: field
 				};
-				if(field == "name" || field == "username" || field == "email") {
+				if(field == "name" || field == "username" || field == "email"){
                     args.type = dojox.grid.cells.Cell;
                     args.editable = true;
                 }
-                if(field == "logged") {
+                if(field == "logged"){
                     args.type = dojox.grid.cells.Bool;
                 }
 				layout[0].cells[0].push(args);
@@ -51,10 +51,10 @@ dojo.extend(desktop.apps.AdminPanel, {
 			});
 			if(this._con) dojo.disconnect(this._con);
 			this._con = dojo.connect(this.main, "resize", grid, "resize");
-			dojo.connect(this._userStore, "onDelete", this, function(a) {
+			dojo.connect(this._userStore, "onDelete", this, function(a){
 				desktop.admin.users.remove(a.id[0]); //that feels really hackish
 			})
-			dojo.connect(this._userStore, "onSet", this, function(item, attribute, oldVal, newVal) {
+			dojo.connect(this._userStore, "onSet", this, function(item, attribute, oldVal, newVal){
 				if(attribute == "permissions") return;
 				var id = this._userStore.getValue(item, "id");
 				if(id == false) return;
@@ -68,18 +68,18 @@ dojo.extend(desktop.apps.AdminPanel, {
 			dojo.forEach([
 				{
 					label: cmn["delete"],
-					onClick: dojo.hitch(this, function(e) {
+					onClick: dojo.hitch(this, function(e){
 						var row = this._userGrid.getItem(this.__rowIndex);
 						desktop.dialog.yesno({
 							title: sys.userDelConfirm,
 							message: sys.delFromSys.replace("%s", row.username),
-							callback: dojo.hitch(this, function(a) {
+							callback: dojo.hitch(this, function(a){
 								if(a == false) return;
 								var id = this._userStore.getValue(row, "id");
 								this._userStore.deleteItem(row);
-								desktop.crosstalk.publish("accountremoval", {}, id, null, null, dojo.hitch(this, function(id) {
-									setTimeout(dojo.hitch(this, function() {
-										desktop.crosstalk.exists(id, dojo.hitch(this, function(notsent) {
+								desktop.crosstalk.publish("accountremoval", {}, id, null, null, dojo.hitch(this, function(id){
+									setTimeout(dojo.hitch(this, function(){
+										desktop.crosstalk.exists(id, dojo.hitch(this, function(notsent){
 											if(notsent)
 												desktop.crosstalk.cancel(id);
 										}));
@@ -91,7 +91,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 				},
 				{
 					label: usr.changePassword,
-					onClick: dojo.hitch(this, function(e) {
+					onClick: dojo.hitch(this, function(e){
 						var row = this._userGrid.getItem(this.__rowIndex);
 						var win = new desktop.widget.Window({
 							title: sys.chUsersPassword.replace("%s", row.username),
@@ -120,7 +120,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 									type: "password"
 								})
 							}
-						], function(item) {
+						], function(item){
 							var row = document.createElement("div");
 							var label = document.createElement("span");
 							label.textContent = item.label+": ";
@@ -139,7 +139,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 						dojo.addClass(div, "floatRight");
 						var button = new dijit.form.Button({
 							label: cmn.ok,
-							onClick: dojo.hitch(this, function() {
+							onClick: dojo.hitch(this, function(){
 								if(input1.getValue() != input2.getValue()) return errBox.textContent = usr.passwordsDontMatch;
 								this._userStore.setValue(row, "password", input1.getValue());
 								win.close();
@@ -164,7 +164,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 						dojo.hitch(this, function(row){
 							return dojo.fromJson(this._userStore.getValue(row, "permissions"));
 						}),
-						dojo.hitch(this, function(row, newPerms) {
+						dojo.hitch(this, function(row, newPerms){
 							this._userStore.setValue(row, "permissions", dojo.toJson(newPerms));
 							desktop.user.set({
 								id: this._userStore.getValue(row, "id"),
@@ -175,18 +175,18 @@ dojo.extend(desktop.apps.AdminPanel, {
 				},
 				{
 					label: sys.modifyQuotaGeneric,
-					onClick: dojo.hitch(this, function() {
+					onClick: dojo.hitch(this, function(){
 						var row = this._userGrid.getItem(this.__rowIndex);
 						var info = {
 							name: this._userStore.getValue(row, "username"),
 							size: this._userStore.getValue(row, "quota")
 						};
-						this.makeQuotaWin(info, dojo.hitch(this, function(value) {
+						this.makeQuotaWin(info, dojo.hitch(this, function(value){
 							this._userStore.setValue(row, "quota", value);
 							var id = this._userStore.getValue(row, "id");
-							desktop.crosstalk.publish("quotaupdate", {}, id, null, null, dojo.hitch(this, function(id) {
-								setTimeout(dojo.hitch(this, function() {
-									desktop.crosstalk.exists(id, dojo.hitch(this, function(notsent) {
+							desktop.crosstalk.publish("quotaupdate", {}, id, null, null, dojo.hitch(this, function(id){
+								setTimeout(dojo.hitch(this, function(){
+									desktop.crosstalk.exists(id, dojo.hitch(this, function(notsent){
 										if(notsent)
 											desktop.crosstalk.cancel(id);
 									}));
@@ -195,11 +195,11 @@ dojo.extend(desktop.apps.AdminPanel, {
 						}));
 					})
 				}
-			], function(item) {
+			], function(item){
 				var menuItem = new dijit.MenuItem(item);
 				menu.addChild(menuItem);
 			});
-			this._userGrid.onRowContextMenu = dojo.hitch(this, function(e) {
+			this._userGrid.onRowContextMenu = dojo.hitch(this, function(e){
 				this.__rowIndex = e.rowIndex;
 				this._userMenu._contextMouse();
 				this._userMenu._openMyself(e);
@@ -208,7 +208,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			this.win.layout();
 		}));
 	},
-	newUserDialog: function() {
+	newUserDialog: function(){
 		var usr = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var dialog = new dijit.TooltipDialog({});
@@ -258,18 +258,18 @@ dojo.extend(desktop.apps.AdminPanel, {
 		var line = document.createElement("div");
 	    var button = new dijit.form.Button({
 			label: cmn.create,
-			onClick: dojo.hitch(this, function() {
+			onClick: dojo.hitch(this, function(){
 				dojo.require("dojox.validate.web");
 				if(username.getValue() == "") return error.textContent = usr.enterUsername;
-				if(username.getValue().indexOf("..") != -1) {
+				if(username.getValue().indexOf("..") != -1){
 					error.textContent = usr.cannotContain.replace("%s", "..");
 					return;
 				}
-				if(username.getValue().indexOf("/") != -1) {
+				if(username.getValue().indexOf("/") != -1){
 					error.textContent = usr.cannotContain.replace("%s", "/");
 					return;
 				}
-				if(username.getValue().indexOf("\\") != -1) {
+				if(username.getValue().indexOf("\\") != -1){
 					error.textContent = usr.cannotContain.replace("%s", "\\");
 					return;
 				}
@@ -282,7 +282,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 					username: username.getValue(),
 					email: email.getValue(),
 					password: password.getValue(),
-					callback: dojo.hitch(this, function(id) {
+					callback: dojo.hitch(this, function(id){
 						if(id == false) return error.textContent = usr.usernameAllreadyTaken;
 						error.textContent = usr.userCreated;
 						this._userStore.newItem({
@@ -308,9 +308,9 @@ dojo.extend(desktop.apps.AdminPanel, {
 		dialog.startup();
 		return dialog;
 	},
-	makeUserStore: function(callback) {
-		desktop.admin.users.list(dojo.hitch(this, function(data) {
-			for(var i=0;i<data.length;i++) {
+	makeUserStore: function(callback){
+		desktop.admin.users.list(dojo.hitch(this, function(data){
+			for(var i=0;i<data.length;i++){
 				data[i].permissions = dojo.toJson(data[i].permissions);
 				data[i].groups = dojo.toJson(data[i].groups);
 			};

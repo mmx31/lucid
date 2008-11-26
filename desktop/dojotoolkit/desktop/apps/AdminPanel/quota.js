@@ -6,7 +6,7 @@ dojo.require("dijit.form.Button");
 
 dojo.extend(desktop.apps.AdminPanel, {
 	_quotaUI: {},
-	quota: function() {
+	quota: function(){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		this.toolbar.destroyDescendants();
@@ -14,9 +14,9 @@ dojo.extend(desktop.apps.AdminPanel, {
 		this.toolbar.addChild(new dijit.form.Button({
 			label: cmn.save,
 			iconClass: "icon-16-actions-document-save",
-			onClick: dojo.hitch(this, function() {
+			onClick: dojo.hitch(this, function(){
 				var values = {};
-				for(var key in this._quotaUI) {
+				for(var key in this._quotaUI){
 					values[key] = this._quotaUI[key]();
 				}
 				desktop.admin.quota.set(values);
@@ -24,9 +24,9 @@ dojo.extend(desktop.apps.AdminPanel, {
 		}));
 		
 		this.main.setContent(cmn.loading);
-		desktop.admin.quota.list(dojo.hitch(this, function(items) {
+		desktop.admin.quota.list(dojo.hitch(this, function(items){
 			var div = document.createElement("div");
-			dojo.forEach(items, function(item) {
+			dojo.forEach(items, function(item){
 				var row = document.createElement("div");
 				var title = document.createElement("b");
 				title.textContent = sys[item.type+"s"] || item.type;
@@ -41,7 +41,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			this.win.layout();
 		}))
 	},
-	makeQuotaRow: function(item, showDefault) {
+	makeQuotaRow: function(item, showDefault){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var row = document.createElement("div");
 				
@@ -52,8 +52,8 @@ dojo.extend(desktop.apps.AdminPanel, {
 			"KB",
 			"MB",
 			"GB"
-		], function(item) {
-			if(!(val % 1024)) {
+		], function(item){
+			if(!(val % 1024)){
 				unit = item;
 				val = val/1024;
 			}
@@ -81,7 +81,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 				}
 			})
 		});
-		var onChange = function(v) {
+		var onChange = function(v){
 			if(!v) return;
 			valueWid.setDisabled(this.value != "custom");
 			unitWid.setDisabled(this.value != "custom");
@@ -99,7 +99,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 		})
 		cb_unlimited.setAttribute("checked", item.size == 0);
 		var cb_default;
-		if(showDefault) {
+		if(showDefault){
 			cb_default = new dijit.form.RadioButton({
 				name: this.sysname+this.instance+"radio"+item.type,
 				value: "default",
@@ -121,7 +121,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 		unLabel.textContent = sys.unlimited;
 		row2.appendChild(unLabel);
 		row.appendChild(row2);
-		if(showDefault) {
+		if(showDefault){
 			var row3 = document.createElement("div");
 			var defLabel = document.createElement("span");
 			defLabel.textContent = sys["default"];
@@ -132,7 +132,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 		
 		return {
 			node: row,
-			getValue: function() {
+			getValue: function(){
 				if(cb_unlimited.checked) return 0;
 				if(showDefault && cb_default.checked) return -1;
 				var val = valueWid.getValue();
@@ -140,7 +140,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 					{unit: "GB", size: 1073741824},
 					{unit: "MB", size: 1048576},
 					{unit: "KB", size: 1024}
-				], function(item) {
+				], function(item){
 					if(unitWid.getValue() == item.unit)
 						val = val*item.size;
 				});
@@ -148,7 +148,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			}
 		};
 	},
-	makeQuotaWin: function(item, callback) {
+	makeQuotaWin: function(item, callback){
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		item.type = item.name;
@@ -171,7 +171,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 		cont.appendChild(cancel.domNode);
 		var save = new dijit.form.Button({
 			label: cmn.save,
-			onClick: dojo.hitch(this, function() {
+			onClick: dojo.hitch(this, function(){
 				callback(ui.getValue());
 				win.close();
 			})

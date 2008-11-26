@@ -6,12 +6,12 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	editing: false,
 	fileEditing: "",
 	
-	kill: function() {
+	kill: function(){
 	    if(!this.window.closed)
 	        this.window.close();
 	},
 	
-	init: function(args) {
+	init: function(args){
 	    dojo.require("dijit.Toolbar");
 	    dojo.require("dijit.layout.ContentPane");
 		dojo.requireLocalization("desktop", "common");
@@ -70,13 +70,13 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 		if(args.file) this._processOpen(args.file);
 		else this.processNew();
 	},
-    updateTitle: function(path) {
+    updateTitle: function(path){
         var app = dojo.i18n.getLocalization("desktop", "apps");
         if(!path) return this.window.attr("title", app["Text Editor"]);
         var files = path.split("/");
         this.window.attr("title", files[files.length-1]+" - "+app["Text Editor"]);
     },
-	processNew: function() {
+	processNew: function(){
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 	    this.editor.setDisabled(false);
@@ -87,7 +87,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    this.statusbar.attr("label", msg.editingFile.replace("%s", cm.untitled));
         this.updateTitle(cm.untitled);
 	},
-	processClose: function() {
+	processClose: function(){
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    this.editor.setDisabled(true);
 		this.editor.setValue("");
@@ -97,7 +97,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    this.statusbar.attr("label", msg.noFileOpen);
 	    this.updateTitle(false);
 	},
-	processOpen: function() {
+	processOpen: function(){
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    desktop.dialog.file({
 	        title: msg.chooseFileOpen,
@@ -106,8 +106,8 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	
 	},
 	
-	_processOpen: function(path) {
-	    if (path == false) {
+	_processOpen: function(path){
+	    if (path == false){
 	        return false;
 	    }
         this.updateTitle(path);
@@ -115,7 +115,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    this.statusbar.attr("label", msg.openingFile.replace("%s", path));
 	    this.newAs = true;
 	    this.editor.setDisabled(true);
-	    desktop.filesystem.readFileContents(path, dojo.hitch(this, function(content) {
+	    desktop.filesystem.readFileContents(path, dojo.hitch(this, function(content){
 			this.editor.setValue(content);
             this.editing = true;
             this.newAs = true;
@@ -126,9 +126,9 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	
 	},
 	
-	processSave: function() {
+	processSave: function(){
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
-	    if (this.editing) {
+	    if (this.editing){
 	        desktop.filesystem.writeFileContents(this.fileEditing, this.editor.getValue());
 	        this.statusbar.attr("label", msg.fileSaved);
             	
@@ -139,14 +139,14 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    }
 	
 	},
-	processSaveAs: function() {
+	processSaveAs: function(){
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
-	    if (this.newAs) {
+	    if (this.newAs){
 	        desktop.dialog.file({
 	            title: msg.chooseFileSave,
 	            callback: dojo.hitch(this, 
-	            function(path) {
-	                if (path == false) {
+	            function(path){
+	                if (path == false){
 	                    return false;
 	                }
 	                this.editing = true;

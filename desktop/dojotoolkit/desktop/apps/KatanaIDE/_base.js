@@ -5,7 +5,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 	appInfo: {}, //application information
 	metaUi: {}, //metadata form UI
 	windows: [],
-	init: function(args) {
+	init: function(args){
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var app = dojo.i18n.getLocalization("desktop", "apps");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
@@ -31,20 +31,20 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		var right = this.tabArea = new dijit.layout.TabContainer({
 			region: "center"
 		});
-		dojo.connect(right, "selectChild", this, function(wid) {
+		dojo.connect(right, "selectChild", this, function(wid){
 			if(!wid.ide_info) return;
 			this.setMeta(this.appInfo[wid.ide_info.appName]);
 		});
-		desktop.app.list(dojo.hitch(this, function(apps) {
-			for(var i in apps) {
+		desktop.app.list(dojo.hitch(this, function(apps){
+			for(var i in apps){
 				if(apps[i].filename) continue;
 				this.appInfo[apps[i].sysname] = apps[i];
 				var files = apps[i].files;
 				apps[i].id = apps[i].sysname;
 				delete apps[i].files;
-				var makeChildren = function(files, parent) {
+				var makeChildren = function(files, parent){
 					var children = [];
-					for(var f in files) {
+					for(var f in files){
 						var fName = typeof files[f] == "object" ? f : files[f];
 						var fileItem = {
 							id: apps[i].sysname+(parent ? parent+"/" : "")+fName+(new Date()).toString(),
@@ -95,12 +95,12 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 //			this.toolbar.addChild(new dijit.form.Button({label: sys.kill, iconClass: "icon-16-actions-media-playback-stop", onClick: dojo.hitch(this, "killExec")}));
 			this.store.fetchItemByIdentity({
 				identity: "useEditorLite",
-				onItem: dojo.hitch(this, function(item) {
+				onItem: dojo.hitch(this, function(item){
 					var button;
 					this.toolbar.addChild(button = new dijit.form.ToggleButton({
 						label: ideLocale.syntaxHighlight,
 						iconClass: "dijitCheckBoxIcon",
-						onChange: dojo.hitch(this, function(v) {
+						onChange: dojo.hitch(this, function(v){
 							this.store.setValue(item, "value", !v);
 							this.store.save();
 						})
@@ -113,7 +113,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		this.win.show();
 		this.win.startup();
 	},
-	makeMenu: function(tree) {
+	makeMenu: function(tree){
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
@@ -134,12 +134,12 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		menu.addChild(new dijit.MenuItem({
 			label: nf.createFolder,
 			iconClass: "icon-16-actions-folder-new",
-			onClick: dojo.hitch(this, function() {
+			onClick: dojo.hitch(this, function(){
 				var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
 				desktop.dialog.input({
 					title: nf.createFolder,
 					message: nf.createFolderText,
-					callback: dojo.hitch(this, function(dirname) {
+					callback: dojo.hitch(this, function(dirname){
 						if(dirname == "") return;
 						dirname = dirname.replace("..", "").replace("/", "");
 						var path = this.appStore.getValue(this._contextItem, "filename");
@@ -150,7 +150,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 								filename: path+"/"+dirname
 							},
 							queryOptions: {deep: true},
-							onComplete: dojo.hitch(this, function(items) {
+							onComplete: dojo.hitch(this, function(items){
 								if(items.length != 0) return desktop.dialog.notify({
 									type: "warning",
 									message: nf.alreadyExists
@@ -175,12 +175,12 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		menu.addChild(new dijit.MenuItem({
 			label: nf.createFile,
 			iconClass: "icon-16-actions-document-new",
-			onClick: dojo.hitch(this, function() {
+			onClick: dojo.hitch(this, function(){
 				var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
 				desktop.dialog.input({
 					title: nf.createFile,
 					message: nf.createFileText,
-					callback: dojo.hitch(this, function(filename) {
+					callback: dojo.hitch(this, function(filename){
 						if(filename == "") return;
 						var path = this.appStore.getValue(this._contextItem, "filename");
 						var appname = this.appStore.getValue(this._contextItem, "appname");
@@ -192,7 +192,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 								filename: path+"/"+filename
 							},
 							queryOptions: {deep: true},
-							onComplete: dojo.hitch(this, function(items) {
+							onComplete: dojo.hitch(this, function(items){
 								if(items.length != 0) return desktop.dialog.notify({
 									type: "warning",
 									message: nf.alreadyExists
@@ -225,13 +225,13 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		menu.addChild(new dijit.MenuSeparator({}));
 		menu.addChild(new dijit.MenuItem({
 			label: cm.rename,
-			onClick: dojo.hitch(this, function() {
+			onClick: dojo.hitch(this, function(){
 				var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
 				var cmn = dojo.i18n.getLocalization("desktop", "common");
 				desktop.dialog.input({
 					title: cmn.rename,
 					initial: this.appStore.getValue(this._contextItem, "name"),
-					callback: dojo.hitch(this, function(filename) {
+					callback: dojo.hitch(this, function(filename){
 						if(filename == "") return;
 						var path = this.appStore.getValue(this._contextItem, "filename");
 						var appname = this.appStore.getValue(this._contextItem, "appname");
@@ -244,7 +244,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 								filename: newPath
 							},
 							queryOptions: {deep: true},
-							onComplete: dojo.hitch(this, function(items) {
+							onComplete: dojo.hitch(this, function(items){
 								if(items.length != 0) return desktop.dialog.notify({
 									type: "warning",
 									message: nf.alreadyExists
@@ -252,11 +252,11 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 								desktop.app.renameFile(
 									this.appStore.getValue(this._contextItem, "filename"),
 									newPath,
-									dojo.hitch(this, function(s) {
+									dojo.hitch(this, function(s){
 										if(!s) return;
-										this.tabArea.getChildren().forEach(function(item) {
+										this.tabArea.getChildren().forEach(function(item){
 											if(!item.ide_info) return;
-											if(item.ide_info.fileName == this.appStore.getValue(this._contextItem, "filename")) {
+											if(item.ide_info.fileName == this.appStore.getValue(this._contextItem, "filename")){
 												item.setAttribute("title", filename);
 												item.ide_info.fileName = newPath;
 											}
@@ -275,13 +275,13 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		menu.addChild(new dijit.MenuItem({
 			label: cm["delete"],
 			iconClass: "icon-16-actions-edit-delete",
-			onClick: dojo.hitch(this, function() {
+			onClick: dojo.hitch(this, function(){
 				var fname = this.appStore.getValue(this._contextItem, "filename");
 				var sname = this.appStore.getValue(this._contextItem, "sysname");
-				var doDelete = dojo.hitch(this, function() {
-					desktop.app.remove(fname ? null : sname, fname || null, dojo.hitch(this, function(result) {
+				var doDelete = dojo.hitch(this, function(){
+					desktop.app.remove(fname ? null : sname, fname || null, dojo.hitch(this, function(result){
 						if(!result) return;
-						this.tabArea.getChildren().forEach(function(wid) {
+						this.tabArea.getChildren().forEach(function(wid){
 							if(wid.ide_info.appName == sname){
 								this.tabArea.removeChild(wid);
 								wid.destroy();
@@ -295,7 +295,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 					desktop.dialog.yesno({
 						title: sys.appDelConfirm,
 						message: sys.delFromSys.replace("%s", this.appStore.getValue(this._contextItem, "name")),
-						callback: dojo.hitch(this, function(a) {
+						callback: dojo.hitch(this, function(a){
 							if(a) doDelete();
 						})
 					})
@@ -303,7 +303,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			})
 		}))
 	},
-	makeTab: function(appname, filename, content) {
+	makeTab: function(appname, filename, content){
 		var div = dojo.doc.createElement("div");
 		dojo.style(div, {
 			width: "100%",
@@ -312,7 +312,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		});
 		this.store.fetch({
 			query: {key:"useEditorLite"},
-			onComplete: dojo.hitch(this, function(items) {
+			onComplete: dojo.hitch(this, function(items){
 			    var item = items[0];
 				var pane = new dijit.layout.ContentPane({
 				    closable: true,
@@ -334,11 +334,11 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 				    editor: editor
 			    }
 			    editor.startup();
-				dojo.connect(pane, "onClose", function() {
-				    pane.resize = function() {};
+				dojo.connect(pane, "onClose", function(){
+				    pane.resize = function(){};
 				    editor.destroy();
 				});
-				setTimeout(dojo.hitch(this, function() {
+				setTimeout(dojo.hitch(this, function(){
 				    if(content != "")
 					    editor.massiveWrite(content);
 					editor.setCaretPosition(0,0);
@@ -348,7 +348,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			})
 		})
 	},
-	_makeMetaDialog: function() {
+	_makeMetaDialog: function(){
 		var mnu = dojo.i18n.getLocalization("desktop.ui", "menus");
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
@@ -412,7 +412,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 					]
 				}
 			}),
-			onChange: dojo.hitch( this, function(val) {
+			onChange: dojo.hitch( this, function(val){
 				if ( typeof val == "undefined" ) return;
 			})
 		});
@@ -428,19 +428,19 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		var dialog = new dijit.TooltipDialog({}, div);
 		return dialog;
 	},
-	saveMeta: function() {
+	saveMeta: function(){
 		var data = {};
-		for(var key in this.metaUi) {
+		for(var key in this.metaUi){
 			data[key] = this.metaUi[key].getValue();
 		}
 		desktop.app.save(data);
 	},
-	setMeta: function(info) {
-		for(var key in this.metaUi) {
+	setMeta: function(info){
+		for(var key in this.metaUi){
 			this.metaUi[key].setValue(info[key]);
 		}
 	},
-	newApp: function() {
+	newApp: function(){
 		var ideLocale = dojo.i18n.getLocalization("desktop.apps.KatanaIDE", "ide");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		
@@ -470,13 +470,13 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		
 		var saveButton = new dijit.form.Button({
 			label: cmn.create,
-			onClick: dojo.hitch(this, function() {
-				if (dispBox.getValue() != "" && sysBox.getValue() != "") {
+			onClick: dojo.hitch(this, function(){
+				if (dispBox.getValue() != "" && sysBox.getValue() != ""){
 					this.appStore.fetch({
 						query: {
 							sysname: sysBox.getValue()
 						},
-						onComplete: dojo.hitch(this, function(items) {
+						onComplete: dojo.hitch(this, function(items){
 							var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
 							if(items.length != 0) return desktop.dialog.notify({
 								type: "warning",
@@ -498,7 +498,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		win.addChild(cpane);
 		win.show();
 	},
-	_newApp: function(info) {
+	_newApp: function(info){
 		this.appInfo[info.sysname] = dojo.mixin({
 			sysname: "",
 			name: "",
@@ -510,10 +510,10 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		}, info);
 		var defaultContent = "dojo"+".provide(\"desktop.apps."+info.sysname+"\");\r\n\r\n"
 								+"dojo.declare(\"desktop.apps."+info.sysname+"\", desktop.apps._App, {\r\n"
-								+"	init: function(args) {\r\n"
+								+"	init: function(args){\r\n"
 								+"		/*Startup code goes here*/\r\n"
 								+"	},\r\n"
-								+"	kill: function(args) {\r\n"
+								+"	kill: function(args){\r\n"
 								+"		/*Cleanup code goes here*/\r\n"
 								+"	}\r\n"
 								+"});"
@@ -548,7 +548,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			attribute: "children"
 		})
 	},
-	onItem: function(item) {
+	onItem: function(item){
 		var store = this.appStore;
 		if(!store.isItem(item)) return;
 		var filename = store.getValue(item, "filename");
@@ -556,17 +556,17 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		if(store.getValue(item, "folder")) return;
 		var app = store.getValue(item, "appname");
 		var tac = this.tabArea.getChildren();
-		for(var i in tac) {
+		for(var i in tac){
 			if(typeof tac[i].ide_info != "object") continue;
-			if(tac[i].ide_info.fileName == filename && tac[i].ide_info.appName == app) {
+			if(tac[i].ide_info.fileName == filename && tac[i].ide_info.appName == app){
 				return this.tabArea.selectChild(tac[i]);
 			}
 		}
-		desktop.app.get(app, filename, dojo.hitch(this, function(content) {
+		desktop.app.get(app, filename, dojo.hitch(this, function(content){
 			this.makeTab(app, filename, content);
 		}))
 	},
-	save: function() {
+	save: function(){
 		var pane = this.tabArea.selectedChildWidget;
 		var content = pane.ide_info.editor.getContent();
 		desktop.app.save({
@@ -574,8 +574,8 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 			content: content
 		});
 		//var lm = dojo._loadedModules;
-		//for(var key in lm) {
-		//	if(key.indexOf("desktop.apps."+pane.ide_info.appName) == 0) {
+		//for(var key in lm){
+		//	if(key.indexOf("desktop.apps."+pane.ide_info.appName) == 0){
 		//		delete lm[key];
 		//	}
 		//}
@@ -583,10 +583,10 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 
 	kill: function()
 	{
-		dojo.forEach(this.windows, function(win) {
+		dojo.forEach(this.windows, function(win){
 			if(!win.closed) win.close();
 		});
-		if(typeof this.loadwin != "undefined") {
+		if(typeof this.loadwin != "undefined"){
 			if(!this.loadwin.closed) this.loadwin.close();
 		}
 		if(!this.win.closed)this.win.close();

@@ -1,10 +1,10 @@
 dojo.provide("desktop.admin");
 
 desktop.admin = {
-    init: function() {
+    init: function(){
         desktop.xhr({
             backend: "core.user.info.isAdmin",
-            load: function(data) {
+            load: function(data){
                 desktop.admin.isAdmin = data.isAdmin;
             },
             sync: true,
@@ -18,7 +18,7 @@ desktop.admin = {
 	//		Contains administration functions
 	//		The user must be an administrator to use these, otherwise the
 	//		server-side code will prevent any action from being taken.
-	diskspace: function(/*Function*/callback) {
+	diskspace: function(/*Function*/callback){
 		//	summary:
 		//		Gets the amount of free space on the server
 		//	callback:
@@ -45,7 +45,7 @@ desktop.admin = {
 			initial: true
 		},
 		=====*/
-		list: function(/*Function*/callback) {
+		list: function(/*Function*/callback){
 			//	summary:
 			//		List the permissions on the system
 			//	callback:
@@ -58,7 +58,7 @@ desktop.admin = {
 				handleAs: "json"
 			})
 		},
-		setDefault: function(/*String*/permission, /*Boolean*/value, /*Function?*/callback) {
+		setDefault: function(/*String*/permission, /*Boolean*/value, /*Function?*/callback){
 			//	summary:
 			//		Set the default value of a permission
 			//	permission:
@@ -73,7 +73,7 @@ desktop.admin = {
 					id: permission,
 					value: value
 				},
-				load: function(data) {
+				load: function(data){
 					callback(data == "0");
 				}
 			});
@@ -95,7 +95,7 @@ desktop.admin = {
 			permissions: {}
 		},
 		=====*/
-		list: function(/*Function*/callback) {
+		list: function(/*Function*/callback){
 			//	summary:
 			//		Lists groups on the server
 			//	callback:
@@ -106,7 +106,7 @@ desktop.admin = {
 				handleAs: "json"
 			});
 		},
-		add: function(/*desktop.admin.groups._listArgs*/args) {
+		add: function(/*desktop.admin.groups._listArgs*/args){
 			//	summary:
 			//		Creates a new group
 			var callback = args.callback;
@@ -115,13 +115,13 @@ desktop.admin = {
 			desktop.xhr({
 				backend: "core.administration.groups.add",
 				content: args,
-				load: function(data) {
+				load: function(data){
 					callback(data.id);
 				},
 				handleAs: "json"
 			})
 		},
-		remove: function(/*Integer*/id, /*Function?*/callback) {
+		remove: function(/*Integer*/id, /*Function?*/callback){
 			//	summary:
 			//		Remove a group from the system
 			//	id:
@@ -133,12 +133,12 @@ desktop.admin = {
 				content: {
 					id: id
 				},
-				load: function(data) {
+				load: function(data){
 					if(callback) callback(data == "0");
 				}
 			});
 		},
-		set: function(/*desktop.admin.groups._listArgs*/args) {
+		set: function(/*desktop.admin.groups._listArgs*/args){
 			//	summary:
 			//		Set group information
 			var callback = args.callback;
@@ -147,12 +147,12 @@ desktop.admin = {
 			desktop.xhr({
 				backend: "core.administration.groups.set",
 				content: args,
-				load: function(data) {
+				load: function(data){
 					callback(data == "0");
 				}
 			})
 		},
-		getMembers: function(/*Integer*/id, /*Function*/callback) {
+		getMembers: function(/*Integer*/id, /*Function*/callback){
 			//	summary:
 			//		Get the members of a group
 			//	id:
@@ -168,7 +168,7 @@ desktop.admin = {
 				handleAs: "json"
 			})
 		},
-		addMember: function(/*Integer*/id, /*Ineger*/userid, /*Function?*/callback) {
+		addMember: function(/*Integer*/id, /*Ineger*/userid, /*Function?*/callback){
 			//	summary:
 			//		adds a user to a group
 			//	id:
@@ -183,12 +183,12 @@ desktop.admin = {
 					groupid: id,
 					userid: userid
 				},
-				load: function(data) {
+				load: function(data){
 					if(callback) callback(data == "0");
 				}
 			})
 		},
-		removeMember: function(/*Integer*/id, /*Integer*/userid, /*Function?*/callback) {
+		removeMember: function(/*Integer*/id, /*Integer*/userid, /*Function?*/callback){
 			//	summary:
 			//		removes a user from a group
 			//	id:
@@ -203,7 +203,7 @@ desktop.admin = {
 					groupid: id,
 					userid: userid
 				},
-				load: function(data) {
+				load: function(data){
 					if(callback) callback(data == "0");
 				}
 			})
@@ -213,19 +213,19 @@ desktop.admin = {
 		//	summary:
 		//		Some user management functions
 		//		for modifying user information see desktop.user
-		list: function(/*Function*/callback) {
+		list: function(/*Function*/callback){
 			//	summary:
 			//		list all users on the system
 			//	callback:
 			//		a callback function. Gets passed an array of desktop.user._setArgs objects
 			desktop.xhr({
 				backend: ("core.administration.users.list"),
-				load: function(data, ioArgs) {
+				load: function(data, ioArgs){
 					callback(dojo.fromJson(data));
 				}
 			});
 		},
-		create: function(/*desktop.user._setArgs*/info) {
+		create: function(/*desktop.user._setArgs*/info){
 			//	summary:
 			//		Creates a user on the system
 			//	info:
@@ -238,7 +238,7 @@ desktop.admin = {
 			desktop.xhr({
 				backend: "core.administration.users.create",
 				content: info,
-				load: function(data) {
+				load: function(data){
 					callback(data.id);
 				},
 				handleAs: "json"
@@ -264,7 +264,7 @@ desktop.admin = {
 				}
 			});
 		},
-		online: function(/*Function*/callback) {
+		online: function(/*Function*/callback){
 			//	summary:
 			//		Gets the number of users currently using the system.
 			//	callback:
@@ -286,7 +286,7 @@ desktop.admin = {
 		//		If a quota is set to 0, then the quota would be limitless.
 		//		if a specific object has a quota of -1, then it looks up the default quota for a user or group.
 		//		you can use these functions to set that default value.
-		list: function(/*Function*/callback) {
+		list: function(/*Function*/callback){
 			//	summary:
 			//		list the different quotas that you can set
 			desktop.xhr({
@@ -295,7 +295,7 @@ desktop.admin = {
 				handleAs: "json"
 			})
 		},
-		set: function(/*Object*/quotas, /*Function?*/callback) {
+		set: function(/*Object*/quotas, /*Function?*/callback){
 			//	summary:
 			//		Sets a default quota for a system object
 			//	quotas:
@@ -310,7 +310,7 @@ desktop.admin = {
 				content: {
 					quotas: dojo.toJson(quotas)
 				},
-				load: callback || function() {}
+				load: callback || function(){}
 			})
 		}
 	}

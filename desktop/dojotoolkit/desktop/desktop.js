@@ -16,7 +16,7 @@ dojo.require("desktop.widget.Console");
 dojo.require("desktop.widget.Filearea");
 dojo.require("desktop.flash.flash");
 
-(function() {
+(function(){
 	var modules = [
 		"desktop.crosstalk",
 		"desktop.filesystem",
@@ -29,26 +29,26 @@ dojo.require("desktop.flash.flash");
 	    'desktop.user',
         'desktop.dialog'
 	]
-	var callIfExists = function(object, method) {
+	var callIfExists = function(object, method){
 		object = dojo.getObject(object);
 		if(dojo.isFunction(object[method]))
 		{
 			object[method]();
 		}
-		else if(object.prototype && dojo.isFunction(object.prototype.draw)) {
+		else if(object.prototype && dojo.isFunction(object.prototype.draw)){
 			object.prototype[method]();
 		}
 	}
-	dojo.addOnLoad(function() {
+	dojo.addOnLoad(function(){
 		desktop.xhr({
 			backend: "core.bootstrap.check.loggedin",
-			load: function(data, ioArgs) {
+			load: function(data, ioArgs){
 				if(data == "0")
 				{
-					dojo.forEach(modules, function(module) {
+					dojo.forEach(modules, function(module){
 						callIfExists(module, "draw");
 					});
-					dojo.forEach(modules, function(module) {
+					dojo.forEach(modules, function(module){
 						callIfExists(module, "init");
 					});
 				}
@@ -61,13 +61,13 @@ dojo.require("desktop.flash.flash");
 			}
 		});
 		//if debugging, put console in a window
-		if(dojo.config.isDebug) {
+		if(dojo.config.isDebug){
 			var console = dojo.byId("firebugToolbar")
 		}
 	});
 })();
 
-desktop.xhr = function(/*dojo.__ioArgs|String*/args) {
+desktop.xhr = function(/*dojo.__ioArgs|String*/args){
 	//	summary:
 	//		an extention of dojo's XHR utilities, but with some extra params to make life easy
 	//	
@@ -76,7 +76,7 @@ desktop.xhr = function(/*dojo.__ioArgs|String*/args) {
 	//		You can also give an object as you would in dojo's XHR methods. However there are two extra params.
 	//		backend - a backend string as described above
 	//		xsite - when true, it makes the call using the server-side proxy (so you can make cross-domain reques
-	var backend = function(str) {
+	var backend = function(str){
 		var mod=str.split(".");
 		//TODO: put in something so we can switch to python backends when desired
 		var url = "../backend";
@@ -93,18 +93,18 @@ desktop.xhr = function(/*dojo.__ioArgs|String*/args) {
 
 		return url;
 	}
-	if(dojo.isString(args)) {
+	if(dojo.isString(args)){
 		//if we just need to get a module url, pass a string
 		return backend(args);
 	}
-	if(args.xsite) {
+	if(args.xsite){
 		if(!dojo.isObject(args.content)) args.content = {};
 		var xsiteArgs = {
 			url: args.url
 		}
-		if(args.auth) {
+		if(args.auth){
 			xsiteArgs.authinfo = dojo.clone(args.auth);
-			if(!args.appid) {
+			if(!args.appid){
 				xsiteArgs.appid=0;
 			}
 			else {
@@ -116,10 +116,10 @@ desktop.xhr = function(/*dojo.__ioArgs|String*/args) {
 		delete args.auth;
 		args.url = "../backend/api/xsite.php";
 	}
-	else if(args.backend) {
+	else if(args.backend){
 		args.url = backend(args.backend);
 	}
-	else if(args.app) {
+	else if(args.app){
 		args.url = "../apps/"+args.app+"/"+args.url;
 	}
 	var df = new dojo.Deferred();
@@ -127,15 +127,15 @@ desktop.xhr = function(/*dojo.__ioArgs|String*/args) {
 	if(args.error) df.addErrback(args.error);
 	
 	var xhr = dojo.xhrPost(dojo.mixin(args, {
-		load: function(data) {
-			if(typeof parseInt(data) == "number" && parseInt(data) > 0 && !args.number) {
+		load: function(data){
+			if(typeof parseInt(data) == "number" && parseInt(data) > 0 && !args.number){
 				console.error(data); //TODO: we should alert the user in some cases, or possibly retry the request. OR FUCKTARD, RETURN AN ERROR, NE?
 				df.errback(data);
 			}
 			else
 				df.callback(data);
 		},
-		error: function(err) {
+		error: function(err){
 			console.error(err);
 			df.errback(err);
 		}
@@ -161,20 +161,20 @@ desktop.addDojoCss = function(/*String*/path)
 	document.getElementsByTagName("head")[0].appendChild(element);
 }
 
-desktop.log = function(/*String*/str) {
+desktop.log = function(/*String*/str){
 	//	summary:
 	//		logs a string onto any console that is open
 	//	
 	//	str:
 	//		the string to log onto the consoles
 	str = dojo.toJson(str);
-	dojo.query(".consoleoutput").forEach(function(elem) {
+	dojo.query(".consoleoutput").forEach(function(elem){
 		elem.innerHTML += "<div>"+str+"</div>";
 	});
 	console.log(str);
 }
 
-desktop.textContent= function(/*DomNode|String*/node, /*String?*/text) {
+desktop.textContent= function(/*DomNode|String*/node, /*String?*/text){
 	//	summary:
 	//		sets the textContent of a domNode if text is provided
 	//		gets the textContent if a domNode if text is not provided

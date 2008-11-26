@@ -36,12 +36,12 @@ dojo.declare("desktop.widget.StatusBar", [dijit._Widget, dijit._Templated], {
 	attributeMap: dojo.mixin(dojo.clone(dijit._Widget.prototype.attributeMap), {
 		label: {node: "labelNode", type: "innerHTML"}
 	}),
-	postCreate: function() {
+	postCreate: function(){
 		dojo.setSelectable(this.domNode, false);
 		this.update({progress: this.progress, maximum: this.maximum, places: this.places, indeterminate: this.indeterminate});
 		dojo.connect(this.progressBar, "onChange", this, "onChange");
 	},
-	_setShowProgressAttr: function(value) {
+	_setShowProgressAttr: function(value){
         dojo.style(this.progressBar.domNode, "display", (value ? "block" : "none"));
 	},
 	update: function(/*Object?*/attributes){

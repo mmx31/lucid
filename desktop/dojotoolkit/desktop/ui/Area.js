@@ -10,7 +10,7 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 	//		the main UI area of the desktop. This is where panels, wallpaper, and most other things are drawn.
 	templatePath: dojo.moduleUrl("desktop.ui.templates", "ui_Area.htm"),
 	drawn: false,
-	postCreate: function() {
+	postCreate: function(){
 		var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
 		var filearea = this.filearea = new desktop.widget.Filearea({
 			path: "file://Desktop/",
@@ -35,16 +35,16 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 		}
 		dojo.connect(window,'onresize',this,"resize");
 	},
-	getBox: function() {
+	getBox: function(){
 		//	summary:
 		//		gets the ammount of space the panels are taking up on each side of the screen.
 		//		Used to calculate the size of the windows when maximized.
 		var thicknesses = {BR: 0, BL: 0, BC: 0, TR: 0, TL: 0, TC: 0, LT: 0, LC: 0, LB: 0, RT: 0, RC: 0, RB: 0};
-		dojo.query(".desktopPanel").forEach(function(panel, i) {
+		dojo.query(".desktopPanel").forEach(function(panel, i){
 			var w = dijit.byNode(panel);
-			if(w.span == 1) {
+			if(w.span == 1){
 				var slot = w.placement.charAt(0);
-				if(w.orientation == "horizontal") {
+				if(w.orientation == "horizontal"){
 					thicknesses[slot+"L"] += w.thickness;
 					thicknesses[slot+"R"] += w.thickness;
 					thicknesses[slot+"C"] += w.thickness;
@@ -58,14 +58,14 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 			else thicknesses[w.placement] += w.thickness;
 		}, this);
 		var max = {B: 0, T: 0, L: 0, R: 0};
-		for(var k in thicknesses) {
-			if(max[k.charAt(0)] < thicknesses[k]) {
+		for(var k in thicknesses){
+			if(max[k.charAt(0)] < thicknesses[k]){
 				max[k.charAt(0)] = thicknesses[k];
 			}
 		}
 		return max;
 	},
-	resize: function(e) {
+	resize: function(e){
 		//	summary:
 		//		Does some cleanup when the window is resized. For example it moves the filearea.
 		//		Also called when a panel is moved.
@@ -75,7 +75,7 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 		dojo.style(this.filearea.domNode, "left", max.L+"px");
 		dojo.style(this.filearea.domNode, "width", (viewport.w - max.R - max.L)+"px");
 		dojo.style(this.filearea.domNode, "height", (viewport.h - max.B - max.T)+"px");
-		dojo.query("div.win", desktop.ui.containerNode).forEach(function(win) {
+		dojo.query("div.win", desktop.ui.containerNode).forEach(function(win){
 			var c = dojo.coords(win);
 			if(c.t < max.T && max.T > 0) dojo.style(win, "top", max.T+c.t+"px");
 			if(c.l < max.L && max.L > 0) dojo.style(win, "left", max.L+c.l+"px");
@@ -86,15 +86,15 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 			
 		}, this);
 	},
-	updateWallpaper: function() {
+	updateWallpaper: function(){
 		//	summary:
 		//		Updates the wallpaper based on what's in desktop.config. Called when the configuration is applied.
 		var image = desktop.config.wallpaper.image;
 		var color = desktop.config.wallpaper.color;
 		var style = desktop.config.wallpaper.style;
 		dojo.style(this.wallpaperNode, "backgroundColor", color);
-		if(image == "") {
-			if(this.wallpaperImageNode) {
+		if(image == ""){
+			if(this.wallpaperImageNode){
 				 this.wallpaperImageNode.parentNode.removeChild(this.wallpaperImageNode);
 				 this.wallpaperImageNode = false;
 			}
@@ -103,7 +103,7 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 		}
 		else if(style == "centered" || style == "tiled")
 			dojo.style(this.wallpaperNode, "backgroundImage", "url('"+image+"')");
-			if(this.wallpaperImageNode) {
+			if(this.wallpaperImageNode){
 				 this.wallpaperImageNode.parentNode.removeChild(this.wallpaperImageNode);
 				 this.wallpaperImageNode = false;
 			}
@@ -111,9 +111,9 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 			dojo.style(this.wallpaperNode, "backgroundRepeat", "no-repeat");
 		else if(style == "tiled")
 			dojo.style(this.wallpaperNode, "backgroundRepeat", "repeat");
-		else if(style == "fillscreen") {
+		else if(style == "fillscreen"){
 			dojo.style(this.wallpaperNode, "backgroundImage", "none");
-			if(!this.wallpaperImageNode) {
+			if(!this.wallpaperImageNode){
 				this.wallpaperImageNode = document.createElement("img");
 				dojo.style(this.wallpaperImageNode, "width", "100%");
 				dojo.style(this.wallpaperImageNode, "height", "100%");
@@ -126,12 +126,12 @@ dojo.declare("desktop.ui.Area", [dijit._Widget, dijit._Templated, dijit._Contain
 			try {
 				rule = document.styleSheets[0].cssRules[0].style;
 			}
-			catch(e) {
+			catch(e){
 				rule = document.styleSheets[0].rules[0].style;
 			}
 			rule.backgroundColor = desktop.config.wallpaper.color;
 		}
-		catch(e) {
+		catch(e){
 			//oh well...
 		}
 	}

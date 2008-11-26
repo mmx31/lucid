@@ -10,16 +10,16 @@ dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 	//		An extention of desktop.ui.applets.Menu except it seperates the application, places, and system menus into their own buttons
 	dispName: "Menu Bar",
 	_drawn: false,
-	postCreate: function() {
+	postCreate: function(){
 		this._prefsMenu = [];
 		this._adminMenu = [];
 		this.inherited("postCreate", arguments);
 	},
-	_drawButton: function() {
+	_drawButton: function(){
 		//	summary:
 		//		Draws the button for the applet
 		var l = dojo.i18n.getLocalization("desktop.ui", "menus");
-		if(this._drawn) {
+		if(this._drawn){
 			this._appMenuButton.dropDown = this._menu;
 			this._appMenuButton._started = false; //hackish....
 			this._appMenuButton.startup();
@@ -42,13 +42,13 @@ dojo.declare("desktop.ui.applets.Menubar", desktop.ui.applets.Menu, {
 				label: l.system,
 				dropDown: this._makeSystemMenu()
 			}
-		], function(i) {
+		], function(i){
 			var b = new dijit.form.DropDownButton(i);
 			tbar.addChild(b);
 			b.domNode.style.height="100%";
 			b.startup();
 			if(i.label == l.applications) this._appMenuButton = b;
-			if(i.label == l.system) {
+			if(i.label == l.system){
 				b.dropDown.addChild(new dijit.MenuSeparator());
 				b.dropDown.addChild(new dijit.MenuItem({
 					label: l.logOut, 

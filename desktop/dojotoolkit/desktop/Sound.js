@@ -26,13 +26,13 @@ dojo.declare("desktop.Sound", dijit._Widget, {
 		id3: true
 	},
 	backend: null,
-	postCreate: function() {
+	postCreate: function(){
 		this.domNode.style.position="absolute";
 		this.domNode.style.left="-999px";
 		this.domNode.style.top="-999px";
 		document.body.appendChild(this.domNode);
 		var backends = ["html", "flash", "embed"];
-		for(var k in backends) {
+		for(var k in backends){
 			var i = backends[k];
 			var backend = new desktop.Sound[i]({
 				src: this.src,
@@ -40,7 +40,7 @@ dojo.declare("desktop.Sound", dijit._Widget, {
 				autoStart: this.autoStart
 			});
 			backend.id = this.id;
-			if(backend.testCompat() === true) {
+			if(backend.testCompat() === true){
 				this.backend = backend;
 				this.capabilities = backend.capabilities;
 				backend.domNode = this.domNode;
@@ -56,23 +56,23 @@ dojo.declare("desktop.Sound", dijit._Widget, {
 			"stop",
 			"position",
 			"duration"
-		], function(i) {
+		], function(i){
 			this[i] = dojo.hitch(this.backend, i);
 		}, this)
 	},
-	play: function() {
+	play: function(){
 		//	summary:
 		//		Play the sound
 	},
-	pause: function() {
+	pause: function(){
 		//	summary:
 		//		Pause the sound
 	},
-	stop: function() {
+	stop: function(){
 		//	summary:
 		//		Stop the sound
 	},
-	volume: function(/*Float|Int?*/volume) {
+	volume: function(/*Float|Int?*/volume){
 		//	summary:
 		//		Set or get the volume
 		//		When the volume argument is skipped, it will return the current volume
@@ -80,22 +80,22 @@ dojo.declare("desktop.Sound", dijit._Widget, {
 		//	volume:
 		//		the new volume (1 being the highest, 0 being the lowest)
 	},
-	position: function(/*Integer?*/position) {
+	position: function(/*Integer?*/position){
 		//	summary:
 		//		Set or get the position
 		//		When the position argument is skipped, it will return the current position
 		//	position:
 		//		the new position (in miliseconds)
 	},
-	duration: function() {
+	duration: function(){
 		//	summary:
 		//		Returns the duration of the file (in miliseconds)
 	},
-	id3: function() {
+	id3: function(){
 		//	summary:
 		//		Returns id3 information (if available)
 	},
-	uninitialize: function() {
+	uninitialize: function(){
 		this.backend.uninitialize();
 		document.body.removeChild(this.domNode);
 	}
@@ -121,27 +121,27 @@ dojo.declare("desktop.Sound._backend", null, {
 		volume: true,
 		id3: true
 	},
-	startup: function() {
+	startup: function(){
 		//	summary:
 		//		do startup tasks here such as embedding an applet
 	},
-	constructor: function(args) {
+	constructor: function(args){
 		this.src = args.src;
 		this.loop = args.loop || false;
 		this.autoStart = args.autoStart || false;
 	},
-	play: function() {},
-	pause: function() {},
-	stop: function() {},
-	uninitialize: function() {
+	play: function(){},
+	pause: function(){},
+	stop: function(){},
+	uninitialize: function(){
 		//	summary:
 		//		cleanup for when the class is destroyed
 	},
-	volume: function(/*Integer?*/volume) {},
-	position: function(/*Integer?*/position) {},
-	duration: function() {},
-	id3: function() {},
-	testCompat: function() {
+	volume: function(/*Integer?*/volume){},
+	position: function(/*Integer?*/position){},
+	duration: function(){},
+	id3: function(){},
+	testCompat: function(){
 		//	summary:
 		//		test for compatibility
 		//	returns:
@@ -165,34 +165,34 @@ dojo.declare("desktop.Sound.html", desktop.Sound._backend, {
 		volume: true,
 		id3: false
 	},
-	testCompat: function() {
+	testCompat: function(){
 			return typeof Audio != "undefined";
 	},
-	startup: function() {
+	startup: function(){
 		this.htmlSound = new Audio(this.src);
 		if(this.autoStart) this.htmlSound.autoPlay = true;
 	},
-	play: function() {
+	play: function(){
 		this.htmlSound.play();
 	},
-	pause: function() {
+	pause: function(){
 		this.htmlSound.pause();
 	},
-	stop: function() {
+	stop: function(){
 		this.htmlSound.stop();
 	},
-	position: function(v) {
+	position: function(v){
 		if(v) this.htmlSound.currentTime = v;
 		return this.htmlSound.currentTime;
 	},
-	duration: function() {
+	duration: function(){
 		return this.htmlSound.duration;
 	},
-	volume: function(l) {
+	volume: function(l){
 		if(l) this.htmlSound.volume = l;
 		return this.htmlSound.volume;
 	},
-	uninitialize: function() {
+	uninitialize: function(){
 		this.stop();
 	}
 });
@@ -203,22 +203,22 @@ dojo.declare("desktop.Sound.flash", desktop.Sound._backend, {
 	//		See desktop.Sound._backend for more info
 	_startPos: 0,
 	playing: false,
-	play: function() {
+	play: function(){
 		dojox.flash.comm.callFunction(this.id, "start", [this._startPos, this.loop]);
 		this.playing = true;
 	},
-	pause: function() {
+	pause: function(){
 		dojox.flash.comm.callFunction(this.id, "stop");
 		this._startPos = this.position()/1000;
 		this.playing = false;
 	},
-	stop: function() {
+	stop: function(){
 		this._startPos = 0;
 		dojox.flash.comm.callFunction(this.id, "stop");
 		this.playing = false;
 	},
-	position: function(v) {
-		if(v) {
+	position: function(v){
+		if(v){
 			this._startPos = v/1000;
 			if(this.playing) this.play();
 		}
@@ -226,24 +226,24 @@ dojo.declare("desktop.Sound.flash", desktop.Sound._backend, {
 			return dojox.flash.comm.getValue(this.id, "position");
 		}
 	},
-	duration: function() {
+	duration: function(){
 		return dojox.flash.comm.getValue(this.id, "duration");
 	},
-	id3: function() {
+	id3: function(){
 		return dojox.flash.comm.getValue(this.id, "id3");
 	},
-	volume: function(val) {
+	volume: function(val){
 		return dojox.flash.comm.callFunction(this.id, "setVolume", [val]);
 	},
-	checkCompat: function() {
+	checkCompat: function(){
 		return dojox.flash.info.capable && typeof dojox.flash.comm.makeObj != "undefined";
 	},
-	startup: function() {
+	startup: function(){
 		dojox.flash.comm.makeObj(this.id, "Sound");
 		dojox.flash.comm.callFunction(this.id, "loadSound", [this.src, true])
 		//dojox.flash.comm.attachEvent(this.id, "onLoad");
 	},
-	uninitialize: function() {
+	uninitialize: function(){
 		this.stop();
 	}
 });
@@ -265,21 +265,21 @@ dojo.declare("desktop.Sound.embed", desktop.Sound._backend, {
 	},
 	timeInterval: 1000,
 	timer: null,
-	play: function() {
+	play: function(){
 		if (this.domNode.innerHTML != "") 
 			this.stop();
 		this.position = 0;
 		this.domNode.innerHTML = "<embed src=\"" + this.src + "\" hidden=\"true\" autoplay=\"true\" loop=\"" + (this.loop ? "true" : "false") + "\">";
 		this.timer = setInterval(dojo.hitch(this, this.fixtime), this.timeInterval);
 	},
-	fixtime: function() {
+	fixtime: function(){
 		this.position += this.timeInterval;
 	},
-	stop: function() {
+	stop: function(){
 		clearInterval(this.timer);
 		this.domNode.innerHTML = "";
 	},
-	uninitialize: function() {
+	uninitialize: function(){
 		clearInterval(this.timer);
 		this.stop();
 	}

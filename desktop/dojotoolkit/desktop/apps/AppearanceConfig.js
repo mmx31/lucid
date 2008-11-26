@@ -1,7 +1,7 @@
 dojo.provide("desktop.apps.AppearanceConfig");
 
 dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
-	init: function(args) {
+	init: function(args){
 		//	summary:
 		//		Shows the appearance configuration dialog
 		var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
@@ -19,11 +19,11 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 		win.show();
 		win.startup();
 	},
-	kill: function() {
+	kill: function(){
 		if(!this.wallWin.closed) this.wallWin.close();
 		desktop.config.save();
 	},
-	_wallpaper: function() {
+	_wallpaper: function(){
 		//	summary:
 		//		Creates a BorderContainer with wallpaper configuration UI and returns it
 		var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
@@ -34,7 +34,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 		dojo.style(cbody, "height", "100%");
 		dojo.style(cbody, "overflow", "auto");
 		
-		var makeThumb = function(item) {
+		var makeThumb = function(item){
 			if(item == "") return;
 			if(item === true) item = "";
 			var p = document.createElement("div");
@@ -43,7 +43,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 			dojo.style(p, "height", "112px");
 			dojo.style(p, "margin", "5px");
 			dojo.style(p, "padding", "5px");
-				if (item != "") {
+				if (item != ""){
 					var img = document.createElement("img");
 					dojo.style(img, "width", "100%");
 					dojo.style(img, "height", "100%");
@@ -52,8 +52,8 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 					p.appendChild(img);
 				}
 			if(desktop.config.wallpaper.image == item) dojo.addClass(p, "selectedItem");
-			dojo.connect(p, "onclick", null, function() {
-				if(desktop.config.wallpaper.image != item) {
+			dojo.connect(p, "onclick", null, function(){
+				if(desktop.config.wallpaper.image != item){
 					dojo.query(".selectedItem", c.domNode).removeClass("selectedItem");
 					dojo.addClass(p, "selectedItem");
 					desktop.config.wallpaper.image = item;
@@ -69,7 +69,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 		
 		var nc = dojo.i18n.getLocalization("desktop", "common");
 		//botom part -------------
-		var color = new dijit.ColorPalette({value: desktop.config.wallpaper.color, onChange: dojo.hitch(this, function(value) {
+		var color = new dijit.ColorPalette({value: desktop.config.wallpaper.color, onChange: dojo.hitch(this, function(value){
 			desktop.config.wallpaper.color = value;
 			desktop.config.apply();
 		})});
@@ -93,7 +93,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 					]
 				}
 			}),
-			onChange: function(val) {
+			onChange: function(val){
 				if(typeof val == "undefined") return;
 				desktop.config.wallpaper.style=val;
 				desktop.config.apply();
@@ -103,13 +103,13 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 		var addButton = new dijit.form.Button({
 			label: nc.add,
 			iconClass: "icon-22-actions-list-add",
-			onClick: function() {
+			onClick: function(){
 				desktop.dialog.file({
 					title: nc.chooseWall,
-					callback: function(path) {
-						if(path) {
+					callback: function(path){
+						if(path){
 							var p = desktop.filesystem.embed(path);
-							for(var key in desktop.config.wallpaper.storedList) {
+							for(var key in desktop.config.wallpaper.storedList){
 								var val = desktop.config.wallpaper.storedList[key];
 								if(val == p) return;
 							}
@@ -123,10 +123,10 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 		var removeButton = new dijit.form.Button({
 			label: nc.remove,
 			iconClass: "icon-22-actions-list-remove",
-			onClick: function() {
+			onClick: function(){
 				var q = dojo.query("div.selectedItem img", c.domNode)
-				if(q[0]) {
-					dojo.forEach(desktop.config.wallpaper.storedList, function(url, i) {
+				if(q[0]){
+					dojo.forEach(desktop.config.wallpaper.storedList, function(url, i){
 						if(url == q[0].name) desktop.config.wallpaper.storedList.splice(i, 1);
 					});
 					q[0].parentNode.parentNode.removeChild(q[0].parentNode);
@@ -136,13 +136,13 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 		/*var closeButton = new dijit.form.Button({
 			label: "Close",
 			style: "position: absolute; right: 0px; top: 0px;",
-			onClick: function() {
+			onClick: function(){
 				win.close();
 			}
 		});*/
 		var p = new dijit.layout.ContentPane({region: "bottom"});
 		var body = document.createElement("div");
-		dojo.forEach([colorButton.domNode, styleLabel, styleButton.domNode, addButton.domNode, removeButton.domNode/*, closeButton.domNode*/], function(c) {
+		dojo.forEach([colorButton.domNode, styleLabel, styleButton.domNode, addButton.domNode, removeButton.domNode/*, closeButton.domNode*/], function(c){
 			dojo.addClass(c, "dijitInline");
 			body.appendChild(c);
 		});
@@ -151,14 +151,14 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 		color.startup();
 		return wallpaper;
 	},
-	_themes: function() {
+	_themes: function(){
 		//	summary:
 		//		generates a theme configuration pane and returns it
 		var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
 		var p = new dijit.layout.BorderContainer({title: l.theme});
 		var m = new dijit.layout.ContentPane({region: "center"});
 		var area = document.createElement("div");
-		var makeThumb = function(item) {
+		var makeThumb = function(item){
 			var p = document.createElement("div");
 			dojo.addClass(p, "floatLeft");
 			dojo.style(p, "width", "150px");
@@ -177,8 +177,8 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 			dojo.style(subtitle, "textAlign", "center");
 			p.appendChild(subtitle);
 			if(desktop.config.theme == item.sysname) dojo.addClass(p, "selectedItem");
-			dojo.connect(p, "onclick", null, function() {
-				if(desktop.config.theme != item.sysname) {
+			dojo.connect(p, "onclick", null, function(){
+				if(desktop.config.theme != item.sysname){
 					dojo.query(".selectedItem", m.domNode).removeClass("selectedItem");
 					dojo.addClass(p, "selectedItem");
 					desktop.config.theme = item.sysname;
@@ -195,14 +195,14 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 			}
 			desktop.config.wallpaper.storedList.push(wallimg.path);
 		}
-		desktop.theme.list(function(list) {
+		desktop.theme.list(function(list){
 			dojo.forEach(list, makeThumb);
 		}, true);
 		m.setContent(area);
 		p.addChild(m);
 		return p;
 	},
-	_effects: function() {
+	_effects: function(){
 		//	summary:
 		//		generates an effects configuration pane and returns it
 		var l = dojo.i18n.getLocalization("desktop.ui", "appearance");
@@ -239,7 +239,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 				desc: "Provides a desktop environment with full transitional effects. Requires a fast-rendering browser and a fast computer.",
 				params: {
 					checked: desktop.config.fx == 3,
-					onClick: function() {
+					onClick: function(){
 						desktop.config.fx = 3;
 					}
 				}
@@ -247,7 +247,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 		}
 		var div = document.createElement("div");
 		dojo.style(div, "padding", "20px");
-		for(var key in rows) {
+		for(var key in rows){
 			var row = document.createElement("div");
 			dojo.style(row, "margin", "10px");
 			rows[key].params.name = "visualeffects_picker";

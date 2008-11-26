@@ -1,11 +1,11 @@
 dojo.provide("desktop.apps.Calculator");
 
 dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
-	kill: function() {
+	kill: function(){
 		if(!this.win.closed) this.win.close();
 	},
 	
-	init: function() {
+	init: function(){
 		dojo.require("dijit.form.Button");
 		dojo.require("dijit.form.TextBox");
 		dojo.require("dijit.layout.ContentPane");
@@ -40,12 +40,12 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 			["4", "5", "6", "*"],
 			["1", "2", "3", "-"],
 			["0", ".", "=", "+"]
-		], function(row) {
+		], function(row){
 			var rowNode = document.createElement("tr");
-			dojo.forEach(row, function(cell) {
+			dojo.forEach(row, function(cell){
 				var cellNode = document.createElement("td");
 				dojo.style(cellNode, "padding", "0px");
-				if(cell != "") {
+				if(cell != ""){
 					var button = new dijit.form.Button({
 						style: "width: 100%; height: 100%; margin: 0px;",
 						label: cell,
@@ -83,13 +83,13 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 		win.show();
 		win.startup();
 	},
-	clear: function(t) {
+	clear: function(t){
 		this.answerShown = false;
 		desktop.textContent(this.eNode, "");
 		t.setValue("");
 	},
 	answerShown: false,
-	onSubmit: function(tb) {
+	onSubmit: function(tb){
 		this.answerShown = true;
 		var v = tb.getValue().replace(/([0-9])\(/, "$1*(").replace(/\)([0-9])/, ")*$1")
 		if(!this.validate(v)) return this.eNode.innerHTML = "E";
@@ -97,11 +97,11 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 		tb.setValue(eval("("+v+")"));
 	},
 	
-	validate: function(v) {
+	validate: function(v){
 		//Check for matching parenthesis
 		if(v.split("(").length != v.split(")").length) return false;
 		//Check for invalid characters
-		for(var i=0; i < v.length; i++) {
+		for(var i=0; i < v.length; i++){
 			var c = v.charAt(i);
 			if(!(!isNaN(parseInt(c))
 			|| c == ")"
@@ -115,7 +115,7 @@ dojo.declare("desktop.apps.Calculator", desktop.apps._App, {
 		}
 		//Check for stray decimal points
 		var parts = v.split(".");
-		for(var i=0; i<parts.length;i++) {
+		for(var i=0; i<parts.length;i++){
 			if(parts[i] == "" && i!=0) return false;
 			if(isNaN(parseInt(parts[i].charAt(0))) && i != 0) return false;
 		}

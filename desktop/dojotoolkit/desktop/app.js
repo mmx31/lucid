@@ -13,21 +13,21 @@ desktop.app = {
 	//	instanceCount: Int
 	//		A counter for making new instances of apps
 	instanceCount: 0,
-	init: function() {
+	init: function(){
 		//	summary:
 		//		Loads the app list from the server
-		var xtalkInit = dojo.subscribe("crosstalkInit", this, function() {
+		var xtalkInit = dojo.subscribe("crosstalkInit", this, function(){
             dojo.unsubscribe(xtalkInit);
             setTimeout(dojo.hitch(this, "startupApps"), 300);
         });
 		desktop.xhr({
 			backend: "core.app.fetch.list",
-			load: dojo.hitch(this, function(data, ioArgs) {
+			load: dojo.hitch(this, function(data, ioArgs){
 				this.appList = data;
 				var style = document.createElement("style");
 				style.type="text/css";
 				var contents = "";
-				dojo.forEach(data, function(item) {
+				dojo.forEach(data, function(item){
 					if(!item.icon || item.icon.indexOf(".") === -1) return;
 					contents += ".icon-app-"+item.sysname+" {"
 								+"width: 16px; height: 16px;"
@@ -40,12 +40,12 @@ desktop.app = {
 			handleAs: "json"
 		});
 	},
-	startupApps: function() {
+	startupApps: function(){
 		//	summary:
 		//		Launches the apps specified in desktop.config to launch on startup
 		var g = desktop.config.startupApps;
-        dojo.forEach(desktop.config.startupApps, function(app) {
-            if(typeof app == "object") {
+        dojo.forEach(desktop.config.startupApps, function(app){
+            if(typeof app == "object"){
 		app.arguments._startup = true;
                 desktop.app.launch(app.name, app.arguments);
 	    }
@@ -53,7 +53,7 @@ desktop.app = {
                 desktop.app.launch(app, {_startup: true});
         });
 	},
-	launchHandler: function(/*String?*/file, /*Object?*/args, /*String?*/format) {
+	launchHandler: function(/*String?*/file, /*Object?*/args, /*String?*/format){
 		//	summary:
 		//		Launches an app to open a certain file
 		//		You must specify either the file *or* it's format
@@ -65,10 +65,10 @@ desktop.app = {
 		//	format:
 		//		the mimetype of the file to save bandwidth checking it on the server
 		if(!args) args = {};
-		if(file) {
+		if(file){
 			var l = file.lastIndexOf(".");
 			var ext = file.substring(l + 1, file.length);
-			if (ext == "desktop") {
+			if (ext == "desktop"){
 				desktop.filesystem.readFileContents(file, dojo.hitch(this, function(content){
 					var c = content.split("\n");
 					desktop.app.launch(c[0], dojo.fromJson(c[1]));
@@ -76,7 +76,7 @@ desktop.app = {
 				return;
 			}
 		}
-		if(!format) {
+		if(!format){
 			desktop.filesystem.info(file, dojo.hitch(this, function(f){
 				var type = f.type;
 				this._launchHandler(file, type, args);
@@ -86,7 +86,7 @@ desktop.app = {
 			this._launchHandler(file, format, args);
 		}
 	},
-	_launchHandler: function(/*String*/file, /*String*/type, /*Object?*/args) {
+	_launchHandler: function(/*String*/file, /*String*/type, /*Object?*/args){
 		//	summary:
 		//		Internal method that is used by the main launchHandler method.
 		//		This is what actually launches the app.
@@ -96,10 +96,10 @@ desktop.app = {
 		//		the file's mimetype
 		//	args:
 		//		arguments to pass to the app
-		if (type == "text/directory") {
-			for (app in this.appList) {
-				for (key in this.appList[app].filetypes) {
-					if (this.appList[app].filetypes[key] == "text/directory") {
+		if (type == "text/directory"){
+			for (app in this.appList){
+				for (key in this.appList[app].filetypes){
+					if (this.appList[app].filetypes[key] == "text/directory"){
 						if(file) args.path = file;
 						desktop.app.launch(this.appList[app].sysname, args);
 						return;
@@ -109,10 +109,10 @@ desktop.app = {
 		}
 		else {
 			var typeParts = type.split("/");
-			for (app in this.appList) {
-				for (key in this.appList[app].filetypes) {
+			for (app in this.appList){
+				for (key in this.appList[app].filetypes){
 					var parts = this.appList[app].filetypes[key].split("/");
-					if (parts[0] == typeParts[0] && (parts[1] == typeParts[1])) {
+					if (parts[0] == typeParts[0] && (parts[1] == typeParts[1])){
 						if(file) args.file = file;
 						desktop.app.launch(this.appList[app].sysname, args);
 						return;
@@ -120,10 +120,10 @@ desktop.app = {
 				}
 			}
 			var typeParts = type.split("/");
-			for (app in this.appList) {
-				for (key in this.appList[app].filetypes) {
+			for (app in this.appList){
+				for (key in this.appList[app].filetypes){
 					var parts = this.appList[app].filetypes[key].split("/");
-					if (parts[0] == typeParts[0] && (parts[1] == "*" || parts[1] == typeParts[1])) {
+					if (parts[0] == typeParts[0] && (parts[1] == "*" || parts[1] == typeParts[1])){
 						if(file) args.file = file;
 						desktop.app.launch(this.appList[app].sysname, args);
 						return;
@@ -155,7 +155,7 @@ desktop.app = {
 			var realName = "";
 			var icon = "";
 			var compatible = "";
-			dojo.forEach(desktop.app.appList, function(item) {
+			dojo.forEach(desktop.app.appList, function(item){
 				if(item.sysname != name) return;
 				realName = item.name;
 				icon = item.icon;
@@ -172,13 +172,13 @@ desktop.app = {
 			try {
 				instance.init(args||{});
 			}
-			catch(e) {
+			catch(e){
 				console.error(e);
 			}
 			instance.status = "active";
 			if(typeof callback == "function") callback(instance);
 		}
-		catch(e) {
+		catch(e){
 			console.error(e);
 		}
 		dojo.publish("launchAppEnd", [name]);
@@ -212,7 +212,7 @@ desktop.app = {
 		filetypes: []
 	},
 	=====*/
-	list: function(/*Function*/callback) {
+	list: function(/*Function*/callback){
 		//	summary:
 		//		Lists the apps available on the server
 		//	callback:
@@ -224,25 +224,25 @@ desktop.app = {
 		});
 	},
 	//PROCESS MANAGEMENT FUNCTIONS
-	getInstances: function() {
+	getInstances: function(){
 		//	summary:
 		//		Returns an array of the current valid instances
 		returnObject = [];
 		for(var x = 0; x<desktop.app.instances.length; x++){
-			if (desktop.app.instances[x] != 'null') {
+			if (desktop.app.instances[x] != 'null'){
 				try { if(typeof desktop.app.instances[x].status == "string")
 					returnObject.push(desktop.app.instances[x]);
-				} catch(e) { }
+				} catch(e){ }
 			}
 		}
 		return returnObject;
 	},
-	getInstancesStatus: function() {
+	getInstancesStatus: function(){
 		//	summary:
 		//		Returns an array of the current valid instances status
 		var returnObject = [];
 		for(var x = 0; x<desktop.app.instances.length; x++){
-				if (desktop.app.instances[x] != null) {
+				if (desktop.app.instances[x] != null){
 					var i = desktop.app.instances[x];
 					returnObject.push({
 						instance: x,
@@ -255,14 +255,14 @@ desktop.app = {
 		}
 		return returnObject;
 	},
-	getInstance: function(/*Integer*/instance) {
+	getInstance: function(/*Integer*/instance){
 		//	summary:
 		//		Returns an instance
 		//	instance:
 		//		the instance ID to fetch
 		return desktop.app.instances[instance];
 	},
-	kill: function(/*Integer*/instance) {
+	kill: function(/*Integer*/instance){
 		//	summary:
 		//		Kills an instance
 		//	instance:
@@ -272,7 +272,7 @@ desktop.app = {
 			desktop.app.instances[instance].kill();	//Pre-Kill the instance
 			return true;
 		}
-		catch(err) {
+		catch(err){
 			desktop.log("procSystem: killing instance "+instance+" failed. setting status to zombie.");
 			console.error(err);
 			desktop.app.instances[instance].status = "zombie";
@@ -311,10 +311,10 @@ desktop.app = {
 		filename: "",
 		//	contents: String?
 		//		the new code to write to the file specified
-		contents: "({init: function(args) { alert('hi'); }})",
+		contents: "({init: function(args){ alert('hi'); }})",
 		//	callback: Function
 		//		a callback function. First argument is the ID of the app just saved (if a sysname was provided)
-		callback: function(id) {}
+		callback: function(id){}
 	},
 	=====*/
 	save: function(/*desktop.app._saveArgs*/app)
@@ -327,7 +327,7 @@ desktop.app = {
 	          desktop.xhr({
 	               backend: "core.app.write.save",
 	               content : app,
-		       error: function(data, ioArgs) {
+		       error: function(data, ioArgs){
 						if(app.error) app.error(data, ioArgs);
 						desktop.log("IDE API: Save error");
 			},
@@ -337,7 +337,7 @@ desktop.app = {
 						delete desktop.app.apps[parseInt(data.id)];
 						desktop.xhr({
 							backend: "core.app.fetch.list",
-							load: dojo.hitch(this, function(data, ioArgs) {
+							load: dojo.hitch(this, function(data, ioArgs){
 								this.appList = data;
 								dojo.publish("updateMenu", [data]);
 							}),
@@ -353,7 +353,7 @@ desktop.app = {
 		 	return false;
 		 }
 	},
-	createFolder: function(/*String*/path, /*Function?*/callback) {
+	createFolder: function(/*String*/path, /*Function?*/callback){
 		//	summary:
 		//		creates a folder for an app
 		//	path:
@@ -365,7 +365,7 @@ desktop.app = {
 			content: {
 				dirname: path
 			},
-			load: function(d) {
+			load: function(d){
 				callback(d == "0");
 			}
 		})
@@ -396,7 +396,7 @@ desktop.app = {
 			handleAs: "json"
 		});
 	},
-	renameFile: function(/*String*/origName, /*String*/newName, /*Function?*/callback) {
+	renameFile: function(/*String*/origName, /*String*/newName, /*Function?*/callback){
 		//	summary:
 		//		renames a file in the app directory
 		//	origName:
@@ -411,12 +411,12 @@ desktop.app = {
 				origName: origName,
 				newName: newName
 			},
-			load: function(d) {
+			load: function(d){
 				callback(d=="0")
 			}
 		});
 	},
-	remove: function(/*String?*/name, /*String?*/filePath, /*Function?*/callback) {
+	remove: function(/*String?*/name, /*String?*/filePath, /*Function?*/callback){
 		//	summary:
 		//		removes an app from the system
 		//	name:
@@ -431,7 +431,7 @@ desktop.app = {
 		desktop.xhr({
 			backend: "core.app.write.remove",
 			content: args,
-			load: function(d) {
+			load: function(d){
 				callback(d=="0");
 			}
 		})

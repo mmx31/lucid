@@ -23,7 +23,7 @@ dojo.declare("desktop.apps.UpdateManager", desktop.apps._App, {
                 stable: null,
                 unstable: "1.0.1.stable"
             }), 2000);*/
-            if(this.drawUi) {
+            if(this.drawUi){
                 var app = dojo.i18n.getLocalization("desktop", "apps");
                 var cmn = dojo.i18n.getLocalization("desktop", "common");
                 var nls = dojo.i18n.getLocalization("desktop.apps.UpdateManager", "messages");
@@ -82,7 +82,7 @@ dojo.declare("desktop.apps.UpdateManager", desktop.apps._App, {
     },
     checkVersion: function(versions){
         var v = desktop.version;
-        if((!v.flag || v.flag == "stable" || v.flag == "final") && this.parseVersion(versions.stable) !== null) {
+        if((!v.flag || v.flag == "stable" || v.flag == "final") && this.parseVersion(versions.stable) !== null){
             //use stable version
             var l = this.parseVersion(versions.stable);
         }
@@ -113,9 +113,9 @@ dojo.declare("desktop.apps.UpdateManager", desktop.apps._App, {
             this.center.setContent(nls.instructions
                                    +"<br /><a href=\"%s\">%s</a>".replace(/\%s/g, "http://www.lucid-desktop.org/downloads/"+version+"/")
                                    +"<br /><br />"+nls.currentVersion.replace("%s", desktop.version));
-            dojo.query("a", this.center.domNode).forEach(function(node) {
-    			dojo.connect(node, "onclick", node, function(e) {
-	        		if(!e.shiftKey && !e.ctrlKey) {
+            dojo.query("a", this.center.domNode).forEach(function(node){
+    			dojo.connect(node, "onclick", node, function(e){
+	        		if(!e.shiftKey && !e.ctrlKey){
 				    	desktop.app.launchHandler(null, {url: this.href}, "text/x-uri");
 			    		e.preventDefault();
 		    		}

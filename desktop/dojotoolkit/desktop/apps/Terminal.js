@@ -21,7 +21,7 @@ dojo.declare("desktop.apps.Terminal", desktop.apps._App, {
 		this.win.startup();
 	},
 	
-	kill: function() {
-		if(!this.win.closed) { this.win.close(); }
+	kill: function(){
+		if(!this.win.closed){ this.win.close(); }
 	}
 })

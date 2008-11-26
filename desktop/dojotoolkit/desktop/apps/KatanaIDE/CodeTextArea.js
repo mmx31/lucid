@@ -370,7 +370,7 @@ dojo.declare(
             this.parseViewport();
         },
         keyUpHandler: function(evt){
-			if(this._blockedEvents) { return; }
+			if(this._blockedEvents){ return; }
             var cmd = this.commands;
             switch (this._command){
                 case cmd.PASTE:
@@ -581,7 +581,7 @@ dojo.declare(
 				// startLine end
 
 				// middle lines begin
-				if(this.indexOf(startLine) < this.indexOf(endLine) - 1) {
+				if(this.indexOf(startLine) < this.indexOf(endLine) - 1){
 					var currentLine = startLine.nextSibling;
 					var nextLine;
 					while(currentLine && (currentLine !== endLine)){
@@ -652,7 +652,7 @@ dojo.declare(
 			});
 		},
         keyPressHandler: function(evt){
-			if(this._blockedEvents) { return; }
+			if(this._blockedEvents){ return; }
             if (this._preventLoops){
                 this._preventLoops = false;
                 return;

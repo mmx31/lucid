@@ -1,7 +1,7 @@
 dojo.provide("desktop.apps.AdminPanel.groups");
 
 dojo.extend(desktop.apps.AdminPanel, {
-	groups: function() {
+	groups: function(){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		this.toolbar.destroyDescendants();
@@ -10,8 +10,8 @@ dojo.extend(desktop.apps.AdminPanel, {
 			dropDown: this.createGroupDialog()
 		});
 		this.toolbar.addChild(button);
-		desktop.admin.groups.list(dojo.hitch(this, function(data) {
-			for(var i=0;i<data.length;i++) {
+		desktop.admin.groups.list(dojo.hitch(this, function(data){
+			for(var i=0;i<data.length;i++){
 				data[i].permissions = dojo.toJson(data[i].permissions);
 			};
 			//make headers (need to do it manually unfortunatly)
@@ -34,10 +34,10 @@ dojo.extend(desktop.apps.AdminPanel, {
 			});
 			if(this._con) dojo.disconnect(this._con);
 			this._con = dojo.connect(this.main, "resize", grid, "resize");
-			dojo.connect(this._groupStore, "onDelete", this, function(a) {
+			dojo.connect(this._groupStore, "onDelete", this, function(a){
 				desktop.admin.groups.remove(a.id[0]); //that feels really hackish
 			})
-			dojo.connect(this._groupStore, "onSet", this, function(item, attribute, oldVal, newVal) {
+			dojo.connect(this._groupStore, "onSet", this, function(item, attribute, oldVal, newVal){
 				if(attribute == "permissions") return;
 				var id = this._groupStore.getValue(item, "id");
 				if(id == false) return;
@@ -51,12 +51,12 @@ dojo.extend(desktop.apps.AdminPanel, {
 			dojo.forEach([
 				{
 					label: cmn["delete"],
-					onClick: dojo.hitch(this, function(e) {
+					onClick: dojo.hitch(this, function(e){
 						var row = this._groupGrid.getItem(this.__rowIndex);
 						desktop.dialog.yesno({
 							title: sys.groupDelConfirm,
 							message: sys.delFromSys.replace("%s", row.name),
-							callback: dojo.hitch(this, function(a) {
+							callback: dojo.hitch(this, function(a){
 								if(a == false) return;
 								this._groupStore.deleteItem(row);
 							})
@@ -67,10 +67,10 @@ dojo.extend(desktop.apps.AdminPanel, {
 					label: sys.alterPermissions,
 					onClick: dojo.hitch(this, "permDialog",
 						grid,
-						dojo.hitch(this, function(row) {
+						dojo.hitch(this, function(row){
 							return this._groupStore.getValue(row, "name");
 						}),
-						dojo.hitch(this, function(row) {
+						dojo.hitch(this, function(row){
 							return dojo.fromJson(this._groupStore.getValue(row, "permissions"));
 						}),
 						dojo.hitch(this, function(row, newPerms){
@@ -88,22 +88,22 @@ dojo.extend(desktop.apps.AdminPanel, {
 				},
 				{
 					label: sys.modifyQuotaGeneric,
-					onClick: dojo.hitch(this, function() {
+					onClick: dojo.hitch(this, function(){
 						var row = this._groupGrid.getItem(this.__rowIndex);
 						var info = {
 							name: this._groupStore.getValue(row, "name"),
 							size: this._groupStore.getValue(row, "quota")
 						};
-						this.makeQuotaWin(info, dojo.hitch(this, function(value) {
+						this.makeQuotaWin(info, dojo.hitch(this, function(value){
 							this._groupStore.setValue(row, "quota", value);
 						}));
 					})
 				}
-			], function(item) {
+			], function(item){
 				var menuItem = new dijit.MenuItem(item);
 				menu.addChild(menuItem);
 			});
-			this._groupGrid.onRowContextMenu = dojo.hitch(this, function(e) {
+			this._groupGrid.onRowContextMenu = dojo.hitch(this, function(e){
 				this.__rowIndex = e.rowIndex;
 				this._groupMenu._contextMouse();
 				this._groupMenu._openMyself(e);
@@ -113,7 +113,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 		}));
 	},
 	
-	createGroupDialog: function() {
+	createGroupDialog: function(){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		
@@ -141,12 +141,12 @@ dojo.extend(desktop.apps.AdminPanel, {
 	    var p = document.createElement("span");
 		var button = new dijit.form.Button({
 			label: cmn.create,
-			onClick: dojo.hitch(this, function() {
+			onClick: dojo.hitch(this, function(){
 				var n = name.getValue();
 				var d = description.getValue();
 				this._groupStore.fetch({
 					query: {name: n},
-					onComplete: dojo.hitch(this, function(list) {
+					onComplete: dojo.hitch(this, function(list){
 						if(list.length != 0){
 							errBox.textContent = sys.groupAlreadyExists;
 							return;
@@ -155,7 +155,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 						desktop.admin.groups.add({
 							name: n,
 							description: d,
-							callback: dojo.hitch(this, function(id) {
+							callback: dojo.hitch(this, function(id){
 								name.setValue("");
 								description.setValue("");
 								this._groupStore.newItem({
@@ -177,7 +177,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 		return dialog;
 	},
 	
-	groupMemberDialog: function(group) {
+	groupMemberDialog: function(group){
 		var sys = dojo.i18n.getLocalization("desktop", "system");
 		var cmn = dojo.i18n.getLocalization("desktop", "common");
 		var row = this._groupGrid.getItem(this.__rowIndex);
@@ -187,7 +187,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			height: "200px"
 		})
 		this.windows.push(window);
-		var makeUI = function(list) {
+		var makeUI = function(list){
 			var client = new dijit.layout.ContentPane({
 				region: "center",
 				style: "overflow-x: auto"
@@ -205,13 +205,13 @@ dojo.extend(desktop.apps.AdminPanel, {
 				dojo.style(right, "top", "0px");
 				dojo.addClass(right, "icon-16-actions-list-remove");
 				drow.appendChild(right);
-				dojo.connect(right, "onclick", this, function() {
+				dojo.connect(right, "onclick", this, function(){
 					desktop.admin.groups.removeMember(
 						this._groupStore.getValue(row, "id"),
 						item.id
 					);
 					div.removeChild(drow);
-					dojo.forEach(idList, function(id, i) {
+					dojo.forEach(idList, function(id, i){
 						if(id == item.id) idList.splice(i, 1);
 					})
 				})
@@ -235,13 +235,13 @@ dojo.extend(desktop.apps.AdminPanel, {
 			});
 			var b = new dijit.form.Button({
 				label: cmn.add,
-				onClick: dojo.hitch(this, function() {
+				onClick: dojo.hitch(this, function(){
 					desktop.admin.groups.addMember(
 						this._groupStore.getValue(row, "id"),
 						s.getValue()
 					);
 					var hasItem = false;
-					dojo.forEach(idList, function(id) {
+					dojo.forEach(idList, function(id){
 						if(id == s.getValue()) hasItem = true;
 					});
 					if(!hasItem) this._userStore.fetch({
@@ -260,7 +260,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			window.startup();
 		}
 		desktop.admin.groups.getMembers(this._groupStore.getValue(row, "id"), dojo.hitch(this, function(list){
-			if(typeof this._userStore == "undefined") {
+			if(typeof this._userStore == "undefined"){
 				this.makeUserStore(dojo.hitch(this, makeUI, list));
 			}
 			else dojo.hitch(this, makeUI, list)();

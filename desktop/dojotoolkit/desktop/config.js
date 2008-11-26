@@ -5,14 +5,14 @@ desktop.version = {
     minor: 0,
     patch: 0,
     flag: "dev",
-    toString: function() {
+    toString: function(){
 	    return this.major+"."+this.minor+"."+this.patch+"."+this.flag;
     }
 };
 dojo.xhrGet({
     url: dojo.moduleUrl("desktop.resources", "version.json"),
     sync: true, //so that we have the version ready before doing anything else
-    load: function(data) {
+    load: function(data){
         dojo.mixin(desktop.version, data);
     },
     handleAs: "json"
@@ -21,18 +21,18 @@ dojo.xhrGet({
 desktop.config = {
 	//	summary:
 	//		Contains configuraton for the desktop.
-	init: function(cback) {
+	init: function(cback){
 		desktop.config.load(cback);
 		setInterval(dojo.hitch(desktop.config, "save"), 1000*60);
 		dojo.subscribe("desktoplogout", dojo.hitch(desktop.config, "save"));
 	},
-	load: function(cback) {
+	load: function(cback){
 		//	summary:
 		//		Loads the configuration from the server
 		desktop.xhr({
 	        backend: "core.config.stream.load",
-	        load: function(data, ioArgs) {
-				if(data == "") {
+	        load: function(data, ioArgs){
+				if(data == ""){
 					desktop.config.apply();
 					if(cback) cback();
 					return;
@@ -47,7 +47,7 @@ desktop.config = {
 			}
         });
 	},
-	save: function(/*Boolean?*/sync, /*Boolean*/sendlogged) {
+	save: function(/*Boolean?*/sync, /*Boolean*/sendlogged){
 		//	summary:
 		//		Saves the current configuration to the server
 		//	sync:
@@ -57,7 +57,7 @@ desktop.config = {
 		if(typeof sync == "undefined") sync=false;
 		if(typeof sendlogged == "undefined") sendlogged=true;
 		var config = {}
-		for(var key in desktop.config) {
+		for(var key in desktop.config){
 			if(dojo.isFunction(desktop.config[key])) continue;
 			config[key] = dojo.clone(desktop.config[key]);
 		}

@@ -59,7 +59,7 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 					]
 				}
 			}),
-			onChange: dojo.hitch( this, function(val) {
+			onChange: dojo.hitch( this, function(val){
 				if ( typeof val == "undefined" ) return;
 				this.difficulty = val;
 				//console.debug( "Difficulty is now " + this.difficulty );
@@ -85,7 +85,7 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 		dojo.connect(this.surfacePane.containerNode, "oncontextmenu", dojo, "stopEvent");
 		
         this.makeBoard(10, 10);
-        setTimeout(dojo.hitch(this, function() {
+        setTimeout(dojo.hitch(this, function(){
             var tHeight = this.toolbar.domNode.offsetHeight;
             this.win.resize({width: "200px", height: (200+tHeight)+"px"});
         }), 200);
@@ -95,16 +95,16 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 	{
 		//console.debug( "Starting game.. difficulty is: " + this.difficulty );
 		var tHeight = this.toolbar.domNode.offsetHeight;
-		if ( this.difficulty == "Easy" ) {
+		if ( this.difficulty == "Easy" ){
 			//console.debug("resizing..");
 			this.win.resize({width: "200px", height: (200+tHeight)+"px"});
 			this.surface.clear();
 			this.makeBoard(10, 10);
-		} else if ( this.difficulty == "Medium" ) {
+		} else if ( this.difficulty == "Medium" ){
 			this.win.resize({width:"300px", height:(300+tHeight)+"px"});
 			this.surface.clear();
 			this.makeBoard(15, 15);
-		} else if ( this.difficulty == "Hard" ) {
+		} else if ( this.difficulty == "Hard" ){
 			this.win.resize({width:"600px", height:(300+tHeight)+"px"});
 			this.surface.clear();
 			this.makeBoard(30,15);
@@ -121,9 +121,9 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 		var a = 0;
 		var b = 0;
 		this.board = new Array();
-		for ( b = 0; b < xSize; b++ ) {
+		for ( b = 0; b < xSize; b++ ){
 			this.board[b] = new Array();
-			for ( a = 0; a < ySize; a++ ) {
+			for ( a = 0; a < ySize; a++ ){
 				this.board[b][a] = this.makeSquare(b, a);
 				this.totalSquares++;
 			}
@@ -142,7 +142,7 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 		if ( this.difficulty == "Easy" ) numMines = 10;
 		if ( this.difficulty == "Medium" ) numMines = 34;
 		if ( this.difficulty == "Hard" ) numMines = 90;
-		for ( a = 0; a < numMines; a++ ) {
+		for ( a = 0; a < numMines; a++ ){
 			var randX = Math.floor(Math.random() * this.xSize);
 			var randY = Math.floor(Math.random() * this.ySize);
 			this.board[randX][randY].hasMine = true;
@@ -156,48 +156,48 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 		var a = 0;
 		var b = 0;
 		var numMines = 0;
-		for ( b = 0; b < this.xSize; b++ ) {
-			for ( a = 0; a < this.ySize; a++ ) {
+		for ( b = 0; b < this.xSize; b++ ){
+			for ( a = 0; a < this.ySize; a++ ){
 				numMines = 0;
 	
 				// Square to the north
-				if ( a > 0) {
+				if ( a > 0){
 					if ( this.board[b][a-1].hasMine == true ) numMines++;
 				}
 	
 				// Square to the north east
-				if ( a > 0 && b < (this.xSize-1) ) {
+				if ( a > 0 && b < (this.xSize-1) ){
 					if ( this.board[b+1][a-1].hasMine == true ) numMines++;
 				}
 	
 				// Square to east
-				if ( b < (this.xSize-1) ) {
+				if ( b < (this.xSize-1) ){
 					if ( this.board[b+1][a].hasMine == true ) numMines++;
 				}
 
 				
 				// Square to south east
-				if ( a < (this.ySize-1) && b < (this.xSize-1) ) {
+				if ( a < (this.ySize-1) && b < (this.xSize-1) ){
 					if ( this.board[b+1][a+1].hasMine == true ) numMines++;
 				}
                             
 				// Square to south
-				if ( a < (this.ySize-1) ) {
+				if ( a < (this.ySize-1) ){
 					if ( this.board[b][a+1].hasMine == true ) numMines++;
 				}
                             
 				// Square to south west
-				if ( b > 0 && a < (this.ySize-1) ) {
+				if ( b > 0 && a < (this.ySize-1) ){
 					if ( this.board[b-1][a+1].hasMine == true ) numMines++;
 				}
                             
 				// Square to west
-				if ( b > 0 ) {
+				if ( b > 0 ){
 					if ( this.board[b-1][a].hasMine == true ) numMines++;
 				}
                             
 				// Square to north west
-				if ( b > 0 && a > 0 ) {
+				if ( b > 0 && a > 0 ){
 					if ( this.board[b-1][a-1].hasMine == true ) numMines++;
 				}
 				this.board[b][a].numMines = numMines;
@@ -210,16 +210,16 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 
 		var square = this.surface.createRect({ x: xPos*20, y: yPos*20, width: 20, height: 20 });
 		this.squareFillNormal( square );
-		square.mouseover = square.connect("onmouseover", this, function blah() { this.squareFillOver(square); });
-		square.mouseout = square.connect("onmouseout", this, function blah2() { this.squareFillNormal(square); });
-		square.mousedown = square.connect("onmouseup", this, function (e) {
+		square.mouseover = square.connect("onmouseover", this, function blah(){ this.squareFillOver(square); });
+		square.mouseout = square.connect("onmouseout", this, function blah2(){ this.squareFillNormal(square); });
+		square.mousedown = square.connect("onmouseup", this, function (e){
 			dojo.stopEvent(e);
 			if(e.button == 2) this.squareFillMarked(square);
 			else this.squareReveal(square);
 			//this.squareReveal(square);
 			return false;
 		});
-		square.mouseright = square.connect("oncontextmenu", this, function (e) { 
+		square.mouseright = square.connect("oncontextmenu", this, function (e){ 
 			dojo.stopEvent(e);
 			//this.squareFillMarked(square);
 		});
@@ -298,7 +298,7 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 		var bbox = square.getBoundingBox();
               
 		// does this square contain a mine?
-		if ( square.hasMine == true ) {
+		if ( square.hasMine == true ){
 			square.setFill("#FF0000");
 			square.mine = this.surface.createCircle({
 				cx: (bbox.x + (bbox.width/2)), cy: (bbox.y + (bbox.height/2)),
@@ -321,12 +321,12 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
               
 		this.squaresRevealed++;
 		//console.debug( this.squaresRevealed + " squares revealed.. " + this.squaresToWin + " needed to win" );
-		if ( this.squaresRevealed >= this.squaresToWin ) {
+		if ( this.squaresRevealed >= this.squaresToWin ){
 			this.gameWin();
 			return;
 		}
               
-		if ( square.numMines > 0 ) {
+		if ( square.numMines > 0 ){
 			var textColor = "#000000";
 			if ( square.numMines == 1 ) textColor = "#0000FF";
 			if ( square.numMines == 2 ) textColor = "#00AA00";
@@ -357,49 +357,49 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 		// Not sure if i should do this diagonally as well..
               
 		// Check square to the north
-		if ( yPos > 0 ) {
+		if ( yPos > 0 ){
 			if ( !this.board[xPos][yPos-1].hasMine  && !this.board[xPos][yPos-1].revealed) this.squareReveal( this.board[xPos][yPos-1] );
 		}
               
 		// Check square to the east
-		if ( xPos < (this.xSize-1) ) {
+		if ( xPos < (this.xSize-1) ){
 			if ( !this.board[xPos+1][yPos].hasMine && !this.board[xPos+1][yPos].revealed) this.squareReveal( this.board[xPos+1][yPos] );
 		}
               
 		// Check square to south
-		if ( yPos < (this.ySize-1) ) {
+		if ( yPos < (this.ySize-1) ){
 			if ( !this.board[xPos][yPos+1].hasMine && this.board[xPos][yPos+1].revealed) this.squareReveal( this.board[xPos][yPos+1] );
 		}
               
 		// Check square to west
-		if ( xPos > 0 ) {
+		if ( xPos > 0 ){
 			if ( !this.board[xPos-1][yPos].hasMine && !this.board[xPos-1][yPos].revealed) this.squareReveal( this.board[xPos-1][yPos] );
 		}
               
 		// check square to northeast
-		if ( yPos > 0 && xPos < (this.xSize-1) ) {
+		if ( yPos > 0 && xPos < (this.xSize-1) ){
 			if ( !this.board[xPos+1][yPos-1].hasMine && !this.board[xPos+1][yPos-1].revealed) this.squareReveal( this.board[xPos+1][yPos-1] );
 		}
               
 		// check square to southeast
-		if ( yPos < (this.ySize-1) && xPos < (this.xSize-1) ) {
+		if ( yPos < (this.ySize-1) && xPos < (this.xSize-1) ){
 			if ( !this.board[xPos+1][yPos+1].hasMine && !this.board[xPos+1][yPos+1].revealed) this.squareReveal( this.board[xPos+1][yPos+1] );
 		}
               
 		// check square to southwest
-		if ( yPos < (this.ySize-1) && xPos > 0 ) {
+		if ( yPos < (this.ySize-1) && xPos > 0 ){
 			if ( !this.board[xPos-1][yPos+1].hasMine && !this.board[xPos-1][yPos+1].revealed) this.squareReveal( this.board[xPos-1][yPos+1] );
 		}
               
 		// check square to northwest
-		if ( yPos > 0 && xPos > 0 ) {
+		if ( yPos > 0 && xPos > 0 ){
 			if ( !this.board[xPos-1][yPos-1].hasMine && !this.board[xPos-1][yPos-1].revealed) this.squareReveal( this.board[xPos-1][yPos-1] );
 		}    
 	},
 
 	squareFillMarked: function( square )
 	{
-		if ( square.marked == false ) {
+		if ( square.marked == false ){
 			square.marked = true;
 			//dojo.disconnect( square.mouseover );
 			var bbox = square.getBoundingBox();

@@ -8,7 +8,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 	//		See dojo's documentation on dojo.data for more info.
 	__desktop_name: "",
 	__desktop_appname: 0,
-	constructor: function(/*Object*/args) {
+	constructor: function(/*Object*/args){
 		//	args: {name: String}
 		//		the name of the store
 		//	args: {appname: String}
@@ -19,14 +19,14 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 		this.__desktop_appname = args.appname;
 		
 		this._jsonData = null;
-		this.exists(dojo.hitch(this, function(e) {
+		this.exists(dojo.hitch(this, function(e){
 			if(e == true) this.url = this._jsonFileUrl = desktop.xhr("api.registry.stream.load")
 			+ "&appname=" + encodeURIComponent(args.appname)
 			+ "&name=" + encodeURIComponent(args.name);
 			else this.data = this._jsonData = args.data;
 		}), true);
 	},
-	_saveEverything: function(saveCompleteCallback, saveFailedCallback, newFileContentString) {
+	_saveEverything: function(saveCompleteCallback, saveFailedCallback, newFileContentString){
 		desktop.xhr({
 			backend: ("api.registry.stream.save"),
 			content: {
@@ -34,10 +34,10 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 				appname: this.__desktop_appname,
 				name: this.__desktop_name
 			},
-			load: function(data, ioArgs) {
+			load: function(data, ioArgs){
 				saveCompleteCallback();
 			},
-			error: function(type, error) {
+			error: function(type, error){
 				saveFailedCallback();
 			}
 		});
@@ -57,7 +57,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 				name: this.__desktop_name,
 				appname: this.__desktop_appname
 			},
-			load: function(data, ioArgs) {
+			load: function(data, ioArgs){
 				callback(data.exists);
 			},
 			handleAs: "json"
@@ -75,7 +75,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 				name: this.__desktop_name,
 				appname: this.__desktop_appname
 			},
-			load: function(data, ioArgs) {
+			load: function(data, ioArgs){
 				if(callback)
 				{
 					callback(data == "0");

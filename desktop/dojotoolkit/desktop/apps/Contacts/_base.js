@@ -10,7 +10,7 @@ dojo.requireLocalization("desktop.apps.Contacts", "Contacts");
 dojo.requireLocalization("desktop", "messages");
 
 dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
-	init: function(args) {
+	init: function(args){
         var nls = dojo.i18n.getLocalization("desktop.apps.Contacts", "Contacts");
         var app = dojo.i18n.getLocalization("desktop", "apps");
 		this.windows = [];
@@ -29,9 +29,9 @@ dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
 		        items: []
 		    }
 		});
-		dojo.connect(contactStore, "onSet", function() { contactStore.save(); });
-		dojo.connect(contactStore, "onDelete", function() { contactStore.save(); });
-        dojo.connect(contactStore, "onNew", function() { contactStore.save(); });
+		dojo.connect(contactStore, "onSet", function(){ contactStore.save(); });
+		dojo.connect(contactStore, "onDelete", function(){ contactStore.save(); });
+        dojo.connect(contactStore, "onNew", function(){ contactStore.save(); });
 		var toolbar = new dijit.Toolbar({region: "top"});
 		
 		var newButton = new dijit.form.Button({
@@ -93,8 +93,8 @@ dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
     removeContact: function(e){
         this.grid.removeSelectedRows();
     },
-	kill: function(args) {
-		dojo.forEach(this.windows, function(win) {
+	kill: function(args){
+		dojo.forEach(this.windows, function(win){
             if(!win.closed)
                 win.close();
         });

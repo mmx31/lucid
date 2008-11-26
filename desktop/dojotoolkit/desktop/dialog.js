@@ -22,7 +22,7 @@ desktop.dialog = {
 		div.innerHTML = "<center> "+(object.message||"")+" </center>";
 		var box = new dijit.Dialog({title: object.title, style: object.style || ""}, div);
 		box.show();
-		if(object.callback) {
+		if(object.callback){
 			dojo.connect(box, 'onUnload', object.callback);
 		}
 	},
@@ -40,16 +40,16 @@ desktop.dialog = {
 		var ac = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
 		if(this.authenticationWin) this.authenticationWin.bringToFront();
 		else {
-		if(!object.program) { object.program = ac.unknown; }
+		if(!object.program){ object.program = ac.unknown; }
 		var times = 3;
 		var success = 1;
 		var win = this.authenticationWin = new desktop.widget.Window({
 			title: ac.authRequired,
 			width: "450px",
 			height: "350px",
-			onClose: dojo.hitch(this, function() {
+			onClose: dojo.hitch(this, function(){
 				this.authenticationWin = false;
-				if(success != 0) { object.callback(1); }
+				if(success != 0){ object.callback(1); }
 			}),
 			showClose: false,
 			showMinimize: false,
@@ -66,13 +66,13 @@ desktop.dialog = {
 		var row2 = document.createElement("div");
 		var authButton = this.authButton = new dijit.form.Button({
 			label: ac.authenticate,
-			onClick: dojo.hitch(this, function() {	
+			onClick: dojo.hitch(this, function(){	
 				desktop.user.authentication({
 					permission: object.permission,
 					action: "set",
 					password: current.getValue(),
-					callback: dojo.hitch(this, function(data) {
-						if(data == 1 && (times - 1) != 0) { times--; row3.innerHTML = times; } //TODO: client side security? wtf are you on?!
+					callback: dojo.hitch(this, function(data){
+						if(data == 1 && (times - 1) != 0){ times--; row3.innerHTML = times; } //TODO: client side security? wtf are you on?!
 						else { object.callback(data); success = data; win.close(); }
 					})
 				})
@@ -92,7 +92,7 @@ desktop.dialog = {
 		client.setContent(main);
 		var bottom = new dijit.layout.ContentPane({region: "bottom", style: "padding: 20px;"});
 		bottom.setContent(ac.program+": "+object.program+"<br />"+ac.action+": "+object.permission+"<br />"+ac.vendor+": "+ac.unknown);
-		dojo.forEach([top, bottom, client], function(e) {
+		dojo.forEach([top, bottom, client], function(e){
 			win.addChild(e);
 		});
 		win.show();
@@ -121,12 +121,12 @@ desktop.dialog = {
 		dialog.title = object.title;	
 		dialog.width = "400px";
 		dialog.height = "150px";
-		var onClose = dojo.connect(dialog, "onClose", null, function() {object.callback(false)});
+		var onClose = dojo.connect(dialog, "onClose", null, function(){object.callback(false)});
 		var details = new dijit.layout.ContentPane({region: "center"}, document.createElement("div"));
 		var text = new dijit.form.TextBox({value: object.initial || ""});
 		var all = document.createElement("div");
-		var blah = new dijit.form.Button({label: cm.ok, onClick: dojo.hitch(this, function() {  dojo.disconnect(onClose); object.callback(text.getValue()); dialog.close(); })});
-		var ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function() {  dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
+		var blah = new dijit.form.Button({label: cm.ok, onClick: dojo.hitch(this, function(){  dojo.disconnect(onClose); object.callback(text.getValue()); dialog.close(); })});
+		var ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function(){  dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
 		var line = document.createElement("div");
         var p = document.createElement("span");
 		var q = document.createElement("span");
@@ -143,7 +143,7 @@ desktop.dialog = {
 		dialog.show();
 		dialog.startup();
         setTimeout(dojo.hitch(text, "focus"), 400);
-        dojo.connect(text.domNode, "onkeyup", this, function(e) {
+        dojo.connect(text.domNode, "onkeyup", this, function(e){
             if(e.keyCode == dojo.keys.ENTER)
                 blah.onClick();
         });
@@ -159,7 +159,7 @@ desktop.dialog = {
 		//	object: {callback: Function?}
 		//		a callback function. The first argument is true if the user clicked yes, and false if the user clicked no or closed the window.
 		//	example:
-		//	|	desktop.dialog.yesno({title: "UI Test", message: "Did you sign your NDA?", callback: function(p) {
+		//	|	desktop.dialog.yesno({title: "UI Test", message: "Did you sign your NDA?", callback: function(p){
 		//	|		if(p) alert("Good for you!");
 		//	|		else alert("Then sign it allready!");
 		//	|	});
@@ -169,11 +169,11 @@ desktop.dialog = {
 		dialog.title = object.title;	
 		dialog.width = "400px";
 		dialog.height = "150px";
-		var onClose = dojo.connect(dialog, "onClose", null, function() {object.callback(false)});
+		var onClose = dojo.connect(dialog, "onClose", null, function(){object.callback(false)});
 		var details = new dijit.layout.ContentPane({region: "center"}, document.createElement("div"));
 		var all = document.createElement("div");
-		var blah = new dijit.form.Button({label: cm.yes, onClick: dojo.hitch(this, function() { dojo.disconnect(onClose); object.callback(true); dialog.close(); })});
-		var ablah = new dijit.form.Button({label: cm.no, onClick: dojo.hitch(this, function() { dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
+		var blah = new dijit.form.Button({label: cm.yes, onClick: dojo.hitch(this, function(){ dojo.disconnect(onClose); object.callback(true); dialog.close(); })});
+		var ablah = new dijit.form.Button({label: cm.no, onClick: dojo.hitch(this, function(){ dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
 		var line = document.createElement("div");
         var p = document.createElement("span");
 		var q = document.createElement("span");
@@ -211,7 +211,7 @@ desktop.dialog = {
 		dialog.title = object.title;
 		dialog.width = "500px";
 		dialog.height = "300px";
-		var file = new desktop.widget.Filearea({path: "file://", onItem: dojo.hitch(this, function(path) {
+		var file = new desktop.widget.Filearea({path: "file://", onItem: dojo.hitch(this, function(path){
 			object.callback(path);
 			dialog.close();
 		})}); //Make the fileArea
@@ -242,7 +242,7 @@ desktop.dialog = {
 		var menu = new dijit.Menu({
 			style: "width: 100%;"
 		});
-		dojo.forEach(desktop.config.filesystem.places, function(place) {
+		dojo.forEach(desktop.config.filesystem.places, function(place){
 			var item = new dijit.MenuItem({label: place.name,
 				iconClass: place.icon || "icon-16-places-folder",
 				onClick: dojo.hitch(file, "setPath", place.path)
@@ -251,7 +251,7 @@ desktop.dialog = {
 		}, this);
 		pane.setContent(menu.domNode);
    		var address = new dijit.form.TextBox({value: "file://"});
-		if(object.types) {
+		if(object.types){
 			var store = this.internalStore = new dojo.data.ItemFileWriteStore({
 				data: {
 					identifier: "type",
@@ -264,18 +264,18 @@ desktop.dialog = {
 				store: store
 			});
 		}
-		var button = new dijit.form.Button({label: cm.loadOrSave, onClick: dojo.hitch(this, function() { 
+		var button = new dijit.form.Button({label: cm.loadOrSave, onClick: dojo.hitch(this, function(){ 
 			var solved = false;
-			dojo.forEach(file.getChildren(), function(item) { //Works for existing files
-				if(item.type=="text/directory") { // Is it a directory?
-					if(file.path+item.name == address.getValue()) {
+			dojo.forEach(file.getChildren(), function(item){ //Works for existing files
+				if(item.type=="text/directory"){ // Is it a directory?
+					if(file.path+item.name == address.getValue()){
 						file.setPath(file.path+item.name);
 						solved = true;
 						return;
 					}
 				}
 				else {
-					if(file.path+item.name == address.getValue()) { // Is it a file?
+					if(file.path+item.name == address.getValue()){ // Is it a file?
 						object.callback(file.path+item.name);
 						dialog.close();
 						solved = true;
@@ -283,12 +283,12 @@ desktop.dialog = {
 					}
 				}		
 			});
-			if(!solved) { //Are we creating a new file?
+			if(!solved){ //Are we creating a new file?
 				object.callback(address.getValue());
 				dialog.close();
 			}
 		})});
-		var ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function() {
+		var ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function(){
 			object.callback(false);
 			dialog.close();
 		})});
@@ -303,8 +303,8 @@ desktop.dialog = {
 		line.appendChild(ablah.domNode);
 		all.appendChild(line);
 		details.setContent(all);
-		file.onPathChange = dojo.hitch(this, function(path) { address.setValue(path); });
-		file.onHighlight = dojo.hitch(this, function(path) { address.setValue(path); });
+		file.onPathChange = dojo.hitch(this, function(path){ address.setValue(path); });
+		file.onHighlight = dojo.hitch(this, function(path){ address.setValue(path); });
 		client.addChild(pane);
 		layout.addChild(file);
 		client.addChild(layout);
@@ -329,14 +329,14 @@ desktop.dialog = {
 		//		how long should the message be displayed in milliseconds
 		dojo.publish("desktop_notification", [message]);
 	},
-	init: function() {
+	init: function(){
 		desktop.addDojoCss("dojox/widget/Toaster/Toaster.css"); //TODO: theme it!
 		var toaster = new dojox.widget.Toaster({
 			messageTopic: "desktop_notification",
 			positionDirection: desktop.config.toasterPos
 		});
 		document.body.appendChild(toaster.domNode);
-		dojo.subscribe("configApply", function() {
+		dojo.subscribe("configApply", function(){
 			toaster.positionDirection = desktop.config.toasterPos;
 		})
 	}

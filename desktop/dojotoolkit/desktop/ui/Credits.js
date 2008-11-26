@@ -2,13 +2,13 @@ dojo.provide("desktop.ui.Credits");
 dojo.require("dojox.fx.scroll");
 
 dojo.declare("desktop.ui.Credits", dijit._Widget, {
-	postCreate: function() {
+	postCreate: function(){
 		dojo.style(this.domNode, {
 			overflow: "hidden",
 			textAlign: "center"
 		});
 	},
-	startup: function() {
+	startup: function(){
 
 		var head = document.createElement("h2");
 		desktop.textContent(head, "Psych Desktop");
@@ -20,17 +20,17 @@ dojo.declare("desktop.ui.Credits", dijit._Widget, {
 		
 		dojo.xhrGet({
 			url: dojo.moduleUrl("desktop.resources", "credits.json"),
-			load: dojo.hitch(this, function(data) {
-				dojo.forEach(data, function(item) {
+			load: dojo.hitch(this, function(data){
+				dojo.forEach(data, function(item){
 					var head = document.createElement("h4");
 					desktop.textContent(head, item.title);
 					this.domNode.appendChild(head);
 					var ul = document.createElement("ul");
 					dojo.style(ul, {padding: "0px"});
-					dojo.forEach(item.items, function(p) {
+					dojo.forEach(item.items, function(p){
 						var li = document.createElement("li");
 						desktop.textContent(li, p[0]);
-						var addPos = function(str) {
+						var addPos = function(str){
 							var div = document.createElement("div");
 							dojo.style(div, "fontSize", "8pt");
 							desktop.textContent(div, str);
@@ -53,16 +53,16 @@ dojo.declare("desktop.ui.Credits", dijit._Widget, {
 			handleAs: "json"
 		})
 	},
-	doScroll: function() {
+	doScroll: function(){
 		this.domNode.scrollTop = 0;
-		setTimeout(dojo.hitch(this, function() {
+		setTimeout(dojo.hitch(this, function(){
 			var height = this.domNode.scrollHeight;
 			var anim = dojox.fx.smoothScroll({
 				win: this.domNode,
 				node: this.lastNode,
 				duration: (height/20)*1000
 			});
-			dojo.connect(anim, "onEnd", this, function() {
+			dojo.connect(anim, "onEnd", this, function(){
 				setTimeout(dojo.hitch(this, "doScroll"), 1000);
 			});
 			anim.play();

@@ -49,13 +49,13 @@ desktop.filesystem = {
 				path: path,
 				login: dojo.toJson(login)
 			},
-			load: dojo.hitch(this, function(data, args) {
+			load: dojo.hitch(this, function(data, args){
 				this._errCheck(	data,
 								dojo.hitch(this, "listDirectory", path, onComplete, onError),
 								dojo.hitch(df, "callback", data),
 								dojo.hitch(df, "errback"));
 			}),
-			error: function(e) {
+			error: function(e){
 				df.errback(e);
 			},	
 			handleAs: "json"
@@ -85,13 +85,13 @@ desktop.filesystem = {
 				login: dojo.toJson(login)
 			},
 			handleAs: "json",
-			load: dojo.hitch(this, function(data, ioArgs) {
+			load: dojo.hitch(this, function(data, ioArgs){
 				this._errCheck(	data,
 								dojo.hitch(this, "readFileContents", path, onComplete, onError),
 								dojo.hitch(df, "callback", data.contents),
 								dojo.hitch(df, "errback"));
 			}),
-			error: function(e) {
+			error: function(e){
 				df.errback(e);
 			}
 		});
@@ -136,14 +136,14 @@ desktop.filesystem = {
 				var p = path.lastIndexOf("/");
 				dojo.publish("filearea:"+path.substring(0, p+1), []);
 			}),
-			error: function(e) {
+			error: function(e){
 				df.errback(e);
 			}
         });
 		df.canceler = dojo.hitch(xhr, "cancel");
 		if(onComplete) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
-		df.addCallback(function() {
+		df.addCallback(function(){
 			dojo.publish("fsSizeChange", [path]);
 		})
 		return df;
@@ -161,7 +161,7 @@ desktop.filesystem = {
 		//	onError:
 		//		callback function to be fired upon error
 
-		if(to.indexOf("/") == -1) {
+		if(to.indexOf("/") == -1){
 			var i = from.lastIndexOf("/");
 			var newpath = from.substring(0, i);
 			newpath += "/" + to;
@@ -186,7 +186,7 @@ desktop.filesystem = {
 									dojo.hitch(df, "errback", Error(desktop._errorCodes[data])),
 									dojo.hitch(df, "errback"));
 			}),
-	        error: function(e) {
+	        error: function(e){
 				df.errback(e);
 			}
         });
@@ -224,7 +224,7 @@ desktop.filesystem = {
 									dojo.hitch(df, "errback", Error(desktop._errorCodes[data])),
 									dojo.hitch(df, "errback"));
 			}),
-		        error: function(e) {
+		        error: function(e){
 				df.errback(e);
 			}
         });
@@ -251,7 +251,7 @@ desktop.filesystem = {
 			content: {
 				path: path
 			},
-			load: dojo.hitch(this, function(data, ioArgs) {
+			load: dojo.hitch(this, function(data, ioArgs){
 				if(data == "0")
 					df.callback();
 				else
@@ -260,14 +260,14 @@ desktop.filesystem = {
 									dojo.hitch(df, "errback", Error(desktop._errorCodes[data])),
 									dojo.hitch(df, "errback"));
 			}),
-	        error: function(e) {
+	        error: function(e){
 				df.errback(e);
 			}
         });
 		df.canceler = dojo.hitch(xhr, "cancel");
 		if(onComplete) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
-		df.addCallback(function() {
+		df.addCallback(function(){
 			dojo.publish("fsSizeChange", [path]);
 		})
 		return df;
@@ -293,7 +293,7 @@ desktop.filesystem = {
 				newpath: to,
 				login: dojo.toJson(login)
 			},
-			load: dojo.hitch(this, function(data, ioArgs) {
+			load: dojo.hitch(this, function(data, ioArgs){
 				if(data == "0")
 					df.callback();
 				else
@@ -302,19 +302,19 @@ desktop.filesystem = {
 									dojo.hitch(df, "errback", Error(desktop._errorCodes[data])),
 									dojo.hitch(df, "errback"));
 			}),
-	        error: function(e) {
+	        error: function(e){
 				df.errback(e);
 			}
         });
 		df.canceler = dojo.hitch(xhr, "cancel");
 		if(onComplete) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
-		df.addCallback(function() {
+		df.addCallback(function(){
 			dojo.publish("fsSizeChange", [to]);
 		})
 		return df;
     },
-	getQuota: function(/*String*/path, /*Function*/onComplete, /*Function?*/onError, /*api.filesystem._loginArgs?*/ login) {
+	getQuota: function(/*String*/path, /*Function*/onComplete, /*Function?*/onError, /*api.filesystem._loginArgs?*/ login){
 		//	summary:
 		//		Gets the ammount of space available, and the ammount of space used for the path specified
 		//	onComplete:
@@ -334,13 +334,13 @@ desktop.filesystem = {
 				path: path,
 				login: dojo.toJson(login)
 			},
-			load: dojo.hitch(this, function(data, ioArgs) {
+			load: dojo.hitch(this, function(data, ioArgs){
 				this._errCheck(	data,
 								dojo.hitch(this, "getQuota", path, onComplete, onError),
 								dojo.hitch(df, "callback", data),
 								dojo.hitch(df, "errback"));
 			}),
-	        error: function(e) {
+	        error: function(e){
 				df.errback(e);
 			},
 			handleAs: "json"
@@ -351,7 +351,7 @@ desktop.filesystem = {
 		
 		return df;
 	},
-	info: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError, /*api.filesystem._loginArgs?*/ login) {
+	info: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError, /*api.filesystem._loginArgs?*/ login){
 		//	summary:
 		//		fetches information about a file
 		//	path:
@@ -367,13 +367,13 @@ desktop.filesystem = {
 				path: path,
 				login: dojo.toJson(login)
 			},
-			load: dojo.hitch(this, function(data, args) {
+			load: dojo.hitch(this, function(data, args){
 				this._errCheck(	data,
 								dojo.hitch(this, "info", path, onComplete, onError),
 								dojo.hitch(df, "callback", data),
 								dojo.hitch(df, "errback"));
 			}),
-			error: function(e) {
+			error: function(e){
 				df.errback(e);
 			},			
 			handleAs: "json"
@@ -384,7 +384,7 @@ desktop.filesystem = {
 		
 		return df;
 	},
-	download: function(/*String*/path, /*String?*/as) {
+	download: function(/*String*/path, /*String?*/as){
 		//	summary:
 		//		Points the browser to the file and forces the browser to download it.
 		//	path:
@@ -398,7 +398,7 @@ desktop.filesystem = {
 		var frame = dojo.io.iframe.create("fs_downloadframe", "");
 		dojo.io.iframe.setSrc(frame, url, true);
 	},
-	embed: function(/*String*/path) {
+	embed: function(/*String*/path){
 		//	summary:
 		//		Generates a URL that you can use in an img tag or an embed tag.
 		//	path:
@@ -407,14 +407,14 @@ desktop.filesystem = {
 		//		a string containing a url
 		return desktop.xhr("api.fs.io.display") + "&path=" + path;
 	},
-	_errCheck: function(code, retry, callback, errback) {
+	_errCheck: function(code, retry, callback, errback){
 		if(typeof code != "number")
 			return callback(code);
 		if(!code) code=-1;
 		err = Error(desktop._errorCodes[code]);
 		code = err.message;
 		var nf = dojo.i18n.getLocalization("desktop.widget", "filearea");
-		if(code == "remote_authentication_failed") {
+		if(code == "remote_authentication_failed"){
 			var win = new desktop.widget.Window({
 				title: nf.enterPass,
 				width: "250px",
@@ -422,8 +422,8 @@ desktop.filesystem = {
 			});
 			var v = new desktop.filesystem._PassForm({
 				region: "center",
-				onCancel: function() { errback(err); win.close(); },
-				onSubmit: function() {
+				onCancel: function(){ errback(err); win.close(); },
+				onSubmit: function(){
 					win.close();
 					retry({
 						password: this.getPassword(),
@@ -435,7 +435,7 @@ desktop.filesystem = {
 			win.show();
 			win.startup();
 		}
-		else if(code == "remote_connection_failed") {
+		else if(code == "remote_connection_failed"){
 			desktop.dialog.notify(nf.connFailed);
 			errback(err);
 		}
@@ -447,7 +447,7 @@ desktop.filesystem = {
 dojo.declare("desktop.filesystem._PassForm", [dijit._Widget, dijit._Templated, dijit._Contained], {
 	templatePath: dojo.moduleUrl("desktop.widget", "templates/filesystem_PassForm.html"),
 	widgetsInTemplate: true,
-	postCreate: function() {
+	postCreate: function(){
 		var nf = dojo.i18n.getLocalization("desktop.widget", "filearea"); //save us the trouble of making a seperate translation file
 		this.titleNode.innerHTML = nf.enterPass;
 		this.forgetNode.setAttribute("checked", true);
@@ -458,19 +458,19 @@ dojo.declare("desktop.filesystem._PassForm", [dijit._Widget, dijit._Templated, d
 		dojo.connect(this.cancelNode, "onClick", this, "onCancel");
 		dojo.connect(this.connectNode, "onClick", this, "onSubmit");
 	},
-	getPassword: function() {
+	getPassword: function(){
 		return this.textNode.getValue();
 	},
-	getRemember: function() {
+	getRemember: function(){
 		if(this.rememberForeverNode.checked)
 			return "forever";
 		else if(this.forgetNode.checked)
 			return "forget";
 	},
-	onSubmit: function() {
+	onSubmit: function(){
 		
 	},
-	onCancel: function() {
+	onCancel: function(){
 		
 	}
 });
