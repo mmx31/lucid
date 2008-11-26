@@ -341,7 +341,7 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 				weight: "bold"
 			});
 			square.numText.moveToFront();
-		} else {
+		}else{
 			this.clearAdjacentSquares( square.xPos, square.yPos );
 		}
               
@@ -412,7 +412,7 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 					{ offset: 1, color: "#444444"}
 				]
 			});
-		} else {
+		}else{
 			square.marked = false;
 			this.squareFillNormal( square );
 		}

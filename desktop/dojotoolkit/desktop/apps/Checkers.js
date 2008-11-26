@@ -71,7 +71,7 @@ dojo.declare("desktop.apps.Checkers", desktop.apps._App, {
 					{offset:1, color: "#DD0000"}
 				]
 			});
-		} else {
+		}else{
 			shape.setFill({
 				type: "radial",
 				cx: c.x, cy: c.y, r: 18,

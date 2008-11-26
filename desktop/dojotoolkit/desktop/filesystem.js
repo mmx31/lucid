@@ -165,7 +165,7 @@ desktop.filesystem = {
 			var i = from.lastIndexOf("/");
 			var newpath = from.substring(0, i);
 			newpath += "/" + to;
-		} else {
+		}else{
 			var newpath = to;
 		}
 		var df = new dojo.Deferred();

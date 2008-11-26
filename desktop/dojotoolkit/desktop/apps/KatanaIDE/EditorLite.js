@@ -32,7 +32,7 @@ dojo.declare("desktop.apps.KatanaIDE.EditorLite", dijit.form.SimpleTextarea, {
 			this.editorNode.selectionStart = startPos+1;
 			this.editorNode.selectionEnd = endPos+1;
 			this.editorNode.scrollTop = scroll;
-		} else {
+		}else{
 			this.editorNode.value += "	";
 		}
 	},
