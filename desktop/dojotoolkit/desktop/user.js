@@ -103,7 +103,7 @@ desktop.user = {
 	{
 		//	summary:
 		//		logs a user out
-		desktop.config.save(true);
+		desktop.config.save(true, false);
 		dojo.publish("desktoplogout", []);
 		desktop.xhr({
 			backend: "core.user.auth.logout",
@@ -126,7 +126,7 @@ desktop.user = {
         //  summary:
         //      Logs a user out, but doesn't clear their session.
         //      This basically just sets their 'logged' property to false in the database, so they appear to be logged out
-        desktop.config.save(true);
+        desktop.config.save(true, false);
         if(desktop.reload) { return false; }
         desktop.xhr({
             backend: "core.user.auth.quickLogout",

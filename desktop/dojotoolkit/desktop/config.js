@@ -47,12 +47,15 @@ desktop.config = {
 			}
         });
 	},
-	save: function(/*Boolean?*/sync) {
+	save: function(/*Boolean?*/sync, /*Boolean*/sendlogged) {
 		//	summary:
 		//		Saves the current configuration to the server
 		//	sync:
 		//		Should the call be synchronous? defaults to false
+		//	sendlogged:
+		//		Should the call update the 'logged' property in the database? defaults to true
 		if(typeof sync == "undefined") sync=false;
+		if(typeof sendlogged == "undefined") sendlogged=true;
 		var config = {}
 		for(var key in desktop.config) {
 			if(dojo.isFunction(desktop.config[key])) continue;
@@ -61,7 +64,7 @@ desktop.config = {
 		desktop.xhr({
             backend: "core.config.stream.save",
 			sync: sync,
-            content: {value: dojo.toJson(config)}
+            content: {logged: sendlogged, value: dojo.toJson(config)}
         });
 	},
 	apply: function()

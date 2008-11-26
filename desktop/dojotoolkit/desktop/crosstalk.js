@@ -230,6 +230,9 @@ desktop.crosstalk = {
 		this.subscribe("quotaupdate", dojo.hitch(this, function() {
 			dojo.publish("fsSizeChange", ["file://"]);
 		}));
+		this.subscribe("accountremoval", dojo.hitch(this, function() {
+			desktop.user.logout();
+		}));
 	},
 	setup_timer: function()
 	{
