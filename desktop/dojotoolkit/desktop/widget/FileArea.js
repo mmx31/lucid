@@ -1,4 +1,4 @@
-dojo.provide("desktop.widget.Filearea");
+dojo.provide("desktop.widget.FileArea");
 dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dijit.Menu");
 dojo.require("dijit.form.TextBox");
@@ -15,7 +15,7 @@ desktop.widget._fileareaClipboard = {
 	widgetRef: null //a reference to the widget
 };
 
-dojo.declare("desktop.widget.Filearea", dijit.layout._LayoutWidget, {
+dojo.declare("desktop.widget.FileArea", dijit.layout._LayoutWidget, {
 	//	path: String
 	//		the path that the filearea should start at
 	path: "file://",
@@ -214,7 +214,7 @@ dojo.declare("desktop.widget.Filearea", dijit.layout._LayoutWidget, {
 	_onClick: function(e)
 	{
 		var w = dijit.getEnclosingWidget(e.target);
-		if (w.declaredClass == "desktop.widget.Filearea._Icon"){
+		if (w.declaredClass == "desktop.widget.FileArea._Icon"){
 			w._dragStart(e);
 			if (dojo.hasClass(e.target, "fileIcon")) 
 				w._onIconClick(e);
@@ -367,7 +367,7 @@ dojo.declare("desktop.widget.Filearea", dijit.layout._LayoutWidget, {
 		//		passes click event to the appropriate child widget
 		//		if a widget wasn't clicked on, we open our own menu
 		var w = dijit.getEnclosingWidget(e.target);
-		if(w.declaredClass == "desktop.widget.Filearea._Icon")
+		if(w.declaredClass == "desktop.widget.FileArea._Icon")
 		{
 			w.menu._contextMouse();
 			w.menu._openMyself(e);
@@ -408,7 +408,7 @@ dojo.declare("desktop.widget.Filearea", dijit.layout._LayoutWidget, {
 				var p = name.lastIndexOf(".");
 				var ext = name.substring(p+1, name.length);
 				var icon = desktop.config.filesystem.icons[ext.toLowerCase()];
-				var wid = new desktop.widget.Filearea._Icon({
+				var wid = new desktop.widget.FileArea._Icon({
 					label: name,
 					name: name,
 					path: item.path,
@@ -470,7 +470,7 @@ dojo.declare("desktop.widget.Filearea", dijit.layout._LayoutWidget, {
 	}
 })
 
-dojo.declare("desktop.widget.Filearea._Icon", [dijit._Widget, dijit._Templated, dijit._Contained], {
+dojo.declare("desktop.widget.FileArea._Icon", [dijit._Widget, dijit._Templated, dijit._Contained], {
 	templatePath: dojo.moduleUrl("desktop.widget", "templates/Filearea_Item.html"),
 	//	label: string
 	//		The label shown underneath the icon
@@ -640,8 +640,8 @@ dojo.declare("desktop.widget.Filearea._Icon", [dijit._Widget, dijit._Templated, 
 			this._dragTopicPublished = false;
 		}
 		var newTarget = dijit.getEnclosingWidget(e.target);
-		if(newTarget.declaredClass && (newTarget.declaredClass == "desktop.widget.Filearea" || newTarget.declaredClass == "desktop.widget.Filearea._Icon")) 
-			var targetPath = (newTarget.declaredClass != "desktop.widget.Filearea"
+		if(newTarget.declaredClass && (newTarget.declaredClass == "desktop.widget.FileArea" || newTarget.declaredClass == "desktop.widget.FileArea._Icon")) 
+			var targetPath = (newTarget.declaredClass != "desktop.widget.FileArea"
 				? (newTarget.type == "text/directory" ? newTarget.getParent().path+newTarget.name+"/" : newTarget.getParent().path)
 				: newTarget.path);
 		if (this._docNode){
@@ -679,7 +679,7 @@ dojo.declare("desktop.widget.Filearea._Icon", [dijit._Widget, dijit._Templated, 
 				this._docNode = null;
 			});
 			if (desktop.config.fx > 0 &&
-			(!(newTarget.declaredClass == "desktop.widget.Filearea" || newTarget.declaredClass=="desktop.widget.Filearea._Icon") || isParent(targetPath))){
+			(!(newTarget.declaredClass == "desktop.widget.FileArea" || newTarget.declaredClass=="desktop.widget.FileArea._Icon") || isParent(targetPath))){
 				var l = dojo.coords(this.domNode);
 				var anim = dojo.animateProperty({
 					node: this._docNode,
@@ -699,12 +699,12 @@ dojo.declare("desktop.widget.Filearea._Icon", [dijit._Widget, dijit._Templated, 
 			if(((e.shiftKey && newTarget.type != "text/directory") || newTarget.id != this.getParent().id)
 			&& newTarget.id != this.id
 			&& !isParent(targetPath)
-			&& (newTarget.declaredClass == "desktop.widget.Filearea" || newTarget.declaredClass == "desktop.widget.Filearea._Icon")){
+			&& (newTarget.declaredClass == "desktop.widget.FileArea" || newTarget.declaredClass == "desktop.widget.FileArea._Icon")){
 				var _loadParent = this.getParent();
 				_loadParent._loadStart();
 				if (e.shiftKey){
 					//copy the file
-					if(newTarget.declaredClass == "desktop.widget.Filearea") 
+					if(newTarget.declaredClass == "desktop.widget.FileArea") 
 						var name = newTarget._fixDuplicateFilename(this.name, this.type);
 					else
 						var name = (newTarget.type == "text/directory" ? 
@@ -712,14 +712,14 @@ dojo.declare("desktop.widget.Filearea._Icon", [dijit._Widget, dijit._Templated, 
 									newTarget.getParent()._fixDuplicateFilename(this.name, this.type));
 					desktop.filesystem.copy(this.getParent().path + "/" + this.name, targetPath + name, function(){
 						_loadParent._loadEnd();
-						if(newTarget.declaredClass == "desktop.widget.Filearea") newTarget.refresh();
+						if(newTarget.declaredClass == "desktop.widget.FileArea") newTarget.refresh();
 						dojo.publish("filearea:"+targetPath, [newTarget.id]);
 						//TODO: copy myself and add me to newTarget?
 					});
 				}
 				else {
 					//move the file
-					if(newTarget.declaredClass == "desktop.widget.Filearea") 
+					if(newTarget.declaredClass == "desktop.widget.FileArea") 
 						var name = newTarget._fixDuplicateFilename(this.name, this.type);
 					else
 						var name = (newTarget.type == "text/directory" ? 
@@ -732,7 +732,7 @@ dojo.declare("desktop.widget.Filearea._Icon", [dijit._Widget, dijit._Templated, 
 						p.layout();
 						this.name = name;
 						this.label = this._formatLabel(name);
-						if(newTarget.declaredClass == "desktop.widget.Filearea"){
+						if(newTarget.declaredClass == "desktop.widget.FileArea"){
 							newTarget.addChild(this);
 							newTarget.layout();
 							this.fixStyle();

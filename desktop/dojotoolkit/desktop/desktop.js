@@ -13,7 +13,7 @@ dojo.require("desktop.dialog");
 dojo.require("desktop.widget.Window");
 dojo.require("desktop.widget.StatusBar");
 dojo.require("desktop.widget.Console");
-dojo.require("desktop.widget.Filearea");
+dojo.require("desktop.widget.FileArea");
 dojo.require("desktop.flash.flash");
 
 (function(){

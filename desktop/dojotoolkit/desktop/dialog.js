@@ -211,7 +211,7 @@ desktop.dialog = {
 		dialog.title = object.title;
 		dialog.width = "500px";
 		dialog.height = "300px";
-		var file = new desktop.widget.Filearea({path: "file://", onItem: dojo.hitch(this, function(path){
+		var file = new desktop.widget.FileArea({path: "file://", onItem: dojo.hitch(this, function(path){
 			object.callback(path);
 			dialog.close();
 		})}); //Make the fileArea
