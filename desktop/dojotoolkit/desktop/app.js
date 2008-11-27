@@ -150,7 +150,7 @@ desktop.app = {
         //	    if there was a problem launching the app, this will be called
 		dojo.publish("launchApp", [name]);
 		desktop.log("launching app "+name);
-        var d = dojo.Deferred();
+        var d = new dojo.Deferred();
         if(onComplete) d.addCallback(onComplete);
         if(onError) d.addErrback(onError);
 		dojo["require"]("desktop.apps."+name);
@@ -226,7 +226,7 @@ desktop.app = {
 		//		a callback function. First argument passed is an array with desktop.app._listCallbackItem objects for each app.
         //	onError:
         //	    if there was an error, this will be called
-        var d = dojo.Deferred();
+        var d = new dojo.Deferred();
         if(onComplete) d.addCallback(onComplete);
         if(onError) d.addErrback(onError);
 		desktop.xhr({
@@ -340,7 +340,7 @@ desktop.app = {
 		//		saves an app to the server. Returns a dojo.Deferred object. 
         var onComplete = app.onComplete;
         var onError = app.onError;
-        var d = dojo.Deferred();
+        var d = new dojo.Deferred();
         if(onComplete) d.addCallback(onComplete);
         if(onError) d.addErrback(onError);
 		if((app.sysname||app.filename)||(app.sysname&&app.filename))
@@ -410,7 +410,7 @@ desktop.app = {
 		//		the filename to open. If excluded, the callback will get an array of filenames
 		//	callback:
 		//		A callback function. Gets passed a desktop.app._saveArgs object, excluding the callback.
-        var d = dojo.Deferred();
+        var d = new dojo.Deferred();
         if(onComplete) d.addCallback(onComplete);
         if(onError) d.addErrback(onError);
 		desktop.xhr({
@@ -440,7 +440,7 @@ desktop.app = {
 		//		the new name of the file
 		//	callback:
 		//		a callback function once the action is complete
-        var d = dojo.Deferred();
+        var d = new dojo.Deferred();
         if(onComplete) d.addCallback(onComplete);
         if(onError) d.addErrback(onError);
 		return desktop.xhr({
@@ -467,7 +467,7 @@ desktop.app = {
 		//		a callback function once the app has been removed
         //	onError:
         //	    if there was a problem, this will be called
-        var d = dojo.Deferred();
+        var d = new dojo.Deferred();
         if(onComplete) d.addCallback(onComplete);
         if(onError) d.addErrback(onError);
 		var args = {};
