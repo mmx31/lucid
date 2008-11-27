@@ -471,7 +471,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 		var saveButton = new dijit.form.Button({
 			label: cmn.create,
 			onClick: dojo.hitch(this, function(){
-				if (dispBox.getValue() != "" && sysBox.getValue() != ""){
+				if (dispBox.getValue() != "" && sysBox.isValid() && sysBox.getValue() != ""){
 					this.appStore.fetch({
 						query: {
 							sysname: sysBox.getValue()
