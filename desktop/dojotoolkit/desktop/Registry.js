@@ -42,14 +42,19 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 			}
 		});
 	},
-	exists: function(/*Function*/callback, /*Boolean*/sync)
+	exists: function(/*Function*/onSuccess, /*Function*/onError, /*Boolean*/sync)
 	{
 		//	summary:
-		//		Checks if this store exists on the server
-		//	callback:
+		//		Checks if this store exists on the server. Returns a dojo.Deferred object.
+		//	onSuccess:
 		//		a callback function. The first argument passed to it is true if it does exist, false if it does not.
+        //	onError:
+        //	    if for some reason there was an error, this will be called.
 		//	sync:
 		//		should the call be syncronous? defaults to false
+        var d = new dojo.Deferred();
+        if(onSuccess) d.addCallback(onSuccess);
+        if(onError) d.addErrback(onError);
 		desktop.xhr({
 			backend: "api.registry.info.exists",
 			sync: sync,
@@ -58,17 +63,24 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 				appname: this.__desktop_appname
 			},
 			load: function(data, ioArgs){
-				callback(data.exists);
+				d.callback(data.exists);
 			},
+            error: dojo.hitch(d, "errback"),
 			handleAs: "json"
 		});
+        return d;
 	},
-	drop: function(/*Function?*/callback)
+	drop: function(/*Function?*/onComplete, /*Function?*/onError)
 	{
 		//	summary:
-		//		Deletes the store on the server.
-		//	callback:
+		//		Deletes the store on the server. Returns a dojo.Deferred object.
+		//	onComplete:
 		//		a callback function. The first argument passed to it is true if deletion was successful, false if it failed.
+        //	onError:
+        //	    if for some reason there was an error, this will be called
+        var d = dojo.Deferred();
+        if(onSuccess) d.addCallback(onSuccess);
+        if(onError) d.addErrback(onError);
 		desktop.xhr({
 			backend: "api.registry.stream.delete",
 			content: {
@@ -76,11 +88,9 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 				appname: this.__desktop_appname
 			},
 			load: function(data, ioArgs){
-				if(callback)
-				{
-					callback(data == "0");
-				}
-			}	
+				d.callback(data == "0");
+			},
+            error: dojo.hitch(d, "errback")
 		});
 	}
 });
