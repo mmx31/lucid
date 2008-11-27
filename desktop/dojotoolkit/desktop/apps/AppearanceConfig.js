@@ -105,6 +105,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 			iconClass: "icon-22-actions-list-add",
 			onClick: function(){
 				desktop.dialog.file({
+					title: nc.chooseWall,
 					callback: function(path){
 						if(path){
 							var p = desktop.filesystem.embed(path);
@@ -196,7 +197,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 		}
 		desktop.theme.list(function(list){
 			dojo.forEach(list, makeThumb);
-		}, true);
+		}, null, true);
 		m.setContent(area);
 		p.addChild(m);
 		return p;
