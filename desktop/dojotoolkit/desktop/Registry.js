@@ -75,7 +75,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 		//	summary:
 		//		Deletes the store on the server. Returns a dojo.Deferred object.
 		//	onComplete:
-		//		a callback function. The first argument passed to it is true if deletion was successful, false if it failed.
+		//		a callback function.
         //	onError:
         //	    if for some reason there was an error, this will be called
         var d = dojo.Deferred();
@@ -88,7 +88,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 				appname: this.__desktop_appname
 			},
 			load: function(data, ioArgs){
-				d.callback(data == "0");
+				d[data == "0" ? "callback" : "errback"]();
 			},
             error: dojo.hitch(d, "errback")
 		});

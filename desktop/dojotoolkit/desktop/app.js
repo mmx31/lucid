@@ -136,18 +136,23 @@ desktop.app = {
 			message: "Cannot open " + file + ", no app associated with " + type
 		});
 	},
-	launch: function(/*String*/name, /*Object?*/args, /*Function*/callback)
+	launch: function(/*String*/name, /*Object?*/args, /*Function?*/onComplete, /*Function?*/onError)
 	{
 		//	summary:
-		//		Fetches an app if it's not in the cache, then launches it.
+		//		Fetches an app if it's not in the cache, then launches it. Returns the process ID of the application.
 		//	name:
 		//		the app's name
 		//	args:
 		//		the arguments to be passed to the app
-		//	callback:
+		//	onComplete:
 		//		a callback once the app has initiated
+        //	onError:
+        //	    if there was a problem launching the app, this will be called
 		dojo.publish("launchApp", [name]);
 		desktop.log("launching app "+name);
+        var d = dojo.Deferred();
+        if(onComplete) d.addCallback(onComplete);
+        if(onError) d.addErrback(onError);
 		dojo["require"]("desktop.apps."+name);
 		var pid = false;
 		try {
@@ -174,12 +179,14 @@ desktop.app = {
 			}
 			catch(e){
 				console.error(e);
+                d.errback(e);
 			}
 			instance.status = "active";
-			if(typeof callback == "function") callback(instance);
+			d.callback(instance);
 		}
 		catch(e){
 			console.error(e);
+            d.errback(e);
 		}
 		dojo.publish("launchAppEnd", [name]);
 		return pid;
@@ -212,16 +219,23 @@ desktop.app = {
 		filetypes: []
 	},
 	=====*/
-	list: function(/*Function*/callback){
+	list: function(/*Function*/onComplete, /*Function?*/onError){
 		//	summary:
-		//		Lists the apps available on the server
-		//	callback:
+		//		Lists the apps available on the server. Returns a dojo.Deferred object.
+		//	onComplete:
 		//		a callback function. First argument passed is an array with desktop.app._listCallbackItem objects for each app.
+        //	onError:
+        //	    if there was an error, this will be called
+        var d = dojo.Deferred();
+        if(onComplete) d.addCallback(onComplete);
+        if(onError) d.addErrback(onError);
 		desktop.xhr({
 			backend: "core.app.fetch.listAll",
-			load: callback,
+			load: dojo.hitch(d, "callback"),
+            error: dojo.hitch(d, "errback"),
 			handleAs: "json"
 		});
+        return d;
 	},
 	//PROCESS MANAGEMENT FUNCTIONS
 	getInstances: function(){
@@ -312,15 +326,23 @@ desktop.app = {
 		//	contents: String?
 		//		the new code to write to the file specified
 		contents: "({init: function(args){ alert('hi'); }})",
-		//	callback: Function
+		//	onComplete: Function
 		//		a callback function. First argument is the ID of the app just saved (if a sysname was provided)
-		callback: function(id){}
+		onComplete: function(id){},
+        //  onError: Function
+        //      if there was an error, this will be called.
+        onError: function(){}
 	},
 	=====*/
 	save: function(/*desktop.app._saveArgs*/app)
 	{
 		//	summary:
-		//		saves an app to the server
+		//		saves an app to the server. Returns a dojo.Deferred object. 
+        var onComplete = app.onComplete;
+        var onError = app.onError;
+        var d = dojo.Deferred();
+        if(onComplete) d.addCallback(onComplete);
+        if(onError) d.addErrback(onError);
 		if((app.sysname||app.filename)||(app.sysname&&app.filename))
 		{
 			  desktop.log("IDE API: Saving application...");
@@ -328,11 +350,11 @@ desktop.app = {
 	               backend: "core.app.write.save",
 	               content : app,
 		       error: function(data, ioArgs){
-						if(app.error) app.error(data, ioArgs);
+						d.errback(data);
 						desktop.log("IDE API: Save error");
 			},
 	               load: function(data, ioArgs){
-						app.callback(data.sysname||true);
+						d.callback(data.sysname||true);
 						desktop.log("IDE API: Save Sucessful");
 						delete desktop.app.apps[parseInt(data.id)];
 						desktop.xhr({
@@ -350,36 +372,47 @@ desktop.app = {
 		 else
 		 {
 			desktop.log("IDE API: Error! Could not save. Not all required strings in the object are defined.");
-		 	return false;
+		 	d.errback();
 		 }
+         return d;
 	},
-	createFolder: function(/*String*/path, /*Function?*/callback){
+	createFolder: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError){
 		//	summary:
-		//		creates a folder for an app
+		//		creates a folder for an app. Returns a dojo.Deferred object.
 		//	path:
 		//		the path to the folder to create, relative to the apps directory
-		//	callback:
+		//	onComplete:
 		//		a callback function once the operation is complete
+        //	onError:
+        //	    if there was an error, this will be called
+        var d = new dojo.Deferred();
+        if(onComplete) d.addCallback(onComplete);
+        if(onError) d.addErrback(onError);
 		return desktop.xhr({
 			backend: "core.app.write.createFolder",
 			content: {
 				dirname: path
 			},
-			load: function(d){
-				callback(d == "0");
-			}
+			load: function(data){
+				d[data=="0" ? "callback" : "errback"]();
+			},
+            error: dojo.hitch(d, "errback")
 		})
+        return d;
 	},
-	get: function(/*String*/name, /*String?*/file, /*Function*/callback)
+	get: function(/*String*/name, /*String?*/file, /*Function*/onComplete, /*Function?*/onError)
 	{
 		//	summary:
-		//		Loads an app's information from the server w/o caching
+		//		Loads an app's information from the server w/o caching. Returns a dojo.Deferred object.
 		//	name:
 		//		the system name of the app to fetch
 		//	file:
 		//		the filename to open. If excluded, the callback will get an array of filenames
 		//	callback:
 		//		A callback function. Gets passed a desktop.app._saveArgs object, excluding the callback.
+        var d = dojo.Deferred();
+        if(onComplete) d.addCallback(onComplete);
+        if(onError) d.addErrback(onError);
 		desktop.xhr({
 			backend: "core.app.fetch.full",
 			content: {
@@ -389,14 +422,16 @@ desktop.app = {
 			load: function(data, ioArgs)
 			{
 				if(data.contents)
-					callback(/*String*/data.contents);
+					d.callback(/*String*/data.contents);
 				else
-					callback(/*Array*/data);
+					d.callback(/*Array*/data);
 			},
+            error: dojo.hitch(d, "errback"),
 			handleAs: "json"
 		});
+        return d;
 	},
-	renameFile: function(/*String*/origName, /*String*/newName, /*Function?*/callback){
+	renameFile: function(/*String*/origName, /*String*/newName, /*Function?*/onComplete, /*Function?*/onError){
 		//	summary:
 		//		renames a file in the app directory
 		//	origName:
@@ -405,36 +440,48 @@ desktop.app = {
 		//		the new name of the file
 		//	callback:
 		//		a callback function once the action is complete
+        var d = dojo.Deferred();
+        if(onComplete) d.addCallback(onComplete);
+        if(onError) d.addErrback(onError);
 		return desktop.xhr({
 			backend: "core.app.write.rename",
 			content: {
 				origName: origName,
 				newName: newName
 			},
-			load: function(d){
-				callback(d=="0")
-			}
+			load: function(data){
+				d[data=="0" ? "callback" : "errback"]();
+			},
+            error: dojo.hitch(d, "errback")
 		});
+        return d;
 	},
-	remove: function(/*String?*/name, /*String?*/filePath, /*Function?*/callback){
+	remove: function(/*String?*/name, /*String?*/filePath, /*Function?*/onComplete, /*Function?*/onError){
 		//	summary:
 		//		removes an app from the system
 		//	name:
 		//		the app's system name
 		//	filePath:
 		//		the path to the specific file to remove
-		//	callback:
+		//	onComplete:
 		//		a callback function once the app has been removed
+        //	onError:
+        //	    if there was a problem, this will be called
+        var d = dojo.Deferred();
+        if(onComplete) d.addCallback(onComplete);
+        if(onError) d.addErrback(onError);
 		var args = {};
 		if(name) args.sysname = name
 		if(filePath) args.filePath = filePath;
 		desktop.xhr({
 			backend: "core.app.write.remove",
 			content: args,
-			load: function(d){
-				callback(d=="0");
-			}
+			load: function(data){
+				d[data=="0" ? "callback" : "errback"]();
+			},
+            error: dojo.hitch(d, "errback")
 		})
+        return d;
 	}
 }
 
