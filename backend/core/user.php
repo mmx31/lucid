@@ -145,8 +145,13 @@
 				if($p->email == $_POST['email'])
 				{
 					$pass = $p->generate_password();
-					$message= "In response to your forgotten password request, here's your new password.\r\n\r\n" . "New Password: '" . $pass . "'\r\n\r\nLog in with this password, then change your password using the control panel. Thanks!\r\n\r\n--The Management";
+					$message= "In response to your forgotten password request, here's your new password.\r\n\r\n"
+                            . "Login URL: " . $_REQUEST['HTTP_REFERER']
+                            . "Username: " . $p->username
+                            . "New Password: " . $pass
+                            . "\r\n\r\nLog in with this password, then change your password from System > Account Information. Thanks!";
 					mail($p->email, "Psych Desktop Password Reset", $message, "From: Psych Desktop Account Service");
+                    $p->save();
 					$out = new intOutput("ok");
 				}
 				else { $out = new intOutput(2); }
