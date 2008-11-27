@@ -60,7 +60,7 @@ desktop.theme = {
 		preview:"screenshot.png"
 	}
 	=====*/
-	list: function(/*Function*/callback, /*Boolean?*/sync)
+	list: function(/*Function*/onComplete, /*Function?*/onError, /*Boolean?*/sync)
 	{
 		//	summary:
 		//		Pases a list of the themes to the callback provided
@@ -68,12 +68,17 @@ desktop.theme = {
 		//		a callback function. First arg is an array of desktop.theme._listArgs objects.
 		//	sync:
 		//		Should the call be synchronous? defaults to false.
+        var d = new dojo.Deferred();
+        if(onComplete) d.addCallback(onComplete);
+        if(onError) d.addErrback(onError);
 		desktop.xhr({
 			backend: "core.theme.get.list",
-			load: callback,
+			load: dojo.hitch(d, "callback"),
+            error: dojo.hitch(d, "errback"),
 			sync: sync || false,
 			handleAs: "json"
 		});
+        return d;
 	},
 	remove: function(/*String*/name, /*String?*/onComplete, /*String?*/onError){
 		//	summary:
@@ -91,8 +96,8 @@ desktop.theme = {
 				themename: name
 			}
 		});
-		df.addCallback(onComplete);
-		df.addErrback(onError);
+		if(onCallback) df.addCallback(onComplete);
+		if(onError) df.addErrback(onError);
 		return df;
 	}
 }

@@ -197,7 +197,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 		}
 		desktop.theme.list(function(list){
 			dojo.forEach(list, makeThumb);
-		}, true);
+		}, null, true);
 		m.setContent(area);
 		p.addChild(m);
 		return p;
