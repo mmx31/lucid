@@ -25,23 +25,6 @@ dojo.declare("desktop.ui.applets.Netmonitor", desktop.ui.Applet, {
 			this.removeClasses();
 			dojo.addClass(this.containerNode, "icon-22-status-network-idle");
 		}); 
-		this.tooltip = new dijit.Tooltip({
-			position: ["above", "below", "after", "before"]
-		});
-		this._onLaunch = dojo.subscribe("launchApp", this, function(name){
-			if(typeof dojo._loadedModules["desktop.apps."+name] != "undefined") return;
-			var appName = false;
-			dojo.forEach(desktop.app.appList, function(app){
-				if(app.sysname == name)
-					appName = "\""+(apploc[app.name] || app.name)+"\"";
-			});
-			this.tooltip.label = "<div style='float: left;' class='icon-loading-indicator'></div> " + l.launchingApp.replace("%s", appName || name);
-			this.tooltip.open(this.containerNode);
-			var onEnd = dojo.subscribe("launchAppEnd",this,function(){
-				dojo.unsubscribe(onEnd);
-				this.tooltip.close();
-			});
-		})
 		this.inherited("postCreate", arguments);
 	},
 	removeClasses: function(){
@@ -53,7 +36,6 @@ dojo.declare("desktop.ui.applets.Netmonitor", desktop.ui.Applet, {
 	uninitialize: function(){
 		dojo.disconnect(this._xhrStart);
 		dojo.disconnect(this._xhrEnd);
-		dojo.unsubscribe(this._onLaunch);
 		this.inherited("uninitialize", arguments);
 	}
 });
