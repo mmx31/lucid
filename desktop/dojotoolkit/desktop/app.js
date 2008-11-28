@@ -235,7 +235,7 @@ desktop.app = {
             error: dojo.hitch(d, "errback"),
 			handleAs: "json"
 		});
-        return d;
+        return d; // dojo.Deferred
 	},
 	//PROCESS MANAGEMENT FUNCTIONS
 	getInstances: function(){
@@ -374,7 +374,7 @@ desktop.app = {
 			desktop.log("IDE API: Error! Could not save. Not all required strings in the object are defined.");
 		 	d.errback();
 		 }
-         return d;
+         return d; // dojo.Deferred
 	},
 	createFolder: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError){
 		//	summary:
@@ -398,7 +398,7 @@ desktop.app = {
 			},
             error: dojo.hitch(d, "errback")
 		})
-        return d;
+        return d; // dojo.Deferred
 	},
 	get: function(/*String*/name, /*String?*/file, /*Function*/onComplete, /*Function?*/onError)
 	{
@@ -429,7 +429,7 @@ desktop.app = {
             error: dojo.hitch(d, "errback"),
 			handleAs: "json"
 		});
-        return d;
+        return d; // dojo.Deferred
 	},
 	renameFile: function(/*String*/origName, /*String*/newName, /*Function?*/onComplete, /*Function?*/onError){
 		//	summary:
@@ -454,7 +454,7 @@ desktop.app = {
 			},
             error: dojo.hitch(d, "errback")
 		});
-        return d;
+        return d; // dojo.Deferred
 	},
 	remove: function(/*String?*/name, /*String?*/filePath, /*Function?*/onComplete, /*Function?*/onError){
 		//	summary:
@@ -481,7 +481,7 @@ desktop.app = {
 			},
             error: dojo.hitch(d, "errback")
 		})
-        return d;
+        return d; // dojo.Deferred
 	}
 }
 

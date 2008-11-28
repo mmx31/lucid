@@ -68,7 +68,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
             error: dojo.hitch(d, "errback"),
 			handleAs: "json"
 		});
-        return d;
+        return d; // dojo.Deferred
 	},
 	drop: function(/*Function?*/onComplete, /*Function?*/onError)
 	{
@@ -92,5 +92,6 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 			},
             error: dojo.hitch(d, "errback")
 		});
+        return d; // dojo.Deferred
 	}
 });

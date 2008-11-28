@@ -78,7 +78,7 @@ desktop.theme = {
 			sync: sync || false,
 			handleAs: "json"
 		});
-        return d;
+        return d; // dojo.Deferred
 	},
 	remove: function(/*String*/name, /*String?*/onComplete, /*String?*/onError){
 		//	summary:
@@ -98,6 +98,6 @@ desktop.theme = {
 		});
 		if(onCallback) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
-		return df;
+		return df; // dojo.Deferred
 	}
 }

@@ -64,7 +64,7 @@ desktop.filesystem = {
 		if(onComplete) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
 
-		return df;
+		return df; // dojo.Deferred
     },
 	readFileContents: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError, /*api.filesystem._loginArgs?*/ login)
     {
@@ -101,7 +101,7 @@ desktop.filesystem = {
 		if(onComplete) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
 		
-		return df;
+		return df; // dojo.Deferred
    },
    writeFileContents: function(/*String*/path, /*String*/content, /*Function?*/onComplete, /*Function?*/onError, /*api.filesystem._loginArgs?*/ login)
    {
@@ -146,7 +146,7 @@ desktop.filesystem = {
 		df.addCallback(function(){
 			dojo.publish("fsSizeChange", [path]);
 		})
-		return df;
+		return df; // dojo.Deferred
     },
     move: function(/*String*/from, /*String*/to, /*Function?*/onComplete, /*Function?*/onError, /*api.filesystem._loginArgs?*/ login)
     {
@@ -194,7 +194,7 @@ desktop.filesystem = {
 		if(onComplete) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
 		
-		return df;
+		return df; // dojo.Deferred
     },
     createDirectory: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError, /*api.filesystem._loginArgs?*/ login)
     {
@@ -232,7 +232,7 @@ desktop.filesystem = {
 		if(onComplete) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
 		
-		return df;
+		return df; // dojo.Deferred
     },
     remove: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError, /*api.filesystem._loginArgs?*/ login)
     {
@@ -270,7 +270,7 @@ desktop.filesystem = {
 		df.addCallback(function(){
 			dojo.publish("fsSizeChange", [path]);
 		})
-		return df;
+		return df; // dojo.Deferred
     },
     copy: function(/*String*/from, /*String*/to, /*Function?*/onComplete, /*Function?*/onError, /*api.filesystem._loginArgs?*/ login)
     {
@@ -312,7 +312,7 @@ desktop.filesystem = {
 		df.addCallback(function(){
 			dojo.publish("fsSizeChange", [to]);
 		})
-		return df;
+		return df; // dojo.Deferred
     },
 	getQuota: function(/*String*/path, /*Function*/onComplete, /*Function?*/onError, /*api.filesystem._loginArgs?*/ login){
 		//	summary:
@@ -349,7 +349,7 @@ desktop.filesystem = {
 		if(onComplete) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
 		
-		return df;
+		return df; // dojo.Deferred
 	},
 	info: function(/*String*/path, /*Function?*/onComplete, /*Function?*/onError, /*api.filesystem._loginArgs?*/ login){
 		//	summary:
@@ -382,7 +382,7 @@ desktop.filesystem = {
 		if(onComplete) df.addCallback(onComplete);
 		if(onError) df.addErrback(onError);
 		
-		return df;
+		return df; // dojo.Deferred
 	},
 	download: function(/*String*/path, /*String?*/as){
 		//	summary:
