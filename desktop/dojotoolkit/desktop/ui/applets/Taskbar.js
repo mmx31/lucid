@@ -28,11 +28,13 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		store.fetch({
 			onItem: dojo.hitch(this, "onNew")
 		});
+        this.setupLaunchApp();
 	},
 	uninitialize: function(){
 		dojo.forEach(this._storeconnects, function(e){
 			dojo.disconnect(e);
 		});
+        dojo.unsubscribe(this._onLaunch);
 		this.inherited("uninitialize", arguments);
 	},
 	onSet: function(item, attribute, oldValue, v){
@@ -62,7 +64,8 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		desktop.textContent(labelNode, v);
 		domNode.appendChild(labelNode);
 		
-		this._winconnects[store.getValue(item, "id")] = dojo.connect(domNode, "onclick", dijit.byId(store.getValue(item, "id")), "_onTaskClick");
+        if(store.getValue(item, "id").indexOf("load") == -1)
+		    this._winconnects[store.getValue(item, "id")] = dojo.connect(domNode, "onclick", dijit.byId(store.getValue(item, "id")), "_onTaskClick");
 		
 		this._buttons[store.getValue(item, "id")] = domNode;
 		this._labels[store.getValue(item, "id")] = labelNode;
@@ -71,11 +74,13 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 			dojo.style(domNode, "opacity", 0);
 			dojo.fadeIn({node: domNode, duration: desktop.config.window.animSpeed}).play();
 		}
-        dijit.byId(store.getValue(item, "id"))._menu.bindDomNode(domNode);
+        if(store.getValue(item, "id").indexOf("load") == -1)
+            dijit.byId(store.getValue(item, "id"))._menu.bindDomNode(domNode);
 	},
 	onDelete: function(item){
 		var node = this._buttons[item.id[0]];
-		dojo.disconnect(this._winconnects[item.id[0]]);
+        if(item.id[0].indexOf("load") == -1)
+		    dojo.disconnect(this._winconnects[item.id[0]]);
 		var onEnd = function(){
 			node.parentNode.removeChild(node);
 			node=null;
@@ -102,5 +107,30 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 			anim.play();
 		}
 		else onEnd();
-	}
+	},
+    setupLaunchApp: function(){
+        var id=0;
+        this._onLaunch = dojo.subscribe("launchApp", this, function(name){
+            id++;
+    		var l = dojo.i18n.getLocalization("desktop", "system");
+	    	var apploc = dojo.i18n.getLocalization("desktop", "apps");
+            var store = desktop.ui._windowList;
+            if(typeof dojo._loadedModules["desktop.apps."+name] != "undefined") return;
+			var appName = false;
+			dojo.forEach(desktop.app.appList, function(app){
+				if(app.sysname == name)
+					appName = "\""+(apploc[app.name] || app.name)+"\"";
+			});
+            var item = store.newItem({
+                id: "load_"+id,
+                icon: "icon-loading-indicator",
+                label: l.launchingApp.replace("%s", appName || name),
+                load: true
+            });
+            var onEnd = dojo.subscribe("launchAppEnd",this,function(){
+				dojo.unsubscribe(onEnd);
+				store.deleteItem(item);
+			});
+        });
+    }
 });
