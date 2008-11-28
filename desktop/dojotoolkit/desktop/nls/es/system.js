@@ -54,7 +54,7 @@
 	"groupAlreadyExists": "Grupo con ese nombre ya existe",
 	"manageGroupMembers": "Administrar los miembros de %s",
 	"notAssigned": "Aún no se ha asignado",
-	"launchingApp": "Lanzamiento aplicación %s...",
+	"launchingApp": "Iniciando %s...",
 	"themes": "Temas",
 	"preview": "Preview",
 	"markAsRead": "Marcar como leído",

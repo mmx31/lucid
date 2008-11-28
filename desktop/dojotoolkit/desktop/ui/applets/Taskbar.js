@@ -109,9 +109,8 @@ dojo.declare("desktop.ui.applets.Taskbar", desktop.ui.Applet, {
 		else onEnd();
 	},
     setupLaunchApp: function(){
-        var id=0;
         this._onLaunch = dojo.subscribe("launchApp", this, function(name){
-            id++;
+            var id = (new Date()).toString();
     		var l = dojo.i18n.getLocalization("desktop", "system");
 	    	var apploc = dojo.i18n.getLocalization("desktop", "apps");
             var store = desktop.ui._windowList;
