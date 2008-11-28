@@ -68,30 +68,37 @@ desktop.crosstalk = {
         	});
 		//}
 	},
-	exists: function(/*Int?*/id, /*Function*/callback)
+	exists: function(/*Int?*/id, /*Function*/onComplete, /*Function?*/onError)
 	{
 		//	summary:
 		//		checks to see if an event exists
 		//	id:
 		//		the event ID to check
-		//	callback:
+		//	onComplete:
 		//		returns true exists or false nonexistant
-    		desktop.xhr({
-		    	backend: "api.crosstalk.io.eventExists",
-			handleAs: "json",
-				content: {
-					id: id
-				},
-				load: function(data, ioArgs){
-					callback(data.exists);
-				},
-		    		error: function(type, error){
-					desktop.log("Error in Crosstalk call: "+error.message);
-					this.setup_timer();
-				}
-	    	});
+        //	onError:
+        //	    if there was error trying to find out if it exists, this will be called
+        var d = new dojo.Deferred();
+        if(onComplete) d.addCallback(onComplete);
+        if(onError) d.addErrback(onError);
+   		desktop.xhr({
+	    	backend: "api.crosstalk.io.eventExists",
+   			handleAs: "json",
+			content: {
+				id: id
+			},
+			load: function(data, ioArgs){
+				d.callback(data.exists);
+			},
+	    	error: function(type, error){
+				desktop.log("Error in Crosstalk call: "+error.message);
+                d.errback(error);
+				this.setup_timer();
+		    }
+	    });
+        return d; // dojo.Deferred
 	},	
-	publish: function(/*String*/topic, /*Array*/args, /*Int?*/userid, /*String*/appsysname, /*Int?*/instance, /*Function*/callback)
+	publish: function(/*String*/topic, /*Array*/args, /*Int?*/userid, /*String*/appsysname, /*Int?*/instance, /*Function?*/onComplete, /*Function?*/onError)
 	{
 		//	summary:
 		//		publish an event to be sent
@@ -107,8 +114,13 @@ desktop.crosstalk = {
 		//	instance:
 		//		the specific app instance to send it to.
 		//		omit to send it to all instances
-		//	callback:
+		//	onComplete:
 		//		will return a ID to cancel the request
+        //	onError:
+        //	    if there was an error when trying to publish the message, this will be called
+        var d = new dojo.Deferred();
+        if(onComplete) d.addCallback(onComplete);
+        if(onError) d.addErrback(onError);
         if(!userid){
             //publish locally
             this.msgQueue.push({topic: topic, instance: instance, appsysname: appsysname, sender: null});
@@ -125,37 +137,46 @@ desktop.crosstalk = {
 				instance: instance || -1
 			},
 			load: function(data, ioArgs){
-				if(callback)
-					callback(data);
+				d.callback(data);
 			},
 	    		error: function(type, error){
 				desktop.log("Error in Crosstalk call: "+error.message);
+                d.errback(error);
 				this.setup_timer();
 			}
     	});
+        return d; // dojo.Deferred
 	},
 
-	cancel: function(/*Int?*/id, /*Function*/callback)
+	cancel: function(/*Int?*/id, /*Function*/onComplete, /*Function?*/onError)
 	{
 		//	summary:
 		//		cancel a pending event
 		//	id:
 		//		the event ID to cancel
-		//	callback:
-		//		returns 0 ok or 7 access_denied
+		//	onComplete:
+		//		returns when cancel was successful
+        //	onError:
+        //	    If you don't have permission to cancel the event, or there was an error, this will be called.
+        var d = new dojo.Deferred();
+        if(onComplete) d.addCallback(onComplete);
+        if(onError) d.addErrback(onError);
+
     	desktop.xhr({
 	    	backend: "api.crosstalk.io.cancelEvent",
 			content: {
 				id: id
 			},
 			load: function(data, ioArgs){
-				callback(data);
+				d[data == "0" ? "callback" : "errback"]();
 			},
 	    		error: function(type, error){
 				desktop.log("Error in Crosstalk call: "+error.message);
+                d.errback(error);
 				this.setup_timer();
 			}
     	});
+        return d; // dojo.Deferred
 	},
 	
 	_internalCheck2: function()

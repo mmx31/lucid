@@ -25,14 +25,20 @@ desktop.user = {
 		//	email: String?
 		//		the email of the user.
 		email: "",
-		//	callback: Function
+		//	onComplete: Function
 		//		A callback function. First argument is a desktop.user._setArgs object, excluding the callback property
-		callback: function(info){}
+		onComplete: function(info){},
+        //  onError: Function?
+        //      if there was a problem while fetching the information, this will be called
+        onError: function(){}
 	},
 	=====*/
 	get: function(/*desktop.user._getArgs*/options){
 		//	summary:
 		//		Gets the information of a certain user
+        var d = new dojo.Deferred();
+        if(options.onComplete) d.addCallback(options.onComplete);
+        if(options.onError) d.addErrback(options.onError);
 		if(!options.id && !options.username && !options.email){ options.id = "0"; }
 		desktop.xhr({
 	        backend: "core.user.info.get",
@@ -43,10 +49,12 @@ desktop.user = {
 				username: options.username
 			},
 	        load: function(data, ioArgs){
-				data = dojo.fromJson(data);
-	        	if(options.callback){ options.callback(data); }
-			}
+	        	d.callback(data);
+			},
+            error: dojo.hitch(d, "errback"),
+            handleAs: "json"
         });
+        return d; // dojo.Deferred
 	},
 	/*=====
 	_setArgs: {
@@ -70,16 +78,21 @@ desktop.user = {
 		groups: [],
 		//	quota: Integer?
 		//		the user's disk quota, in bytes
-		//	callback: Function?
+        quota: 0,
+		//	onComplete: Function?
 		//		a callback function. Not required.
-		callback: function(){}
+		onComplete: function(){},
+        //  onError: Function?
+        //      if there was an error while setting the info, then this will be called.
+        onError: function(){}
 	},
 	=====*/
 	set: function(/*desktop.user._setArgs*/op){
 		//	summary:
 		//		changes a user's information
-		var callback = op.callback || false;
-		delete op.callback;
+        var d = new dojo.Deferred();
+        if(op.onComplete) d.addCallback(op.onComplete);
+        if(op.onError) d.addErrback(op.onError)
 		if(op.password){
 			//base64 encode it
 			var b = [];
@@ -94,10 +107,10 @@ desktop.user = {
 		desktop.xhr({
 			backend: "core.user.info.set",
 			content: op,
-			load: function(data){
-				if(callback) callback(data);
-			}
-		})		
+			load: dojo.hitch(d, "callback"),
+            error: dojo.hitch(d, "errback")
+		})
+        return d; // dojo.Deferred
 	},
 	logout: function()
 	{
@@ -133,9 +146,12 @@ desktop.user = {
             sync: true
         });
     },
-	authenticate: function(/*String*/password, /*Function?*/callback){
+	authenticate: function(/*String*/password, /*Function?*/onComplete, /*Function?*/onError){
 		//	summary:
 		//		re-authenticates the user so that he/she can change their password
+        var d = new dojo.Deferred();
+        if(onComplete) d.addCallback(onComplete);
+        if(onError) d.addErrback(onError);
 		//first, base64 encode the password to stay at least somewhat secure
 		var b = [];
 		for(var i = 0; i < password.length; ++i){
@@ -150,8 +166,10 @@ desktop.user = {
 				password: password
 			},
 			load: function(data){
-				callback(data == "0");
-			}
+				d[data == "0" ? "callback" : "errback"]();
+			},
+            error: dojo.hitch(d, "errback")
 		})
+        return d; // dojo.Deferred
 	}
 }
