@@ -24,7 +24,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 			+ "&appname=" + encodeURIComponent(args.appname)
 			+ "&name=" + encodeURIComponent(args.name);
 			else this.data = this._jsonData = args.data;
-		}), true);
+		}), null, true);
 	},
 	_saveEverything: function(saveCompleteCallback, saveFailedCallback, newFileContentString){
 		desktop.xhr({
@@ -42,7 +42,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 			}
 		});
 	},
-	exists: function(/*Function*/onSuccess, /*Function*/onError, /*Boolean*/sync)
+	exists: function(/*Function*/onComplete, /*Function*/onError, /*Boolean*/sync)
 	{
 		//	summary:
 		//		Checks if this store exists on the server. Returns a dojo.Deferred object.
@@ -53,7 +53,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 		//	sync:
 		//		should the call be syncronous? defaults to false
         var d = new dojo.Deferred();
-        if(onSuccess) d.addCallback(onSuccess);
+        if(onComplete) d.addCallback(onComplete);
         if(onError) d.addErrback(onError);
 		desktop.xhr({
 			backend: "api.registry.info.exists",

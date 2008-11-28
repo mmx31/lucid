@@ -95,6 +95,11 @@ dependencies ={
             layerDependencies: ["../desktop/desktop.js"]
 		},
 		{
+			name: "../desktop/apps/Todo.js",
+			dependencies: ["desktop.apps.Todo"],
+            layerDependencies: ["../desktop/desktop.js"]
+		},
+		{
 			name: "../desktop/apps/UpdateManager.js",
 			dependencies: ["desktop.apps.UpdateManager"],
             layerDependencies: ["../desktop/desktop.js"]
