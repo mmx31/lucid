@@ -3,13 +3,15 @@ dojo.require("dojox.grid.DataGrid");
 dojo.require("dijit.Toolbar");
 dojo.require("dijit.form.Button");
 dojo.requireLocalization("desktop.apps.Todo", "labels");
+dojo.requireLocalization("desktop", "apps");
 desktop.addDojoCss("dojox/grid/resources/Grid.css");
 
 dojo.declare("desktop.apps.Todo", desktop.apps._App, {
     init: function(args){
         var labels = dojo.i18n.getLocalization("desktop.apps.Todo", "labels");
+        var app = dojo.i18n.getLocalization("desktop", "apps");
         var win = this.win = new desktop.widget.Window({
-            title: "Todo",
+            title: app["Todo"],
             width: "450px",
             height: "250px",
             onClose: dojo.hitch(this, "kill")
