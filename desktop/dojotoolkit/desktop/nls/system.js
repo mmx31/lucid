@@ -56,7 +56,7 @@
 	"groupAlreadyExists": "Group with that name already exists",
 	"manageGroupMembers": "Manage %s members",
 	"notAssigned": "Not yet assigned",
-	"launchingApp": "Launching app %s...",
+	"launchingApp": "Starting %s...",
 	"themes": "Themes",
 	"preview": "Preivew",
 	"quota": "Quota",
