@@ -18,5 +18,6 @@
 	"Appearance": "Appearance",
 	"Account Information": "Account Information",
 	"Startup Applications": "Startup Applications",
-    "Update Manager": "Update Manager"
+    "Update Manager": "Update Manager",
+    "Todo": "Todo"
 })

@@ -18,5 +18,6 @@
 	"Appearance": "Apariencia",
 	"Account Information": "Información de la cuenta",
 	"Startup Applications": "Aplicaciones de inicio",
-    "Update Manager": "Actualización Manager"
+    "Update Manager": "Actualización Manager",
+    "Todo": "Lista de tareas"
 })
