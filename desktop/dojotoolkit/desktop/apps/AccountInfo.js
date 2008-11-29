@@ -100,11 +100,13 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 			win.addChild(wid);
 			wid.startup();
 		}, this);
-		desktop.user.get({callback: function(info){
-			elems["name"].setValue(info.name);
-			elems["email"].setValue(info.email);
-			desktop.textContent(usernameSpan, info.username);
-		}});
+		desktop.user.get({
+            onComplete: function(info){
+    			elems["name"].setValue(info.name);
+	    		elems["email"].setValue(info.email);
+		    	desktop.textContent(usernameSpan, info.username);
+		    }
+        });
 		dojo.connect(win, "onClose", this, function(){
 			var args = {};
 			for(var key in elems){
