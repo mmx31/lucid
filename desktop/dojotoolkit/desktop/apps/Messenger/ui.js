@@ -150,7 +150,7 @@ dojo.extend(desktop.apps.Messenger, {
                         //add the user who sent this to the buddy list
                         desktop.user.get({
                             id: uid,
-                            callback: dojo.hitch(this, function(info){
+                            onComplete: dojo.hitch(this, function(info){
                                 var item = this.addBuddy(info);
                                 var win = this.makeImWindow(item);
                                 this.pushMsg(uid, msg);
@@ -211,7 +211,7 @@ dojo.extend(desktop.apps.Messenger, {
                 var values = form.getValues();
                 desktop.user.get({
                     username: values.username,
-                    callback: dojo.hitch(this, "addBuddy")
+                    onComplete: dojo.hitch(this, "addBuddy")
                 });
                 win.close();
                 return false;

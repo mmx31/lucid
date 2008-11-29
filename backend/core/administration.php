@@ -41,10 +41,10 @@
 				$outList = array();
 				foreach($list as $perm) {
 					array_push($outList, array(
-						id => $perm->id,
-						name => $perm->name,
-						description => $perm->description,
-						initial => ($perm->initial == 1)
+						"id" => $perm->id,
+						"name" => $perm->name,
+						"description" => $perm->description,
+						"initial" => ($perm->initial == 1)
 					));
 				}
 				$out = new jsonOutput($outList);
@@ -247,8 +247,8 @@
 				$fin = array();
 				foreach($list as $item) {
 					array_push($fin, array(
-						type => $item->type,
-						size => $item->size
+						"type" => $item->type,
+						"size" => $item->size
 					));
 				}
 				$out = new jsonOutput($fin);
