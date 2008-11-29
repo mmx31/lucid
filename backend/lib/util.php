@@ -32,7 +32,7 @@ if (get_magic_quotes_gpc())
 function internal_error($type, $msg="")
 {
 	if($msg=="") $msg = $type;
-	header('FirePHP-Data: {"msg":"' . addslashes($msg) . '"}');
+	header('FirePHP-Data: {"msg":"' . str_replace("\n", "", addslashes($msg)) . '"}');
 	$p = new intOutput();
 	$p->set($type);
 	error_log("Lucid Error: " . $type . " (" . $msg . ")");
