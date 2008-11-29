@@ -5,10 +5,6 @@
 
 	Licensed under the Academic Free License version 2.1 or above.
 */
-ini_set( 'memory_limit', '50M' );
-if( false === ini_set( "memory_limit", "50M" ) ) {
-	//Could not upper memory limit
-}
 require("../lib/includes.php");
 import("api.vfs.Base");
 import("models.user");
