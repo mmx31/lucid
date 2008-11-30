@@ -335,7 +335,7 @@ desktop.admin = {
 			return desktop.xhr({
 				backend: "core.administration.users.online",
 				load: onComplete,
-                error: onError
+                error: onError,
 				handleAs: "json"
 			}); // dojo.Deferred
 		}
