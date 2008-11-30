@@ -6,7 +6,6 @@
 	Licensed under the Academic Free License version 2.1 or above.
 */
 
-
 error_reporting(0);
 //make sure no responces are being cached
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -78,4 +77,31 @@ function desktop_errorHandler($exception) {
 	internal_error("generic_err", $exception->getMessage());
 }
 set_exception_handler("desktop_errorHandler");
+//test session token
+$omit_backends = array(
+    "core.bootstrap.check.getToken",
+    "core.bootstrap.check.loggedin",
+    "core.user.auth.login",
+    "core.user.auth.register",
+    "core.user.auth.resetpass",
+    "api.fs.io.display",
+    "api.fs.io.download",
+    "api.fs.io.upload",
+    "core.theme.package.install",
+    "core.app.install.package",
+);
+$res = array();
+ereg("(.+)\/([A-Za-z0-9]+)\/([A-Za-z0-9]+)\.php", $_SERVER["SCRIPT_FILENAME"], $res);
+$backend = $res[2] . "." . $res[3] . "." . $_GET['section'] . "." . $_GET['action'];
+$omit = false;
+foreach($omit_backends as $tbackend){
+    if($backend == $tbackend){
+        $omit = true;
+    }
+}
+if(!$omit){
+    if($_SESSION['token'] != $_POST['DESKTOP_TOKEN']){
+        internal_error("token_mismatch", "CSRF token didn't match");
+    }
+}
 

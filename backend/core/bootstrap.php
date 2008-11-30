@@ -17,4 +17,11 @@ if($_GET['section'] == "check")
 		$out = new intOutput($c !== false ? "ok" : "generic_err");
 		if($c !== false) $c->writeLocaleCookie();
 	}
+    if($_GET['action'] == "getToken"){
+        $token = md5(uniqid(rand()));
+        $_SESSION['token'] = $token;
+        $out = new jsonOutput(array(
+            "token" => $token
+        ));
+    }
 }
