@@ -139,7 +139,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 				desktop.dialog.input({
 					title: nf.createFolder,
 					message: nf.createFolderText,
-					callback: dojo.hitch(this, function(dirname){
+					onComplete: dojo.hitch(this, function(dirname){
 						if(dirname == "") return;
 						dirname = dirname.replace("..", "").replace("/", "");
 						var path = this.appStore.getValue(this._contextItem, "filename");
@@ -180,7 +180,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 				desktop.dialog.input({
 					title: nf.createFile,
 					message: nf.createFileText,
-					callback: dojo.hitch(this, function(filename){
+					onComplete: dojo.hitch(this, function(filename){
 						if(filename == "") return;
 						var path = this.appStore.getValue(this._contextItem, "filename");
 						var appname = this.appStore.getValue(this._contextItem, "appname");
@@ -231,7 +231,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 				desktop.dialog.input({
 					title: cmn.rename,
 					initial: this.appStore.getValue(this._contextItem, "name"),
-					callback: dojo.hitch(this, function(filename){
+					onComplete: dojo.hitch(this, function(filename){
 						if(filename == "") return;
 						var path = this.appStore.getValue(this._contextItem, "filename");
 						var appname = this.appStore.getValue(this._contextItem, "appname");
@@ -295,7 +295,7 @@ dojo.declare("desktop.apps.KatanaIDE", desktop.apps._App, {
 					desktop.dialog.yesno({
 						title: sys.appDelConfirm,
 						message: sys.delFromSys.replace("%s", this.appStore.getValue(this._contextItem, "name")),
-						callback: dojo.hitch(this, function(a){
+						onComplete: dojo.hitch(this, function(a){
 							if(a) doDelete();
 						})
 					})

@@ -18,16 +18,19 @@ desktop.admin = {
 	//		Contains administration functions
 	//		The user must be an administrator to use these, otherwise the
 	//		server-side code will prevent any action from being taken.
-	diskspace: function(/*Function*/callback){
+	diskspace: function(/*Function*/onComplete, /*Function?*/onError){
 		//	summary:
 		//		Gets the amount of free space on the server
-		//	callback:
+		//	onComplete:
 		//		a callback function. Passes an object as an argument with two properties: 'free', and 'total'
+        //	onError:
+        //	    if there was an error with the request, this will be called.
 		return desktop.xhr({
 			backend: "core.administration.general.diskspace",
-			load: callback,
+			load: onComplete,
+            error: onError,
 			handleAs: "json"
-		});
+		}); // dojo.Deferred
 	},
 	permissions: {
 		//	summary:
@@ -45,20 +48,23 @@ desktop.admin = {
 			initial: true
 		},
 		=====*/
-		list: function(/*Function*/callback){
+		list: function(/*Function*/onComplete, /*Function?*/onError){
 			//	summary:
 			//		List the permissions on the system
-			//	callback:
+			//  onComplete:
 			//		a callback function to pass the results to.
 			//		The callback will get a single array of values as it's first argument.
 			//		Each slot in the array will be a desktop.admin.permissions._listArgs object with the permission's information
-			desktop.xhr({
+            //	onError:
+            //	    if there was a problem, then this will be called
+			return desktop.xhr({
 				backend: "core.administration.permissions.list",
-				load: callback,
+				load: onComplete,
+                error: onError,
 				handleAs: "json"
-			})
+			}) // dojo.Deferred
 		},
-		setDefault: function(/*String*/permission, /*Boolean*/value, /*Function?*/callback){
+		setDefault: function(/*String*/permission, /*Boolean*/value, /*Function?*/onComplete, /*Function?*/onError){
 			//	summary:
 			//		Set the default value of a permission
 			//	permission:
@@ -67,16 +73,21 @@ desktop.admin = {
 			//		the default value of the permission
 			//	callback:
 			//		a callback function once the operation is completed
-			return desktop.xhr({
+            var d = new dojo.Deferred();
+            if(onComplete) d.addCallback(onComplete);
+            if(onError) d.addErrback(onError);
+			desktop.xhr({
 				backend: "core.administration.permissions.setDefault",
 				content: {
 					id: permission,
 					value: value
 				},
 				load: function(data){
-					callback(data == "0");
-				}
+					d[data == "0" ? "callback" : "errback"]();
+				},
+                error: dojo.hitch(d, "errback")
 			});
+            return d; // dojo.Deferred
 		}
 	},
 	groups: {
@@ -92,91 +103,121 @@ desktop.admin = {
 			description: "",
 			//	permissions: Object
 			//		An object with permission information for the group
-			permissions: {}
+			permissions: {},
+            //  onComplete: Function
+            //      when a response is received, this will be called
+            onComplete: function(items){},
+            //  onError: Function?
+            //      if there was an error, this will be called
+            onError: function(){}
 		},
 		=====*/
-		list: function(/*Function*/callback){
+		list: function(/*Function*/onComplete, /*Function?*/onError){
 			//	summary:
 			//		Lists groups on the server
-			//	callback:
-			//		a callback function. First arg is an array with desktop.admin.groups._listArgs objects
+			//	onComplete:
+			//		a callback function. First arg is an array with desktop.admin.groups._listArgs objects (without the onComplete or onError functions)
+            //	onError:
+            //	    if there was an error, this will be called
 			return desktop.xhr({
 				backend: "core.administration.groups.list",
-				load: callback|| function(){},
+				load: onComplete,
+                error: onError,
 				handleAs: "json"
-			});
+			}); // dojo.Deferred
 		},
 		add: function(/*desktop.admin.groups._listArgs*/args){
 			//	summary:
 			//		Creates a new group
-			var callback = args.callback;
-			delete args.callback;
+            var d = new dojo.Deferred();
+			if(args.onComplete) d.addCallback(args.onComplete);
+            if(args.onError) d.addErrback(args.onError);
 			args.permissions = dojo.toJson(args.permissions || {});
 			desktop.xhr({
 				backend: "core.administration.groups.add",
 				content: args,
 				load: function(data){
-					callback(data.id);
+					d.callback(data.id);
 				},
+                error: dojo.hitch(d, "errback"),
 				handleAs: "json"
 			})
+            return d; // dojo.Deferred
 		},
-		remove: function(/*Integer*/id, /*Function?*/callback){
+		remove: function(/*Integer*/id, /*Function?*/onComplete, /*Function?*/onError){
 			//	summary:
 			//		Remove a group from the system
 			//	id:
 			//		the id of the group to remove
-			//	callback:
+			//	onComplete:
 			//		a callback function once the operation is complete
+            //	onError:
+            //	    if there was an error, this will be called.
+            var d = new dojo.Deferred();
+            if(onComplete) d.addCallback(onComplete);
+            if(onError) d.addErrback(onError);
 			desktop.xhr({
 				backend: "core.administration.groups.delete",
 				content: {
 					id: id
 				},
 				load: function(data){
-					if(callback) callback(data == "0");
-				}
+					d[data == "0" ? "callback" : "errback"]();
+				},
+                error: dojo.hitch(d, "onError")
 			});
+            return d; //dojo.Deferred
 		},
 		set: function(/*desktop.admin.groups._listArgs*/args){
 			//	summary:
 			//		Set group information
-			var callback = args.callback;
-			delete args.callback;
+            var d = new dojo.Deferred();
+			if(args.onComplete) d.addCallback(args.onComplete);
+            if(args.onError) d.addErrback(args.onError);
 			if(typeof args.permissions != "undefined") args.permissions = dojo.toJson(args.permissions);
 			desktop.xhr({
 				backend: "core.administration.groups.set",
 				content: args,
 				load: function(data){
-					callback(data == "0");
-				}
+					d[data == "0" ? "callback" : "errback"]();
+				},
+                error: dojo.hitch(d, "errback")
 			})
+            return d; // dojo.Deferred
 		},
-		getMembers: function(/*Integer*/id, /*Function*/callback){
+		getMembers: function(/*Integer*/id, /*Function*/onComplete, /*Function?*/onError){
 			//	summary:
 			//		Get the members of a group
 			//	id:
 			//		the id of the group to get the members of
-			//	callback:
+			//	onComplete:
 			//		callback function. First argument is an array of the users. See desktop.user.get for the attributes of each object in the array.
-			desktop.xhr({
+            //	onError:
+            //	    if there was an error, this will be called
+			return desktop.xhr({
 				backend: "core.administration.groups.getMembers",
 				content: {
 					id: id
 				},
-				load: callback,
+				load: onComplete,
+                error: onError,
 				handleAs: "json"
-			})
+			}); // dojo.Deferred
 		},
-		addMember: function(/*Integer*/id, /*Ineger*/userid, /*Function?*/callback){
+		addMember: function(/*Integer*/id, /*Ineger*/userid, /*Function?*/onComplete, /*Function?*/onError){
 			//	summary:
 			//		adds a user to a group
 			//	id:
 			//		the group ID
 			//	userid:
 			//		the user's id
-			//	callback:
+			//	onComplete:
 			//		a callback for once the operation has been completed
+            //	onError:
+            //	    if there was a problem, this will be called
+            var d = new dojo.Deferred();
+            if(onComplete) d.addCallback(onComplete);
+            if(onError) d.addErrback(onError);
 			desktop.xhr({
 				backend: "core.administration.groups.addMember",
 				content: {
@@ -184,9 +225,11 @@ desktop.admin = {
 					userid: userid
 				},
 				load: function(data){
-					if(callback) callback(data == "0");
-				}
+					d[data == "0" ? "callback" : "errback"]();
+				},
+                error: dojo.hitch(d, "errback")
 			})
+            return d; // dojo.Deferred
 		},
 		removeMember: function(/*Integer*/id, /*Integer*/userid, /*Function?*/callback){
 			//	summary:
@@ -197,6 +240,9 @@ desktop.admin = {
 			//		the user's id
 			//	callback:
 			//		a callback for once the operation has been completed
+            var d = new dojo.Deferred();
+            if(onComplete) d.addCallback(onComplete);
+            if(onError) d.addErrback(onError);
 			desktop.xhr({
 				backend: "core.administration.groups.removeMember",
 				content: {
@@ -204,26 +250,30 @@ desktop.admin = {
 					userid: userid
 				},
 				load: function(data){
-					if(callback) callback(data == "0");
-				}
+					d[data == "0" ? "callback" : "errback"]();
+				},
+                error: dojo.hitch(d, "errback")
 			})
+            return d; // dojo.Deferred
 		}
 	},
 	users: {
 		//	summary:
 		//		Some user management functions
 		//		for modifying user information see desktop.user
-		list: function(/*Function*/callback){
+		list: function(/*Function*/onComplete, /*Function?*/onError){
 			//	summary:
 			//		list all users on the system
-			//	callback:
+			//	onComplete:
 			//		a callback function. Gets passed an array of desktop.user._setArgs objects
-			desktop.xhr({
+            //	onError:
+            //	    if there was a problem, this will be called
+			return desktop.xhr({
 				backend: ("core.administration.users.list"),
-				load: function(data, ioArgs){
-					callback(dojo.fromJson(data));
-				}
-			});
+				load: onComplete,
+                error: onError,
+                handleAs: "json"
+			}); // dojo.Deferred
 		},
 		create: function(/*desktop.user._setArgs*/info){
 			//	summary:
@@ -231,51 +281,63 @@ desktop.admin = {
 			//	info:
 			//		A desktop.user._setArgs object, however, the callback gets passed the id of the new user as it's first argument.
 			//		Also, you cannot specify the user's id. it is generated by the server.
-			var callback = info.callback;
-			delete info.callback;
+            var d = new dojo.Deferred();
+            if(info.onComplete) d.addCallback(info.onComplete);
+            if(info.onError) d.addErrback(info.onError);
 			info.permissions = dojo.toJson(info.permissions || []);
 			info.groups = dojo.toJson(info.groups || []);
 			desktop.xhr({
 				backend: "core.administration.users.create",
 				content: info,
 				load: function(data){
-					callback(data.id);
+					d.callback(data.id);
 				},
+                error: dojo.hitch(d, "errback"),
 				handleAs: "json"
 			});
+            return d; // dojo.Deferred
 		},
-		remove: function(/*Integer*/id, /*Function*/callback)
+		remove: function(/*Integer*/id, /*Function*/onComplete, /*Function?*/onError)
 		{
 			//	summary:
 			//		Permanently removes (deletes) a user from the system
 			//	id:
 			//		the id of the user to delete (NOT the username)
-			//	callback:
+			//	onComplete:
 			//		a callback function once the process is complete. passes a single parameter.
 			//		If it's false the user's deletion failed. If true, it was successful.
+            //	onError:
+            //	    if there was a problem, this will be called
+            var d = new dojo.Deferred();
+            if(onComplete) d.addCallback(onComplete);
+            if(onError) d.addErrback(onError);
 			desktop.xhr({
 				backend: "core.administration.users.delete",
 				content: {
 					id: id
 				},
-				load: function(data, ioArgs)
-				{
-					callback(data == "0");
-				}
+				load: function(data, ioArgs){
+					d[data == "0" ? "callback" : "errback"]();
+				},
+                error: dojo.hitch(d, "errback")
 			});
+            return d; // dojo.Deferred
 		},
-		online: function(/*Function*/callback){
+		online: function(/*Function*/onComplete, /*Function?*/onError){
 			//	summary:
 			//		Gets the number of users currently using the system.
-			//	callback:
+			//  onComplete:
 			//		a callback function. Passes a single object as a parameter, with two keys;
 			//		'total', the total number of users on the system, and 'online', the number of users currently online. 
 			//		Both are integers.
-			desktop.xhr({
+            //	onError:
+            //	    If there was an error, this will be called
+			return desktop.xhr({
 				backend: "core.administration.users.online",
-				load: callback,
+				load: onComplete,
+                error: onError
 				handleAs: "json"
-			});
+			}); // dojo.Deferred
 		}
 	},
 	quota: {
@@ -286,16 +348,19 @@ desktop.admin = {
 		//		If a quota is set to 0, then the quota would be limitless.
 		//		if a specific object has a quota of -1, then it looks up the default quota for a user or group.
 		//		you can use these functions to set that default value.
-		list: function(/*Function*/callback){
+		list: function(/*Function*/onComplete, /*Function*/onError){
 			//	summary:
 			//		list the different quotas that you can set
-			desktop.xhr({
+            //	onComplete:
+            //	    a callback method. First argument is the list of each quota. Example: [{"type":"user","size":"26214400"},{"type":"group","size":"0"}]
+			return desktop.xhr({
 				backend: "core.administration.quota.list",
-				load: callback,
+				load: onComplete,
+                error: onError,
 				handleAs: "json"
-			})
+			}) // dojo.Deferred
 		},
-		set: function(/*Object*/quotas, /*Function?*/callback){
+		set: function(/*Object*/quotas, /*Function?*/onComplete, /*Function?*/onError){
 			//	summary:
 			//		Sets a default quota for a system object
 			//	quotas:
@@ -305,13 +370,18 @@ desktop.admin = {
 			//		|	user: 1024,
 			//		|	group: 0
 			//		|}
-			desktop.xhr({
+            //	onComplete:
+            //	    when the operation is complete, this will be called
+            //	onError:
+            //	    if there was a problem, this will be called
+			return desktop.xhr({
 				backend: "core.administration.quota.set",
 				content: {
 					quotas: dojo.toJson(quotas)
 				},
-				load: callback || function(){}
-			})
+				load: onComplete,
+                error: onError
+			}); // dojo.Deferred
 		}
 	}
 }

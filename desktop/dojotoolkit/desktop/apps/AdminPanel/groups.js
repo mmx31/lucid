@@ -56,8 +56,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 						desktop.dialog.yesno({
 							title: sys.groupDelConfirm,
 							message: sys.delFromSys.replace("%s", row.name),
-							callback: dojo.hitch(this, function(a){
-								if(a == false) return;
+							onComplete: dojo.hitch(this, function(a){
 								this._groupStore.deleteItem(row);
 							})
 						})
@@ -155,7 +154,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 						desktop.admin.groups.add({
 							name: n,
 							description: d,
-							callback: dojo.hitch(this, function(id){
+							onComplete: dojo.hitch(this, function(id){
 								name.setValue("");
 								description.setValue("");
 								this._groupStore.newItem({

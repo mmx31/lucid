@@ -26,7 +26,7 @@ dojo.declare("desktop.apps.ImageViewer", desktop.apps._App, {
 				onClick: dojo.hitch(this, function(){
 					desktop.dialog.file({
 						title: "Choose an image to open",
-						callback: dojo.hitch(this, "open")
+						onComplete: dojo.hitch(this, "open")
 					});
 				})
 			}

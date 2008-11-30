@@ -235,7 +235,7 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 				
 				desktop.user.set({
 					password: newpasswd.getValue(),
-					callback: function(){
+					onComplete: function(){
 						resetForm();
 						desktop.textContent(row4, l.passwordChangeSuccessful);
 						clearTimeout(this._authTimeout);

@@ -1,4 +1,5 @@
 <?php
+<<<<<<< .working
 	return array(
 		database => array(
 			'adapter' => 'Mysqli',

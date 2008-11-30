@@ -36,7 +36,7 @@ dojo.extend(desktop.apps.Messenger, {
             onItem: function(item){
                 desktop.user.get({
                     id: store.getValue(item, "id"),
-                    callback: function(info){
+                    onComplete: function(info){
                         store.setValue(item, "logged", !!parseInt(info.logged));
                     }
                 });
