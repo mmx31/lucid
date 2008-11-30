@@ -2,40 +2,69 @@ dojo.provide("desktop.dialog");
 dojo.require("dijit.layout.ContentPane");
 dojo.require("dijit.form.FilteringSelect");
 dojo.require("dojox.widget.Toaster");
+dojo.require("dijit.Dialog");
 dojo.requireLocalization("desktop", "common");
 
 desktop.dialog = {
 	//	summary:
 	//		An API that provides things like dialogs and such
-	alert: function(/*Object*/object)
+    /*=====
+    _alertArgs: {
+        //  title: String
+        //      the title of the dialog
+        title: "",
+        //  message: String
+        //      the message to be shown in the body of the window
+        message: "",
+        //  onComplete: Function?
+        //      a function that is called when the dialog is closed
+        onComplete: function(){},
+        //  onError: Function?
+        //      since there's no way this can result in an error, this is never called. It's just here because this function uses dojo.Deferred.
+        onError: function(){}
+    },
+    =====*/
+	alert: function(/*desktop.dialog._alertArgs*/object)
 	{
 		//	summary:
 		//		Shows a simple alert dialog
-		//	object: {title: String}
-		//		the title of the dialog
-		//	object: {message: String}
-		//		the message to be shown in the body of the window
-		//	object: {callback: Function?}
-		//		a callback that is called when the dialog is closed
-		dojo.require("dijit.Dialog");
+        var d = new dojo.Deferred();
+        if(object.onComplete) d.addCallback(object.onComplete);
+        if(object.onError) d.addErrback(object.onError);
+
 		var div = dojo.doc.createElement("div");
 		div.innerHTML = "<center> "+(object.message||"")+" </center>";
 		var box = new dijit.Dialog({title: object.title, style: object.style || ""}, div);
 		box.show();
 		if(object.callback){
-			dojo.connect(box, 'onUnload', object.callback);
+			dojo.connect(box, 'onUnload', d, "callback");
 		}
+        return d; // dojo.Deferred
 	},
-	authentication: function(/*Object*/object)
+    /*=====
+    _authenticationArgs: {
+        //  permission: String
+        //      The permission to authenticate
+        permission: "",
+        //  program: String?
+        //      the program that wants this authentication (for UI only)
+        program: "",
+        //  onComplete: Function
+        //      will be called if authenticated succesfully
+        onComplete: function(){},
+        //  onError: Function?
+        //      will be called if authentication failed
+        onError: function(){}
+    },
+    =====*/
+	authentication: function(/*desktop.dialog._authenticationArgs*/object)
 	{
 		//	summary:
 		//		Shows a simple authentication dialog
-		//	object: {permission: String}
-		//		The permission to authenticate
-		//	object: {program: String?}
-		//		The program that wants this authentication (for UI only)
-		//	object: {callback: Function}
-		//		Will return 0 or 1 to this when authenticated
+        var d = new dojo.Deferred();
+        if(object.onComplete) d.addCallback(object.onComplete);
+        if(object.onError) d.addErrback(object.onError);
+
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var ac = dojo.i18n.getLocalization("desktop.ui", "accountInfo");
 		if(this.authenticationWin) this.authenticationWin.bringToFront();
@@ -49,7 +78,7 @@ desktop.dialog = {
 			height: "350px",
 			onClose: dojo.hitch(this, function(){
 				this.authenticationWin = false;
-				if(success != 0){ object.callback(1); }
+				if(success != 0){ d.callback(); }
 			}),
 			showClose: false,
 			showMinimize: false,
@@ -73,7 +102,7 @@ desktop.dialog = {
 					password: current.getValue(),
 					callback: dojo.hitch(this, function(data){
 						if(data == 1 && (times - 1) != 0){ times--; row3.innerHTML = times; } //TODO: client side security? wtf are you on?!
-						else { object.callback(data); success = data; win.close(); }
+						else { d[data == "1" ? "callback" : "errback"](); success = data; win.close(); }
 					})
 				})
 			})
@@ -100,33 +129,48 @@ desktop.dialog = {
         setTimeout(dojo.hitch(current, "focus"), 400);
 
 		}
-				
+		return d; // dojo.Deferred
 	},
-	input: function(/*Object*/object)
+    /*=====
+    _inputArgs: {
+        //  title: String
+        //      the title of the dialog
+        title: "",
+        //  message: String
+        //      the message to display above the text field and buttons
+        message: "",
+        //  initial: String?
+        //      the initial contents fo the text field
+        initial: "",
+        //  onComplete: Function
+        //      a callback function, The first argument is the text that was inputted into the dialog
+        onComplete: function(text){},
+        //  onError: Function
+        //      if the user closed the dialog box or hit cancel, then this will be called.
+        onError: function(){}
+    },
+    =====*/
+	input: function(/*desktop.dialog._inputArgs*/object)
 	{
 		//	summary:
 		//		A dialog with a text field
-		//	object: {title: String}
-		//		the title of the dialog
-		//	object: {message: String}
-		//		a message to display above the text field and buttons
-		//	object: {initial: String}
-		//		the initial contents of the dialog
-		//	object: {callback: Function?}
-		//		a callback function. The first argument is the inputted string if the user clicked OK, but false if the user clicked cancel or closed the window.
 		//	example:
-		//	|	desktop.dialog.input({title: "UI Test", message: "What is your name?", callback: desktop.log});
+		//	|	desktop.dialog.input({title: "UI Test", message: "What is your name?", onComplete: desktop.log});
+        var d = new dojo.Deferred();
+        if(object.onComplete) d.addCallback(object.onComplete);
+        if(object.onError) d.addErrback(object.onError);
+
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var dialog = new desktop.widget.Window();
-		dialog.title = object.title;	
+		dialog.title = object.title;
 		dialog.width = "400px";
 		dialog.height = "150px";
-		var onClose = dojo.connect(dialog, "onClose", null, function(){object.callback(false)});
+		var onClose = dojo.connect(dialog, "onClose", null, function(){d.errback()});
 		var details = new dijit.layout.ContentPane({region: "center"}, document.createElement("div"));
 		var text = new dijit.form.TextBox({value: object.initial || ""});
 		var all = document.createElement("div");
-		var blah = new dijit.form.Button({label: cm.ok, onClick: dojo.hitch(this, function(){  dojo.disconnect(onClose); object.callback(text.getValue()); dialog.close(); })});
-		var ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function(){  dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
+		var blah = new dijit.form.Button({label: cm.ok, onClick: dojo.hitch(this, function(){  dojo.disconnect(onClose); d.callback(text.getValue()); dialog.close(); })});
+		var ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function(){  dojo.disconnect(onClose); d.errback(); dialog.close(); })});
 		var line = document.createElement("div");
         var p = document.createElement("span");
 		var q = document.createElement("span");
@@ -147,33 +191,46 @@ desktop.dialog = {
             if(e.keyCode == dojo.keys.ENTER)
                 blah.onClick();
         });
+        return d; // dojo.Deferred
 	},
-	yesno: function(/*Object*/object)
+    /*=====
+    _yesnoArgs: {
+        //  title: String
+        //      the title of the dialog
+        title: "",
+        //  message: String
+        //      the message to display above the yes/no buttons
+        message: "",
+        //  onComplete: Function
+        //      called with what the user chose. The first argument is true if the user selected 'yes', or false if they selected 'no'.
+        onComplete: function(result){},
+        //  onError: Function?
+        //      if the user closed the dialog without choosing, this will be called.
+    },
+    =====*/
+	yesno: function(/*desktop.dialog._yesnoArgs*/object)
 	{
 		//	summary:
 		//		A yes or no dialog
-		//	object: {title: String}
-		//		the title of the dialog
-		//	object: {message: String}
-		//		a message to display above the yes/no buttons
-		//	object: {callback: Function?}
-		//		a callback function. The first argument is true if the user clicked yes, and false if the user clicked no or closed the window.
 		//	example:
-		//	|	desktop.dialog.yesno({title: "UI Test", message: "Did you sign your NDA?", callback: function(p){
+		//	|	desktop.dialog.yesno({title: "UI Test", message: "Did you sign your NDA?", onComplete: function(p){
 		//	|		if(p) alert("Good for you!");
 		//	|		else alert("Then sign it allready!");
-		//	|	});
+		//	|	}});
 		
+        var d = new dojo.Deferred();
+        if(object.onComplete) d.addCallback(object.onComplete);
+        if(object.onError) d.addErrback(object.onError);
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var dialog = new desktop.widget.Window();
 		dialog.title = object.title;	
 		dialog.width = "400px";
 		dialog.height = "150px";
-		var onClose = dojo.connect(dialog, "onClose", null, function(){object.callback(false)});
+		var onClose = dojo.connect(dialog, "onClose", null, function(){d.errback();});
 		var details = new dijit.layout.ContentPane({region: "center"}, document.createElement("div"));
 		var all = document.createElement("div");
-		var blah = new dijit.form.Button({label: cm.yes, onClick: dojo.hitch(this, function(){ dojo.disconnect(onClose); object.callback(true); dialog.close(); })});
-		var ablah = new dijit.form.Button({label: cm.no, onClick: dojo.hitch(this, function(){ dojo.disconnect(onClose); object.callback(false); dialog.close(); })});
+		var blah = new dijit.form.Button({label: cm.yes, onClick: dojo.hitch(this, function(){ dojo.disconnect(onClose); d.callback(true); dialog.close(); })});
+		var ablah = new dijit.form.Button({label: cm.no, onClick: dojo.hitch(this, function(){ dojo.disconnect(onClose); d.callback(false); dialog.close(); })});
 		var line = document.createElement("div");
         var p = document.createElement("span");
 		var q = document.createElement("span");
@@ -189,17 +246,31 @@ desktop.dialog = {
 		dialog.show();
 		dialog.startup();
         setTimeout(dojo.hitch(blah, "focus"), 400);
+        return d; // dojo.Deferred
 	},
-	file: function(/*Object*/object)
+    /*=====
+    _fileArgs: {
+        //  title: String
+        //      the title of the dialog
+        title: "",
+        //  types: Array?
+        //      array which contains an object. e.g types[0].type = "txt"; types[0].label = ".txt (Text)";
+        types: [],
+        //  onComplete: Function
+        //      a callback function. returns the path to the file/folder selected as a string
+        onComplete: function(path){},
+        //  onError: Function?
+        //      if the user hits cancel, then this will be called
+        onError: function(){}
+    },
+    =====*/
+	file: function(/*desktop.dialog._fileArgs*/object)
 	{
 		//	summary:
 		//		Shows a file selector dialog
-		//	object: {title: String}
-		//		the title of the dialog
-		//	object: {types: Array?}
-		//		array which contains an object. e.g types[0].type = "txt"; types[0].label = ".txt (Text)";
-		//	object: {callback: Function?}
-		//		a callback function. returns the path to the file/folder selected as a string
+        var d = new dojo.Deferred();
+        if(object.onComplete) d.addCallback(object.onComplete);
+        if(object.onError) d.addErrback(object.onError);
 		var cm = dojo.i18n.getLocalization("desktop", "common");
 		var pl = dojo.i18n.getLocalization("desktop", "places");
 		dojo.require("dijit.layout.SplitContainer");
@@ -276,7 +347,7 @@ desktop.dialog = {
 				}
 				else {
 					if(file.path+item.name == address.getValue()){ // Is it a file?
-						object.callback(file.path+item.name);
+						d.callback(file.path+item.name);
 						dialog.close();
 						solved = true;
 						return;
@@ -284,12 +355,12 @@ desktop.dialog = {
 				}		
 			});
 			if(!solved){ //Are we creating a new file?
-				object.callback(address.getValue());
+				d.callback(address.getValue());
 				dialog.close();
 			}
 		})});
 		var ablah = new dijit.form.Button({label: cm.cancel, onClick: dojo.hitch(this, function(){
-			object.callback(false);
+			d.errback();
 			dialog.close();
 		})});
 		var all = document.createElement("div");
@@ -314,19 +385,25 @@ desktop.dialog = {
 		dialog.show();
 		file.refresh();
 		dialog.startup();
+        return d; // dojo.Deferred
 	},
-	notify: function(/*String|Object*/message)
+    /*=====
+    _notifyArgs: {
+        //  message: String
+        //      the message to show
+        message: "",
+        //  type: String?
+        //      the type of message. can be "message", "warning", "error", or "fatal"
+        type: "message",
+        //  duration: Integer?
+        //      how long the message will be displayed in miliseconds
+        duration: 5000
+    },
+    =====*/
+	notify: function(/*String|desktop.dialog._notifyArgs*/message)
 	{
 		//	summary:
 		//		Show a toaster popup (similar to libnotify)
-		//	message:
-		//		the message to show. If an object is passed, it takes three parameters.
-		//	message: {message: String}
-		//		the message to show
-		//	message: {type: String?}
-		//		type of message. Can be "message", "warning", "error", or "fatal"
-		//	message: {duration: Integer?}
-		//		how long should the message be displayed in milliseconds
 		dojo.publish("desktop_notification", [message]);
 	},
 	init: function(){
