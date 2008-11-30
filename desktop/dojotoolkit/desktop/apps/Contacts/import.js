@@ -12,7 +12,7 @@ dojo.provide("desktop.apps.Contacts.import");
             var msg = dojo.i18n.getLocalization("desktop", "messages");
             desktop.dialog.file({
 	            title: msg.chooseFileOpen,
-	            callback: dojo.hitch(this, function(path){
+	            onComplete: dojo.hitch(this, function(path){
                    this.importData(path, function(){}, function(){}); //TODO: add notifications? 
 	            })
 	        });

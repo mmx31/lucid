@@ -64,11 +64,11 @@
 				$out = array();
 				foreach($list as $group) {
 					array_push($out, array(
-						id => $group->id,
-						name => $group->name,
-						description => $group->description,
-						permissions => $group->permissions,
-						quota => $group->quota
+						"id" => $group->id,
+						"name" => $group->name,
+						"description" => $group->description,
+						"permissions" => $group->permissions,
+						"quota" => $group->quota
 					));
 				}
 				$output = new jsonOutput($out);
@@ -78,13 +78,13 @@
 				import("lib.Json.Json");
 				$perms = Zend_Json::decode($_POST['permissions']);
 				$p = new $Group(array(
-					name => $_POST['name'],
-					description => $_POST['description'],
-					permissions => $perms
+					"name" => $_POST['name'],
+					"description" => $_POST['description'],
+					"permissions" => $perms
 				));
 				$p->save();
 				$out = new jsonOutput(array(
-					id => $p->id
+					"id" => $p->id
 				));
 			}
 			if($_GET['action'] == "set") {
@@ -167,7 +167,7 @@
 				$exUser = $User->filter("username", $_POST['username']);
 				if($exUser != false) {
 					$out = new jsonOutput(array(
-						id => false
+						"id" => false
 					));
 					die();
 				}

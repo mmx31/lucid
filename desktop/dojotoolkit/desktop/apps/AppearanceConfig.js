@@ -106,7 +106,7 @@ dojo.declare("desktop.apps.AppearanceConfig", desktop.apps._App, {
 			onClick: function(){
 				desktop.dialog.file({
 					title: nc.chooseWall,
-					callback: function(path){
+					onComplete: function(path){
 						if(path){
 							var p = desktop.filesystem.embed(path);
 							for(var key in desktop.config.wallpaper.storedList){

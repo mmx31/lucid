@@ -101,7 +101,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    desktop.dialog.file({
 	        title: msg.chooseFileOpen,
-	        callback: dojo.hitch(this, "_processOpen")
+	        onComplete: dojo.hitch(this, "_processOpen")
 	    });
 	
 	},
@@ -144,7 +144,7 @@ dojo.declare("desktop.apps.TextEditor", desktop.apps._App, {
 	    if (this.newAs){
 	        desktop.dialog.file({
 	            title: msg.chooseFileSave,
-	            callback: dojo.hitch(this, 
+	            onComplete: dojo.hitch(this, 
 	            function(path){
 	                if (path == false){
 	                    return false;

@@ -173,7 +173,7 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 	openURLDialog: function(){
 		desktop.dialog.input({
 			title: this.nls.openUrl,
-			callback: dojo.hitch(this, this.openURL)
+			onComplete: dojo.hitch(this, this.openURL)
 		});
 	},
 	openURL: function(fileurl){
@@ -189,7 +189,7 @@ dojo.declare("desktop.apps.MusicPlayer", desktop.apps._App, {
 	openFileDialog: function(){
 		desktop.dialog.file({
 			title: "Select audio file to open",
-			callback: dojo.hitch(this, this.openFile)
+			onComplete: dojo.hitch(this, this.openFile)
 		});
 	},
 	openFile: function(file){

@@ -135,7 +135,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    desktop.dialog.file({
 	        title: msg.chooseFileOpen,
 		types: [{type: ".html"}],
-	        callback: dojo.hitch(this, this._processOpen)
+	        onComplete: dojo.hitch(this, this._processOpen)
 	    });
 	
 	},
@@ -177,7 +177,7 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	    if (this.newAs){
 	        desktop.dialog.file({
 	            title: msg.chooseFileSave,
-	            callback: dojo.hitch(this, 
+	            onComplete: dojo.hitch(this, 
 	            function(path){
 	                if (path == false){
 	                    return false;

@@ -73,7 +73,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 						desktop.dialog.yesno({
 							title: sys.userDelConfirm,
 							message: sys.delFromSys.replace("%s", row.username),
-							callback: dojo.hitch(this, function(a){
+							onComplete: dojo.hitch(this, function(a){
 								if(a == false) return;
 								var id = this._userStore.getValue(row, "id");
 								this._userStore.deleteItem(row);
@@ -282,7 +282,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 					username: username.getValue(),
 					email: email.getValue(),
 					password: password.getValue(),
-					callback: dojo.hitch(this, function(id){
+					onComplete: dojo.hitch(this, function(id){
 						if(id == false) return error.textContent = usr.usernameAllreadyTaken;
 						error.textContent = usr.userCreated;
 						this._userStore.newItem({

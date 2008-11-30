@@ -60,7 +60,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 						desktop.dialog.yesno({
 							title: sys.appDelConfirm,
 							message: sys.delFromSys.replace("%s", row.name),
-							callback: dojo.hitch(this, function(a){
+							onComplete: dojo.hitch(this, function(a){
 								if(a == false) return;
 								this._appStore.deleteItem(row);
 							})
