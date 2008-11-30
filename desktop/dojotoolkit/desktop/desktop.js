@@ -152,7 +152,6 @@ dojo.require("desktop.flash.flash");
         sync: true,
         load: function(data){
             token = data.token;
-            alert(token);
         },
         handleAs: "json"
     });
