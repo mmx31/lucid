@@ -2,13 +2,7 @@
 <<<<<<< .working
 	return array(
 		database => array(
-			'adapter' => 'Mysqli',
-            'params' => array(
-				'host' => 'localhost',
-                'dbname' => 'desktop',
-                'username' => 'mysql',
-                'password' => 'mysql'
-            ),
+            'dsn' => 'mysql://user:pass@localhost/database',
 			'prefix' => ''
 		),
 		configuration => array(

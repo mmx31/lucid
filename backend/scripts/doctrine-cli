@@ -1,0 +1,6 @@
+#!/usr/bin/env php
+<?php
+require dirname(__FILE__).'/../application/global.php';
+
+$cli = new Doctrine_Cli(Zend_Registry::get('doctrine_config'));
+$cli->run($_SERVER['argv']);

@@ -1,0 +1,45 @@
+App:
+    columns:
+        id:
+            primary: true
+            autoincrement: true
+            type: integer(4)
+        sysname: string(128)
+        name: string(128)
+        author: string(128)
+        email: string(128)
+        website: string(128)
+        version: string(128)
+        category: string(128)
+        icon: string(128)
+
+Group:
+    id:
+        primary: true
+        autoincrement: true
+        type: integer(4)
+    name: string(128)
+    description: string(1000)
+
+Filetype:
+    columns:
+        id:
+            primary: true
+            autoincrement: true
+            type: integer(4)
+        mimetype: string(128)
+        extension: string(16)
+    relations:
+        App:
+            foreignAlias: Filetypes
+
+Permission:
+    columns:
+        id:
+            primary: true
+            autoincrement: true
+            type: integer(4)
+        name: string(128)
+    relations:
+        App:
+            foreignAlias: Permissions
