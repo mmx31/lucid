@@ -25,7 +25,7 @@
 		if($_GET['action'] == "load")
 		{
 			$p = $User->get_current();
-			$result = $Registry->filter(array("userid" => $p->id, "appname" => $_GET['appname'], "name" => $_GET['name']));
+			$result = $Registry->filter(array("userid" => $p->id, "appname" => $_POST['appname'], "name" => $_POST['name']));
 			if($result != false)
 			{
 				$result = $result[0];

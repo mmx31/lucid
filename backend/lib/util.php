@@ -100,7 +100,7 @@ foreach($omit_backends as $tbackend){
     }
 }
 if(!$omit){
-    if($_SESSION['token'] != $_POST['DESKTOP_TOKEN'] && $_SESSION['token'] != $_GET['DESKTOP_TOKEN']){
+    if($_SESSION['token'] != $_POST['DESKTOP_TOKEN']){
         internal_error("token_mismatch", "CSRF token didn't match");
     }
 }

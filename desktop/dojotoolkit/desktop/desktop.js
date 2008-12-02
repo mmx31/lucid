@@ -98,7 +98,7 @@ dojo.require("desktop.flash.flash");
     	}
 	    if(dojo.isString(args)){
 		    //if we just need to get a module url, pass a string
-    		return backend(args)+"&DESKTOP_TOKEN="+token;
+    		return backend(args);
 	    }
     	if(args.xsite){
 	    	if(!dojo.isObject(args.content)) args.content = {};
