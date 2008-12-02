@@ -26,6 +26,24 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 			else this.data = this._jsonData = args.data;
 		}), null, true);
 	},
+    _fetchItems: function(){
+        //hack so we have the xhr through desktop
+        var oxhr=dojo.xhrGet;
+        var self = this;
+        dojo.xhrGet = function(){
+            return desktop.xhr({
+                backend: "api.registry.stream.load",
+                content: {
+                    name: self.__desktop_name,
+                    appname: self.__desktop_appname
+                },
+                handleAs: "json-comment-optional"
+            });
+        };
+        var ret = this.inherited(arguments);
+        dojo.xhrGet = oxhr;
+        return ret;
+    },
 	_saveEverything: function(saveCompleteCallback, saveFailedCallback, newFileContentString){
 		desktop.xhr({
 			backend: ("api.registry.stream.save"),
