@@ -7,6 +7,7 @@ dojo.require("dijit.form.Button");
 dojo.require("dijit.Toolbar");
 dojo.require("dojox.fx.scroll");
 dojo.require("dojox.fx.easing");
+dojo.require("dojox.validate.web");
 
 dojo.extend(desktop.apps.Messenger, {
     buddyListWin: null,
@@ -188,6 +189,26 @@ dojo.extend(desktop.apps.Messenger, {
 
         var msgSpan = document.createElement("span");
         desktop.textContent(msgSpan, message);
+        var message = msgSpan.innerHTML.split(" ");
+        var fixedMessage = [];
+        dojo.forEach(message, function(word){
+            if(dojox.validate.isUrl(word))
+                fixedMessage.push("<a href=\""+word.replace("\"", "\\\"")+"\">"+word+"</a>");
+            else
+                fixedMessage.push(word);
+        });
+        msgSpan.innerHTML = fixedMessage.join(" ");
+
+        dojo.query("a", msgSpan).forEach(function(node){
+			dojo.connect(node, "onclick", node, function(e){
+				if(!e.shiftKey
+				&& !e.ctrlKey){
+					desktop.app.launchHandler(null, {url: this.href}, "text/x-uri");
+					e.preventDefault();
+				}
+            })
+		});
+
         div.appendChild(msgSpan);
         
         if(local){
