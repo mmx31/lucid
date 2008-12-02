@@ -193,7 +193,7 @@
                 $id = "'" . $this->_escape($id) . "'"; 
             }
 			$this->_query("SELECT * FROM ${tablename} WHERE id=${id}");
-			if($this->_result[0])
+			if(isset($this->_result[0]))
 			{
 				$p = $this->_makeModel($this->_result[0]);
 				return $p;
