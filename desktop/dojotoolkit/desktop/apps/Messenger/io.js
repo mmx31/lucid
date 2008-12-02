@@ -32,7 +32,7 @@ dojo.extend(desktop.apps.Messenger, {
     },
     getCurrentUsername: function(cback){
         if(this.currentUsername) cback(this.currentUsername);
-        desktop.user.get({callback: dojo.hitch(this, function(data){
+        desktop.user.get({onComplete: dojo.hitch(this, function(data){
             this.currentUsername = data.username;
             cback(this.currentUsername);
         })});

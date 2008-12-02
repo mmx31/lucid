@@ -88,7 +88,7 @@ dojo.require("desktop.flash.flash");
     			url += "/"+mod[i];
 	    	}
 		    url += ".php?section="+escape(mod[mod.length-2]);
-    		url += "&action="+escape(mod[mod.length-1])
+    		url += "&action="+escape(mod[mod.length-1]);
     
             // WORKAROUND, see #159 for more info
             if(str == "api.fs.io.upload")
@@ -98,7 +98,7 @@ dojo.require("desktop.flash.flash");
     	}
 	    if(dojo.isString(args)){
 		    //if we just need to get a module url, pass a string
-    		return backend(args);
+    		return backend(args)+"&DESKTOP_TOKEN="+token;
 	    }
     	if(args.xsite){
 	    	if(!dojo.isObject(args.content)) args.content = {};
