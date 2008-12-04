@@ -153,7 +153,7 @@ desktop.app = {
         var d = new dojo.Deferred();
         if(onComplete) d.addCallback(onComplete);
         if(onError) d.addErrback(onError);
-		dojo["require"]("desktop.apps."+name);
+        desktop._loadApp(name);
 		var pid = false;
 		try {
 			pid = desktop.app.instances.length;
