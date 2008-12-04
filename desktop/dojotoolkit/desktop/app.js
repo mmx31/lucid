@@ -13,6 +13,9 @@ desktop.app = {
 	//	instanceCount: Int
 	//		A counter for making new instances of apps
 	instanceCount: 0,
+    //  currentApp: String
+    //      the current application that is running
+    currentApp: "",
 	init: function(){
 		//	summary:
 		//		Loads the app list from the server

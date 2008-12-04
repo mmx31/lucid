@@ -74,6 +74,7 @@ dojo.require("desktop.flash.flash");
     var token = null;
     var systemActive = true;
     var appActive = false;
+    var currentApp = false;
     var _registeredModules = {};
     
     // make sure XMLHttpRequest can't be accessed directly
@@ -186,10 +187,16 @@ dojo.require("desktop.flash.flash");
         },
         handleAs: "json"
     });
+    
+    var getCurrentApp = function(){
+        return (currentApp ? currentApp.match(/desktop\.apps\.([^\.]+).+/)[1] : false);
+    }
 
     var registerSystemFunc = function(module, context, funcname){
         var oldFunc = context[funcname];
         context[funcname] = function(){
+            //this is so that someone can't override this property and pose as any app they choose
+            desktop.app.currentApp = getCurrentApp();
             //make sure we don't get in the way of the original call
             var firstCall = false;
             var appWasActive = false;
@@ -216,16 +223,22 @@ dojo.require("desktop.flash.flash");
         var oldFunc = context[funcname];
 
         context[funcname] = function(){
+            //this is so that someone can't override this property and pose as any app they choose
+            desktop.app.currentApp = getCurrentApp();
             var appWasActive = false;
             if(appActive){
                 appWasActive = true;
             }
-            appActive = module;
+            appActive = true;
+            currentApp = module;
             
             var ret = oldFunc.apply(this, arguments);
 
-            if(!appWasActive)
+            if(!appWasActive){
                 appActive = false;
+                currentApp = false;
+                desktop.app.currentApp = "";
+            }
 
             return ret;
         }
