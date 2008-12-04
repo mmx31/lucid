@@ -67,9 +67,40 @@ dojo.require("desktop.flash.flash");
 	});
 })();
 
+
+
 (function(){
+    // some internal sysem vars for XHR security
     var token = null;
+    var systemActive = true;
+    var appActive = false;
+    var _registeredModules = {};
     
+    // make sure XMLHttpRequest can't be accessed directly
+    var xhr = XMLHttpRequest;
+    window.XMLHttpRequest = null;
+    if(dojo.isIE){
+        var AXO = ActiveXObject;
+        window.ActiveXObject = null;
+    }
+    // redeclare the function in this scope
+    var d = dojo;
+    var dxhr = eval("("+dojo._xhrObj.toString()+")");
+    dojo._xhrObj = function(){
+        if(!(systemActive == true && appActive === false)){
+            throw new Error("Access denied: App or outside script attempted to get an XHR object directly");
+            return;
+        }
+        window.XMLHttpRequest = xhr;
+        if(dojo.isIE)
+            window.ActiveXObject = AXO;
+        var ret = dxhr.call(dojo, arguments);
+        window.XMLHttpRequest = null;
+        if(dojo.isIE)
+            window.ActiveXObject = null;
+        return ret;
+    }
+
     desktop.xhr = function(/*dojo.__ioArgs|String*/args){
 	    //	summary:
     	//		an extention of dojo's XHR utilities, but with some extra params to make life easy
@@ -130,7 +161,7 @@ dojo.require("desktop.flash.flash");
     	if(args.error) df.addErrback(args.error);
         if(!args.content) args.content = {};
 	    args.content["DESKTOP_TOKEN"] = token;
-    	var xhr = dojo.xhrPost(dojo.mixin(args, {
+    	var xhr = dojo.xhr("POST", dojo.mixin(args, {
 	    	load: function(data){
 		    	if(typeof parseInt(data) == "number" && parseInt(data) > 0 && !args.number){
 			    	console.error(data); //TODO: we should alert the user in some cases, or possibly retry the request. OR FUCKTARD, RETURN AN ERROR, NE?
@@ -143,7 +174,7 @@ dojo.require("desktop.flash.flash");
 		    	console.error(err);
 			    df.errback(err);
     		},
-	    }));
+	    }), true);
     	df.canceler = dojo.hitch(xhr, "cancel");
 	    return df;
     }
@@ -155,7 +186,98 @@ dojo.require("desktop.flash.flash");
         },
         handleAs: "json"
     });
+
+    var registerSystemFunc = function(module, context, funcname){
+        var oldFunc = context[funcname];
+        context[funcname] = function(){
+            //make sure we don't get in the way of the original call
+            var firstCall = false;
+            var appWasActive = false;
+            if(systemActive == false)
+                firstCall = true;
+            if(appActive){
+                appWasActive = appActive;
+                appActive = false;
+            }
+            systemActive = true;
+            
+            var ret = oldFunc.apply(this, arguments);
+            
+            if(firstCall){
+                systemActive = false;
+                if(appWasActive)
+                    appActive = appWasActive;
+            }
+
+            return ret;
+        }
+    }
+    var registerAppFunc = function(module, context, funcname){
+        var oldFunc = context[funcname];
+
+        context[funcname] = function(){
+            var appWasActive = false;
+            if(appActive){
+                appWasActive = true;
+            }
+            appActive = module;
+            
+            var ret = oldFunc.apply(this, arguments);
+
+            if(!appWasActive)
+                appActive = false;
+
+            return ret;
+        }
+    }
+
+    var registerModule = desktop.registerModule = function(name, obj){
+        if(!systemActive){
+            throw new Error("Access Denied: Attempted to register a module while the system wasn't active");
+            return;
+        }
+        // recursively registers a module
+        if(_registeredModules[name] == true) return; //already registered
+        _registeredModules[name] = true;
+        if(!obj)
+            obj = dojo.getObject(name);
+        var isApp = (name.indexOf("desktop.apps.") == 0);
+        for(var prop in obj){
+            var d = obj[prop];
+            var t = typeof d;
+            if(!obj[prop] || prop == "constructor")
+                continue;
+            if(d.prototype && d.prototype.declaredClass){
+                registerModule(name+"."+prop+".prototype", d.prototype);
+            }
+            else if(t == "object"){
+                registerModule(name+"."+prop, d);
+            } 
+            else if(t == "function"){
+                (isApp ? registerAppFunc : registerSystemFunc)(name, obj, prop);
+            }
+        }
+    }
+    //register dojo's xhr methods as system functions
+    dojo.forEach([
+        "xhrGet",
+        "xhrPost",
+        "rawXhrPost",
+        "xhrPut",
+        "rawXhrPut",
+        "xhrDelete"
+    ], function(method){
+        registerSystemFunc("dojo", method);
+    });
+    dojo.addOnLoad(dojo.hitch(this, registerModule, "desktop"));
 })();
+
+desktop._loadApp = function(app){
+    //declared outside of security scope so apps can't access security variables
+    dojo["require"]("desktop.apps."+app);
+    desktop.registerModule("desktop.apps."+app);
+}
+
 desktop.addDojoCss = function(/*String*/path)
 {
 	//	summary:
@@ -220,5 +342,6 @@ desktop._errorCodes = [
 	"already_installed",
 	"quota_exceeded",
 	"remote_authentication_failed",
-	"remote_connection_failed"
+	"remote_connection_failed",
+    "token_mismatch"
 ];
