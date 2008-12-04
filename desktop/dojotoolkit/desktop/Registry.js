@@ -16,7 +16,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 		//	args: {data: Object}
 		//		this argument differs from a regular datastore; if the database exists on the server then it is ignored and the server-side data is used.
 		this.__desktop_name = args.name;
-		this.__desktop_appname = args.appname;
+		this.__desktop_appname = desktop.app.currentApp;
 		
 		this._jsonData = null;
 		this.exists(dojo.hitch(this, function(e){
@@ -35,7 +35,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
                 backend: "api.registry.stream.load",
                 content: {
                     name: self.__desktop_name,
-                    appname: self.__desktop_appname
+                    appname: desktop.app.currentApp
                 },
                 handleAs: "json-comment-optional"
             });
@@ -49,7 +49,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 			backend: ("api.registry.stream.save"),
 			content: {
 				value: newFileContentString,
-				appname: this.__desktop_appname,
+				appname: desktop.app.currentApp,
 				name: this.__desktop_name
 			},
 			load: function(data, ioArgs){
@@ -78,7 +78,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 			sync: sync,
 			content: {
 				name: this.__desktop_name,
-				appname: this.__desktop_appname
+				appname: desktop.app.currentApp
 			},
 			load: function(data, ioArgs){
 				d.callback(data.exists);
@@ -103,7 +103,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 			backend: "api.registry.stream.delete",
 			content: {
 				name: this.__desktop_name,
-				appname: this.__desktop_appname
+				appname: desktop.app.currentApp
 			},
 			load: function(data, ioArgs){
 				d[data == "0" ? "callback" : "errback"]();
