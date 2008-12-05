@@ -195,16 +195,23 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 			onClick: dojo.hitch(this, function(){
 				current.setDisabled(true);
 				this.authButton.setDisabled(true);
-				
-				desktop.user.authenticate(current.getValue(), dojo.hitch(this, function(data){
-					current.setDisabled(data);
-					authButton.setDisabled(data);
-					newpasswd.setDisabled(!data);
-					confpasswd.setDisabled(!data);
-					desktop.textContent(row4, (data ? l.authSuccess : l.authFail));
-					this._authTimeout = setTimeout(resetForm, 5*60*1000);
-				}))
-				current.setValue("");
+				var res = function(data){
+    				current.setDisabled(data);
+	    			authButton.setDisabled(data);
+		    		newpasswd.setDisabled(!data);
+			    	confpasswd.setDisabled(!data);
+				    desktop.textContent(row4, (data ? l.authSuccess : l.authFail));
+    				this._authTimeout = setTimeout(resetForm, 5*60*1000);
+	    		}
+				desktop.user.authenticate(current.getValue(), 
+                    dojo.hitch(this, function(){
+                        res(true);
+                    }),
+                    dojo.hitch(this, function(){
+                        res(false);
+	    		    })
+                )
+		    	current.setValue("");
 			})
 		})
 		row1.appendChild(authButton.domNode);
