@@ -89,6 +89,7 @@ dojo.require("desktop.flash.flash");
     var dxhr = eval("("+dojo._xhrObj.toString()+")");
     dojo._xhrObj = function(){
         if(!(systemActive == true && appActive === false)){
+            console.log(arguments.callee.caller.toString());
             throw new Error("Access denied: App or outside script attempted to get an XHR object directly");
             return;
         }
@@ -278,9 +279,10 @@ dojo.require("desktop.flash.flash");
         "rawXhrPost",
         "xhrPut",
         "rawXhrPut",
-        "xhrDelete"
+        "xhrDelete",
+        "_getText"
     ], function(method){
-        registerSystemFunc("dojo", method);
+        registerSystemFunc("dojo", dojo, method);
     });
     dojo.addOnLoad(dojo.hitch(this, registerModule, "desktop"));
 })();
