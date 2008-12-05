@@ -6,6 +6,7 @@ dojo.require("dijit._editor.plugins.TextColor");
 dojo.require("dijit._editor.plugins.FontChoice");
 dojo.require("dijit._editor.plugins.LinkDialog");
 dojo.require("dijit._editor.plugins.TabIndent");
+dojo.require("dojo.date");
 
 dojo.requireLocalization("desktop", "common");
 dojo.requireLocalization("desktop", "apps");
@@ -163,8 +164,9 @@ dojo.declare("desktop.apps.WordProcessor", desktop.apps._App, {
 	processSave: function(){
 		var msg = dojo.i18n.getLocalization("desktop", "messages");
 	    if (this.editing){
-        desktop.filesystem.writeFileContents(this.fileEditing, "<html>"+this.editor.getValue()+"</html>");
-        this.statusbar.attr("label", msg.fileSaved);
+            desktop.filesystem.writeFileContents(this.fileEditing, "<html>"+this.editor.getValue()+"</html>");
+            var p = dojo.date.locale.format(new Date());
+            this.statusbar.attr("label", msg.fileSaved+" ("+p+")");
 	    }
 	    else {
 	        this.processSaveAs();
