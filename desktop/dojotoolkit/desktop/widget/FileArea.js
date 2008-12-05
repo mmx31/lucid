@@ -240,7 +240,7 @@ dojo.declare("desktop.widget.FileArea", dijit.layout._LayoutWidget, {
 		desktop.dialog.input({
 			title: nf.createFolder,
 			message: nf.createFolderText,
-			callback: dojo.hitch(this, function(dirname){
+			onComplete: dojo.hitch(this, function(dirname){
 				if(dirname == "") return;
 				dirname = this._fixDuplicateFilename(dirname, "text/directory");
 				desktop.filesystem.createDirectory(this.path+dirname, dojo.hitch(this, function(){
@@ -350,7 +350,7 @@ dojo.declare("desktop.widget.FileArea", dijit.layout._LayoutWidget, {
 		desktop.dialog.input({
 			title: nf.createFile,
 			message: nf.createFileText,
-			callback: dojo.hitch(this, function(filename){
+			onComplete: dojo.hitch(this, function(filename){
 				if(filename == "") return;
 				filename = this._fixDuplicateFilename(filename, "text/plain");
 				desktop.filesystem.writeFileContents(this.path+filename, "", dojo.hitch(this, function(){
