@@ -1,5 +1,4 @@
 <?php
-<<<<<<< .working
 	return array(
 		database => array(
             'dsn' => 'mysql://user:pass@localhost/database',
