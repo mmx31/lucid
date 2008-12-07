@@ -80,8 +80,8 @@
 	display: none;
 	z-index: 100;
 }
-.mainFileArea {
-	z-index: 10;
+div.mainFileArea {
+	z-index: 6;
     position: absolute;
 }
 .wallpaper {

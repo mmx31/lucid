@@ -181,16 +181,20 @@ desktop.app = {
 				instance.init(args||{});
 			}
 			catch(e){
+                dojo.publish("launchAppEnd", [name]);
 				console.error(e);
                 d.errback(e);
+                return;
 			}
 			instance.status = "active";
-			d.callback(instance);
 		}
 		catch(e){
+            dojo.publish("launchAppEnd", [name]);
 			console.error(e);
             d.errback(e);
+            return;
 		}
+		d.callback(instance);
 		dojo.publish("launchAppEnd", [name]);
 		return pid;
 	},

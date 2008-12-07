@@ -78,26 +78,30 @@ dojo.require("desktop.flash.flash");
     var _registeredModules = {};
     
     // make sure XMLHttpRequest can't be accessed directly
-    var xhr = XMLHttpRequest;
-    window.XMLHttpRequest = null;
+    if(typeof XMLHttpRequest != "undefined"){
+        var xhr = XMLHttpRequest;
+        window.XMLHttpRequest = null;
+    }
     if(dojo.isIE){
         var AXO = ActiveXObject;
         window.ActiveXObject = null;
     }
     // redeclare the function in this scope
     var d = dojo;
-    var dxhr = eval("("+dojo._xhrObj.toString()+")");
+    var dxhr = eval("({xhr:"+dojo._xhrObj.toString()+"})").xhr; //stupid workaround for IE
     dojo._xhrObj = function(){
         if(!(systemActive == true && appActive === false)){
             console.log(arguments.callee.caller.toString());
             throw new Error("Access denied: App or outside script attempted to get an XHR object directly");
             return;
         }
-        window.XMLHttpRequest = xhr;
+        if(xhr)
+            window.XMLHttpRequest = xhr;
         if(dojo.isIE)
             window.ActiveXObject = AXO;
         var ret = dxhr.call(dojo, arguments);
-        window.XMLHttpRequest = null;
+        if(xhr)
+            window.XMLHttpRequest = null;
         if(dojo.isIE)
             window.ActiveXObject = null;
         return ret;
@@ -175,7 +179,7 @@ dojo.require("desktop.flash.flash");
 	    	error: function(err){
 		    	console.error(err);
 			    df.errback(err);
-    		},
+    		}
 	    }), true);
     	df.canceler = dojo.hitch(xhr, "cancel");
 	    return df;

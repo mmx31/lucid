@@ -28,6 +28,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		});
 		this.fileArea = new desktop.widget.FileArea({path: (args.path || "file://"), region: "center"});
         this.updateTitle(this.fileArea.path);
+        this.fileArea.refresh();
 		this.pane = new dijit.layout.ContentPane({region: "left", splitter: true, minSize: 120, style: "width: 120px;"});
 		var menu = new dijit.Menu({
 			style: "width: 100%;"
@@ -124,9 +125,7 @@ dojo.declare("desktop.apps.FileBrowser", desktop.apps._App, {
 		this.win.addChild(this.statusbar);
 		this.win.show();
 		bCont.startup();
-		this.win.startup();
-		this.win.onClose = dojo.hitch(this, this.kill);
-		this.fileArea.refresh();
+        this.win.resize();
 		setTimeout(dojo.hitch(this, "makeUploader"), 1000);
 	},
     updateTitle: function(path){

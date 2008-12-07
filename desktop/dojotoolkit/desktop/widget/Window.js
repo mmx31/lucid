@@ -229,10 +229,10 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			});
 			anim.play();
 		} else this.resize();
-		if(!this._started){
+		this.bringToFront();
+        if(!this._started){
 			this.startup();
 		}
-		this.bringToFront();
 	},
 	_toggleBody: function(/*Boolean*/show){
 		//	summary:
@@ -563,19 +563,18 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			if(this._winListItem) desktop.ui._windowList.deleteItem(this._winListItem);
 			this._winListItem = false;
 			this.onClose();
-			var onEnd = dojo.hitch(this, function(){
-				this.destroy();
-			})
 			if (desktop.config.fx >= 2){
 				if(desktop.config.fx < 3) this._toggleBody(false);
 				var anim = dojo.fadeOut({
 					node: this.domNode,
-					duration: desktop.config.window.animSpeed
+					duration: desktop.config.window.animSpeed,
+                    onEnd: dojo.hitch(this, function(){
+                        this.destroy();
+                    })
 				});
-				dojo.connect(anim, "onEnd", this, onEnd);
 				anim.play();
 			}
-			else onEnd();
+			else this.destroy();
 		}
 	},
 	layout: function(){
@@ -638,7 +637,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		//		starts the widget up
 		if(this._started) return;
 		this.inherited(arguments);
-		this.resize();
+		//this.resize();
 		this._started = true;
 	}
 });

@@ -41,7 +41,6 @@ desktop.filesystem = {
 		//		a callback function to fire on completion. The first argument passed is an array of api.filesystem._fileInfo objects
 		//	onError:
 		//		a callback function to fire on error
-
         var df = new dojo.Deferred();
 		desktop.xhr({
 	        backend: "api.fs.io.getFolder",
@@ -57,7 +56,7 @@ desktop.filesystem = {
 			}),
 			error: function(e){
 				df.errback(e);
-			},	
+			},
 			handleAs: "json"
 		});
 		
