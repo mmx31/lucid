@@ -86,7 +86,8 @@ $omit_backends = array(
     "core.user.auth.resetpass",
     "api.fs.io.display",
     "api.fs.io.download",
-    "api.fs.io.upload",
+    //"api.fs.io.upload",
+    "..io.upload", //for some reason this is what $backend is set to when uploading. Probably due to the uploader workarounds
     "core.theme.package.install",
     "core.app.install.package",
 );
