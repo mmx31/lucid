@@ -36,9 +36,7 @@ desktop.dialog = {
 		div.innerHTML = "<center> "+(object.message||"")+" </center>";
 		var box = new dijit.Dialog({title: object.title, style: object.style || ""}, div);
 		box.show();
-		if(object.callback){
-			dojo.connect(box, 'onUnload', d, "callback");
-		}
+		dojo.connect(box, 'onUnload', d, "callback");
         return d; // dojo.Deferred
 	},
     /*=====
@@ -283,7 +281,7 @@ desktop.dialog = {
 		dialog.width = "500px";
 		dialog.height = "300px";
 		var file = new desktop.widget.FileArea({path: "file://", onItem: dojo.hitch(this, function(path){
-			object.callback(path);
+			d.callback(path);
 			dialog.close();
 		})}); //Make the fileArea
 		var toolbar = new dijit.Toolbar({region: "top"});
