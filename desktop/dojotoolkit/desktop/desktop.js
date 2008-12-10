@@ -16,6 +16,9 @@ dojo.require("desktop.widget.Console");
 dojo.require("desktop.widget.FileArea");
 dojo.require("desktop.flash.flash");
 
+dojo.require("dojox.uuid");
+dojo.require("dojox.uuid.generateTimeBasedUuid");
+
 (function(){
 	var modules = [
 		"desktop.crosstalk",
@@ -193,8 +196,19 @@ dojo.require("desktop.flash.flash");
         handleAs: "json"
     });
     
+
     var getCurrentApp = function(){
         return (currentApp ? currentApp.match(/desktop\.apps\.([^\.]+).+/)[1] : false);
+    }
+    
+    var idsForOwners = {};
+    var alterConstructedObject = function(obj){
+        var id = obj.__desktop_id = dojox.uuid.generateTimeBasedUuid();
+        if(typeof idsForOwners[id] != "undefined"){
+            throw Error("Constructor id conflict, possible security intrusion");
+        }
+        idsForOwners[id] = getCurrentApp();
+        return obj;
     }
 
     var registerSystemFunc = function(module, context, funcname){
@@ -213,8 +227,16 @@ dojo.require("desktop.flash.flash");
             }
             systemActive = true;
             
+            if(this.__desktop_id){
+                this.__desktop_owner = idsForOwners[this.__desktop_id];
+            }
+
             var ret = oldFunc.apply(this, arguments);
             
+            if(funcname == "_constructor" && context.declaredClass){
+                ret = alterConstructedObject(ret);
+            }
+
             if(firstCall){
                 systemActive = false;
                 if(appWasActive)
@@ -230,6 +252,7 @@ dojo.require("desktop.flash.flash");
         context[funcname] = function(){
             //this is so that someone can't override this property and pose as any app they choose
             desktop.app.currentApp = getCurrentApp();
+            
             var appWasActive = false;
             if(appActive){
                 appWasActive = true;
@@ -238,7 +261,7 @@ dojo.require("desktop.flash.flash");
             currentApp = module;
             
             var ret = oldFunc.apply(this, arguments);
-
+            
             if(!appWasActive){
                 appActive = false;
                 currentApp = false;
