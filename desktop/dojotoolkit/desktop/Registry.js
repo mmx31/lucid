@@ -1,13 +1,15 @@
 dojo.provide("desktop.Registry");
 dojo.require("dojo.data.ItemFileWriteStore");
 
+
 dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 	//	summary:
 	//		An API that allows storage in a table format for users.
 	//		This is basically a persistant dojo.data store with write capabilities.
 	//		See dojo's documentation on dojo.data for more info.
 	__desktop_name: "",
-	__desktop_appname: 0,
+	__desktop_appname: "",
+    __desktop_id: "",
 	constructor: function(/*Object*/args){
 		//	args: {name: String}
 		//		the name of the store
@@ -21,7 +23,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 		this._jsonData = null;
 		this.exists(dojo.hitch(this, function(e){
 			if(e == true) this.url = this._jsonFileUrl = desktop.xhr("api.registry.stream.load")
-			+ "&appname=" + encodeURIComponent(args.appname)
+			+ "&appname=" + encodeURIComponent(this.__desktop_owner)
 			+ "&name=" + encodeURIComponent(args.name);
 			else this.data = this._jsonData = args.data;
 		}), null, true);
@@ -35,7 +37,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
                 backend: "api.registry.stream.load",
                 content: {
                     name: self.__desktop_name,
-                    appname: desktop.app.currentApp
+                    appname: self.__desktop_owner
                 },
                 handleAs: "json-comment-optional"
             });
@@ -49,7 +51,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 			backend: ("api.registry.stream.save"),
 			content: {
 				value: newFileContentString,
-				appname: desktop.app.currentApp,
+				appname: this.__desktop_owner,
 				name: this.__desktop_name
 			},
 			load: function(data, ioArgs){
@@ -78,7 +80,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 			sync: sync,
 			content: {
 				name: this.__desktop_name,
-				appname: desktop.app.currentApp
+				appname: this.__desktop_owner
 			},
 			load: function(data, ioArgs){
 				d.callback(data.exists);
@@ -103,7 +105,7 @@ dojo.declare("desktop.Registry", dojo.data.ItemFileWriteStore, {
 			backend: "api.registry.stream.delete",
 			content: {
 				name: this.__desktop_name,
-				appname: desktop.app.currentApp
+				appname: this.__desktop_owner
 			},
 			load: function(data, ioArgs){
 				d[data == "0" ? "callback" : "errback"]();
