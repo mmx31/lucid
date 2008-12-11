@@ -76,7 +76,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 	//	minimized: Boolean
 	//		Whether or not the window is minimized
 	minimized: false,
-	//	allwaysOnTop: boolean
+	//	alwaysOnTop: boolean
 	//		Whether or not the window is to always stay on top of other windows
 	alwaysOnTop: false,	 	 	 
 	//	height: String
@@ -91,9 +91,6 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 	//	resizable: Boolean
 	//		Weather or not the window is resizable.
 	resizable: true,
-    //  alwaysOnTop: Boolean
-    //      Weather or not the window stays on top of all the other windows.
-    alwaysOnTop: false,
 	//	pos: Object
 	//		Internal variable used by the window maximizer
 	pos: {top: 0, left: 0, width: 0, height: 0},
@@ -524,7 +521,6 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		//		true if it had to be raised
 		//		false if it was already on top
 		var maxZindex = 11;
-		var alwaysOnTopNum = 0;		// Number of wins with 'alwaysOnTop' property set to true
 		var topWins = [];	// Array of reffernces to win widgets with 'alwaysOnTop' property set to true
 		var winWidget;			// Reffernce to window widget by dom node
 		dojo.forEach(this.getParent().getChildren(), function(wid){
@@ -534,9 +530,8 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			if(zindex > maxZindex && zindex != "auto"){
 				maxZindex = zindex;
 			}
-			if (wid.alwaysOnTop == true){
-				alwaysOnTopNum++;
-				topWins.push(winWidget);
+			if(wid.alwaysOnTop){
+				topWins.push(wid);
 			}
 		});
 		var zindex = dojo.style(this.domNode, "zIndex");
@@ -545,7 +540,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			maxZindex++;
 			dojo.style(this.domNode, "zIndex", maxZindex);
 			// Check for win widgets with 'alwaysOnTop' property set to true
-			if ( topWins.length > 0 ){
+			if(topWins.length > 0){
 				dojo.forEach(topWins, function(win){
 					maxZindex++;
 					dojo.style(win.domNode, "zIndex", maxZindex);
