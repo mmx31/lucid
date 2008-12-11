@@ -208,7 +208,6 @@ dojo.require("dojox.uuid.generateTimeBasedUuid");
             throw Error("Constructor id conflict, possible security intrusion");
         }
         idsForOwners[id] = getCurrentApp();
-        console.info(obj)
     }
 
     var registerSystemFunc = function(module, context, funcname){
