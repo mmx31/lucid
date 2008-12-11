@@ -97,7 +97,10 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 	//	pos: Object
 	//		Internal variable used by the window maximizer
 	pos: {top: 0, left: 0, width: 0, height: 0},
-	//	_minimizeAnim: Boolean
+	//  minPos: Object
+    //      Same as pos, but when the window is minimized
+    minPos: {top: 0, left: 0, width: 0, height: 0},
+    //	_minimizeAnim: Boolean
 	//		Set to true when the window is in the middle of a minimize animation.
 	//		This is to prevent a bug where the size is captured mid-animation and restores weird.
 	_minimizeAnim: false,
@@ -125,9 +128,9 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		});
 		
 		if(dojo.isIE){
-			this.connect(this.domNode,'onresize',"_onResize");
+			dojo.connect(this.domNode,'onresize',this,"_onResize");
 		}
-		this.connect(window,'onresize',"_onResize");
+		dojo.connect(window,'onresize', this, "_onResize");
 		dojo.style(this.domNode, "position", "absolute"); //override /all/ css values for this one
         this.pos = {top: 0, left: 0, width: 0, height: 0};
         this._makeMenu();
@@ -323,11 +326,11 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			this._minimizeAnim = true;
 			if(desktop.config.fx < 3) this._toggleBody(false);
 			var pos = dojo.coords(this.domNode, true);
-			this.pos.left = pos.x;
-			this.pos.top = pos.y;
+			this.minPos.left = pos.x;
+			this.minPos.top = pos.y;
 			var win = this.domNode;
-			this.pos.width = dojo.style(win, "width");
-			this.pos.height = dojo.style(win, "height");
+			this.minPos.width = dojo.style(win, "width");
+			this.minPos.height = dojo.style(win, "height");
 			var taskbar = dijit.byNode(dojo.query(".desktopTaskbarApplet")[0].parentNode);
 			if(taskbar) var pos = dojo.coords(taskbar._buttons[this.id], true);
 			else var pos = {x: 0, y: 0, w: 0, h: 0};
@@ -368,15 +371,20 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		{
 			this._minimizeAnim = true;
 			if(desktop.config.fx < 3) this._toggleBody(false);
+            
+            var taskbar = dijit.byNode(dojo.query(".desktopTaskbarApplet")[0].parentNode);
+			if(taskbar) var startpos = dojo.coords(taskbar._buttons[this.id], true);
+			else var startpos = {x: 0, y: 0, w: 0, h: 0};
+
 			var anim = dojo.animateProperty({
 				node: this.domNode,
 				duration: desktop.config.window.animSpeed,
 				properties: {
 					opacity: {end: 100},
-					top: {end: this.pos.top},
-					left: {end: this.pos.left},
-					height: {end: this.pos.height},
-					width: {end: this.pos.width}
+					top: {start: startpos.y, end: this.minPos.top},
+					left: {start: startpos.x, end: this.minPos.left},
+					height: {start: startpos.h, end: this.minPos.height},
+					width: {start: startpos.w, end: this.minPos.width}
 				},
 				easing: dojox.fx.easing.easeOut
 			});
@@ -627,8 +635,8 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		else if(this.maximized && this.minimized){
 			var max = desktop.ui._area.getBox();
 			var v = dijit.getViewport();
-			this.pos.width = v.w - max.L - max.R;
-			this.pos.height = v.h - max.T - max.B;
+			this.minPos.width = v.w - max.L - max.R;
+			this.minPos.height = v.h - max.T - max.B;
 		}
 		this.resize();
 	},
