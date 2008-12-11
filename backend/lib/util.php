@@ -100,6 +100,9 @@ foreach($omit_backends as $tbackend){
         $omit = true;
     }
 }
+if(array_key_exists('installing', $GLOBALS)){
+    $omit=true;
+}
 if(!$omit){
     if($_SESSION['token'] != $_POST['DESKTOP_TOKEN']){
         internal_error("token_mismatch", "CSRF token didn't match");
