@@ -116,18 +116,18 @@
 		$writebuffer .= "\t\t\"public\" => " . ($conf_public == "true" ? "true" : "false") . ",\n";
 		$writebuffer .= "\t\t\"crosstalkThrottle\" => " . ($conf_throttle == "true" ? "true" : "false") . "\n";
 		$writebuffer .= "\t);\n";
-		if (is_writable("../backend/configuration.php")) {
+		if (is_writable("../backend/")) {
 	        $handle = fopen("../backend/configuration.php", 'w');
 	        fwrite($handle, $writebuffer);
 	        fclose($handle);
-			$out->append("Saving new configuration...", "...done");
+			$out->append("Saving configuration...", "...done");
 		}
 		else {
-			$out->append("Saving new configuration...", "...fail");
+			$out->append("Saving configuration...", "...fail");
 			die();
 		}
 		require("../backend/configuration.php");
-		$out->append("Reloading configuration...", "...done");
+		$out->append("Loading configuration...", "...done");
 		$dir = opendir("../backend/models");
 		while(($file = readdir($dir)) !== false){
 			if($file{0} == '.' || $file == "base.php"){
@@ -167,7 +167,7 @@
 	if($act == "checkpermissions")
 	{
 		$dirs = array(
-			"../backend/configuration.php",
+			"../backend/",
 			"../files/",
 			"../public/",
 			"../tmp/",
