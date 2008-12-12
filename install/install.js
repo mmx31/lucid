@@ -39,7 +39,8 @@ install = new function() {
 		   page.title == "Installation Type" ||
 		   page.title == "Database" ||
 		   page.title == "Admin Setup" ||
-		   page.title == "Installing")
+		   page.title == "Installing" ||
+		   page.title == "Pre-Install" )
 		{
 			dijit.byId("next").setDisabled(true);
 		}
@@ -53,6 +54,9 @@ install = new function() {
 		}
 		if(page.title == "Admin Setup") {
 			install.checkAdmin();
+		}
+		if(page.title == "Pre-Install") {
+			install.checkEnvironment();
 		}
 	}
 	this.checkAdmin = function() {
@@ -149,6 +153,38 @@ install = new function() {
 			});
 		}
 	}
+	this.checkEnvironment = function()
+	{
+		if (install.currentPage.title == "Pre-Install") {
+			dojo.xhrGet({
+				url: "./backend.php?action=checkenvironment",
+				load: function(data, args){
+					if(dojo.isString(data)) {
+						dojo.byId("configcheck").innerHTML = "<span style='color: red'>An error occurred:</span><br />"+data;
+						return;
+					}
+					var html = "<ul>";
+					var ready = true;
+					for (key in data) {
+						html += "<li>" + key.replace("../", "") + ": ";
+						if (data[key].substr(0,2) == "ok") 
+							html += "<span style='color: green'>";
+						else if(data[key].substr(0,4) == "warn")
+							html += "<span style='color: orange'>";
+						else {
+							html += "<span style='color: red'>";
+							ready = false;
+						}
+						html += data[key] + "</span></li>";
+					}
+					html += "</ul>";
+					dojo.byId("configcheck").innerHTML = html;
+					dijit.byId("next").setDisabled(!ready);
+				},
+				handleAs: "json"
+			});
+		}
+	}
 	this.onTypeRadioClick = function(e) {
 		if(!this.checked) {
 			this.setChecked(true);
@@ -164,7 +200,7 @@ install = new function() {
 			this.setChecked(true);
 			dijit.byId("next").setDisabled(false);
 			dijit.byId("next").onClick = function(e) {
-				dijit.byId("wizard").selectChild("install-page");
+				dijit.byId("wizard").selectChild("config-check");
 				this.onClick = function(e) { dijit.byId('wizard').forward(); }
 			};
 		}

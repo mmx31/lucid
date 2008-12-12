@@ -188,3 +188,11 @@
 			}
 		}
 	}
+	if($act == "checkenvironment")
+	{
+		$out = new jsonOutput();
+		if(file_exists("../backend/configuration.php"))
+			$out->append("Checking for any existing configuration...", "warn: Existing configuration found, continuing will overwrite.");
+		else
+			$out->append("Checking for any existing configuration...", "ok: None found.");
+	}
