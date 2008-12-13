@@ -91,7 +91,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			value: "custom",
 			onChange: onChange
 		});
-		cb_custom.setAttribute("checked", item.size != 0);
+		cb_custom.setAttribute("checked", item.size > 0);
 		var cb_unlimited = new dijit.form.RadioButton({
 			name: this.sysname+this.instance+"radio"+item.type,
 			value: "unlimited",
