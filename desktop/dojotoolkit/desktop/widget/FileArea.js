@@ -367,6 +367,7 @@ dojo.declare("desktop.widget.FileArea", dijit.layout._LayoutWidget, {
 		//		passes click event to the appropriate child widget
 		//		if a widget wasn't clicked on, we open our own menu
 		var w = dijit.getEnclosingWidget(e.target);
+        if(!w) return;
 		if(w.declaredClass == "desktop.widget.FileArea._Icon")
 		{
 			w.menu._contextMouse();
@@ -394,8 +395,11 @@ dojo.declare("desktop.widget.FileArea", dijit.layout._LayoutWidget, {
 		
 		//clear the area
 		dojo.forEach(this.getChildren(), function(item){
-			item.destroy();
-		});
+            if(item){
+                this.removeChild(item);
+    			item.destroy();
+            }
+		}, this);
 		//cancel the current xhr if there is one
 		if(this._lsHandle) this._lsHandle.cancel();
 		//list the path

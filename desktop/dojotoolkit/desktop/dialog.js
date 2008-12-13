@@ -381,6 +381,7 @@ desktop.dialog = {
 		dialog.addChild(details);
 		dialog.showClose = false;
 		dialog.show();
+        file.startup();
 		file.refresh();
 		dialog.startup();
         return d; // dojo.Deferred
