@@ -106,6 +106,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		this.domNode.title="";
 		this.makeDragger();
         this.shown = false;
+        this.closed = false;
 		this.sizeHandle = new dojox.layout.ResizeHandle({
 			targetContainer: this.domNode,
 			activeResize: (desktop.config.fx >= 2),
@@ -261,8 +262,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		this.title = title;
 	},
 	setTitle: function(/*String*/title){
-		if(dojo.version.major >= 1 && dojo.version.minor >= 2)
-			dojo.deprecated("window.setTitle", "setTitle is deprecated. Please use dojo.attr(\"title\", \"value\");", "1.1");
+		dojo.deprecated("desktop.widget.Window.setTitle", "setTitle is deprecated. Please use Window.attr(\"title\", \"value\");", "1.1");
 		return this._setTitleAttr(title);
 	},
 	_getPoints: function(/*Object*/box){
@@ -554,6 +554,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 	},
 	uninitialize: function(){
 		if(!this.closed) this.onClose();
+        desktop.ui._area.removeChild(this);
 		if(this._winListItem) desktop.ui._windowList.deleteItem(this._winListItem);
 		if(this._drag) this._drag.destroy();
         if(this._menu) this._menu.destroy();
@@ -589,8 +590,12 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		//hack so we don't have to deal with BorderContainer's method using this.domNode
 		var oldNode = this.domNode;
 		this.domNode = this.containerNode;
-		this.inherited(arguments);
-		this.domNode = oldNode;
+        try{
+    		this.inherited(arguments);
+        }
+        finally{
+    		this.domNode = oldNode;
+        }
 	},
 	resize: function(/*Object?*/size){
         // resize the window
@@ -610,8 +615,12 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		//hack so we don't have to deal with BorderContainer's method using this.domNode
 		var oldNode = this.domNode;
 		this.domNode = this.containerNode;
-		this.inherited(arguments);
-		this.domNode = oldNode;
+        try{
+    		this.inherited(arguments);
+        }
+        finally{
+    		this.domNode = oldNode;
+        }
 		dojo.forEach(this.getChildren(), function(wid){
             if(typeof wid != "undefined" && typeof wid.resize == "function")
                 wid.resize();
@@ -636,13 +645,5 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 			this.minPos.height = v.h - max.T - max.B;
 		}
 		this.resize();
-	},
-	startup: function(){
-		//	summary:
-		//		starts the widget up
-		if(this._started) return;
-		this.inherited(arguments);
-		//this.resize();
-		this._started = true;
 	}
 });
