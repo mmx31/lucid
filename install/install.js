@@ -179,6 +179,10 @@ install = new function() {
 					}
 					html += "</ul>";
 					dojo.byId("configcheck").innerHTML = html;
+					if(ready)
+						dojo.byId("pinstall").innerHTML = "Everything OK!<br>Everything looks okay so far, hit next to start the installation process!";
+					else
+						dojo.byId("pinstall").innerHTML = "Something is wrong!<br>Please look above and rectify the pending issues.";			
 					dijit.byId("next").setDisabled(!ready);
 				},
 				handleAs: "json"
