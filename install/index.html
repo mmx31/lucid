@@ -12,7 +12,10 @@
 	</head>
 	<body class="tundra">
 		<form dojoType="dijit.form.Form" id="form">
-			<div id="pageBar"><span id="wizardPages" dojoType="dijit.layout.StackController" containerId="wizard"></span></div>
+			<div id="pageBar">
+                <div id="pageBarOverlay"></div>
+                <div id="wizardPages" dojoType="dijit.layout.StackController" containerId="wizard"></div>
+            </div>
 			<noscript>
 				<style type="text/css">
 					#wizard, .buttons {

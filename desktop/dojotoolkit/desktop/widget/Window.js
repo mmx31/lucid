@@ -130,6 +130,8 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
 		dojo.connect(window,'onresize', this, "_onResize");
 		dojo.style(this.domNode, "position", "absolute"); //override /all/ css values for this one
         this.pos = {top: 0, left: 0, width: 0, height: 0};
+        this.minPos = {top: 0, left: 0, width: 0, height: 0};
+
         this._makeMenu();
 		this.inherited(arguments);
 	},

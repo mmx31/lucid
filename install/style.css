@@ -24,16 +24,16 @@ body {
 
 #pageBar {
 	height: 48px;
+    position: relative;
 }
-
-.dijitStackController .dijitToggleButtonChecked button {
-	background-color: white;
-	background-image: none;
+#pageBarOverlay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 20;
 }
-.dijit_a11y .dijitStackController .dijitToggleButtonChecked button {
-	border-style: dashed !important;
-}
-
 
 #wizard {
 	border: 1px solid #9b9b9b;

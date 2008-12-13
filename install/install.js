@@ -91,10 +91,6 @@ install = new function() {
 			dijit.byId(e)._clicked = install.onTypeRadioClick;
 		});
 		dijit.byId("installtype-reset")._clicked = install.onResetRadioClick;
-		dijit.byId("wizardPages").onButtonClick = function() {};
-		dojo.forEach(dijit.byId("wizardPages").getChildren(), function(button) {
-			button._clicked=function() {}
-		})
 		setTimeout(function() {dijit.byId("wizard").resize();}, 100);
 	}
 	this.checkDbInput = function() {

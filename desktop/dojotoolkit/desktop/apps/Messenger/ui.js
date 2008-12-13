@@ -192,7 +192,7 @@ dojo.extend(desktop.apps.Messenger, {
         var message = msgSpan.innerHTML.split(" ");
         var fixedMessage = [];
         dojo.forEach(message, function(word){
-            if(dojox.validate.isUrl(word))
+            if(dojox.validate.isUrl(word) && word.indexOf("://") != -1)
                 fixedMessage.push("<a href=\""+word.replace("\"", "\\\"")+"\">"+word+"</a>");
             else
                 fixedMessage.push(word);
