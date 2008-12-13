@@ -88,8 +88,9 @@
 					//rename their userdir
 					rename("../../files/" . $user->$key, "../../files/" . $val);
 				}
-				$user->$key = $val;
-				
+                if(isset($user->$key)){
+				    $user->$key = $val;
+				}
 			}
 			$user->save();
 			$out = new intOutput("ok");
