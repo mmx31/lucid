@@ -195,4 +195,12 @@
 			$out->append("Checking for any existing configuration...", "warn: Existing configuration found, continuing will overwrite.");
 		else
 			$out->append("Checking for any existing configuration...", "ok: None found.");
+		if(function_exists("ftp_connect"))
+			$out->append("Checking for FTP support...", "ok: FTP Supported");
+		else
+			$out->append("Checking for FTP support...", "warn: FTP Not Supported - FTP will not be functional");
+		if(function_exists("ssh2_connect"))
+			$out->append("Checking for SFTP support...", "ok: SFTP Supported");
+		else
+			$out->append("Checking for SFTP support...", "warn: SFTP Not Supported - SFTP will not be functional");
 	}
