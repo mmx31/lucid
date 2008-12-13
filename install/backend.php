@@ -112,7 +112,7 @@
 		$out->append("Generating encryption hash...", "...done");
 		$writebuffer  = "<?php\n";
 		$writebuffer .= "\treturn array(\n";
-		$writebuffer .= "\t\tdatabase => array(\n";
+		$writebuffer .= "\t\t'database' => array(\n";
 		$writebuffer .= "\t\t\t'adapter' => '".$db_type."',\n";
 		$writebuffer .= "\t\t\t'params' => array(\n";
 		$writebuffer .= "\t\t\t\t'host' => '".$db_host."',\n";
@@ -122,7 +122,7 @@
 		$writebuffer .= "\t\t\t),\n";
 		$writebuffer .= "\t\t\t'prefix' => ''\n";
 		$writebuffer .= "\t\t),\n";
-		$writebuffer .= "\t\tconfiguration => array(\n";
+		$writebuffer .= "\t\t'configuration'=> array(\n";
 		$writebuffer .= "\t\t\t'salt' => '".$conf_secretword."',\n";
 		$writebuffer .= "\t\t\t'public' => ".($conf_public == "true" ? "true" : "false").",\n";
 		$writebuffer .= "\t\t\t'crosstalkThrottle' => ".($conf_throttle == "true" ? "true" : "false")."\n";
@@ -199,4 +199,20 @@
 				$out->append($key, "ok");
 			}
 		}
+	}
+	if($act == "checkenvironment")
+	{
+		$out = new jsonOutput();
+		if(file_exists("../backend/configuration.php"))
+			$out->append("Checking for any existing configuration...", "warn: Existing configuration found, continuing will overwrite.");
+		else
+			$out->append("Checking for any existing configuration...", "ok: None found.");
+		if(function_exists("ftp_connect"))
+			$out->append("Checking for FTP support...", "ok: FTP Supported");
+		else
+			$out->append("Checking for FTP support...", "warn: FTP Not Supported - FTP will not be functional");
+		if(function_exists("ssh2_connect"))
+			$out->append("Checking for SFTP support...", "ok: SFTP Supported");
+		else
+			$out->append("Checking for SFTP support...", "warn: SFTP Not Supported - SFTP will not be functional");
 	}
