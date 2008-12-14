@@ -31,7 +31,6 @@ dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
 		});
 		dojo.connect(contactStore, "onSet", function(){ contactStore.save(); });
 		dojo.connect(contactStore, "onDelete", function(){ contactStore.save(); });
-        dojo.connect(contactStore, "onNew", function(){ contactStore.save(); });
 		var toolbar = new dijit.Toolbar({region: "top"});
 		
 		var newButton = new dijit.form.Button({
@@ -83,12 +82,13 @@ dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
         var store = this.contactStore;
         var nls = dojo.i18n.getLocalization("desktop.apps.Contacts", "Contacts");
         store.newItem({
-            id: (new Date()).toString(), //to prevent id collisions
+            id: (new Date()).getTime(), //to prevent id collisions
             name: nls.newContact,
             email: "",
             phone: "",
             address: ""
         });
+        store.save();
     },
     removeContact: function(e){
         this.grid.removeSelectedRows();
