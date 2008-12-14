@@ -21,30 +21,36 @@ dojo.provide("desktop.apps.Contacts.import");
         importData: function(path, onComplete, onError){
             var store = this.contactStore;
             desktop.filesystem.readFileContents(path, function(data){ 
-                var lines = (data+"\r").split("\n");
+                var lines = (data+"\r\n").split("\n");
                 var vcard = {};
+                var vcards = [];
                 var info;
                 var lastKey;
-                for(var i in lines){
-                    var line = lines[i];
-                    var re = /^([^:;]+)([^:]+:|\:)(.+)$/mg;
+                var counter = 0;
+                dojo.forEach(lines, function(line){
+                    if(line == "") return;
+                    var re = new RegExp("^([^:;]+)([^:]+:|\:)(|.|.+)$", "mg");
                     var info = re.exec(line);
                     if(!info){
                         vcard[lastKey]+= line;
-                        continue;
+                        return;
                     }
                     var key = info[1];
-                    lastKey = key;
                     var value = info[3];
-                    if(key == "BEGIN")
-                        vcard = {id: (new Date()).toString()}
-                    else if(key == "END"){
-                        console.log(vcard);
-                        store.newItem(vcard);
+                    if(key == "BEGIN"){
+                        vcard = {id: (new Date()).getTime().toString()+(counter++)}
                     }
-                    else if(keys[key])
+                    else if(key == "END"){
+                        vcards.push(vcard);
+                    }
+                    else if(keys[key]){
                         vcard[keys[key]] = value;
-                };
+                        lastKey = keys[key];
+                    }
+                });
+                console.log(vcards);
+                dojo.forEach(vcards, dojo.hitch(store, "newItem"));
+                store.save();
             }, onError);
         }
     });
