@@ -349,6 +349,7 @@
 			$this->_connect();
 			$this->_link->mgDropTable($this->_link->quoteIdentifier($this->_get_tablename()));
 			$list = array();
+            $constraints = array();
 			foreach($this as $key => $v)
 			{
 				if($key{0} != "_" && is_array($v)) {
@@ -359,6 +360,10 @@
 						$v['type'] = "text";
 					}
 					$list[$key] = $v;
+                    if(isset($v['unique']) && $v['unique']){
+                        $constraints[] = $key;
+                        unset($v['unique']);
+                    }
 				}
 			}
 			$p = $this->_link->mgCreateTable($this->_link->quoteIdentifier($this->_get_tablename()), $list);
@@ -376,5 +381,14 @@
 				)
 			));
 			$this->_link->createSequence($this->_get_tablename());
+            foreach($constraints as $row){
+                $definition = array(
+                        'unique' => true,
+                        'fields' => array(
+                            $row => array()
+                        )
+                );
+                $this->_link->createConstraint($this->_link->quoteIdentifier($this->_get_tablename()), 'unique_'.$row, $definition);
+            }
 		}
 	}
