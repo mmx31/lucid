@@ -40,6 +40,12 @@
 	padding-left: 0px;
 	position: relative;
 }
+.dj_ie6 .win-title {
+    margin-top: 0px;
+}
+.dj_ie6 .win-title-label {
+    margin-top: -14px;
+}
 .win-tr,
 .win-tl {
 	height: 29px;
@@ -74,6 +80,22 @@
 }*/
 .win > .win-bmw {
 	top: 29px;
+}
+.dj_ie6 .win-bmw {
+    top: 0px;
+    height: inherit;
+    margin-bottom: 29px;
+}
+.dj_ie6 .win-ml {
+    height: 91%;
+}
+.dj_ie6 .win-bl {
+    position: absolute;
+    bottom: 28px;
+    left: 0px;
+}
+.dj_ie6 .win-resize {
+    bottom: 28px;
 }
 /*.win-mr > .win-mc {
 	left: 10px;
