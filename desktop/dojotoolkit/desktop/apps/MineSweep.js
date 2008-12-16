@@ -33,6 +33,7 @@ dojo.declare("desktop.apps.MineSweep", desktop.apps._App, {
 			height: "230px",
 			iconClass: this.iconClass,
 			resizable: false,
+            showMaximize: false,
 			onClose: dojo.hitch(this, this.kill)
 		});
 	

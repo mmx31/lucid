@@ -12,6 +12,7 @@ dojo.declare("desktop.apps.Checkers", desktop.apps._App, {
 			width: "400px",
 			height: "400px",
 			resizable: false,
+            showMaximize: false,
 			iconClass: this.iconClass,
 			onClose: dojo.hitch(this, this.kill)
 		});
