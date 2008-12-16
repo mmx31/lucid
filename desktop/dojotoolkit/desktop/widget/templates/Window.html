@@ -7,9 +7,9 @@
 					<div dojoAttachPoint="titleNode" class="win-title-label">${title}</div>
 				</div>
 				<div class="win-buttons">
-					<div dojoattachevent="onmouseup: close" class="win-close"></div>
-					<div dojoattachevent="onmouseup: _toggleMaximize" class="win-max"></div>
-					<div dojoattachevent="onmouseup: minimize" class="win-min"></div>
+					<div dojoAttachPoint="closeNode" dojoattachevent="onmouseup: close" class="win-close"></div>
+					<div dojoAttachPoint="maxNode" dojoattachevent="onmouseup: _toggleMaximize" class="win-max"></div>
+					<div dojoAttachPoint="minNode" dojoattachevent="onmouseup: minimize" class="win-min"></div>
 				</div>
 			</div>
 		</div>

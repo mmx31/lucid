@@ -134,6 +134,21 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
         this.minPos = {top: 0, left: 0, width: 0, height: 0};
 
         this._makeMenu();
+
+        // fix close/min/max buttons
+        if(!this.showClose){
+            dojo.style(this.closeNode, "display", "none"); // overridable in the theme with !important
+            dojo.addClass(this.closeNode, "win-button-hidden");
+        }
+        if(!this.showMaximize){
+            dojo.style(this.maxNode, "display", "none");
+            dojo.addClass(this.maxNode, "win-button-hidden");
+        }
+        if(!this.showMinimize){
+            dojo.style(this.minNode, "display", "none");
+            dojo.addClass(this.minNode, "win-button-hidden");
+        }
+
 		this.inherited(arguments);
 	},
     _makeMenu: function(){
@@ -144,11 +159,13 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
         this._menuItems = {};
         menu.addChild(this._menuItems.min = new dijit.MenuItem({
             label: nls.minimize,
-            onClick: dojo.hitch(this, "minimize")
+            onClick: dojo.hitch(this, "minimize"),
+            disabled: !this.showMinimize
         }));
         menu.addChild(this._menuItems.max = new dijit.MenuItem({
             label: nls.maximize,
-            onClick: dojo.hitch(this, "maximize")
+            onClick: dojo.hitch(this, "maximize"),
+            disabled: !this.showMaximize
         }));
         menu.addChild(new dijit.MenuSeparator({}));
         menu.addChild(new dijit.CheckedMenuItem({
@@ -161,7 +178,8 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
         menu.addChild(new dijit.MenuSeparator({}));
         menu.addChild(new dijit.MenuItem({
             label: nls.close,
-            onClick: dojo.hitch(this, "close")
+            onClick: dojo.hitch(this, "close"),
+            disabled: !this.showClose
         }));
         menu.bindDomNode(this.titleNode);
         this._fixMenu();
