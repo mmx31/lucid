@@ -29,7 +29,7 @@ dojo.extend(desktop.apps.AdminPanel, {
 			dojo.forEach(items, function(item){
 				var row = document.createElement("div");
 				var title = document.createElement("b");
-				title.textContent = sys[item.type+"s"] || item.type;
+				title.innerHTML = sys[item.type+"s"] || item.type;
 				row.appendChild(title);
 				row.appendChild(document.createElement("hr"));
 				var ui = this.makeQuotaRow(item);
@@ -118,13 +118,13 @@ dojo.extend(desktop.apps.AdminPanel, {
 		var row2 = document.createElement("div");
 		row2.appendChild(cb_unlimited.domNode);
 		var unLabel = document.createElement("span");
-		unLabel.textContent = sys.unlimited;
+		unLabel.innerHTML = sys.unlimited;
 		row2.appendChild(unLabel);
 		row.appendChild(row2);
 		if(showDefault){
 			var row3 = document.createElement("div");
 			var defLabel = document.createElement("span");
-			defLabel.textContent = sys["default"];
+			defLabel.innerHTML = sys["default"];
 			row3.appendChild(cb_default.domNode);
 			row3.appendChild(defLabel);
 			row.appendChild(row3);

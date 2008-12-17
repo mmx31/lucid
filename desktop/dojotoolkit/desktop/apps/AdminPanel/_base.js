@@ -115,7 +115,7 @@ dojo.declare("desktop.apps.AdminPanel", desktop.apps._App, {
 				tr.appendChild(td);
 				var td = document.createElement("td");
 				var deny = new dijit.form.RadioButton({
-					name: item.name+this.instance+lbl(row),
+					name: item.name+this.instance+lbl(row)
 				});
 				deny.setChecked(perms[item.name] == false);
 				td.appendChild(deny.domNode);
