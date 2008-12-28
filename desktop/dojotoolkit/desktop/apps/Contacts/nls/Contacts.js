@@ -6,5 +6,6 @@
     "phone": "Phone Number",
     "address": "Address",
     "import": "Import",
-    "export": "Export"
+    "export": "Export",
+    "editContact": "Editing Contact %s"
 })

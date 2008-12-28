@@ -6,6 +6,7 @@ dojo.declare("desktop.ui.applets.Clock", desktop.ui.Applet, {
 	//		A clock applet with a drop-down calendar
 	dispName: "Clock",
 	postCreate: function(){
+        dojo.attr(this.containerNode, "aria-live", "off");
 		var calendar = new dijit._Calendar({});
 		this.button = new dijit.form.DropDownButton({
 			label: "loading...",

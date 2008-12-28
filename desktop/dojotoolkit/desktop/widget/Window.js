@@ -643,6 +643,7 @@ dojo.declare("desktop.widget.Window", [dijit.layout.BorderContainer, dijit._Temp
             if(typeof wid != "undefined" && typeof wid.resize == "function")
                 wid.resize();
         });
+        this.onResize();
 	},
 	_onResize: function(e){
 		//	summary:

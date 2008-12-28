@@ -1,0 +1,33 @@
+<form dojoAttachPoint='containerNode' dojoAttachEvent='onreset:_onReset,onsubmit:_onSubmit'>
+    <div dojoType="dijit.layout.BorderContainer" dojoAttachPoint="borderContainer" style="width: 100%; height: 100%;">
+        <div dojoType="dijit.layout.TabContainer" dojoAttachPoint="tabContainer" region="center">
+            <div dojoType="dijit.layout.ContentPane" dojoAttachPoint="contactTab" title="Contact">
+                <div>
+                    <label for="${id}_name" dojoAttachPoint="nameLabelNode">Name:</label>
+                    <input dojoType="dijit.form.TextBox" id="${id}_name" name="name" required="true" />
+                </div>
+                <div>
+                    <label for="${id}_email" dojoAttachPoint="emailLabelNode">Email:</label>
+                    <input id="${id}_email" name="email" dojoType="dijit.form.ValidationTextBox" />
+                </div>
+            </div>
+            <div dojoType="dijit.layout.ContentPane" dojoAttachPoint="addressTab" title="Address">
+                <div>
+                    <label for="${id}_street" dojoAttachPoint="streetLabelNode">Street:</label>
+                    <input dojoType="dijit.form.Textarea" id="${id}_street" name="street" style="width: 70%;" />
+                </div>
+                <div>
+                    <label for="${id}_city" dojoAttachPoint="cityLabelNode">City:</label>
+                    <input id="${id}_city" name="city" dojoType="dijit.form.ValidationTextBox" />
+                </div>
+            </div>
+    
+        </div>
+        <div dojoType="dijit.layout.ContentPane" region="bottom">
+            <div style="text-align: right; margin-top: 5px;">
+                <div dojoType="dijit.form.Button" class="dijitInline" label="Cancel" dojoAttachEvent="onClick:onCancel"></div>
+                <div dojoType="dijit.form.Button" class="dijitInline" iconClass="icon-16-actions-document-save" label="Save" dojoAttachEvent="onClick:onSubmit"></div>
+            </div>
+        </div>
+    </div>
+</form> 
