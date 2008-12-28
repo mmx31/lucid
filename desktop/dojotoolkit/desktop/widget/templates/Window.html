@@ -1,10 +1,10 @@
-<div class="win" style="display: none;" dojoattachevent="onmousedown: bringToFront">
+<div class="win" style="display: none;" dojoattachevent="onmousedown:bringToFront,onfocus:bringToFront" tabindex="0" waiState="labelledby-${id}_title" waiRole="window">
 	<div class="win-tl">
 		<div class="win-tr">
 			<div class="win-tc" dojoattachevent="onmousedown: bringToFront">
 				<div dojoattachpoint="handle" class="win-title">
 					<div class="win-icon ${iconClass}"></div>
-					<div dojoAttachPoint="titleNode" class="win-title-label">${title}</div>
+					<div dojoAttachPoint="titleNode" class="win-title-label" id="${id}_title">${title}</div>
 				</div>
 				<div class="win-buttons">
 					<div dojoAttachPoint="closeNode" dojoattachevent="onmouseup: close" class="win-close"></div>
@@ -14,10 +14,10 @@
 			</div>
 		</div>
 	</div>
-	<div class="win-bmw">
-		<div class="win-ml">
-			<div class="win-mr">
-				<div class="win-mc" style="overflow: hidden;" dojoattachpoint="containerNode"></div>
+	<div class="win-bmw" role="presentation">
+		<div class="win-ml" role="presentation">
+			<div class="win-mr" role="presentation">
+				<div class="win-mc" style="overflow: hidden;" dojoattachpoint="containerNode" waiRole=""></div>
 				<div class="win-mc" style="display: none;" dojoattachpoint="dragContainerNode"></div>
 			</div>
 		</div>

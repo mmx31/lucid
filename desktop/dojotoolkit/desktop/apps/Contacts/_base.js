@@ -68,15 +68,15 @@ dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
             region: "center",
             structure: [{
 		        cells: [[
-			        {field: "name", name: nls.name, editable: true, type: dojox.grid.cells.Cell, width: "150px"},
-	                {field: "email", name: nls.email, editable: true, type: dojox.grid.cells.Cell, width: "150px"},
-	                {field: "phone", name: nls.phone, editable: true, type: dojox.grid.cells.Cell, width: "100px"},
-	                {field: "address", name: nls.address, editable: true, type: dojox.grid.cells.Editor, editorToolbar: false, width: "auto"}
+			        {field: "name", name: nls.name, width: "auto"},
+	                {field: "email", name: nls.email, width: "150px"},
+	                {field: "phone", name: nls.phone, width: "100px"}
 		        ]]
 	        }]
         });
+        dojo.connect(grid, "onRowDblClick", this, "openContact");
         win.addChild(grid);
-        
+        grid.startup();
 	},
 	newContact: function(e){
         var store = this.contactStore;
@@ -89,6 +89,27 @@ dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
             address: ""
         });
         store.save();
+    },
+    openContact: function(e){
+        var nls = dojo.i18n.getLocalization("desktop.apps.Contacts", "Contacts");
+        var item = this.grid.getItem(e.rowIndex);
+        var form = new desktop.apps.Contacts.ContactForm({
+            item: item,
+            store: this.contactStore,
+            region: "center"
+        });
+        var win = new desktop.widget.Window({
+            width: "450px",
+            height: "350px",
+            title: nls.editContact.replace("%s", this.contactStore.getValue(item, "name"))
+        });
+        dojo.connect(form, "onCancel", win, "close");
+        dojo.connect(form, "onSubmit", win, "close");
+        dojo.connect(win, "onResize", form.borderContainer, "resize");
+        dojo.connect(win, "onResize", form.tabContainer, "resize");
+        win.addChild(form);
+        win.show();
+        this.windows.push(win);
     },
     removeContact: function(e){
         this.grid.removeSelectedRows();
