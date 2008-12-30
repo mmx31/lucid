@@ -69,9 +69,11 @@ dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
 		        cells: [[
 			        {field: "name", name: nls.name, width: "auto"},
 	                {field: "email", name: nls.email, width: "150px"},
-	                {field: "phone", name: nls.phone, width: "100px"}
+	                {field: "phone-home", name: nls.phone, width: "100px"}
 		        ]]
-	        }]
+	        }],
+            columnToggling: true,
+            columnReordering: true
         });
         dojo.connect(grid, "onRowDblClick", this, "openContact");
         win.addChild(grid);
