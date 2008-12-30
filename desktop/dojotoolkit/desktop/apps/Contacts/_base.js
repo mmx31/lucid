@@ -29,7 +29,6 @@ dojo.declare("desktop.apps.Contacts", desktop.apps._App, {
 		        items: []
 		    }
 		});
-		dojo.connect(contactStore, "onSet", function(){ contactStore.save(); });
 		dojo.connect(contactStore, "onDelete", function(){ contactStore.save(); });
 		var toolbar = new dijit.Toolbar({region: "top"});
 		

@@ -11,7 +11,11 @@ dojo.declare("desktop.apps.Contacts.ContactForm", dijit.form.Form, {
     templateString: null,
     templatePath: dojo.moduleUrl("desktop.apps.Contacts.templates", "ContactForm.html"),
     postCreate: function(){
-        
+        var values = {};
+        dojo.forEach(this.store.getAttributes(this.item), function(key){
+            values[key] = this.store.getValue(this.item, key);
+        }, this);
+        this.attr('value', values);
     },
     onSubmit: function(){
         var values = this.getValues();

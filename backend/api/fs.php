@@ -79,7 +79,7 @@ if($_GET['section'] == "io")
 {
 	if(isset($_GET['path'])) $sentpath = $_GET['path'];
 	else $sentpath = $_POST['path'];
-	$_POST['path'] = str_replace("..", "", $_POST['path']); // fix to stop hacking.
+	$sentpath = str_replace("..", "", $sentpath); // fix to stop hacking.
 	//parse url for the protocol
 	$protocolPart = explode("://", $sentpath, 2);
 	if(!isset($protocolPart[1])) { $protocol = "file"; }
@@ -89,7 +89,7 @@ if($_GET['section'] == "io")
 	$class = ucwords($protocol);
 	import("api.vfs." . $class);
 	$class .= "Fs";
-	$module = new $class($_POST['path'] ? $_POST['path'] : $_GET['path']);
+	$module = new $class(isset($_POST['path']) ? $_POST['path'] : $_GET['path']);
 	
 	if($module->_type == "server") {
 		//strip the server URL out of $sentpath
