@@ -8,18 +8,81 @@
                 </div>
                 <div>
                     <label for="${id}_email" dojoAttachPoint="emailLabelNode">Email:</label>
-                    <input id="${id}_email" name="email" dojoType="dijit.form.ValidationTextBox" />
+                    <input id="${id}_email" name="email" dojoType="dijit.form.TextBox" />
                 </div>
+                <div>
+                    <label for="${id}_phone_home" dojoAttachPoint="phoneHomeLabelNode">Home Phone:</label>
+                    <input id="${id}_phone_home" name="phone-home" dojoType="dijit.form.TextBox" />
+                </div>
+                <div>
+                    <label for="${id}_phone_work" dojoAttachPoint="phoneWorkLabelNode">Work Phone:</label>
+                    <input id="${id}_phone_work" name="phone-work" dojoType="dijit.form.TextBox" />
+                </div>
+                <div>
+                    <label for="${id}_phone_mobile" dojoAttachPoint="phoneMobileLabelNode">Mobile Phone:</label>
+                    <input id="${id}_phone_mobile" name="phone-mobile" dojoType="dijit.form.TextBox" />
+                </div>
+                <div>
+                    <label for="${id}_fax" dojoAttachPoint="faxLabelNode">Fax:</label>
+                    <input id="${id}_fax" name="fax" dojoType="dijit.form.TextBox" />
+                </div>
+
             </div>
             <div dojoType="dijit.layout.ContentPane" dojoAttachPoint="addressTab" title="Address">
+                <b dojoAttachPoint="homeLabelNode">Home</b>
+                <hr />
                 <div>
-                    <label for="${id}_street" dojoAttachPoint="streetLabelNode">Street:</label>
-                    <input dojoType="dijit.form.Textarea" id="${id}_street" name="street" style="width: 70%;" />
+                    <label for="${id}_address_home" dojoAttachPoint="addressHomeLabelNode">Address:</label>
+                    <input dojoType="dijit.form.Textarea" id="${id}_address_home" name="address-home" style="width: 70%;" />
                 </div>
                 <div>
-                    <label for="${id}_city" dojoAttachPoint="cityLabelNode">City:</label>
-                    <input id="${id}_city" name="city" dojoType="dijit.form.ValidationTextBox" />
+                    <label for="${id}_pobox_home" dojoAttachPoint="poboxHomeLabelNode">PO Box:</label>
+                    <input id="${id}_pobox_home" name="pobox-home" dojoType="dijit.form.TextBox" />
                 </div>
+                <div>
+                    <label for="${id}_city_home" dojoAttachPoint="cityHomeLabelNode">City:</label>
+                    <input id="${id}_city_home" name="city-home" dojoType="dijit.form.TextBox" />
+                </div>
+                <div>
+                    <label for="${id}_zip_home" dojoAttachPoint="zipHomeLabelNode">Zip/Postal Code:</label>
+                    <input id="${id}_zip_home" name="zip-home" dojoType="dijit.form.TextBox" />
+                </div>
+                <div>
+                    <label for="${id}_state_home" dojoAttachPoint="stateHomeLabelNode">State/Province:</label>
+                    <input id="${id}_state_home" name="state-home" dojoType="dijit.form.TextBox" />
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label for="${id}_country_home" dojoAttachPoint="countryHomeLabelNode">Country:</label>
+                    <input id="${id}_country_home" name="country-home" dojoType="dijit.form.TextBox" />
+                </div>
+
+                <b dojoAttachPoint="workLabelNode">Work</b>
+                <hr />
+                <div>
+                    <label for="${id}_address_work" dojoAttachPoint="addressWorkLabelNode">Address:</label>
+                    <input dojoType="dijit.form.Textarea" id="${id}_address_work" name="address-work" style="width: 70%;" />
+                </div>
+                <div>
+                    <label for="${id}_pobox_work" dojoAttachPoint="poboxWorkLabelNode">PO Box:</label>
+                    <input id="${id}_pobox_work" name="pobox-work" dojoType="dijit.form.TextBox" />
+                </div>
+                <div>
+                    <label for="${id}_city_work" dojoAttachPoint="cityWorkLabelNode">City:</label>
+                    <input id="${id}_city_work" name="city-work" dojoType="dijit.form.TextBox" />
+                </div>
+                <div>
+                    <label for="${id}_zip_work" dojoAttachPoint="zipWorkLabelNode">Zip/Postal Code:</label>
+                    <input id="${id}_zip_work" name="zip-work" dojoType="dijit.form.TextBox" />
+                </div>
+                <div>
+                    <label for="${id}_state_work" dojoAttachPoint="stateWorkLabelNode">State/Province:</label>
+                    <input id="${id}_state_work" name="state-work" dojoType="dijit.form.TextBox" />
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label for="${id}_country_work" dojoAttachPoint="countryWorkLabelNode">Country:</label>
+                    <input id="${id}_country_work" name="country-work" dojoType="dijit.form.TextBox" />
+                </div>
+
             </div>
     
         </div>
