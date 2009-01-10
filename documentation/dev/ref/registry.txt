@@ -1,0 +1,68 @@
+.. _dev-ref-registry:
+
+================
+desktop.Registry
+================
+
+.. module:: desktop.Registry
+    :synopsis: Use the registry to store application data
+
+Lucid's registry is basically a persistant dojo.data store that apps can use to store data. This can be used to store application settings, and other data. For example, I cold use the Registry to store contacts in a contacts application.
+
+Creating a registry
+===================
+To create a registry, we need to specify our application's name, the store's name, and any initial data we want if the store doesn't exist yet.
+
+.. code-block:: javascript
+
+   var store = new desktop.Registry({
+       name: "contacts",
+       appname: this.sysname,
+       data: {
+           identifier: "id",
+           items: [
+               {id: 0, name: "Foo Barson"},
+               {id: 1, name: "Bar Fooson"}
+               // etc.
+           ]
+       }
+   });
+
+If the store exists on the server, then it will load the data. If it doesn't, then it will use the initial data that was supplied when it was created.
+
+Reading and writing with the registry
+=====================================
+Reading and writing to a registry store works just like any other ``dojo.data`` store. See `Dojo's documentation`_. for more info on dojo.data stores.
+
+.. _Dojo's documentation: http://www.dojotoolkit.org/docs
+
+Registry operations
+===================
+
+Saving data
+-----------
+To save the data in the store, use the ``save`` method. You must save the store once you are finished adding and removing items from the store. This works the same as the ``save`` method defined in the dojo.data write api.
+
+.. code-block:: javascript
+
+    store.save();
+
+Checking if a store exists
+--------------------------
+To see if a store exists, use the ``exists`` method. It takes three arguments: the first being a callback function, the second being an error callback, and the third being a boolean. If the third argument is set to ``true``, then the request to the server is syncronous.
+
+.. code-block:: javascript
+
+    store.exists(function(e) {
+        desktop.dialog.notify(e ? "Store exists" : "Store doesn't exist");
+    });
+
+Dropping a store
+----------------
+If you want to delete the store's contents on the server, use the ``drop`` method. It takes an optional callback as the first parameter, and an optional error callback as the second argument. After the store is dropped, it will act as if it never existed.
+
+.. code-block:: javascript
+
+    store.drop(function(e) {
+       desktop.dialog.notify("dropped the store!");
+    });

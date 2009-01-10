@@ -1,0 +1,148 @@
+.. _dev-howto-translations:
+
+=================
+Translating Lucid
+=================
+
+Manual Translations
+===================
+Translating Lucid is simple. You just need to translate strings you will find
+in a few JS files located under ``nls`` directories. Here is where
+they are (in bold):
+
+- desktop/
+
+  - dojotoolkit/
+
+    - desktop/
+
+      - apps/
+
+        - Contacts/
+
+          - **nls/**
+
+            - es/ spanish translation
+            - fr/ french translation
+            - Contacts.js
+
+        - KatanaIDE/
+
+          - **nls/**
+
+            - es/ spanish translation
+            - fr/ french translation
+            - ide.js
+
+        - etc.
+
+      - **nls/**
+
+        - es/ spanish translation
+        - fr/ french translation
+        - apps.js
+        - common.js
+        - etc.
+
+      - ui/
+
+        - **nls/**
+
+          - es/ spanish translation
+          - fr/ french translation
+          - accountInfo.js
+          - appearance.js
+          - etc.
+
+      - widget/
+
+        - **nls/**
+
+          - es/ spanish translation
+          - fr/ french translation
+          - console.js
+          - filearea.js
+          - window.js
+
+Directly under the ``nls`` directories you will find the original english
+``js`` files you will need to translate.
+
+To make a new translation, you create a new folder under the corresponding ``nls/``
+folder using the two letters keyword for your language, e.g. ``es`` for
+Spanish, ``de`` for German, etc. You then need to copy the files you find under the
+``nls`` directory into your new directory,
+
+If your language is for a specific country, you can use the 2 letters language
+code for yours and add a 2 letters code for your country, e.g. en-au for 
+australian or fr-ca for french Canada. I know we should use upper-case letters
+for countries, but hey... 
+
+
+Translating an application
+--------------------------
+If you open one of these files, say ``desktop/apps/Contacts/nls/Contacts.js``
+for exemple, you'll see this
+
+.. code-block:: javascript
+
+    ({
+        "newContact": "New Contact",
+        "removeContact": "Remove Contact",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone Number",
+        "address": "Address",
+        "import": "Import",
+        "export": "Export"
+    })
+
+Your job (if you wish to accept it -- we would be forever grateful) is to
+translate the strings you see in the localization file you just copied in your
+language folder. What you'll see there are key/value pairs. You need to translate
+the right side which are the values.
+
+For example, this is the french translation, located in 
+``desktop/apps/Contacts/nls/fr/``
+
+.. code-block:: javascript
+
+    ({
+        "newContact": "Nouveau contact",
+        "removeContact": "Enlever le contact",
+        "name": "Nom",
+        "email": "Courriel",
+        "phone": "TÃ©lÃ©phone",
+        "address": "Adresse",
+        "import": "Importer",
+        "export": "Exporter"
+    })
+
+**By the way,** we strongly suggest using an UTF-8 character set. This is going
+to go a long way toward universal translations and use.
+
+The way it is used
+------------------
+Later on, the application will require its localization through the use of
+``dojo.requireLocalization``::
+
+    dojo.requireLocalization("desktop.apps.Contacts", "Contacts");
+
+And within the application, as needed::
+
+   var nls = dojo.i18n.getLocalization("desktop.apps.Contacts", "Contacts");
+
+A bit of caution
+----------------
+**Be attentive** and watch out for missing commas. These are Javascript
+objects and they are sentitive. Also, you must make sure the last line does
+**not** have a comma. In the example above, ihe line containing the
+``"export":"Export"`` doesn't have a comma. If you were to put one in, our
+beloved Internet Explorer would make a tantrum!!
+
+
+Translation editor application
+==============================
+Currently (as of 2008-12-12), there is an application being developed that will make translating an app (as well as Lucid) much easier.
+
+At the moment, it's in developement, but probably won't be released until after 1.0. The main reason behind this is because the backends are going to be rewritten in 1.1, and the editor will rely on a lot of server-side code to read the translation files.
+

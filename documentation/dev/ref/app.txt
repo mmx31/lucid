@@ -1,0 +1,56 @@
+.. _dev-ref-app:
+
+===========
+desktop.app
+===========
+
+.. module:: desktop.app
+    :synopsis: Application management
+
+The app module is what handles applications in lucid.
+
+Launching apps
+==============
+
+By system name
+--------------
+To launch apps by system name, we can use ``desktop.app.launch()``:
+
+.. code-block:: javascript
+    
+    desktop.app.launch("FileManager");
+
+We can also provide arguments for this application if we want:
+
+.. code-block:: javascript
+    
+    desktop.app.launch("FileManager", {path: "public://"});
+
+Launch an app to edit a file
+----------------------------
+The method ``desktop.app.launchHandler()`` can be used to launch an app that can be used to edit/view a file:
+
+.. code-block:: javascript
+    
+    desktop.app.launchHandler("file://foo/bar.txt", {someArg: "someValue"});
+
+If we don't specify arguments, the file's path will be passed as the only argument. If arguments *are* passed, then the file's path will be added to the provided arguments.
+
+Launch an app based on mimetype
+-------------------------------
+If we want to launch an app that can edit/view a file with a certain mimetype, then we can pass this to ``desktop.app.launchHandler()``:
+
+.. code-block:: javascript
+
+   desktop.app.launchHandler(null, {}, "text/plain");
+
+If we specify a file's path rather then ``null``, then the method won't need to request the file's mimetype from the server.
+
+Launch the web browser
+----------------------
+We can use ``launchHandler()`` to launch the installed web browser as well. We could launch the WebBrowser app directly using ``launch()``, but there's no guarantee that the app is installed, or if the user has that specified as the default web-browsing app. So, we'll use the "text/x-uri" mimetype to do this cleanly.
+
+.. code-block:: javascript
+
+   desktop.app.launchHandler(null, {url: "http://www.lucid-desktop.org/"}, "text/x-uri");
+

@@ -1,0 +1,10 @@
+.. _dev-ref-widget-filearea:
+
+=======================
+desktop.widget.Filearea
+=======================
+
+.. module:: desktop.widget.Filearea
+    :synopsis: A widget that displays files and folders in a given path
+
+The file area widget is what is used to display files and folders in a given path in a graphical way. This is what is used in the File Browser, as well as the file dialogs.

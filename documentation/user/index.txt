@@ -1,0 +1,29 @@
+.. _user-index:
+
+==================
+User Documentation
+==================
+
+Installation
+============
+
+:ref:`Installation Instructions <user-install-instructions>`
+    How to install Lucid on a webserver
+
+:ref:`Installing From Source <user-install-source>`
+    Installing Lucid from unbuilt source code
+
+:ref:`Embedding the Login Form <user-install-login-form>`
+    Add the login form to any web page, and customize it's behavior
+
+Using the Desktop
+=================
+
+:ref:`Mobile File Browser <user-mobile>`
+    Access your files from any WAP-enabled mobile device
+
+Fixing Problems
+===============
+
+:ref:`Troubleshooting <user-troubleshoot>`
+    Common problems when using Lucid

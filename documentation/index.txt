@@ -1,0 +1,11 @@
+.. _index:
+
+===================
+Lucid Documentation
+===================
+
+:ref:`For Users <user-index>`
+    Learn how to use Lucid
+
+:ref:`For Developers <dev-index>`
+    Learn how to write things for Lucid

@@ -1,0 +1,12 @@
+.. _user-install-index:
+
+===================
+Installation guides
+===================
+
+.. toctree::
+   :maxdepth: 1
+   
+    instructions
+    source
+    login-form

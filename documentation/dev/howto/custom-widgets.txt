@@ -1,0 +1,86 @@
+.. _dev-howto-custom-widgets:
+
+==============
+Custom Widgets
+==============
+Since Lucid applications are essentially dojo modules, you can include custom widgets in your app.
+
+Folder Structure
+================
+In your app, make the following directory structure:
+
+::
+
+    MyApp/
+        templates/
+            widget.html
+        _base.js
+        widget.js
+    MyApp.js
+
+Now we need to put some code in each file.
+
+MyApp.js
+--------
+
+.. code-block:: javascript
+
+   dojo.provide("desktop.apps.MyApp");
+   dojo.require("desktop.apps.MyApp._base");
+
+_base.js
+--------
+
+.. code-block:: javascript
+
+   dojo.provide("desktop.apps.MyApp._base");
+
+   dojo.declare("desktop.apps.MyApp", desktop.apps._App, {
+       init: function(args) {
+           this.win = new desktop.widget.Window({
+               title: "My App",
+               onClose: dojo.hitch(this, "kill")
+           });
+           var widget = new desktop.apps.MyApp.widget({
+               region: "center"
+           });
+           this.win.addChild(widget);
+           this.win.show();
+       },
+       kill: function() {
+           if(!this.win.closed)
+               this.win.close();
+       }
+   });
+
+   dojo.require("desktop.apps.MyApp.widget");
+
+Now that we've got our app written, we can move on to the next part.
+
+Writing the widget
+==================
+This is just like writing any other dojo widget, you're just confined to the namespace that your app lives in. This is just an example widget, you can customize your widget however you'd like.
+
+widget.js
+---------
+
+.. code-block:: javascript
+
+   dojo.provide("desktop.apps.MyApp.widget");
+   
+   dojo.declare("desktop.apps.MyApp.widget", [dijit._Widget, dijit._Templated, dijit._Contained], {
+       templatePath: dojo.moduleUrl("desktop.apps.MyApp.templates", "widget.html"),
+       doSomething: function(e){
+           this.textNode.innerHTML = "Link was clicked on "+(new Date())+"!";
+       }
+   });
+
+widget.html
+-----------
+
+.. code-block:: html
+
+   <div>
+      <div dojoAttachPoint="textNode">The link hasn't been clicked yet!</div>
+      <a href="javascript://" dojoAttachEvent="onclick:doSomething">Change text</a>
+   </div>

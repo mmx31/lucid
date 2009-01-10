@@ -1,0 +1,80 @@
+.. _dev-ref-widget-statusbar:
+
+========================
+desktop.widget.StatusBar
+========================
+
+.. module:: desktop.widget.StatusBar
+    :synopsis: A status bar widget that can be used in windows
+
+The status bar widget is a simple widget that you can use to indicate what your application is currently doing. It displays messages, and has a progress bar. It shares many of the methods and properties used in the ``dijit.ProgressBar`` widget.
+
+Creating a status bar, and adding it to a window
+================================================
+The code below will add a status bar to the bottom of the window.
+
+.. code-block:: javascript
+
+   var statusbar = this.statusbar = new desktop.widget.StatusBar({
+       region: "bottom"
+   });
+   window.addChild(statusbar);
+
+If you want to show a specific message when adding the status bar, just provide the message in the ``label`` property. By default, the label is ``"&nbsp;"``, which is displayed as a space.
+
+.. code-block:: javascript
+
+   var statusbar = this.statusbar = new desktop.widget.StatusBar({
+       label: "Loading data from server..."
+   });
+
+Changing the message
+====================
+You can change the message anywhere in the application by using the ``attr`` method to set a new value for the ``label`` attribute.
+
+.. code-block:: javascript
+
+   this.statusbar.attr("label", "Done loading data.");
+
+Displaying the progress bar
+===========================
+The status bar widget also has a progress bar that can be used to show activity. To display it, use the ``showProgress`` attribute.
+
+.. code-block:: javascript
+
+   var statusbar = this.statusbar = new desktop.widget.StatusBar({
+       showProgress: true,
+       region: "bottom"
+   });
+
+To show the progress bar after the widget has created, use the ``attr`` method to set ``showProgress`` to ``true``.
+
+.. code-block:: javascript
+
+   this.statusbar.attr("showProgress", true);
+
+To hide the progress bar, use the ``attr`` method to set ``showProgress`` to ``false``.
+
+.. code-block:: javascript
+
+   this.statusbar.attr("showProgress", false);
+
+Updating the progress bar
+=========================
+You can update the status bar by using the ``update`` method. This acts just like the ``update`` method on the ``dijit.ProgressBar`` widget.
+
+.. code-block:: javascript
+
+   this.statusbar.update({
+       progress: 0,
+       maximum: 100
+   });
+
+You can show indeterminate progress by passing the ``indeterminate`` property. Set to ``true`` to show, ``false`` to show determinate progress again.
+
+.. code-block:: javascript
+
+   this.statusbar.update({
+       indeterminate: true
+   });
+

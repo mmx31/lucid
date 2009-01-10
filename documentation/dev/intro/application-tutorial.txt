@@ -1,0 +1,275 @@
+.. _dev-intro-application-tutorial:
+
+====================
+Application Tutorial
+====================
+Application development with Lucid is very easy, and you can make full featured applications very quickly using a combination of Dojo, and it's built-in APIs.
+
+
+This tutorial will assume that you know how to use Dojo's widget system. If you don't, it is suggested you take a look at `Dojo's documentation`_. before we begin.
+
+.. _Dojo's documentation: http://dojotoolkit.org/docs
+
+You can use Katana IDE to write your application, or you may use your favorite text editor. If you use a text editor, you have to create the app in the IDE first, and then open ``/desktop/dojotoolkit/desktop/apps/YourApp.js`` in the text editor.
+
+
+In this tutorial, we will be writing a simple contact manager app. You will see how easy it is to make such a useful application. From the IDE, click on the 'New' button, and enter in 'MyContacts' as the System name, and 'My Contacts' as the displayed name. System names cannot contain spaces, should start with a letter, and should be camel-cased. Displayed names, however, can contain anything. The IDE will then create your application, and give you the skeleton below.
+
+.. code-block:: javascript
+
+    dojo.provide("desktop.apps.MyContacts");
+    
+    dojo.declare("desktop.apps.MyContacts", desktop.apps._App, {
+        init: function(args) {
+            /*Startup code goes here*/
+        }
+        kill: function(args) {
+	    /*Cleanup code goes here*/
+        }
+    });
+
+If you're familiar with Dojo, you'll see that each app is essentially a class in the destkop.apps namespace. In other words, Lucid applications are really Dojo modules. Each app extends a base ``_App`` class, which provides some basic self-management functionality.
+
+Let's examine this. We have two functions, ``init`` and ``kill``. ``init`` is called when the application is launched, and ``kill`` is called when the application shuts down. Simple, right?
+
+Creating Windows
+================
+Now let's create a window. The ``desktop.widget.Window`` widget provides us with all the windows in the desktop. We'll add the following code to our init function:
+
+.. code-block:: javascript
+
+    this.windows = [];
+    var win = new desktop.widget.Window({
+        title: "My Contacts",
+        onClose: dojo.hitch(this, "kill")
+    });
+    this.windows.push(win);
+    win.show();
+
+Now when you launch the app, it will show an empty window. Notice the onClose event. This is very important, because the base ``_App`` class uses ``dojo.connect`` to know when the app is being closed. After a small delay, it removes itself from the process table.
+
+In the event that your application is killed from the task manager, your app must remove all open windows. This is where that ``this.windows`` array we made before comes into play. In your ``kill`` function, add the following code:
+
+.. code-block:: javascript
+
+    dojo.forEach(this.windows, function(win) {
+        if(!win.closed)
+            win.close();
+    });
+
+This will close any open windows in the ``this.windows`` array. As our app uses more windows, we can append those onto this array.
+
+Using the Registry
+==================
+
+Before we make our UI, we should make a ``Registry`` store to save our contacts in. Add this to the end of the ``init`` function, but before you call ``win.show()``:
+
+.. code-block:: javascript
+
+    var contactStore = this.contactStore = new desktop.Registry({
+        name: "contacts",
+        appname: this.sysname,
+        data: {
+            identifier: "id",
+            items: []
+        }
+    });
+    dojo.connect(contactStore, "onNew", function() { contactStore.save(); });
+    dojo.connect(contactStore, "onDelete", function() { contactStore.save(); });
+    dojo.connect(contactStore, "onSet", function() { contactStore.save(); });
+
+If you're experienced with Dojo, you'll notice that ``desktop.Registry`` is a ``dojo.data`` store. This store is unique, because it can store all of it's information on the server. The name of the store is a unique name, specific to your app. Two stores should never have the same name, so make sure you're descriptive when choosing the name of the store. We provide the store with our system name (contained in ``this.sysname``), so that one app won't override the contents of another app's store. You'll also notice that the store is saved every time it's data changes. You'll see the store in action later in the tutorial.
+
+Writing the UI
+==============
+
+Making a Toolbar
+----------------
+Now that we have our store defined, we can begin to piece together our UI. We'll start by adding some ``dojo.require`` calls to the top of our app, right underneath our ``dojo.declare`` statement.
+
+.. code-block:: javascript
+
+    dojo.require("dijit.Toolbar");
+    dojo.require("dojox.grid.DataGrid");
+    dojo.require("dojox.grid.cells.dijit");
+    dojo.require("dijit.form.TextBox");
+    dojo.require("dijit.form.Button");
+    desktop.addDojoCss("dojox/grid/resources/Grid.css");
+
+This will load the widgets from the server when our app is loaded. Also note that we included a CSS file. This is because the ``dojox`` widgets are not included in the base stylesheet that Lucid uses, so we have to load them when we load the app.
+
+Now that we have loaded our widgets, we can start drawing our UI. ``desktop.widget.Window`` is a subclassed ``BorderContainer``, so you add a ``region`` property to position the element. It can be either "top", "bottom", "leading", "trailing", "left", "right", or "center". Add the following code to your ``init`` function, just before you call ``win.show()``:
+
+.. code-block:: javascript
+
+    var toolbar = new dijit.Toolbar({region: "top"});
+    
+    var newButton = new dijit.form.Button({
+        label: "New Contact",
+        iconClass: "icon-16-actions-contact-new",
+        onClick: dojo.hitch(this, "newContact")
+    });
+    toolbar.addChild(newButton);
+    
+    var removeButton = new dijit.form.Button({
+        label: "Remove Contact",
+        iconClass: "icon-16-actions-edit-delete",
+        onClick: dojo.hitch(this, "removeContact")
+    });
+    toolbar.addChild(removeButton);
+    
+    win.addChild(toolbar);
+
+We also need to add the methods we referenced for the toolbar to the app. Add this before the ``kill`` method in your app declaration:
+
+.. code-block:: javascript
+
+    newContact: function(e){
+        
+    },
+    removeContact: function(e){
+        
+    },
+
+Adding a Grid
+-------------
+So, now we have a toolbar added to our window. Let's make a ``dojox.grid.DataGrid`` to display the contacts. Since Dojo's grid has editing functionality, we don't need an 'Edit Contact' dialog. Add the following code after the ``win.show()`` call:
+
+.. code-block:: javascript
+
+    var grid = this.grid = new dojox.grid.DataGrid({
+        store: contactStore,
+        region: "center",
+        structure: [{
+            cells: [[
+                {field: "name", name: "Name", editable: true, type: dojox.grid.cells.Cell, width: "150px"},
+                {field: "email", name: "Email", editable: true, type: dojox.grid.cells.Cell, width: "150px"},
+                {field: "phone", name: "Phone Number", editable: true, type: dojox.grid.cells.Cell, width: "100px"},
+                {field: "address", name: "Address", editable: true, type: dojox.grid.cells.Editor, editorToolbar: false, width: "auto"}
+            ]]
+        }]
+    });
+    win.addChild(grid);
+
+Working with the Registry
+=========================
+Now that we have our grid, we can now define the methods that add and remove contacts to our store. Remember, ``desktop.Registry`` is a ``dojo.data`` store. When we made the store, we set it up so that it will save it's contents whenever a field is changed, so we don't have to worry about saving the store when we close the application.
+
+Add the following code to your new/removeContact methods:
+
+.. code-block:: javascript
+
+    newContact: function(e){
+        var store = this.contactStore;
+        store.newItem({
+            id: (new Date()).toString(), //to prevent id collisions
+            name: "New Contact",
+            email: "",
+            phone: "",
+            address: ""
+        });
+    },
+    removeContact: function(e){
+        this.grid.removeSelectedRows();
+    },
+
+Final Product
+=============
+You should now be able to add and remove contacts from the grid:
+
+.. image:: _images/screenshot.png
+   :alt: Finished contacts application window
+
+To edit a field, double-click on the cell and input some text. To save it, click on a different cell.
+
+Here's the full application's code:
+
+.. code-block:: javascript
+
+    dojo.provide("desktop.apps.MyContacts");
+    dojo.require("dijit.Toolbar");
+    dojo.require("dojox.grid.DataGrid");
+    dojo.require("dojox.grid.cells.dijit");
+    dojo.require("dijit.form.TextBox");
+    dojo.require("dijit.form.Button");
+    desktop.addDojoCss("dojox/grid/resources/Grid.css");
+
+    dojo.declare("desktop.apps.MyContacts", desktop.apps._App, {
+        init: function(args) {
+            this.windows = [];
+            var win = new desktop.widget.Window({
+                title: "My Contacts",
+                onClose: dojo.hitch(this, "kill")
+            });
+            this.windows.push(win);
+        
+            var contactStore = this.contactStore = new desktop.Registry({
+                name: "contacts",
+                appname: this.sysname,
+                data: {
+                    identifier: "id",
+                    items: []
+                }
+            });
+            dojo.connect(contactStore, "onSet", function() { contactStore.save(); });
+        
+            var toolbar = new dijit.Toolbar({region: "top"});
+        
+            var newButton = new dijit.form.Button({
+                label: "New Contact",
+                iconClass: "icon-16-actions-contact-new",
+                onClick: dojo.hitch(this, "newContact")
+            });
+            toolbar.addChild(newButton);
+        
+            var removeButton = new dijit.form.Button({
+                label: "Remove Contact",
+                iconClass: "icon-16-actions-edit-delete",
+                onClick: dojo.hitch(this, "removeContact")
+            });
+            toolbar.addChild(removeButton);
+
+            win.addChild(toolbar);
+        
+            win.show();
+        
+            var grid = this.grid = new dojox.grid.DataGrid({
+                store: contactStore,
+                region: "center",
+                structure: [{
+                    cells: [[
+                        {field: "name", name: "Name", editable: true, type: dojox.grid.cells.Cell, width: "150px"},
+                        {field: "email", name: "Email", editable: true, type: dojox.grid.cells.Cell, width: "150px"},
+                        {field: "phone", name: "Phone Number", editable: true, type: dojox.grid.cells.Cell, width: "100px"},
+                        {field: "address", name: "Address", editable: true, type: dojox.grid.cells.Editor, editorToolbar: false, width: "auto"}
+                    ]]
+                }]
+            });
+            win.addChild(grid);
+        
+            },
+            newContact: function(e){
+            var store = this.contactStore;
+            store.newItem({
+                id: (new Date()).toString(), //to prevent id collisions
+                name: "New Contact",
+                email: "",
+                phone: "",
+                address: ""
+            });
+        },
+        removeContact: function(e){
+            this.grid.removeSelectedRows();
+        },
+        kill: function(args) {
+            dojo.forEach(this.windows, function(win) {
+                if(!win.closed)
+                    win.close();
+            });
+        }
+    });
+
+Summary
+=======
+As you can see, we can make useful applications with minimal effort in Lucid. In just 80 lines of code, we wrote a decent contact manager. With Lucid's rich set of APIs, and Dojo's excelent widget system, application development is almost too easy!
+

@@ -1,0 +1,22 @@
+.. _user-mobile:
+
+===================
+Mobile File Browser
+===================
+Lucid's mobile file browser is a WAP site that allows you to access your files from mobile devices. This includes cell phones, PDAs, and other devices.
+
+Accessing the Mobile Frontend
+=============================
+To access the mobile frontend, navigate to the ``mobile/`` directory of your Lucid installation from your device's web browser. You will then see a login form. Enter in your username and password to continue.
+
+Browsing files
+==============
+Once you log in, you'll be presented with your ``file://`` directory. At the top, you will see your current path. Follow the link of a folder to go back up to that directory. In the middle of the page, you will see the current folder's contents. If you select the link of a folder, you will be shown that folder's contents. If you select the link of a file, that file will be downloaded to your device, or displayed by your phone's browser, depending on the file type.
+
+Managing files
+==============
+You can't move, copy, or delete files from your device yet, however, you can create directories and upload files. The forms for these actions are on the bottom of the page.
+
+Logging out
+===========
+Scroll all the way down, and click on the 'Log Out' link to end your session.

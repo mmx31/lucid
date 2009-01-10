@@ -1,0 +1,102 @@
+.. _dev-howto-packages:
+
+=========
+Packaging
+=========
+Lucid has a package system that you can use to distribute modifications, applications, themes, and other things.
+
+Anatomy of a package
+====================
+Packages for Lucid are zip files that contain a ``meta.json`` file. They end in ``.lucid.zip``. The ``meta.json`` file contains information about the package. It contains `JSON`_. encoded data. Here's an example:
+
+.. _JSON: http://www.json.org/
+
+.. code-block:: javascript
+
+   {
+       "key": "value",
+       "key2": ["value1", "value2", "value3"],
+       "key3": [],
+       "key4": "value4"
+   }
+
+Common parameters
+-----------------
+All package share these parameters.
+
+``type``
+    The type of package. Must be ``application``, ``update``, or ``theme``.
+
+``author``
+    The author of the contents of this package.
+
+``email``
+    The author's email address.
+
+``version``
+    The version of this package.
+
+``maturity``
+    The package's maturity. Can be ``alpha``, ``beta``, ``rc`` or ``stable``.
+
+``compatible``
+    The versions that this package is compatible with. This parameter is an array. For example, if I wanted to say that my package was only compatible with version 1.0 of Lucid, I would pass ``["1.0.0"]``. However, if I wanted to specify that it would be compatible with both 1.0 and 1.1, I would pass ``["1.0.0", "1.1.0"]``.
+
+Application Packages
+====================
+Application packages have the following directory structure::
+   
+   <sysname>/
+      (any additional files)
+   <sysname>.js
+   <sysname>.js.uncompressed.js (optional)
+   meta.json
+
+They have the following key-value pairs for the ``meta.json`` file:
+
+``sysname``
+    This is the system name of your application. This cannot contain any spaces, must start with a letter, and should be camel-cased. This must be the same as the names of the files in the package (see above).
+	
+``name``
+    This is the displayed name of your application.
+
+``category``
+    The category of the application. Must be either ``Accessories``, ``Development``, ``Games``, ``Graphics``, ``Internet``, ``Multimedia``, ``Office``, ``System``, ``Administration``, or ``Preferences``. Casing does matter.
+
+``icon`` *(optional)*
+    The icon of the application. Either an icon class, such as ``icon-16-apps-accessories-calculator``, or a icon file, such as ``calculator.png``. Should be 16x16 pixels large. The icon should be placed in the application's directory (not the root of the archive).
+
+``filetypes``
+    The filetypes that the application can handle. This parameter is an array, where each part of the array is a mimetype. For example, if I had an HTML editor, I would specify ``["text/html"]``.
+
+``permissions``
+    An array with the permissions required for this app. This does not prevent the app from being launched, but just prevents it from showing up on the menu in the case that the user is lacking the permissions. Example: ``["core.administration"]``.
+
+Theme Packages
+==============
+Theme packages have the following directory structure::
+   
+   <name>/
+      (Theme files go in here)
+   meta.json
+
+The ``meta.json`` file takes the following parameters:
+
+``name``
+    The name of the theme. Must be the same as the folder in the package (see above).
+
+``preview``
+    A file in the theme's directory that is a thumbnail of the theme's screenshot. This is **not** a full-sized screenshot.
+
+``wallpaper`` *(optional)*
+    A file in the theme's directory that can be used as wallpaper.
+
+Update Packages
+===============
+Updates have the following directory structure::
+   
+   root/
+      <contents of update>
+   update.php
+
+``update.php`` is run after the package is installed. This script needs to detect the current version of Lucid and update it accordingly. It can detect the version from the ``version.json`` file in ``/desktop/dojotoolkit/desktop/resources/``. Once the script has been run, the updater copies the files within ``root`` to the root folder of the installation.

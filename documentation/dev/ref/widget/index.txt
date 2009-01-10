@@ -1,0 +1,13 @@
+.. _dev-ref-widget-index:
+
+================
+Widget Reference
+================
+
+.. toctree::
+   :maxdepth: 1
+
+   statusbar
+   window
+   console
+   filearea
