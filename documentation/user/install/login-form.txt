@@ -1,0 +1,187 @@
+.. _user-install-login-form:
+
+========================
+Embedding the Login Form
+========================
+Lucid's login form can be embedded into any web page on your site by including some scripts in the page. The form supports ARIA standards, and will work while using a screen reader.
+
+**Note:** If this page is using the Dojo javascript toolkit, or prototype, the form may not work. In this case you must use an iframe to display the form. (see below)
+
+Displaying the Form
+===================
+
+Add scripts/css to the page head
+--------------------------------
+First, add the following before the ``</head>`` tag in your page. Be sure to replace ``/path/to/lucid/`` with your installation path.
+
+.. code-block:: html
+    
+    <script src="/path/to/lucid/desktop/dojotoolkit/dojo/dojo.js" type="text/javascript"></script>
+    <link href="/path/to/lucid/desktop/dojotoolkit/dijit/themes/dijit.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+        dojo.require("desktop.login.Form");
+    </script>
+
+Place form in page
+------------------
+To place the form, add the following ``<div>`` element to anywhere in the ``<body>`` section of the page.
+
+.. code-block:: html
+    
+    <div dojoType="desktop.login.Form"></div>
+
+Make the HTML valid
+-------------------
+This step is optional. If you're concerned about your HTML validating, you can create the widget programatically. Change the second ``<script>`` tag you added so it looks like this:
+
+.. code-block:: html
+
+   <script type="text/javascript">
+       dojo.require("desktop.login.Form");
+       dojo.addOnLoad(function(){
+           var form = new desktop.login.Form({}, "desktop_login_form");
+           form.startup();
+       });
+   </script>
+
+Now change the ``<div>`` element to look like this:
+
+.. code-block:: html
+
+   <div id="desktop_login_form"></div>
+
+The page should now validate.
+
+Displaying the Form in an Iframe
+================================
+If your site uses Dojo or prototype, then it will conflict with the scripts provided by the login form. The best way to solve this is to display the login form using an ``<iframe>`` that displays a page containing the login form.
+
+Copy the following code into an HTML file, and upload it to your installation path. You can name the file anything you want, but for this example we're going to name it ``login.html``. You can also add any CSS you wish (see below for more info).
+
+.. code-block:: html
+
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+    <html>
+        <head>
+            <title>Psych Desktop - Login</title>
+            <script type="text/javascript" src="./desktop/dojotoolkit/release/dojo/dojo/dojo.js"></script>
+            <script type="text/javascript">
+                dojo.require("desktop.login.Form");
+            </script>
+            <link href="./desktop/dojotoolkit/dojo/resources/dojo.css" rel="stylesheet" type="text/css" />
+            <link href="./desktop/dojotoolkit/dijit/themes/dijit.css" rel="stylesheet" type="text/css" />
+            <link href="./desktop/dojotoolkit/dijit/themes/tundra/tundra.css" rel="stylesheet" type="text/css" />
+        </head>
+        <body class="tundra">
+            <form id="psychdesktop_login" dojoType="desktop.login.Form"></form>
+        </body>
+    </html>
+
+Once that page is saved, add this to the part of your page that you want to display the form. Be sure to replace ``/path/to/lucid/login.html`` with the path to the HTML page we made before.
+
+.. code-block:: html
+
+   <iframe src="/path/to/lucid/login.html" />
+
+You can stylize the Iframe using any CSS rules you want.
+
+Customizing
+===========
+The login form takes a few parameters that control it's behavior.
+
+Adding parameters
+-----------------
+Here is how you would add each property to the form:
+
+.. code-block:: html
+
+   <div dojoType="desktop.login.Form" parameter1="true" parameter2="value"></div>
+
+If you are using the programatic declaration of the form (the one that validates), use the following syntax. Note that boolean values don't get quotes, and the last parameter gets no comma at the end.
+
+.. code-block:: javascript
+    
+    var form = new desktop.login.Form({
+        parameter1: true,
+        parameter2: "value"
+    }, "desktop_login_form");
+
+Parameter List
+--------------
+================  ===================  ===================  =======================================================================================
+Name              Possible Values      Default Value        Description
+================  ===================  ===================  =======================================================================================
+``preload``       ``true``, ``false``  ``true``             Weather or not the form preloads the desktop once the user starts typing
+``autoRedirect``  ``true``, ``false``  ``false``            Weather or not the form redirects the user to the desktop if they are already logged in
+``focusOnLoad``   ``true``, ``false``  ``false``            Weather or not the username feild on the form is focused when the page loads 
+``label``         Any string           ``"Desktop Login"``  The label shown above the login form
+================  ===================  ===================  =======================================================================================
+
+Stylizing using CSS
+===================
+
+Using a Dijit theme
+-------------------
+Dijit, Dojo's widget library, comes with a few themes that you can use to stylize the form. You can pick one of these, and add it right after the first ``<script>`` tag. Again, be sure to replace ``/path/to/lucid/`` with your installation path.
+
+.. code-block:: html
+    
+    <link href="/path/to/lucid/desktop/dojotoolkit/dijit/themes/tundra/tundra.css" rel="stylesheet" type="text/css" />
+    <link href="/path/to/lucid/desktop/dojotoolkit/dijit/themes/soria/soria.css" rel="stylesheet" type="text/css" />
+    <link href="/path/to/lucid/desktop/dojotoolkit/dijit/themes/nihilo/nihilo.css" rel="stylesheet" type="text/css" />
+
+Also, you need to add the theme's CSS class to the ``<div>`` tag. Change 'tundra' to the name of the CSS file you put in the ``<head>`` section of the page.
+
+.. code-block:: html
+
+   <div dojoType="desktop.login.Form" class="tundra"></div>
+
+
+Writing your own CSS rules
+--------------------------
+You can styleize parts of the form using your own CSS as well. Note that any CSS class/style you assign to the ``<div>`` will be copied to the ``<form>`` tag. Here's the HTML that the form contains:
+
+.. code-block:: html
+    
+    <form>
+	    <div>
+		    <div class="desktop_message">Desktop Login</div>
+    		<div class="desktopFormError" dojoattachpoint="errorNode"/>
+	    	<div>
+		    	<span class="desktopInputLabel">Username:</span>
+			    <input type="text" name="username" class="dijit dijitReset dijitLeft desktopInput dijitTextBox" value=""/>
+    		</div>
+	    	<div>
+		    	<span class="desktopInputLabel">Password:</span>
+			    <input type="password" class="dijit dijitReset dijitLeft desktopInput dijitTextBox" value=""/>
+    		</div>
+	    	<div>
+		    	<div class="dijitReset dijitInline dijitRadio">
+                    <input type="radio" class="dijitReset dijitCheckBoxInput" name="windowAct" value="new" />
+                </div>
+                <label> New window</label>   
+    			<div class="dijitReset dijitInline dijitRadio dijitRadioChecked dijitChecked">
+                    <input type="radio" class="dijitReset dijitCheckBoxInput" name="windowAct" value="current" />
+                </div>
+	    		<label> Current window</label>
+		    </div>
+        		<span class="dijit dijitReset dijitLeft dijitInline dijitButton">
+                    <span class="dijitReset dijitRight dijitInline">
+                        <span class="dijitReset dijitInline dijitButtonNode">
+                            <button type="submit" name="submit" value="Login">
+                                <span dojoattachpoint="iconNode" class="dijitReset dijitInline">
+                                    <span class="dijitReset dijitToggleButtonIconChar">✓</span>
+                                </span>
+                                <span dojoattachpoint="containerNode" class="dijitReset dijitInline dijitButtonText">Login</span>
+                            </button>
+                        </span>
+                    </span>
+                </span>
+	    	<div>
+		    	<a href="javascript:void(0);">Register</a>
+    		</div>
+	    	<div>
+		    	<a href="javascript:void(0);">Reset Password</a>
+    		</div>
+	    </div>
+    </form>

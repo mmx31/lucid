@@ -1,0 +1,11 @@
+.. _contents:
+
+============================
+Lucid Documentation Contents
+============================
+
+.. toctree::
+    :maxdepth: 3
+
+    user/index
+    dev/index

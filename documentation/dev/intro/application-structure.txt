@@ -1,0 +1,61 @@
+.. _dev-intro-application-structure:
+
+=====================
+Application Structure
+=====================
+Applications are Dojo modules
+=============================
+Lucid applications are essentially dojo modules. They live in the ``desktop.apps`` namespace. The name of the module in this namespace is known as the application's system name, or sysname. All applications extend the ``desktop.apps._App`` class, which contains some bootstrap code and self-management functions.
+
+Metadata
+========
+Each app has metadata associated with it, which is stored in the database. This tells Lucid what category it is, which file types it can open, and other things.
+
+Application Skeleton
+====================
+TODO: provide an example app that kills itself, walk through what happens
+
+File layout
+===========
+The layout for applications consists of the following:
+
+    SysName/
+    SysName.js
+
+SysName being the sysname of your application. Depending on how complex your application is, you can take two routes when choosing a layout.
+
+Single-file applications
+------------------------
+These are good for quick applications that don't do much.
+
+TODO: provide examples, elaborate
+
+Multiple-file applications
+--------------------------
+TODO: talk about how it makes it easy to maintain, how to break it up using dojo.extend, etc.
+
+Accessing files/backends bundled with an application
+----------------------------------------------------
+You can get the path to scripts, images, audio, etc. using ``dojo.moduleUrl``:
+
+.. code-block:: javascript
+
+   var soundPath = dojo.moduleUrl("desktop.apps.SystemName", "resources/sound.mp3");
+
+
+Note that some APIs (such as the Sound API) require that you pass a string. Since moduleUrl returns an object containing a toString method, you need to pass the ``uri`` property of the object returned.
+
+.. code-block:: javascript
+    
+    soundPath = soundPath.uri;
+
+When used in conjunction with the ``desktop.xhr`` method, you can make calls to custom backends packaged with your app this way.
+
+.. code-block:: javascript
+
+   desktop.xhr({
+       url: dojo.moduleUrl("desktop.apps.SystemName", "backends/someFile.php"),
+       load: function(data){
+           console.log("Returned from backend: "+data);
+       }
+   })

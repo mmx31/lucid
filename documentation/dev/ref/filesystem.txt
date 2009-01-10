@@ -1,0 +1,176 @@
+.. _dev-ref-filesystem:
+
+==================
+desktop.filesystem
+==================
+
+.. module:: desktop.filesystem
+    :synopsis: Read and write to files
+
+Lucid's filesystem provides an easy way to read and write to the server. You can also read and write to remote servers as well.
+
+In the event that you try to connect to a remote server, and a password is required, the filesystem will automaitically show a password dialog and retry the request. This way, you don't have to bother with it in your own application.
+
+All of the methods are asyncronous, and return cancelable ``dojo.Deferred`` objects.
+
+Reading
+=======
+
+Listing a directory and fetching file information
+-------------------------------------------------
+To list a directory, use the ``listDirectory`` method:
+
+.. code-block:: javascript
+
+   desktop.filesystem.listDirectory("file://", function(files) {
+       dojo.forEach(files, function(file) {
+           console.log(file.name);
+       });
+   }, function(e) {
+       console.error("something bad happened");
+   });
+
+Each slot on the array returned contains the following structure:
+
+.. code-block:: javascript
+
+    _fileInfo: {
+        //  name: String
+        //      the name of the file
+        name: "",
+        //  type: String
+        //      the mimetype of the file ("text/directory" for directories)
+        type: "text/plain",
+        //  size: Int
+        //      the size of the file (in bytes)
+        size: 0,
+        //  modified: String
+        //      a timestamp of when the file was last modified
+        modified: "F d Y H:i:s."
+    },
+
+The ``info`` method can be used to get information about a file. It returns only one ``_fileInfo`` object, where ``listDirectory`` returns an array of ``_fileInfo`` objects.
+
+.. code-block:: javascript
+
+    desktop.filesystem.info("file://something.txt", function(info) {
+       console.log(info.name);
+    }, function(e) {
+        console.error("something bad happened");
+    });
+
+Reading file contents
+---------------------
+Use the ``readFileContents`` method to get a file's contents.
+
+.. code-block:: javascript
+
+   desktop.filesystem.readFileContents("file://something.txt", function(content) {
+       console.log("file contents: "+content);
+   }, function(e) {
+       console.error("something bad happened");
+   });
+
+Writing
+=======
+
+Creating directories
+--------------------
+Use the ``createDirectory`` method to make a new directory. If the directory already exists, then nothing will happen.
+
+.. code-block:: javascript
+
+    desktop.filesystem.createDirectory("file://folderName/", function(){
+        console.log("file created!");
+    }, function(e){
+        console.error("something bad happened");
+    });
+
+Removing files
+--------------
+Use the ``remove`` method to remove a file or directory. In the case of a directory, it will be deleted recursively.
+
+.. code-block:: javascript
+
+   desktop.filesystem.remove("file://something.txt", function(){
+       console.log("file deleted!");
+   }, function(e){
+       console.error("something bad happened");
+   });
+
+Copying files
+-------------
+To copy a file or directory, use the ``copy`` method. In the case of a directory, it will copy it recursively. The first argument is the source, and the second is the target. If the target directory does not exist, it is created. You must provide the full name of the file in the target directory.
+
+.. code-block:: javascript
+
+   desktop.filesystem.copy("file://someFile.txt", "file://someFolder/someFile.txt", function(){
+       console.log("copied file!");
+    }, function(e){
+       console.error("something bad happened");
+    });
+
+Moving/Renaming files
+---------------------
+To rename or move files or directories, use the ``move`` method. The first argument is the source, and the second is the target. If the target directory does not exist, it is created. If only a filename is specified in the target, then it will be renamed. To move the file, you must specify a full path in the target argument.
+
+.. code-block:: javascript
+
+   // example of renaming a file
+   desktop.filesystem.move("file://someDir/someFile.txt", "newName.txt", function(){
+       console.log("file renamed!");
+   }, function(e){
+       console.log("something bad happened");
+   });
+   // example of moving a file
+   desktop.filesystem.move("file://someDir/someFile.txt", "file://someFile.txt" /* You can add the onComplete and onError callbacks here as well */);
+
+Writing to files
+----------------
+To write to a file, use the ``writeFileContents`` method.
+
+.. code-block:: javascript
+
+   desktop.filesystem.writeFileContents("file://someFile.txt", "here are some\ncontents of the new file", function(){
+       console.log("file contents written!");
+   }, function(e){
+       console.error("something bad happened");
+   });
+
+Misc features
+=============
+Downloading files
+-----------------
+You can allow the user to download a file off of the filesystem using the ``download`` function.
+
+.. code-block:: javascript
+
+   desktop.filesystem.download("file://someFile.txt");
+
+If it's a directory, it will be downloaded as a zip file. You can specify the archive format with a second argument. You can also use this argument to download a file as an archive. The value provided can be either ``"zip"``, ``"gzip"``, or ``"bzip"``.
+
+.. code-block:: javascript
+
+   desktop.filesystem.download("file://someFile.txt", "gzip");
+
+Embedding files
+---------------
+You can use the ``embed`` method to get a URL that can be used to embed the file. This can be used in conjunction with an HTML element, such as ``<embed>``.
+
+.. code-block:: javascript
+
+   var path = desktop.filesystem.embed("file://someFile.txt");
+
+Quota checking
+--------------
+You can check a quota by using the ``getQuota`` method. If this is a remote filesystem, and the protocol supports it, this will return the ammount of disk space left.
+
+.. code-block:: javascript
+
+   desktop.filesystem.getQuota("file://", function(quota){
+        console.log("used: "+quota.used+" remaining: "+quota.remaining+" total: "+quota.total);
+   }, function(e){
+        console.log("something bad happened");
+   });
+
+

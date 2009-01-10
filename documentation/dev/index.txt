@@ -1,0 +1,58 @@
+.. _dev-index:
+
+=======================
+Developer Documentation
+=======================
+
+Getting Started
+===============
+:ref:`Application Tutorial <dev-intro-application-tutorial>`
+    Learn how to write applications for Lucid
+
+:ref:`Application Structure <dev-intro-application-structure>`
+    How Lucid applications are structured
+
+Reference
+=========
+
+Libraries
+---------
+:ref:`Registry <dev-ref-registry>`
+    Use the registry to store application data
+
+:ref:`Filesystem <dev-ref-filesystem>`
+    Read and write to files
+
+:ref:`Sound <dev-ref-sound>`
+    Play audio files in applications
+
+:ref:`Crosstalk <dev-ref-crosstalk>`
+    Communicate between two instances of an app, regardless of user
+
+:ref:`App <dev-ref-app>`
+    Launch other applications from your application
+
+Widgets
+-------
+:ref:`Window <dev-ref-widget-window>`
+    The standard window widget
+
+:ref:`Statusbar <dev-ref-widget-statusbar>`
+    A status bar widget that can be used in windows
+
+:ref:`Console <dev-ref-widget-console>`
+    A bash-like console widget
+
+:ref:`File Area <dev-ref-widget-filearea>`
+    A widget that displays files and folders in a given path
+
+How-to guides
+=============
+:ref:`Translations <dev-howto-translations>`
+    Learn how to translate Lucid and it's applications
+
+:ref:`Packaging <dev-howto-packages>`
+    Make packages that can be installed easily
+
+:ref:`Writing Custom Widgets <dev-howto-custom-widgets>`
+    How to bundle custom dijit widgets in your application

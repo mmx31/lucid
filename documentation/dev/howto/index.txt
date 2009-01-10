@@ -1,0 +1,12 @@
+.. _dev-howto-index:
+
+=============
+How-to guides
+=============
+
+.. toctree::
+   :maxdepth: 1
+    
+    custom-widgets
+    packages
+    translations

@@ -1,0 +1,10 @@
+.. _dev-ref-widget-console:
+
+======================
+desktop.widget.Console
+======================
+
+.. module:: desktop.widget.Console
+    :synopsis: A bash-like console widget
+
+The console widget provides a bash-like terminal that you can add to your application. The Console application uses this.

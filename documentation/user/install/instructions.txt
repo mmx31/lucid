@@ -1,0 +1,42 @@
+.. _user-install-instructions:
+
+=========================
+Installation Instructions
+=========================
+Installing Lucid is a pretty easy task. The installer will guide you most of the way, but this guide will help you get started.
+
+Server Requirements
+===================
+You may use Lucid with any web server that supports PHP5. PHP4 is unsupported, and will not work. Also, you should have some sort of database support in PHP. Lucid supports the popular database servers (mySQL, pgSQL, etc.), as well as SQLite.
+
+Upload to Webserver
+===================
+The first step to installing is to upload the files. Since Lucid is pretty big, it's reccomended that you upload the files in a compressed archive (zip, tar.gz, etc) and extract it on the server. This may not be made available by your hosting provider.
+
+You can upload your files however you wish. Most webhosts use FTP, but SCP and SFTP are options as well. If you use SCP or SFTP, the uploaded files can't be corrupted while being transferred.
+
+Open Installer
+==============
+In your web browser, go to the directory that you uploaded Lucid to, and add ``/install/`` to the end. This will load the installer, which will guide you through setting up file permissions, and the database.
+
+Delete Installer
+================
+Once you are done installing Lucid, you should remove the installer for security reasons. If you don't want to delete the directory, but prevent access to the installer, you can copy ``/files/.htaccess`` to the ``/install/`` directory. Doing this will deny all access to ``/install/`` until you remove the ``.htaccess`` file, and keep ``/install/`` on the server for backup purposes.
+
+Protect folders
+===============
+Some folders in Lucid need to be protected, to prevent access to them. Lucid has ``.htaccess`` files in these directories, however, you may need to take additional measures to protect the folders.
+
+If you're using a server other then apache/apache2, or your server isn't configured to use rules in ``.htaccess`` files, you must manually protect the ``/tmp/``, ``/public/``, and ``/files/`` folders. Consult your web server's documentation for information on how to do this.
+
+Force a secure connection
+=========================
+Since Lucid streams everything off the server, it is reccomended that you force a secure HTTP connection. This is not a required step, but it is strongly reccomended. In ``/.htaccess``, uncomment the rules in the file to force the use of an HTTPS connection. Note that your webserver must be configured to allow HTTPS connections in order to use this.
+
+Log in for the first time
+=========================
+The desktop is now ready for action. Log in with the username/password you gave in the installer, and your desktop is ready for use. You can also access the :ref:`mobile file browser <user-mobile>` from the ``/mobile/`` directory of your installation.
+
+Where to go from here
+=====================
+If you'd like to display the login form on your website, take a look at :ref:`Embedding the Login Form <user-install-login-form>`. Also, you can take a look at the :ref:`user documentation <user-index>` to learn more about the desktop.

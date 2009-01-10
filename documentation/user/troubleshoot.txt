@@ -1,0 +1,63 @@
+.. _user-troubleshoot:
+
+===============
+Troubleshooting
+===============
+
+Installer stalls at file permissions check
+==========================================
+This issue can be caused by a number of things. First off, make sure you're using PHP 5. PHP 4 is unsupported. Checking your PHP error log will help you diagnose this issue. Make sure you've uploaded all the files completely, and your webserver can read the files. Some hosts will not run PHP scripts if they are writable by the group, in that case make sure you chmod the files to 755 instead of 777.
+
+Images are missing from the desktop
+===================================
+This is usually a problem involving themes. Make sure that the theme you are using is installed, and that all the theme's files were uploaded correctly. Also, make sure that the theme is compatible with the version of Lucid that you are using.
+
+Can't modify files
+==================
+Make sure that the ``/files/`` and ``/public/`` directories (and their contents) are writable by the web server.
+
+Database related error while installing
+=======================================
+Make sure that you've specified the correct database backend, and username/password (if applicable). If you're using SQLite, make sure that both the database file and it's parent directory are writable by the webserver. If you're using a database server, make sure the user you specified has access to the database, and that the database exists.
+
+Database related error after installing
+=======================================
+Your database may require maintenence. Try repairing the database and seeing if the problem persists.
+
+Sessions are not persistent (Logs out without being told)
+=========================================================
+You need to increase the session lifetime in ``php.ini``. Either that, or your cookie may be expiring. Check your browser's cookie configuration.
+
+Problem when uploading large files
+==================================
+This is most likely caused due to your PHP configuration having a low max upload size. Change the value of ``MAX_FILE_SIZE`` in ``php.ini`` to a larger amount.
+
+Can't run a .exe file
+=====================
+Windows programs cannot be run inside of Lucid.
+
+Lucid is really slow/looks ugly in a certain browser. Which browsers are recommended?
+=====================================================================================
+These are the browsers we have found to work the best with Lucid:
+
+* Firefox 3+
+* Safari 3+
+* Chrome 1+
+
+Lucid won't work in a certain browser. Which browsers are supported?
+====================================================================
+Currently, Lucid supports the following:
+
+* Firefox 2+
+* Safari 3+
+* Internet Explorer 7+
+* Opera 9.02+
+
+Internet Explorer 6 is partially supported, but due to the complexity of Lucid, it is difficult to support.
+Generally, any javascript-enabled browser that has good standards support should be able to run Lucid.
+Browser support of 3rd party applications varies, see the publisher's site for more information.
+
+When I close the desktop, the login form just re-opens the desktop. Why?
+========================================================================
+This is so that if you want to set Lucid as your homepage, you don't have to bother with logging back in. If you don't want to stay logged in, simply log out. To do this, go to System > Log Out on the panel.
+

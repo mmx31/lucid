@@ -1,0 +1,91 @@
+.. _dev-ref-sound:
+
+=============
+desktop.Sound
+=============
+
+.. module:: desktop.Sound
+    :synopsis: Play audio files in applications
+
+The sound module can be used to stream audio from both the web and from the filesystem. It abstracts between flash, html5 <audio>, and <embed> to play the sounds.
+
+Creating a sound object
+=======================
+Before we can play the sound, we need to create a sound object. To start, we'll just stream an audio file that we have in our application's folder.
+
+.. code-block:: javascript
+    
+    var sound = new desktop.Sound({
+        src: dojo.moduleUrl("desktop.apps."+this.sysname, "media/sound.wav")
+    });
+
+There's some additional parameters we can pass to the sound object:
+
+loop : boolean
+    Weather or not the sound should loop (defaults to false)
+
+autoStart : boolean
+    Weather or not the sound starts once it's loaded (defaults to false)
+
+Controlling audio playback
+==========================
+We can control playback of the sound pretty easily:
+
+.. code-block:: javascript
+
+   sound.play();
+   sound.pause();
+   sound.stop();
+
+Detecting capabilities
+======================
+You can detect the sound backend's capabilities using the ``capabilities`` property:
+
+.. code-block:: javascript
+
+    // capabilities: Object
+    //     What can the current backend do/have access to?
+    capabilities: {
+        play: true,
+        pause: true,
+        stop: true,
+        duration: true,
+        position: true,
+        volume: true,
+        id3: true
+    },
+
+Position, duration, and volume
+==============================
+For position, duration, and volume, there are functions that act the same (except for duration). If you call them without argumens, the function will return it's current value. If you call them with a number as the first argument, you can set the property's value (except for duration, which cannot be set). For functions that define time, values will be in miliseconds. For volume, the number will be a floating point (1 would be full volume, 0 would be muted, 0.5 would be 50% volume).
+
+.. code-block:: javascript
+
+   var pos = sound.position();
+   var dur = sound.duration();
+   sound.position(dur/2);
+   var vol = sound.volume();
+   sound.volume(0.75);
+   console.log(pos, dur, vol);
+
+Reading ID3 information
+=======================
+If the browser is using the flash sound backend, you can read the audio file's ID3 information:
+
+.. code-block:: javascript
+
+   if(sound.capabilities.id3)
+       console.log(sound.capabilites.id3());
+
+This function's return value is the same thing you would get back in flash. See the `flash's documentation on id3 tags`_. for more info.
+
+.. _flash's documentation on id3 tags: http://livedocs.adobe.com/flash/9.0/ActionScriptLangRefV3/flash/media/ID3Info.html
+
+Cleaning up
+===========
+To stop all playback and unload the sound, you can use the ``destroy`` method:
+
+.. code-block:: javascript
+
+   sound.destroy();
+
