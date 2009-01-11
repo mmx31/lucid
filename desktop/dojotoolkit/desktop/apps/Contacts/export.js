@@ -31,17 +31,20 @@ dojo.provide("desktop.apps.Contacts.export");
                             for(var t in types){
                                 var type = types[t];
                                 //grab all the address fields, merge into one
-                                var fields = ["pobox", "address", "city", "state", "zip", "country"];
+                                var fields = ["pobox", "", "address", "city", "state", "zip", "country"];
                                 var parts = [];
-                                var labels = [];
                                 for(var i in fields){
+                                    if(fields[i] == ""){
+                                        parts.push("");
+                                        continue;
+                                    }
                                     var field = fields[i]+"-"+type;
-                                    if(store.hasAttribute(item, field)){
-                                        labels.push(type+" "+fields[i]);
+                                    if(store.hasAttribute(item, field) && store.getValue(item, field) != ""){
                                         parts.push(store.getValue(item, field));
+                                    }else{
+                                        parts.push("");
                                     }
                                 }
-                                card += "LABEL;TYPE="+type+":"+labels.join("\\n")+"\r\n";
                                 card += keys[key]+";TYPE="+type.toUpperCase()+":";
                                 card += parts.join(";");
                                 card += "\r\n";
@@ -58,8 +61,8 @@ dojo.provide("desktop.apps.Contacts.export");
                                     mobile: "MOBILE,VOICE",
                                     fax: "WORK,FAX"
                                 }
-                                if(store.hasAttribute(item, field)){
-                                    card += "TEL;TYPE="+vcardFields[type]+":"+store.getValue(item, field);
+                                if(store.hasAttribute(item, field) && store.getValue(item, field) != ""){
+                                    card += "TEL;TYPE="+vcardFields[type]+":"+store.getValue(item, field)+"\r\n";
                                 }
                             }
                        }
