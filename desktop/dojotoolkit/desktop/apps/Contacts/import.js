@@ -48,7 +48,6 @@ dojo.provide("desktop.apps.Contacts.import");
                 var lastKey;
                 var counter = 0;
                 dojo.forEach(lines, function(line){
-                    console.log(line);
                     if(line == "") return;
                     var re = new RegExp("^([^:;]+)([^:]+:|\:)(|.|.+)$", "mg");
                     var info = re.exec(line);
@@ -83,7 +82,6 @@ dojo.provide("desktop.apps.Contacts.import");
                                 if(parts[i] != "")
                                     vcard[addrKeys[i]+"-"+type] = parts[i];
                             }
-                            console.log("done");
                         }
                     }
                     else if(keys[key] == "phone"){
@@ -103,7 +101,6 @@ dojo.provide("desktop.apps.Contacts.import");
                         lastKey = keys[key];
                     }
                 });
-                console.log(vcards);
                 dojo.forEach(vcards, dojo.hitch(store, "newItem"));
                 store.save();
             }, onError);
