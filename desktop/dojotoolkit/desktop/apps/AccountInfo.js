@@ -135,7 +135,6 @@ dojo.declare("desktop.apps.AccountInfo", desktop.apps._App, {
 		});
 		
 		win.show();
-		win.startup();
 	},
 	password: function(){
 		//	summary:
