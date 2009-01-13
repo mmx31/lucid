@@ -25,8 +25,12 @@ desktop.user = {
 		//	email: String?
 		//		the email of the user.
 		email: "",
+        //  users: Array?
+        //      An array that contains objects with "id", "name", "username" and/or "email" params. Use this to fetch information in bulk.
+        users: [],
 		//	onComplete: Function
 		//		A callback function. First argument is a desktop.user._setArgs object, excluding the callback property
+        //		If the 'users' param is provided, the first argument will be an array desktop.user._setArgs, one for each object provided.
 		onComplete: function(info){},
         //  onError: Function?
         //      if there was a problem while fetching the information, this will be called
@@ -39,17 +43,32 @@ desktop.user = {
         var d = new dojo.Deferred();
         if(options.onComplete) d.addCallback(options.onComplete);
         if(options.onError) d.addErrback(options.onError);
-		if(!options.id && !options.username && !options.email){ options.id = "0"; }
+        var fixParams = function(o){
+    		if(!o.id && !o.username && !o.email){ o.id = "0"; }
+            if(o.onComplete)
+                delete o.onComplete;
+            if(o.onError)
+                delete o.onError;
+            return o;
+        }
+        var objs = [];
+        if(options.users){
+            dojo.forEach(options.users, function(user){
+                objs.push(fixParams(user));
+            });
+        }else{
+            objs = [fixParams(options)];
+        }
 		desktop.xhr({
 	        backend: "core.user.info.get",
 			content: {
-				id: options.id,
-				name: options.name,
-				email: options.email,
-				username: options.username
+				users: dojo.toJson(objs)
 			},
 	        load: function(data, ioArgs){
-	        	d.callback(data);
+                if(options.users)
+                    d.callback(data);
+                else
+                    d.callback(data[0]);
 			},
             error: dojo.hitch(d, "errback"),
             handleAs: "json"

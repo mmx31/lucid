@@ -9,34 +9,43 @@
 
 	require("../lib/includes.php");
 	import("models.user");
+    import("lib.Json.Json");
 	if($_GET['section'] == "info")
 	{
 		if ($_GET['action'] == "get") {
-            $x = null;
-            $y = null;
-			if(array_key_exists('username', $_POST)) { $x = "username"; $y = $_POST['username']; }
-			if(array_key_exists('name', $_POST)) { $x = "name"; $y = $_POST['name']; }
-			if(array_key_exists('email', $_POST)) { $x = "email"; $y = $_POST['email']; }
-			if($x && $y) $user = $User->filter($x, $y);
-			else if($_POST['id'] == "0") { $user = $User->get_current(); }
-			else { $user = $User->get($_POST['id']); }
-            if($user !== false) {
-                if(is_array($user)) {
-                    $user = $user[0];
+            function core_user_get($data){
+                global $User;
+                $x = null;
+                $y = null;
+		    	if(array_key_exists('username', $data)) { $x = "username"; $y = $data['username']; }
+			    if(array_key_exists('name', $data)) { $x = "name"; $y = $data['name']; }
+    			if(array_key_exists('email', $data)) { $x = "email"; $y = $data['email']; }
+	    		if($x && $y) $user = $User->filter($x, $y);
+		    	else if($data['id'] == "0") { $user = $User->get_current(); }
+			    else { $user = $User->get($data['id']); }
+                if($user !== false) {
+                    if(is_array($user)) {
+                        $user = $user[0];
+                    }
+                    return array(
+                        "id" => $user->id,
+                        "name" => $user->name,
+                        "username" => $user->username,
+                        "email" => $user->email,
+                        "lastauth" => $user->lastauth,
+                        "logged" => $user->logged,
+                        "exists" => true,
+                    );
+                }else{
+                    return array("exists" => false);
                 }
-			    $out = new jsonOutput();
-			    $out->append("id", $user->id);
-			    $out->append("name", $user->name);
-			    $out->append("username", $user->username);
-			    $out->append("email", $user->email);
-			    $out->append("lastauth", $user->lastauth);
-                $out->append("logged", $user->logged);
-                $out->append("exists", true);
             }
-            else {
-                $out = new jsonOutput();
-                $out->append("exists", false);
+            $info = Zend_Json::decode($_POST['users']);
+            $arr = array();
+            foreach($info as $item){
+                array_push($arr, core_user_get($item));
             }
+            $out = new JsonOutput($arr);
 		}
         if($_GET['action'] == "isAdmin") {
             $u = $User->get_current();
