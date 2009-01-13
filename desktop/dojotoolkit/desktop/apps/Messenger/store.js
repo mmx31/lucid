@@ -33,11 +33,24 @@ dojo.extend(desktop.apps.Messenger, {
         var store = this.buddyStore;
         store.fetch({
             query: {id: "*"},
-            onItem: function(item){
+            onComplete: function(items){
+                var params = [];
+                dojo.forEach(items, function(item){
+                    params.push({
+                        id: store.getValue(item, "id")
+                    });
+                }, this);
                 desktop.user.get({
-                    id: store.getValue(item, "id"),
-                    onComplete: function(info){
-                        store.setValue(item, "logged", !!parseInt(info.logged));
+                    users: params,
+                    onComplete: function(users){
+                        dojo.forEach(users, function(user){
+                            store.fetch({
+                                query: {id: user.id},
+                                onItem: function(item){
+                                    store.setValue(item, "logged", !!parseInt(user.logged));
+                                }
+                            });
+                        }, this);
                     }
                 });
             }
