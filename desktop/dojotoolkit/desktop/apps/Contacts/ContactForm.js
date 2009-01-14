@@ -23,12 +23,15 @@ dojo.declare("desktop.apps.Contacts.ContactForm", dijit.form.Form, {
         var nls = dojo.i18n.getLocalization("desktop.apps.Contacts", "Contacts");
         for(var key in this){
             if(key.indexOf("LabelNode") === -1) continue;
-            var str = key.match(/[a-z]+/);
+            var str = key.match(/[a-z]+/)[0];
+            console.log(this[key], str, nls[str]);
             if(nls[str])
-                this[key].innerHtml = nls[str]+":";
+                this[key].childNodes[0].data = nls[str]+":";
         }
         this.saveButton.attr("label", nls.save);
         this.cancelButton.attr("label", nls.cancel);
+        this.contactTab.attr("title", nls.contact);
+        this.addressTab.attr("title", nls.address);
     },
     onSubmit: function(){
         var values = this.getValues();

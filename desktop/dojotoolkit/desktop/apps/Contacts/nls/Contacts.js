@@ -1,6 +1,7 @@
 ({
     "newContact": "New Contact",
     "removeContact": "Remove Contact",
+    "contact": "Contact",
     "name": "Name",
     "email": "Email",
     "phone": "Phone Number",
@@ -17,6 +18,8 @@
     "import": "Import",
     "export": "Export",
     "editContact": "Editing Contact %s",
+    "work": "Work",
+    "home": "Home",
     "save": "Save",
     "cancel": "Cancel"
 })

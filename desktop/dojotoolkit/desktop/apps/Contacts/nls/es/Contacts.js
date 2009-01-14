@@ -1,6 +1,7 @@
 ({
     "newContact": "Nuevo Contacto",
     "removeContact": "Eliminar Contacto",
+    "contact": "Contacto",
     "name": "Nombre",
     "email": "Correo Electrónico",
     "phone": "Número de Teléfono",
@@ -17,6 +18,8 @@
     "import": "Importar",
     "export": "Exportar",
     "editContact": "Edición de Contacto %s",
+    "work": "Trabajo",
+    "home": "Casa",
     "save": "Guardar",
     "cancel": "Cancelar"
 })
