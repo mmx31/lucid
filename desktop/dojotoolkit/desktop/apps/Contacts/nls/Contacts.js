@@ -5,7 +5,18 @@
     "email": "Email",
     "phone": "Phone Number",
     "address": "Address",
+    "pobox": "PO Box",
+    "city": "City",
+    "state": "State/Province",
+    "country": "Country",
+    "zip": "Zip/Postal Code",
+    "fax": "Fax",
+    "homephone": "Home Phone",
+    "mobilephone": "Mobile Phone",
+    "workphone": "Work Phone",
     "import": "Import",
     "export": "Export",
-    "editContact": "Editing Contact %s"
+    "editContact": "Editing Contact %s",
+    "save": "Save",
+    "cancel": "Cancel"
 })

@@ -11,15 +11,15 @@
                     <input id="${id}_email" name="email" dojoType="dijit.form.TextBox" />
                 </div>
                 <div>
-                    <label for="${id}_phone_home" dojoAttachPoint="phoneHomeLabelNode">Home Phone:</label>
+                    <label for="${id}_phone_home" dojoAttachPoint="homephoneLabelNode">Home Phone:</label>
                     <input id="${id}_phone_home" name="phone-home" dojoType="dijit.form.TextBox" />
                 </div>
                 <div>
-                    <label for="${id}_phone_work" dojoAttachPoint="phoneWorkLabelNode">Work Phone:</label>
+                    <label for="${id}_phone_work" dojoAttachPoint="workphoneLabelNode">Work Phone:</label>
                     <input id="${id}_phone_work" name="phone-work" dojoType="dijit.form.TextBox" />
                 </div>
                 <div>
-                    <label for="${id}_phone_mobile" dojoAttachPoint="phoneMobileLabelNode">Mobile Phone:</label>
+                    <label for="${id}_phone_mobile" dojoAttachPoint="mobilephoneLabelNode">Mobile Phone:</label>
                     <input id="${id}_phone_mobile" name="phone-mobile" dojoType="dijit.form.TextBox" />
                 </div>
                 <div>
@@ -88,8 +88,8 @@
         </div>
         <div dojoType="dijit.layout.ContentPane" region="bottom">
             <div style="text-align: right; margin-top: 5px;">
-                <div dojoType="dijit.form.Button" class="dijitInline" label="Cancel" dojoAttachEvent="onClick:onCancel"></div>
-                <div dojoType="dijit.form.Button" class="dijitInline" iconClass="icon-16-actions-document-save" label="Save" dojoAttachEvent="onClick:onSubmit"></div>
+                <div dojoType="dijit.form.Button" dojoAttachPoint="cancelButton" class="dijitInline" label="Cancel" dojoAttachEvent="onClick:onCancel"></div>
+                <div dojoType="dijit.form.Button" dojoAttachPoint="saveButton" class="dijitInline" iconClass="icon-16-actions-document-save" label="Save" dojoAttachEvent="onClick:onSubmit"></div>
             </div>
         </div>
     </div>

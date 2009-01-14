@@ -5,6 +5,7 @@ dojo.require("dijit.form.ValidationTextBox");
 dojo.require("dijit.form.Form");
 dojo.require("dijit.layout.TabContainer");
 dojo.require("dijit.layout.ContentPane");
+dojo.requireLocalization("desktop.apps.Contacts", "Contacts");
 
 dojo.declare("desktop.apps.Contacts.ContactForm", dijit.form.Form, {
     widgetsInTemplate: true,
@@ -16,6 +17,18 @@ dojo.declare("desktop.apps.Contacts.ContactForm", dijit.form.Form, {
             values[key] = this.store.getValue(this.item, key);
         }, this);
         this.attr('value', values);
+        this.doTranslations();
+    },
+    doTranslations: function(){
+        var nls = dojo.i18n.getLocalization("desktop.apps.Contacts", "Contacts");
+        for(var key in this){
+            if(key.indexOf("LabelNode") === -1) continue;
+            var str = key.match(/[a-z]+/);
+            if(nls[str])
+                this[key].innerHtml = nls[str]+":";
+        }
+        this.saveButton.attr("label", nls.save);
+        this.cancelButton.attr("label", nls.cancel);
     },
     onSubmit: function(){
         var values = this.getValues();
