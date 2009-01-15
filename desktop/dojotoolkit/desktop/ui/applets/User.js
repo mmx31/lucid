@@ -6,10 +6,9 @@ dojo.declare("desktop.ui.applets.User", desktop.ui.Applet, {
     postCreate: function(){
         var button = new dijit.form.Button({
             label: " ",
-            onClick: dojo.hitch(desktop.apps, "launch", "AccountInfo")
+            onClick: dojo.hitch(desktop.app, "launch", "AccountInfo")
         });
-        desktop.user.get({callback: function(data){
-            console.log(data);
+        desktop.user.get({onComplete: function(data){
             button.attr("label", data.name || data.username);
         }});
         this.containerNode.appendChild(button.domNode);
